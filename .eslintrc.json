@@ -1,3 +1,24 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": [
+    "airbnb",
+    "airbnb/hooks",
+    "next/core-web-vitals",
+    "next/typescript",
+    "prettier"
+  ],
+  "rules": {
+    "import/prefer-default-export": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-uses-react": "off",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-filename-extension": [
+       "warn",
+    { "extensions": [".jsx", ".tsx"] }
+  ]
+  },
+  "env": {
+  "browser": true,
+  "es2021": true
+}
 }
