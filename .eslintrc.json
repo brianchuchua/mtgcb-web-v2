@@ -4,7 +4,8 @@
     "airbnb/hooks",
     "next/core-web-vitals",
     "next/typescript",
-    "prettier"
+    "prettier",
+    "eslint-plugin-react-compiler"
   ],
   "rules": {
     "import/prefer-default-export": "off",
@@ -12,13 +13,11 @@
     "react/jsx-uses-react": "off",
     "no-console": ["warn", { "allow": ["warn", "error"] }],
     "react/jsx-props-no-spreading": "off",
-    "react/jsx-filename-extension": [
-       "warn",
-    { "extensions": [".jsx", ".tsx"] }
-  ]
+    "react/jsx-filename-extension": ["warn", { "extensions": [".jsx", ".tsx"] }],
+    "react-compiler/react-compiler": "error"
   },
   "env": {
-  "browser": true,
-  "es2021": true
-}
+    "browser": true,
+    "es2021": true
+  }
 }
