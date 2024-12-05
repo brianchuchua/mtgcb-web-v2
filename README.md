@@ -2,13 +2,9 @@
 
 ## Now
 
-- Integrate React Compiler
-- Figure out basic routing
-- Create a basic page
-- Create a different page
-- Integrate Emotion
-- Integrate Material UI
+- Integrate Emotion and Material UI
 - Integrate Redux Toolkit
+- Integrate Cypress and Jest -- skip the darn snapshot tests, though. Those never help me.
 - Start porting over mtgcb-web to this project
 
 ## Later
