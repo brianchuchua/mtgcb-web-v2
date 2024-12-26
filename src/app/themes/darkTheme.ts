@@ -1,6 +1,7 @@
 'use client';
 
 import { createTheme } from '@mui/material/styles';
+import globalStyles from '@/app/themes/globalStyle';
 
 const darkTheme = createTheme({
   typography: {
@@ -8,6 +9,16 @@ const darkTheme = createTheme({
   },
   palette: {
     mode: 'dark',
+    background: {
+      default: '#1c2025',
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: (theme) => ({
+        ...globalStyles(theme),
+      }),
+    },
   },
 });
 
