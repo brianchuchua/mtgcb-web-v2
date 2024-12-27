@@ -1,7 +1,7 @@
 'use client';
 
 import { createTheme } from '@mui/material/styles';
-import globalStyles from '@/app/themes/globalStyle';
+import globalStyles from '@/styles/globalStyle';
 
 const darkTheme = createTheme({
   typography: {

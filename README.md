@@ -10,6 +10,7 @@
 ## Later
 
 - Clean up this README
+- Sentry integration
 
 ## UX Thoughts
 

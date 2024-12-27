@@ -3,8 +3,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
+import darkTheme from '../styles/darkTheme';
 import './globals.css';
-import darkTheme from './themes/darkTheme';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
