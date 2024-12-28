@@ -3,8 +3,9 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
-import darkTheme from '../styles/darkTheme';
 import './globals.css';
+import StoreProvider from '@/redux/StoreProvider';
+import darkTheme from '@/styles/darkTheme';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -29,9 +30,11 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={darkTheme}>
             <CssBaseline enableColorScheme />
-            header example
-            <br />
-            {children}
+            <StoreProvider>
+              header example
+              <br />
+              {children}
+            </StoreProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
