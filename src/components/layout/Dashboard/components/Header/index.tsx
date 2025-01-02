@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import { useDashboardContext } from '@/components/contexts/DashboardContext';
+import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
 const Header = () => {
   const { isOpen, setIsOpen, isMobile, sidenavWidth } = useDashboardContext();

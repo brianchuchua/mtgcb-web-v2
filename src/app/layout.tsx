@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import { ReactNode } from 'react';
 import './globals.css';
-import Dashboard from '@/components/Dashboard';
+import Dashboard from '@/components/layout/Dashboard';
 import StoreProvider from '@/redux/StoreProvider';
 import darkTheme from '@/styles/darkTheme';
 

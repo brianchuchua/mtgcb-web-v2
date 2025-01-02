@@ -1,7 +1,7 @@
 'use client';
 
-import { ReactNode, createContext, useContext, useState, useEffect } from 'react';
 import { useMediaQuery, useTheme } from '@mui/material';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 interface DashboardContextProps {
   isOpen: boolean;
@@ -20,7 +20,7 @@ interface DashboardProviderProps {
 export const DashboardProvider = ({ children, sidenavWidth = 320 }: DashboardProviderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   // Set initial drawer state based on viewport
   useEffect(() => {

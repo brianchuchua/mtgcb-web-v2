@@ -1,7 +1,7 @@
 'use client';
 
 import { styled } from '@mui/material/styles';
-import { useDashboardContext } from '@/components/contexts/DashboardContext';
+import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
 interface MainProps {
   children: React.ReactNode;

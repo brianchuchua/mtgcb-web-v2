@@ -3,7 +3,7 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { Drawer, IconButton } from '@mui/material';
 import { Theme, styled } from '@mui/material/styles';
-import { useDashboardContext } from '@/components/contexts/DashboardContext';
+import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
 // TODO: Unit test setIsOpen behavior, maybe make a handler function
 
