@@ -3,7 +3,9 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
+import { ReactNode } from 'react';
 import './globals.css';
+import Dashboard from '@/components/Dashboard';
 import StoreProvider from '@/redux/StoreProvider';
 import darkTheme from '@/styles/darkTheme';
 
@@ -22,7 +24,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -31,9 +33,7 @@ export default function RootLayout({
           <ThemeProvider theme={darkTheme}>
             <CssBaseline enableColorScheme />
             <StoreProvider>
-              header example
-              <br />
-              {children}
+              <Dashboard>{children}</Dashboard>
             </StoreProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>

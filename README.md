@@ -16,4 +16,4 @@
 
 - How to best handle filters and searching on mobile? How do other tools do it?
 - Let's make UX changes as we port components over.
-- Need a main landing page that doesn't suck.
+- Need a main landing page that doesn't suck. It needs a large call-to-action to register and show off the features of the site.
