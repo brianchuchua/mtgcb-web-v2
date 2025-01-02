@@ -11,13 +11,13 @@ import { styled } from '@mui/material/styles';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
 const Header = () => {
-  const { isOpen, setIsOpen, isMobile, sidenavWidth } = useDashboardContext();
+  const { isDesktopOpen, setDesktopOpen, sidenavWidth } = useDashboardContext();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <TopBar 
         position="fixed" 
-        isOpen={isOpen && !isMobile} 
+        isOpen={isDesktopOpen} 
         sidenavWidth={sidenavWidth}
       >
         <Toolbar>
@@ -27,7 +27,7 @@ const Header = () => {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => setDesktopOpen(!isDesktopOpen)}
           >
             <MenuIcon />
           </IconButton>
@@ -56,4 +56,7 @@ const TopBar = styled(AppBar, {
     width: `calc(100% - ${sidenavWidth}px)`,
     marginLeft: `${sidenavWidth}px`,
   }),
+  [theme.breakpoints.down('sm')]: {
+    display: 'none',
+  },
 }));

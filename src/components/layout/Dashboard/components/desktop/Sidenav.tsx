@@ -5,14 +5,11 @@ import { Drawer, IconButton } from '@mui/material';
 import { Theme, styled } from '@mui/material/styles';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
-// TODO: Unit test setIsOpen behavior, maybe make a handler function
-
-// TODO: Confirm how theme is passed in
 const Sidenav = () => {
-  const { isOpen, setIsOpen, isMobile, sidenavWidth } = useDashboardContext();
+  const { isDesktopOpen, setDesktopOpen, sidenavWidth } = useDashboardContext();
 
   return (
-    <Drawer
+    <StyledDrawer
       sx={{
         width: sidenavWidth,
         flexShrink: 0,
@@ -21,22 +18,25 @@ const Sidenav = () => {
           boxSizing: 'border-box',
         },
       }}
-      variant={isMobile ? 'temporary' : 'persistent'}
+      variant="persistent"
       anchor="left"
-      open={isOpen}
-      onClose={() => setIsOpen(false)}
+      open={isDesktopOpen}
     >
       <SidenavHeader>
-        <IconButton onClick={() => setIsOpen(!isOpen)}>
+        <IconButton onClick={() => setDesktopOpen(!isDesktopOpen)}>
           <ChevronLeftIcon />
         </IconButton>
       </SidenavHeader>
-      Drawer
-    </Drawer>
+      Drawer Content
+    </StyledDrawer>
   );
 };
 
-export default Sidenav;
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  [theme.breakpoints.down('sm')]: {
+    display: 'none',
+  },
+}));
 
 const SidenavHeader = styled('div')(({ theme }: { theme: Theme }) => ({
   display: 'flex',
@@ -45,3 +45,5 @@ const SidenavHeader = styled('div')(({ theme }: { theme: Theme }) => ({
   ...theme.mixins.toolbar,
   justifyContent: 'flex-end',
 }));
+
+export default Sidenav;
