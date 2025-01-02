@@ -10,16 +10,16 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { useDashboardContext } from '@/components/contexts/DashboardContext';
 
-interface HeaderProps {
-  sidenavWidth: number;
-}
-
-const Header: React.FC<HeaderProps> = ({ sidenavWidth }) => {
-  const { isOpen, setIsOpen } = useDashboardContext();
+const Header = () => {
+  const { isOpen, setIsOpen, isMobile, sidenavWidth } = useDashboardContext();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <TopBar position="fixed" isOpen={isOpen} sidenavWidth={sidenavWidth}>
+      <TopBar 
+        position="fixed" 
+        isOpen={isOpen && !isMobile} 
+        sidenavWidth={sidenavWidth}
+      >
         <Toolbar>
           <IconButton
             size="large"
@@ -47,16 +47,13 @@ interface TopBarProps extends AppBarProps {
   isOpen?: boolean;
   sidenavWidth: number;
 }
+
 const TopBar = styled(AppBar, {
   shouldForwardProp: (prop) => prop !== 'isOpen' && prop !== 'sidenavWidth',
-})<TopBarProps>(({ theme, sidenavWidth }) => ({
-  variants: [
-    {
-      props: ({ isOpen }) => isOpen,
-      style: {
-        width: `calc(100% - ${sidenavWidth}px)`,
-        marginLeft: `${sidenavWidth}px`,
-      },
-    },
-  ],
+})<TopBarProps>(({ theme, isOpen, sidenavWidth }) => ({
+  width: '100%',
+  ...(isOpen && {
+    width: `calc(100% - ${sidenavWidth}px)`,
+    marginLeft: `${sidenavWidth}px`,
+  }),
 }));

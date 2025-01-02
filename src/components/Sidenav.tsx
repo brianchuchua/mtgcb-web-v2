@@ -2,42 +2,37 @@
 
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { Drawer, IconButton } from '@mui/material';
-import { Theme, styled, useTheme } from '@mui/material/styles';
+import { Theme, styled } from '@mui/material/styles';
 import { useDashboardContext } from '@/components/contexts/DashboardContext';
-
-interface DrawerProps {
-  sidenavWidth: number;
-}
 
 // TODO: Unit test setIsOpen behavior, maybe make a handler function
 
 // TODO: Confirm how theme is passed in
-const Sidenav: React.FC<DrawerProps> = ({ sidenavWidth }) => {
-  const { isOpen, setIsOpen } = useDashboardContext();
+const Sidenav = () => {
+  const { isOpen, setIsOpen, isMobile, sidenavWidth } = useDashboardContext();
 
   return (
-    <>
-      <Drawer
-        sx={{
+    <Drawer
+      sx={{
+        width: sidenavWidth,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
           width: sidenavWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: sidenavWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={isOpen}
-      >
-        <SidenavHeader>
-          <IconButton onClick={() => setIsOpen(!isOpen)}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </SidenavHeader>
-        Drawer
-      </Drawer>
-    </>
+          boxSizing: 'border-box',
+        },
+      }}
+      variant={isMobile ? 'temporary' : 'persistent'}
+      anchor="left"
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+    >
+      <SidenavHeader>
+        <IconButton onClick={() => setIsOpen(!isOpen)}>
+          <ChevronLeftIcon />
+        </IconButton>
+      </SidenavHeader>
+      Drawer
+    </Drawer>
   );
 };
 
