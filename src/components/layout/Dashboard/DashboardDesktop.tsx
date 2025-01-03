@@ -22,7 +22,8 @@ export const DashboardDesktop = ({ children }: DashboardDesktopProps) => {
 };
 
 const StyledDashboardDesktop = styled(Box)(({ theme }) => ({
-  display: 'flex',
+  position: 'relative',
+  minHeight: '100vh',
   [theme.breakpoints.down('sm')]: {
     display: 'none',
   },

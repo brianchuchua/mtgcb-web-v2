@@ -10,8 +10,14 @@ interface MainProps {
 const Main = ({ children }: MainProps) => {
   const { isDesktopOpen, sidenavWidth } = useDashboardContext();
 
-  return <StyledMain open={isDesktopOpen} sidenavwidth={sidenavWidth}>{children}</StyledMain>;
+  return (
+    <StyledMain open={isDesktopOpen} sidenavwidth={sidenavWidth}>
+      {children}
+    </StyledMain>
+  );
 };
+
+export default Main;
 
 interface StyledMainProps {
   open: boolean;
@@ -22,8 +28,11 @@ const StyledMain = styled('main', {
   shouldForwardProp: (prop) => prop !== 'open' && prop !== 'sidenavwidth',
 })<StyledMainProps>(({ theme, open, sidenavwidth }) => ({
   flexGrow: 1,
-  padding: theme.spacing(3),
   marginLeft: open ? `${sidenavwidth}px` : 0,
+  paddingTop: '64px',
+  minHeight: 'calc(100vh - 64px)',
+  display: 'flex',
+  justifyContent: 'center',
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -32,5 +41,3 @@ const StyledMain = styled('main', {
     display: 'none',
   },
 }));
-
-export default Main;
