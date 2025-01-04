@@ -6,6 +6,7 @@ export const authApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
     me: builder.query<ApiResponse<UserData>, void>({
       query: () => 'auth/me',
+      providesTags: ['Auth'],
     }),
     login: builder.mutation<ApiResponse<LoginData>, LoginRequest>({
       query: (credentials) => ({
@@ -13,6 +14,7 @@ export const authApi = mtgcbApi.injectEndpoints({
         method: 'POST',
         body: credentials,
       }),
+      invalidatesTags: ['Auth'],
     }),
     logout: builder.mutation<ApiResponse<void>, void>({
       query: () => ({
@@ -20,6 +22,15 @@ export const authApi = mtgcbApi.injectEndpoints({
         method: 'POST',
         body: {},
       }),
+      invalidatesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(authApi.util.resetApiState());
+        } catch {
+          console.error('Logout failed or incomplete');
+        }
+      },
     }),
   }),
   overrideExisting: false,

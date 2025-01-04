@@ -37,21 +37,23 @@ export const AccountMenu = () => {
     router.push('/login');
   };
 
-  const menuItems = isAuthenticated ? [
-    <MenuItem key="profile" onClick={handleProfile}>
-      <Person sx={{ mr: 1 }} />
-      <Typography>Profile</Typography>
-    </MenuItem>,
-    <MenuItem key="logout" onClick={handleLogout}>
-      <Logout sx={{ mr: 1 }} />
-      <Typography>Log out</Typography>
-    </MenuItem>
-  ] : [
-    <MenuItem key="login" onClick={handleLogin}>
-      <Login sx={{ mr: 1 }} />
-      <Typography>Log in</Typography>
-    </MenuItem>
-  ];
+  const menuItems = isAuthenticated
+    ? [
+        <MenuItem key="profile" onClick={handleProfile}>
+          <Person sx={{ mr: 1 }} />
+          <Typography>Profile</Typography>
+        </MenuItem>,
+        <MenuItem key="logout" onClick={handleLogout}>
+          <Logout sx={{ mr: 1 }} />
+          <Typography>Log out</Typography>
+        </MenuItem>,
+      ]
+    : [
+        <MenuItem key="login" onClick={handleLogin}>
+          <Login sx={{ mr: 1 }} />
+          <Typography>Log in</Typography>
+        </MenuItem>,
+      ];
 
   return (
     <>

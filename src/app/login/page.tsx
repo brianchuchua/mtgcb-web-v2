@@ -26,10 +26,10 @@ export default function LoginPage() {
   const { isAuthenticated, user, isLoading } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated && user?.userId) {
+    if (!isLoading && isAuthenticated && user?.userId) {
       router.push(`/collections/${user.userId}`);
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router, isLoading]);
 
   const {
     register,
