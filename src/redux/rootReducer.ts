@@ -1,9 +1,9 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import { mtgcbApi } from '@/api/mtgcbApi';
-import counterReducer from '@/redux/counterSlice';
+import authReducer from '@/redux/slices/authSlice';
 
 export const rootReducer = combineReducers({
-  counter: counterReducer,
+  auth: authReducer,
   [mtgcbApi.reducerPath]: mtgcbApi.reducer,
 });
 

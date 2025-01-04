@@ -4,14 +4,17 @@ import { LockOutlined } from '@mui/icons-material';
 import { Avatar, Box, FormHelperText, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { LoginData, useLoginMutation } from '@/api/auth/authApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
+import { useAuth } from '@/hooks/useAuth';
 
 // TODO: Add Captcha
+// TODO: Implement account page, guard with withAuth
 interface LoginFormInputs {
   username: string;
   password: string;
@@ -20,6 +23,13 @@ interface LoginFormInputs {
 export default function LoginPage() {
   const router = useRouter();
   const [login] = useLoginMutation();
+  const { isAuthenticated, user, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && user?.userId) {
+      router.push(`/collections/${user.userId}`);
+    }
+  }, [isAuthenticated, user, router]);
 
   const {
     register,
@@ -28,6 +38,10 @@ export default function LoginPage() {
     setError,
   } = useForm<LoginFormInputs>();
 
+  if (isLoading || (isAuthenticated && user?.userId)) {
+    return null;
+  }
+
   const onSubmit = async (data: LoginFormInputs) => {
     try {
       const result = await login(data).unwrap();
@@ -35,14 +49,13 @@ export default function LoginPage() {
       if (result.success && result.data?.userId) {
         router.push(`/collections/${result.data.userId}`);
       } else if (!result.success) {
-        // This would only happen if the API returns a 200 status code with an error response
+        // This would only happen if the API returns a 200 status code with a failure case
         setError('root', {
           type: 'manual',
           message: result.error?.message || 'Login failed unexpectedly. Please try again.',
         });
       }
     } catch (error: any) {
-      console.log(error);
       const errorData = error.data as ApiResponse<LoginData>;
       const message =
         errorData?.error?.message ||

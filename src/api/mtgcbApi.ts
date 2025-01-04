@@ -9,7 +9,14 @@ verifyEnvironmentVariables();
 
 export const mtgcbApi = createApi({
   reducerPath: 'mtgcbApi',
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL,
+    credentials: 'include',
+    prepareHeaders: (headers) => {
+      headers.set('Content-Type', 'application/json');
+      return headers;
+    },
+  }),
   endpoints: () => ({}),
 });
 

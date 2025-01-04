@@ -14,9 +14,16 @@ export const authApi = mtgcbApi.injectEndpoints({
         body: credentials,
       }),
     }),
+    logout: builder.mutation<ApiResponse<void>, void>({
+      query: () => ({
+        url: 'auth/logout',
+        method: 'POST',
+        body: {},
+      }),
+    }),
   }),
   overrideExisting: false,
 });
 
 export type { LoginData, UserData };
-export const { useMeQuery, useLoginMutation } = authApi;
+export const { useMeQuery, useLoginMutation, useLogoutMutation } = authApi;

@@ -8,7 +8,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
-import { Link } from '@/components/ui/link';
+import { AccountMenu } from '@/components/layout/Dashboard/components/AccountMenu';
 
 export const Header = () => {
   const { isDesktopOpen, setDesktopOpen, sidenavWidth } = useDashboardContext();
@@ -30,19 +30,7 @@ export const Header = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             MTG Collection Builder
           </Typography>
-          <Link
-            href="/login"
-            sx={{
-              color: 'inherit',
-              '&:hover': {
-                textDecoration: 'none',
-              },
-            }}
-          >
-            <Typography variant="button" color="inherit">
-              Login
-            </Typography>
-          </Link>
+          <AccountMenu />
         </Toolbar>
       </TopBar>
     </Box>

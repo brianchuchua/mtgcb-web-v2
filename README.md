@@ -2,8 +2,6 @@
 
 ## Now
 
-- Integrate Emotion and Material UI
-- Integrate Redux Toolkit
 - Integrate Playwright and Jest and React Testing Library -- skip the darn snapshot tests, though. Those never help me.
 - Start porting over mtgcb-web to this project, using the latest React best practices
 
@@ -11,6 +9,7 @@
 
 - Clean up this README
 - Sentry integration
+- Performance testing
 
 ## UX Thoughts
 
