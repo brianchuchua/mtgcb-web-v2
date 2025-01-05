@@ -1,26 +1,29 @@
 'use client';
 
-import { LockOutlined } from '@mui/icons-material';
+import { SentimentVerySatisfied } from '@mui/icons-material';
 import { Avatar, Box, FormHelperText, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useForm } from 'react-hook-form';
-import { LoginData, useLoginMutation } from '@/api/auth/authApi';
+import { LoginData, SignUpData, useLoginMutation, useSignUpMutation } from '@/api/auth/authApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
 
-interface LoginFormInputs {
+interface SignUpFormInputs {
   username: string;
+  email: string;
   password: string;
+  passwordConfirmation: string;
 }
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const router = useRouter();
+  const [signUp] = useSignUpMutation();
   const [login] = useLoginMutation();
   const { isAuthenticated, user, isLoading } = useAuth();
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -36,13 +39,16 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<LoginFormInputs>();
+    watch,
+  } = useForm<SignUpFormInputs>();
+
+  const password = watch('password');
 
   if (isLoading || (isAuthenticated && user?.userId)) {
     return null;
   }
 
-  const onSubmit = async (data: LoginFormInputs) => {
+  const onSubmit = async (data: SignUpFormInputs) => {
     try {
       if (!executeRecaptcha) {
         setError('root', {
@@ -52,26 +58,50 @@ export default function LoginPage() {
         return;
       }
 
-      const token = await executeRecaptcha('login');
+      const token = await executeRecaptcha('signup');
 
-      const result = await login({
-        ...data,
+      // First attempt signup
+      const signupResult = await signUp({
+        username: data.username,
+        email: data.email,
+        password: data.password,
         recaptchaToken: token,
       }).unwrap();
 
-      if (result.success && result.data?.userId) {
-        router.push(`/collections/${result.data.userId}`);
-      } else if (!result.success) {
+      if (!signupResult.success) {
         setError('root', {
           type: 'manual',
-          message: result.error?.message || 'Login failed unexpectedly. Please try again.',
+          message: signupResult.error?.message || 'Sign up failed unexpectedly. Please try again.',
         });
+        return;
+      }
+
+      // If signup succeeds, attempt login
+      const loginToken = await executeRecaptcha('login');
+      const loginResult = await login({
+        username: data.username,
+        password: data.password,
+        recaptchaToken: loginToken,
+      }).unwrap();
+
+      if (!loginResult.success) {
+        setError('root', {
+          type: 'manual',
+          message: 'Sign up successful but login failed. Please try logging in manually.',
+        });
+        router.push('/login');
+        return;
+      }
+
+      // If both succeed, redirect to collection
+      if (loginResult.success && loginResult.data?.userId) {
+        router.push(`/collections/${loginResult.data.userId}`);
       }
     } catch (error: any) {
-      const errorData = error.data as ApiResponse<LoginData>;
-      const message =
+      const errorData = error.data as ApiResponse<SignUpData | LoginData>;
+      let message =
         errorData?.error?.message ||
-        'There was a problem trying to login. Please try again in a moment.';
+        'There was a problem trying to sign up. Please try again in a moment.';
 
       setError('root', {
         type: 'manual',
@@ -82,14 +112,14 @@ export default function LoginPage() {
 
   return (
     <CenteredContainer>
-      <LoginWrapper>
-        <LoginIcon>
-          <LockOutlined />
-        </LoginIcon>
+      <SignUpWrapper>
+        <SignUpIcon title="It's free! :D">
+          <SentimentVerySatisfied />
+        </SignUpIcon>
         <Typography component="h1" variant="h5">
-          Log In
+          Sign Up
         </Typography>
-        <LoginForm noValidate onSubmit={handleSubmit(onSubmit)}>
+        <SignUpForm noValidate onSubmit={handleSubmit(onSubmit)}>
           <TextField
             {...register('username', { required: 'Username is required' })}
             label="Username"
@@ -110,16 +140,71 @@ export default function LoginPage() {
           />
 
           <TextField
-            {...register('password', { required: 'Password is required' })}
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Valid email is required',
+              },
+            })}
+            label="Email"
+            type="email"
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            autoComplete="email"
+            error={Boolean(errors.email)}
+            helperText={errors.email?.message}
+            slotProps={{
+              htmlInput: {
+                maxLength: 255,
+              },
+            }}
+          />
+
+          <TextField
+            {...register('password', {
+              required: 'Password is required',
+              minLength: {
+                value: 8,
+                message: 'Password must be at least eight characters long',
+              },
+            })}
             label="Password"
             variant="outlined"
             margin="normal"
             required
             fullWidth
-            autoComplete="current-password"
+            autoComplete="new-password"
             type="password"
             error={Boolean(errors.password)}
             helperText={errors.password?.message}
+            slotProps={{
+              htmlInput: {
+                maxLength: 255,
+              },
+            }}
+          />
+
+          <TextField
+            {...register('passwordConfirmation', {
+              required: 'Password confirmation is required',
+              minLength: {
+                value: 8,
+                message: 'Password confirmation must be at least eight characters long',
+              },
+              validate: (value) => value === password || 'Passwords must match',
+            })}
+            label="Confirm Password"
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            autoComplete="new-password"
+            type="password"
+            error={Boolean(errors.passwordConfirmation)}
+            helperText={errors.passwordConfirmation?.message}
             slotProps={{
               htmlInput: {
                 maxLength: 255,
@@ -139,30 +224,14 @@ export default function LoginPage() {
               color="primary"
               isSubmitting={isSubmitting}
             >
-              Log In
+              Sign Up
             </Button>
           </SubmitButtonWrapper>
 
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-            }}
-          >
-            <Box>
-              <Link href="#" variant="body2">
-                Forgot password?
-                <br />
-                (In Progress)
-              </Link>
-            </Box>
-            <Box>
-              <Link href="/signup" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Link href="/login" variant="body2">
+              Already have an account? Log In
+            </Link>
           </Box>
 
           <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>
@@ -184,13 +253,13 @@ export default function LoginPage() {
             </Link>{' '}
             apply.
           </Typography>
-        </LoginForm>
-      </LoginWrapper>
+        </SignUpForm>
+      </SignUpWrapper>
     </CenteredContainer>
   );
 }
 
-const LoginWrapper = styled('div')(({ theme }) => ({
+const SignUpWrapper = styled('div')(({ theme }) => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -198,12 +267,12 @@ const LoginWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(3),
 }));
 
-const LoginIcon = styled(Avatar)(({ theme }) => ({
+const SignUpIcon = styled(Avatar)(({ theme }) => ({
   margin: theme.spacing(1),
   backgroundColor: theme.palette.primary.main,
 }));
 
-const LoginForm = styled('form')(({ theme }) => ({
+const SignUpForm = styled('form')(({ theme }) => ({
   width: '100%',
   marginTop: theme.spacing(1),
 }));

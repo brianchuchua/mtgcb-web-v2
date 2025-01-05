@@ -1,6 +1,6 @@
 'use client';
 
-import { AccountCircle, Login, Logout, Person } from '@mui/icons-material';
+import { AccountCircle, Login, Logout, Person, PersonAdd } from '@mui/icons-material';
 import { IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -37,6 +37,11 @@ export const AccountMenu = () => {
     router.push('/login');
   };
 
+  const handleSignUp = () => {
+    handleClose();
+    router.push('/signup');
+  };
+
   const menuItems = isAuthenticated
     ? [
         <MenuItem key="profile" onClick={handleProfile}>
@@ -52,6 +57,10 @@ export const AccountMenu = () => {
         <MenuItem key="login" onClick={handleLogin}>
           <Login sx={{ mr: 1 }} />
           <Typography>Log in</Typography>
+        </MenuItem>,
+        <MenuItem key="signup" onClick={handleSignUp}>
+          <PersonAdd sx={{ mr: 1 }} />
+          <Typography>Sign up</Typography>
         </MenuItem>,
       ];
 

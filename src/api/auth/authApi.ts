@@ -1,4 +1,4 @@
-import { LoginData, LoginRequest, UserData } from '@/api/auth/types';
+import { LoginData, LoginRequest, SignUpData, SignUpRequest, UserData } from '@/api/auth/types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 
@@ -13,6 +13,14 @@ export const authApi = mtgcbApi.injectEndpoints({
         url: 'auth/login',
         method: 'POST',
         body: credentials,
+      }),
+      invalidatesTags: ['Auth'],
+    }),
+    signUp: builder.mutation<ApiResponse<SignUpData>, SignUpRequest>({
+      query: (data) => ({
+        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/register`,
+        method: 'POST',
+        body: data,
       }),
       invalidatesTags: ['Auth'],
     }),
@@ -36,5 +44,5 @@ export const authApi = mtgcbApi.injectEndpoints({
   overrideExisting: false,
 });
 
-export type { LoginData, UserData };
-export const { useMeQuery, useLoginMutation, useLogoutMutation } = authApi;
+export type { LoginData, SignUpData, UserData };
+export const { useMeQuery, useLoginMutation, useSignUpMutation, useLogoutMutation } = authApi;
