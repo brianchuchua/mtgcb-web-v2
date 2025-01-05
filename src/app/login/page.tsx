@@ -146,23 +146,32 @@ export default function LoginPage() {
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              justifyContent: 'center',
               width: '100%',
+              mb: 2
             }}
           >
-            <Box>
-              <Link href="#" variant="body2">
-                Forgot password?
-                <br />
-                (In Progress)
-              </Link>
-            </Box>
-            <Box>
-              <Link href="/signup" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Box>
+            <Link href="#" variant="body2">
+              Forgot password?
+            </Link>
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%',
+              mb: 2
+            }}
+          >
+            <Button
+              href="/signup"
+              variant="outlined"
+              color="secondary"
+              fullWidth
+            >
+              Don't have an account? Sign Up
+            </Button>
           </Box>
 
           <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>

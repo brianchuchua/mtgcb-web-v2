@@ -228,7 +228,14 @@ export default function SignUpPage() {
             </Button>
           </SubmitButtonWrapper>
 
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%',
+              mb: 2
+            }}
+          >
             <Link href="/login" variant="body2">
               Already have an account? Log In
             </Link>
