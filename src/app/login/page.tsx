@@ -5,6 +5,7 @@ import { Avatar, Box, FormHelperText, TextField, Typography } from '@mui/materia
 import { styled } from '@mui/material/styles';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useForm } from 'react-hook-form';
 import { LoginData, useLoginMutation } from '@/api/auth/authApi';
 import { ApiResponse } from '@/api/types/apiTypes';
@@ -13,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
 
-// TODO: Add Captcha
 // TODO: Implement account page, guard with withAuth
 interface LoginFormInputs {
   username: string;
@@ -24,6 +24,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [login] = useLoginMutation();
   const { isAuthenticated, user, isLoading } = useAuth();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.userId) {
@@ -44,7 +45,20 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormInputs) => {
     try {
-      const result = await login(data).unwrap();
+      if (!executeRecaptcha) {
+        setError('root', {
+          type: 'manual',
+          message: 'ReCAPTCHA not initialized. Please try again in a moment.',
+        });
+        return;
+      }
+
+      const token = await executeRecaptcha('login');
+
+      const result = await login({
+        ...data,
+        recaptchaToken: token,
+      }).unwrap();
 
       if (result.success && result.data?.userId) {
         router.push(`/collections/${result.data.userId}`);
