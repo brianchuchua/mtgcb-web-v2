@@ -63,7 +63,6 @@ export default function LoginPage() {
       if (result.success && result.data?.userId) {
         router.push(`/collections/${result.data.userId}`);
       } else if (!result.success) {
-        // This would only happen if the API returns a 200 status code with a failure case
         setError('root', {
           type: 'manual',
           message: result.error?.message || 'Login failed unexpectedly. Please try again.',
@@ -166,6 +165,26 @@ export default function LoginPage() {
               </Link>
             </Box>
           </Box>
+
+          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>
+            This site is protected by reCAPTCHA and the Google{' '}
+            <Link
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Privacy Policy
+            </Link>{' '}
+            and{' '}
+            <Link
+              href="https://policies.google.com/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Terms of Service
+            </Link>{' '}
+            apply.
+          </Typography>
         </LoginForm>
       </LoginWrapper>
     </CenteredContainer>
