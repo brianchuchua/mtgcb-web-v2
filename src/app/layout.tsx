@@ -6,6 +6,7 @@ import { Roboto } from 'next/font/google';
 import { ReactNode } from 'react';
 import Dashboard from '@/components/layout/Dashboard';
 import ReCaptchaProvider from '@/components/providers/ReCaptchaProvider';
+import SnackbarProvider from '@/components/providers/NotistackProvider';
 import StoreProvider from '@/redux/StoreProvider';
 import darkTheme from '@/styles/darkTheme';
 
@@ -34,7 +35,9 @@ export default function RootLayout({
             <CssBaseline enableColorScheme />
             <StoreProvider>
               <ReCaptchaProvider>
-                <Dashboard>{children}</Dashboard>
+                <SnackbarProvider>
+                  <Dashboard>{children}</Dashboard>
+                </SnackbarProvider>
               </ReCaptchaProvider>
             </StoreProvider>
           </ThemeProvider>

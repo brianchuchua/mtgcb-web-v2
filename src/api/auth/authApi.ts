@@ -1,4 +1,13 @@
-import { LoginData, LoginRequest, SignUpData, SignUpRequest, UserData } from '@/api/auth/types';
+import {
+  ForgotPasswordRequest,
+  LoginData,
+  LoginRequest,
+  ResetPasswordRequest,
+  SignUpData,
+  SignUpRequest,
+  UserData,
+  ValidatePasswordResetRequest,
+} from '@/api/auth/types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 
@@ -40,9 +49,41 @@ export const authApi = mtgcbApi.injectEndpoints({
         }
       },
     }),
+    forgotPassword: builder.mutation<ApiResponse<void>, ForgotPasswordRequest>({
+      query: (data) => ({
+        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/forgot-password`,
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    resetPassword: builder.mutation<ApiResponse<void>, Omit<ResetPasswordRequest, 'privateKey'>>({
+      query: (data) => ({
+        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/reset-password`,
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    validatePasswordReset: builder.mutation<
+      ApiResponse<void>,
+      Omit<ValidatePasswordResetRequest, 'privateKey'>
+    >({
+      query: (data) => ({
+        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/validate-password-reset`,
+        method: 'POST',
+        body: data,
+      }),
+    }),
   }),
   overrideExisting: false,
 });
 
 export type { LoginData, SignUpData, UserData };
-export const { useMeQuery, useLoginMutation, useSignUpMutation, useLogoutMutation } = authApi;
+export const {
+  useMeQuery,
+  useLoginMutation,
+  useSignUpMutation,
+  useLogoutMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  useValidatePasswordResetMutation,
+} = authApi;

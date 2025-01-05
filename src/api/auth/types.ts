@@ -24,3 +24,20 @@ export interface UserData {
   username: string;
   email: string;
 }
+
+export interface ForgotPasswordRequest {
+  username: string;
+  email: string;
+  recaptchaToken: string;
+}
+
+export interface ResetPasswordRequest {
+  newPassword: string;
+  privateKey: string;
+  token: string;
+}
+
+export interface ValidatePasswordResetRequest {
+  privateKey: string;
+  token: string;
+}
