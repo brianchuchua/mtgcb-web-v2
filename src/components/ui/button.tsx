@@ -10,7 +10,7 @@ import * as React from 'react';
 
 const ButtonWrapper = styled('div')({
   position: 'relative',
-  display: 'inline-flex', // Ensure proper alignment and spacing
+  display: 'flex',
 });
 
 const StyledCircularProgress = styled(CircularProgress)(({ theme }) => ({
