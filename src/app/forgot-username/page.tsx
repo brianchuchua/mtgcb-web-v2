@@ -1,29 +1,30 @@
 'use client';
 
-import { LockOutlined } from '@mui/icons-material';
+import { PersonOutline } from '@mui/icons-material';
 import { Avatar, Box, FormHelperText, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useRouter } from 'next/navigation';
+import { useSnackbar } from 'notistack';
 import { useEffect } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useForm } from 'react-hook-form';
-import { LoginData, useLoginMutation } from '@/api/auth/authApi';
+import { useForgotUsernameMutation } from '@/api/auth/authApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
 
-interface LoginFormInputs {
-  username: string;
-  password: string;
+interface ForgotUsernameFormInputs {
+  email: string;
 }
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [login] = useLoginMutation();
+export default function ForgotUsernamePage() {
+  const { enqueueSnackbar } = useSnackbar();
+  const [forgotUsername] = useForgotUsernameMutation();
   const { isAuthenticated, user, isLoading } = useAuth();
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.userId) {
@@ -36,13 +37,14 @@ export default function LoginPage() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
-  } = useForm<LoginFormInputs>();
+    reset,
+  } = useForm<ForgotUsernameFormInputs>();
 
   if (isLoading || (isAuthenticated && user?.userId)) {
     return null;
   }
 
-  const onSubmit = async (data: LoginFormInputs) => {
+  const onSubmit = async (data: ForgotUsernameFormInputs) => {
     try {
       if (!executeRecaptcha) {
         setError('root', {
@@ -52,74 +54,75 @@ export default function LoginPage() {
         return;
       }
 
-      const token = await executeRecaptcha('login');
+      const token = await executeRecaptcha('forgotUsername');
 
-      const result = await login({
-        ...data,
+      const result = await forgotUsername({
+        email: data.email,
         recaptchaToken: token,
       }).unwrap();
 
-      if (result.success && result.data?.userId) {
-        router.push(`/collections/${result.data.userId}`);
-      } else if (!result.success) {
+      if (result.success) {
+        enqueueSnackbar('Username sent to your email if a matching account exists.', {
+          variant: 'success',
+        });
+        reset(); // Clear the form
+      } else {
         setError('root', {
           type: 'manual',
-          message: result.error?.message || 'Login failed unexpectedly. Please try again.',
+          message: result.error?.message || 'Username recovery request failed. Please try again.',
         });
+        enqueueSnackbar(
+          result.error?.message || 'Username recovery request failed. Please try again.',
+          {
+            variant: 'error',
+          },
+        );
       }
     } catch (error: any) {
-      const errorData = error.data as ApiResponse<LoginData>;
+      const errorData = error.data as ApiResponse<void>;
       const message =
         errorData?.error?.message ||
-        'There was a problem trying to login. Please try again in a moment.';
+        'There was a problem requesting username recovery. Please try again in a moment.';
 
       setError('root', {
         type: 'manual',
         message,
       });
+      enqueueSnackbar(message, { variant: 'error' });
     }
   };
 
   return (
     <CenteredContainer>
-      <LoginWrapper>
-        <LoginIcon>
-          <LockOutlined />
-        </LoginIcon>
+      <ForgotUsernameWrapper>
+        <ForgotUsernameIcon>
+          <PersonOutline />
+        </ForgotUsernameIcon>
         <Typography component="h1" variant="h5">
-          Log In
+          Forgot Username
         </Typography>
-        <LoginForm noValidate onSubmit={handleSubmit(onSubmit)}>
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }}>
+          Enter your email address and we'll send you your username.
+        </Typography>
+        <ForgotUsernameForm noValidate onSubmit={handleSubmit(onSubmit)}>
           <TextField
-            {...register('username', { required: 'Username is required' })}
-            label="Username"
-            type="text"
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            autoComplete="nickname"
-            autoFocus
-            error={Boolean(errors.username)}
-            helperText={errors.username?.message}
-            slotProps={{
-              htmlInput: {
-                maxLength: 255,
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Invalid email address',
               },
-            }}
-          />
-
-          <TextField
-            {...register('password', { required: 'Password is required' })}
-            label="Password"
+            })}
+            label="Email"
+            type="email"
             variant="outlined"
             margin="normal"
             required
             fullWidth
-            autoComplete="current-password"
-            type="password"
-            error={Boolean(errors.password)}
-            helperText={errors.password?.message}
+            autoComplete="email"
+            autoFocus
+            error={Boolean(errors.email)}
+            helperText={errors.email?.message}
             slotProps={{
               htmlInput: {
                 maxLength: 255,
@@ -139,7 +142,7 @@ export default function LoginPage() {
               color="primary"
               isSubmitting={isSubmitting}
             >
-              Log In
+              Recover Username
             </Button>
           </SubmitButtonWrapper>
 
@@ -147,30 +150,13 @@ export default function LoginPage() {
             sx={{
               display: 'flex',
               justifyContent: 'center',
-              gap: 4,
               width: '100%',
               mb: 2,
             }}
           >
-            <Link href="/forgot-password" variant="body2">
-              Forgot password?
+            <Link href="/login" variant="body2">
+              Back to Login
             </Link>
-            <Link href="/forgot-username" variant="body2">
-              Forgot username?
-            </Link>
-          </Box>
-
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              width: '100%',
-              mb: 2,
-            }}
-          >
-            <Button href="/signup" variant="outlined" color="secondary" fullWidth>
-              Don't have an account? Sign Up
-            </Button>
           </Box>
 
           <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>
@@ -192,13 +178,13 @@ export default function LoginPage() {
             </Link>{' '}
             apply.
           </Typography>
-        </LoginForm>
-      </LoginWrapper>
+        </ForgotUsernameForm>
+      </ForgotUsernameWrapper>
     </CenteredContainer>
   );
 }
 
-const LoginWrapper = styled('div')(({ theme }) => ({
+const ForgotUsernameWrapper = styled('div')(({ theme }) => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -206,12 +192,12 @@ const LoginWrapper = styled('div')(({ theme }) => ({
   padding: theme.spacing(3),
 }));
 
-const LoginIcon = styled(Avatar)(({ theme }) => ({
+const ForgotUsernameIcon = styled(Avatar)(({ theme }) => ({
   margin: theme.spacing(1),
   backgroundColor: theme.palette.primary.main,
 }));
 
-const LoginForm = styled('form')(({ theme }) => ({
+const ForgotUsernameForm = styled('form')(({ theme }) => ({
   width: '100%',
   marginTop: theme.spacing(1),
 }));

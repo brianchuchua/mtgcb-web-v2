@@ -31,6 +31,11 @@ export interface ForgotPasswordRequest {
   recaptchaToken: string;
 }
 
+export interface ForgotUsernameRequest {
+  email: string;
+  recaptchaToken: string;
+}
+
 export interface ResetPasswordRequest {
   newPassword: string;
   privateKey: string;

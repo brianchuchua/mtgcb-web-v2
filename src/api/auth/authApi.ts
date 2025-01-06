@@ -1,5 +1,6 @@
 import {
   ForgotPasswordRequest,
+  ForgotUsernameRequest,
   LoginData,
   LoginRequest,
   ResetPasswordRequest,
@@ -56,6 +57,13 @@ export const authApi = mtgcbApi.injectEndpoints({
         body: data,
       }),
     }),
+    forgotUsername: builder.mutation<ApiResponse<void>, ForgotUsernameRequest>({
+      query: (data) => ({
+        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/forgot-username`,
+        method: 'POST',
+        body: data,
+      }),
+    }),
     resetPassword: builder.mutation<ApiResponse<void>, Omit<ResetPasswordRequest, 'privateKey'>>({
       query: (data) => ({
         url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/reset-password`,
@@ -84,6 +92,7 @@ export const {
   useSignUpMutation,
   useLogoutMutation,
   useForgotPasswordMutation,
+  useForgotUsernameMutation,
   useResetPasswordMutation,
   useValidatePasswordResetMutation,
 } = authApi;
