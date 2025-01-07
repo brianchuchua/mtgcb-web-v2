@@ -19,11 +19,9 @@ export const AccountMenu = () => {
     setAnchorEl(null);
   };
 
-  const handleProfile = () => {
+  const handleAccount = () => {
     handleClose();
-    if (user?.userId) {
-      router.push(`/collections/${user.userId}`);
-    }
+    router.push('/account');
   };
 
   const handleLogout = async () => {
@@ -44,9 +42,9 @@ export const AccountMenu = () => {
 
   const menuItems = isAuthenticated
     ? [
-        <MenuItem key="profile" onClick={handleProfile}>
+        <MenuItem key="account" onClick={handleAccount}>
           <Person sx={{ mr: 1 }} />
-          <Typography>Profile</Typography>
+          <Typography>Account</Typography>
         </MenuItem>,
         <MenuItem key="logout" onClick={handleLogout}>
           <Logout sx={{ mr: 1 }} />

@@ -7,7 +7,8 @@ import type { RootState } from '@/redux/store';
 export function useAuth() {
   const dispatch = useDispatch();
   const { user, isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
-  const { data: meData, isLoading: isMeLoading } = useMeQuery();
+  const { data: meData, isLoading: isMeLoading, error: meError, isError: isMeError } = useMeQuery();
+
   const [logout] = useLogoutMutation();
 
   useEffect(() => {
@@ -15,10 +16,14 @@ export function useAuth() {
       dispatch(startLoading());
     } else if (meData?.success && meData.data) {
       dispatch(setUser(meData.data));
-    } else {
-      dispatch(clearAuth());
+    } else if (isMeError && meError) {
+      const status = (meError as any)?.status;
+      if (status === 401 || status === 403) {
+        dispatch(clearAuth());
+      }
+      console.error('Me query error:', meError);
     }
-  }, [meData, isMeLoading, dispatch]);
+  }, [meData, isMeLoading, isMeError, meError, dispatch]);
 
   const handleLogout = async () => {
     try {
@@ -29,10 +34,15 @@ export function useAuth() {
     }
   };
 
+  const updateUser = (newUser: typeof user) => {
+    dispatch(setUser(newUser));
+  };
+
   return {
     user,
     isAuthenticated,
     isLoading: isLoading || isMeLoading,
     logout: handleLogout,
+    updateUser,
   };
 }

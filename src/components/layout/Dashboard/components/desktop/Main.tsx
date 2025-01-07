@@ -12,7 +12,9 @@ const Main = ({ children }: MainProps) => {
 
   return (
     <StyledMain open={isDesktopOpen} sidenavwidth={sidenavWidth}>
-      {children}
+      <MainContent>
+        {children}
+      </MainContent>
     </StyledMain>
   );
 };
@@ -30,7 +32,7 @@ const StyledMain = styled('main', {
   flexGrow: 1,
   marginLeft: open ? `${sidenavwidth}px` : 0,
   paddingTop: '64px',
-  minHeight: 'calc(100vh - 64px)',
+  minHeight: '100vh',
   display: 'flex',
   justifyContent: 'center',
   transition: theme.transitions.create('margin', {
@@ -40,4 +42,9 @@ const StyledMain = styled('main', {
   [theme.breakpoints.down('sm')]: {
     display: 'none',
   },
+}));
+
+const MainContent = styled('div')(({ theme }) => ({
+  width: '100%',
+  padding: theme.spacing(4),
 }));
