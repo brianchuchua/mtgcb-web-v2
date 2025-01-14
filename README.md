@@ -10,6 +10,7 @@
 - Clean up this README
 - Sentry integration
 - Performance testing
+- Switch from Google reCAPTCHA to Cloudflare Turnstile
 
 ## UX Thoughts
 

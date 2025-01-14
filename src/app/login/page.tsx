@@ -83,13 +83,13 @@ export default function LoginPage() {
   return (
     <CenteredContainer>
       <LoginWrapper>
-        <LoginIcon>
+        <LoginIcon data-testid="login-icon">
           <LockOutlined />
         </LoginIcon>
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h5" data-testid="login-title">
           Log In
         </Typography>
-        <LoginForm noValidate onSubmit={handleSubmit(onSubmit)}>
+        <LoginForm noValidate onSubmit={handleSubmit(onSubmit)} data-testid="login-form">
           <TextField
             {...register('username', { required: 'Username is required' })}
             label="Username"
@@ -105,6 +105,7 @@ export default function LoginPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'username-input',
               },
             }}
           />
@@ -123,12 +124,15 @@ export default function LoginPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'password-input',
               },
             }}
           />
 
           <Box>
-            <FormHelperText error={Boolean(errors.root)}>{errors.root?.message}</FormHelperText>
+            <FormHelperText error={Boolean(errors.root)} data-testid="form-error">
+              {errors.root?.message}
+            </FormHelperText>
           </Box>
 
           <SubmitButtonWrapper>
@@ -138,6 +142,7 @@ export default function LoginPage() {
               variant="contained"
               color="primary"
               isSubmitting={isSubmitting}
+              data-testid="submit-button"
             >
               Log In
             </Button>
@@ -152,10 +157,10 @@ export default function LoginPage() {
               mb: 2,
             }}
           >
-            <Link href="/forgot-password" variant="body2">
+            <Link href="/forgot-password" variant="body2" data-testid="forgot-password-link">
               Forgot password?
             </Link>
-            <Link href="/forgot-username" variant="body2">
+            <Link href="/forgot-username" variant="body2" data-testid="forgot-username-link">
               Forgot username?
             </Link>
           </Box>
@@ -168,17 +173,30 @@ export default function LoginPage() {
               mb: 2,
             }}
           >
-            <Button href="/signup" variant="outlined" color="secondary" fullWidth>
+            <Button
+              href="/signup"
+              variant="outlined"
+              color="secondary"
+              fullWidth
+              data-testid="signup-button"
+            >
               Don't have an account? Sign Up
             </Button>
           </Box>
 
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            align="center"
+            sx={{ mt: 2 }}
+            data-testid="recaptcha-text"
+          >
             This site is protected by reCAPTCHA and the Google{' '}
             <Link
               href="https://policies.google.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
+              data-testid="privacy-link"
             >
               Privacy Policy
             </Link>{' '}
@@ -187,6 +205,7 @@ export default function LoginPage() {
               href="https://policies.google.com/terms"
               target="_blank"
               rel="noopener noreferrer"
+              data-testid="terms-link"
             >
               Terms of Service
             </Link>{' '}
