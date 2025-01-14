@@ -113,13 +113,13 @@ export default function SignUpPage() {
   return (
     <CenteredContainer>
       <SignUpWrapper>
-        <SignUpIcon title="It's free! :D">
+        <SignUpIcon data-testid="signup-icon" title="It's free! :D">
           <SentimentVerySatisfied />
         </SignUpIcon>
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h5" data-testid="signup-title">
           Sign Up
         </Typography>
-        <SignUpForm noValidate onSubmit={handleSubmit(onSubmit)}>
+        <SignUpForm noValidate onSubmit={handleSubmit(onSubmit)} data-testid="signup-form">
           <TextField
             {...register('username', { required: 'Username is required' })}
             label="Username"
@@ -135,6 +135,7 @@ export default function SignUpPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'username-input',
               },
             }}
           />
@@ -159,6 +160,7 @@ export default function SignUpPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'email-input',
               },
             }}
           />
@@ -183,6 +185,7 @@ export default function SignUpPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'password-input',
               },
             }}
           />
@@ -208,12 +211,15 @@ export default function SignUpPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'password-confirmation-input',
               },
             }}
           />
 
           <Box>
-            <FormHelperText error={Boolean(errors.root)}>{errors.root?.message}</FormHelperText>
+            <FormHelperText error={Boolean(errors.root)} data-testid="form-error">
+              {errors.root?.message}
+            </FormHelperText>
           </Box>
 
           <SubmitButtonWrapper>
@@ -223,6 +229,7 @@ export default function SignUpPage() {
               variant="contained"
               color="primary"
               isSubmitting={isSubmitting}
+              data-testid="submit-button"
             >
               Sign Up
             </Button>
@@ -236,17 +243,18 @@ export default function SignUpPage() {
               mb: 2
             }}
           >
-            <Link href="/login" variant="body2">
+            <Link href="/login" variant="body2" data-testid="login-link">
               Already have an account? Log In
             </Link>
           </Box>
 
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>
+          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }} data-testid="recaptcha-text">
             This site is protected by reCAPTCHA and the Google{' '}
             <Link
               href="https://policies.google.com/privacy"
               target="_blank"
               rel="noopener noreferrer"
+              data-testid="privacy-link"
             >
               Privacy Policy
             </Link>{' '}
@@ -255,6 +263,7 @@ export default function SignUpPage() {
               href="https://policies.google.com/terms"
               target="_blank"
               rel="noopener noreferrer"
+              data-testid="terms-link"
             >
               Terms of Service
             </Link>{' '}
