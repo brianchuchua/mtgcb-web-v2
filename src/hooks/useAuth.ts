@@ -21,7 +21,6 @@ export function useAuth() {
       if (status === 401 || status === 403) {
         dispatch(clearAuth());
       }
-      console.error('Me query error:', meError);
     }
   }, [meData, isMeLoading, isMeError, meError, dispatch]);
 
