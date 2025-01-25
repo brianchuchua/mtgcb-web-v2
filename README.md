@@ -3,10 +3,10 @@
 ## Now
 
 - Start porting over mtgcb-web to this project, using the latest React best practices
-- Reduce number of /auth/me calls if appropriate
 
 ## Later
 
+- Reduce number of /auth/me calls if appropriate, keep an eye on it for now
 - Clean up this README -- make a separate TODO file?
 - Continue writing front-end tests -- paused them to focus on feature work since the app is so simple to validate manually
 - Evaluate if e2e tests should mock less and test the full stack in the test environment -- or perhaps both in different tests ("page level" unit tests vs "full stack" tests)

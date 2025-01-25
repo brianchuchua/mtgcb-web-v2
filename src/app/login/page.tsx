@@ -3,7 +3,7 @@
 import { LockOutlined } from '@mui/icons-material';
 import { Avatar, Box, FormHelperText, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useForm } from 'react-hook-form';
@@ -21,15 +21,21 @@ interface LoginFormInputs {
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo');
   const [login] = useLoginMutation();
   const { isAuthenticated, user, isLoading } = useAuth();
   const { executeRecaptcha } = useGoogleReCaptcha();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.userId) {
-      router.push(`/collections/${user.userId}`);
+      if (redirectTo) {
+        router.push(decodeURIComponent(redirectTo));
+      } else {
+        router.push(`/collections/${user.userId}`);
+      }
     }
-  }, [isAuthenticated, user, router, isLoading]);
+  }, [isAuthenticated, user, router, isLoading, redirectTo]);
 
   const {
     register,
@@ -60,7 +66,11 @@ export default function LoginPage() {
       }).unwrap();
 
       if (result.success && result.data?.userId) {
-        router.push(`/collections/${result.data.userId}`);
+        if (redirectTo) {
+          router.push(decodeURIComponent(redirectTo));
+        } else {
+          router.push(`/collections/${result.data.userId}`);
+        }
       } else if (!result.success) {
         setError('root', {
           type: 'manual',

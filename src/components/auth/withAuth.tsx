@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, CircularProgress } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -9,12 +9,17 @@ export function withAuth<T extends object>(WrappedComponent: React.ComponentType
   return function WithAuthComponent(props: T) {
     const { isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
       if (!isLoading && !isAuthenticated) {
-        router.push('/login');
+        const currentPath =
+          pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
+        const encodedPath = encodeURIComponent(currentPath);
+        router.push(`/login?redirectTo=${encodedPath}`);
       }
-    }, [isAuthenticated, isLoading, router]);
+    }, [isAuthenticated, isLoading, router, pathname, searchParams]);
 
     if (isLoading) {
       return (
