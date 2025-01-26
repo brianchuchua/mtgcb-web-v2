@@ -15,7 +15,7 @@ import { ApiResponse } from '@/api/types/apiTypes';
 export const authApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
     me: builder.query<ApiResponse<UserData>, void>({
-      query: () => 'auth/me', // TODO: Grok how often this is called and reduce if necessary, should just be onload and login stuff
+      query: () => 'auth/me',
       providesTags: ['Auth'],
     }),
     login: builder.mutation<ApiResponse<LoginData>, LoginRequest>({
