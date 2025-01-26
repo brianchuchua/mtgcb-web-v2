@@ -3,6 +3,8 @@
 ## Now
 
 - Start porting over mtgcb-web to this project, using the latest React best practices
+- Goals should probably be under Collection, as should be Locations
+- Collection should better show that it's a dropdown and feel less awkward
 
 ## Later
 
@@ -14,6 +16,12 @@
 - Performance testing
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - TODO hunting
+- Legal disclaimer
+
+## Known Bugs
+
+- Minor: When logging out of a page that requires authentication, redirectTo is set to the page you were on during logout.
+- Minor: The background color of the sidenav is different on mobile.
 
 ## UX Thoughts
 
