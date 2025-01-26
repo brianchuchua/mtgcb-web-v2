@@ -3,6 +3,7 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { Drawer, IconButton } from '@mui/material';
 import { Theme, styled } from '@mui/material/styles';
+import { SidenavItems } from '@/components/layout/Dashboard/components/shared/SidenavItems';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
 const Sidenav = () => {
@@ -27,7 +28,7 @@ const Sidenav = () => {
           <ChevronLeftIcon />
         </IconButton>
       </SidenavHeader>
-      Drawer Content
+      <SidenavItems />
     </StyledDrawer>
   );
 };

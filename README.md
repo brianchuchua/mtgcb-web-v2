@@ -20,6 +20,8 @@
 
 ## Known Bugs
 
+- Moderate: Logout isn't redirecting the user -- probably want them back to the login page.
+- Minor (UX): I hate how the collection submenu behaves. Add a carat?
 - Minor: When logging out of a page that requires authentication, redirectTo is set to the page you were on during logout.
 - Minor: The background color of the sidenav is different on mobile.
 

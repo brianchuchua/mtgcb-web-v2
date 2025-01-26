@@ -3,10 +3,15 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { Drawer, IconButton } from '@mui/material';
 import { Theme, styled } from '@mui/material/styles';
+import { SidenavItems } from '@/components/layout/Dashboard/components/shared/SidenavItems';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
 const Sidenav = () => {
   const { isMobileOpen, setMobileOpen, sidenavWidth } = useDashboardContext();
+
+  const handleClose = () => {
+    setMobileOpen(false);
+  };
 
   return (
     <StyledDrawer
@@ -21,14 +26,14 @@ const Sidenav = () => {
       variant="temporary"
       anchor="left"
       open={isMobileOpen}
-      onClose={() => setMobileOpen(false)}
+      onClose={handleClose}
     >
       <SidenavHeader>
-        <IconButton onClick={() => setMobileOpen(false)}>
+        <IconButton onClick={handleClose}>
           <ChevronLeftIcon />
         </IconButton>
       </SidenavHeader>
-      Mobile Drawer Content
+      <SidenavItems onNavigate={handleClose} />
     </StyledDrawer>
   );
 };
