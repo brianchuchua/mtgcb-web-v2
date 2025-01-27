@@ -14,6 +14,7 @@ import { Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText } f
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { Link } from '@/components/ui/link';
+import { SearchForms } from '@/components/layout/Dashboard/components/shared/SearchForms';
 import { useAuth } from '@/hooks/useAuth';
 
 interface SidenavItemsProps {
@@ -138,6 +139,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
         </ListItem>
       </List>
       <Divider />
+      <SearchForms />
     </>
   );
 };

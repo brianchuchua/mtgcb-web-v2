@@ -3,7 +3,7 @@
 ## Now
 
 - Start porting over mtgcb-web to this project, using the latest React best practices
-- Goals should probably be under Collection, as should be Locations
+- Don't forget to store some settings in local storage but also have them in the url for sharing
 - Collection should better show that it's a dropdown and feel less awkward
 
 ## Later
@@ -20,6 +20,7 @@
 
 ## Known Bugs
 
+- Moderate (UX): The search form has prefilling and styling issues.
 - Moderate: Logout isn't redirecting the user -- probably want them back to the login page.
 - Minor (UX): I hate how the collection submenu behaves. Add a carat?
 - Minor: When logging out of a page that requires authentication, redirectTo is set to the page you were on during logout.
