@@ -21,7 +21,7 @@ export const useSyncBrowseUrl = () => {
       const newUrl = search ? `${pathname}?${search}` : pathname;
 
       router.replace(newUrl, { scroll: false });
-    }, 300);
+    }, 400);
 
     updateUrl();
     return () => updateUrl.cancel();
