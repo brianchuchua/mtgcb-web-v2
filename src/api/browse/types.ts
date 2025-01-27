@@ -57,6 +57,7 @@ export interface CardModel {
 
 export interface CardSearchRequest {
   name?: string;
+  oracleText?: string;
   limit?: number;
   offset?: number;
   sortBy?: string;

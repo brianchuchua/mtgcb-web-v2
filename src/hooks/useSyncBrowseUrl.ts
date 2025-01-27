@@ -16,6 +16,10 @@ export const useSyncBrowseUrl = () => {
       if (searchParams.name) {
         params.set('name', searchParams.name);
       }
+      
+      if (searchParams.oracleText) {
+        params.set('oracleText', searchParams.oracleText);
+      }
 
       const search = params.toString();
       const newUrl = search ? `${pathname}?${search}` : pathname;

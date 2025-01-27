@@ -20,6 +20,7 @@ export default function BrowsePage() {
   useEffect(() => {
     searchCards({
       name: searchParams.name,
+      oracleText: searchParams.oracleText,
       limit: 24, // hard-coded until I add preferences
       offset: 0,
       sortBy: 'name', // hard-coded until I add preferences
@@ -32,6 +33,7 @@ export default function BrowsePage() {
       <Typography variant="h4" component="h1" gutterBottom>
         Browse
       </Typography>
+
       {isLoading && <Typography>Loading...</Typography>}
 
       {error && <Typography color="error">Error loading cards: {JSON.stringify(error)}</Typography>}

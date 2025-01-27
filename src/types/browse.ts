@@ -6,6 +6,7 @@ export interface BrowsePreferences {
 
 export interface BrowseSearchParams {
   name?: string;
+  oracleText?: string;
 }
 
 export interface BrowseState {
