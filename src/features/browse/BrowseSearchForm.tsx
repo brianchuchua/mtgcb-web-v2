@@ -1,6 +1,5 @@
 'use client';
 
-import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { InputAdornment, Paper, Stack, TextField, Tooltip } from '@mui/material';
@@ -8,6 +7,7 @@ import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import ColorSelector from './ColorSelector';
 import {
   selectOracleText,
   selectSearchName,
@@ -34,14 +34,14 @@ const BrowseSearchForm = () => {
   const debouncedNameDispatch = useCallback(
     debounce((value: string) => {
       dispatch(setSearchName(value));
-    }, 400),
+    }, 300),
     [dispatch],
   );
 
   const debouncedOracleDispatch = useCallback(
     debounce((value: string) => {
       dispatch(setOracleText(value));
-    }, 400),
+    }, 300),
     [dispatch],
   );
 
@@ -60,7 +60,7 @@ const BrowseSearchForm = () => {
   return (
     <FormWrapper>
       <Form>
-        <Stack spacing={1}>
+        <Stack spacing={1.5}>
           <TextField
             fullWidth
             label="Card Name"
@@ -106,6 +106,7 @@ const BrowseSearchForm = () => {
               },
             }}
           />
+          <ColorSelector />
         </Stack>
       </Form>
     </FormWrapper>

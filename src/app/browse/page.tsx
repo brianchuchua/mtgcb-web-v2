@@ -1,39 +1,19 @@
 'use client';
 
 import { Box, Typography } from '@mui/material';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useSearchCardsMutation } from '@/api/browse/browseApi';
 import BrowseSearchForm from '@/features/browse/BrowseSearchForm';
 import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
+import { useSearchFromUrl } from '@/hooks/useSearchFromUrl';
 import { useSyncBrowseUrl } from '@/hooks/useSyncBrowseUrl';
-import { selectSearchParams } from '@/redux/slices/browseSlice';
 
 export default function BrowsePage() {
-  const [searchCards, { data: searchResult, isLoading, error }] = useSearchCardsMutation();
-  const searchParams = useSelector(selectSearchParams);
+  const { searchResult, isLoading, error } = useSearchFromUrl();
 
-  // Initialize from URL and sync to URL
   useInitializeBrowseFromUrl();
   useSyncBrowseUrl();
 
-  useEffect(() => {
-    searchCards({
-      name: searchParams.name,
-      oracleText: searchParams.oracleText,
-      limit: 24, // hard-coded until I add preferences
-      offset: 0,
-      sortBy: 'name', // hard-coded until I add preferences
-      sortDirection: 'asc', // hard-coded until I add preferences
-    });
-  }, [searchCards, searchParams]);
-
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Browse
-      </Typography>
-
       {isLoading && <Typography>Loading...</Typography>}
 
       {error && <Typography color="error">Error loading cards: {JSON.stringify(error)}</Typography>}

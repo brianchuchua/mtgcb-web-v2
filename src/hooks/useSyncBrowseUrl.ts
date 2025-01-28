@@ -1,5 +1,5 @@
 import debounce from 'lodash.debounce';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectSearchParams } from '@/redux/slices/browseSlice';
@@ -8,6 +8,7 @@ export const useSyncBrowseUrl = () => {
   const searchParams = useSelector(selectSearchParams);
   const router = useRouter();
   const pathname = usePathname();
+  const currentSearchParams = useSearchParams();
 
   useEffect(() => {
     const updateUrl = debounce(() => {
@@ -16,18 +17,31 @@ export const useSyncBrowseUrl = () => {
       if (searchParams.name) {
         params.set('name', searchParams.name);
       }
-      
+
       if (searchParams.oracleText) {
         params.set('oracleText', searchParams.oracleText);
       }
 
-      const search = params.toString();
-      const newUrl = search ? `${pathname}?${search}` : pathname;
+      if (searchParams.colors) {
+        if (searchParams.colors.includeColorless) {
+          params.set('colorless', 'true');
+        } else if (searchParams.colors.colors.length > 0) {
+          params.set('colors', searchParams.colors.colors.join(','));
+          params.set('colorMatchType', searchParams.colors.matchType);
+        }
+      }
 
-      router.replace(newUrl, { scroll: false });
-    }, 400);
+      const newSearch = params.toString();
+      const currentSearch = currentSearchParams.toString();
+
+      // Only update URL if the params have actually changed
+      if (newSearch !== currentSearch) {
+        const newUrl = newSearch ? `${pathname}?${newSearch}` : pathname;
+        router.replace(newUrl, { scroll: false });
+      }
+    }, 300);
 
     updateUrl();
     return () => updateUrl.cancel();
-  }, [searchParams, router, pathname]);
+  }, [searchParams, router, pathname, currentSearchParams]);
 };

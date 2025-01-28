@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../rootReducer';
-import { BrowsePreferences, BrowseSearchParams, BrowseState } from '@/types/browse';
+import { BrowsePreferences, BrowseSearchParams, BrowseState, ColorFilter, ColorMatchType } from '@/types/browse';
 
 const defaultPreferences: BrowsePreferences = {
   pageSize: 24,
@@ -8,21 +8,9 @@ const defaultPreferences: BrowsePreferences = {
   sortDirection: 'desc',
 };
 
-const parseSearchParams = (): BrowseSearchParams => {
-  if (typeof window === 'undefined') return {};
-
-  const params = new URLSearchParams(window.location.search);
-  const name = params.get('name');
-  const oracleText = params.get('oracleText');
-
-  return {
-    ...(name ? { name } : {}),
-    ...(oracleText ? { oracleText } : {}),
-  };
-};
-
+// Initialize with empty state - let the useInitializeBrowseFromUrl handle population
 const initialState: BrowseState = {
-  searchParams: parseSearchParams(),
+  searchParams: {},
 };
 
 export const browseSlice = createSlice({
@@ -43,13 +31,25 @@ export const browseSlice = createSlice({
         state.searchParams.oracleText = action.payload;
       }
     },
+    setColors: (state, action: PayloadAction<ColorFilter>) => {
+      if (action.payload.colors.length === 0 && !action.payload.includeColorless) {
+        delete state.searchParams.colors;
+      } else {
+        state.searchParams.colors = action.payload;
+      }
+    },
+    // Add an action to set the entire search params state at once
+    setSearchParams: (state, action: PayloadAction<BrowseSearchParams>) => {
+      state.searchParams = action.payload;
+    },
   },
 });
 
-export const { setSearchName, setOracleText } = browseSlice.actions;
+export const { setSearchName, setOracleText, setColors, setSearchParams } = browseSlice.actions;
 
 export const selectSearchParams = (state: RootState) => state.browse.searchParams;
 export const selectSearchName = (state: RootState) => state.browse.searchParams.name;
 export const selectOracleText = (state: RootState) => state.browse.searchParams.oracleText;
+export const selectColors = (state: RootState) => state.browse.searchParams.colors;
 
 export default browseSlice.reducer;
