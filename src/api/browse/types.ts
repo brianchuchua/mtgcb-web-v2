@@ -56,8 +56,17 @@ export interface CardModel {
 }
 
 export interface CardSearchRequest {
+  type?: {
+    AND?: string[];
+    NOT?: string[];
+  };
   name?: string;
   oracleText?: string;
+  colors?: {
+    colors: string[];
+    matchType: string;
+  };
+  select: string[];
   limit?: number;
   offset?: number;
   sortBy?: string;

@@ -31,6 +31,15 @@ export const useSyncBrowseUrl = () => {
         }
       }
 
+      if (searchParams.types) {
+        if (searchParams.types.include.length > 0) {
+          params.set('includeTypes', searchParams.types.include.join('|'));
+        }
+        if (searchParams.types.exclude.length > 0) {
+          params.set('excludeTypes', searchParams.types.exclude.join('|'));
+        }
+      }
+
       const newSearch = params.toString();
       const currentSearch = currentSearchParams.toString();
 

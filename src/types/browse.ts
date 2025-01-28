@@ -12,10 +12,16 @@ export interface ColorFilter {
   includeColorless?: boolean;
 }
 
+export interface TypeFilter {
+  include: string[];
+  exclude: string[];
+}
+
 export interface BrowseSearchParams {
   name?: string;
   oracleText?: string;
   colors?: ColorFilter;
+  types?: TypeFilter;
 }
 
 export interface BrowseState {

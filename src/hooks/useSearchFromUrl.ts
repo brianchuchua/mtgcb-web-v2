@@ -36,26 +36,43 @@ export const useSearchFromUrl = () => {
 
     if (colorless) {
       apiParams.colors_array = {
-        exactly: []
+        exactly: [],
       };
     } else if (colors) {
       const colorArray = colors.split(',');
       switch (colorMatchType) {
         case 'exactly':
           apiParams.colors_array = {
-            exactly: colorArray
+            exactly: colorArray,
           };
           break;
         case 'atLeast':
           apiParams.colors_array = {
-            atLeast: colorArray
+            atLeast: colorArray,
           };
           break;
         case 'atMost':
           apiParams.colors_array = {
-            atMost: colorArray
+            atMost: colorArray,
           };
           break;
+      }
+    }
+
+    // Add type filtering
+    const includeTypes = searchParams.get('includeTypes');
+    const excludeTypes = searchParams.get('excludeTypes');
+
+    if (includeTypes || excludeTypes) {
+      const includeArray = includeTypes?.split('|');
+      const excludeArray = excludeTypes?.split('|');
+      apiParams.type = {
+        ...(includeArray && { AND: includeArray }),
+        ...(excludeArray && { NOT: excludeArray }),
+      };
+
+      if (Object.keys(apiParams.type).length === 0) {
+        delete apiParams.type;
       }
     }
 

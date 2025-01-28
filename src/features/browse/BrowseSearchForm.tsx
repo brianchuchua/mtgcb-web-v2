@@ -7,7 +7,8 @@ import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import ColorSelector from './ColorSelector';
+import ColorSelector from '@/features/browse/ColorSelector';
+import TypeSelector from '@/features/browse/TypeSelector';
 import {
   selectOracleText,
   selectSearchName,
@@ -59,7 +60,7 @@ const BrowseSearchForm = () => {
 
   return (
     <FormWrapper>
-      <Form>
+      <Form sx={{ paddingTop: 0.5 }}>
         <Stack spacing={1.5}>
           <TextField
             fullWidth
@@ -107,6 +108,7 @@ const BrowseSearchForm = () => {
             }}
           />
           <ColorSelector />
+          <TypeSelector />
         </Stack>
       </Form>
     </FormWrapper>

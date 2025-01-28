@@ -49,6 +49,17 @@ export const useInitializeBrowseFromUrl = () => {
       };
     }
 
+    // Handle type params
+    const includeTypes = searchParams.get('includeTypes');
+    const excludeTypes = searchParams.get('excludeTypes');
+
+    if (includeTypes || excludeTypes) {
+      params.types = {
+        include: includeTypes ? includeTypes.split('|') : [],
+        exclude: excludeTypes ? excludeTypes.split('|') : []
+      };
+    }
+
     // Set all params at once
     dispatch(setSearchParams(params));
   }, [dispatch, searchParams]);
