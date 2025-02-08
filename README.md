@@ -31,6 +31,7 @@
 - A statistics page for a user's collection
 - A "money draft" tool to help users during a draft
 - Support searching by collector number and collector number ranges
+- Compare Vercel to Heroku for hosting
 
 ## Known Bugs
 
@@ -51,6 +52,11 @@
 - Ensure the add/remove buttons are very large and easy to press on tablets and mobile
 - Subsetgroups are confusing to users. Probably just hide this.
 - Allow user to tap a card row to add that card to their collection in table view
+- Some users would like result numbers listed, to help binder placement
+- Some users express that when selecting a number input, they want the entire number highlighted so it's easy to replace
+- Make a button on mobile to open filters side menu
+- Need to search by flavorName too
+- Evaluate if custom image sizes cause performance issues that can be avoided
 
 ## New TCGPlayer Affiliate Links
 
