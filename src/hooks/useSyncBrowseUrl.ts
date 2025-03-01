@@ -40,6 +40,19 @@ export const useSyncBrowseUrl = () => {
         }
       }
 
+      if (searchParams.stats) {
+        // Format each stat group as: attribute=condition1|condition2
+        const statParams = Object.entries(searchParams.stats)
+          .filter(([_, conditions]) => conditions.length > 0)
+          .map(([attribute, conditions]) => 
+            `${attribute}=${conditions.join('|')}`
+          );
+        
+        if (statParams.length > 0) {
+          params.set('stats', statParams.join(','));
+        }
+      }
+
       const newSearch = params.toString();
       const currentSearch = currentSearchParams.toString();
 

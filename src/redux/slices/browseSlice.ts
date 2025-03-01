@@ -6,6 +6,7 @@ import {
   BrowseState,
   ColorFilter,
   ColorMatchType,
+  StatFilters,
   TypeFilter,
 } from '@/types/browse';
 
@@ -52,19 +53,37 @@ export const browseSlice = createSlice({
         state.searchParams.types = action.payload;
       }
     },
+    setStats: (state, action: PayloadAction<StatFilters>) => {
+      const hasConditions = Object.values(action.payload).some(conditions => 
+        conditions.length > 0
+      );
+      
+      if (!hasConditions) {
+        delete state.searchParams.stats;
+      } else {
+        state.searchParams.stats = action.payload;
+      }
+    },
     setSearchParams: (state, action: PayloadAction<BrowseSearchParams>) => {
       state.searchParams = action.payload;
     },
   },
 });
 
-export const { setSearchName, setOracleText, setColors, setTypes, setSearchParams } =
-  browseSlice.actions;
+export const {
+  setSearchName,
+  setOracleText,
+  setColors,
+  setTypes,
+  setStats,
+  setSearchParams,
+} = browseSlice.actions;
 
 export const selectSearchParams = (state: RootState) => state.browse.searchParams;
 export const selectSearchName = (state: RootState) => state.browse.searchParams.name;
 export const selectOracleText = (state: RootState) => state.browse.searchParams.oracleText;
 export const selectColors = (state: RootState) => state.browse.searchParams.colors;
 export const selectTypes = (state: RootState) => state.browse.searchParams.types;
+export const selectStats = (state: RootState) => state.browse.searchParams.stats;
 
 export default browseSlice.reducer;

@@ -17,11 +17,22 @@ export interface TypeFilter {
   exclude: string[];
 }
 
+export interface StatCondition {
+  attribute: string;
+  operator: string;
+  value: string;
+}
+
+export interface StatFilters {
+  [key: string]: string[];  // Maps attribute to array of conditions
+}
+
 export interface BrowseSearchParams {
   name?: string;
   oracleText?: string;
   colors?: ColorFilter;
   types?: TypeFilter;
+  stats?: StatFilters;
 }
 
 export interface BrowseState {

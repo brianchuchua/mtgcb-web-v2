@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { setSearchParams } from '@/redux/slices/browseSlice';
-import { BrowseSearchParams, ColorMatchType } from '@/types/browse';
+import { BrowseSearchParams, ColorMatchType, StatFilters } from '@/types/browse';
 
 export const useInitializeBrowseFromUrl = () => {
   const dispatch = useDispatch();
@@ -33,19 +33,19 @@ export const useInitializeBrowseFromUrl = () => {
     // Handle color params
     const colorless = searchParams.get('colorless') === 'true';
     const colors = searchParams.get('colors');
-    const colorMatchType = searchParams.get('colorMatchType') as ColorMatchType || 'exactly';
+    const colorMatchType = (searchParams.get('colorMatchType') || 'exactly') as ColorMatchType;
 
     if (colorless) {
       params.colors = {
         colors: [],
         matchType: 'exactly',
-        includeColorless: true
+        includeColorless: true,
       };
     } else if (colors) {
       params.colors = {
         colors: colors.split(','),
         matchType: colorMatchType,
-        includeColorless: false
+        includeColorless: false,
       };
     }
 
@@ -56,8 +56,27 @@ export const useInitializeBrowseFromUrl = () => {
     if (includeTypes || excludeTypes) {
       params.types = {
         include: includeTypes ? includeTypes.split('|') : [],
-        exclude: excludeTypes ? excludeTypes.split('|') : []
+        exclude: excludeTypes ? excludeTypes.split('|') : [],
       };
+    }
+
+    // Handle stat params
+    const stats = searchParams.get('stats');
+    if (stats) {
+      const statFilters: StatFilters = {};
+      
+      // Format: convertedManaCost=gte2|lt5,power=gte2
+      stats.split(',').forEach(group => {
+        const [attribute, conditions] = group.split('=');
+        if (attribute && conditions) {
+          // Split multiple conditions by pipe
+          statFilters[attribute] = conditions.split('|');
+        }
+      });
+      
+      if (Object.keys(statFilters).length > 0) {
+        params.stats = statFilters;
+      }
     }
 
     // Set all params at once
