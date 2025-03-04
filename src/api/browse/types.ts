@@ -55,6 +55,46 @@ export interface CardModel {
   updatedAt: string | null;
 }
 
+export interface CardFace {
+  name: string;
+  manaCost: string | null;
+  typeLine: string | null;
+  oracleText: string | null;
+  colors: string[];
+  power: string | null;
+  toughness: string | null;
+  loyalty: string | null;
+  flavorText: string | null;
+  artist: string | null;
+  artistId: string | null;
+  imageUrl: string | null;
+}
+
+export interface ArtistModel {
+  id: string;
+  name: string;
+  englishName: string;
+  scryfallId: string;
+  description: string;
+  url: string;
+}
+
+export interface SetModel {
+  id: string;
+  name: string;
+  slug: string;
+  code: string | null;
+  scryfallId: string | null;
+  tcgplayerId: number | null;
+  setType: string | null;
+  category: string | null;
+  releasedAt: string | null;
+  blockId: number | null;
+  parentSetId: number | null;
+  cardCount: number | null;
+  iconUrl: string | null;
+}
+
 export interface CardSearchRequest {
   type?: {
     AND?: string[];
