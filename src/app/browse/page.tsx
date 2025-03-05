@@ -1,13 +1,14 @@
 'use client';
 
-import { Box, Typography, Divider } from '@mui/material';
-import BrowseSearchForm from '@/features/browse/BrowseSearchForm';
+import { Box, Divider, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import CardGallery from '@/components/cards/CardGallery';
+import Breadcrumbs from '@/components/ui/breadcrumbs';
+import BrowseSearchForm from '@/features/browse/BrowseSearchForm';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
 import { useSearchFromUrl } from '@/hooks/useSearchFromUrl';
 import { useSyncBrowseUrl } from '@/hooks/useSyncBrowseUrl';
-import { useRouter } from 'next/navigation';
 
 export default function BrowsePage() {
   const { searchResult, isLoading, error } = useSearchFromUrl();
@@ -22,7 +23,9 @@ export default function BrowsePage() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
+      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Browse' }]} />
+
       {error && (
         <Box mb={2}>
           <Typography color="error">Error loading cards: {JSON.stringify(error)}</Typography>
@@ -31,8 +34,8 @@ export default function BrowsePage() {
 
       {/* Render the card gallery with our search results */}
       {searchResult && (
-        <CardGallery 
-          cards={mapApiCardsToCardItems(searchResult.data?.cards || [])} 
+        <CardGallery
+          cards={mapApiCardsToCardItems(searchResult.data?.cards || [])}
           isLoading={isLoading}
           cardsPerRow={4}
           galleryWidth={95}
@@ -44,7 +47,9 @@ export default function BrowsePage() {
       {searchResult && (
         <>
           <Divider sx={{ my: 4 }} />
-          <Typography variant="h6" sx={{ mb: 2 }}>Debug: Raw API Response</Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Debug: Raw API Response
+          </Typography>
           <Box
             component="pre"
             sx={{

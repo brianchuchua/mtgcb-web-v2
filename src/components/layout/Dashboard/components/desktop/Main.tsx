@@ -12,9 +12,7 @@ const Main = ({ children }: MainProps) => {
 
   return (
     <StyledMain open={isDesktopOpen} sidenavwidth={sidenavWidth}>
-      <MainContent>
-        {children}
-      </MainContent>
+      <MainContent>{children}</MainContent>
     </StyledMain>
   );
 };
@@ -46,5 +44,5 @@ const StyledMain = styled('main', {
 
 const MainContent = styled('div')(({ theme }) => ({
   width: '100%',
-  padding: theme.spacing(4),
+  padding: `${theme.spacing(2)} ${theme.spacing(4)} ${theme.spacing(4)} ${theme.spacing(4)}`,
 }));
