@@ -1,10 +1,10 @@
 import { ApiResponse } from '@/api/types/apiTypes';
 import { mtgcbApi } from '@/api/mtgcbApi';
-import { CardSearchData, CardSearchRequest } from './types';
+import { CardApiParams, CardSearchData } from './types';
 
 export const browseApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
-    searchCards: builder.mutation<ApiResponse<CardSearchData>, CardSearchRequest>({
+    searchCards: builder.mutation<ApiResponse<CardSearchData>, CardApiParams>({
       query: (body) => ({
         url: '/cards/search',
         method: 'POST',

@@ -3,16 +3,17 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useSearchCardsMutation } from '@/api/browse/browseApi';
+import { CardApiParams } from '@/api/browse/types';
 import { ColorMatchType } from '@/types/browse';
 
 // Map our URL operators to API operators
 const OPERATOR_MAP = {
-  'gte': '>=',
-  'gt': '>',
-  'lte': '<=',
-  'lt': '<',
-  'eq': '=',
-  'not': '!='
+  gte: '>=',
+  gt: '>',
+  lte: '<=',
+  lt: '<',
+  eq: '=',
+  not: '!=',
 };
 
 export const useSearchFromUrl = () => {
@@ -20,8 +21,20 @@ export const useSearchFromUrl = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const apiParams: any = {
-      select: ['*'],
+    const apiParams: CardApiParams = {
+      select: [
+        'name',
+        'setId',
+        'setName',
+        'tcgplayerId',
+        'market',
+        'low',
+        'average',
+        'high',
+        'foil',
+        'collectorNumber',
+        'mtgcbCollectorNumber',
+      ],
       limit: 24,
       offset: 0,
       sortBy: 'name',
@@ -85,10 +98,10 @@ export const useSearchFromUrl = () => {
     const stats = searchParams.get('stats');
     if (stats) {
       // Parse stats parameter: convertedManaCost=gte4|gte3,power=gte2
-      stats.split(',').forEach(group => {
+      stats.split(',').forEach((group) => {
         const [attribute, conditions] = group.split('=');
         if (attribute && conditions) {
-          const transformedConditions = conditions.split('|').map(cond => {
+          const transformedConditions = conditions.split('|').map((cond) => {
             // Extract operator and value
             for (const [urlOp, apiOp] of Object.entries(OPERATOR_MAP)) {
               if (cond.startsWith(urlOp)) {
@@ -101,7 +114,7 @@ export const useSearchFromUrl = () => {
 
           // Add conditions directly to the field
           apiParams[attribute] = {
-            AND: transformedConditions
+            AND: transformedConditions,
           };
         }
       });

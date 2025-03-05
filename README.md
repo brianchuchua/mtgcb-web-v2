@@ -2,7 +2,9 @@
 
 ## Now
 
+- Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files)
 - Start porting over mtgcb-web to this project, using the latest React best practices
+- Maybe the React windowing shouldn't unload items when they leave the viewport, only load them.
 - Don't forget to store some settings in local storage but also have them in the url for sharing
 - Collection should better show that it's a dropdown and feel less awkward
 - Clean up BrowseSearchForm into smaller components

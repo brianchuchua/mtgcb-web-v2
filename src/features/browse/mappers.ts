@@ -9,25 +9,24 @@ export const mapApiCardToCardItem = (card: CardModel): CardItemProps => {
     id: card.id,
     name: card.name,
     setCode: card.tcgplayerSetCode?.toLowerCase() || card.setId?.toLowerCase(),
-    setName: card.setId || undefined,
+    setName: card.setName || undefined,
     collectorNumber: card.collectorNumber || undefined,
     rarity: card.rarity || undefined,
+    tcgplayerId: card.tcgplayerId || undefined,
 
     // Handle price data
-    price:
-      card.market || card.average || card.low || card.foil
-        ? {
-            value: parseFloat(card.market || card.average || card.low || card.foil || '0'),
-            isFoil: !!(
-              !card.market &&
-              !card.average &&
-              !card.low &&
-              card.foil &&
-              card.canBeFoil &&
-              !card.canBeNonFoil
-            ),
-          }
-        : undefined,
+    prices: {
+      // Normal price - check market, average, low in that order
+      normal:
+        card.market || card.average || card.low
+          ? {
+              value: parseFloat(card.market || card.average || card.low || '0'),
+            }
+          : undefined,
+
+      // Foil price if available
+      foil: card.foil ? { value: parseFloat(card.foil) } : undefined,
+    },
   };
 };
 

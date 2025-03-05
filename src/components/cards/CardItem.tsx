@@ -3,6 +3,7 @@
 import { Box, Card, CardContent, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useEffect, useRef, useState } from 'react';
+import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
 // Define a generic card interface that's not tied to any specific API
 export interface CardItemProps {
@@ -27,6 +28,11 @@ export interface CardItemProps {
   setName?: string;
 
   /**
+   * TCGPlayer Id
+   */
+  tcgplayerId?: number | string;
+
+  /**
    * Collector number within the set
    */
   collectorNumber?: string;
@@ -39,10 +45,15 @@ export interface CardItemProps {
   /**
    * Price information
    */
-  price?: {
-    value: number;
-    currency?: string;
-    isFoil?: boolean;
+  prices?: {
+    normal?: {
+      value: number;
+      currency?: string;
+    };
+    foil?: {
+      value: number;
+      currency?: string;
+    };
   };
 
   /**
@@ -68,9 +79,10 @@ const CardItem = ({
   name,
   setCode,
   setName,
+  tcgplayerId,
   collectorNumber,
   rarity,
-  price,
+  prices,
   display = {
     nameIsVisible: true,
     setIsVisible: true,
@@ -101,17 +113,30 @@ const CardItem = ({
 
   // Get price display
   const getPriceDisplay = () => {
-    if (!price) return 'Price N/A';
+    if (!prices || (!prices.normal && !prices.foil)) return 'Price N/A';
 
-    const currency = price.currency || '$';
-    const formattedPrice = `${currency}${price.value.toFixed(2)}`;
+    const normalPrice = prices.normal;
+    const foilPrice = prices.foil;
+    const currency = '$';
 
-    // Show foil indicator if applicable
-    if (price.isFoil) {
-      return `${formattedPrice} (F)`;
+    // Both prices available
+    if (normalPrice && foilPrice) {
+      const formattedNormal = `${currency}${normalPrice.value.toFixed(2)}`;
+      const formattedFoil = `${currency}${foilPrice.value.toFixed(2)}`;
+      return `${formattedNormal} (${formattedFoil} foil)`;
     }
 
-    return formattedPrice;
+    // Only normal price available
+    if (normalPrice) {
+      return `${currency}${normalPrice.value.toFixed(2)}`;
+    }
+
+    // Only foil price available
+    if (foilPrice) {
+      return `${currency}${foilPrice.value.toFixed(2)} foil`;
+    }
+
+    return 'Price N/A';
   };
 
   // Get image URL with cache busting
@@ -119,16 +144,51 @@ const CardItem = ({
     return `https://mtgcb-images.s3.amazonaws.com/cards/images/normal/${id}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`;
   };
 
+  // Get TCGPlayer affiliate link for this card
+  const getTCGPlayerLink = () => {
+    // Always generate a link to TCGPlayer - use direct product link if we have tcgplayerId,
+    // otherwise search for the card by name
+    return generateTCGPlayerLink(tcgplayerId, name);
+  };
+
+  // Determine the border radius based on set name
+  const getBorderRadius = () => {
+    return setName === 'Limited Edition Alpha' ? '7%' : '5%';
+  };
+
+  // Handle element click for card navigation
+  const handleCardElementClick = (e: React.MouseEvent) => {
+    // Stop event from bubbling up to parent elements
+    e.stopPropagation();
+
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
-    <StyledCard onClick={onClick} sx={{ cursor: onClick ? 'pointer' : 'default' }}>
-      <CardImageContainer>
+    <StyledCard
+      sx={{
+        borderRadius: getBorderRadius(),
+      }}
+      setName={setName}
+    >
+      <CardImageContainer
+        onClick={onClick ? handleCardElementClick : undefined}
+        sx={{ cursor: onClick ? 'pointer' : 'default' }}
+      >
         {!imageLoaded && !imageError && (
           <Skeleton
             variant="rectangular"
             width="100%"
             height="100%"
             animation="wave"
-            sx={{ position: 'absolute', top: 0, left: 0 }}
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              borderRadius: getBorderRadius(),
+            }}
           />
         )}
         {!imageError ? (
@@ -138,12 +198,13 @@ const CardItem = ({
             src={undefined}
             data-src={getImageUrl()}
             alt={name}
+            setName={setName}
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
             style={{ opacity: imageLoaded ? 1 : 0 }}
           />
         ) : (
-          <MissingImageFallback>
+          <MissingImageFallback setName={setName}>
             <Typography variant="subtitle2">{name}</Typography>
             <Typography variant="caption">Image not available</Typography>
           </MissingImageFallback>
@@ -153,27 +214,63 @@ const CardItem = ({
       {(nameIsVisible || setIsVisible || priceIsVisible) && (
         <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
           {nameIsVisible && (
-            <Typography variant="subtitle2" noWrap title={name} sx={{ fontWeight: 'bold' }}>
+            <Typography
+              variant="h6"
+              noWrap
+              title={name}
+              onClick={onClick ? handleCardElementClick : undefined}
+              sx={{
+                fontWeight: 'bold',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
+                cursor: onClick ? 'pointer' : 'default',
+                '&:hover': {
+                  textDecoration: onClick ? 'underline' : 'none',
+                },
+              }}
+            >
               {name}
             </Typography>
           )}
 
           {setIsVisible && setName && (
-            <Typography variant="caption" noWrap display="block" sx={{ opacity: 0.8 }}>
-              <i className={`ss ss-${setCode?.toLowerCase() || 'unfinity'}`} />
-              &nbsp;{setName} #{collectorNumber || '??'}
+            <Typography
+              variant="body2"
+              noWrap
+              display="block"
+              sx={{
+                opacity: 0.8,
+                fontStyle: 'italic',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
+              }}
+            >
+              {setName} #{collectorNumber || '??'}
             </Typography>
           )}
 
           {priceIsVisible && (
             <Typography
-              variant="caption"
+              variant="subtitle1"
               noWrap
               display="block"
+              component="a"
+              href={getTCGPlayerLink()}
+              target="_blank"
+              rel="noreferrer"
               sx={{
                 mt: 0.5,
                 fontWeight: 'medium',
                 color: (theme) => theme.palette.primary.main,
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+                cursor: 'pointer', // Always show pointer since we always link to TCGPlayer now
               }}
             >
               {getPriceDisplay()}
@@ -186,12 +283,21 @@ const CardItem = ({
 };
 
 // Styled components
-const StyledCard = styled(Card)(({ theme }) => ({
+interface CardElementProps {
+  setName?: string;
+}
+
+const StyledCard = styled(Card, {
+  shouldForwardProp: (prop) => prop !== 'setName',
+})<CardElementProps>(({ theme, setName }) => ({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
   transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
   backgroundColor: theme.palette.background.paper,
+  textAlign: 'center', // Ensure text is centered like original
+  borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
+  overflow: 'hidden',
   '&:hover': {
     transform: 'translateY(-4px)',
     boxShadow: theme.shadows[4],
@@ -200,11 +306,15 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 const CardImageContainer = styled(Box)({
   position: 'relative',
-  paddingTop: '140%', // 2.5:3.5 aspect ratio (Magic card dimensions)
+  paddingTop: '139.3%', // Aspect ratio of a magic card (680/488)
   overflow: 'hidden',
 });
 
-const CardImage = styled('img')({
+interface CardImageProps {
+  setName?: string;
+}
+
+const CardImage = styled('img')<CardImageProps>(({ setName }) => ({
   position: 'absolute',
   top: 0,
   left: 0,
@@ -212,9 +322,12 @@ const CardImage = styled('img')({
   height: '100%',
   objectFit: 'contain',
   transition: 'opacity 0.3s ease-in-out',
-});
+  borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
+}));
 
-const MissingImageFallback = styled(Box)(({ theme }) => ({
+const MissingImageFallback = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'setName',
+})<CardElementProps>(({ theme, setName }) => ({
   position: 'absolute',
   top: 0,
   left: 0,
@@ -226,7 +339,7 @@ const MissingImageFallback = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   backgroundColor: theme.palette.background.default,
   border: `1px solid ${theme.palette.divider}`,
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
   padding: theme.spacing(2),
   textAlign: 'center',
   '& .MuiTypography-subtitle2': {

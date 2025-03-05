@@ -53,6 +53,8 @@ export interface CardModel {
   releasedAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+  // Derived fields
+  setName: string | null;
 }
 
 export interface CardFace {
@@ -95,6 +97,35 @@ export interface SetModel {
   iconUrl: string | null;
 }
 
+// Create a type for the select parameter that allows for all possible fields of CardModel
+export type CardModelField = keyof CardModel;
+
+/**
+ * Interface for API parameters used in card search requests
+ */
+export interface CardApiParams {
+  /**
+   * Optional array of fields to select from the CardModel
+   * If omitted, all fields will be returned
+   */
+  select?: CardModelField[];
+
+  /** Maximum number of results to return */
+  limit?: number;
+
+  /** Number of results to skip (for pagination) */
+  offset?: number;
+
+  /** Field to sort results by */
+  sortBy?: CardModelField | string;
+
+  /** Sort direction */
+  sortDirection?: 'asc' | 'desc';
+
+  // Additional search parameters can be added as needed
+  [key: string]: any;
+}
+
 export interface CardSearchRequest {
   type?: {
     AND?: string[];
@@ -106,7 +137,7 @@ export interface CardSearchRequest {
     colors: string[];
     matchType: string;
   };
-  select: string[];
+  select?: CardModelField[];
   limit?: number;
   offset?: number;
   sortBy?: string;
