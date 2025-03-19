@@ -20,6 +20,7 @@
 - Sort order implementation, stable
 - Clear all filters button
 - Adrix and Nev, Twincasters image size issue on mobile
+- Perf issues when rendering 8000 cards on the page -- the viewport stuff isn't working maybe? (Manually edit URL to do this)
 
 ## Later
 

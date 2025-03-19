@@ -176,10 +176,10 @@ export default function BrowsePage() {
   }, [apiLoading, isLoading]);
 
   useEffect(() => {
-    const params = new URLSearchParams(urlSearchParams.toString());
+    const params = new URLSearchParams();
     const defaults = { currentPage: 1, pageSize: 24, viewMode: 'grid' };
 
-    // Only include non-default values in URL
+    // Add pagination parameters
     pagination.currentPage > defaults.currentPage
       ? params.set('page', pagination.currentPage.toString())
       : params.delete('page');
@@ -192,10 +192,48 @@ export default function BrowsePage() {
       ? params.set('view', pagination.viewMode)
       : params.delete('view');
 
+    // Add search parameters from Redux
+    if (reduxSearchParams.name) {
+      params.set('name', reduxSearchParams.name);
+    }
+
+    if (reduxSearchParams.oracleText) {
+      params.set('oracleText', reduxSearchParams.oracleText);
+    }
+
+    if (reduxSearchParams.colors) {
+      if (reduxSearchParams.colors.includeColorless) {
+        params.set('colorless', 'true');
+      } else if (reduxSearchParams.colors.colors.length > 0) {
+        params.set('colors', reduxSearchParams.colors.colors.join(','));
+        params.set('colorMatchType', reduxSearchParams.colors.matchType);
+      }
+    }
+
+    if (reduxSearchParams.types) {
+      if (reduxSearchParams.types.include.length > 0) {
+        params.set('includeTypes', reduxSearchParams.types.include.join('|'));
+      }
+      if (reduxSearchParams.types.exclude.length > 0) {
+        params.set('excludeTypes', reduxSearchParams.types.exclude.join('|'));
+      }
+    }
+
+    if (reduxSearchParams.stats) {
+      // Format each stat group as: attribute=condition1|condition2
+      const statParams = Object.entries(reduxSearchParams.stats)
+        .filter(([_, conditions]) => conditions.length > 0)
+        .map(([attribute, conditions]) => `${attribute}=${conditions.join('|')}`);
+
+      if (statParams.length > 0) {
+        params.set('stats', statParams.join(','));
+      }
+    }
+
     const newSearch = params.toString();
     const newUrl = newSearch ? `${pathname}?${newSearch}` : pathname;
     router.replace(newUrl, { scroll: false });
-  }, [pagination, pathname, router, urlSearchParams]);
+  }, [pagination, reduxSearchParams, pathname, router]);
 
   const handlePageChange = useCallback((page: number) => {
     setPagination((prev) => ({ ...prev, currentPage: page }));
