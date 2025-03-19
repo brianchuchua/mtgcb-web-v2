@@ -4,6 +4,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import GridViewIcon from '@mui/icons-material/GridView';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import {
@@ -11,6 +12,7 @@ import {
   Button,
   FormControl,
   IconButton,
+  InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -67,7 +69,7 @@ const ViewModeToggle = React.memo(
             onClick={handleGridClick}
             startIcon={<GridViewIcon />}
           >
-            {!isSmallMobile && 'Grid'}
+            Grid
           </Button>
         </Tooltip>
         <Tooltip title="Table view">
@@ -77,7 +79,7 @@ const ViewModeToggle = React.memo(
             onClick={handleTableClick}
             startIcon={<TableRowsIcon />}
           >
-            {!isSmallMobile && 'Table'}
+            Table
           </Button>
         </Tooltip>
       </ViewModeToggleGroup>
@@ -106,11 +108,25 @@ const PageSizeControl = React.memo(
       [onPageSizeChange],
     );
 
+    const isMobile = useMediaQuery('(max-width:900px)');
+
     return (
       <PageSizeSelector>
-        <Typography variant="body2" color="text.secondary" sx={{ mr: 1, whiteSpace: 'nowrap' }}>
-          Cards per page:
-        </Typography>
+        {!isMobile ? (
+          // Desktop view
+          <Typography variant="body1" color="text.secondary" sx={{ mr: 1, whiteSpace: 'nowrap' }}>
+            Cards per page:
+          </Typography>
+        ) : null}
+        {isMobile && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mr: 1, fontSize: '0.875rem', whiteSpace: 'nowrap' }}
+          >
+            Cards:
+          </Typography>
+        )}
         <FormControl size="small" variant="outlined">
           <Select
             value={pageSize}
@@ -320,7 +336,7 @@ export const CardGalleryPagination = React.memo(
               {/* Item range display */}
               <ItemRangeInfo>
                 {!isLoading && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body1" color="text.secondary">
                     Showing {startItem}-{endItem} of {totalItems} cards
                   </Typography>
                 )}
@@ -329,68 +345,97 @@ export const CardGalleryPagination = React.memo(
 
             {/* Center section with pagination controls */}
             <CenterSection>
-              {/* Pagination controls */}
-              <NavigationControls
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-                isLoading={isLoading}
-                isSmallMobile={isSmallMobile}
-              />
+              {/* Mobile layout groups pagination controls and page size in single row */}
+              {/* Desktop layout - centered navigation controls */}
+              {!isSmallMobile && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                  <NavigationControls
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                    isLoading={isLoading}
+                    isSmallMobile={isSmallMobile}
+                  />
+                </Box>
+              )}
 
-              {/* Page indicator on mobile */}
+              {/* Mobile layout with two columns in one row */}
               {isSmallMobile && (
-                <PageIndicator>
-                  <Typography variant="body2" color="text.secondary">
-                    Page {currentPage} of {totalPages}
-                  </Typography>
-                </PageIndicator>
+                <MobileControlsRow>
+                  {/* Left column: pagination controls and page indicator */}
+                  <PaginationControlsGroup>
+                    {/* Pagination controls */}
+                    <NavigationControls
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={onPageChange}
+                      isLoading={isLoading}
+                      isSmallMobile={isSmallMobile}
+                    />
+
+                    {/* Page indicator directly beneath pagination controls */}
+                    <PageIndicator>
+                      <Typography variant="body2" color="text.secondary">
+                        Page {currentPage} of {totalPages}
+                      </Typography>
+                    </PageIndicator>
+                  </PaginationControlsGroup>
+
+                  {/* Right column: page size selector and view mode toggles */}
+                  <RightControlsGroup>
+                    {/* Cards dropdown right-aligned */}
+                    <PageSizeControl
+                      pageSize={pageSize}
+                      onPageSizeChange={onPageSizeChange}
+                      pageSizeOptions={pageSizeOptions}
+                    />
+
+                    {/* View mode toggles aligned with dropdown */}
+                    <Box sx={{ mt: 1 }}>
+                      <ViewModeToggle
+                        viewMode={viewMode}
+                        onViewModeChange={onViewModeChange}
+                        isSmallMobile={isSmallMobile}
+                      />
+                    </Box>
+                  </RightControlsGroup>
+                </MobileControlsRow>
+              )}
+
+              {/* Desktop view: View mode toggles centered */}
+              {!isSmallMobile && (
+                <ViewToggleContainer>
+                  <ViewModeToggle
+                    viewMode={viewMode}
+                    onViewModeChange={onViewModeChange}
+                    isSmallMobile={isSmallMobile}
+                  />
+                </ViewToggleContainer>
               )}
             </CenterSection>
 
-            {/* Right section with page size selector and view mode toggles */}
-            <RightSection>
-              <ControlsGroup>
-                {/* Page size selector */}
-                <PageSizeControl
-                  pageSize={pageSize}
-                  onPageSizeChange={onPageSizeChange}
-                  pageSizeOptions={pageSizeOptions}
-                />
-
-                {/* View mode toggles */}
-                <ViewModeToggle
-                  viewMode={viewMode}
-                  onViewModeChange={onViewModeChange}
-                  isSmallMobile={isSmallMobile}
-                />
-              </ControlsGroup>
+            {/* Right section with page size selector - visible only on large screens */}
+            <RightSection sx={{ display: { xs: 'none', lg: 'flex' } }}>
+              <PageSizeControl
+                pageSize={pageSize}
+                onPageSizeChange={onPageSizeChange}
+                pageSizeOptions={pageSizeOptions}
+              />
             </RightSection>
           </TopPaginationLayout>
         ) : (
           // Bottom pagination - simpler layout
           <BottomPaginationLayout>
-            {/* Pagination controls */}
-            <NavigationControls
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-              isLoading={isLoading}
-              isSmallMobile={isSmallMobile}
-            />
-
-            {/* Page indicator on mobile */}
-            {isSmallMobile && (
-              <PageIndicator>
-                <Typography variant="body2" color="text.secondary">
-                  Page {currentPage} of {totalPages}
-                </Typography>
-              </PageIndicator>
-            )}
-
-            {/* Back to top button */}
+            {/* Only Back to top button with icon */}
             <BackToTopButton>
-              <Button variant="text" size="small" onClick={scrollToTop} color="primary">
+              <Button
+                variant="outlined"
+                size="medium"
+                onClick={scrollToTop}
+                color="primary"
+                startIcon={<KeyboardArrowUpIcon />}
+                sx={{ px: 3, py: 0.75, borderRadius: 4 }}
+              >
                 Back to top
               </Button>
             </BackToTopButton>
@@ -422,9 +467,18 @@ CardGalleryPagination.displayName = 'CardGalleryPagination';
 
 // Styled components
 const PaginationContainer = styled(Box)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  width: '100%',
+  margin: `${theme.spacing(2)} auto`,
+  width: '95%',
+  padding: theme.spacing(0, 2),
+
+  // Match CardGallery's responsive widths
+  [theme.breakpoints.down('md')]: {
+    width: '98%',
+  },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+    padding: theme.spacing(0, 1),
+  },
 }));
 
 const TopPaginationLayout = styled(Box)(({ theme }) => ({
@@ -434,7 +488,7 @@ const TopPaginationLayout = styled(Box)(({ theme }) => ({
   width: '100%',
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
-    gap: theme.spacing(2),
+    alignItems: 'center',
   },
 }));
 
@@ -450,9 +504,12 @@ const BottomPaginationLayout = styled(Box)(({ theme }) => ({
 const LeftSection = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
+  width: '240px', // Fixed width to prevent shifting
+  justifyContent: 'flex-start',
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 1,
+    justifyContent: 'center', // Center on mobile
   },
 }));
 
@@ -461,6 +518,7 @@ const CenterSection = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  flex: 1,
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 3,
@@ -472,22 +530,11 @@ const RightSection = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
+  width: '240px', // Fixed width to match LeftSection
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 2,
-    justifyContent: 'flex-start',
-  },
-}));
-
-const ControlsGroup = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: theme.spacing(2),
-  [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    width: '100%',
-    gap: theme.spacing(1),
+    justifyContent: 'center', // Center on mobile
   },
 }));
 
@@ -500,11 +547,18 @@ const ViewModeToggleGroup = styled(Stack)(({ theme }) => ({
 const ItemRangeInfo = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
+  minWidth: '200px', // Ensure text has enough space to not wrap
+  '& .MuiTypography-root': {
+    whiteSpace: 'nowrap', // Prevent text wrapping
+  },
 }));
 
-const PageSizeSelector = styled(Box)(() => ({
+const PageSizeSelector = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
+  [theme.breakpoints.down('md')]: {
+    justifyContent: 'center',
+  },
 }));
 
 const PaginationControls = styled(Box)(({ theme }) => ({
@@ -531,14 +585,55 @@ const PageButton = styled(Button, {
 const PageIndicator = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
-  width: '100%',
-  marginTop: theme.spacing(1),
+  width: '100%', // Use full width to ensure centering works within parent
+  marginTop: theme.spacing(0.5), // Small top margin to separate from controls
 }));
 
 const BackToTopButton = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
+  margin: theme.spacing(3, 0, 1, 0),
+}));
+
+const ViewToggleContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  marginTop: theme.spacing(1.5),
+  [theme.breakpoints.down('md')]: {
+    marginTop: theme.spacing(1),
+  },
+}));
+
+const MobileControlsRow = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between', // Changed to space-between to align items at edges
+  flexDirection: 'row',
+  width: '100%',
+  gap: theme.spacing(2),
+}));
+
+const SecondControlsRow = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  width: '100%',
+  flexDirection: 'row',
+  justifyContent: 'space-between', // Changed to space-between for alignment
   marginTop: theme.spacing(1),
+}));
+
+// For grouping pagination controls and page indicator vertically
+const PaginationControlsGroup = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+}));
+
+// For grouping page size and view mode toggles vertically
+const RightControlsGroup = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end', // Right align contents
 }));
 
 export default CardGalleryPagination;

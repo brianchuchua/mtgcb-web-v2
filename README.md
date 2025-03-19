@@ -2,11 +2,13 @@
 
 ## Now
 
-- Figure out how to best render the grid and table style buttons
+- Mobile and desktop view card size issues while scrolling
 - Have same default order of cards as legacy site
 - Fix alignment of breadcrumbs and image gallery to match, along with other elements
 - Fix mobile view for cardgallery and pagination controls
 - Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files)
+- "No cards found" when refreshing the Browse page, briefly
+- Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
 - Maybe the React windowing shouldn't unload items when they leave the viewport, only load them.
 - Don't forget to store some settings in local storage but also have them in the url for sharing

@@ -60,30 +60,6 @@ interface DebugViewProps {
   searchResult: ApiResponse<CardSearchData>;
 }
 
-const DebugView = ({ searchResult }: DebugViewProps) => (
-  <>
-    <Divider sx={{ my: 4 }} />
-    <Typography variant="h6" sx={{ mb: 2 }}>
-      Debug: Raw API Response
-    </Typography>
-    <Box
-      component="pre"
-      sx={{
-        p: 2,
-        bgcolor: 'background.paper',
-        border: 1,
-        borderColor: 'divider',
-        borderRadius: 1,
-        color: 'text.primary',
-        overflow: 'auto',
-        fontSize: '0.75rem',
-      }}
-    >
-      {JSON.stringify(searchResult, null, 2)}
-    </Box>
-  </>
-);
-
 export default function BrowsePage() {
   const router = useRouter();
   const pathname = usePathname();
@@ -287,8 +263,6 @@ export default function BrowsePage() {
       />
 
       <CardGalleryPagination {...paginationProps} isOnBottom={true} />
-
-      {searchResult && <DebugView searchResult={searchResult} />}
     </Box>
   );
 }
