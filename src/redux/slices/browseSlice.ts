@@ -1,7 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../rootReducer';
 import {
-  BrowsePreferences,
   BrowseSearchParams,
   BrowseState,
   ColorFilter,
@@ -9,12 +8,6 @@ import {
   StatFilters,
   TypeFilter,
 } from '@/types/browse';
-
-const defaultPreferences: BrowsePreferences = {
-  pageSize: 24,
-  sortBy: 'releasedAt',
-  sortDirection: 'desc',
-};
 
 // Initialize with empty state - let the useInitializeBrowseFromUrl handle population
 const initialState: BrowseState = {

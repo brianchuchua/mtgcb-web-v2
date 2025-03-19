@@ -1,8 +1,3 @@
-export interface BrowsePreferences {
-  pageSize: number;
-  sortBy: string;
-  sortDirection: 'asc' | 'desc';
-}
 
 export type ColorMatchType = 'exactly' | 'atLeast' | 'atMost';
 

@@ -4,6 +4,7 @@ import { Box, Divider, Typography } from '@mui/material';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ApiResponse } from '@/api/types/apiTypes';
 import CardGallery from '@/components/cards/CardGallery';
 import CardTable from '@/components/cards/CardTable';
 import { CardGalleryPagination } from '@/components/pagination';
@@ -13,13 +14,20 @@ import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
 import { useGetCardsQuery, useGetCardsPrefetch, getNextPageParams } from '@/api/browse/browseApi';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { skipToken } from '@reduxjs/toolkit/query';
-import { CardApiParams } from '@/api/browse/types';
+import { CardApiParams, CardModel, CardSearchData } from '@/api/browse/types';
 import { selectSearchParams } from '@/redux/slices/browseSlice';
 import { BrowsePagination } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 import { useImagePreloader } from '@/hooks/useImagePreloader';
 
-const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick }) => {
+interface CardDisplayProps {
+  cardItems: ReturnType<typeof mapApiCardsToCardItems>;
+  isLoading: boolean;
+  viewMode: 'grid' | 'table';
+  onCardClick: (cardId: string) => void;
+}
+
+const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick }: CardDisplayProps) => {
   const displayCards = isLoading
     ? Array(24).fill(0).map((_, index) => ({
         id: `skeleton-${index}`,
@@ -51,7 +59,11 @@ const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick }) => {
 };
 
 // Debug view as a separate component
-const DebugView = ({ searchResult }) => (
+interface DebugViewProps {
+  searchResult: ApiResponse<CardSearchData>;
+}
+
+const DebugView = ({ searchResult }: DebugViewProps) => (
   <>
     <Divider sx={{ my: 4 }} />
     <Typography variant="h6" sx={{ mb: 2 }}>
@@ -94,12 +106,12 @@ export default function BrowsePage() {
     limit: pagination.pageSize,
     offset: (pagination.currentPage - 1) * pagination.pageSize,
     sortBy: 'name',
-    sortDirection: 'asc',
+    sortDirection: 'asc' as const,
     select: [
       'name', 'setId', 'setName', 'tcgplayerId',
       'market', 'low', 'average', 'high', 'foil',
       'collectorNumber', 'mtgcbCollectorNumber', 'rarity',
-    ],
+    ] as Array<keyof CardModel>,
   }), [reduxSearchParams, pagination]);
   
   const nextPageApiParams = useMemo(() => 
@@ -146,7 +158,7 @@ export default function BrowsePage() {
   );
   
   const [isLoading, setIsLoading] = useState(false);
-  const loadingTimerRef = useRef(null);
+  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   useImagePreloader(nextPageData, isLoading);
   

@@ -1,15 +1,22 @@
 import debounce from 'lodash.debounce';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { selectPagination, selectSearchParams } from '@/redux/slices/browseSlice';
+import { selectSearchParams } from '@/redux/slices/browseSlice';
+import { BrowsePagination } from '@/types/browse';
 
 export const useSyncBrowseUrl = () => {
   const searchParams = useSelector(selectSearchParams);
-  const pagination = useSelector(selectPagination);
   const router = useRouter();
   const pathname = usePathname();
   const currentSearchParams = useSearchParams();
+  
+  // Use local pagination instead of from redux
+  const [pagination, setPagination] = useState<BrowsePagination>({
+    currentPage: parseInt(currentSearchParams.get('page') || '1', 10),
+    pageSize: parseInt(currentSearchParams.get('pageSize') || '24', 10),
+    viewMode: currentSearchParams.get('view') === 'table' ? 'table' : 'grid'
+  });
   
   const prevUrlRef = useRef<string | null>(null);
 

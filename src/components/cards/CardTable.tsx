@@ -69,7 +69,7 @@ const CardTable = React.memo(({
     }
   }, [onCardClick]);
 
-  const getPriceDisplay = useCallback((card: CardItemProps) => {
+  const getPriceDisplay = useCallback((card: CardItemProps | any) => {
     if (!card.prices || (!card.prices.normal && !card.prices.foil)) return 'N/A';
 
     const normalPrice = card.prices.normal;
@@ -136,7 +136,7 @@ const CardTable = React.memo(({
                 <TableCell>{card.rarity || 'N/A'}</TableCell>
                 <TableCell>
                   <PriceLink
-                    href={generateTCGPlayerLink(card.tcgplayerId, card.name)}
+                    href={generateTCGPlayerLink('tcgplayerId' in card ? card.tcgplayerId : undefined, card.name)}
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()} // Prevent row click when clicking on price

@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useSearchCardsMutation } from '@/api/browse/browseApi';
 import { CardApiParams } from '@/api/browse/types';
-import { selectCurrentPage, selectPageSize } from '@/redux/slices/browseSlice';
+import { useAppSelector } from '@/redux/hooks';
 import { ColorMatchType } from '@/types/browse';
 
 const OPERATOR_MAP = {
@@ -21,9 +21,9 @@ export const useSearchFromUrl = () => {
   const [searchCards, { data: searchResult, isLoading, error }] = useSearchCardsMutation();
   const searchParams = useSearchParams();
   
-  // Get pagination state from Redux
-  const currentPage = useSelector(selectCurrentPage);
-  const pageSize = useSelector(selectPageSize);
+  // Get pagination state from URL
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
+  const pageSize = parseInt(searchParams.get('pageSize') || '24', 10);
 
   useEffect(() => {
     const apiParams: CardApiParams = {
