@@ -12,7 +12,6 @@ export const useInitializeBrowseFromUrl = () => {
   const initialized = useRef(false);
 
   useEffect(() => {
-    // Only run once on initial mount
     if (initialized.current) return;
     initialized.current = true;
 
@@ -60,7 +59,6 @@ export const useInitializeBrowseFromUrl = () => {
       };
     }
 
-    // Handle stat params
     const stats = searchParams.get('stats');
     if (stats) {
       const statFilters: StatFilters = {};
@@ -69,7 +67,6 @@ export const useInitializeBrowseFromUrl = () => {
       stats.split(',').forEach(group => {
         const [attribute, conditions] = group.split('=');
         if (attribute && conditions) {
-          // Split multiple conditions by pipe
           statFilters[attribute] = conditions.split('|');
         }
       });
@@ -79,7 +76,6 @@ export const useInitializeBrowseFromUrl = () => {
       }
     }
 
-    // Set all params at once
     dispatch(setSearchParams(params));
   }, [dispatch, searchParams]);
 };

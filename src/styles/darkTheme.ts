@@ -39,6 +39,13 @@ const darkTheme = createTheme({
         ...globalStyles(theme),
       }),
     },
+    MuiSkeleton: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#282C34',
+        },
+      },
+    },
     MuiPaper: {
       styleOverrides: {
         root: {

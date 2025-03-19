@@ -2,11 +2,12 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { useSearchCardsMutation } from '@/api/browse/browseApi';
 import { CardApiParams } from '@/api/browse/types';
+import { selectCurrentPage, selectPageSize } from '@/redux/slices/browseSlice';
 import { ColorMatchType } from '@/types/browse';
 
-// Map our URL operators to API operators
 const OPERATOR_MAP = {
   gte: '>=',
   gt: '>',
@@ -19,6 +20,10 @@ const OPERATOR_MAP = {
 export const useSearchFromUrl = () => {
   const [searchCards, { data: searchResult, isLoading, error }] = useSearchCardsMutation();
   const searchParams = useSearchParams();
+  
+  // Get pagination state from Redux
+  const currentPage = useSelector(selectCurrentPage);
+  const pageSize = useSelector(selectPageSize);
 
   useEffect(() => {
     const apiParams: CardApiParams = {
@@ -34,9 +39,10 @@ export const useSearchFromUrl = () => {
         'foil',
         'collectorNumber',
         'mtgcbCollectorNumber',
+        'rarity',
       ],
-      limit: 24,
-      offset: 0,
+      limit: pageSize,
+      offset: (currentPage - 1) * pageSize,
       sortBy: 'name',
       sortDirection: 'asc',
     };
@@ -94,7 +100,6 @@ export const useSearchFromUrl = () => {
       };
     }
 
-    // Add stat filtering - apply directly to the numeric fields
     const stats = searchParams.get('stats');
     if (stats) {
       // Parse stats parameter: convertedManaCost=gte4|gte3,power=gte2
@@ -102,7 +107,6 @@ export const useSearchFromUrl = () => {
         const [attribute, conditions] = group.split('=');
         if (attribute && conditions) {
           const transformedConditions = conditions.split('|').map((cond) => {
-            // Extract operator and value
             for (const [urlOp, apiOp] of Object.entries(OPERATOR_MAP)) {
               if (cond.startsWith(urlOp)) {
                 const value = cond.slice(urlOp.length);
@@ -112,7 +116,6 @@ export const useSearchFromUrl = () => {
             return cond;
           });
 
-          // Add conditions directly to the field
           apiParams[attribute] = {
             AND: transformedConditions,
           };
@@ -120,8 +123,20 @@ export const useSearchFromUrl = () => {
       });
     }
 
+    // Add sort parameters from URL if specified
+    const sortBy = searchParams.get('sortBy');
+    const sortDirection = searchParams.get('sortDirection');
+    
+    if (sortBy) {
+      apiParams.sortBy = sortBy;
+    }
+    
+    if (sortDirection && (sortDirection === 'asc' || sortDirection === 'desc')) {
+      apiParams.sortDirection = sortDirection;
+    }
+
     searchCards(apiParams);
-  }, [searchCards, searchParams]);
+  }, [searchCards, searchParams, currentPage, pageSize]);
 
   return { searchResult, isLoading, error };
 };

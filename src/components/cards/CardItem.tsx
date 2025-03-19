@@ -28,6 +28,11 @@ export interface CardItemProps {
   setName?: string;
 
   /**
+   * Flag to indicate this is a loading skeleton
+   */
+  isLoadingSkeleton?: boolean;
+
+  /**
    * TCGPlayer Id
    */
   tcgplayerId?: number | string;
@@ -89,12 +94,49 @@ const CardItem = ({
     priceIsVisible: true,
   },
   onClick,
+  isLoadingSkeleton = false,
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
   const { nameIsVisible, setIsVisible, priceIsVisible } = display;
+
+  // If this is a loading skeleton, render a placeholder
+  if (isLoadingSkeleton) {
+    return (
+      <StyledCard>
+        <CardImageContainer>
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height="100%"
+            animation="wave"
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              borderRadius: '5%',
+            }}
+          />
+        </CardImageContainer>
+
+        <CardContent
+          sx={{
+            p: 1,
+            '&:last-child': { pb: 1 },
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Skeleton variant="text" width="80%" height={28} animation="wave" />
+          <Skeleton variant="text" width="60%" height={20} animation="wave" />
+          <Skeleton variant="text" width="50%" height={20} animation="wave" />
+        </CardContent>
+      </StyledCard>
+    );
+  }
 
   // Lazy load the image
   useEffect(() => {

@@ -2,6 +2,10 @@
 
 ## Now
 
+- Figure out how to best render the grid and table style buttons
+- Have same default order of cards as legacy site
+- Fix alignment of breadcrumbs and image gallery to match, along with other elements
+- Fix mobile view for cardgallery and pagination controls
 - Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files)
 - Start porting over mtgcb-web to this project, using the latest React best practices
 - Maybe the React windowing shouldn't unload items when they leave the viewport, only load them.
@@ -10,6 +14,10 @@
 - Clean up BrowseSearchForm into smaller components
 - Grok URL source of truth pattern vs Redux state
 - Use the new TCGPlayer domain (see below)
+- Consider if the viewport loading/unloading of react components is too aggressive or if it should just load and never unload
+- Sort order implementation, stable
+- Clear all filters button
+- Adrix and Nev, Twincasters image size issue on mobile
 
 ## Later
 

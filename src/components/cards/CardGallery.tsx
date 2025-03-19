@@ -2,7 +2,7 @@
 
 import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import CardItem, { CardItemProps } from './CardItem';
 
 export interface CardGalleryProps {
@@ -36,161 +36,169 @@ export interface CardGalleryProps {
  * A virtualized, responsive card gallery component
  * Efficiently renders a large number of cards with lazy loading
  */
-const CardGallery = ({
-  cards,
-  isLoading = false,
-  cardsPerRow = 4,
-  galleryWidth = 100,
-  onCardClick,
-}: CardGalleryProps) => {
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+const CardGallery = React.memo(
+  ({
+    cards,
+    isLoading = false,
+    cardsPerRow = 4,
+    galleryWidth = 100,
+    onCardClick,
+  }: CardGalleryProps) => {
+    const observerRef = useRef<IntersectionObserver | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Initialize visibility state with first few cards visible for initial render
-  const [visibleItems, setVisibleItems] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {};
-    // Pre-mark the first 8 cards as visible (first two rows on desktop)
-    cards.slice(0, 8).forEach((card) => {
-      initial[card.id] = true;
-    });
-    return initial;
-  });
-
-  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  // Setup intersection observer to track which items are visible
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Cleanup previous observer
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
-
-    // Create new observer with a more optimized callback
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        // Batch state updates for better performance
-        setVisibleItems((prevVisibility) => {
-          const newVisibility = { ...prevVisibility };
-          let hasChanges = false;
-
-          entries.forEach((entry) => {
-            const id = entry.target.getAttribute('data-id');
-            if (id && newVisibility[id] !== entry.isIntersecting) {
-              newVisibility[id] = entry.isIntersecting;
-              hasChanges = true;
-            }
-          });
-
-          return hasChanges ? newVisibility : prevVisibility;
-        });
-      },
-      {
-        root: null,
-        rootMargin: '500px 0px', // Large margin to preload items well before they're visible
-        threshold: 0.01, // Trigger when just 1% of element is visible
-      },
-    );
-
-    // Reset refs and re-observe all items to ensure fresh detection
-    itemRefs.current = {};
-
-    // Add a small delay to ensure DOM is ready
-    const timer = setTimeout(() => {
-      const elements = document.querySelectorAll('[data-id]');
-      elements.forEach((el) => {
-        const id = el.getAttribute('data-id');
-        if (id && observerRef.current) {
-          itemRefs.current[id] = el as HTMLDivElement;
-          observerRef.current.observe(el);
-        }
+    // Initialize visibility state with first few cards visible for initial render
+    const [visibleItems, setVisibleItems] = useState<Record<string, boolean>>(() => {
+      const initial: Record<string, boolean> = {};
+      // Pre-mark the first 8 cards as visible (first two rows on desktop)
+      cards.slice(0, 8).forEach((card) => {
+        initial[card.id] = true;
       });
-    }, 50);
+      return initial;
+    });
 
-    return () => {
-      clearTimeout(timer);
+    const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+    // Setup intersection observer to track which items are visible
+    useEffect(() => {
+      if (typeof window === 'undefined') return;
+
+      // Cleanup previous observer
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
-    };
-  }, [cards]); // Only re-run when cards change
 
-  // Create refs for all cards with memoized callback
-  const setItemRef = useCallback((id: string, element: HTMLDivElement | null) => {
-    // Only update if the reference changed
-    if (itemRefs.current[id] !== element) {
-      // Clean up old observer if element is null
-      if (!element && itemRefs.current[id] && observerRef.current) {
-        observerRef.current.unobserve(itemRefs.current[id]!);
+      // Create new observer with a more optimized callback
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          // Batch state updates for better performance
+          setVisibleItems((prevVisibility) => {
+            const newVisibility = { ...prevVisibility };
+            let hasChanges = false;
+
+            entries.forEach((entry) => {
+              const id = entry.target.getAttribute('data-id');
+              if (id && newVisibility[id] !== entry.isIntersecting) {
+                newVisibility[id] = entry.isIntersecting;
+                hasChanges = true;
+              }
+            });
+
+            return hasChanges ? newVisibility : prevVisibility;
+          });
+        },
+        {
+          root: null,
+          rootMargin: '500px 0px', // Large margin to preload items well before they're visible
+          threshold: 0.01, // Trigger when just 1% of element is visible
+        },
+      );
+
+      // Reset refs and re-observe all items to ensure fresh detection
+      itemRefs.current = {};
+
+      // Add a small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        const elements = document.querySelectorAll('[data-id]');
+        elements.forEach((el) => {
+          const id = el.getAttribute('data-id');
+          if (id && observerRef.current) {
+            itemRefs.current[id] = el as HTMLDivElement;
+            observerRef.current.observe(el);
+          }
+        });
+      }, 50);
+
+      return () => {
+        clearTimeout(timer);
+        if (observerRef.current) {
+          observerRef.current.disconnect();
+        }
+      };
+    }, [cards]); // Only re-run when cards change
+
+    // Create refs for all cards with memoized callback
+    const setItemRef = useCallback((id: string, element: HTMLDivElement | null) => {
+      // Only update if the reference changed
+      if (itemRefs.current[id] !== element) {
+        // Clean up old observer if element is null
+        if (!element && itemRefs.current[id] && observerRef.current) {
+          observerRef.current.unobserve(itemRefs.current[id]!);
+        }
+
+        // Update ref
+        itemRefs.current[id] = element;
+
+        // Observe new element
+        if (element && observerRef.current) {
+          observerRef.current.observe(element);
+        }
       }
+    }, []);
 
-      // Update ref
-      itemRefs.current[id] = element;
+    // Properly check if a card should be visible
+    const isVisible = useCallback(
+      (id: string) => {
+        // Show cards that are marked as visible by the IntersectionObserver
+        return !!visibleItems[id];
+      },
+      [visibleItems],
+    );
 
-      // Observe new element
-      if (element && observerRef.current) {
-        observerRef.current.observe(element);
-      }
+    // Handle card click
+    const handleCardClick = useCallback(
+      (id: string) => {
+        if (onCardClick) {
+          onCardClick(id);
+        }
+      },
+      [onCardClick],
+    );
+
+    // Only show "No cards found" when not loading and actually have no cards
+    if (!isLoading && (!cards || cards.length === 0)) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+          <Typography variant="h6">No cards found</Typography>
+        </Box>
+      );
     }
-  }, []);
 
-  // Properly check if a card should be visible
-  const isVisible = useCallback(
-    (id: string) => {
-      // Show cards that are marked as visible by the IntersectionObserver
-      return !!visibleItems[id];
-    },
-    [visibleItems],
-  );
-
-  // Handle card click
-  const handleCardClick = useCallback(
-    (id: string) => {
-      if (onCardClick) {
-        onCardClick(id);
-      }
-    },
-    [onCardClick],
-  );
-
-  if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-        <Typography variant="h6">Loading cards...</Typography>
-      </Box>
+      <CardGalleryWrapper ref={containerRef} cardsPerRow={cardsPerRow} galleryWidth={galleryWidth}>
+        {cards.map((card) => (
+          <CardItemWrapper
+            key={card.id}
+            data-id={card.id}
+            ref={(element: HTMLDivElement | null) => setItemRef(card.id, element)}
+          >
+            {isVisible(card.id) ? (
+              <CardItem
+                {...card}
+                onClick={onCardClick ? () => handleCardClick(card.id) : undefined}
+              />
+            ) : (
+              <CardPlaceholder />
+            )}
+          </CardItemWrapper>
+        ))}
+      </CardGalleryWrapper>
     );
-  }
-
-  if (!cards || cards.length === 0) {
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison function for memo
+    // Only re-render if these props have changed
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-        <Typography variant="h6">No cards found</Typography>
-      </Box>
+      prevProps.isLoading === nextProps.isLoading &&
+      prevProps.cardsPerRow === nextProps.cardsPerRow &&
+      prevProps.galleryWidth === nextProps.galleryWidth &&
+      prevProps.onCardClick === nextProps.onCardClick &&
+      prevProps.cards === nextProps.cards
     );
-  }
+  },
+);
 
-  return (
-    <CardGalleryWrapper ref={containerRef} cardsPerRow={cardsPerRow} galleryWidth={galleryWidth}>
-      {cards.map((card) => (
-        <CardItemWrapper
-          key={card.id}
-          data-id={card.id}
-          ref={(element: HTMLDivElement | null) => setItemRef(card.id, element)}
-        >
-          {isVisible(card.id) ? (
-            <CardItem
-              {...card}
-              onClick={onCardClick ? () => handleCardClick(card.id) : undefined}
-            />
-          ) : (
-            <CardPlaceholder />
-          )}
-        </CardItemWrapper>
-      ))}
-    </CardGalleryWrapper>
-  );
-};
+CardGallery.displayName = 'CardGallery';
 
 // Styled components
 interface CardGalleryWrapperProps {

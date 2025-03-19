@@ -35,6 +35,12 @@ export interface BrowseSearchParams {
   stats?: StatFilters;
 }
 
+export interface BrowsePagination {
+  currentPage: number;
+  pageSize: number;
+  viewMode: 'grid' | 'table';
+}
+
 export interface BrowseState {
   searchParams: BrowseSearchParams;
 }
