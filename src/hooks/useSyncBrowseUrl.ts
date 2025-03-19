@@ -10,14 +10,14 @@ export const useSyncBrowseUrl = () => {
   const router = useRouter();
   const pathname = usePathname();
   const currentSearchParams = useSearchParams();
-  
+
   // Use local pagination instead of from redux
   const [pagination, setPagination] = useState<BrowsePagination>({
     currentPage: parseInt(currentSearchParams.get('page') || '1', 10),
     pageSize: parseInt(currentSearchParams.get('pageSize') || '24', 10),
-    viewMode: currentSearchParams.get('view') === 'table' ? 'table' : 'grid'
+    viewMode: currentSearchParams.get('view') === 'table' ? 'table' : 'grid',
   });
-  
+
   const prevUrlRef = useRef<string | null>(null);
 
   const createUrlParams = useCallback(() => {
@@ -54,10 +54,8 @@ export const useSyncBrowseUrl = () => {
       // Format each stat group as: attribute=condition1|condition2
       const statParams = Object.entries(searchParams.stats)
         .filter(([_, conditions]) => conditions.length > 0)
-        .map(([attribute, conditions]) => 
-          `${attribute}=${conditions.join('|')}`
-        );
-      
+        .map(([attribute, conditions]) => `${attribute}=${conditions.join('|')}`);
+
       if (statParams.length > 0) {
         params.set('stats', statParams.join(','));
       }
@@ -67,12 +65,14 @@ export const useSyncBrowseUrl = () => {
     if (pagination.currentPage > 1) {
       params.set('page', pagination.currentPage.toString());
     }
-    
-    if (pagination.pageSize !== 24) { // Only add if not default
+
+    if (pagination.pageSize !== 24) {
+      // Only add if not default
       params.set('pageSize', pagination.pageSize.toString());
     }
-    
-    if (pagination.viewMode !== 'grid') { // Only add if not default
+
+    if (pagination.viewMode !== 'grid') {
+      // Only add if not default
       params.set('view', pagination.viewMode);
     }
 
@@ -87,7 +87,7 @@ export const useSyncBrowseUrl = () => {
 
       if (newSearch !== currentSearch) {
         const newUrl = newSearch ? `${pathname}?${newSearch}` : pathname;
-        
+
         if (newUrl !== prevUrlRef.current) {
           prevUrlRef.current = newUrl;
           router.replace(newUrl, { scroll: false });

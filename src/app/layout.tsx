@@ -5,8 +5,8 @@ import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import { ReactNode } from 'react';
 import Dashboard from '@/components/layout/Dashboard';
-import ReCaptchaProvider from '@/components/providers/ReCaptchaProvider';
 import SnackbarProvider from '@/components/providers/NotistackProvider';
+import ReCaptchaProvider from '@/components/providers/ReCaptchaProvider';
 import StoreProvider from '@/redux/StoreProvider';
 import darkTheme from '@/styles/darkTheme';
 

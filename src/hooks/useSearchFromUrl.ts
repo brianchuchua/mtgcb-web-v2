@@ -20,7 +20,7 @@ const OPERATOR_MAP = {
 export const useSearchFromUrl = () => {
   const [searchCards, { data: searchResult, isLoading, error }] = useSearchCardsMutation();
   const searchParams = useSearchParams();
-  
+
   // Get pagination state from URL
   const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const pageSize = parseInt(searchParams.get('pageSize') || '24', 10);
@@ -126,11 +126,11 @@ export const useSearchFromUrl = () => {
     // Add sort parameters from URL if specified
     const sortBy = searchParams.get('sortBy');
     const sortDirection = searchParams.get('sortDirection');
-    
+
     if (sortBy) {
       apiParams.sortBy = sortBy;
     }
-    
+
     if (sortDirection && (sortDirection === 'asc' || sortDirection === 'desc')) {
       apiParams.sortDirection = sortDirection;
     }

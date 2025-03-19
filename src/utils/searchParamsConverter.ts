@@ -5,7 +5,9 @@ import { BrowseSearchParams, ColorMatchType } from '@/types/browse';
  * Converts browser/Redux search parameters to API parameters
  * This utility extracts the logic for converting the search params format to API format
  */
-export const buildApiParamsFromSearchParams = (searchParams: BrowseSearchParams): Partial<CardApiParams> => {
+export const buildApiParamsFromSearchParams = (
+  searchParams: BrowseSearchParams,
+): Partial<CardApiParams> => {
   const apiParams: Partial<CardApiParams> = {};
 
   // Add name filter
@@ -27,7 +29,7 @@ export const buildApiParamsFromSearchParams = (searchParams: BrowseSearchParams)
     } else if (searchParams.colors.colors.length > 0) {
       const colorArray = searchParams.colors.colors;
       const matchType = searchParams.colors.matchType as ColorMatchType;
-      
+
       switch (matchType) {
         case 'exactly':
           apiParams.colors_array = {

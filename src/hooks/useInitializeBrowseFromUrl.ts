@@ -62,15 +62,15 @@ export const useInitializeBrowseFromUrl = () => {
     const stats = searchParams.get('stats');
     if (stats) {
       const statFilters: StatFilters = {};
-      
+
       // Format: convertedManaCost=gte2|lt5,power=gte2
-      stats.split(',').forEach(group => {
+      stats.split(',').forEach((group) => {
         const [attribute, conditions] = group.split('=');
         if (attribute && conditions) {
           statFilters[attribute] = conditions.split('|');
         }
       });
-      
+
       if (Object.keys(statFilters).length > 0) {
         params.stats = statFilters;
       }

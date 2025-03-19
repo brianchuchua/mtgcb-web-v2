@@ -22,13 +22,15 @@ export const DashboardProvider = ({ children, sidenavWidth = 320 }: DashboardPro
   const [isMobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <DashboardContext.Provider value={{ 
-      isDesktopOpen, 
-      isMobileOpen,
-      setDesktopOpen,
-      setMobileOpen,
-      sidenavWidth 
-    }}>
+    <DashboardContext.Provider
+      value={{
+        isDesktopOpen,
+        isMobileOpen,
+        setDesktopOpen,
+        setMobileOpen,
+        sidenavWidth,
+      }}
+    >
       {children}
     </DashboardContext.Provider>
   );

@@ -1,24 +1,24 @@
 'use client';
 
 import { Box, Divider, Typography } from '@mui/material';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { skipToken } from '@reduxjs/toolkit/query';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery } from '@/api/browse/browseApi';
+import { CardApiParams, CardModel, CardSearchData } from '@/api/browse/types';
+import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 import CardGallery from '@/components/cards/CardGallery';
 import CardTable from '@/components/cards/CardTable';
 import { CardGalleryPagination } from '@/components/pagination';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
+import { useImagePreloader } from '@/hooks/useImagePreloader';
 import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
-import { useGetCardsQuery, useGetCardsPrefetch, getNextPageParams } from '@/api/browse/browseApi';
-import { mtgcbApi } from '@/api/mtgcbApi';
-import { skipToken } from '@reduxjs/toolkit/query';
-import { CardApiParams, CardModel, CardSearchData } from '@/api/browse/types';
 import { selectSearchParams } from '@/redux/slices/browseSlice';
 import { BrowsePagination } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
-import { useImagePreloader } from '@/hooks/useImagePreloader';
 
 interface CardDisplayProps {
   cardItems: ReturnType<typeof mapApiCardsToCardItems>;
@@ -29,16 +29,18 @@ interface CardDisplayProps {
 
 const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick }: CardDisplayProps) => {
   const displayCards = isLoading
-    ? Array(24).fill(0).map((_, index) => ({
-        id: `skeleton-${index}`,
-        name: '',
-        setName: '',
-        collectorNumber: '',
-        rarity: '',
-        isLoadingSkeleton: true,
-      }))
+    ? Array(24)
+        .fill(0)
+        .map((_, index) => ({
+          id: `skeleton-${index}`,
+          name: '',
+          setName: '',
+          collectorNumber: '',
+          rarity: '',
+          isLoadingSkeleton: true,
+        }))
     : cardItems;
-  
+
   return viewMode === 'grid' ? (
     <CardGallery
       key="gallery"
@@ -49,12 +51,7 @@ const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick }: CardDispla
       onCardClick={onCardClick}
     />
   ) : (
-    <CardTable
-      key="table"
-      cards={displayCards}
-      isLoading={isLoading}
-      onCardClick={onCardClick}
-    />
+    <CardTable key="table" cards={displayCards} isLoading={isLoading} onCardClick={onCardClick} />
   );
 };
 
@@ -92,83 +89,97 @@ export default function BrowsePage() {
   const pathname = usePathname();
   const urlSearchParams = useSearchParams();
   const reduxSearchParams = useSelector(selectSearchParams);
-  
+
   const [pagination, setPagination] = useState<BrowsePagination>({
     currentPage: parseInt(urlSearchParams.get('page') || '1', 10),
     pageSize: parseInt(urlSearchParams.get('pageSize') || '24', 10),
-    viewMode: urlSearchParams.get('view') === 'table' ? 'table' : 'grid'
+    viewMode: urlSearchParams.get('view') === 'table' ? 'table' : 'grid',
   });
-  
+
   useInitializeBrowseFromUrl();
-  
-  const apiParams = useMemo(() => ({
-    ...buildApiParamsFromSearchParams(reduxSearchParams),
-    limit: pagination.pageSize,
-    offset: (pagination.currentPage - 1) * pagination.pageSize,
-    sortBy: 'name',
-    sortDirection: 'asc' as const,
-    select: [
-      'name', 'setId', 'setName', 'tcgplayerId',
-      'market', 'low', 'average', 'high', 'foil',
-      'collectorNumber', 'mtgcbCollectorNumber', 'rarity',
-    ] as Array<keyof CardModel>,
-  }), [reduxSearchParams, pagination]);
-  
-  const nextPageApiParams = useMemo(() => 
-    pagination.currentPage >= 1
-      ? getNextPageParams(apiParams, pagination.currentPage, pagination.pageSize)
-      : null,
-    [apiParams, pagination.currentPage, pagination.pageSize]
+
+  const apiParams = useMemo(
+    () => ({
+      ...buildApiParamsFromSearchParams(reduxSearchParams),
+      limit: pagination.pageSize,
+      offset: (pagination.currentPage - 1) * pagination.pageSize,
+      sortBy: 'name',
+      sortDirection: 'asc' as const,
+      select: [
+        'name',
+        'setId',
+        'setName',
+        'tcgplayerId',
+        'market',
+        'low',
+        'average',
+        'high',
+        'foil',
+        'collectorNumber',
+        'mtgcbCollectorNumber',
+        'rarity',
+      ] as Array<keyof CardModel>,
+    }),
+    [reduxSearchParams, pagination],
+  );
+
+  const nextPageApiParams = useMemo(
+    () =>
+      pagination.currentPage >= 1
+        ? getNextPageParams(apiParams, pagination.currentPage, pagination.pageSize)
+        : null,
+    [apiParams, pagination.currentPage, pagination.pageSize],
   );
 
   const queryConfig = {
     refetchOnMountOrArgChange: false,
     refetchOnFocus: false,
-    refetchOnReconnect: false
+    refetchOnReconnect: false,
   };
 
-  const { 
-    data: searchResult, 
+  const {
+    data: searchResult,
     isFetching: apiLoading,
-    error 
+    error,
   } = useGetCardsQuery(apiParams, queryConfig);
 
   const prefetchNextPage = useGetCardsPrefetch('getCards');
-  
+
   useEffect(() => {
     if (!nextPageApiParams || apiLoading) return;
-    
+
     const prefetchTimer = setTimeout(() => {
       prefetchNextPage(nextPageApiParams, { ifOlderThan: 300 });
     }, 1000);
-    
+
     return () => clearTimeout(prefetchTimer);
   }, [prefetchNextPage, nextPageApiParams, apiLoading]);
-  
-  const { currentData: nextPageCachedData } = useGetCardsQuery(
-    nextPageApiParams || skipToken, 
-    { ...queryConfig, skip: !nextPageApiParams }
+
+  const { currentData: nextPageCachedData } = useGetCardsQuery(nextPageApiParams || skipToken, {
+    ...queryConfig,
+    skip: !nextPageApiParams,
+  });
+
+  const nextPageData = useMemo(
+    () =>
+      nextPageCachedData?.data?.cards
+        ? mapApiCardsToCardItems(nextPageCachedData.data.cards)
+        : null,
+    [nextPageCachedData],
   );
-  
-  const nextPageData = useMemo(() => 
-    nextPageCachedData?.data?.cards 
-      ? mapApiCardsToCardItems(nextPageCachedData.data.cards)
-      : null,
-    [nextPageCachedData]
-  );
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  
+
   useImagePreloader(nextPageData, isLoading);
-  
+
   useEffect(() => {
     // Clear any pending timers first
     if (loadingTimerRef.current) {
       clearTimeout(loadingTimerRef.current);
       loadingTimerRef.current = null;
     }
-    
+
     if (apiLoading) {
       // Add delay before showing loading indicators to prevent flashing
       loadingTimerRef.current = setTimeout(() => {
@@ -182,63 +193,66 @@ export default function BrowsePage() {
     } else {
       setIsLoading(false);
     }
-    
+
     return () => {
       if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
     };
   }, [apiLoading, isLoading]);
-  
+
   useEffect(() => {
     const params = new URLSearchParams(urlSearchParams.toString());
     const defaults = { currentPage: 1, pageSize: 24, viewMode: 'grid' };
-    
+
     // Only include non-default values in URL
-    pagination.currentPage > defaults.currentPage 
+    pagination.currentPage > defaults.currentPage
       ? params.set('page', pagination.currentPage.toString())
       : params.delete('page');
-    
+
     pagination.pageSize !== defaults.pageSize
       ? params.set('pageSize', pagination.pageSize.toString())
       : params.delete('pageSize');
-    
+
     pagination.viewMode !== defaults.viewMode
       ? params.set('view', pagination.viewMode)
       : params.delete('view');
-    
+
     const newSearch = params.toString();
     const newUrl = newSearch ? `${pathname}?${newSearch}` : pathname;
     router.replace(newUrl, { scroll: false });
   }, [pagination, pathname, router, urlSearchParams]);
 
   const handlePageChange = useCallback((page: number) => {
-    setPagination(prev => ({ ...prev, currentPage: page }));
+    setPagination((prev) => ({ ...prev, currentPage: page }));
   }, []);
 
   const handlePageSizeChange = useCallback((size: number) => {
-    setPagination(prev => ({ ...prev, pageSize: size, currentPage: 1 }));
+    setPagination((prev) => ({ ...prev, pageSize: size, currentPage: 1 }));
   }, []);
 
   const handleViewModeChange = useCallback((mode: 'grid' | 'table') => {
-    setPagination(prev => ({ ...prev, viewMode: mode }));
+    setPagination((prev) => ({ ...prev, viewMode: mode }));
   }, []);
 
-  const handleCardClick = useCallback((cardId: string) => {
-    router.push(`/browse/cards/${cardId}`);
-  }, [router]);
-
-  const cardItems = useMemo(() => 
-    searchResult?.data ? mapApiCardsToCardItems(searchResult.data.cards || []) : [],
-    [searchResult?.data]
+  const handleCardClick = useCallback(
+    (cardId: string) => {
+      router.push(`/browse/cards/${cardId}`);
+    },
+    [router],
   );
 
-  const totalItems = useMemo(() => 
-    searchResult?.data?.totalCount || 0,
-    [searchResult?.data?.totalCount]
+  const cardItems = useMemo(
+    () => (searchResult?.data ? mapApiCardsToCardItems(searchResult.data.cards || []) : []),
+    [searchResult?.data],
   );
-  
-  const totalPages = useMemo(() => 
-    Math.ceil(totalItems / pagination.pageSize),
-    [totalItems, pagination.pageSize]
+
+  const totalItems = useMemo(
+    () => searchResult?.data?.totalCount || 0,
+    [searchResult?.data?.totalCount],
+  );
+
+  const totalPages = useMemo(
+    () => Math.ceil(totalItems / pagination.pageSize),
+    [totalItems, pagination.pageSize],
   );
 
   const paginationProps = {
@@ -250,7 +264,7 @@ export default function BrowsePage() {
     onPageChange: handlePageChange,
     onPageSizeChange: handlePageSizeChange,
     onViewModeChange: handleViewModeChange,
-    isLoading
+    isLoading,
   };
 
   return (
@@ -265,17 +279,14 @@ export default function BrowsePage() {
         </Box>
       )}
 
-      <CardDisplay 
+      <CardDisplay
         cardItems={cardItems}
         isLoading={isLoading}
         viewMode={pagination.viewMode}
         onCardClick={handleCardClick}
       />
 
-      <CardGalleryPagination 
-        {...paginationProps} 
-        isOnBottom={true} 
-      />
+      <CardGalleryPagination {...paginationProps} isOnBottom={true} />
 
       {searchResult && <DebugView searchResult={searchResult} />}
     </Box>

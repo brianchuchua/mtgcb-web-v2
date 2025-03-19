@@ -6,6 +6,6 @@ export interface ApiResponse<T> {
 
 export interface ApiError {
   message: string;
-  code?: string;  // Not HTTP status code, e.g., "UNAUTHORIZED"
+  code?: string; // Not HTTP status code, e.g., "UNAUTHORIZED"
   details?: unknown;
 }

@@ -47,10 +47,10 @@ export const browseSlice = createSlice({
       }
     },
     setStats: (state, action: PayloadAction<StatFilters>) => {
-      const hasConditions = Object.values(action.payload).some(conditions => 
-        conditions.length > 0
+      const hasConditions = Object.values(action.payload).some(
+        (conditions) => conditions.length > 0,
       );
-      
+
       if (!hasConditions) {
         delete state.searchParams.stats;
       } else {
@@ -63,14 +63,8 @@ export const browseSlice = createSlice({
   },
 });
 
-export const {
-  setSearchName,
-  setOracleText,
-  setColors,
-  setTypes,
-  setStats,
-  setSearchParams,
-} = browseSlice.actions;
+export const { setSearchName, setOracleText, setColors, setTypes, setStats, setSearchParams } =
+  browseSlice.actions;
 
 export const selectSearchParams = (state: RootState) => state.browse.searchParams;
 export const selectSearchName = (state: RootState) => state.browse.searchParams.name;

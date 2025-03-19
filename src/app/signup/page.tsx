@@ -240,7 +240,7 @@ export default function SignUpPage() {
               display: 'flex',
               justifyContent: 'center',
               width: '100%',
-              mb: 2
+              mb: 2,
             }}
           >
             <Link href="/login" variant="body2" data-testid="login-link">
@@ -248,7 +248,13 @@ export default function SignUpPage() {
             </Link>
           </Box>
 
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }} data-testid="recaptcha-text">
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            align="center"
+            sx={{ mt: 2 }}
+            data-testid="recaptcha-text"
+          >
             This site is protected by reCAPTCHA and the Google{' '}
             <Link
               href="https://policies.google.com/privacy"

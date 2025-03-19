@@ -1,4 +1,3 @@
-
 export type ColorMatchType = 'exactly' | 'atLeast' | 'atMost';
 
 export interface ColorFilter {
@@ -19,7 +18,7 @@ export interface StatCondition {
 }
 
 export interface StatFilters {
-  [key: string]: string[];  // Maps attribute to array of conditions
+  [key: string]: string[]; // Maps attribute to array of conditions
 }
 
 export interface BrowseSearchParams {
