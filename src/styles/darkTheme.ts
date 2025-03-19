@@ -3,7 +3,7 @@
 import { createTheme } from '@mui/material/styles';
 import globalStyles from '@/styles/globalStyle';
 
-const PAPER_BG = '#282c34';
+const PAPER_BG = '#22262c';
 
 const darkTheme = createTheme({
   typography: {

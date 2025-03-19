@@ -220,7 +220,6 @@ const CardItem = ({
               title={name}
               onClick={onClick ? handleCardElementClick : undefined}
               sx={{
-                fontWeight: 'bold',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -298,6 +297,7 @@ const StyledCard = styled(Card, {
   textAlign: 'center', // Ensure text is centered like original
   borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
   overflow: 'hidden',
+  boxShadow: theme.shadows[3],
   '&:hover': {
     transform: 'translateY(-4px)',
     boxShadow: theme.shadows[4],
