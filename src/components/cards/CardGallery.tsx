@@ -4,32 +4,19 @@ import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import CardItem, { CardItemProps } from './CardItem';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 export interface CardGalleryProps {
-  /**
-   * Array of cards to display in the gallery
-   */
   cards: CardItemProps[];
-
-  /**
-   * Loading state
-   */
   isLoading?: boolean;
-
-  /**
-   * Number of cards per row
-   */
   cardsPerRow?: number;
-
-  /**
-   * Gallery width as percentage of container
-   */
   galleryWidth?: number;
-
-  /**
-   * Callback when a card is clicked
-   */
   onCardClick?: (cardId: string) => void;
+  displaySettings?: {
+    nameIsVisible?: boolean;
+    setIsVisible?: boolean;
+    priceIsVisible?: boolean;
+  };
 }
 
 /**
@@ -43,9 +30,34 @@ const CardGallery = React.memo(
     cardsPerRow = 4,
     galleryWidth = 100,
     onCardClick,
+    displaySettings,
   }: CardGalleryProps) => {
     const observerRef = useRef<IntersectionObserver | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
+
+    const [nameIsVisible, setNameIsVisible] = useLocalStorage('cardNameIsVisible', true);
+    const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
+    const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
+
+    // This effect forces a re-render when localStorage values change
+    useEffect(() => {
+      // We're using this as a dependency to trigger re-renders when these values change
+      // from other components (like the settings panel)
+    }, [nameIsVisible, setIsVisible, priceIsVisible, cards]);
+
+    // Use either provided display settings or localStorage values
+    const display = {
+      nameIsVisible:
+        displaySettings?.nameIsVisible !== undefined
+          ? displaySettings.nameIsVisible
+          : nameIsVisible,
+      setIsVisible:
+        displaySettings?.setIsVisible !== undefined ? displaySettings.setIsVisible : setIsVisible,
+      priceIsVisible:
+        displaySettings?.priceIsVisible !== undefined
+          ? displaySettings.priceIsVisible
+          : priceIsVisible,
+    };
 
     // Initialize visibility state with first few cards visible for initial render
     const [visibleItems, setVisibleItems] = useState<Record<string, boolean>>(() => {
@@ -176,6 +188,7 @@ const CardGallery = React.memo(
               <CardItem
                 {...card}
                 onClick={onCardClick ? () => handleCardClick(card.id) : undefined}
+                display={display}
               />
             ) : (
               <CardPlaceholder />
@@ -200,7 +213,6 @@ const CardGallery = React.memo(
 
 CardGallery.displayName = 'CardGallery';
 
-// Styled components
 interface CardGalleryWrapperProps {
   cardsPerRow: number;
   galleryWidth: number;

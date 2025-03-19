@@ -24,6 +24,8 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useCallback, useMemo } from 'react';
+import CardSettingsPanel from '@/components/cards/CardSettingsPanel';
+import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 
 // TODO: Assess memoization needs here given I'm using React Compiler
 export interface CardGalleryPaginationProps {
@@ -99,6 +101,8 @@ const PageSizeControl = React.memo(
     onPageSizeChange: (size: number) => void;
     pageSizeOptions: number[];
   }) => {
+    const cardSettingGroups = useCardSettingGroups();
+
     // Memoize handler
     const handlePageSizeChange = useCallback(
       (event: SelectChangeEvent<number>) => {
@@ -142,12 +146,15 @@ const PageSizeControl = React.memo(
             ))}
           </Select>
         </FormControl>
+
+        {/* Card display settings with margin left */}
+        <Box sx={{ ml: 1 }}>
+          <CardSettingsPanel settingGroups={cardSettingGroups} panelId="cardGallerySettings" />
+        </Box>
       </PageSizeSelector>
     );
   },
 );
-
-PageSizeControl.displayName = 'PageSizeControl';
 
 const NavigationControls = React.memo(
   ({
@@ -297,7 +304,9 @@ export const CardGalleryPagination = React.memo(
     currentPage,
     totalPages,
     pageSize,
-    pageSizeOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 25, 50, 100, 200, 300, 400, 500],
+    pageSizeOptions = [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 25, 50, 100, 200, 300, 400, 500,
+    ],
     totalItems,
     viewMode,
     onPageChange,

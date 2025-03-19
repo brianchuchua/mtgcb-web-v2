@@ -276,7 +276,7 @@ const CardItem = ({
             </Typography>
           )}
 
-          {setIsVisible && setName && (
+          {setIsVisible && (
             <Typography
               variant="body2"
               noWrap
@@ -290,7 +290,7 @@ const CardItem = ({
                 maxWidth: '100%',
               }}
             >
-              {setName} #{collectorNumber || '??'}
+              {setName || 'Unknown Set'} #{collectorNumber || '??'}
             </Typography>
           )}
 

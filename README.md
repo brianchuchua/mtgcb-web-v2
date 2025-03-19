@@ -2,6 +2,7 @@
 
 ## Now
 
+- Integrate local storage into settings that it should be a part of
 - Mobile and desktop view card size issues while scrolling
 - Have same default order of cards as legacy site
 - Fix alignment of breadcrumbs and image gallery to match, along with other elements
@@ -24,6 +25,7 @@
 
 ## Later
 
+- Consider cardsPerRow changing and image size changing, binder updating mode basically
 - Grok browser history and URL query parameters during search
 - Clean up this README -- make a separate TODO file?
 - Continue writing front-end tests -- paused them to focus on feature work since the app is so simple to validate manually
