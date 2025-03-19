@@ -297,7 +297,7 @@ export const CardGalleryPagination = React.memo(
     currentPage,
     totalPages,
     pageSize,
-    pageSizeOptions = [20, 50, 100, 200],
+    pageSizeOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 25, 50, 100, 200, 300, 400, 500],
     totalItems,
     viewMode,
     onPageChange,

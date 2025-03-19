@@ -67,8 +67,8 @@ export default function BrowsePage() {
   const reduxSearchParams = useSelector(selectSearchParams);
 
   const [pagination, setPagination] = useState<BrowsePagination>({
-    currentPage: parseInt(urlSearchParams.get('page') || '1', 10),
-    pageSize: parseInt(urlSearchParams.get('pageSize') || '24', 10),
+    currentPage: Math.max(parseInt(urlSearchParams.get('page') || '1', 10), 1),
+    pageSize: Math.min(Math.max(parseInt(urlSearchParams.get('pageSize') || '24', 10), 1), 500),
     viewMode: urlSearchParams.get('view') === 'table' ? 'table' : 'grid',
   });
 
@@ -236,11 +236,13 @@ export default function BrowsePage() {
   }, [pagination, reduxSearchParams, pathname, router]);
 
   const handlePageChange = useCallback((page: number) => {
-    setPagination((prev) => ({ ...prev, currentPage: page }));
+    const validPage = Math.max(page, 1);
+    setPagination((prev) => ({ ...prev, currentPage: validPage }));
   }, []);
 
   const handlePageSizeChange = useCallback((size: number) => {
-    setPagination((prev) => ({ ...prev, pageSize: size, currentPage: 1 }));
+    const limitedSize = Math.min(Math.max(size, 1), 500);
+    setPagination((prev) => ({ ...prev, pageSize: limitedSize, currentPage: 1 }));
   }, []);
 
   const handleViewModeChange = useCallback((mode: 'grid' | 'table') => {
