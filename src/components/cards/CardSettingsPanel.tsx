@@ -3,6 +3,7 @@
 import SettingsIcon from '@mui/icons-material/Settings';
 import {
   Box,
+  Chip,
   Divider,
   FormControl,
   FormControlLabel,
@@ -25,10 +26,19 @@ export interface CardSetting {
   setVisibility: (isVisible: boolean) => void;
 }
 
+export interface CardSelectSetting {
+  key: string;
+  label: string;
+  value: number;
+  setValue: (value: number) => void;
+  options: { value: number; label: string }[];
+  type: 'select';
+}
+
 export interface CardSettingGroup {
   label: string;
-  settings: CardSetting[];
-  type: string;
+  settings: CardSetting[] | CardSelectSetting[];
+  type: 'toggle' | 'select';
 }
 
 interface CardSettingsPanelProps {
@@ -113,53 +123,83 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({ settingGroups, pa
           <Divider sx={{ mb: 2 }} />
 
           <FormControl component="fieldset" sx={{ width: '100%' }}>
-            {settingGroups.map((settingGroup) => (
-              <FormGroup key={settingGroup.label}>
-                <GroupHeader>
-                  <Typography variant="body2" fontWeight={500} color="text.secondary">
-                    {settingGroup.label}
-                  </Typography>
-                </GroupHeader>
+            {settingGroups.map((settingGroup) => {
+              return (
+                <FormGroup key={settingGroup.label}>
+                  <GroupHeader>
+                    <Typography variant="body2" fontWeight={500} color="text.secondary">
+                      {settingGroup.label}
+                    </Typography>
+                  </GroupHeader>
 
                 <SettingsGrid>
-                  {settingGroup.settings.map((setting) => (
-                    <FormControlLabel
-                      key={setting.key}
-                      control={
-                        <Switch
-                          color="primary"
-                          size="small"
-                          checked={setting.isVisible}
-                          onChange={() => setting.setVisibility(!setting.isVisible)}
-                          sx={{
-                            '& .MuiSwitch-switchBase.Mui-checked': {
-                              color: theme.palette.primary.main,
-                            },
-                            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                              backgroundColor: alpha(theme.palette.primary.main, 0.5),
-                            },
-                          }}
-                        />
-                      }
-                      label={
-                        <Typography variant="body2" sx={{ fontWeight: 400 }}>
+                  {settingGroup.type === 'toggle' ? (
+                    // Toggle switch controls for visibility settings
+                    (settingGroup.settings as CardSetting[]).map((setting) => (
+                      <FormControlLabel
+                        key={setting.key}
+                        control={
+                          <Switch
+                            color="primary"
+                            size="small"
+                            checked={setting.isVisible}
+                            onChange={() => setting.setVisibility(!setting.isVisible)}
+                            sx={{
+                              '& .MuiSwitch-switchBase.Mui-checked': {
+                                color: theme.palette.primary.main,
+                              },
+                              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                backgroundColor: alpha(theme.palette.primary.main, 0.5),
+                              },
+                            }}
+                          />
+                        }
+                        label={
+                          <Typography variant="body2" sx={{ fontWeight: 400 }}>
+                            {setting.label}
+                          </Typography>
+                        }
+                        sx={{
+                          margin: 0,
+                          py: 0.75,
+                          px: 1,
+                          borderRadius: 1,
+                          '&:hover': {
+                            backgroundColor: alpha(theme.palette.primary.main, 0.04),
+                          },
+                        }}
+                      />
+                    ))
+                  ) : (
+                    // Select controls for numeric settings
+                    (settingGroup.settings as CardSelectSetting[]).map((setting) => (
+                      <Box key={setting.key} sx={{ py: 0.75, px: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 400, mb: 0.5 }}>
                           {setting.label}
                         </Typography>
-                      }
-                      sx={{
-                        margin: 0,
-                        py: 0.75,
-                        px: 1,
-                        borderRadius: 1,
-                        '&:hover': {
-                          backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                        },
-                      }}
-                    />
-                  ))}
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                          {setting.options.map((option) => (
+                            <Chip
+                              key={option.value}
+                              label={option.label}
+                              clickable
+                              color={setting.value === option.value ? 'primary' : 'default'}
+                              onClick={() => setting.setValue(option.value)}
+                              size="small"
+                              sx={{
+                                borderRadius: 1,
+                                fontWeight: setting.value === option.value ? 500 : 400,
+                              }}
+                            />
+                          ))}
+                        </Box>
+                      </Box>
+                    ))
+                  )}
                 </SettingsGrid>
               </FormGroup>
-            ))}
+              );
+            })}
           </FormControl>
         </SettingsPanelContent>
       </Popover>

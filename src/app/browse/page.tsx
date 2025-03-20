@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery } from '@/api/browse/browseApi';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { CardApiParams, CardModel, CardSearchData } from '@/api/browse/types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
@@ -41,12 +42,15 @@ const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick }: CardDispla
         }))
     : cardItems;
 
+  // Use the cards per row from localStorage, defaulting to 4 if not set
+  const [cardsPerRow] = useLocalStorage<number>('cardsPerRow', 4);
+  
   return viewMode === 'grid' ? (
     <CardGallery
       key="gallery"
       cards={displayCards}
       isLoading={isLoading}
-      cardsPerRow={4}
+      cardsPerRow={cardsPerRow}
       galleryWidth={95}
       onCardClick={onCardClick}
     />
