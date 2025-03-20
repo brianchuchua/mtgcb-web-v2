@@ -2,8 +2,6 @@
 
 ## Now
 
-- Integrate local storage into settings that it should be a part of
-- Mobile and desktop view card size issues while scrolling
 - Have same default order of cards as legacy site
 - Fix alignment of breadcrumbs and image gallery to match, along with other elements
 - Fix mobile view for cardgallery and pagination controls
@@ -19,12 +17,12 @@
 - Consider if the viewport loading/unloading of react components is too aggressive or if it should just load and never unload
 - Sort order implementation, stable
 - Clear all filters button
-- Adrix and Nev, Twincasters image size issue on mobile
-- Perf issues when rendering 8000 cards on the page -- the viewport stuff isn't working maybe? (Manually edit URL to do this)
+- Examine pageSize in URL vs local storage
 
 ## Later
 
 - Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files, top-down hierarchy, easy to read)
+- Table view with proper header-row sorting server-side
 - Consider cardsPerRow changing and image size changing, binder updating mode basically
 - Grok browser history and URL query parameters during search
 - Clean up this README -- make a separate TODO file?

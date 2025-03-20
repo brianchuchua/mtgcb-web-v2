@@ -332,6 +332,8 @@ const StyledCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== 'setName',
 })<CardElementProps>(({ theme, setName }) => ({
   height: '100%',
+  width: '100%',
+  maxWidth: '100%',
   display: 'flex',
   flexDirection: 'column',
   transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
@@ -344,27 +346,46 @@ const StyledCard = styled(Card, {
     transform: 'translateY(-4px)',
     boxShadow: theme.shadows[4],
   },
+  
+  // Add specific mobile constraints
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '100%',
+    width: '100%',
+  },
 }));
 
-const CardImageContainer = styled(Box)({
+const CardImageContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
   paddingTop: '139.3%', // Aspect ratio of a magic card (680/488)
   overflow: 'hidden',
-});
+  
+  // Add specific mobile constraint
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '100vw',
+    width: '100%',
+  },
+}));
 
 interface CardImageProps {
   setName?: string;
 }
 
-const CardImage = styled('img')<CardImageProps>(({ setName }) => ({
+const CardImage = styled('img')<CardImageProps>(({ theme, setName }) => ({
   position: 'absolute',
   top: 0,
   left: 0,
   width: '100%',
+  maxWidth: '100%',
   height: '100%',
   objectFit: 'contain',
   transition: 'opacity 0.3s ease-in-out',
   borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
+  
+  // Add specific mobile constraints
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '100%',
+    width: '100%',
+  },
 }));
 
 const MissingImageFallback = styled(Box, {
@@ -374,6 +395,7 @@ const MissingImageFallback = styled(Box, {
   top: 0,
   left: 0,
   width: '100%',
+  maxWidth: '100%',
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -384,6 +406,8 @@ const MissingImageFallback = styled(Box, {
   borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
   padding: theme.spacing(2),
   textAlign: 'center',
+  boxSizing: 'border-box',
+  overflow: 'hidden',
   '& .MuiTypography-subtitle2': {
     marginBottom: theme.spacing(1),
     fontWeight: 'bold',
@@ -393,6 +417,12 @@ const MissingImageFallback = styled(Box, {
   },
   '& .MuiTypography-caption': {
     opacity: 0.7,
+  },
+  
+  // Match mobile constraints
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '100%',
+    width: '100%',
   },
 }));
 

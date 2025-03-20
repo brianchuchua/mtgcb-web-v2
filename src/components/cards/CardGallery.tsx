@@ -247,27 +247,36 @@ const CardGalleryWrapper = styled(Box, {
     width: '98%',
   },
   [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: 'repeat(1, 1fr)',
+    gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
     width: '100%',
+    maxWidth: '100vw',
     padding: theme.spacing(1),
     gap: theme.spacing(2),
+    overflow: 'hidden',
+    boxSizing: 'border-box',
   },
 }));
 
 const CardItemWrapper = styled(Box)(({ theme }) => ({
   // TODO: Experimenting without minHeight for better responsiveness, so far so good
-  //minHeight: '300px', // Set a minimum height to prevent layout shifts
   position: 'relative',
+  // minHeight: '300px', // Set a minimum height to prevent layout shifts
+  // width: '100%',
 
-  // [theme.breakpoints.down('sm')]: {
-  //   minHeight: '460px', // Increased for better card display on mobile
-  // },
+  [theme.breakpoints.down('sm')]: {
+    // minHeight: '460px', // Increased for better card display on mobile
+    // width: '100%',
+    // maxWidth: '100%',
+    // Ensure container fits within viewport on mobile
+    // boxSizing: 'border-box',
+  },
 }));
 
 // A placeholder component shown before the actual card content is visible
 const CardPlaceholder = styled(Box)(({ theme }) => ({
   height: '100%',
   width: '100%',
+  maxWidth: '100%',
   backgroundColor: theme.palette.background.paper,
   borderRadius: theme.shape.borderRadius,
   position: 'absolute',
@@ -277,6 +286,8 @@ const CardPlaceholder = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
+  boxSizing: 'border-box',
+  overflow: 'hidden',
   '&::before': {
     content: '""',
     position: 'absolute',
@@ -299,6 +310,12 @@ const CardPlaceholder = styled(Box)(({ theme }) => ({
     '100%': {
       backgroundPosition: '-200% 0',
     },
+  },
+
+  // Match mobile constraints
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '100%',
+    width: '100%',
   },
 }));
 
