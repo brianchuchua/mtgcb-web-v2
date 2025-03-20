@@ -175,6 +175,25 @@ export default function BrowsePage() {
     };
   }, [apiLoading, isLoading]);
 
+  // Reset pagination to page 1 when search parameters change
+  const reduxSearchParamsRef = useRef(reduxSearchParams);
+  useEffect(() => {
+    // Skip on first render
+    if (reduxSearchParamsRef.current === reduxSearchParams) {
+      reduxSearchParamsRef.current = reduxSearchParams;
+      return;
+    }
+    
+    // Only reset pagination if search params (not pagination params) have changed
+    const hasSearchParamsChanged = JSON.stringify(reduxSearchParamsRef.current) !== JSON.stringify(reduxSearchParams);
+    
+    if (hasSearchParamsChanged && pagination.currentPage !== 1) {
+      setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    }
+    
+    reduxSearchParamsRef.current = reduxSearchParams;
+  }, [reduxSearchParams, pagination.currentPage]);
+
   useEffect(() => {
     const params = new URLSearchParams();
     const defaults = { currentPage: 1, pageSize: 24, viewMode: 'grid' };
