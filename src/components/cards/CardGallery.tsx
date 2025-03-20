@@ -38,12 +38,13 @@ const CardGallery = React.memo(
     const [nameIsVisible, setNameIsVisible] = useLocalStorage('cardNameIsVisible', true);
     const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
     const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
+    const [cardSizeMargin] = useLocalStorage('cardSizeMargin', 5); // Get card size margin setting
 
     // This effect forces a re-render when localStorage values change
     useEffect(() => {
       // We're using this as a dependency to trigger re-renders when these values change
       // from other components (like the settings panel)
-    }, [nameIsVisible, setIsVisible, priceIsVisible, cards]);
+    }, [nameIsVisible, setIsVisible, priceIsVisible, cardSizeMargin, cards]);
 
     // Use either provided display settings or localStorage values
     const display = {
@@ -176,8 +177,16 @@ const CardGallery = React.memo(
       );
     }
 
+    // Calculate horizontal padding based on the card size margin setting
+    const horizontalPadding = cardSizeMargin;
+
     return (
-      <CardGalleryWrapper ref={containerRef} cardsPerRow={cardsPerRow} galleryWidth={galleryWidth}>
+      <CardGalleryWrapper
+        ref={containerRef}
+        cardsPerRow={cardsPerRow}
+        galleryWidth={galleryWidth}
+        horizontalPadding={horizontalPadding}
+      >
         {cards.map((card) => (
           <CardItemWrapper
             key={card.id}
@@ -216,17 +225,21 @@ CardGallery.displayName = 'CardGallery';
 interface CardGalleryWrapperProps {
   cardsPerRow: number;
   galleryWidth: number;
+  horizontalPadding: number;
 }
 
 const CardGalleryWrapper = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'cardsPerRow' && prop !== 'galleryWidth',
-})<CardGalleryWrapperProps>(({ theme, cardsPerRow, galleryWidth }) => ({
+  shouldForwardProp: (prop) =>
+    prop !== 'cardsPerRow' && prop !== 'galleryWidth' && prop !== 'horizontalPadding',
+})<CardGalleryWrapperProps>(({ theme, cardsPerRow, galleryWidth, horizontalPadding }) => ({
   display: 'grid',
   gridTemplateColumns: `repeat(${cardsPerRow}, minmax(0, 1fr))`,
   gap: theme.spacing(2),
   width: `${galleryWidth}%`,
   margin: '0 auto',
   padding: theme.spacing(2),
+  paddingLeft: `${horizontalPadding}%`,
+  paddingRight: `${horizontalPadding}%`,
 
   // Responsive adjustments
   [theme.breakpoints.down('md')]: {
@@ -242,12 +255,13 @@ const CardGalleryWrapper = styled(Box, {
 }));
 
 const CardItemWrapper = styled(Box)(({ theme }) => ({
-  minHeight: '300px', // Set a minimum height to prevent layout shifts
+  // TODO: Experimenting without minHeight for better responsiveness, so far so good
+  //minHeight: '300px', // Set a minimum height to prevent layout shifts
   position: 'relative',
 
-  [theme.breakpoints.down('sm')]: {
-    minHeight: '460px', // Increased for better card display on mobile
-  },
+  // [theme.breakpoints.down('sm')]: {
+  //   minHeight: '460px', // Increased for better card display on mobile
+  // },
 }));
 
 // A placeholder component shown before the actual card content is visible

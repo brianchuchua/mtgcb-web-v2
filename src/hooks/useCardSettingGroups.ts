@@ -1,13 +1,18 @@
 'use client';
 
 import { useLocalStorage } from './useLocalStorage';
-import { CardSelectSetting, CardSettingGroup } from '@/components/cards/CardSettingsPanel';
+import {
+  CardSelectSetting,
+  CardSettingGroup,
+  CardSliderSetting,
+} from '@/components/cards/CardSettingsPanel';
 
 export const useCardSettingGroups = (): CardSettingGroup[] => {
   const [nameIsVisible, setNameIsVisible] = useLocalStorage('cardNameIsVisible', true);
   const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
   const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cardsPerRow', 4);
+  const [cardSizeMargin, setCardSizeMargin] = useLocalStorage('cardSizeMargin', 5);
 
   return [
     {
@@ -52,6 +57,22 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
             { value: 5, label: '5' },
             { value: 6, label: '6' },
           ],
+        },
+      ],
+    },
+    {
+      label: 'Card Size',
+      type: 'slider',
+      settings: [
+        {
+          key: 'cardSizeMargin',
+          label: 'Shrink cards (desktop only)',
+          value: cardSizeMargin,
+          setValue: setCardSizeMargin,
+          min: 0,
+          max: 40,
+          step: 1,
+          type: 'slider',
         },
       ],
     },

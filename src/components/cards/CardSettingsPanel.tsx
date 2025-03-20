@@ -11,6 +11,7 @@ import {
   IconButton,
   Paper,
   Popover,
+  Slider,
   Switch,
   Tooltip,
   Typography,
@@ -35,10 +36,21 @@ export interface CardSelectSetting {
   type: 'select';
 }
 
+export interface CardSliderSetting {
+  key: string;
+  label: string;
+  value: number;
+  setValue: (value: number) => void;
+  min: number;
+  max: number;
+  step: number;
+  type: 'slider';
+}
+
 export interface CardSettingGroup {
   label: string;
-  settings: CardSetting[] | CardSelectSetting[];
-  type: 'toggle' | 'select';
+  settings: CardSetting[] | CardSelectSetting[] | CardSliderSetting[];
+  type: 'toggle' | 'select' | 'slider';
 }
 
 interface CardSettingsPanelProps {
@@ -93,6 +105,7 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({ settingGroups, pa
           horizontal: 'center',
         }}
         elevation={3}
+        disableScrollLock={true}
         sx={{
           '& .MuiPaper-root': {
             overflow: 'visible',
@@ -132,72 +145,98 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({ settingGroups, pa
                     </Typography>
                   </GroupHeader>
 
-                <SettingsGrid>
-                  {settingGroup.type === 'toggle' ? (
-                    // Toggle switch controls for visibility settings
-                    (settingGroup.settings as CardSetting[]).map((setting) => (
-                      <FormControlLabel
-                        key={setting.key}
-                        control={
-                          <Switch
-                            color="primary"
-                            size="small"
-                            checked={setting.isVisible}
-                            onChange={() => setting.setVisibility(!setting.isVisible)}
+                  <SettingsGrid>
+                    {settingGroup.type === 'toggle'
+                      ? // Toggle switch controls for visibility settings
+                        (settingGroup.settings as CardSetting[]).map((setting) => (
+                          <FormControlLabel
+                            key={setting.key}
+                            control={
+                              <Switch
+                                color="primary"
+                                size="small"
+                                checked={setting.isVisible}
+                                onChange={() => setting.setVisibility(!setting.isVisible)}
+                                sx={{
+                                  '& .MuiSwitch-switchBase.Mui-checked': {
+                                    color: theme.palette.primary.main,
+                                  },
+                                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                    backgroundColor: alpha(theme.palette.primary.main, 0.5),
+                                  },
+                                }}
+                              />
+                            }
+                            label={
+                              <Typography variant="body2" sx={{ fontWeight: 400 }}>
+                                {setting.label}
+                              </Typography>
+                            }
                             sx={{
-                              '& .MuiSwitch-switchBase.Mui-checked': {
-                                color: theme.palette.primary.main,
-                              },
-                              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                backgroundColor: alpha(theme.palette.primary.main, 0.5),
+                              margin: 0,
+                              py: 0.75,
+                              px: 1,
+                              borderRadius: 1,
+                              '&:hover': {
+                                backgroundColor: alpha(theme.palette.primary.main, 0.04),
                               },
                             }}
                           />
-                        }
-                        label={
-                          <Typography variant="body2" sx={{ fontWeight: 400 }}>
-                            {setting.label}
-                          </Typography>
-                        }
-                        sx={{
-                          margin: 0,
-                          py: 0.75,
-                          px: 1,
-                          borderRadius: 1,
-                          '&:hover': {
-                            backgroundColor: alpha(theme.palette.primary.main, 0.04),
-                          },
-                        }}
-                      />
-                    ))
-                  ) : (
-                    // Select controls for numeric settings
-                    (settingGroup.settings as CardSelectSetting[]).map((setting) => (
-                      <Box key={setting.key} sx={{ py: 0.75, px: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 400, mb: 0.5 }}>
-                          {setting.label}
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                          {setting.options.map((option) => (
-                            <Chip
-                              key={option.value}
-                              label={option.label}
-                              clickable
-                              color={setting.value === option.value ? 'primary' : 'default'}
-                              onClick={() => setting.setValue(option.value)}
-                              size="small"
-                              sx={{
-                                borderRadius: 1,
-                                fontWeight: setting.value === option.value ? 500 : 400,
-                              }}
-                            />
+                        ))
+                      : settingGroup.type === 'select'
+                        ? // Select controls for numeric settings
+                          (settingGroup.settings as CardSelectSetting[]).map((setting) => (
+                            <Box key={setting.key} sx={{ py: 0.75, px: 1 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 400, mb: 0.5 }}>
+                                {setting.label}
+                              </Typography>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {setting.options.map((option) => (
+                                  <Chip
+                                    key={option.value}
+                                    label={option.label}
+                                    clickable
+                                    color={setting.value === option.value ? 'primary' : 'default'}
+                                    onClick={() => setting.setValue(option.value)}
+                                    size="small"
+                                    sx={{
+                                      borderRadius: 1,
+                                      fontWeight: setting.value === option.value ? 500 : 400,
+                                    }}
+                                  />
+                                ))}
+                              </Box>
+                            </Box>
+                          ))
+                        : // Slider controls
+                          (settingGroup.settings as CardSliderSetting[]).map((setting) => (
+                            <Box key={setting.key} sx={{ py: 0.75, px: 1 }}>
+                              <Box
+                                sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}
+                              >
+                                <Typography variant="body2" sx={{ fontWeight: 400 }}>
+                                  {setting.label}
+                                </Typography>
+                              </Box>
+                              <Slider
+                                value={setting.value}
+                                onChange={(_, newValue) => setting.setValue(newValue as number)}
+                                min={setting.min}
+                                max={setting.max}
+                                step={setting.step}
+                                size="small"
+                                sx={{
+                                  mt: 1,
+                                  '& .MuiSlider-thumb': {
+                                    width: 14,
+                                    height: 14,
+                                  },
+                                }}
+                              />
+                            </Box>
                           ))}
-                        </Box>
-                      </Box>
-                    ))
-                  )}
-                </SettingsGrid>
-              </FormGroup>
+                  </SettingsGrid>
+                </FormGroup>
               );
             })}
           </FormControl>

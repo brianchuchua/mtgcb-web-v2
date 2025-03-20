@@ -6,7 +6,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery } from '@/api/browse/browseApi';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { CardApiParams, CardModel, CardSearchData } from '@/api/browse/types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
@@ -17,6 +16,7 @@ import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { useImagePreloader } from '@/hooks/useImagePreloader';
 import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { selectSearchParams } from '@/redux/slices/browseSlice';
 import { BrowsePagination } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
@@ -42,9 +42,8 @@ const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick }: CardDispla
         }))
     : cardItems;
 
-  // Use the cards per row from localStorage, defaulting to 4 if not set
   const [cardsPerRow] = useLocalStorage<number>('cardsPerRow', 4);
-  
+
   return viewMode === 'grid' ? (
     <CardGallery
       key="gallery"
@@ -187,14 +186,15 @@ export default function BrowsePage() {
       reduxSearchParamsRef.current = reduxSearchParams;
       return;
     }
-    
+
     // Only reset pagination if search params (not pagination params) have changed
-    const hasSearchParamsChanged = JSON.stringify(reduxSearchParamsRef.current) !== JSON.stringify(reduxSearchParams);
-    
+    const hasSearchParamsChanged =
+      JSON.stringify(reduxSearchParamsRef.current) !== JSON.stringify(reduxSearchParams);
+
     if (hasSearchParamsChanged && pagination.currentPage !== 1) {
       setPagination((prev) => ({ ...prev, currentPage: 1 }));
     }
-    
+
     reduxSearchParamsRef.current = reduxSearchParams;
   }, [reduxSearchParams, pagination.currentPage]);
 

@@ -7,7 +7,6 @@
 - Have same default order of cards as legacy site
 - Fix alignment of breadcrumbs and image gallery to match, along with other elements
 - Fix mobile view for cardgallery and pagination controls
-- Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files)
 - "No cards found" when refreshing the Browse page, briefly
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
@@ -25,6 +24,7 @@
 
 ## Later
 
+- Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files, top-down hierarchy, easy to read)
 - Consider cardsPerRow changing and image size changing, binder updating mode basically
 - Grok browser history and URL query parameters during search
 - Clean up this README -- make a separate TODO file?
