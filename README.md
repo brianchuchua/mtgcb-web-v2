@@ -2,7 +2,7 @@
 
 ## Now
 
-- Have same default order of cards as legacy site -- current order is random, so slices of searches sometimes show previous results as you paginate
+- Let the user choose the sort order
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
 - Don't forget to store some settings in local storage but also have them in the url for sharing

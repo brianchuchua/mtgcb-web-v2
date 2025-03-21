@@ -88,7 +88,7 @@ export default function BrowsePage() {
       ...buildApiParamsFromSearchParams(reduxSearchParams),
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
-      sortBy: 'name',
+      sortBy: 'releasedAt', // TODO: Allow use to change
       sortDirection: 'asc' as const,
       select: [
         'name',

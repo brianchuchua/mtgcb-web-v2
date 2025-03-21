@@ -43,8 +43,8 @@ export const useSearchFromUrl = () => {
       ],
       limit: pageSize,
       offset: (currentPage - 1) * pageSize,
-      sortBy: 'name',
-      sortDirection: 'asc',
+      sortBy: 'name', // TODO: Handle defaults
+      sortDirection: 'asc', // TODO: Handle defaults
     };
 
     // Add name filter
