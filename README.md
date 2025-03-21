@@ -2,14 +2,9 @@
 
 ## Now
 
-- High memory usage during extended testing, maybe only in developer mode -- at least in the chrome tab, not in heap snapshot
-- Due to image garbage collection? Network call caching seems unlikely. Anything I need to do differently, or is the browser handling it?
-- Once I click the colorless mana symbol, I can't click a colored one
 - Have same default order of cards as legacy site -- current order is random, so slices of searches sometimes show previous results as you paginate
-- "No cards found" when refreshing the Browse page, briefly
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
-- Maybe the React windowing shouldn't unload items when they leave the viewport, only load them.
 - Don't forget to store some settings in local storage but also have them in the url for sharing
 - Collection should better show that it's a dropdown and feel less awkward
 - Clean up BrowseSearchForm into smaller components

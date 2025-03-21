@@ -30,7 +30,7 @@ const ColorSelector = () => {
           }),
         );
       } else {
-        // If selecting a color, disable colorless
+        // If selecting a color, disable colorless if it's enabled
         const newColors = selectedColors.includes(color)
           ? selectedColors.filter((c) => c !== color)
           : [...selectedColors, color];
@@ -39,7 +39,7 @@ const ColorSelector = () => {
           setColors({
             colors: newColors,
             matchType,
-            includeColorless: false,
+            includeColorless: false, // Always disable colorless when selecting a color
           }),
         );
       }
@@ -82,7 +82,6 @@ const ColorSelector = () => {
             key={color}
             size="small"
             onClick={() => handleColorClick(color)}
-            disabled={includeColorless}
             isSelected={selectedColors.includes(color)}
           >
             <i className={`ms ms-${color.toLowerCase()} ms-cost ms-2x`} />
