@@ -12,7 +12,7 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
   const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
   const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cardsPerRow', 4);
-  const [cardSizeMargin, setCardSizeMargin] = useLocalStorage('cardSizeMargin', 5);
+  const [cardSizeMargin, setCardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
 
   return [
     {

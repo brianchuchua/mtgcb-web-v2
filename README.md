@@ -2,9 +2,10 @@
 
 ## Now
 
-- Have same default order of cards as legacy site
-- Fix alignment of breadcrumbs and image gallery to match, along with other elements
-- Fix mobile view for cardgallery and pagination controls
+- High memory usage during extended testing, maybe only in developer mode -- at least in the chrome tab, not in heap snapshot
+- Due to image garbage collection? Network call caching seems unlikely. Anything I need to do differently, or is the browser handling it?
+- Once I click the colorless mana symbol, I can't click a colored one
+- Have same default order of cards as legacy site -- current order is random, so slices of searches sometimes show previous results as you paginate
 - "No cards found" when refreshing the Browse page, briefly
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
@@ -14,13 +15,13 @@
 - Clean up BrowseSearchForm into smaller components
 - Grok URL source of truth pattern vs Redux state
 - Use the new TCGPlayer domain (see below)
-- Consider if the viewport loading/unloading of react components is too aggressive or if it should just load and never unload
 - Sort order implementation, stable
 - Clear all filters button
 - Examine pageSize in URL vs local storage
 
 ## Later
 
+- While searching, group by unique username, linking to a card name page that lists all printings -- and say "Printed in 13 sets" instead of the set name for those cards, or just the set name if a single printing. Need to group by the original, unadorned card name.
 - Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files, top-down hierarchy, easy to read)
 - Table view with proper header-row sorting server-side
 - Consider cardsPerRow changing and image size changing, binder updating mode basically

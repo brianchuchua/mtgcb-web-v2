@@ -443,7 +443,13 @@ export const CardGalleryPagination = React.memo(
                 onClick={scrollToTop}
                 color="primary"
                 startIcon={<KeyboardArrowUpIcon />}
-                sx={{ px: 3, py: 0.75, borderRadius: 4 }}
+                sx={{
+                  px: 3,
+                  py: 0.75,
+                  borderRadius: 4,
+                  opacity: isLoading ? 0 : 1,
+                  transition: 'opacity 2.0s',
+                }}
               >
                 Back to top
               </Button>

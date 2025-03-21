@@ -28,17 +28,23 @@ const CardGallery = React.memo(
     cards,
     isLoading = false,
     cardsPerRow = 4,
-    galleryWidth = 100,
+    galleryWidth = 95,
     onCardClick,
     displaySettings,
   }: CardGalleryProps) => {
     const observerRef = useRef<IntersectionObserver | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const [isHydrated, setIsHydrated] = useState(false);
 
     const [nameIsVisible, setNameIsVisible] = useLocalStorage('cardNameIsVisible', true);
     const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
     const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
-    const [cardSizeMargin] = useLocalStorage('cardSizeMargin', 5); // Get card size margin setting
+    const [cardSizeMargin] = useLocalStorage('cardSizeMargin', 0); // Get card size margin setting
+
+    // Mark when hydration is complete (localStorage values loaded)
+    useEffect(() => {
+      setIsHydrated(true);
+    }, []);
 
     // This effect forces a re-render when localStorage values change
     useEffect(() => {
@@ -169,7 +175,7 @@ const CardGallery = React.memo(
     );
 
     // Only show "No cards found" when not loading and actually have no cards
-    if (!isLoading && (!cards || cards.length === 0)) {
+    if (!isLoading && cards && cards.length === 0) {
       return (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
           <Typography variant="h6">No cards found</Typography>
@@ -179,6 +185,22 @@ const CardGallery = React.memo(
 
     // Calculate horizontal padding based on the card size margin setting
     const horizontalPadding = cardSizeMargin;
+
+    // If we're not yet hydrated (localStorage values not loaded), show a loading placeholder to prevent side padding shift
+    if (!isHydrated) {
+      return (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            width: '100%',
+            opacity: 0.5,
+          }}
+        ></Box>
+      );
+    }
 
     return (
       <CardGalleryWrapper

@@ -7,49 +7,14 @@ import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
 // Define a generic card interface that's not tied to any specific API
 export interface CardItemProps {
-  /**
-   * Unique identifier for the card
-   */
   id: string;
-
-  /**
-   * Card name
-   */
   name: string;
-
-  /**
-   * Set code used for display and icon
-   */
   setCode?: string;
-
-  /**
-   * Set name
-   */
   setName?: string;
-
-  /**
-   * Flag to indicate this is a loading skeleton
-   */
   isLoadingSkeleton?: boolean;
-
-  /**
-   * TCGPlayer Id
-   */
   tcgplayerId?: number | string;
-
-  /**
-   * Collector number within the set
-   */
   collectorNumber?: string;
-
-  /**
-   * Card rarity (common, uncommon, rare, mythic, etc.)
-   */
   rarity?: string;
-
-  /**
-   * Price information
-   */
   prices?: {
     normal?: {
       value: number;
@@ -60,19 +25,11 @@ export interface CardItemProps {
       currency?: string;
     };
   };
-
-  /**
-   * Visual display options
-   */
   display?: {
     nameIsVisible?: boolean;
     setIsVisible?: boolean;
     priceIsVisible?: boolean;
   };
-
-  /**
-   * Optional callback when card is clicked
-   */
   onClick?: () => void;
 }
 
@@ -102,16 +59,20 @@ const CardItem = ({
 
   const { nameIsVisible, setIsVisible, priceIsVisible } = display;
 
-  // If this is a loading skeleton, render a placeholder
+  // If this is a loading skeleton, render an invisible placeholder
   if (isLoadingSkeleton) {
     return (
-      <StyledCard>
+      <StyledCard
+        sx={{
+          opacity: 0.0, // Intentional while I experiment with skeleton loaders
+        }}
+      >
         <CardImageContainer>
           <Skeleton
             variant="rectangular"
             width="100%"
             height="100%"
-            animation="wave"
+            animation={false}
             sx={{
               position: 'absolute',
               top: 0,
@@ -346,7 +307,7 @@ const StyledCard = styled(Card, {
     transform: 'translateY(-4px)',
     boxShadow: theme.shadows[4],
   },
-  
+
   // Add specific mobile constraints
   [theme.breakpoints.down('sm')]: {
     maxWidth: '100%',
@@ -358,7 +319,7 @@ const CardImageContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
   paddingTop: '139.3%', // Aspect ratio of a magic card (680/488)
   overflow: 'hidden',
-  
+
   // Add specific mobile constraint
   [theme.breakpoints.down('sm')]: {
     maxWidth: '100vw',
@@ -378,9 +339,9 @@ const CardImage = styled('img')<CardImageProps>(({ theme, setName }) => ({
   maxWidth: '100%',
   height: '100%',
   objectFit: 'contain',
-  transition: 'opacity 0.3s ease-in-out',
+  transition: 'opacity 0.7s ease-in-out',
   borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
-  
+
   // Add specific mobile constraints
   [theme.breakpoints.down('sm')]: {
     maxWidth: '100%',
@@ -418,7 +379,7 @@ const MissingImageFallback = styled(Box, {
   '& .MuiTypography-caption': {
     opacity: 0.7,
   },
-  
+
   // Match mobile constraints
   [theme.breakpoints.down('sm')]: {
     maxWidth: '100%',

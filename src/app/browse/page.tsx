@@ -14,7 +14,6 @@ import CardTable from '@/components/cards/CardTable';
 import { CardGalleryPagination } from '@/components/pagination';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
-import { useImagePreloader } from '@/hooks/useImagePreloader';
 import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { selectSearchParams } from '@/redux/slices/browseSlice';
@@ -26,11 +25,18 @@ interface CardDisplayProps {
   isLoading: boolean;
   viewMode: 'grid' | 'table';
   onCardClick: (cardId: string) => void;
+  pageSize: number;
 }
 
-const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick }: CardDisplayProps) => {
+const CardDisplay = ({
+  cardItems,
+  isLoading,
+  viewMode,
+  onCardClick,
+  pageSize,
+}: CardDisplayProps) => {
   const displayCards = isLoading
-    ? Array(24)
+    ? Array(pageSize)
         .fill(0)
         .map((_, index) => ({
           id: `skeleton-${index}`,
@@ -118,65 +124,21 @@ export default function BrowsePage() {
 
   const {
     data: searchResult,
-    isFetching: apiLoading,
+    isFetching: isApiLoading,
     error,
   } = useGetCardsQuery(apiParams, queryConfig);
 
   const prefetchNextPage = useGetCardsPrefetch('getCards');
 
   useEffect(() => {
-    if (!nextPageApiParams || apiLoading) return;
+    if (!nextPageApiParams || isApiLoading) return;
 
     const prefetchTimer = setTimeout(() => {
       prefetchNextPage(nextPageApiParams, { ifOlderThan: 300 });
     }, 1000);
 
     return () => clearTimeout(prefetchTimer);
-  }, [prefetchNextPage, nextPageApiParams, apiLoading]);
-
-  const { currentData: nextPageCachedData } = useGetCardsQuery(nextPageApiParams || skipToken, {
-    ...queryConfig,
-    skip: !nextPageApiParams,
-  });
-
-  const nextPageData = useMemo(
-    () =>
-      nextPageCachedData?.data?.cards
-        ? mapApiCardsToCardItems(nextPageCachedData.data.cards)
-        : null,
-    [nextPageCachedData],
-  );
-
-  const [isLoading, setIsLoading] = useState(false);
-  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useImagePreloader(nextPageData, isLoading);
-
-  useEffect(() => {
-    // Clear any pending timers first
-    if (loadingTimerRef.current) {
-      clearTimeout(loadingTimerRef.current);
-      loadingTimerRef.current = null;
-    }
-
-    if (apiLoading) {
-      // Add delay before showing loading indicators to prevent flashing
-      loadingTimerRef.current = setTimeout(() => {
-        if (apiLoading) setIsLoading(true);
-        loadingTimerRef.current = null;
-      }, 300);
-    } else if (isLoading) {
-      // Maintain minimum loading duration for consistent UX
-      const minLoadingTimer = setTimeout(() => setIsLoading(false), 400);
-      return () => clearTimeout(minLoadingTimer);
-    } else {
-      setIsLoading(false);
-    }
-
-    return () => {
-      if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
-    };
-  }, [apiLoading, isLoading]);
+  }, [prefetchNextPage, nextPageApiParams, isApiLoading]);
 
   // Reset pagination to page 1 when search parameters change
   const reduxSearchParamsRef = useRef(reduxSearchParams);
@@ -303,7 +265,7 @@ export default function BrowsePage() {
     onPageChange: handlePageChange,
     onPageSizeChange: handlePageSizeChange,
     onViewModeChange: handleViewModeChange,
-    isLoading,
+    isLoading: isApiLoading,
   };
 
   return (
@@ -320,9 +282,10 @@ export default function BrowsePage() {
 
       <CardDisplay
         cardItems={cardItems}
-        isLoading={isLoading}
+        isLoading={isApiLoading}
         viewMode={pagination.viewMode}
         onCardClick={handleCardClick}
+        pageSize={pagination.pageSize}
       />
 
       <CardGalleryPagination {...paginationProps} isOnBottom={true} />
