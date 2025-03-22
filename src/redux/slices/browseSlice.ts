@@ -60,11 +60,21 @@ export const browseSlice = createSlice({
     setSearchParams: (state, action: PayloadAction<BrowseSearchParams>) => {
       state.searchParams = action.payload;
     },
+    resetSearch: (state) => {
+      state.searchParams = {};
+    },
   },
 });
 
-export const { setSearchName, setOracleText, setColors, setTypes, setStats, setSearchParams } =
-  browseSlice.actions;
+export const { 
+  setSearchName, 
+  setOracleText, 
+  setColors, 
+  setTypes, 
+  setStats, 
+  setSearchParams,
+  resetSearch 
+} = browseSlice.actions;
 
 export const selectSearchParams = (state: RootState) => state.browse.searchParams;
 export const selectSearchName = (state: RootState) => state.browse.searchParams.name;

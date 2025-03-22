@@ -1,8 +1,9 @@
 'use client';
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SearchIcon from '@mui/icons-material/Search';
-import { InputAdornment, Paper, Stack, TextField, Tooltip } from '@mui/material';
+import { Button, InputAdornment, Paper, Stack, TextField, Tooltip } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useState } from 'react';
@@ -11,6 +12,7 @@ import ColorSelector from '@/features/browse/ColorSelector';
 import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
 import {
+  resetSearch,
   selectOracleText,
   selectSearchName,
   setOracleText,
@@ -59,6 +61,10 @@ const BrowseSearchForm = () => {
     debouncedOracleDispatch(newValue);
   };
 
+  const handleResetSearch = () => {
+    dispatch(resetSearch());
+  };
+
   return (
     <FormWrapper>
       <Form sx={{ paddingTop: 0.5 }}>
@@ -100,6 +106,14 @@ const BrowseSearchForm = () => {
           <ColorSelector />
           <TypeSelector />
           <StatSearch />
+          <Button
+            variant="outlined"
+            startIcon={<RestartAltIcon />}
+            onClick={handleResetSearch}
+            sx={{ mt: 1 }}
+          >
+            Reset Search
+          </Button>
         </Stack>
       </Form>
     </FormWrapper>

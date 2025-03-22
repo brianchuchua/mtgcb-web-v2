@@ -2,6 +2,7 @@
 
 ## Now
 
+- Should render navigation arrows on the bottom, but using them should scroll to top automatically
 - Let the user choose the sort order
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
@@ -13,13 +14,13 @@
 - Sort order implementation, stable
 - Clear all filters button
 - Examine pageSize in URL vs local storage
+- Make filter easier to find for mobile users
 
 ## Later
 
-- While searching, group by unique username, linking to a card name page that lists all printings -- and say "Printed in 13 sets" instead of the set name for those cards, or just the set name if a single printing. Need to group by the original, unadorned card name.
+- While searching, group by unique username, linking to a card name page that lists all printings -- and say "Printed in 13 sets" instead of the set name for those cards, or just the set name if a single printing. Need to group by the original, unadorned card name. This would show the newest printing first.
 - Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files, top-down hierarchy, easy to read)
 - Table view with proper header-row sorting server-side
-- Consider cardsPerRow changing and image size changing, binder updating mode basically
 - Grok browser history and URL query parameters during search
 - Clean up this README -- make a separate TODO file?
 - Continue writing front-end tests -- paused them to focus on feature work since the app is so simple to validate manually
@@ -41,6 +42,8 @@
 - A "money draft" tool to help users during a draft
 - Support searching by collector number and collector number ranges
 - Compare Vercel to Heroku for hosting
+- Data issue: Release date for some sets cause sorting issues if they're exactly the same. Need to nudge some by 1 second.
+- Reduce image file size.
 
 ## Known Bugs
 

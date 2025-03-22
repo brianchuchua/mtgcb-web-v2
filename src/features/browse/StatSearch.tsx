@@ -1,12 +1,23 @@
 'use client';
 
 import AddIcon from '@mui/icons-material/Add';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { IconButton, MenuItem, Paper, Select, Stack, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  IconButton,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectStats, setStats } from '@/redux/slices/browseSlice';
+import { selectSearchParams, selectStats, setStats } from '@/redux/slices/browseSlice';
 import { StatCondition, StatFilters } from '@/types/browse';
 
 const STAT_ATTRIBUTES = [
@@ -25,10 +36,16 @@ const OPERATORS = [
   { label: '≠', value: 'not' },
 ];
 
-const parseReduxStats = (reduxStats: StatFilters | undefined): StatCondition[] => {
-  if (!reduxStats) return [{ attribute: 'convertedManaCost', operator: 'gte', value: '' }];
+const DEFAULT_CONDITION: StatCondition = {
+  attribute: 'convertedManaCost',
+  operator: 'gte',
+  value: '',
+};
 
-  return Object.entries(reduxStats)
+const parseReduxStats = (reduxStats: StatFilters | undefined): StatCondition[] => {
+  if (!reduxStats) return [];
+
+  const parsed = Object.entries(reduxStats)
     .flatMap(([attribute, conditions]) =>
       conditions.map((condition) => {
         for (const op of ['gte', 'gt', 'lte', 'lt', 'eq', 'not']) {
@@ -41,24 +58,50 @@ const parseReduxStats = (reduxStats: StatFilters | undefined): StatCondition[] =
       }),
     )
     .filter((condition): condition is StatCondition => condition !== null);
+
+  return parsed.length > 0 ? parsed : [];
 };
 
 const StatSearch = () => {
   const dispatch = useDispatch();
   const reduxStats = useSelector(selectStats);
+  const searchParams = useSelector(selectSearchParams);
   const userModified = useRef(false);
   const [conditions, setConditions] = useState<StatCondition[]>(() => parseReduxStats(reduxStats));
+  const [filtersActive, setFiltersActive] = useState(conditions.length > 0);
 
-  // Sync with Redux state when it changes from URL
+  // Check if search parameters are empty (after reset)
+  const everyConditionHasAEmptyValue = conditions.every((condition) => condition.value === '');
+  const isEmptySearchParams =
+    everyConditionHasAEmptyValue || Object.keys(searchParams || {}).length === 0;
+
+  // Sync with Redux state when it changes
   useEffect(() => {
-    if (!userModified.current) {
-      setConditions(parseReduxStats(reduxStats));
+    // Reset our local state if the search params are empty (after reset action)
+    if (isEmptySearchParams) {
+      userModified.current = false;
+      setConditions([]);
+      setFiltersActive(false);
+      return;
     }
-  }, [reduxStats]);
+
+    // Normal sync with Redux for URL changes
+    if (!userModified.current) {
+      const parsedConditions = parseReduxStats(reduxStats);
+      setConditions(parsedConditions);
+      setFiltersActive(parsedConditions.length > 0);
+    }
+  }, [reduxStats, searchParams, isEmptySearchParams]);
 
   // Update Redux when local state changes
   useEffect(() => {
     if (!userModified.current) return;
+
+    // If filters are not active, ensure we clear any existing stats from redux
+    if (!filtersActive) {
+      dispatch(setStats({}));
+      return;
+    }
 
     const statFilters: StatFilters = {};
 
@@ -72,7 +115,7 @@ const StatSearch = () => {
     });
 
     dispatch(setStats(statFilters));
-  }, [conditions, dispatch]);
+  }, [conditions, dispatch, filtersActive]);
 
   const handleAttributeChange = (index: number, newValue: string) => {
     userModified.current = true;
@@ -97,65 +140,85 @@ const StatSearch = () => {
 
   const addCondition = () => {
     userModified.current = true;
-    setConditions([...conditions, { attribute: 'convertedManaCost', operator: 'gte', value: '' }]);
+    setConditions([...conditions, { ...DEFAULT_CONDITION }]);
   };
 
   const removeCondition = () => {
     userModified.current = true;
     if (conditions.length > 1) {
       setConditions(conditions.slice(0, -1));
+    } else if (conditions.length === 1) {
+      setConditions([]);
+      setFiltersActive(false);
     }
+  };
+
+  const activateFilters = () => {
+    userModified.current = true;
+    setFiltersActive(true);
+    setConditions([{ ...DEFAULT_CONDITION }]);
   };
 
   return (
     <>
-      <Stack spacing={1.5}>
-        {conditions.map((condition, index) => (
-          <StatRow key={index}>
-            <AttributeSelect
-              size="small"
-              value={condition.attribute}
-              onChange={(e) => handleAttributeChange(index, e.target.value as string)}
-            >
-              {STAT_ATTRIBUTES.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </AttributeSelect>
+      {!filtersActive ? (
+        <Button
+          variant="outlined"
+          startIcon={<FilterListIcon />}
+          onClick={activateFilters}
+          fullWidth
+          sx={{ mt: 1 }}
+        >
+          Add Stat Filters
+        </Button>
+      ) : (
+        <Stack spacing={1.5}>
+          {conditions.map((condition, index) => (
+            <StatRow key={index}>
+              <AttributeSelect
+                size="small"
+                value={condition.attribute}
+                onChange={(e) => handleAttributeChange(index, e.target.value as string)}
+              >
+                {STAT_ATTRIBUTES.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </AttributeSelect>
 
-            <OperatorSelect
-              size="small"
-              value={condition.operator}
-              onChange={(e) => handleOperatorChange(index, e.target.value as string)}
-            >
-              {OPERATORS.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </OperatorSelect>
+              <OperatorSelect
+                size="small"
+                value={condition.operator}
+                onChange={(e) => handleOperatorChange(index, e.target.value as string)}
+              >
+                {OPERATORS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </OperatorSelect>
 
-            <ValueInput
-              size="small"
-              type="number"
-              value={condition.value}
-              onChange={(e) => handleValueChange(index, e.target.value as string)}
-              placeholder="0"
-            />
-          </StatRow>
-        ))}
+              <ValueInput
+                size="small"
+                type="number"
+                value={condition.value}
+                onChange={(e) => handleValueChange(index, e.target.value as string)}
+              />
+            </StatRow>
+          ))}
 
-        <Actions>
-          <InstructionText>Add or remove stat filters:</InstructionText>
-          <IconButton size="small" onClick={removeCondition} disabled={conditions.length === 1}>
-            <RemoveIcon />
-          </IconButton>
-          <IconButton size="small" onClick={addCondition}>
-            <AddIcon />
-          </IconButton>
-        </Actions>
-      </Stack>
+          <Actions>
+            <InstructionText>Add or remove stat filters:</InstructionText>
+            <IconButton size="small" onClick={removeCondition}>
+              <RemoveIcon />
+            </IconButton>
+            <IconButton size="small" onClick={addCondition}>
+              <AddIcon />
+            </IconButton>
+          </Actions>
+        </Stack>
+      )}
     </>
   );
 };
