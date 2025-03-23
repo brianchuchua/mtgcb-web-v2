@@ -13,6 +13,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  SelectChangeEvent,
   Stack,
   Switch,
   TextField,
@@ -89,11 +90,11 @@ const BrowseSearchForm = () => {
     dispatch(setOneResultPerCardName(e.target.checked));
   };
 
-  const handleSortByChange = (e) => {
+  const handleSortByChange = (e: SelectChangeEvent<SortByOption>) => {
     dispatch(setSortBy(e.target.value as SortByOption));
   };
 
-  const handleSortOrderChange = (e) => {
+  const handleSortOrderChange = (e: SelectChangeEvent<SortOrderOption>) => {
     dispatch(setSortOrder(e.target.value as SortOrderOption));
   };
 

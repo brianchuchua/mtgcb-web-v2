@@ -2,7 +2,6 @@
 
 ## Now
 
-- Unit test coverage for the final version of sorting and uniqueness filtering in the API
 - Should render navigation arrows on the bottom, but using them should scroll to top automatically
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
