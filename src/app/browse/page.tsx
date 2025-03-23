@@ -91,7 +91,7 @@ export default function BrowsePage() {
         limit: pagination.pageSize,
         offset: (pagination.currentPage - 1) * pagination.pageSize,
         // Use the sort parameters from the redux store if provided, otherwise use defaults
-        sortBy: params.sortBy || 'name',
+        sortBy: params.sortBy || 'releasedAt',
         sortDirection: params.sortDirection || 'asc' as const,
         select: [
           'name',

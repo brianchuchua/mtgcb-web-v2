@@ -45,7 +45,7 @@ const BrowseSearchForm = () => {
   const reduxName = useSelector(selectSearchName) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
-  const reduxSortBy = useSelector(selectSortBy) || 'name';
+  const reduxSortBy = useSelector(selectSortBy) || 'releasedAt';
   const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
 
   const [localName, setLocalName] = useState(reduxName);
