@@ -3,11 +3,16 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SearchIcon from '@mui/icons-material/Search';
+import SortIcon from '@mui/icons-material/Sort';
 import {
   Button,
+  FormControl,
   FormControlLabel,
   InputAdornment,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   Switch,
   TextField,
@@ -25,16 +30,23 @@ import {
   selectOneResultPerCardName,
   selectOracleText,
   selectSearchName,
+  selectSortBy,
+  selectSortOrder,
   setOneResultPerCardName,
   setOracleText,
   setSearchName,
+  setSortBy,
+  setSortOrder,
 } from '@/redux/slices/browseSlice';
+import { SortByOption, SortOrderOption } from '@/types/browse';
 
 const BrowseSearchForm = () => {
   const dispatch = useDispatch();
   const reduxName = useSelector(selectSearchName) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
+  const reduxSortBy = useSelector(selectSortBy) || 'name';
+  const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
 
   const [localName, setLocalName] = useState(reduxName);
   const [localOracleText, setLocalOracleText] = useState(reduxOracleText);
@@ -75,6 +87,14 @@ const BrowseSearchForm = () => {
 
   const handleOneResultPerCardNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setOneResultPerCardName(e.target.checked));
+  };
+
+  const handleSortByChange = (e) => {
+    dispatch(setSortBy(e.target.value as SortByOption));
+  };
+
+  const handleSortOrderChange = (e) => {
+    dispatch(setSortOrder(e.target.value as SortOrderOption));
   };
 
   const handleResetSearch = () => {
@@ -143,6 +163,40 @@ const BrowseSearchForm = () => {
             }
           />
           <StatSearch />
+          <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+            <FormControl size="small" sx={{ width: '65%' }}>
+              <InputLabel id="sort-by-label">Sort By</InputLabel>
+              <Select
+                labelId="sort-by-label"
+                value={reduxSortBy}
+                label="Sort By"
+                onChange={handleSortByChange}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <SortIcon color="disabled" />
+                  </InputAdornment>
+                }
+              >
+                <MenuItem value="name">Name</MenuItem>
+                <MenuItem value="releasedAt">Release Date</MenuItem>
+                <MenuItem value="collectorNumber">Collector Number</MenuItem>
+                <MenuItem value="powerNumeric">Power</MenuItem>
+                <MenuItem value="toughnessNumeric">Toughness</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl size="small" sx={{ width: '35%' }}>
+              <InputLabel id="sort-order-label">Order</InputLabel>
+              <Select
+                labelId="sort-order-label"
+                value={reduxSortOrder}
+                label="Order"
+                onChange={handleSortOrderChange}
+              >
+                <MenuItem value="asc">ASC</MenuItem>
+                <MenuItem value="desc">DESC</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
           <Button
             variant="outlined"
             startIcon={<RestartAltIcon />}

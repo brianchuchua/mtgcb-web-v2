@@ -84,27 +84,34 @@ export default function BrowsePage() {
   useInitializeBrowseFromUrl();
 
   const apiParams = useMemo(
-    () => ({
-      ...buildApiParamsFromSearchParams(reduxSearchParams),
-      limit: pagination.pageSize,
-      offset: (pagination.currentPage - 1) * pagination.pageSize,
-      sortBy: 'releasedAt', // TODO: Allow use to change
-      sortDirection: 'asc' as const,
-      select: [
-        'name',
-        'setId',
-        'setName',
-        'tcgplayerId',
-        'market',
-        'low',
-        'average',
-        'high',
-        'foil',
-        'collectorNumber',
-        'mtgcbCollectorNumber',
-        'rarity',
-      ] as Array<keyof CardModel>,
-    }),
+    () => {
+      const params = buildApiParamsFromSearchParams(reduxSearchParams);
+      return {
+        ...params,
+        limit: pagination.pageSize,
+        offset: (pagination.currentPage - 1) * pagination.pageSize,
+        // Use the sort parameters from the redux store if provided, otherwise use defaults
+        sortBy: params.sortBy || 'name',
+        sortDirection: params.sortDirection || 'asc' as const,
+        select: [
+          'name',
+          'setId',
+          'setName',
+          'tcgplayerId',
+          'market',
+          'low',
+          'average',
+          'high',
+          'foil',
+          'collectorNumber',
+          'mtgcbCollectorNumber',
+          'rarity',
+          'powerNumeric',
+          'toughnessNumeric',
+          'releaseDate',
+        ] as Array<keyof CardModel>,
+      };
+    },
     [reduxSearchParams, pagination],
   );
 
@@ -217,6 +224,15 @@ export default function BrowsePage() {
       if (statParams.length > 0) {
         params.set('stats', statParams.join(','));
       }
+    }
+
+    // Add sorting parameters to URL
+    if (reduxSearchParams.sortBy) {
+      params.set('sortBy', reduxSearchParams.sortBy);
+    }
+    
+    if (reduxSearchParams.sortOrder) {
+      params.set('sortOrder', reduxSearchParams.sortOrder);
     }
 
     const newSearch = params.toString();

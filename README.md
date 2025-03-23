@@ -2,7 +2,7 @@
 
 ## Now
 
-- Let the user choose the sort order -- and make sure it plays nicely with hide duplicate printings
+- Unit test coverage for the final version of sorting and uniqueness filtering in the API
 - Should render navigation arrows on the bottom, but using them should scroll to top automatically
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
@@ -16,6 +16,8 @@
 - Examine pageSize in URL vs local storage
 - Make filter easier to find for mobile users
 - Move these TODOs to a TODO.md file :)
+- Improve error state on browse page -- right out it outputs API errors as red text.
+- Add more sortBy options
 
 ## Later
 

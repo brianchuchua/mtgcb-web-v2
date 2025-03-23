@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { setSearchParams } from '@/redux/slices/browseSlice';
-import { BrowseSearchParams, ColorMatchType, StatFilters } from '@/types/browse';
+import { BrowseSearchParams, ColorMatchType, SortByOption, SortOrderOption, StatFilters } from '@/types/browse';
 
 export const useInitializeBrowseFromUrl = () => {
   const dispatch = useDispatch();
@@ -80,6 +80,17 @@ export const useInitializeBrowseFromUrl = () => {
       if (Object.keys(statFilters).length > 0) {
         params.stats = statFilters;
       }
+    }
+
+    // Handle sorting parameters
+    const sortBy = searchParams.get('sortBy') as SortByOption | null;
+    if (sortBy) {
+      params.sortBy = sortBy;
+    }
+
+    const sortOrder = searchParams.get('sortOrder') as SortOrderOption | null;
+    if (sortOrder) {
+      params.sortOrder = sortOrder;
     }
 
     dispatch(setSearchParams(params));

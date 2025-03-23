@@ -1,5 +1,5 @@
 import { CardApiParams } from '@/api/browse/types';
-import { BrowseSearchParams, ColorMatchType } from '@/types/browse';
+import { BrowseSearchParams, ColorMatchType, SortByOption, SortOrderOption } from '@/types/browse';
 
 /**
  * Converts browser/Redux search parameters to API parameters
@@ -99,6 +99,15 @@ export const buildApiParamsFromSearchParams = (
         };
       }
     });
+  }
+
+  // Add sorting parameters
+  if (searchParams.sortBy) {
+    apiParams.sortBy = searchParams.sortBy;
+  }
+  
+  if (searchParams.sortOrder) {
+    apiParams.sortDirection = searchParams.sortOrder;
   }
 
   return apiParams;

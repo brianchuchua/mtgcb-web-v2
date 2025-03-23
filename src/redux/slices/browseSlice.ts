@@ -5,6 +5,8 @@ import {
   BrowseState,
   ColorFilter,
   ColorMatchType,
+  SortByOption,
+  SortOrderOption,
   StatFilters,
   TypeFilter,
 } from '@/types/browse';
@@ -64,6 +66,12 @@ export const browseSlice = createSlice({
         state.searchParams.oneResultPerCardName = action.payload;
       }
     },
+    setSortBy: (state, action: PayloadAction<SortByOption>) => {
+      state.searchParams.sortBy = action.payload;
+    },
+    setSortOrder: (state, action: PayloadAction<SortOrderOption>) => {
+      state.searchParams.sortOrder = action.payload;
+    },
     setSearchParams: (state, action: PayloadAction<BrowseSearchParams>) => {
       state.searchParams = action.payload;
     },
@@ -80,6 +88,8 @@ export const {
   setTypes,
   setStats,
   setOneResultPerCardName,
+  setSortBy,
+  setSortOrder,
   setSearchParams,
   resetSearch,
 } = browseSlice.actions;
@@ -92,5 +102,7 @@ export const selectTypes = (state: RootState) => state.browse.searchParams.types
 export const selectStats = (state: RootState) => state.browse.searchParams.stats;
 export const selectOneResultPerCardName = (state: RootState) =>
   state.browse.searchParams.oneResultPerCardName;
+export const selectSortBy = (state: RootState) => state.browse.searchParams.sortBy;
+export const selectSortOrder = (state: RootState) => state.browse.searchParams.sortOrder;
 
 export default browseSlice.reducer;

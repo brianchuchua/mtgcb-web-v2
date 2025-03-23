@@ -21,6 +21,14 @@ export interface StatFilters {
   [key: string]: string[]; // Maps attribute to array of conditions
 }
 
+export type SortByOption =
+  | 'name'
+  | 'releasedAt'
+  | 'collectorNumber'
+  | 'powerNumeric'
+  | 'toughnessNumeric';
+export type SortOrderOption = 'asc' | 'desc';
+
 export interface BrowseSearchParams {
   name?: string;
   oracleText?: string;
@@ -28,6 +36,8 @@ export interface BrowseSearchParams {
   types?: TypeFilter;
   stats?: StatFilters;
   oneResultPerCardName?: boolean;
+  sortBy?: SortByOption;
+  sortOrder?: SortOrderOption;
 }
 
 export interface BrowsePagination {
