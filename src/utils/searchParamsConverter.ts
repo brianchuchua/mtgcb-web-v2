@@ -20,6 +20,11 @@ export const buildApiParamsFromSearchParams = (
     apiParams.oracleText = searchParams.oracleText;
   }
 
+  // Add oneResultPerCardName parameter
+  if (searchParams.oneResultPerCardName) {
+    apiParams.oneResultPerCardName = searchParams.oneResultPerCardName;
+  }
+
   // Add color filtering
   if (searchParams.colors) {
     if (searchParams.colors.includeColorless) {

@@ -3,7 +3,16 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SearchIcon from '@mui/icons-material/Search';
-import { Button, InputAdornment, Paper, Stack, TextField, Tooltip } from '@mui/material';
+import {
+  Button,
+  FormControlLabel,
+  InputAdornment,
+  Paper,
+  Stack,
+  Switch,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useState } from 'react';
@@ -13,8 +22,10 @@ import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
 import {
   resetSearch,
+  selectOneResultPerCardName,
   selectOracleText,
   selectSearchName,
+  setOneResultPerCardName,
   setOracleText,
   setSearchName,
 } from '@/redux/slices/browseSlice';
@@ -23,6 +34,7 @@ const BrowseSearchForm = () => {
   const dispatch = useDispatch();
   const reduxName = useSelector(selectSearchName) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
+  const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
 
   const [localName, setLocalName] = useState(reduxName);
   const [localOracleText, setLocalOracleText] = useState(reduxOracleText);
@@ -59,6 +71,10 @@ const BrowseSearchForm = () => {
     const newValue = e.target.value;
     setLocalOracleText(newValue);
     debouncedOracleDispatch(newValue);
+  };
+
+  const handleOneResultPerCardNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setOneResultPerCardName(e.target.checked));
   };
 
   const handleResetSearch = () => {
@@ -105,6 +121,27 @@ const BrowseSearchForm = () => {
           />
           <ColorSelector />
           <TypeSelector />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={reduxOneResultPerCardName}
+                onChange={handleOneResultPerCardNameChange}
+                name="oneResultPerCardName"
+                color="primary"
+                size="small"
+                sx={{ marginRight: '3px' }}
+              />
+            }
+            label="Hide duplicate printings"
+            sx={
+              {
+                // TODO: Debating these styles, leaving them here for now
+                // border: '1px solid #616161',
+                // borderRadius: '4px',
+                // padding: '8px',
+              }
+            }
+          />
           <StatSearch />
           <Button
             variant="outlined"

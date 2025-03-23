@@ -57,6 +57,13 @@ export const browseSlice = createSlice({
         state.searchParams.stats = action.payload;
       }
     },
+    setOneResultPerCardName: (state, action: PayloadAction<boolean>) => {
+      if (!action.payload) {
+        delete state.searchParams.oneResultPerCardName;
+      } else {
+        state.searchParams.oneResultPerCardName = action.payload;
+      }
+    },
     setSearchParams: (state, action: PayloadAction<BrowseSearchParams>) => {
       state.searchParams = action.payload;
     },
@@ -66,14 +73,15 @@ export const browseSlice = createSlice({
   },
 });
 
-export const { 
-  setSearchName, 
-  setOracleText, 
-  setColors, 
-  setTypes, 
-  setStats, 
+export const {
+  setSearchName,
+  setOracleText,
+  setColors,
+  setTypes,
+  setStats,
+  setOneResultPerCardName,
   setSearchParams,
-  resetSearch 
+  resetSearch,
 } = browseSlice.actions;
 
 export const selectSearchParams = (state: RootState) => state.browse.searchParams;
@@ -82,5 +90,7 @@ export const selectOracleText = (state: RootState) => state.browse.searchParams.
 export const selectColors = (state: RootState) => state.browse.searchParams.colors;
 export const selectTypes = (state: RootState) => state.browse.searchParams.types;
 export const selectStats = (state: RootState) => state.browse.searchParams.stats;
+export const selectOneResultPerCardName = (state: RootState) =>
+  state.browse.searchParams.oneResultPerCardName;
 
 export default browseSlice.reducer;

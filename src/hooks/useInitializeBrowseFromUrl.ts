@@ -29,6 +29,12 @@ export const useInitializeBrowseFromUrl = () => {
       params.oracleText = oracleText;
     }
 
+    // Handle oneResultPerCardName
+    const oneResultPerCardName = searchParams.get('oneResultPerCardName') === 'true';
+    if (oneResultPerCardName) {
+      params.oneResultPerCardName = true;
+    }
+
     // Handle color params
     const colorless = searchParams.get('colorless') === 'true';
     const colors = searchParams.get('colors');

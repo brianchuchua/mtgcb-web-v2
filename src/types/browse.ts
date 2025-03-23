@@ -27,6 +27,7 @@ export interface BrowseSearchParams {
   colors?: ColorFilter;
   types?: TypeFilter;
   stats?: StatFilters;
+  oneResultPerCardName?: boolean;
 }
 
 export interface BrowsePagination {

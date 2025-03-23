@@ -186,6 +186,10 @@ export default function BrowsePage() {
       params.set('oracleText', reduxSearchParams.oracleText);
     }
 
+    if (reduxSearchParams.oneResultPerCardName) {
+      params.set('oneResultPerCardName', 'true');
+    }
+
     if (reduxSearchParams.colors) {
       if (reduxSearchParams.colors.includeColorless) {
         params.set('colorless', 'true');

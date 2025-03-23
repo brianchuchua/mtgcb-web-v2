@@ -2,8 +2,8 @@
 
 ## Now
 
+- Let the user choose the sort order -- and make sure it plays nicely with hide duplicate printings
 - Should render navigation arrows on the bottom, but using them should scroll to top automatically
-- Let the user choose the sort order
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
 - Don't forget to store some settings in local storage but also have them in the url for sharing
@@ -15,9 +15,11 @@
 - Clear all filters button
 - Examine pageSize in URL vs local storage
 - Make filter easier to find for mobile users
+- Move these TODOs to a TODO.md file :)
 
 ## Later
 
+- Audit all indexes
 - While searching, group by unique username, linking to a card name page that lists all printings -- and say "Printed in 13 sets" instead of the set name for those cards, or just the set name if a single printing. Need to group by the original, unadorned card name. This would show the newest printing first.
 - Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files, top-down hierarchy, easy to read)
 - Table view with proper header-row sorting server-side
