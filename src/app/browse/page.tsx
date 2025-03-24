@@ -83,37 +83,36 @@ export default function BrowsePage() {
 
   useInitializeBrowseFromUrl();
 
-  const apiParams = useMemo(
-    () => {
-      const params = buildApiParamsFromSearchParams(reduxSearchParams);
-      return {
-        ...params,
-        limit: pagination.pageSize,
-        offset: (pagination.currentPage - 1) * pagination.pageSize,
-        // Use the sort parameters from the redux store if provided, otherwise use defaults
-        sortBy: params.sortBy || 'releasedAt',
-        sortDirection: params.sortDirection || 'asc' as const,
-        select: [
-          'name',
-          'setId',
-          'setName',
-          'tcgplayerId',
-          'market',
-          'low',
-          'average',
-          'high',
-          'foil',
-          'collectorNumber',
-          'mtgcbCollectorNumber',
-          'rarity',
-          'powerNumeric',
-          'toughnessNumeric',
-          'releaseDate',
-        ] as Array<keyof CardModel>,
-      };
-    },
-    [reduxSearchParams, pagination],
-  );
+  const apiParams = useMemo(() => {
+    const params = buildApiParamsFromSearchParams(reduxSearchParams);
+    return {
+      ...params,
+      limit: pagination.pageSize,
+      offset: (pagination.currentPage - 1) * pagination.pageSize,
+      // Use the sort parameters from the redux store if provided, otherwise use defaults
+      sortBy: params.sortBy || 'releasedAt',
+      sortDirection: params.sortDirection || ('asc' as const),
+      select: [
+        'name',
+        'setId',
+        'setName',
+        'tcgplayerId',
+        'market',
+        'low',
+        'average',
+        'high',
+        'foil',
+        'collectorNumber',
+        'mtgcbCollectorNumber',
+        'rarity',
+        'rarityNumeric',
+        'powerNumeric',
+        'toughnessNumeric',
+        'loyaltyNumeric',
+        'releaseDate',
+      ] as Array<keyof CardModel>,
+    };
+  }, [reduxSearchParams, pagination]);
 
   const nextPageApiParams = useMemo(
     () =>
@@ -234,7 +233,7 @@ export default function BrowsePage() {
     if (reduxSearchParams.sortBy) {
       params.set('sortBy', reduxSearchParams.sortBy);
     }
-    
+
     if (reduxSearchParams.sortOrder) {
       params.set('sortOrder', reduxSearchParams.sortOrder);
     }

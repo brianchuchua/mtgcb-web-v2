@@ -244,8 +244,11 @@ const BrowseSearchForm = () => {
                 <MenuItem value="name">Name</MenuItem>
                 <MenuItem value="releasedAt">Release Date</MenuItem>
                 <MenuItem value="collectorNumber">Collector Number</MenuItem>
+                <MenuItem value="mtgcbCollectorNumber">MTG CB Collector Number</MenuItem>
+                <MenuItem value="rarityNumeric">Rarity</MenuItem>
                 <MenuItem value="powerNumeric">Power</MenuItem>
                 <MenuItem value="toughnessNumeric">Toughness</MenuItem>
+                <MenuItem value="loyaltyNumeric">Loyalty</MenuItem>
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ width: '35%' }}>

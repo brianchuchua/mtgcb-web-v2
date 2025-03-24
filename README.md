@@ -3,6 +3,8 @@
 ## Now
 
 - More sorting options and implement a better table view that also allows configuration and sorting
+- Add rarities selector
+- Price type support
 - Don't forget to store some settings in local storage but also have them in the url for sharing
 - Collection in the sidenav should show that it's a dropdown and feel less awkward
 - Clean up BrowseSearchForm into smaller components

@@ -25,8 +25,11 @@ export type SortByOption =
   | 'name'
   | 'releasedAt'
   | 'collectorNumber'
+  | 'mtgcbCollectorNumber'
+  | 'rarityNumeric'
   | 'powerNumeric'
-  | 'toughnessNumeric';
+  | 'toughnessNumeric'
+  | 'loyaltyNumeric';
 export type SortOrderOption = 'asc' | 'desc';
 
 export interface BrowseSearchParams {

@@ -28,6 +28,7 @@ export const useSearchFromUrl = () => {
   useEffect(() => {
     const apiParams: CardApiParams = {
       select: [
+        // TODO: This stuff is duplicated in another file, grok
         'name',
         'setId',
         'setName',
@@ -40,6 +41,7 @@ export const useSearchFromUrl = () => {
         'collectorNumber',
         'mtgcbCollectorNumber',
         'rarity',
+        'rarityNumeric',
       ],
       limit: pageSize,
       offset: (currentPage - 1) * pageSize,
