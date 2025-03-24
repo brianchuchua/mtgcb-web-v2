@@ -203,8 +203,8 @@ const BrowseSearchForm = () => {
               ),
             }}
           />
-          <ColorSelector />
           <TypeSelector />
+          <ColorSelector />
           <FormControlLabel
             control={
               <Switch
