@@ -2,7 +2,6 @@
 
 ## Now
 
-- Consider switching to native lazy loading for images. (Can I animate this the same way?)
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
 - Don't forget to store some settings in local storage but also have them in the url for sharing
