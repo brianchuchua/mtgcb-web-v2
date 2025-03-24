@@ -2,7 +2,8 @@
 
 ## Now
 
-- Should render navigation arrows on the bottom, but using them should scroll to top automatically
+- Major detached node issue with virtualization if scrolling down and paging up quickly -- at least I think that's the cause of memory issues. Images are in those nodes. Noticed it once I got perf issues. Detached nodes may be related to "!imageLoaded && !imageError && (" loading state in CardItem, although this was diagnosed with virtualization removed. Still happens even if I remove all loading skeletons from CardItem and have it use native lazy loading.
+- Consider switching to native lazy loading for images. (Can I animate this the same way?)
 - Mobile/desktop data persistence in Browse page view
 - Start porting over mtgcb-web to this project, using the latest React best practices
 - Don't forget to store some settings in local storage but also have them in the url for sharing

@@ -57,6 +57,24 @@ const CardItem = ({
   const [imageError, setImageError] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
+  // Lazy load the image - moved before conditional return to follow React Hooks rules
+  useEffect(() => {
+    // Skip for loading skeletons
+    if (isLoadingSkeleton) return;
+    
+    // When the component mounts, set the image src from data-src
+    if (imageRef.current && imageRef.current.dataset.src) {
+      // Small timeout to ensure it doesn't block other UI rendering
+      const timer = setTimeout(() => {
+        if (imageRef.current) {
+          imageRef.current.src = imageRef.current.dataset.src || '';
+        }
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingSkeleton]);
+
   const { nameIsVisible, setIsVisible, priceIsVisible } = display;
 
   // If this is a loading skeleton, render an invisible placeholder
@@ -98,21 +116,6 @@ const CardItem = ({
       </StyledCard>
     );
   }
-
-  // Lazy load the image
-  useEffect(() => {
-    // When the component mounts, set the image src from data-src
-    if (imageRef.current && imageRef.current.dataset.src) {
-      // Small timeout to ensure it doesn't block other UI rendering
-      const timer = setTimeout(() => {
-        if (imageRef.current) {
-          imageRef.current.src = imageRef.current.dataset.src || '';
-        }
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   // Get price display
   const getPriceDisplay = () => {
