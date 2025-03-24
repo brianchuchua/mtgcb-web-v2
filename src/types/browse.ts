@@ -32,6 +32,7 @@ export type SortOrderOption = 'asc' | 'desc';
 export interface BrowseSearchParams {
   name?: string;
   oracleText?: string;
+  artist?: string;
   colors?: ColorFilter;
   types?: TypeFilter;
   stats?: StatFilters;

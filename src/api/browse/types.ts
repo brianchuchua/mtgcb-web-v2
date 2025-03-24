@@ -55,6 +55,7 @@ export interface CardModel {
   updatedAt: string | null;
   // Derived fields
   setName: string | null;
+  artist: string | null;
 }
 
 export interface CardFace {
@@ -133,6 +134,7 @@ export interface CardSearchRequest {
   };
   name?: string;
   oracleText?: string;
+  artist?: string;
   colors?: {
     colors: string[];
     matchType: string;

@@ -34,6 +34,13 @@ export const browseSlice = createSlice({
         state.searchParams.oracleText = action.payload;
       }
     },
+    setArtist: (state, action: PayloadAction<string>) => {
+      if (action.payload === '') {
+        delete state.searchParams.artist;
+      } else {
+        state.searchParams.artist = action.payload;
+      }
+    },
     setColors: (state, action: PayloadAction<ColorFilter>) => {
       if (action.payload.colors.length === 0 && !action.payload.includeColorless) {
         delete state.searchParams.colors;
@@ -84,6 +91,7 @@ export const browseSlice = createSlice({
 export const {
   setSearchName,
   setOracleText,
+  setArtist,
   setColors,
   setTypes,
   setStats,
@@ -97,6 +105,7 @@ export const {
 export const selectSearchParams = (state: RootState) => state.browse.searchParams;
 export const selectSearchName = (state: RootState) => state.browse.searchParams.name;
 export const selectOracleText = (state: RootState) => state.browse.searchParams.oracleText;
+export const selectArtist = (state: RootState) => state.browse.searchParams.artist;
 export const selectColors = (state: RootState) => state.browse.searchParams.colors;
 export const selectTypes = (state: RootState) => state.browse.searchParams.types;
 export const selectStats = (state: RootState) => state.browse.searchParams.stats;

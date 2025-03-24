@@ -2,6 +2,7 @@
 
 ## Now
 
+- More sorting options and implement a better table view that also allows configuration and sorting
 - Don't forget to store some settings in local storage but also have them in the url for sharing
 - Collection in the sidenav should show that it's a dropdown and feel less awkward
 - Clean up BrowseSearchForm into smaller components
@@ -9,7 +10,6 @@
 - Use the new TCGPlayer domain (see below)
 - Sort order implementation, stable
 - Examine pageSize in URL vs local storage
-- Make filter easier to find for mobile users
 - Move these TODOs to a TODO.md file :)
 - Improve error state on browse page -- right out it outputs API errors as red text.
 - Add more sortBy options
@@ -43,6 +43,7 @@
 - Compare Vercel to Heroku for hosting
 - Data issue: Release date for some sets cause sorting issues if they're exactly the same. Need to nudge some by 1 second.
 - Reduce image file size.
+- Remove Artist table, prefer to bake it into cards for now
 
 ## Known Bugs
 
@@ -54,7 +55,6 @@
 
 ## UX Thoughts
 
-- How to best handle filters and searching on mobile? How do other tools do it?
 - Let's make UX changes as we port components over.
 - Need a main landing page that doesn't suck. It needs a large call-to-action to register and show off the features of the site.
 - For tables, consider slanted-header-table-example.png design. See Rotated CSS section below.

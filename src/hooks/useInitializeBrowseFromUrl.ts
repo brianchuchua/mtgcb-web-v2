@@ -29,6 +29,12 @@ export const useInitializeBrowseFromUrl = () => {
       params.oracleText = oracleText;
     }
 
+    // Handle artist
+    const artist = searchParams.get('artist');
+    if (artist) {
+      params.artist = artist;
+    }
+
     // Handle oneResultPerCardName
     const oneResultPerCardName = searchParams.get('oneResultPerCardName') === 'true';
     if (oneResultPerCardName) {

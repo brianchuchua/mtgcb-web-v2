@@ -193,6 +193,10 @@ export default function BrowsePage() {
       params.set('oracleText', reduxSearchParams.oracleText);
     }
 
+    if (reduxSearchParams.artist) {
+      params.set('artist', reduxSearchParams.artist);
+    }
+
     if (reduxSearchParams.oneResultPerCardName) {
       params.set('oneResultPerCardName', 'true');
     }

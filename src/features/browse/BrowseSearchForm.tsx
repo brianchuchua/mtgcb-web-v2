@@ -33,11 +33,13 @@ import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
 import {
   resetSearch,
+  selectArtist,
   selectOneResultPerCardName,
   selectOracleText,
   selectSearchName,
   selectSortBy,
   selectSortOrder,
+  setArtist,
   setOneResultPerCardName,
   setOracleText,
   setSearchName,
@@ -54,12 +56,14 @@ const BrowseSearchForm = () => {
 
   const reduxName = useSelector(selectSearchName) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
+  const reduxArtist = useSelector(selectArtist) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
   const reduxSortBy = useSelector(selectSortBy) || 'releasedAt';
   const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
 
   const [localName, setLocalName] = useState(reduxName);
   const [localOracleText, setLocalOracleText] = useState(reduxOracleText);
+  const [localArtist, setLocalArtist] = useState(reduxArtist);
 
   useEffect(() => {
     setLocalName(reduxName);
@@ -68,6 +72,10 @@ const BrowseSearchForm = () => {
   useEffect(() => {
     setLocalOracleText(reduxOracleText);
   }, [reduxOracleText]);
+
+  useEffect(() => {
+    setLocalArtist(reduxArtist);
+  }, [reduxArtist]);
 
   const debouncedNameDispatch = useCallback(
     debounce((value: string) => {
@@ -83,6 +91,13 @@ const BrowseSearchForm = () => {
     [dispatch],
   );
 
+  const debouncedArtistDispatch = useCallback(
+    debounce((value: string) => {
+      dispatch(setArtist(value));
+    }, 300),
+    [dispatch],
+  );
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setLocalName(newValue);
@@ -93,6 +108,12 @@ const BrowseSearchForm = () => {
     const newValue = e.target.value;
     setLocalOracleText(newValue);
     debouncedOracleDispatch(newValue);
+  };
+
+  const handleArtistChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setLocalArtist(newValue);
+    debouncedArtistDispatch(newValue);
   };
 
   const handleOneResultPerCardNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,6 +184,21 @@ const BrowseSearchForm = () => {
                   <Tooltip title={<OracleTextTooltip />} placement="right">
                     <InfoOutlinedIcon color="disabled" sx={{ cursor: 'help' }} />
                   </Tooltip>
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Artist"
+            value={localArtist}
+            onChange={handleArtistChange}
+            placeholder="Search by artist name"
+            margin="dense"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="disabled" />
                 </InputAdornment>
               ),
             }}

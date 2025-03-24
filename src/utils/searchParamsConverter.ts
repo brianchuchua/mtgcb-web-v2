@@ -20,6 +20,11 @@ export const buildApiParamsFromSearchParams = (
     apiParams.oracleText = searchParams.oracleText;
   }
 
+  // Add artist filter
+  if (searchParams.artist) {
+    apiParams.artist = searchParams.artist;
+  }
+
   // Add oneResultPerCardName parameter
   if (searchParams.oneResultPerCardName) {
     apiParams.oneResultPerCardName = searchParams.oneResultPerCardName;
