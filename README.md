@@ -2,15 +2,12 @@
 
 ## Now
 
-- Mobile/desktop data persistence in Browse page view
-- Start porting over mtgcb-web to this project, using the latest React best practices
 - Don't forget to store some settings in local storage but also have them in the url for sharing
-- Collection should better show that it's a dropdown and feel less awkward
+- Collection in the sidenav should show that it's a dropdown and feel less awkward
 - Clean up BrowseSearchForm into smaller components
 - Grok URL source of truth pattern vs Redux state
 - Use the new TCGPlayer domain (see below)
 - Sort order implementation, stable
-- Clear all filters button
 - Examine pageSize in URL vs local storage
 - Make filter easier to find for mobile users
 - Move these TODOs to a TODO.md file :)

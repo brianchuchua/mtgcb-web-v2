@@ -6,6 +6,7 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import GridViewIcon from '@mui/icons-material/GridView';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import LastPageIcon from '@mui/icons-material/LastPage';
+import SearchIcon from '@mui/icons-material/Search';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import {
   Box,
@@ -25,6 +26,7 @@ import {
 import { styled } from '@mui/material/styles';
 import React, { useCallback, useMemo } from 'react';
 import CardSettingsPanel from '@/components/cards/CardSettingsPanel';
+import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 
 // TODO: Assess memoization needs here given I'm using React Compiler
@@ -41,6 +43,32 @@ export interface CardGalleryPaginationProps {
   isOnBottom?: boolean;
   isLoading?: boolean;
 }
+
+// Memoized Search Button for mobile view
+const MobileSearchButton = React.memo(() => {
+  const { setMobileOpen } = useDashboardContext();
+
+  const handleSearchClick = useCallback(() => {
+    setMobileOpen(true);
+  }, [setMobileOpen]);
+
+  return (
+    <SearchButtonContainer>
+      <Button
+        variant="outlined"
+        color="primary"
+        size="medium"
+        onClick={handleSearchClick}
+        startIcon={<SearchIcon />}
+        fullWidth
+      >
+        Open Search Options
+      </Button>
+    </SearchButtonContainer>
+  );
+});
+
+MobileSearchButton.displayName = 'MobileSearchButton';
 
 // Create separate memoized components for sub-sections
 const ViewModeToggle = React.memo(
@@ -421,6 +449,8 @@ export const CardGalleryPagination = React.memo(
                   />
                 </ViewToggleContainer>
               )}
+              {/* Mobile search button - only visible on small mobile */}
+              {isSmallMobile && <MobileSearchButton />}
             </CenterSection>
 
             {/* Right section with page size selector - visible only on large screens */}
@@ -492,7 +522,8 @@ const PaginationContainer = styled(Box)(({ theme }) => ({
   },
   [theme.breakpoints.down('sm')]: {
     width: '100%',
-    padding: theme.spacing(0, 1),
+    margin: `${theme.spacing(0)} auto`,
+    padding: theme.spacing(0, 0),
   },
 }));
 
@@ -514,6 +545,11 @@ const BottomPaginationLayout = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   gap: theme.spacing(1),
   width: '100%',
+}));
+
+const SearchButtonContainer = styled(Box)(({ theme }) => ({
+  width: '100%',
+  marginTop: theme.spacing(1),
 }));
 
 const LeftSection = styled(Box)(({ theme }) => ({
@@ -626,15 +662,6 @@ const MobileControlsRow = styled(Box)(({ theme }) => ({
   flexDirection: 'row',
   width: '100%',
   gap: theme.spacing(2),
-}));
-
-const SecondControlsRow = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  width: '100%',
-  flexDirection: 'row',
-  justifyContent: 'space-between', // Changed to space-between for alignment
-  marginTop: theme.spacing(1),
 }));
 
 // For grouping pagination controls and page indicator vertically

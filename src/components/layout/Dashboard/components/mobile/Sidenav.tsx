@@ -27,6 +27,7 @@ const Sidenav = () => {
       anchor="left"
       open={isMobileOpen}
       onClose={handleClose}
+      elevation={0}
     >
       <SidenavHeader>
         <IconButton onClick={handleClose}>

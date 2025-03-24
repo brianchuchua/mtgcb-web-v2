@@ -4,7 +4,9 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import {
+  Box,
   Button,
   FormControl,
   FormControlLabel,
@@ -18,11 +20,14 @@ import {
   Switch,
   TextField,
   Tooltip,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ColorSelector from '@/features/browse/ColorSelector';
 import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
@@ -43,6 +48,10 @@ import { SortByOption, SortOrderOption } from '@/types/browse';
 
 const BrowseSearchForm = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { setMobileOpen } = useDashboardContext();
+
   const reduxName = useSelector(selectSearchName) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
@@ -102,10 +111,28 @@ const BrowseSearchForm = () => {
     dispatch(resetSearch());
   };
 
+  const handleSeeResults = () => {
+    setMobileOpen(false);
+  };
+
   return (
     <FormWrapper>
       <Form sx={{ paddingTop: 0.5 }}>
         <Stack spacing={1.5}>
+          {/* Only show the See Results button on mobile */}
+          {isMobile && (
+            <Box sx={{ mt: 3, mb: 2 }}>
+              <Button
+                variant="contained"
+                fullWidth
+                color="primary"
+                onClick={handleSeeResults}
+                size="large"
+              >
+                View Search Results
+              </Button>
+            </Box>
+          )}
           <TextField
             fullWidth
             label="Card Name"
