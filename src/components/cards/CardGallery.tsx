@@ -120,7 +120,6 @@ const CardGallery = React.memo(
           }}
           itemContent={itemContent}
           listClassName="card-gallery-grid"
-          overscan={200} // Reduced to help with detached nodes
           increaseViewportBy={600} // Pre-render items this many pixels outside the viewport
           computeItemKey={(index) => cards[index]?.id || index} // Use card ID as stable key
         />
@@ -204,63 +203,13 @@ const CardGalleryWrapper = styled(Box, {
 const CardItemWrapper = styled(Box)(({ theme }) => ({
   position: 'relative',
   width: '100%',
-  minHeight: '360px', // Set a fixed minimum height to accommodate card + text
   boxSizing: 'border-box',
 
   // No additional margin/padding here - let the grid handle spacing
   // This ensures that we match the original layout more closely
 
   [theme.breakpoints.down('sm')]: {
-    minHeight: '400px', // Slightly higher for mobile
     boxSizing: 'border-box',
-  },
-}));
-
-// This component is no longer needed as Virtuoso handles visibility
-// Keeping the styled component in case it's needed for a loading state
-const CardPlaceholder = styled(Box)(({ theme }) => ({
-  height: '100%',
-  width: '100%',
-  maxWidth: '100%',
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.shape.borderRadius,
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  boxSizing: 'border-box',
-  overflow: 'hidden',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: '10%',
-    left: '10%',
-    right: '10%',
-    bottom: '10%',
-    background: `linear-gradient(90deg, 
-      ${theme.palette.background.paper} 25%, 
-      ${theme.palette.background.default} 50%, 
-      ${theme.palette.background.paper} 75%)`,
-    backgroundSize: '200% 100%',
-    borderRadius: '8px',
-    animation: 'shimmer 1.5s infinite',
-  },
-  '@keyframes shimmer': {
-    '0%': {
-      backgroundPosition: '200% 0',
-    },
-    '100%': {
-      backgroundPosition: '-200% 0',
-    },
-  },
-
-  // Match mobile constraints
-  [theme.breakpoints.down('sm')]: {
-    maxWidth: '100%',
-    width: '100%',
   },
 }));
 
