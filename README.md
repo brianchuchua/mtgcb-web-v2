@@ -44,6 +44,7 @@
 - Support searching by collector number and collector number ranges
 - Compare Vercel to Heroku for hosting
 - Data issue: Release date for some sets cause sorting issues if they're exactly the same. Need to nudge some by 1 second.
+- Sorting by release date for cards by using their set's release date isn't great for aggregate sets like Prerelease Cards.
 - Reduce image file size.
 - Remove Artist table, prefer to bake it into cards for now
 

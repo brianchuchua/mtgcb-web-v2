@@ -5,6 +5,7 @@ import {
   BrowseState,
   ColorFilter,
   ColorMatchType,
+  RarityFilter,
   SortByOption,
   SortOrderOption,
   StatFilters,
@@ -55,6 +56,13 @@ export const browseSlice = createSlice({
         state.searchParams.types = action.payload;
       }
     },
+    setRarities: (state, action: PayloadAction<RarityFilter>) => {
+      if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
+        delete state.searchParams.rarities;
+      } else {
+        state.searchParams.rarities = action.payload;
+      }
+    },
     setStats: (state, action: PayloadAction<StatFilters>) => {
       const hasConditions = Object.values(action.payload).some(
         (conditions) => conditions.length > 0,
@@ -94,6 +102,7 @@ export const {
   setArtist,
   setColors,
   setTypes,
+  setRarities,
   setStats,
   setOneResultPerCardName,
   setSortBy,
@@ -108,6 +117,7 @@ export const selectOracleText = (state: RootState) => state.browse.searchParams.
 export const selectArtist = (state: RootState) => state.browse.searchParams.artist;
 export const selectColors = (state: RootState) => state.browse.searchParams.colors;
 export const selectTypes = (state: RootState) => state.browse.searchParams.types;
+export const selectRarities = (state: RootState) => state.browse.searchParams.rarities;
 export const selectStats = (state: RootState) => state.browse.searchParams.stats;
 export const selectOneResultPerCardName = (state: RootState) =>
   state.browse.searchParams.oneResultPerCardName;

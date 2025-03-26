@@ -29,6 +29,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ColorSelector from '@/features/browse/ColorSelector';
+import RaritySelector from '@/features/browse/RaritySelector';
 import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
 import {
@@ -204,6 +205,7 @@ const BrowseSearchForm = () => {
             }}
           />
           <TypeSelector />
+          <RaritySelector />
           <ColorSelector />
           <FormControlLabel
             control={

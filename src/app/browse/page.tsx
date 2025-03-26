@@ -218,6 +218,16 @@ export default function BrowsePage() {
       }
     }
 
+    // Add rarity parameters to URL
+    if (reduxSearchParams.rarities) {
+      if (reduxSearchParams.rarities.include.length > 0) {
+        params.set('includeRarities', reduxSearchParams.rarities.include.join('|'));
+      }
+      if (reduxSearchParams.rarities.exclude.length > 0) {
+        params.set('excludeRarities', reduxSearchParams.rarities.exclude.join('|'));
+      }
+    }
+
     if (reduxSearchParams.stats) {
       // Format each stat group as: attribute=condition1|condition2
       const statParams = Object.entries(reduxSearchParams.stats)

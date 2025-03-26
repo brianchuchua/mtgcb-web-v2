@@ -71,6 +71,17 @@ export const useInitializeBrowseFromUrl = () => {
       };
     }
 
+    // Handle rarity params
+    const includeRarities = searchParams.get('includeRarities');
+    const excludeRarities = searchParams.get('excludeRarities');
+
+    if (includeRarities || excludeRarities) {
+      params.rarities = {
+        include: includeRarities ? includeRarities.split('|') : [],
+        exclude: excludeRarities ? excludeRarities.split('|') : [],
+      };
+    }
+
     const stats = searchParams.get('stats');
     if (stats) {
       const statFilters: StatFilters = {};

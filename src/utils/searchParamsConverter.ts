@@ -73,6 +73,30 @@ export const buildApiParamsFromSearchParams = (
     }
   }
 
+  // Add rarity filtering - using OR for includes (since a card can only have one rarity)
+  if (searchParams.rarities) {
+    const includeRarities = searchParams.rarities.include;
+    const excludeRarities = searchParams.rarities.exclude;
+
+    if (includeRarities.length > 0 || excludeRarities.length > 0) {
+      // Handle includes with OR logic (card has any of the selected rarities)
+      if (includeRarities.length > 0) {
+        apiParams.rarityNumeric = {
+          OR: includeRarities.map(value => `=${value}`)
+        };
+      }
+      
+      // Handle excludes with AND logic (card has none of the excluded rarities)
+      if (excludeRarities.length > 0) {
+        if (!apiParams.rarityNumeric) {
+          apiParams.rarityNumeric = {};
+        }
+        
+        apiParams.rarityNumeric.AND = excludeRarities.map(value => `!=${value}`);
+      }
+    }
+  }
+
   // Add stat filtering - apply directly to the numeric fields
   if (searchParams.stats) {
     Object.entries(searchParams.stats).forEach(([attribute, conditions]) => {
