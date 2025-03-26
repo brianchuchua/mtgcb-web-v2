@@ -4,6 +4,8 @@ import { Box, Card, CardContent, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useEffect, useRef, useState } from 'react';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import CardPrice from './CardPrice';
+import { PriceType } from '@/types/pricing';
 
 // Define a generic card interface that's not tied to any specific API
 export interface CardItemProps {
@@ -17,19 +19,30 @@ export interface CardItemProps {
   rarity?: string;
   prices?: {
     normal?: {
-      value: number;
-      currency?: string;
-    };
+      market?: number | null;
+      low?: number | null;
+      average?: number | null;
+      high?: number | null;
+    } | null;
     foil?: {
-      value: number;
-      currency?: string;
-    };
+      market?: number | null;
+      low?: number | null;
+      average?: number | null;
+      high?: number | null;
+    } | null;
   };
+  // Raw price data from API
+  low?: string | null;
+  average?: string | null;
+  high?: string | null;
+  market?: string | null;
+  foil?: string | null;
   display?: {
     nameIsVisible?: boolean;
     setIsVisible?: boolean;
     priceIsVisible?: boolean;
   };
+  priceType?: PriceType; // Price type to display
   onClick?: () => void;
 }
 
@@ -45,11 +58,17 @@ const CardItem = ({
   collectorNumber,
   rarity,
   prices,
+  low,
+  average,
+  high,
+  market,
+  foil,
   display = {
     nameIsVisible: true,
     setIsVisible: true,
     priceIsVisible: true,
   },
+  priceType = PriceType.Market,
   onClick,
   isLoadingSkeleton = false,
 }: CardItemProps) => {
@@ -99,32 +118,22 @@ const CardItem = ({
     );
   }
 
-  // Get price display
-  const getPriceDisplay = () => {
-    if (!prices || (!prices.normal && !prices.foil)) return 'Price N/A';
-
-    const normalPrice = prices.normal;
-    const foilPrice = prices.foil;
-    const currency = '$';
-
-    // Both prices available
-    if (normalPrice && foilPrice) {
-      const formattedNormal = `${currency}${normalPrice.value.toFixed(2)}`;
-      const formattedFoil = `${currency}${foilPrice.value.toFixed(2)}`;
-      return `${formattedNormal} (${formattedFoil} foil)`;
-    }
-
-    // Only normal price available
-    if (normalPrice) {
-      return `${currency}${normalPrice.value.toFixed(2)}`;
-    }
-
-    // Only foil price available
-    if (foilPrice) {
-      return `${currency}${foilPrice.value.toFixed(2)} foil`;
-    }
-
-    return 'Price N/A';
+  // Create structured price data from the raw API values if not already provided
+  const priceData = prices || {
+    normal: {
+      market: market ? parseFloat(market) : null,
+      low: low ? parseFloat(low) : null,
+      average: average ? parseFloat(average) : null,
+      high: high ? parseFloat(high) : null,
+    },
+    foil: foil 
+      ? {
+          market: parseFloat(foil),
+          low: null,
+          average: null,
+          high: null,
+        } 
+      : null,
   };
 
   // Get image URL with cache busting
@@ -240,27 +249,24 @@ const CardItem = ({
           )}
 
           {priceIsVisible && (
-            <Typography
-              variant="subtitle1"
-              noWrap
-              display="block"
+            <Box
               component="a"
               href={getTCGPlayerLink()}
               target="_blank"
               rel="noreferrer"
               sx={{
                 mt: 0.5,
-                fontWeight: 'medium',
-                color: (theme) => theme.palette.primary.main,
+                display: 'block',
                 textDecoration: 'none',
                 '&:hover': {
                   textDecoration: 'underline',
                 },
-                cursor: 'pointer', // Always show pointer since we always link to TCGPlayer now
+                cursor: 'pointer',
+                color: (theme) => theme.palette.primary.main,
               }}
             >
-              {getPriceDisplay()}
-            </Typography>
+              <CardPrice prices={priceData} isLoading={isLoadingSkeleton} priceType={priceType} />
+            </Box>
           )}
         </CardContent>
       )}

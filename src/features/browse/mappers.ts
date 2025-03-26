@@ -14,18 +14,27 @@ export const mapApiCardToCardItem = (card: CardModel): CardItemProps => {
     rarity: card.rarity || undefined,
     tcgplayerId: card.tcgplayerId || undefined,
 
-    // Handle price data
-    prices: {
-      // Normal price - check market, average, low in that order
-      normal:
-        card.market || card.average || card.low
-          ? {
-              value: parseFloat(card.market || card.average || card.low || '0'),
-            }
-          : undefined,
+    // Raw price values directly from API
+    market: card.market,
+    low: card.low,
+    average: card.average,
+    high: card.high,
+    foil: card.foil,
 
-      // Foil price if available
-      foil: card.foil ? { value: parseFloat(card.foil) } : undefined,
+    // New format price data
+    prices: {
+      normal: {
+        market: card.market ? parseFloat(card.market) : null,
+        low: card.low ? parseFloat(card.low) : null,
+        average: card.average ? parseFloat(card.average) : null,
+        high: card.high ? parseFloat(card.high) : null,
+      },
+      foil: card.foil ? {
+        market: parseFloat(card.foil),
+        low: null,
+        average: null,
+        high: null,
+      } : null,
     },
   };
 };

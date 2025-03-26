@@ -6,13 +6,20 @@ import {
   CardSettingGroup,
   CardSliderSetting,
 } from '@/components/cards/CardSettingsPanel';
+import { PriceType } from '@/types/pricing';
 
 export const useCardSettingGroups = (): CardSettingGroup[] => {
+  // Card visibility settings
   const [nameIsVisible, setNameIsVisible] = useLocalStorage('cardNameIsVisible', true);
   const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
   const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
+  
+  // Layout settings
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cardsPerRow', 4);
   const [cardSizeMargin, setCardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
+  
+  // Price display setting
+  const [displayPriceType, setDisplayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
 
   return [
     {
@@ -36,6 +43,25 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
           label: 'Price',
           isVisible: priceIsVisible,
           setVisibility: setPriceIsVisible,
+        },
+      ],
+    },
+    {
+      label: 'Price Settings',
+      type: 'select',
+      settings: [
+        {
+          key: 'priceType',
+          label: '',  // Removed the redundant label
+          value: displayPriceType as unknown as number,
+          setValue: setDisplayPriceType as (value: number) => void,
+          type: 'select',
+          options: [
+            { value: PriceType.Market as unknown as number, label: 'Market' },
+            { value: PriceType.Low as unknown as number, label: 'Low' },
+            { value: PriceType.Average as unknown as number, label: 'Average' },
+            { value: PriceType.High as unknown as number, label: 'High' },
+          ],
         },
       ],
     },

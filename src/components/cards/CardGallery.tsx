@@ -6,6 +6,8 @@ import React, { useEffect, useState } from 'react';
 import { Virtuoso, VirtuosoGrid } from 'react-virtuoso';
 import CardItem, { CardItemProps } from './CardItem';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { usePriceType } from '@/hooks/usePriceType';
+import { PriceType } from '@/types/pricing';
 
 export interface CardGalleryProps {
   cards: CardItemProps[];
@@ -39,6 +41,8 @@ const CardGallery = React.memo(
     const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
     const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
     const [cardSizeMargin] = useLocalStorage('cardSizeMargin', 0); // Get card size margin setting
+
+    const currentPriceType = usePriceType();
 
     // Mark when hydration is complete (localStorage values loaded)
     useEffect(() => {
@@ -102,6 +106,7 @@ const CardGallery = React.memo(
           {...card}
           onClick={onCardClick ? () => handleCardClick(card.id) : undefined}
           display={display}
+          priceType={currentPriceType}
         />
       );
     };

@@ -15,6 +15,8 @@ import {
 import { styled } from '@mui/material/styles';
 import React, { useCallback } from 'react';
 import { CardItemProps } from './CardItem';
+import CardPrice from './CardPrice';
+import { usePriceType } from '@/hooks/usePriceType';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
 export interface CardTableProps {
@@ -39,6 +41,8 @@ export interface CardTableProps {
  */
 const CardTable = React.memo(
   ({ cards, isLoading = false, onCardClick }: CardTableProps) => {
+    const currentPriceType = usePriceType();
+
     // For empty state
     if (!isLoading && (!cards || cards.length === 0)) {
       return (
@@ -71,31 +75,30 @@ const CardTable = React.memo(
       [onCardClick],
     );
 
-    const getPriceDisplay = useCallback((card: CardItemProps | any) => {
-      if (!card.prices || (!card.prices.normal && !card.prices.foil)) return 'N/A';
-
-      const normalPrice = card.prices.normal;
-      const foilPrice = card.prices.foil;
-      const currency = '$';
-
-      // Both prices available
-      if (normalPrice && foilPrice) {
-        const formattedNormal = `${currency}${normalPrice.value.toFixed(2)}`;
-        const formattedFoil = `${currency}${foilPrice.value.toFixed(2)}`;
-        return `${formattedNormal} / ${formattedFoil} (F)`;
+    // Function to prepare price data for cards that might not have it already
+    const preparePriceData = useCallback((card: CardItemProps) => {
+      // If prices object already exists with the correct format, use it
+      if (card.prices?.normal || card.prices?.foil) {
+        return card.prices;
       }
 
-      // Only normal price available
-      if (normalPrice) {
-        return `${currency}${normalPrice.value.toFixed(2)}`;
-      }
-
-      // Only foil price available
-      if (foilPrice) {
-        return `${currency}${foilPrice.value.toFixed(2)} (F)`;
-      }
-
-      return 'N/A';
+      // Otherwise create it from raw price data
+      return {
+        normal: {
+          market: card.market ? parseFloat(card.market as string) : null,
+          low: card.low ? parseFloat(card.low as string) : null,
+          average: card.average ? parseFloat(card.average as string) : null,
+          high: card.high ? parseFloat(card.high as string) : null,
+        },
+        foil: card.foil
+          ? {
+              market: parseFloat(card.foil as string),
+              low: null,
+              average: null,
+              high: null,
+            }
+          : null,
+      };
     }, []);
 
     return (
@@ -154,7 +157,11 @@ const CardTable = React.memo(
                       rel="noreferrer"
                       onClick={(e) => e.stopPropagation()} // Prevent row click when clicking on price
                     >
-                      {getPriceDisplay(card)}
+                      <CardPrice
+                        prices={preparePriceData(card)}
+                        isLoading={false}
+                        priceType={currentPriceType}
+                      />
                     </PriceLink>
                   </TableCell>
                 </StyledTableRow>

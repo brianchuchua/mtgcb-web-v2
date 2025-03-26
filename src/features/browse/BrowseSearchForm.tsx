@@ -206,9 +206,9 @@ const BrowseSearchForm = () => {
             }}
           />
           <TypeSelector />
+          <ColorSelector />
           <RaritySelector />
           <SetSelector />
-          <ColorSelector />
           <FormControlLabel
             control={
               <Switch

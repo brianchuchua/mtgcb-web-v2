@@ -187,9 +187,12 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({ settingGroups, pa
                         ? // Select controls for numeric settings
                           (settingGroup.settings as CardSelectSetting[]).map((setting) => (
                             <Box key={setting.key} sx={{ py: 0.75, px: 1 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 400, mb: 0.5 }}>
-                                {setting.label}
-                              </Typography>
+                              {/* Only render the label Typography if the label is not empty */}
+                              {setting.label && (
+                                <Typography variant="body2" sx={{ fontWeight: 400, mb: 0.5 }}>
+                                  {setting.label}
+                                </Typography>
+                              )}
                               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                 {setting.options.map((option) => (
                                   <Chip

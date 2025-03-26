@@ -2,6 +2,9 @@
 
 ## Now
 
+- Enhance the cardprice component to fallback to other prices if some are missing. Like if no market, then low price, etc. Have it render an asterisk and explain itself.
+- Add price stat filters (careful with corner cases)
+- Add price sorting
 - Make navigation into a collapsed state if a form is open, like "Go to..." and then it expands to show the rest of navigation
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
 - More sorting options and implement a better table view that also allows configuration and sorting
