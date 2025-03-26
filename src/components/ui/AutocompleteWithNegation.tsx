@@ -37,17 +37,6 @@ const AutocompleteWithNegation = ({
     setSelectedOptionsRemotely(updatedOptions);
   };
 
-  const groupedOptions = options.reduce(
-    (acc, option) => {
-      if (!acc[option.category]) {
-        acc[option.category] = [];
-      }
-      acc[option.category].push(option);
-      return acc;
-    },
-    {} as Record<string, Option[]>,
-  );
-
   return (
     <Autocomplete
       multiple

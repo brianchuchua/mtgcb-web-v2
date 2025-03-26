@@ -228,6 +228,16 @@ export default function BrowsePage() {
       }
     }
 
+    // Add set parameters to URL
+    if (reduxSearchParams.sets) {
+      if (reduxSearchParams.sets.include.length > 0) {
+        params.set('includeSets', reduxSearchParams.sets.include.join('|'));
+      }
+      if (reduxSearchParams.sets.exclude.length > 0) {
+        params.set('excludeSets', reduxSearchParams.sets.exclude.join('|'));
+      }
+    }
+
     if (reduxSearchParams.stats) {
       // Format each stat group as: attribute=condition1|condition2
       const statParams = Object.entries(reduxSearchParams.stats)

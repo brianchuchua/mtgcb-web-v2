@@ -82,6 +82,17 @@ export const useInitializeBrowseFromUrl = () => {
       };
     }
 
+    // Handle set params
+    const includeSets = searchParams.get('includeSets');
+    const excludeSets = searchParams.get('excludeSets');
+
+    if (includeSets || excludeSets) {
+      params.sets = {
+        include: includeSets ? includeSets.split('|') : [],
+        exclude: excludeSets ? excludeSets.split('|') : [],
+      };
+    }
+
     const stats = searchParams.get('stats');
     if (stats) {
       const statFilters: StatFilters = {};

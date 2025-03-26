@@ -16,6 +16,11 @@ export interface RarityFilter {
   exclude: string[];
 }
 
+export interface SetFilter {
+  include: string[];
+  exclude: string[];
+}
+
 export interface StatCondition {
   attribute: string;
   operator: string;
@@ -44,6 +49,7 @@ export interface BrowseSearchParams {
   colors?: ColorFilter;
   types?: TypeFilter;
   rarities?: RarityFilter;
+  sets?: SetFilter;
   stats?: StatFilters;
   oneResultPerCardName?: boolean;
   sortBy?: SortByOption;

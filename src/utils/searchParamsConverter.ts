@@ -97,6 +97,30 @@ export const buildApiParamsFromSearchParams = (
     }
   }
 
+  // Add set filtering - using OR for includes (since a card can only belong to one set)
+  if (searchParams.sets) {
+    const includeSets = searchParams.sets.include;
+    const excludeSets = searchParams.sets.exclude;
+
+    if (includeSets.length > 0 || excludeSets.length > 0) {
+      if (includeSets.length > 0) {
+        // For numeric IDs, use direct values in an OR array
+        apiParams.setId = {
+          OR: includeSets
+        };
+      }
+      
+      if (excludeSets.length > 0) {
+        if (!apiParams.setId) {
+          apiParams.setId = {};
+        }
+        
+        // For exclusions, use direct values in an AND array with != operator
+        apiParams.setId.AND = excludeSets.map(value => `!=${value}`);
+      }
+    }
+  }
+
   // Add stat filtering - apply directly to the numeric fields
   if (searchParams.stats) {
     Object.entries(searchParams.stats).forEach(([attribute, conditions]) => {

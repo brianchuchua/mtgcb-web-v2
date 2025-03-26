@@ -2,6 +2,8 @@
 
 ## Now
 
+- Make navigation into a collapsed state if a form is open, like "Go to..." and then it expands to show the rest of navigation
+- BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
 - More sorting options and implement a better table view that also allows configuration and sorting
 - Add rarities selector
 - Price type support
