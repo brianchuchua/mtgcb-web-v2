@@ -25,6 +25,11 @@ const STAT_ATTRIBUTES = [
   { label: 'Power', value: 'powerNumeric' },
   { label: 'Toughness', value: 'toughnessNumeric' },
   { label: 'Loyalty', value: 'loyaltyNumeric' },
+  { label: 'Price (Market)', value: 'market' },
+  { label: 'Price (Low)', value: 'low' },
+  { label: 'Price (Average)', value: 'average' },
+  { label: 'Price (High)', value: 'high' },
+  { label: 'Price (Foil)', value: 'foil' },
 ];
 
 const OPERATORS = [
@@ -159,6 +164,33 @@ const StatSearch = () => {
     setConditions([{ ...DEFAULT_CONDITION }]);
   };
 
+  // Helper to determine if input should be a number with decimal places (prices)
+  const isDecimalNumberInput = (attribute: string) => {
+    return ['market', 'low', 'average', 'high', 'foil'].includes(attribute);
+  };
+
+  // Helper to get a placeholder based on attribute
+  const getPlaceholder = (attribute: string) => {
+    if (isDecimalNumberInput(attribute)) {
+      return "0.00";
+    }
+    return "";
+  };
+
+  // Helper to configure input props based on attribute type
+  const getInputProps = (attribute: string) => {
+    if (isDecimalNumberInput(attribute)) {
+      return {
+        min: "0",
+        step: "any" // Disables step arrows
+      };
+    }
+    return {
+      min: "0",
+      step: "1"
+    };
+  };
+
   return (
     <>
       {!filtersActive ? (
@@ -202,6 +234,8 @@ const StatSearch = () => {
               <ValueInput
                 size="small"
                 type="number"
+                inputProps={getInputProps(condition.attribute)}
+                placeholder={getPlaceholder(condition.attribute)}
                 value={condition.value}
                 onChange={(e) => handleValueChange(index, e.target.value as string)}
               />
