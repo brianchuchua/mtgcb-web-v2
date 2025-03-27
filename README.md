@@ -3,8 +3,7 @@
 ## Now
 
 - Check search filter vertical scrolling behavior on different resolutions
-- When someone sorts by prices with a price type not matching their preference, show a warning and auto-change
-- Do the same for filtering by price type that doesn't match their preference
+- Notistack on the bottom-left is interfering with forms while it's up -- can't be manually closed either
 - Show "no prices available" when all prices are missing
 - Make navigation into a collapsed state if a form is open, like "Go to..." and then it expands to show the rest of navigation
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
