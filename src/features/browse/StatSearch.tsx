@@ -67,36 +67,58 @@ const parseReduxStats = (reduxStats: StatFilters | undefined): StatCondition[] =
   return parsed.length > 0 ? parsed : [];
 };
 
+// Helper function to check if we have any non-empty stat conditions in Redux
+const hasActiveStatFilters = (stats: StatFilters | undefined): boolean => {
+  if (!stats) return false;
+  
+  // Check if there's at least one condition with a non-empty value
+  return Object.values(stats).some(conditions => 
+    conditions.some(condition => {
+      for (const op of ['gte', 'gt', 'lte', 'lt', 'eq', 'not']) {
+        if (condition.startsWith(op)) {
+          const value = condition.slice(op.length);
+          return value.trim() !== '';
+        }
+      }
+      return false;
+    })
+  );
+};
+
 const StatSearch = () => {
   const dispatch = useDispatch();
   const reduxStats = useSelector(selectStats);
   const searchParams = useSelector(selectSearchParams);
   const userModified = useRef(false);
   const [conditions, setConditions] = useState<StatCondition[]>(() => parseReduxStats(reduxStats));
-  const [filtersActive, setFiltersActive] = useState(conditions.length > 0);
+  
+  // Only consider filters active if there are any conditions in Redux
+  // This ensures consistency with page refreshes/URL changes
+  const [filtersActive, setFiltersActive] = useState(() => {
+    const parsedConditions = parseReduxStats(reduxStats);
+    return parsedConditions.length > 0;
+  });
 
-  // Check if search parameters are empty (after reset)
-  const everyConditionHasAEmptyValue = conditions.every((condition) => condition.value === '');
-  const isEmptySearchParams =
-    everyConditionHasAEmptyValue || Object.keys(searchParams || {}).length === 0;
+  // Check if search parameters are being reset
+  const isSearchParamsReset = Object.keys(searchParams || {}).length === 0;
 
-  // Sync with Redux state when it changes
+  // Sync with Redux state when it changes (but only for URL/reset changes)
   useEffect(() => {
-    // Reset our local state if the search params are empty (after reset action)
-    if (isEmptySearchParams) {
+    // Reset our local state if we detect a reset action from outside
+    if (isSearchParamsReset) {
       userModified.current = false;
       setConditions([]);
       setFiltersActive(false);
       return;
     }
 
-    // Normal sync with Redux for URL changes
+    // Only sync from Redux when not user-modified
     if (!userModified.current) {
       const parsedConditions = parseReduxStats(reduxStats);
       setConditions(parsedConditions);
       setFiltersActive(parsedConditions.length > 0);
     }
-  }, [reduxStats, searchParams, isEmptySearchParams]);
+  }, [reduxStats, isSearchParamsReset]);
 
   // Update Redux when local state changes
   useEffect(() => {
@@ -111,11 +133,11 @@ const StatSearch = () => {
     const statFilters: StatFilters = {};
 
     conditions.forEach(({ attribute, operator, value }) => {
-      if (!value) return;
-
+      // Always create entries for the attribute, even for empty values
       if (!statFilters[attribute]) {
         statFilters[attribute] = [];
       }
+      // Always include the condition, even with empty value
       statFilters[attribute].push(`${operator}${value}`);
     });
 

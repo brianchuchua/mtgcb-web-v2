@@ -2,7 +2,6 @@
 
 ## Now
 
-- Make sure card stats don't disappear when erased
 - Ensure API handles price stat filter corner cases
 - Ensure API handles price sorting corner cases
 - Make navigation into a collapsed state if a form is open, like "Go to..." and then it expands to show the rest of navigation

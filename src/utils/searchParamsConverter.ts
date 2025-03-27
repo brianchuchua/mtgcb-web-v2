@@ -135,21 +135,35 @@ export const buildApiParamsFromSearchParams = (
           not: '!=',
         };
 
-        const transformedConditions = conditions.map((cond) => {
-          // Extract operator and value
-          for (const [urlOp, apiOp] of Object.entries(OPERATOR_MAP)) {
-            if (cond.startsWith(urlOp)) {
-              const value = cond.slice(urlOp.length);
-              return `${apiOp}${value}`;
+        // Filter out empty values and transform the valid ones
+        const transformedConditions = conditions
+          .filter(cond => {
+            // Check if condition has a value
+            for (const urlOp of Object.keys(OPERATOR_MAP)) {
+              if (cond.startsWith(urlOp)) {
+                const value = cond.slice(urlOp.length);
+                return value.trim() !== ''; // Skip empty values
+              }
             }
-          }
-          return cond;
-        });
+            return false;
+          })
+          .map((cond) => {
+            // Extract operator and value
+            for (const [urlOp, apiOp] of Object.entries(OPERATOR_MAP)) {
+              if (cond.startsWith(urlOp)) {
+                const value = cond.slice(urlOp.length);
+                return `${apiOp}${value}`;
+              }
+            }
+            return cond;
+          });
 
-        // Add conditions directly to the field
-        apiParams[attribute] = {
-          AND: transformedConditions,
-        };
+        // Only add field if there are actual conditions after filtering
+        if (transformedConditions.length > 0) {
+          apiParams[attribute] = {
+            AND: transformedConditions,
+          };
+        }
       }
     });
   }
