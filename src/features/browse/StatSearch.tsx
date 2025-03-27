@@ -20,8 +20,8 @@ import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectSearchParams, selectStats, setStats } from '@/redux/slices/browseSlice';
 import { usePriceType } from '@/hooks/usePriceType';
+import { selectSearchParams, selectStats, setStats } from '@/redux/slices/browseSlice';
 import { StatCondition, StatFilters } from '@/types/browse';
 
 const STAT_ATTRIBUTES = [
@@ -74,10 +74,10 @@ const parseReduxStats = (reduxStats: StatFilters | undefined): StatCondition[] =
 // Helper function to check if we have any non-empty stat conditions in Redux
 const hasActiveStatFilters = (stats: StatFilters | undefined): boolean => {
   if (!stats) return false;
-  
+
   // Check if there's at least one condition with a non-empty value
-  return Object.values(stats).some(conditions => 
-    conditions.some(condition => {
+  return Object.values(stats).some((conditions) =>
+    conditions.some((condition) => {
       for (const op of ['gte', 'gt', 'lte', 'lt', 'eq', 'not']) {
         if (condition.startsWith(op)) {
           const value = condition.slice(op.length);
@@ -85,7 +85,7 @@ const hasActiveStatFilters = (stats: StatFilters | undefined): boolean => {
         }
       }
       return false;
-    })
+    }),
   );
 };
 
@@ -101,10 +101,10 @@ const StatSearch = () => {
   const searchParams = useSelector(selectSearchParams);
   const userModified = useRef(false);
   const [conditions, setConditions] = useState<StatCondition[]>(() => parseReduxStats(reduxStats));
-  
+
   // Get the current display price type
   const displayPriceType = usePriceType();
-  
+
   // Only consider filters active if there are any conditions in Redux
   // This ensures consistency with page refreshes/URL changes
   const [filtersActive, setFiltersActive] = useState(() => {
@@ -136,38 +136,41 @@ const StatSearch = () => {
   // Check and fix price attribute mismatches when display price type changes
   useEffect(() => {
     if (!filtersActive || conditions.length === 0) return;
-    
+
     // Find conditions with price attributes that don't match current display price
     const mismatchedConditions = conditions.filter(
-      condition => isPriceAttribute(condition.attribute) && 
-                  condition.attribute !== displayPriceType && 
-                  condition.attribute !== 'foil'
+      (condition) =>
+        isPriceAttribute(condition.attribute) &&
+        condition.attribute !== displayPriceType &&
+        condition.attribute !== 'foil',
     );
-    
+
     if (mismatchedConditions.length > 0) {
       // Auto-fix the mismatched conditions
-      const newConditions = conditions.map(condition => {
-        if (isPriceAttribute(condition.attribute) && 
-            condition.attribute !== displayPriceType && 
-            condition.attribute !== 'foil') {
+      const newConditions = conditions.map((condition) => {
+        if (
+          isPriceAttribute(condition.attribute) &&
+          condition.attribute !== displayPriceType &&
+          condition.attribute !== 'foil'
+        ) {
           // Notify the user about the change
           enqueueSnackbar(
             `Changed price filter from ${condition.attribute} to ${displayPriceType} to match your display settings`,
             {
               variant: 'info',
               autoHideDuration: 5000,
-            }
+            },
           );
-          
+
           // Return a new condition with the current display price type
           return {
             ...condition,
-            attribute: displayPriceType
+            attribute: displayPriceType,
           };
         }
         return condition;
       });
-      
+
       // Update conditions and trigger Redux update
       setConditions(newConditions);
       userModified.current = true;
@@ -200,7 +203,7 @@ const StatSearch = () => {
 
   const handleAttributeChange = (index: number, newValue: string) => {
     userModified.current = true;
-    
+
     // Check if changing to a price attribute that doesn't match display price
     if (isPriceAttribute(newValue) && newValue !== displayPriceType && newValue !== 'foil') {
       // Show warning
@@ -209,10 +212,10 @@ const StatSearch = () => {
         {
           variant: 'warning',
           autoHideDuration: 8000,
-        }
+        },
       );
     }
-    
+
     const newConditions = [...conditions];
     newConditions[index].attribute = newValue;
     setConditions(newConditions);
@@ -261,28 +264,32 @@ const StatSearch = () => {
   // Helper to get a placeholder based on attribute
   const getPlaceholder = (attribute: string) => {
     if (isDecimalNumberInput(attribute)) {
-      return "0.00";
+      return '0.00';
     }
-    return "";
+    return '';
   };
 
   // Helper to configure input props based on attribute type
   const getInputProps = (attribute: string) => {
     if (isDecimalNumberInput(attribute)) {
       return {
-        min: "0",
-        step: "any" // Disables step arrows
+        min: '0',
+        step: 'any', // Disables step arrows
       };
     }
     return {
-      min: "0",
-      step: "1"
+      min: '0',
+      step: '1',
     };
   };
 
   // Function to determine if a price option is mismatched with the display setting
   const isPriceMismatched = (priceAttribute: string): boolean => {
-    return isPriceAttribute(priceAttribute) && priceAttribute !== displayPriceType && priceAttribute !== 'foil';
+    return (
+      isPriceAttribute(priceAttribute) &&
+      priceAttribute !== displayPriceType &&
+      priceAttribute !== 'foil'
+    );
   };
 
   // Special component to make tooltips work with disabled MenuItems
@@ -298,7 +305,7 @@ const StatSearch = () => {
       }}
     >
       <Tooltip
-        title={`To filter by ${priceType} price, change your display price setting to ${priceType}`}
+        title={`To filter by ${priceType} price, change your display price setting to ${priceType} in the gear icon menu on the top-right`}
       >
         <WarningAmberIcon color="disabled" fontSize="small" />
       </Tooltip>
@@ -327,8 +334,8 @@ const StatSearch = () => {
                 onChange={(e) => handleAttributeChange(index, e.target.value as string)}
               >
                 {STAT_ATTRIBUTES.map((option) => (
-                  <MenuItem 
-                    key={option.value} 
+                  <MenuItem
+                    key={option.value}
                     value={option.value}
                     disabled={isPriceMismatched(option.value)}
                   >
