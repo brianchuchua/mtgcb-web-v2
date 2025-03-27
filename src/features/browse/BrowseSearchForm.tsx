@@ -253,6 +253,11 @@ const BrowseSearchForm = () => {
                 <MenuItem value="powerNumeric">Power</MenuItem>
                 <MenuItem value="toughnessNumeric">Toughness</MenuItem>
                 <MenuItem value="loyaltyNumeric">Loyalty</MenuItem>
+                <MenuItem value="market">Price (Market)</MenuItem>
+                <MenuItem value="low">Price (Low)</MenuItem>
+                <MenuItem value="average">Price (Average)</MenuItem>
+                <MenuItem value="high">Price (High)</MenuItem>
+                <MenuItem value="foil">Price (Foil)</MenuItem>
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ width: '35%' }}>

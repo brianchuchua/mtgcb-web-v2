@@ -39,7 +39,12 @@ export type SortByOption =
   | 'rarityNumeric'
   | 'powerNumeric'
   | 'toughnessNumeric'
-  | 'loyaltyNumeric';
+  | 'loyaltyNumeric'
+  | 'market'
+  | 'low'
+  | 'average'
+  | 'high'
+  | 'foil';
 export type SortOrderOption = 'asc' | 'desc';
 
 export interface BrowseSearchParams {
