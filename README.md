@@ -2,11 +2,9 @@
 
 ## Now
 
+- Do a type check
 - Check search filter vertical scrolling behavior on different resolutions
 - Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
-- Remove confusing message and clean up the behavior if a url leads to a price type conflict.
-- Notistack on the bottom-left is interfering with forms while it's up -- can't be manually closed either
-- Show "no prices available" when all prices are missing
 - Make navigation into a collapsed state if a form is open, like "Go to..." and then it expands to show the rest of navigation
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
 - More sorting options and implement a better table view that also allows configuration and sorting

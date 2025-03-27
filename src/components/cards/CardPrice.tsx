@@ -283,7 +283,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
   
   // No prices available
   return (
-    <Tooltip title={`No ${requestedPriceTypeLabel.toLowerCase()} price available`}>
+    <Tooltip title="No prices available">
       <Typography 
         variant="subtitle1" 
         fontWeight="medium" 
