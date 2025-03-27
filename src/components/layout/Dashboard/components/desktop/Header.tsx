@@ -1,5 +1,6 @@
 'use client';
 
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import MenuIcon from '@mui/icons-material/Menu';
 import AppBar, { AppBarProps } from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -25,7 +26,7 @@ export const Header = () => {
             sx={{ mr: 2 }}
             onClick={() => setDesktopOpen(!isDesktopOpen)}
           >
-            <MenuIcon />
+            {isDesktopOpen ? <ChevronLeftIcon /> : <MenuIcon />}
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             MTG Collection Builder

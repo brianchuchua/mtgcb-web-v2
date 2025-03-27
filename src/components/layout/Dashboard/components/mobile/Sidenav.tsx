@@ -1,8 +1,7 @@
 'use client';
 
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { Drawer, IconButton } from '@mui/material';
-import { Theme, styled } from '@mui/material/styles';
+import { Drawer } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { SidenavItems } from '@/components/layout/Dashboard/components/shared/SidenavItems';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
@@ -29,11 +28,6 @@ const Sidenav = () => {
       onClose={handleClose}
       elevation={0}
     >
-      <SidenavHeader>
-        <IconButton onClick={handleClose}>
-          <ChevronLeftIcon />
-        </IconButton>
-      </SidenavHeader>
       <SidenavItems onNavigate={handleClose} />
     </StyledDrawer>
   );
@@ -43,14 +37,6 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
   [theme.breakpoints.up('sm')]: {
     display: 'none',
   },
-}));
-
-const SidenavHeader = styled('div')(({ theme }: { theme: Theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
 }));
 
 export default Sidenav;
