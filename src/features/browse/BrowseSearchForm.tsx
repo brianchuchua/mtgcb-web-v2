@@ -5,6 +5,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
   Box,
   Button,
@@ -25,7 +26,8 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
-import { useCallback, useEffect, useState } from 'react';
+import { useSnackbar } from 'notistack';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ColorSelector from '@/features/browse/ColorSelector';
@@ -33,6 +35,8 @@ import RaritySelector from '@/features/browse/RaritySelector';
 import SetSelector from '@/features/browse/SetSelector';
 import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
+import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
+import { usePriceType } from '@/hooks/usePriceType';
 import {
   resetSearch,
   selectArtist,
@@ -49,12 +53,15 @@ import {
   setSortOrder,
 } from '@/redux/slices/browseSlice';
 import { SortByOption, SortOrderOption } from '@/types/browse';
+import { PriceType } from '@/types/pricing';
 
 const BrowseSearchForm = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { setMobileOpen } = useDashboardContext();
+  const { enqueueSnackbar } = useSnackbar();
+  const initialCheckDone = useRef(false);
 
   const reduxName = useSelector(selectSearchName) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
@@ -67,6 +74,9 @@ const BrowseSearchForm = () => {
   const [localOracleText, setLocalOracleText] = useState(reduxOracleText);
   const [localArtist, setLocalArtist] = useState(reduxArtist);
 
+  // Get the current display price type
+  const displayPriceType = usePriceType();
+
   useEffect(() => {
     setLocalName(reduxName);
   }, [reduxName]);
@@ -78,6 +88,47 @@ const BrowseSearchForm = () => {
   useEffect(() => {
     setLocalArtist(reduxArtist);
   }, [reduxArtist]);
+
+  // Reset the sort option if display price type changes and current sort option is now invalid
+  useEffect(() => {
+    // If current sort is a price type that doesn't match display price
+    if (isPriceMismatched(reduxSortBy)) {
+      // Set the sort to the current display price type if it's a price sort
+      if (isPriceSort(reduxSortBy)) {
+        dispatch(setSortBy(displayPriceType as SortByOption));
+        enqueueSnackbar(
+          `Changed sort to ${displayPriceType} prices to match your display settings`,
+          {
+            variant: 'info',
+            autoHideDuration: 5000,
+          },
+        );
+      }
+    }
+  }, [displayPriceType, reduxSortBy, dispatch, enqueueSnackbar]);
+
+  // Check for price mismatch only on initial load
+  useEffect(() => {
+    if (initialCheckDone.current) return;
+
+    const isPriceSort =
+      reduxSortBy === 'market' ||
+      reduxSortBy === 'low' ||
+      reduxSortBy === 'average' ||
+      reduxSortBy === 'high' ||
+      reduxSortBy === 'foil';
+
+    if (isPriceSort && reduxSortBy !== displayPriceType && reduxSortBy !== 'foil') {
+      // Change the sort option to match the display price type
+      dispatch(setSortBy(displayPriceType as SortByOption));
+      enqueueSnackbar(`Changed sort to ${displayPriceType} prices to match your display settings`, {
+        variant: 'info',
+        autoHideDuration: 5000,
+      });
+    }
+
+    initialCheckDone.current = true;
+  }, [reduxSortBy, displayPriceType, enqueueSnackbar, dispatch]);
 
   const debouncedNameDispatch = useCallback(
     debounce((value: string) => {
@@ -123,7 +174,8 @@ const BrowseSearchForm = () => {
   };
 
   const handleSortByChange = (e: SelectChangeEvent<SortByOption>) => {
-    dispatch(setSortBy(e.target.value as SortByOption));
+    const newSortBy = e.target.value as SortByOption;
+    dispatch(setSortBy(newSortBy));
   };
 
   const handleSortOrderChange = (e: SelectChangeEvent<SortOrderOption>) => {
@@ -137,6 +189,42 @@ const BrowseSearchForm = () => {
   const handleSeeResults = () => {
     setMobileOpen(false);
   };
+
+  // Function to check if a sort option is price-related
+  const isPriceSort = (option: string): boolean => {
+    return (
+      option === 'market' ||
+      option === 'low' ||
+      option === 'average' ||
+      option === 'high' ||
+      option === 'foil'
+    );
+  };
+
+  // Function to determine if a price option is mismatched with the display setting
+  const isPriceMismatched = (priceOption: string): boolean => {
+    return isPriceSort(priceOption) && priceOption !== displayPriceType && priceOption !== 'foil';
+  };
+
+  // Special component to make tooltips work with disabled MenuItems
+  const WarningTooltip = ({ priceType }: { priceType: string }) => (
+    <Box
+      component="span"
+      onClick={(e) => e.stopPropagation()}
+      sx={{
+        display: 'inline-flex',
+        marginLeft: 1,
+        // This makes the span still interactive even when parent is disabled
+        pointerEvents: 'auto',
+      }}
+    >
+      <Tooltip
+        title={`To sort by ${priceType} price, change your display price setting to ${priceType} in the gear icon menu on the top-right`}
+      >
+        <WarningAmberIcon color="disabled" fontSize="small" />
+      </Tooltip>
+    </Box>
+  );
 
   return (
     <FormWrapper>
@@ -253,10 +341,22 @@ const BrowseSearchForm = () => {
                 <MenuItem value="powerNumeric">Power</MenuItem>
                 <MenuItem value="toughnessNumeric">Toughness</MenuItem>
                 <MenuItem value="loyaltyNumeric">Loyalty</MenuItem>
-                <MenuItem value="market">Price (Market)</MenuItem>
-                <MenuItem value="low">Price (Low)</MenuItem>
-                <MenuItem value="average">Price (Average)</MenuItem>
-                <MenuItem value="high">Price (High)</MenuItem>
+                <MenuItem value="market" disabled={isPriceMismatched('market')}>
+                  Price (Market)
+                  {isPriceMismatched('market') && <WarningTooltip priceType="Market" />}
+                </MenuItem>
+                <MenuItem value="low" disabled={isPriceMismatched('low')}>
+                  Price (Low)
+                  {isPriceMismatched('low') && <WarningTooltip priceType="Low" />}
+                </MenuItem>
+                <MenuItem value="average" disabled={isPriceMismatched('average')}>
+                  Price (Average)
+                  {isPriceMismatched('average') && <WarningTooltip priceType="Average" />}
+                </MenuItem>
+                <MenuItem value="high" disabled={isPriceMismatched('high')}>
+                  Price (High)
+                  {isPriceMismatched('high') && <WarningTooltip priceType="High" />}
+                </MenuItem>
                 <MenuItem value="foil">Price (Foil)</MenuItem>
               </Select>
             </FormControl>

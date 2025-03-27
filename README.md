@@ -2,8 +2,10 @@
 
 ## Now
 
-- Ensure API handles price stat filter corner cases
-- Ensure API handles price sorting corner cases
+- Check search filter vertical scrolling behavior on different resolutions
+- When someone sorts by prices with a price type not matching their preference, show a warning and auto-change
+- Do the same for filtering by price type that doesn't match their preference
+- Show "no prices available" when all prices are missing
 - Make navigation into a collapsed state if a form is open, like "Go to..." and then it expands to show the rest of navigation
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
 - More sorting options and implement a better table view that also allows configuration and sorting
@@ -19,6 +21,7 @@
 - Move these TODOs to a TODO.md file :)
 - Improve error state on browse page -- right out it outputs API errors as red text.
 - Add more sortBy options
+- Audit tablet sizes, gear icon may not be visible in browse page pagination controls
 
 ## Later
 
