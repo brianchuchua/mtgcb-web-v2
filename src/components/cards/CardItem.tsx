@@ -3,9 +3,9 @@
 import { Box, Card, CardContent, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useEffect, useRef, useState } from 'react';
-import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import CardPrice from './CardPrice';
 import { PriceType } from '@/types/pricing';
+import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
 // Define a generic card interface that's not tied to any specific API
 export interface CardItemProps {
@@ -126,13 +126,13 @@ const CardItem = ({
       average: average ? parseFloat(average) : null,
       high: high ? parseFloat(high) : null,
     },
-    foil: foil 
+    foil: foil
       ? {
           market: parseFloat(foil),
           low: null,
           average: null,
           high: null,
-        } 
+        }
       : null,
   };
 
@@ -287,16 +287,11 @@ const StyledCard = styled(Card, {
   maxWidth: '100%',
   display: 'flex',
   flexDirection: 'column',
-  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
   backgroundColor: theme.palette.background.paper,
   textAlign: 'center', // Ensure text is centered like original
   borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
   overflow: 'hidden',
   boxShadow: theme.shadows[3],
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: theme.shadows[4],
-  },
 
   // Add specific mobile constraints
   [theme.breakpoints.down('sm')]: {
