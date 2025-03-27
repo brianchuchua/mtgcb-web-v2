@@ -62,6 +62,7 @@ const BrowseSearchForm = () => {
   const { setMobileOpen } = useDashboardContext();
   const { enqueueSnackbar } = useSnackbar();
   const initialCheckDone = useRef(false);
+  const prevDisplayPriceType = useRef<string | null>(null);
 
   const reduxName = useSelector(selectSearchName) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
@@ -77,6 +78,10 @@ const BrowseSearchForm = () => {
   // Get the current display price type
   const displayPriceType = usePriceType();
 
+  // Get the settings to be able to change display price type
+  const cardSettings = useCardSettingGroups();
+  const setDisplayPriceType = cardSettings?.[1]?.settings?.[0]?.setValue;
+
   useEffect(() => {
     setLocalName(reduxName);
   }, [reduxName]);
@@ -89,25 +94,34 @@ const BrowseSearchForm = () => {
     setLocalArtist(reduxArtist);
   }, [reduxArtist]);
 
-  // Reset the sort option if display price type changes and current sort option is now invalid
+  // When display price type changes, check if current sort is a price sort and update if needed
   useEffect(() => {
-    // If current sort is a price type that doesn't match display price
-    if (isPriceMismatched(reduxSortBy)) {
-      // Set the sort to the current display price type if it's a price sort
-      if (isPriceSort(reduxSortBy)) {
+    // Skip during initial render
+    if (prevDisplayPriceType.current === null) {
+      prevDisplayPriceType.current = displayPriceType;
+      return;
+    }
+
+    // If display price type changed
+    if (prevDisplayPriceType.current !== displayPriceType) {
+      // Check if current sort is a price sort but not matching the new display price
+      if (isPriceSort(reduxSortBy) && reduxSortBy !== displayPriceType && reduxSortBy !== 'foil') {
+        // Update the sort to match the new display price
         dispatch(setSortBy(displayPriceType as SortByOption));
         enqueueSnackbar(
-          `Changed sort to ${displayPriceType} prices to match your display settings`,
+          `Changed your sort to ${displayPriceType} prices to match your display price setting.`,
           {
             variant: 'info',
-            autoHideDuration: 5000,
           },
         );
       }
+
+      // Update previous value
+      prevDisplayPriceType.current = displayPriceType;
     }
   }, [displayPriceType, reduxSortBy, dispatch, enqueueSnackbar]);
 
-  // Check for price mismatch only on initial load
+  // Check for price mismatch only on initial load cornercase - just show warning
   useEffect(() => {
     if (initialCheckDone.current) return;
 
@@ -119,16 +133,17 @@ const BrowseSearchForm = () => {
       reduxSortBy === 'foil';
 
     if (isPriceSort && reduxSortBy !== displayPriceType && reduxSortBy !== 'foil') {
-      // Change the sort option to match the display price type
-      dispatch(setSortBy(displayPriceType as SortByOption));
-      enqueueSnackbar(`Changed sort to ${displayPriceType} prices to match your display settings`, {
-        variant: 'info',
-        autoHideDuration: 5000,
-      });
+      enqueueSnackbar(
+        `You're sorting by ${reduxSortBy} prices, but displaying ${displayPriceType} prices in the gallery. This may be confusing.`,
+        {
+          variant: 'warning',
+          autoHideDuration: 8000,
+        },
+      );
     }
 
     initialCheckDone.current = true;
-  }, [reduxSortBy, displayPriceType, enqueueSnackbar, dispatch]);
+  }, [reduxSortBy, displayPriceType, enqueueSnackbar]);
 
   const debouncedNameDispatch = useCallback(
     debounce((value: string) => {
@@ -176,6 +191,25 @@ const BrowseSearchForm = () => {
   const handleSortByChange = (e: SelectChangeEvent<SortByOption>) => {
     const newSortBy = e.target.value as SortByOption;
     dispatch(setSortBy(newSortBy));
+
+    // Check if this is a price-based sort that doesn't match display setting
+    if (
+      isPriceSort(newSortBy) &&
+      newSortBy !== displayPriceType &&
+      newSortBy !== 'foil' &&
+      setDisplayPriceType
+    ) {
+      // Update display price type to match sort selection
+      const priceTypeValue = getPriceTypeEnum(newSortBy);
+      setDisplayPriceType(priceTypeValue);
+
+      enqueueSnackbar(
+        `Changed your display price setting to ${newSortBy} to match your sort selection.`,
+        {
+          variant: 'info',
+        },
+      );
+    }
   };
 
   const handleSortOrderChange = (e: SelectChangeEvent<SortOrderOption>) => {
@@ -188,6 +222,22 @@ const BrowseSearchForm = () => {
 
   const handleSeeResults = () => {
     setMobileOpen(false);
+  };
+
+  // Helper function to convert string price type to enum value
+  const getPriceTypeEnum = (priceType: string): number => {
+    switch (priceType) {
+      case 'market':
+        return PriceType.Market as unknown as number;
+      case 'low':
+        return PriceType.Low as unknown as number;
+      case 'average':
+        return PriceType.Average as unknown as number;
+      case 'high':
+        return PriceType.High as unknown as number;
+      default:
+        return PriceType.Market as unknown as number;
+    }
   };
 
   // Function to check if a sort option is price-related
@@ -218,10 +268,8 @@ const BrowseSearchForm = () => {
         pointerEvents: 'auto',
       }}
     >
-      <Tooltip
-        title={`To sort by ${priceType} price, change your display price setting to ${priceType} in the gear icon menu on the top-right`}
-      >
-        <WarningAmberIcon color="disabled" fontSize="small" />
+      <Tooltip title={`Selecting this will change your display price setting to ${priceType}`}>
+        <WarningAmberIcon color="warning" fontSize="small" />
       </Tooltip>
     </Box>
   );
@@ -341,19 +389,19 @@ const BrowseSearchForm = () => {
                 <MenuItem value="powerNumeric">Power</MenuItem>
                 <MenuItem value="toughnessNumeric">Toughness</MenuItem>
                 <MenuItem value="loyaltyNumeric">Loyalty</MenuItem>
-                <MenuItem value="market" disabled={isPriceMismatched('market')}>
+                <MenuItem value="market">
                   Price (Market)
                   {isPriceMismatched('market') && <WarningTooltip priceType="Market" />}
                 </MenuItem>
-                <MenuItem value="low" disabled={isPriceMismatched('low')}>
+                <MenuItem value="low">
                   Price (Low)
                   {isPriceMismatched('low') && <WarningTooltip priceType="Low" />}
                 </MenuItem>
-                <MenuItem value="average" disabled={isPriceMismatched('average')}>
+                <MenuItem value="average">
                   Price (Average)
                   {isPriceMismatched('average') && <WarningTooltip priceType="Average" />}
                 </MenuItem>
-                <MenuItem value="high" disabled={isPriceMismatched('high')}>
+                <MenuItem value="high">
                   Price (High)
                   {isPriceMismatched('high') && <WarningTooltip priceType="High" />}
                 </MenuItem>

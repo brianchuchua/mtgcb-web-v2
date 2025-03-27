@@ -20,9 +20,11 @@ import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { usePriceType } from '@/hooks/usePriceType';
 import { selectSearchParams, selectStats, setStats } from '@/redux/slices/browseSlice';
 import { StatCondition, StatFilters } from '@/types/browse';
+import { PriceType } from '@/types/pricing';
 
 const STAT_ATTRIBUTES = [
   { label: 'Mana Value', value: 'convertedManaCost' },
@@ -101,9 +103,14 @@ const StatSearch = () => {
   const searchParams = useSelector(selectSearchParams);
   const userModified = useRef(false);
   const [conditions, setConditions] = useState<StatCondition[]>(() => parseReduxStats(reduxStats));
+  const prevDisplayPriceType = useRef<string | null>(null);
 
   // Get the current display price type
   const displayPriceType = usePriceType();
+
+  // Get the settings to be able to change display price type
+  const cardSettings = useCardSettingGroups();
+  const setDisplayPriceType = cardSettings?.[1]?.settings?.[0]?.setValue;
 
   // Only consider filters active if there are any conditions in Redux
   // This ensures consistency with page refreshes/URL changes
@@ -133,36 +140,32 @@ const StatSearch = () => {
     }
   }, [reduxStats, isSearchParamsReset]);
 
-  // Check and fix price attribute mismatches when display price type changes
+  // When display price type changes, update any price filters to match
   useEffect(() => {
-    if (!filtersActive || conditions.length === 0) return;
+    // Skip during initial render
+    if (prevDisplayPriceType.current === null) {
+      prevDisplayPriceType.current = displayPriceType;
+      return;
+    }
 
-    // Find conditions with price attributes that don't match current display price
-    const mismatchedConditions = conditions.filter(
-      (condition) =>
-        isPriceAttribute(condition.attribute) &&
-        condition.attribute !== displayPriceType &&
-        condition.attribute !== 'foil',
-    );
+    // If display price type changed and we have active filters
+    if (
+      prevDisplayPriceType.current !== displayPriceType &&
+      filtersActive &&
+      conditions.length > 0
+    ) {
+      let hasChangedFilters = false;
 
-    if (mismatchedConditions.length > 0) {
-      // Auto-fix the mismatched conditions
-      const newConditions = conditions.map((condition) => {
+      // Update any price filter conditions to match the new display price type
+      const updatedConditions = conditions.map((condition) => {
         if (
           isPriceAttribute(condition.attribute) &&
           condition.attribute !== displayPriceType &&
           condition.attribute !== 'foil'
         ) {
-          // Notify the user about the change
-          enqueueSnackbar(
-            `Changed price filter from ${condition.attribute} to ${displayPriceType} to match your display settings`,
-            {
-              variant: 'info',
-              autoHideDuration: 5000,
-            },
-          );
+          hasChangedFilters = true;
 
-          // Return a new condition with the current display price type
+          // Return updated condition
           return {
             ...condition,
             attribute: displayPriceType,
@@ -171,9 +174,21 @@ const StatSearch = () => {
         return condition;
       });
 
-      // Update conditions and trigger Redux update
-      setConditions(newConditions);
-      userModified.current = true;
+      // If we made changes, update conditions and show notification
+      if (hasChangedFilters) {
+        setConditions(updatedConditions);
+        userModified.current = true;
+
+        enqueueSnackbar(
+          `Updated your price filters to use ${displayPriceType} prices to match your display settings.`,
+          {
+            variant: 'info',
+          },
+        );
+      }
+
+      // Update previous value
+      prevDisplayPriceType.current = displayPriceType;
     }
   }, [displayPriceType, conditions, filtersActive, enqueueSnackbar]);
 
@@ -201,17 +216,41 @@ const StatSearch = () => {
     dispatch(setStats(statFilters));
   }, [conditions, dispatch, filtersActive]);
 
+  // Helper function to convert string price type to enum value
+  const getPriceTypeEnum = (priceType: string): number => {
+    switch (priceType) {
+      case 'market':
+        return PriceType.Market as unknown as number;
+      case 'low':
+        return PriceType.Low as unknown as number;
+      case 'average':
+        return PriceType.Average as unknown as number;
+      case 'high':
+        return PriceType.High as unknown as number;
+      default:
+        return PriceType.Market as unknown as number;
+    }
+  };
+
   const handleAttributeChange = (index: number, newValue: string) => {
     userModified.current = true;
 
     // Check if changing to a price attribute that doesn't match display price
-    if (isPriceAttribute(newValue) && newValue !== displayPriceType && newValue !== 'foil') {
-      // Show warning
+    if (
+      isPriceAttribute(newValue) &&
+      newValue !== displayPriceType &&
+      newValue !== 'foil' &&
+      setDisplayPriceType
+    ) {
+      // Update display price type to match filter
+      const priceTypeValue = getPriceTypeEnum(newValue);
+      setDisplayPriceType(priceTypeValue);
+
+      // Show notification
       enqueueSnackbar(
-        `You're filtering by ${newValue} prices, but displaying ${displayPriceType} prices in the gallery.`,
+        `Changed your display price setting to ${newValue} to match your filter selection.`,
         {
-          variant: 'warning',
-          autoHideDuration: 8000,
+          variant: 'info',
         },
       );
     }
@@ -304,10 +343,8 @@ const StatSearch = () => {
         pointerEvents: 'auto',
       }}
     >
-      <Tooltip
-        title={`To filter by ${priceType} price, change your display price setting to ${priceType} in the gear icon menu on the top-right`}
-      >
-        <WarningAmberIcon color="disabled" fontSize="small" />
+      <Tooltip title={`Selecting this will change your display price setting to ${priceType}`}>
+        <WarningAmberIcon color="warning" fontSize="small" />
       </Tooltip>
     </Box>
   );
@@ -334,11 +371,7 @@ const StatSearch = () => {
                 onChange={(e) => handleAttributeChange(index, e.target.value as string)}
               >
                 {STAT_ATTRIBUTES.map((option) => (
-                  <MenuItem
-                    key={option.value}
-                    value={option.value}
-                    disabled={isPriceMismatched(option.value)}
-                  >
+                  <MenuItem key={option.value} value={option.value}>
                     {option.label}
                     {isPriceMismatched(option.value) && (
                       <WarningTooltip priceType={option.label.split(' ')[1].slice(1, -1)} />
