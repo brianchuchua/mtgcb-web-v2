@@ -194,6 +194,7 @@ const CardItem = ({
             src={getImageUrl()}
             loading="lazy"
             alt={name}
+            title={name}
             setName={setName}
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}

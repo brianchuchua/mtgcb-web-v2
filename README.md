@@ -53,6 +53,8 @@
 - Sorting by release date for cards by using their set's release date isn't great for aggregate sets like Prerelease Cards.
 - Reduce image file size.
 - Remove Artist table, prefer to bake it into cards for now
+- Collection statistics
+- Before open sourcing, full automation suite and readability refactor -- make it work, make it fast, make it clean
 
 ## Known Bugs
 

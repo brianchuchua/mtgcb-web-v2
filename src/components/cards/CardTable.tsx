@@ -161,6 +161,7 @@ const CardTable = React.memo(
                         prices={preparePriceData(card)}
                         isLoading={false}
                         priceType={currentPriceType}
+                        centered={false}
                       />
                     </PriceLink>
                   </TableCell>

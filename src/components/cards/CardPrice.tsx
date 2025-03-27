@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Typography, Box, Skeleton, Tooltip } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
 import { PriceType } from '@/types/pricing';
 
 interface CardPriceProps {
@@ -22,6 +23,7 @@ interface CardPriceProps {
   isFoil?: boolean;
   isLoading?: boolean;
   priceType?: PriceType; // Main display price type
+  centered?: boolean; // Whether to center the price text or not (default: true)
 }
 
 const formatPrice = (price: number): string => {
@@ -33,11 +35,19 @@ const formatPrice = (price: number): string => {
   }).format(price);
 };
 
+// This interface represents a price with its type for fallback mechanism
+interface PriceWithType {
+  price: number;
+  type: PriceType;
+  isFallback: boolean;
+}
+
 const CardPrice: React.FC<CardPriceProps> = ({
   prices,
   isFoil = false,
   isLoading = false,
-  priceType = PriceType.Market
+  priceType = PriceType.Market,
+  centered = true
 }) => {
   if (isLoading) {
     return <Skeleton width={60} />;
@@ -45,7 +55,11 @@ const CardPrice: React.FC<CardPriceProps> = ({
   
   if (!prices) {
     return (
-      <Typography variant="subtitle1" fontWeight="medium">
+      <Typography 
+        variant="subtitle1" 
+        fontWeight="medium" 
+        textAlign={centered ? "center" : "inherit"}
+      >
         N/A
       </Typography>
     );
@@ -56,47 +70,127 @@ const CardPrice: React.FC<CardPriceProps> = ({
   
   if (!normalPriceData && !foilPriceData) {
     return (
-      <Typography variant="subtitle1" fontWeight="medium">
+      <Typography 
+        variant="subtitle1" 
+        fontWeight="medium" 
+        textAlign={centered ? "center" : "inherit"}
+      >
         N/A
       </Typography>
     );
   }
   
-  // Get price values based on price type
-  const normalPrice = normalPriceData ? 
-    (priceType === PriceType.Market ? normalPriceData.market :
-     priceType === PriceType.Low ? normalPriceData.low :
-     priceType === PriceType.Average ? normalPriceData.average :
-     normalPriceData.high) : null;
+  // Helper function to check if any price in the priceData is non-null
+  const hasAnyValidPrice = (priceData: any): boolean => {
+    if (!priceData) return false;
+    return (
+      (priceData.market !== null && priceData.market !== undefined) ||
+      (priceData.low !== null && priceData.low !== undefined) ||
+      (priceData.average !== null && priceData.average !== undefined) ||
+      (priceData.high !== null && priceData.high !== undefined)
+    );
+  };
   
-  // Foil always uses market price
-  const foilPrice = foilPriceData ? foilPriceData.market : null;
+  // Get the normal price with fallback mechanism
+  const getNormalPriceWithFallback = (): PriceWithType | null => {
+    if (!normalPriceData) return null;
+
+    // Try to get the selected price type first
+    if (priceType === PriceType.Market && normalPriceData.market !== null && normalPriceData.market !== undefined) {
+      return { price: normalPriceData.market, type: PriceType.Market, isFallback: false };
+    }
+    if (priceType === PriceType.Low && normalPriceData.low !== null && normalPriceData.low !== undefined) {
+      return { price: normalPriceData.low, type: PriceType.Low, isFallback: false };
+    }
+    if (priceType === PriceType.Average && normalPriceData.average !== null && normalPriceData.average !== undefined) {
+      return { price: normalPriceData.average, type: PriceType.Average, isFallback: false };
+    }
+    if (priceType === PriceType.High && normalPriceData.high !== null && normalPriceData.high !== undefined) {
+      return { price: normalPriceData.high, type: PriceType.High, isFallback: false };
+    }
+
+    // Fallback logic: market → low → average → high
+    // If the requested price is not available, try others in order
+    const fallbackChecks = [
+      { value: normalPriceData.market, type: PriceType.Market },
+      { value: normalPriceData.low, type: PriceType.Low },
+      { value: normalPriceData.average, type: PriceType.Average },
+      { value: normalPriceData.high, type: PriceType.High },
+    ];
+
+    // Filter out the originally requested price type that's already been checked
+    const fallbacks = fallbackChecks.filter(check => check.type !== priceType);
+    
+    // Try each fallback in order
+    for (const fallback of fallbacks) {
+      if (fallback.value !== null && fallback.value !== undefined) {
+        return { price: fallback.value, type: fallback.type, isFallback: true };
+      }
+    }
+    
+    return null;
+  };
   
-  let priceLabel = '';
+  // Get foil price (usually market price is used for foil)
+  const getFoilPrice = (): number | null => {
+    if (!foilPriceData) return null;
+    
+    // For foil, try to get market price first, then fallback to others if not available
+    if (foilPriceData.market !== null && foilPriceData.market !== undefined) {
+      return foilPriceData.market;
+    }
+    if (foilPriceData.low !== null && foilPriceData.low !== undefined) {
+      return foilPriceData.low;
+    }
+    if (foilPriceData.average !== null && foilPriceData.average !== undefined) {
+      return foilPriceData.average;
+    }
+    if (foilPriceData.high !== null && foilPriceData.high !== undefined) {
+      return foilPriceData.high;
+    }
+    
+    return null;
+  };
   
-  switch (priceType) {
-    case PriceType.Market:
-      priceLabel = 'Market';
-      break;
-    case PriceType.Low:
-      priceLabel = 'Low';
-      break;
-    case PriceType.Average:
-      priceLabel = 'Average';
-      break;
-    case PriceType.High:
-      priceLabel = 'High';
-      break;
-    default:
-      priceLabel = 'Market';
-      break;
-  }
+  // Check if normal prices exist but are all null (or the object doesn't exist)
+  const hasAnyNormalPrice = hasAnyValidPrice(normalPriceData);
+  
+  // Check if this is a foil-only card (no normal prices, but has foil price)
+  const isFoilOnlyCard = !hasAnyNormalPrice && hasAnyValidPrice(foilPriceData);
+  
+  const normalPriceWithType = getNormalPriceWithFallback();
+  const foilPrice = getFoilPrice();
+  
+  // Get the display label for the price type
+  const getPriceTypeLabel = (type: PriceType): string => {
+    switch (type) {
+      case PriceType.Market:
+        return 'Market';
+      case PriceType.Low:
+        return 'Low';
+      case PriceType.Average:
+        return 'Average';
+      case PriceType.High:
+        return 'High';
+      default:
+        return 'Market';
+    }
+  };
+  
+  // Get the requested price type label (what the user wanted)
+  const requestedPriceTypeLabel = getPriceTypeLabel(priceType);
+  
+  // Set up alignment styles based on the centered prop
+  const containerStyle = centered ? { textAlign: 'center' as const } : {};
+  const flexContainerStyle = centered 
+    ? { display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }
+    : { display: 'inline-flex', alignItems: 'center' };
   
   // If specifically asking for foil, just use foil price
-  if (isFoil && foilPrice !== null && foilPrice !== undefined) {
+  if (isFoil && foilPrice !== null) {
     return (
       <Tooltip title="Foil Price">
-        <Box>
+        <Box sx={containerStyle}>
           <Typography variant="subtitle1" fontWeight="medium">
             {formatPrice(foilPrice)} foil
           </Typography>
@@ -105,41 +199,83 @@ const CardPrice: React.FC<CardPriceProps> = ({
     );
   }
   
-  // Handle display cases similar to the original implementation
+  // Handle display cases with fallback mechanism
   // Both prices available
-  if (normalPrice !== null && normalPrice !== undefined && foilPrice !== null && foilPrice !== undefined) {
+  if (normalPriceWithType && foilPrice !== null) {
+    const { price: normalPrice, type: actualPriceType, isFallback } = normalPriceWithType;
+    const actualPriceTypeLabel = getPriceTypeLabel(actualPriceType);
+    
+    const tooltipTitle = isFallback
+      ? `${requestedPriceTypeLabel} price not available — showing ${actualPriceTypeLabel.toLowerCase()} price instead`
+      : `${actualPriceTypeLabel} Price (with Foil)`;
+    
     return (
-      <Tooltip title={`${priceLabel} Price (with Foil)`}>
-        <Box>
-          <Typography variant="subtitle1" fontWeight="medium">
-            {formatPrice(normalPrice)} ({formatPrice(foilPrice)} foil)
-          </Typography>
+      <Tooltip title={tooltipTitle}>
+        <Box sx={containerStyle}>
+          <Box sx={flexContainerStyle}>
+            <Typography variant="subtitle1" fontWeight="medium">
+              {formatPrice(normalPrice)} ({formatPrice(foilPrice)} foil)
+            </Typography>
+            {isFallback && (
+              <InfoIcon 
+                fontSize="small" 
+                color="action" 
+                sx={{ ml: 0.5, fontSize: '1rem' }} 
+              />
+            )}
+          </Box>
         </Box>
       </Tooltip>
     );
   }
   
   // Only normal price available
-  if (normalPrice !== null && normalPrice !== undefined) {
+  if (normalPriceWithType) {
+    const { price: normalPrice, type: actualPriceType, isFallback } = normalPriceWithType;
+    const actualPriceTypeLabel = getPriceTypeLabel(actualPriceType);
+    
+    const tooltipTitle = isFallback
+      ? `${requestedPriceTypeLabel} price not available — showing ${actualPriceTypeLabel.toLowerCase()} price instead`
+      : `${actualPriceTypeLabel} Price`;
+    
     return (
-      <Tooltip title={`${priceLabel} Price`}>
-        <Box>
-          <Typography variant="subtitle1" fontWeight="medium">
-            {formatPrice(normalPrice)}
-          </Typography>
+      <Tooltip title={tooltipTitle}>
+        <Box sx={containerStyle}>
+          <Box sx={flexContainerStyle}>
+            <Typography variant="subtitle1" fontWeight="medium">
+              {formatPrice(normalPrice)}
+            </Typography>
+            {isFallback && (
+              <InfoIcon 
+                fontSize="small" 
+                color="action" 
+                sx={{ ml: 0.5, fontSize: '1rem' }} 
+              />
+            )}
+          </Box>
         </Box>
       </Tooltip>
     );
   }
   
-  // Only foil price available
-  if (foilPrice !== null && foilPrice !== undefined) {
+  // Only foil price available as a last resort
+  if (foilPrice !== null) {
     return (
-      <Tooltip title="Foil Price">
-        <Box>
-          <Typography variant="subtitle1" fontWeight="medium">
-            {formatPrice(foilPrice)} foil
-          </Typography>
+      <Tooltip title={isFoilOnlyCard ? "Foil Price" : `No ${requestedPriceTypeLabel.toLowerCase()} price available — showing foil price instead`}>
+        <Box sx={containerStyle}>
+          <Box sx={flexContainerStyle}>
+            <Typography variant="subtitle1" fontWeight="medium">
+              {formatPrice(foilPrice)} foil
+            </Typography>
+            {/* Only show the info icon if this is NOT a foil-only card */}
+            {!isFoilOnlyCard && (
+              <InfoIcon 
+                fontSize="small" 
+                color="action" 
+                sx={{ ml: 0.5, fontSize: '1rem' }} 
+              />
+            )}
+          </Box>
         </Box>
       </Tooltip>
     );
@@ -147,8 +283,12 @@ const CardPrice: React.FC<CardPriceProps> = ({
   
   // No prices available
   return (
-    <Tooltip title={`No ${priceLabel.toLowerCase()} price available`}>
-      <Typography variant="subtitle1" fontWeight="medium">
+    <Tooltip title={`No ${requestedPriceTypeLabel.toLowerCase()} price available`}>
+      <Typography 
+        variant="subtitle1" 
+        fontWeight="medium" 
+        textAlign={centered ? "center" : "inherit"}
+      >
         N/A
       </Typography>
     </Tooltip>
