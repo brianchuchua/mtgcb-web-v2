@@ -9,20 +9,27 @@
 
 ### Next
 
-- Responsive text
-- Implement a better table view that also allows configuration and server-side sorting
+- Implement a better table view that also allows configuration and server-side sorting (integrate with virtuoso)
+- Support mana value sorting and then pretty display on the table
+- Table view should show card image on hover.
+- Perfect table view styling, widths of columns and column configuration (make settings contextual to table or grid too)
+- Consider removing loading skeletons for the table
+- Should move grid/table view away from the url and instead use localstorage
+- Look at padding of showing and dropdown cards per page on table view and other views.
+- Special should really come after mythic, not before common, change in API and update tooltip in table view
 - Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
 - Clean up BrowseSearchForm into smaller components
-- Handle sideways cards and flip cards
-- Sort by market price descending should be nulls last
-- BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
-- Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
+- Sort by market price descending should be nulls last -- look at sorting values that can be null in general
+- Add ability to save searches (even independently of collection goals, a saved searches section)
 
 ## Later
 
+- BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
+- Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
+- Handle sideways cards and flip cards
 - Collection valuation, fall back to available prices using the same logic
 - Use the new TCGPlayer domain (see below)
-- On hover contextual stuff, like increasing quantity or removing a card
+- On hover contextual stuff, like increasing quantity or removing a card, or visiting the card page, or buying on tcgplayer
 - Audit all indexes
 - While searching, group by unique username, linking to a card name page that lists all printings -- and say "Printed in 13 sets" instead of the set name for those cards, or just the set name if a single printing. Need to group by the original, unadorned card name. This would show the newest printing first.
 - Clean up a bunch of AI-assisted code to fit more my style (functional programming with pure functions, minimal comments, self-describing, small files, top-down hierarchy, easy to read)

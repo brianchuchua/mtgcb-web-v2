@@ -7,7 +7,6 @@ import CardPrice from './CardPrice';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
-// Define a generic card interface that's not tied to any specific API
 export interface CardItemProps {
   id: string;
   name: string;
@@ -16,7 +15,11 @@ export interface CardItemProps {
   isLoadingSkeleton?: boolean;
   tcgplayerId?: number | string;
   collectorNumber?: string;
+  mtgcbCollectorNumber?: string;
   rarity?: string;
+  powerNumeric?: string;
+  toughnessNumeric?: string;
+  loyaltyNumeric?: string;
   prices?: {
     normal?: {
       market?: number | null;

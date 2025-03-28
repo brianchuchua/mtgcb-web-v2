@@ -1,5 +1,6 @@
 'use client';
 
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Box,
   Paper,
@@ -10,13 +11,18 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { CardItemProps } from './CardItem';
 import CardPrice from './CardPrice';
 import { usePriceType } from '@/hooks/usePriceType';
+import { selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
+import { SortByOption, SortOrderOption } from '@/types/browse';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
 export interface CardTableProps {
@@ -36,21 +42,95 @@ export interface CardTableProps {
   onCardClick?: (cardId: string) => void;
 }
 
+// Define table headers with their corresponding sort options
+interface TableHeader {
+  label: string;
+  id: SortByOption | null;
+  width?: string;
+  align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
+  tooltip?: React.ReactNode;
+  hasInfoIcon?: boolean;
+}
+
 /**
- * A table view for displaying card data
+ * A table view for displaying card data with sortable columns
  */
 const CardTable = React.memo(
   ({ cards, isLoading = false, onCardClick }: CardTableProps) => {
+    const dispatch = useDispatch();
+    const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
+    const currentSortOrder = useSelector(selectSortOrder) || 'asc';
     const currentPriceType = usePriceType();
 
-    // For empty state
-    if (!isLoading && (!cards || cards.length === 0)) {
-      return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-          <Typography variant="h6">No cards found</Typography>
-        </Box>
-      );
-    }
+    // Custom tooltip components
+    const ReleaseDateTooltip = () => (
+      <div>
+        <div>Sort by set release date</div>
+        <div>Sets are displayed by name, but sorted chronologically</div>
+      </div>
+    );
+
+    const PriceTooltip = () => (
+      <div>
+        <div>Sort by {currentPriceType} price</div>
+        <div>Changes to the price type in settings will update this sort</div>
+      </div>
+    );
+
+    const RarityTooltip = () => (
+      <div>
+        <div>Sort by rarity</div>
+        <div>Common → Uncommon → Rare → Mythic</div>
+      </div>
+    );
+
+    const MtgcbNumberTooltip = () => (
+      <div>
+        <div>Sort by MTG CB Collector Number</div>
+        <div>Custom sequential numbering system used by MTG Collection Builder</div>
+      </div>
+    );
+
+    // Table headers with corresponding sort options
+    const tableHeaders: TableHeader[] = useMemo(
+      () => [
+        { label: 'Name', id: 'name', width: '25%' },
+        {
+          label: 'Set',
+          id: 'releasedAt',
+          width: '20%',
+          tooltip: <ReleaseDateTooltip />,
+          hasInfoIcon: true,
+        },
+        { label: 'Collector #', id: 'collectorNumber', width: '8%' },
+        {
+          label: 'MTG CB #',
+          id: 'mtgcbCollectorNumber',
+          width: '10%',
+          tooltip: <MtgcbNumberTooltip />,
+          hasInfoIcon: true,
+        },
+        {
+          label: 'Rarity',
+          id: 'rarityNumeric',
+          width: '7%',
+          tooltip: <RarityTooltip />,
+          hasInfoIcon: true,
+        },
+        { label: 'Power', id: 'powerNumeric', width: '6%' },
+        { label: 'Toughness', id: 'toughnessNumeric', width: '7%' },
+        { label: 'Loyalty', id: 'loyaltyNumeric', width: '6%' },
+        {
+          label: 'Price',
+          id: currentPriceType as SortByOption,
+          // width: '11%',
+          // align: 'left',
+          tooltip: <PriceTooltip />,
+          hasInfoIcon: true,
+        },
+      ],
+      [currentPriceType],
+    );
 
     // For loading states, always use skeleton placeholders
     const tableCards = isLoading
@@ -61,7 +141,11 @@ const CardTable = React.memo(
             name: '',
             setName: '',
             collectorNumber: '',
+            mtgcbCollectorNumber: '',
             rarity: '',
+            powerNumeric: '',
+            toughnessNumeric: '',
+            loyaltyNumeric: '',
             isLoadingSkeleton: true,
           }))
       : cards;
@@ -73,6 +157,22 @@ const CardTable = React.memo(
         }
       },
       [onCardClick],
+    );
+
+    const handleSortClick = useCallback(
+      (headerId: SortByOption | null) => {
+        if (!headerId) return; // Skip if no sort option
+
+        // If clicking the same column, toggle sort order, otherwise set to asc
+        if (headerId === currentSortBy) {
+          const newOrder: SortOrderOption = currentSortOrder === 'asc' ? 'desc' : 'asc';
+          dispatch(setSortOrder(newOrder));
+        } else {
+          dispatch(setSortBy(headerId));
+          dispatch(setSortOrder('asc')); // Reset to ascending when changing columns
+        }
+      },
+      [currentSortBy, currentSortOrder, dispatch],
     );
 
     // Function to prepare price data for cards that might not have it already
@@ -101,16 +201,66 @@ const CardTable = React.memo(
       };
     }, []);
 
+    // Format numeric values with decimals to whole numbers, handling null/undefined
+    const formatNumeric = (value: string | null | undefined): string => {
+      if (value === null || value === undefined) return '';
+
+      // Try to parse as float and display as integer
+      const parsed = parseFloat(value);
+      if (!isNaN(parsed)) {
+        return Math.floor(parsed).toString();
+      }
+      return value;
+    };
+
+    // Check for empty state after all hooks have been called
+    const hasNoCards = !isLoading && (!cards || cards.length === 0);
+
+    if (hasNoCards) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+          <Typography variant="h6">No cards found</Typography>
+        </Box>
+      );
+    }
+
     return (
       <TableContainer component={Paper} sx={{ mt: 2 }}>
-        <Table aria-label="card table">
+        <Table aria-label="card table" size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Set</TableCell>
-              <TableCell>Collector #</TableCell>
-              <TableCell>Rarity</TableCell>
-              <TableCell>Price</TableCell>
+              {tableHeaders.map((header) => (
+                <TableCell key={header.label} width={header.width} align={header.align || 'left'}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    {header.id ? (
+                      <TableSortLabel
+                        active={currentSortBy === header.id}
+                        direction={currentSortBy === header.id ? currentSortOrder : 'asc'}
+                        onClick={() => handleSortClick(header.id)}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          {header.label}
+                          {header.tooltip && header.hasInfoIcon && (
+                            <Tooltip title={header.tooltip} placement="top">
+                              <InfoOutlinedIcon
+                                color="disabled"
+                                sx={{
+                                  cursor: 'help',
+                                  fontSize: '0.875rem',
+                                  ml: 0.5,
+                                  verticalAlign: 'middle',
+                                }}
+                              />
+                            </Tooltip>
+                          )}
+                        </Box>
+                      </TableSortLabel>
+                    ) : (
+                      header.label
+                    )}
+                  </Box>
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -129,10 +279,22 @@ const CardTable = React.memo(
                       <Skeleton variant="text" width="40%" animation="wave" />
                     </TableCell>
                     <TableCell>
+                      <Skeleton variant="text" width="40%" animation="wave" />
+                    </TableCell>
+                    <TableCell>
                       <Skeleton variant="text" width="50%" animation="wave" />
                     </TableCell>
                     <TableCell>
-                      <Skeleton variant="text" width="60%" animation="wave" />
+                      <Skeleton variant="text" width="30%" animation="wave" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="30%" animation="wave" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="30%" animation="wave" />
+                    </TableCell>
+                    <TableCell align="right">
+                      <Skeleton variant="text" width="60%" animation="wave" sx={{ ml: 'auto' }} />
                     </TableCell>
                   </StyledTableRow>
                 );
@@ -146,7 +308,11 @@ const CardTable = React.memo(
                   </TableCell>
                   <TableCell>{card.setName || 'Unknown'}</TableCell>
                   <TableCell>{card.collectorNumber || 'N/A'}</TableCell>
+                  <TableCell>{card.mtgcbCollectorNumber || 'N/A'}</TableCell>
                   <TableCell>{card.rarity || 'N/A'}</TableCell>
+                  <TableCell>{formatNumeric(card.powerNumeric)}</TableCell>
+                  <TableCell>{formatNumeric(card.toughnessNumeric)}</TableCell>
+                  <TableCell>{formatNumeric(card.loyaltyNumeric)}</TableCell>
                   <TableCell>
                     <PriceLink
                       href={generateTCGPlayerLink(

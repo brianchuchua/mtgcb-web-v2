@@ -11,8 +11,12 @@ export const mapApiCardToCardItem = (card: CardModel): CardItemProps => {
     setCode: card.tcgplayerSetCode?.toLowerCase() || card.setId?.toLowerCase(),
     setName: card.setName || undefined,
     collectorNumber: card.collectorNumber || undefined,
+    mtgcbCollectorNumber: card.mtgcbCollectorNumber || undefined,
     rarity: card.rarity || undefined,
     tcgplayerId: card.tcgplayerId || undefined,
+    powerNumeric: card.powerNumeric || undefined,
+    toughnessNumeric: card.toughnessNumeric || undefined,
+    loyaltyNumeric: card.loyaltyNumeric || undefined,
 
     // Raw price values directly from API
     market: card.market,
@@ -29,12 +33,14 @@ export const mapApiCardToCardItem = (card: CardModel): CardItemProps => {
         average: card.average ? parseFloat(card.average) : null,
         high: card.high ? parseFloat(card.high) : null,
       },
-      foil: card.foil ? {
-        market: parseFloat(card.foil),
-        low: null,
-        average: null,
-        high: null,
-      } : null,
+      foil: card.foil
+        ? {
+            market: parseFloat(card.foil),
+            low: null,
+            average: null,
+            high: null,
+          }
+        : null,
     },
   };
 };
