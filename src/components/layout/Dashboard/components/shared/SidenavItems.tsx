@@ -54,41 +54,39 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
 
   return (
     <SidenavContainer>
-      {/* Navigation header with toggle - no longer sticky */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          px: 2,
-          py: 1,
-          cursor: 'pointer',
-          backgroundColor: (theme) => theme.palette.background.paper,
-          minHeight: '64px',
-          height: '64px',
-        }}
-        onClick={toggleNavExpanded}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <ListAltIcon color="primary" sx={{ mr: 1.5 }} />
-          <Typography variant="subtitle1" fontWeight="medium">
-            Main Menu
-          </Typography>
-        </Box>
-        <IconButton
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent the Box onClick from firing
-            toggleNavExpanded();
-          }}
-          size="small"
-          aria-label={isNavExpanded ? 'Collapse navigation' : 'Expand navigation'}
-        >
-          {isNavExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </IconButton>
-      </Box>
-      <Divider />
-
       <ScrollableContent>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 2,
+            py: 1,
+            cursor: 'pointer',
+            backgroundColor: (theme) => theme.palette.background.paper,
+            minHeight: '64px',
+            height: '64px',
+          }}
+          onClick={toggleNavExpanded}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <ListAltIcon color="primary" sx={{ mr: 1.5 }} />
+            <Typography variant="subtitle1" fontWeight="medium">
+              Main Menu
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent the Box onClick from firing
+              toggleNavExpanded();
+            }}
+            size="small"
+            aria-label={isNavExpanded ? 'Collapse navigation' : 'Expand navigation'}
+          >
+            {isNavExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Box>
+        <Divider />
         {/* Collapsible navigation menu */}
         <Collapse in={isNavExpanded} timeout="auto">
           <List disablePadding>
