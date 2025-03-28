@@ -2,6 +2,7 @@
 
 ## Now
 
+- Improve sub 900px experience by tweaking card grid to be configurable but starting with a different default or hiding the menu by default
 - Check search filter vertical scrolling behavior on different resolutions
 - Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
@@ -17,9 +18,9 @@
 - Move these TODOs to a TODO.md file :)
 - Improve error state on browse page -- right out it outputs API errors as red text.
 - Add more sortBy options
-- Audit tablet sizes, gear icon may not be visible in browse page pagination controls
 - Handle sizeways cards and flip cards
 - Sort by market price descending should be nulls last
+- Responsive text
 
 ## Later
 

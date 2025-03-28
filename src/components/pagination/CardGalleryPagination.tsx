@@ -75,11 +75,11 @@ const ViewModeToggle = React.memo(
   ({
     viewMode,
     onViewModeChange,
-    isSmallMobile,
+    isSmallScreen,
   }: {
     viewMode: 'grid' | 'table';
     onViewModeChange: (mode: 'grid' | 'table') => void;
-    isSmallMobile: boolean;
+    isSmallScreen: boolean;
   }) => {
     // Memoize handlers
     const handleGridClick = useCallback(() => {
@@ -140,17 +140,17 @@ const PageSizeControl = React.memo(
       [onPageSizeChange],
     );
 
-    const isMobile = useMediaQuery('(max-width:900px)');
+    const isSmallScreen = useMediaQuery('(max-width:899px)');
 
     return (
       <PageSizeSelector>
-        {!isMobile ? (
+        {!isSmallScreen ? (
           // Desktop view
           <Typography variant="body1" color="text.secondary" sx={{ mr: 1, whiteSpace: 'nowrap' }}>
             Cards per page:
           </Typography>
         ) : null}
-        {isMobile && (
+        {isSmallScreen && (
           <Typography
             variant="body2"
             color="text.secondary"
@@ -190,13 +190,13 @@ const NavigationControls = React.memo(
     totalPages,
     onPageChange,
     isLoading,
-    isSmallMobile,
+    isSmallScreen,
   }: {
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
     isLoading: boolean;
-    isSmallMobile: boolean;
+    isSmallScreen: boolean;
   }) => {
     // Memoize handlers
     const handleFirstPage = useCallback(() => {
@@ -217,7 +217,7 @@ const NavigationControls = React.memo(
 
     // Memoize page numbers array
     const pageNumbers = useMemo(() => {
-      const visiblePages = isSmallMobile ? 3 : 5;
+      const visiblePages = isSmallScreen ? 3 : 5;
       const result: number[] = [];
 
       // Calculate start and end page numbers
@@ -235,7 +235,7 @@ const NavigationControls = React.memo(
       }
 
       return result;
-    }, [currentPage, totalPages, isSmallMobile]);
+    }, [currentPage, totalPages, isSmallScreen]);
 
     return (
       <PaginationControls>
@@ -268,7 +268,7 @@ const NavigationControls = React.memo(
         </Tooltip>
 
         {/* Page number buttons - only show on non-mobile */}
-        {!isSmallMobile && (
+        {!isSmallScreen && (
           <PageNumbers>
             {pageNumbers.map((page) => {
               // Memoize click handler for each page button
@@ -344,8 +344,9 @@ export const CardGalleryPagination = React.memo(
     isLoading = false,
   }: CardGalleryPaginationProps) => {
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    // Use md breakpoint (900px) to determine small screens
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+    const isMediumScreen = useMediaQuery('(min-width:900px) and (max-width:1199px)');
 
     // Calculate the range of items being shown
     const startItem = useMemo(
@@ -368,38 +369,37 @@ export const CardGalleryPagination = React.memo(
         {!isOnBottom ? (
           // Top pagination with all controls in a single row on desktop
           <TopPaginationLayout>
-            {/* Left section with item range info */}
+            {/* Left section with item range info - only visible on desktop */}
             <LeftSection>
-              {/* Item range display */}
-              <ItemRangeInfo>
-                {!isLoading && (
+              {/* Item range display - only show on desktop */}
+              {!isSmallScreen && !isLoading && (
+                <ItemRangeInfo>
                   <Typography variant="body1" color="text.secondary">
                     Showing {startItem}-{endItem} of {totalItems} cards
                   </Typography>
-                )}
-              </ItemRangeInfo>
+                </ItemRangeInfo>
+              )}
             </LeftSection>
 
             {/* Center section with pagination controls */}
             <CenterSection>
-              {/* Mobile layout groups pagination controls and page size in single row */}
               {/* Desktop layout - centered navigation controls */}
-              {!isSmallMobile && (
+              {!isSmallScreen && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                   <NavigationControls
                     currentPage={currentPage}
                     totalPages={totalPages}
                     onPageChange={onPageChange}
                     isLoading={isLoading}
-                    isSmallMobile={isSmallMobile}
+                    isSmallScreen={isSmallScreen}
                   />
                 </Box>
               )}
 
-              {/* Mobile layout with two columns in one row */}
-              {isSmallMobile && (
+              {/* Mobile layout (for xs and sm) with two columns in one row */}
+              {isSmallScreen && (
                 <MobileControlsRow>
-                  {/* Left column: pagination controls and page indicator */}
+                  {/* Left column: pagination controls and compact info */}
                   <PaginationControlsGroup>
                     {/* Pagination controls */}
                     <NavigationControls
@@ -407,15 +407,25 @@ export const CardGalleryPagination = React.memo(
                       totalPages={totalPages}
                       onPageChange={onPageChange}
                       isLoading={isLoading}
-                      isSmallMobile={isSmallMobile}
+                      isSmallScreen={isSmallScreen}
                     />
 
-                    {/* Page indicator directly beneath pagination controls */}
-                    <PageIndicator>
-                      <Typography variant="body2" color="text.secondary">
-                        Page {currentPage} of {totalPages}
-                      </Typography>
-                    </PageIndicator>
+                    {/* Mobile layout - range and page info in one row */}
+                    <MobileInfoRow>
+                      {/* Compact item range - "1-24 of 100" */}
+                      {!isLoading && (
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{
+                            fontSize: '0.825rem',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {startItem}-{endItem} of {totalItems}
+                        </Typography>
+                      )}
+                    </MobileInfoRow>
                   </PaginationControlsGroup>
 
                   {/* Right column: page size selector and view mode toggles */}
@@ -432,7 +442,7 @@ export const CardGalleryPagination = React.memo(
                       <ViewModeToggle
                         viewMode={viewMode}
                         onViewModeChange={onViewModeChange}
-                        isSmallMobile={isSmallMobile}
+                        isSmallScreen={isSmallScreen}
                       />
                     </Box>
                   </RightControlsGroup>
@@ -440,21 +450,27 @@ export const CardGalleryPagination = React.memo(
               )}
 
               {/* Desktop view: View mode toggles centered */}
-              {!isSmallMobile && (
+              {!isSmallScreen && (
                 <ViewToggleContainer>
                   <ViewModeToggle
                     viewMode={viewMode}
                     onViewModeChange={onViewModeChange}
-                    isSmallMobile={isSmallMobile}
+                    isSmallScreen={isSmallScreen}
                   />
                 </ViewToggleContainer>
               )}
-              {/* Mobile search button - only visible on small mobile */}
-              {isSmallMobile && <MobileSearchButton />}
+
+              {/* Mobile search button - visible on all small screens */}
+              {isSmallScreen && <MobileSearchButton />}
             </CenterSection>
 
-            {/* Right section with page size selector - visible only on large screens */}
-            <RightSection sx={{ display: { xs: 'none', lg: 'flex' } }}>
+            {/* Right section with page size selector - only visible on desktop screens */}
+            <RightSection
+              sx={{
+                // Only display on desktop screens (≥ 900px)
+                display: isSmallScreen ? 'none' : 'flex',
+              }}
+            >
               <PageSizeControl
                 pageSize={pageSize}
                 onPageSizeChange={onPageSizeChange}
@@ -532,6 +548,7 @@ const TopPaginationLayout = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   width: '100%',
+  // Change layout on all small screens (below md)
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -557,6 +574,7 @@ const LeftSection = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   width: '240px', // Fixed width to prevent shifting
   justifyContent: 'flex-start',
+  // Change layout on all small screens (below md)
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 1,
@@ -570,6 +588,7 @@ const CenterSection = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   flex: 1,
+  // Change layout on all small screens (below md)
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 3,
@@ -582,6 +601,7 @@ const RightSection = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'flex-end',
   width: '240px', // Fixed width to match LeftSection
+  // Change layout on all small screens (below md)
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 2,
@@ -607,6 +627,7 @@ const ItemRangeInfo = styled(Box)(() => ({
 const PageSizeSelector = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
+  // Change layout on all small screens (below md)
   [theme.breakpoints.down('md')]: {
     justifyContent: 'center',
   },
@@ -633,11 +654,13 @@ const PageButton = styled(Button, {
   padding: 0,
 }));
 
-const PageIndicator = styled(Box)(({ theme }) => ({
+// New component for displaying both range and page information in one row on mobile
+const MobileInfoRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
-  width: '100%', // Use full width to ensure centering works within parent
-  marginTop: theme.spacing(0.5), // Small top margin to separate from controls
+  alignItems: 'center',
+  width: '100%',
+  marginTop: theme.spacing(0.5),
 }));
 
 const BackToTopButton = styled(Box)(({ theme }) => ({
@@ -650,6 +673,7 @@ const ViewToggleContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   marginTop: theme.spacing(1.5),
+  // Reduce spacing on smaller screens
   [theme.breakpoints.down('md')]: {
     marginTop: theme.spacing(1),
   },
@@ -658,7 +682,7 @@ const ViewToggleContainer = styled(Box)(({ theme }) => ({
 const MobileControlsRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between', // Changed to space-between to align items at edges
+  justifyContent: 'space-between',
   flexDirection: 'row',
   width: '100%',
   gap: theme.spacing(2),
