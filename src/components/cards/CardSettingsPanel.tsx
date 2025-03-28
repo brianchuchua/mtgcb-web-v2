@@ -25,6 +25,7 @@ export interface CardSetting {
   label: string;
   isVisible: boolean;
   setVisibility: (isVisible: boolean) => void;
+  type?: 'toggle';
 }
 
 export interface CardSelectSetting {
@@ -47,9 +48,11 @@ export interface CardSliderSetting {
   type: 'slider';
 }
 
+export type CardSettingType = CardSetting | CardSelectSetting | CardSliderSetting;
+
 export interface CardSettingGroup {
   label: string;
-  settings: CardSetting[] | CardSelectSetting[] | CardSliderSetting[];
+  settings: CardSettingType[];
   type: 'toggle' | 'select' | 'slider';
 }
 

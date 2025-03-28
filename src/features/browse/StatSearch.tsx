@@ -20,6 +20,7 @@ import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { usePriceType } from '@/hooks/usePriceType';
 import { selectSearchParams, selectStats, setStats } from '@/redux/slices/browseSlice';
@@ -110,7 +111,8 @@ const StatSearch = () => {
 
   // Get the settings to be able to change display price type
   const cardSettings = useCardSettingGroups();
-  const setDisplayPriceType = cardSettings?.[1]?.settings?.[0]?.setValue;
+  const priceSettings = cardSettings?.[1]?.settings?.[0] as CardSelectSetting | undefined;
+  const setDisplayPriceType = priceSettings?.setValue;
 
   // Only consider filters active if there are any conditions in Redux
   // This ensures consistency with page refreshes/URL changes

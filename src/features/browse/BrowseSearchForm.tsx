@@ -30,6 +30,7 @@ import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
+import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import ColorSelector from '@/features/browse/ColorSelector';
 import RaritySelector from '@/features/browse/RaritySelector';
 import SetSelector from '@/features/browse/SetSelector';
@@ -80,7 +81,8 @@ const BrowseSearchForm = () => {
 
   // Get the settings to be able to change display price type
   const cardSettings = useCardSettingGroups();
-  const setDisplayPriceType = cardSettings?.[1]?.settings?.[0]?.setValue;
+  const priceSettings = cardSettings?.[1]?.settings?.[0] as CardSelectSetting | undefined;
+  const setDisplayPriceType = priceSettings?.setValue;
 
   useEffect(() => {
     setLocalName(reduxName);

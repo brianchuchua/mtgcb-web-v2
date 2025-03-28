@@ -13,13 +13,20 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
   const [nameIsVisible, setNameIsVisible] = useLocalStorage('cardNameIsVisible', true);
   const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
   const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
-  
+
   // Layout settings
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cardsPerRow', 4);
   const [cardSizeMargin, setCardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
-  
+
   // Price display setting
-  const [displayPriceType, setDisplayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
+  const [displayPriceType, setDisplayPriceType] = useLocalStorage<PriceType>(
+    'displayPriceType',
+    PriceType.Market,
+  );
+
+  const handleSetPriceType = (value: number): void => {
+    setDisplayPriceType(value as unknown as PriceType);
+  };
 
   return [
     {
@@ -31,18 +38,21 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
           label: 'Name',
           isVisible: nameIsVisible,
           setVisibility: setNameIsVisible,
+          type: 'toggle',
         },
         {
           key: 'set',
           label: 'Set',
           isVisible: setIsVisible,
           setVisibility: setSetIsVisible,
+          type: 'toggle',
         },
         {
           key: 'price',
           label: 'Price',
           isVisible: priceIsVisible,
           setVisibility: setPriceIsVisible,
+          type: 'toggle',
         },
       ],
     },
@@ -52,9 +62,9 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
       settings: [
         {
           key: 'priceType',
-          label: '',  // Removed the redundant label
+          label: '', // Removed the redundant label
           value: displayPriceType as unknown as number,
-          setValue: setDisplayPriceType as (value: number) => void,
+          setValue: handleSetPriceType,
           type: 'select',
           options: [
             { value: PriceType.Market as unknown as number, label: 'Market' },
