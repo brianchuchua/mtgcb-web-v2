@@ -9,20 +9,18 @@
 
 ### Next
 
-- Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
-- BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
-- Implement a better table view that also allows configuration and sorting
-- Don't forget to store some settings in local storage but also have them in the url for sharing
-- Clean up BrowseSearchForm into smaller components
-- Move these TODOs to a TODO.md file :)
-- Improve error state on browse page -- right out it outputs API errors as red text.
-- Add more sortBy options
-- Handle sizeways cards and flip cards
-- Sort by market price descending should be nulls last
 - Responsive text
+- Implement a better table view that also allows configuration and server-side sorting
+- Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
+- Clean up BrowseSearchForm into smaller components
+- Handle sideways cards and flip cards
+- Sort by market price descending should be nulls last
+- BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
+- Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
 
 ## Later
 
+- Collection valuation, fall back to available prices using the same logic
 - Use the new TCGPlayer domain (see below)
 - On hover contextual stuff, like increasing quantity or removing a card
 - Audit all indexes

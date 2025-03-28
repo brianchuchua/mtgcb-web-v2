@@ -1,5 +1,6 @@
 'use client';
 
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { Box, Divider, Typography } from '@mui/material';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -318,8 +319,33 @@ export default function BrowsePage() {
       <CardGalleryPagination {...paginationProps} />
 
       {error && (
-        <Box mb={2}>
-          <Typography color="error">Error loading cards: {JSON.stringify(error)}</Typography>
+        <Box
+          mb={3}
+          sx={{
+            textAlign: 'center',
+            p: 3,
+            borderRadius: 1,
+            border: '1px solid',
+            borderColor: 'rgba(211, 47, 47, 0.3)',
+            bgcolor: 'rgba(211, 47, 47, 0.03)',
+            maxWidth: '800px',
+            mx: 'auto',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+          }}
+        >
+          <ErrorOutlineIcon
+            sx={{
+              fontSize: 40,
+              color: 'error.main',
+              mb: 1,
+            }}
+          />
+          <Typography variant="h6" gutterBottom fontWeight="bold" color="error.main">
+            Unable to load cards
+          </Typography>
+          <Typography color="text.primary">
+            There was a problem fetching card data. Please try again later.
+          </Typography>
         </Box>
       )}
 
