@@ -13,12 +13,15 @@ interface DashboardProps {
 
 const Dashboard = ({ children, sidenavWidth = 320 }: DashboardProps) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <DashboardProvider sidenavWidth={sidenavWidth}>
-      {!isMobile && <DashboardDesktop>{children}</DashboardDesktop>}
-      {isMobile && <DashboardMobile>{children}</DashboardMobile>}
+      {isMobile ? (
+        <DashboardMobile>{children}</DashboardMobile>
+      ) : (
+        <DashboardDesktop>{children}</DashboardDesktop>
+      )}
     </DashboardProvider>
   );
 };

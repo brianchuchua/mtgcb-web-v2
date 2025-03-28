@@ -38,10 +38,6 @@ const Header = () => {
   );
 };
 
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  [theme.breakpoints.up('sm')]: {
-    display: 'none',
-  },
-}));
+const StyledAppBar = styled(AppBar)(() => ({}));
 
 export default Header;

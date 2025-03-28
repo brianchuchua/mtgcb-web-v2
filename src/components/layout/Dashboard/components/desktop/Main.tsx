@@ -37,9 +37,6 @@ const StyledMain = styled('main', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  [theme.breakpoints.down('sm')]: {
-    display: 'none',
-  },
 }));
 
 const MainContent = styled('div')(({ theme }) => ({
