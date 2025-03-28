@@ -185,14 +185,6 @@ const CardGalleryWrapper = styled(Box, {
     padding: 0,
     margin: 0,
   },
-
-  // Responsive adjustments
-  [theme.breakpoints.down('md')]: {
-    width: '98%',
-    '& .card-gallery-grid': {
-      gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-    },
-  },
   [theme.breakpoints.down('sm')]: {
     width: '100%',
     maxWidth: '100vw',

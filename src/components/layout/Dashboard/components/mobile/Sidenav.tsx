@@ -33,6 +33,10 @@ const Sidenav = () => {
   );
 };
 
-const StyledDrawer = styled(Drawer)(() => ({}));
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  [theme.breakpoints.up('md')]: {
+    display: 'none',
+  },
+}));
 
 export default Sidenav;

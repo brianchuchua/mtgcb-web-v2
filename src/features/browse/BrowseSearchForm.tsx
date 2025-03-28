@@ -29,8 +29,8 @@ import debounce from 'lodash.debounce';
 import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
+import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ColorSelector from '@/features/browse/ColorSelector';
 import RaritySelector from '@/features/browse/RaritySelector';
 import SetSelector from '@/features/browse/SetSelector';
@@ -59,7 +59,7 @@ import { PriceType } from '@/types/pricing';
 const BrowseSearchForm = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { setMobileOpen } = useDashboardContext();
   const { enqueueSnackbar } = useSnackbar();
   const initialCheckDone = useRef(false);

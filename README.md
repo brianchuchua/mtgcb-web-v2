@@ -2,6 +2,7 @@
 
 ## Now
 
+- Main menu at top and scrollbar is weird, scrollbar isn't up there
 - Top padding is a tad different between 600px and 900px
 - Improve sub 900px experience by tweaking card grid to be configurable but starting with a different default or hiding the menu by default
 - Check search filter vertical scrolling behavior on different resolutions

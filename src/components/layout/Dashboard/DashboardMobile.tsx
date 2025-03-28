@@ -24,4 +24,7 @@ export const DashboardMobile = ({ children }: DashboardMobileProps) => {
 const StyledDashboardMobile = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
+  [theme.breakpoints.up('md')]: {
+    display: 'none',
+  },
 }));

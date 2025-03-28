@@ -53,4 +53,7 @@ const TopBar = styled(AppBar, {
     width: `calc(100% - ${sidenavWidth}px)`,
     marginLeft: `${sidenavWidth}px`,
   }),
+  [theme.breakpoints.down('md')]: {
+    display: 'none',
+  },
 }));
