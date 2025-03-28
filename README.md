@@ -2,20 +2,14 @@
 
 ## Now
 
-- Main menu at top and scrollbar is weird, scrollbar isn't up there
-- Top padding is a tad different between 600px and 900px
-- Improve sub 900px experience by tweaking card grid to be configurable but starting with a different default or hiding the menu by default
-- Check search filter vertical scrolling behavior on different resolutions
 - Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
 - More sorting options and implement a better table view that also allows configuration and sorting
-- Price type support
 - Don't forget to store some settings in local storage but also have them in the url for sharing
 - Collection in the sidenav should show that it's a dropdown and feel less awkward
 - Clean up BrowseSearchForm into smaller components
 - Grok URL source of truth pattern vs Redux state
 - Use the new TCGPlayer domain (see below)
-- Sort order implementation, stable
 - Examine pageSize in URL vs local storage
 - Move these TODOs to a TODO.md file :)
 - Improve error state on browse page -- right out it outputs API errors as red text.
