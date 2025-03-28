@@ -2,15 +2,18 @@
 
 ## Now
 
+### Can't Reproduce, Keeping An Eye On
+
+- iPad mini, 1024 x 768, pagination controls are too wide if sidenav is open, maybe needs to be responsive to that
+- vertical mode, also borked -- goes too wide, general issues with both, will look at next
+
+### Next
+
 - Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
-- More sorting options and implement a better table view that also allows configuration and sorting
+- Implement a better table view that also allows configuration and sorting
 - Don't forget to store some settings in local storage but also have them in the url for sharing
-- Collection in the sidenav should show that it's a dropdown and feel less awkward
 - Clean up BrowseSearchForm into smaller components
-- Grok URL source of truth pattern vs Redux state
-- Use the new TCGPlayer domain (see below)
-- Examine pageSize in URL vs local storage
 - Move these TODOs to a TODO.md file :)
 - Improve error state on browse page -- right out it outputs API errors as red text.
 - Add more sortBy options
@@ -20,6 +23,7 @@
 
 ## Later
 
+- Use the new TCGPlayer domain (see below)
 - On hover contextual stuff, like increasing quantity or removing a card
 - Audit all indexes
 - While searching, group by unique username, linking to a card name page that lists all printings -- and say "Printed in 13 sets" instead of the set name for those cards, or just the set name if a single printing. Need to group by the original, unadorned card name. This would show the newest printing first.
