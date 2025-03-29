@@ -9,7 +9,7 @@
 
 ### Next
 
-- Implement a better table view that also allows configuration and server-side sorting (integrate with virtuoso)
+- Implement a better table view that also allows configuration and server-side sorting (integrate with virtuoso probably)
 - Support mana value sorting and then pretty display on the table
 - Table view should show card image on hover.
 - Table view should link to set page from the set name

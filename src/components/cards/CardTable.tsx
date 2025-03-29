@@ -134,17 +134,17 @@ const CardTable = React.memo(
 
     // Create a ref to store the previous cards for smooth transitions
     const prevCardsRef = React.useRef(cards || []);
-    
+
     // Update the ref when not loading and we have cards
     React.useEffect(() => {
       if (!isLoading && cards && cards.length > 0) {
         prevCardsRef.current = cards;
       }
     }, [isLoading, cards]);
-    
+
     // For loading states, keep the previous data instead of using placeholders
-    const tableCards = isLoading ? prevCardsRef.current : (cards || []);
-    
+    const tableCards = isLoading ? prevCardsRef.current : cards || [];
+
     // Fade-in fade-out transition for the table content
     const tableOpacity = isLoading ? 0.6 : 1;
     const tablePointerEvents = isLoading ? 'none' : 'auto';
@@ -226,24 +226,26 @@ const CardTable = React.memo(
     return (
       <TableContainer component={Paper} sx={{ mt: 2, position: 'relative' }}>
         {isLoading && (
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              zIndex: 2
+              zIndex: 2,
             }}
           >
             <CircularProgress size={32} thickness={4} sx={{ opacity: 0.7 }} />
           </Box>
         )}
-        <Table 
-          aria-label="card table" 
-          size="small" 
-          sx={{ 
+        <Table
+          aria-label="card table"
+          size="small"
+          sx={{
             transition: 'opacity 0.2s ease',
             opacity: tableOpacity,
+            // add blur effect when loading
+            filter: isLoading ? 'blur(2px)' : 'none',
           }}
         >
           <TableHead>
@@ -306,21 +308,20 @@ const CardTable = React.memo(
           </TableHead>
           <TableBody>
             {tableCards.map((card) => {
-
               // For normal rows
               return (
-                <StyledTableRow 
-                  key={card.id} 
+                <StyledTableRow
+                  key={card.id}
                   onClick={() => handleCardClick(card.id)}
                   sx={{ pointerEvents: tablePointerEvents }}
                 >
                   <TableCell component="th" scope="row">
                     <ClickableText>{card.name}</ClickableText>
                   </TableCell>
-                  <TableCell>{card.setName || 'Unknown'}</TableCell>
-                  <TableCell>{card.collectorNumber || 'N/A'}</TableCell>
-                  <TableCell>{card.mtgcbCollectorNumber || 'N/A'}</TableCell>
-                  <TableCell>{card.rarity || 'N/A'}</TableCell>
+                  <TableCell>{card.setName || (isLoading ? '' : 'Unknown')}</TableCell>
+                  <TableCell>{card.collectorNumber || (isLoading ? '' : 'N/A')}</TableCell>
+                  <TableCell>{card.mtgcbCollectorNumber || (isLoading ? '' : 'N/A')}</TableCell>
+                  <TableCell>{card.rarity || (isLoading ? '' : 'N/A')}</TableCell>
                   <TableCell sx={{ textAlign: 'center' }}>
                     {formatNumeric(card.powerNumeric)}
                   </TableCell>
