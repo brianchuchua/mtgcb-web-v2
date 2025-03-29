@@ -12,6 +12,7 @@
 - Implement a better table view that also allows configuration and server-side sorting (integrate with virtuoso)
 - Support mana value sorting and then pretty display on the table
 - Table view should show card image on hover.
+- Table view should link to set page from the set name
 - Perfect table view styling, widths of columns and column configuration (make settings contextual to table or grid too)
 - Consider removing loading skeletons for the table
 - Should move grid/table view away from the url and instead use localstorage

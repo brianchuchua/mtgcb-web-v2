@@ -3,8 +3,8 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Box,
+  CircularProgress,
   Paper,
-  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -98,7 +98,7 @@ const CardTable = React.memo(
         {
           label: 'Set',
           id: 'releasedAt',
-          width: '20%',
+          width: '16%',
           tooltip: <ReleaseDateTooltip />,
           hasInfoIcon: true,
         },
@@ -117,13 +117,13 @@ const CardTable = React.memo(
           tooltip: <RarityTooltip />,
           hasInfoIcon: true,
         },
-        { label: 'Power', id: 'powerNumeric', width: '6%' },
-        { label: 'Toughness', id: 'toughnessNumeric', width: '7%' },
-        { label: 'Loyalty', id: 'loyaltyNumeric', width: '6%' },
+        { label: 'Power', id: 'powerNumeric', width: '6%', align: 'center' },
+        { label: 'Toughness', id: 'toughnessNumeric', width: '7%', align: 'center' },
+        { label: 'Loyalty', id: 'loyaltyNumeric', width: '6%', align: 'center' },
         {
           label: 'Price',
           id: currentPriceType as SortByOption,
-          // width: '11%',
+          width: '12%',
           // align: 'left',
           tooltip: <PriceTooltip />,
           hasInfoIcon: true,
@@ -132,23 +132,22 @@ const CardTable = React.memo(
       [currentPriceType],
     );
 
-    // For loading states, always use skeleton placeholders
-    const tableCards = isLoading
-      ? Array(24)
-          .fill(0)
-          .map((_, index) => ({
-            id: `table-skeleton-${index}`,
-            name: '',
-            setName: '',
-            collectorNumber: '',
-            mtgcbCollectorNumber: '',
-            rarity: '',
-            powerNumeric: '',
-            toughnessNumeric: '',
-            loyaltyNumeric: '',
-            isLoadingSkeleton: true,
-          }))
-      : cards;
+    // Create a ref to store the previous cards for smooth transitions
+    const prevCardsRef = React.useRef(cards || []);
+    
+    // Update the ref when not loading and we have cards
+    React.useEffect(() => {
+      if (!isLoading && cards && cards.length > 0) {
+        prevCardsRef.current = cards;
+      }
+    }, [isLoading, cards]);
+    
+    // For loading states, keep the previous data instead of using placeholders
+    const tableCards = isLoading ? prevCardsRef.current : (cards || []);
+    
+    // Fade-in fade-out transition for the table content
+    const tableOpacity = isLoading ? 0.6 : 1;
+    const tablePointerEvents = isLoading ? 'none' : 'auto';
 
     const handleCardClick = useCallback(
       (cardId: string) => {
@@ -225,84 +224,96 @@ const CardTable = React.memo(
     }
 
     return (
-      <TableContainer component={Paper} sx={{ mt: 2 }}>
-        <Table aria-label="card table" size="small">
+      <TableContainer component={Paper} sx={{ mt: 2, position: 'relative' }}>
+        {isLoading && (
+          <Box 
+            sx={{ 
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 2
+            }}
+          >
+            <CircularProgress size={32} thickness={4} sx={{ opacity: 0.7 }} />
+          </Box>
+        )}
+        <Table 
+          aria-label="card table" 
+          size="small" 
+          sx={{ 
+            transition: 'opacity 0.2s ease',
+            opacity: tableOpacity,
+          }}
+        >
           <TableHead>
             <TableRow>
               {tableHeaders.map((header) => (
-                <TableCell key={header.label} width={header.width} align={header.align || 'left'}>
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {header.id ? (
-                      <TableSortLabel
-                        active={currentSortBy === header.id}
-                        direction={currentSortBy === header.id ? currentSortOrder : 'asc'}
-                        onClick={() => handleSortClick(header.id)}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          {header.label}
-                          {header.tooltip && header.hasInfoIcon && (
-                            <Tooltip title={header.tooltip} placement="top">
-                              <InfoOutlinedIcon
-                                color="disabled"
-                                sx={{
-                                  cursor: 'help',
-                                  fontSize: '0.875rem',
-                                  ml: 0.5,
-                                  verticalAlign: 'middle',
-                                }}
-                              />
-                            </Tooltip>
-                          )}
-                        </Box>
-                      </TableSortLabel>
-                    ) : (
-                      header.label
-                    )}
-                  </Box>
+                <TableCell
+                  key={header.label}
+                  width={header.width}
+                  align={header.align || 'left'}
+                  sx={{
+                    '& .MuiTableSortLabel-root': {
+                      width: '100%',
+                      justifyContent: header.align === 'center' ? 'center' : 'flex-start',
+                      // This makes the icon not take space when hidden
+                      '& .MuiTableSortLabel-icon': {
+                        opacity: 0,
+                        position: header.align === 'center' ? 'absolute' : 'static',
+                        right: 0,
+                      },
+                      '&.Mui-active .MuiTableSortLabel-icon': {
+                        opacity: 1,
+                        position: 'static',
+                      },
+                    },
+                  }}
+                >
+                  {header.id ? (
+                    <TableSortLabel
+                      active={currentSortBy === header.id}
+                      direction={currentSortBy === header.id ? currentSortOrder : 'asc'}
+                      onClick={() => handleSortClick(header.id)}
+                      hideSortIcon={header.align === 'center' && currentSortBy !== header.id}
+                      sx={{
+                        display: 'flex',
+                        width: '100%',
+                        justifyContent: header.align === 'center' ? 'center' : 'flex-start',
+                      }}
+                    >
+                      {header.label}
+                      {header.tooltip && header.hasInfoIcon && (
+                        <Tooltip title={header.tooltip} placement="top">
+                          <InfoOutlinedIcon
+                            color="disabled"
+                            sx={{
+                              cursor: 'help',
+                              fontSize: '0.875rem',
+                              ml: 0.5,
+                              verticalAlign: 'middle',
+                            }}
+                          />
+                        </Tooltip>
+                      )}
+                    </TableSortLabel>
+                  ) : (
+                    header.label
+                  )}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {tableCards.map((card) => {
-              // For skeleton rows
-              if (card.isLoadingSkeleton) {
-                return (
-                  <StyledTableRow key={card.id}>
-                    <TableCell component="th" scope="row">
-                      <Skeleton variant="text" width="80%" animation="wave" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="70%" animation="wave" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="40%" animation="wave" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="40%" animation="wave" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="50%" animation="wave" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="30%" animation="wave" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="30%" animation="wave" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton variant="text" width="30%" animation="wave" />
-                    </TableCell>
-                    <TableCell align="right">
-                      <Skeleton variant="text" width="60%" animation="wave" sx={{ ml: 'auto' }} />
-                    </TableCell>
-                  </StyledTableRow>
-                );
-              }
 
               // For normal rows
               return (
-                <StyledTableRow key={card.id} onClick={() => handleCardClick(card.id)}>
+                <StyledTableRow 
+                  key={card.id} 
+                  onClick={() => handleCardClick(card.id)}
+                  sx={{ pointerEvents: tablePointerEvents }}
+                >
                   <TableCell component="th" scope="row">
                     <ClickableText>{card.name}</ClickableText>
                   </TableCell>
@@ -310,9 +321,15 @@ const CardTable = React.memo(
                   <TableCell>{card.collectorNumber || 'N/A'}</TableCell>
                   <TableCell>{card.mtgcbCollectorNumber || 'N/A'}</TableCell>
                   <TableCell>{card.rarity || 'N/A'}</TableCell>
-                  <TableCell>{formatNumeric(card.powerNumeric)}</TableCell>
-                  <TableCell>{formatNumeric(card.toughnessNumeric)}</TableCell>
-                  <TableCell>{formatNumeric(card.loyaltyNumeric)}</TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>
+                    {formatNumeric(card.powerNumeric)}
+                  </TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>
+                    {formatNumeric(card.toughnessNumeric)}
+                  </TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>
+                    {formatNumeric(card.loyaltyNumeric)}
+                  </TableCell>
                   <TableCell>
                     <PriceLink
                       href={generateTCGPlayerLink(
@@ -356,7 +373,7 @@ CardTable.displayName = 'CardTable';
 // Styled components
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   cursor: 'pointer',
-  transition: 'background-color 0.2s ease',
+  transition: 'background-color 0.2s ease, opacity 0.2s ease',
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
   },
