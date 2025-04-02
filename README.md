@@ -9,14 +9,14 @@
 
 ### Next
 
-- Implement a better table view that also allows configuration and server-side sorting (integrate with virtuoso probably)
+- Implement a better table view that also allows configuration and server-side sorting.
+- Table columns probably need good fixed widths so toggling on and off is smooth.
 - Support mana value sorting and then pretty display on the table
 - Table view should show card image on hover.
 - Table view should link to set page from the set name
 - Perfect table view styling, widths of columns and column configuration (make settings contextual to table or grid too)
-- Consider removing loading skeletons for the table
 - Should move grid/table view away from the url and instead use localstorage
-- Look at padding of showing and dropdown cards per page on table view and other views.
+- Look at padding of "showing X cards" and number-of-pages dropdown on table view and other views.
 - Special should really come after mythic, not before common, change in API and update tooltip in table view
 - Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
 - Clean up BrowseSearchForm into smaller components
@@ -62,14 +62,13 @@
 - Remove Artist table, prefer to bake it into cards for now
 - Collection statistics
 - Before open sourcing, full automation suite and readability refactor -- make it work, make it fast, make it clean
+- Bad data detector
 
 ## Known Bugs
 
 - Moderate (UX): The search form has prefilling and styling issues.
 - Moderate: Logout isn't redirecting the user -- probably want them back to the login page.
-- Minor (UX): I hate how the collection submenu behaves. Add a carat?
 - Minor: When logging out of a page that requires authentication, redirectTo is set to the page you were on during logout.
-- Minor: The background color of the sidenav is different on mobile.
 
 ## UX Thoughts
 

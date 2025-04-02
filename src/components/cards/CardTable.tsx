@@ -18,6 +18,7 @@ import {
 import { styled } from '@mui/material/styles';
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { TableVirtuoso } from 'react-virtuoso';
 import { CardItemProps } from './CardItem';
 import CardPrice from './CardPrice';
 import { usePriceType } from '@/hooks/usePriceType';
@@ -52,8 +53,34 @@ interface TableHeader {
   hasInfoIcon?: boolean;
 }
 
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: 'pointer',
+  transition: 'background-color 0.2s ease, opacity 0.2s ease',
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  '&:hover': {
+    backgroundColor: theme.palette.action.selected,
+  },
+}));
+
+const ClickableText = styled(Typography)(({ theme }) => ({
+  fontWeight: 'medium',
+  '&:hover': {
+    textDecoration: 'underline',
+  },
+}));
+
+const PriceLink = styled('a')(({ theme }) => ({
+  color: theme.palette.primary.main,
+  textDecoration: 'none',
+  '&:hover': {
+    textDecoration: 'underline',
+  },
+}));
+
 /**
- * A table view for displaying card data with sortable columns
+ * A virtualized table view for displaying card data with sortable columns
  */
 const CardTable = React.memo(
   ({ cards, isLoading = false, onCardClick }: CardTableProps) => {
@@ -124,7 +151,6 @@ const CardTable = React.memo(
           label: 'Price',
           id: currentPriceType as SortByOption,
           width: '12%',
-          // align: 'left',
           tooltip: <PriceTooltip />,
           hasInfoIcon: true,
         },
@@ -223,8 +249,150 @@ const CardTable = React.memo(
       );
     }
 
+    // Custom table row component that includes click handling
+    const CustomTableRow = React.useCallback(
+      (props: any) => {
+        const { index, item, ...restProps } = props;
+        return (
+          <StyledTableRow
+            onClick={() => handleCardClick(item.id)}
+            style={{ pointerEvents: tablePointerEvents }}
+            {...restProps}
+          />
+        );
+      },
+      [handleCardClick, tablePointerEvents],
+    );
+
+    // Define MUI table components
+    const VirtuosoTableComponents = {
+      Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
+        <TableContainer component={Paper} {...props} ref={ref} />
+      )),
+      Table: (props: React.ComponentProps<typeof Table>) => (
+        <Table
+          {...props}
+          size="small"
+          aria-label="card table"
+          sx={{
+            borderCollapse: 'separate', // Fix for virtuoso rendering
+            ...props.sx,
+          }}
+        />
+      ),
+      TableHead,
+      TableRow: CustomTableRow,
+      TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
+        <TableBody {...props} ref={ref} />
+      )),
+    };
+
+    // Fixed header content for the TableVirtuoso
+    const fixedHeaderContent = React.useCallback(
+      () => (
+        <TableRow>
+          {tableHeaders.map((header) => (
+            <TableCell
+              key={header.label}
+              width={header.width}
+              align={header.align || 'left'}
+              sx={{
+                '& .MuiTableSortLabel-root': {
+                  width: '100%',
+                  justifyContent: header.align === 'center' ? 'center' : 'flex-start',
+                  // This makes the icon not take space when hidden
+                  '& .MuiTableSortLabel-icon': {
+                    opacity: 0,
+                    position: header.align === 'center' ? 'absolute' : 'static',
+                    right: 0,
+                  },
+                  '&.Mui-active .MuiTableSortLabel-icon': {
+                    opacity: 1,
+                    position: 'static',
+                  },
+                },
+              }}
+            >
+              {header.id ? (
+                <TableSortLabel
+                  active={currentSortBy === header.id}
+                  direction={currentSortBy === header.id ? currentSortOrder : 'asc'}
+                  onClick={() => handleSortClick(header.id)}
+                  hideSortIcon={header.align === 'center' && currentSortBy !== header.id}
+                  sx={{
+                    display: 'flex',
+                    width: '100%',
+                    justifyContent: header.align === 'center' ? 'center' : 'flex-start',
+                  }}
+                >
+                  {header.label}
+                  {header.tooltip && header.hasInfoIcon && (
+                    <Tooltip title={header.tooltip} placement="top">
+                      <InfoOutlinedIcon
+                        color="disabled"
+                        sx={{
+                          cursor: 'help',
+                          fontSize: '0.875rem',
+                          ml: 0.5,
+                          verticalAlign: 'middle',
+                        }}
+                      />
+                    </Tooltip>
+                  )}
+                </TableSortLabel>
+              ) : (
+                header.label
+              )}
+            </TableCell>
+          ))}
+        </TableRow>
+      ),
+      [tableHeaders, currentSortBy, currentSortOrder, handleSortClick],
+    );
+
+    // Row content renderer for the TableVirtuoso
+    const rowContent = React.useCallback(
+      (index: number, card: CardItemProps) => {
+        return (
+          <React.Fragment>
+            <TableCell component="th" scope="row">
+              <ClickableText>{card.name}</ClickableText>
+            </TableCell>
+            <TableCell>{card.setName || (isLoading ? '' : 'Unknown')}</TableCell>
+            <TableCell>{card.collectorNumber || (isLoading ? '' : 'N/A')}</TableCell>
+            <TableCell>{card.mtgcbCollectorNumber || (isLoading ? '' : 'N/A')}</TableCell>
+            <TableCell>{card.rarity || (isLoading ? '' : 'N/A')}</TableCell>
+            <TableCell sx={{ textAlign: 'center' }}>{formatNumeric(card.powerNumeric)}</TableCell>
+            <TableCell sx={{ textAlign: 'center' }}>
+              {formatNumeric(card.toughnessNumeric)}
+            </TableCell>
+            <TableCell sx={{ textAlign: 'center' }}>{formatNumeric(card.loyaltyNumeric)}</TableCell>
+            <TableCell>
+              <PriceLink
+                href={generateTCGPlayerLink(
+                  'tcgplayerId' in card ? card.tcgplayerId : undefined,
+                  card.name,
+                )}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()} // Prevent row click when clicking on price
+              >
+                <CardPrice
+                  prices={preparePriceData(card)}
+                  isLoading={false}
+                  priceType={currentPriceType}
+                  centered={false}
+                />
+              </PriceLink>
+            </TableCell>
+          </React.Fragment>
+        );
+      },
+      [isLoading, preparePriceData, currentPriceType, formatNumeric],
+    );
+
     return (
-      <TableContainer component={Paper} sx={{ mt: 2, position: 'relative' }}>
+      <Box sx={{ position: 'relative', mt: 2 }}>
         {isLoading && (
           <Box
             sx={{
@@ -238,123 +406,26 @@ const CardTable = React.memo(
             <CircularProgress size={32} thickness={4} sx={{ opacity: 0.7 }} />
           </Box>
         )}
-        <Table
-          aria-label="card table"
-          size="small"
-          sx={{
+
+        <TableVirtuoso
+          style={{
+            height: 'calc(100vh - 250px)', // Adjust height as needed
+            minHeight: '400px',
             transition: 'opacity 0.2s ease',
             opacity: tableOpacity,
-            // add blur effect when loading
             filter: isLoading ? 'blur(2px)' : 'none',
           }}
-        >
-          <TableHead>
-            <TableRow>
-              {tableHeaders.map((header) => (
-                <TableCell
-                  key={header.label}
-                  width={header.width}
-                  align={header.align || 'left'}
-                  sx={{
-                    '& .MuiTableSortLabel-root': {
-                      width: '100%',
-                      justifyContent: header.align === 'center' ? 'center' : 'flex-start',
-                      // This makes the icon not take space when hidden
-                      '& .MuiTableSortLabel-icon': {
-                        opacity: 0,
-                        position: header.align === 'center' ? 'absolute' : 'static',
-                        right: 0,
-                      },
-                      '&.Mui-active .MuiTableSortLabel-icon': {
-                        opacity: 1,
-                        position: 'static',
-                      },
-                    },
-                  }}
-                >
-                  {header.id ? (
-                    <TableSortLabel
-                      active={currentSortBy === header.id}
-                      direction={currentSortBy === header.id ? currentSortOrder : 'asc'}
-                      onClick={() => handleSortClick(header.id)}
-                      hideSortIcon={header.align === 'center' && currentSortBy !== header.id}
-                      sx={{
-                        display: 'flex',
-                        width: '100%',
-                        justifyContent: header.align === 'center' ? 'center' : 'flex-start',
-                      }}
-                    >
-                      {header.label}
-                      {header.tooltip && header.hasInfoIcon && (
-                        <Tooltip title={header.tooltip} placement="top">
-                          <InfoOutlinedIcon
-                            color="disabled"
-                            sx={{
-                              cursor: 'help',
-                              fontSize: '0.875rem',
-                              ml: 0.5,
-                              verticalAlign: 'middle',
-                            }}
-                          />
-                        </Tooltip>
-                      )}
-                    </TableSortLabel>
-                  ) : (
-                    header.label
-                  )}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tableCards.map((card) => {
-              // For normal rows
-              return (
-                <StyledTableRow
-                  key={card.id}
-                  onClick={() => handleCardClick(card.id)}
-                  sx={{ pointerEvents: tablePointerEvents }}
-                >
-                  <TableCell component="th" scope="row">
-                    <ClickableText>{card.name}</ClickableText>
-                  </TableCell>
-                  <TableCell>{card.setName || (isLoading ? '' : 'Unknown')}</TableCell>
-                  <TableCell>{card.collectorNumber || (isLoading ? '' : 'N/A')}</TableCell>
-                  <TableCell>{card.mtgcbCollectorNumber || (isLoading ? '' : 'N/A')}</TableCell>
-                  <TableCell>{card.rarity || (isLoading ? '' : 'N/A')}</TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>
-                    {formatNumeric(card.powerNumeric)}
-                  </TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>
-                    {formatNumeric(card.toughnessNumeric)}
-                  </TableCell>
-                  <TableCell sx={{ textAlign: 'center' }}>
-                    {formatNumeric(card.loyaltyNumeric)}
-                  </TableCell>
-                  <TableCell>
-                    <PriceLink
-                      href={generateTCGPlayerLink(
-                        'tcgplayerId' in card ? card.tcgplayerId : undefined,
-                        card.name,
-                      )}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => e.stopPropagation()} // Prevent row click when clicking on price
-                    >
-                      <CardPrice
-                        prices={preparePriceData(card)}
-                        isLoading={false}
-                        priceType={currentPriceType}
-                        centered={false}
-                      />
-                    </PriceLink>
-                  </TableCell>
-                </StyledTableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          data={tableCards}
+          components={VirtuosoTableComponents}
+          fixedHeaderContent={fixedHeaderContent}
+          itemContent={rowContent}
+          useWindowScroll
+          increaseViewportBy={200} // Pre-render more rows for smoother scrolling
+          computeItemKey={(index) => tableCards[index]?.id || index.toString()}
+          totalCount={tableCards.length}
+          overscan={50} // Additional rows to render beyond the visible area
+        />
+      </Box>
     );
   },
   (prevProps, nextProps) => {
@@ -370,32 +441,5 @@ const CardTable = React.memo(
 
 // For better debugging in React DevTools
 CardTable.displayName = 'CardTable';
-
-// Styled components
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  cursor: 'pointer',
-  transition: 'background-color 0.2s ease, opacity 0.2s ease',
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  '&:hover': {
-    backgroundColor: theme.palette.action.selected,
-  },
-}));
-
-const ClickableText = styled(Typography)(({ theme }) => ({
-  fontWeight: 'medium',
-  '&:hover': {
-    textDecoration: 'underline',
-  },
-}));
-
-const PriceLink = styled('a')(({ theme }) => ({
-  color: theme.palette.primary.main,
-  textDecoration: 'none',
-  '&:hover': {
-    textDecoration: 'underline',
-  },
-}));
 
 export default CardTable;
