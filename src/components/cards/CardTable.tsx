@@ -650,6 +650,7 @@ const CardTable = React.memo(
             width: `${totalTableWidth}px`,
             maxWidth: '100%',
             overflowX: 'auto',
+            overflowY: 'hidden', // Hide vertical scrollbar but keep horizontal
             ...props.sx,
           }}
         />

@@ -9,7 +9,6 @@
 
 ### Next
 
-- Make virtuoso table use vertical scrollbar of main page
 - Implement a better table view that also allows configuration and server-side sorting.
 - Compare with other good tools and see which fields I should show or add on the table.
 - Table columns probably need good fixed widths so toggling on and off is smooth.
