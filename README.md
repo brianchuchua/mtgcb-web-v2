@@ -22,9 +22,12 @@
 - Clean up BrowseSearchForm into smaller components
 - Sort by market price descending should be nulls last -- look at sorting values that can be null in general
 - Add ability to save searches (even independently of collection goals, a saved searches section)
+- Catch up on minor typescript errors
 
 ## Later
 
+- Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
+- Clean up MTG CB collector number
 - Make a cool stats page
 - S3 image storage is costing a lot of money, look into alternatives like Cloudflare R2, Vercel Blob Storage, Cloudflare Images, Digital Ocean Spaces, etc.
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.

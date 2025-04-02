@@ -451,38 +451,38 @@ const CardTable = React.memo(
     // Table headers with corresponding sort options
     const allTableHeaders: TableHeader[] = useMemo(
       () => [
-        { label: 'Name', id: 'name', width: '20%' },
+        { label: 'Name', id: 'name', width: '350px' },
         {
           label: 'Set',
           id: 'releasedAt',
-          width: '12%',
+          width: '350px',
           tooltip: <ReleaseDateTooltip />,
           hasInfoIcon: true,
         },
-        { label: 'Collector #', id: 'collectorNumber', width: '8%' },
+        { label: 'Collector #', id: 'collectorNumber', width: '100px' },
         {
           label: 'MTG CB #',
           id: 'mtgcbCollectorNumber',
-          width: '8%',
+          width: '100px',
           tooltip: <MtgcbNumberTooltip />,
           hasInfoIcon: true,
         },
         {
           label: 'Rarity',
           id: 'rarityNumeric',
-          width: '6%',
+          width: '100px',
           tooltip: <RarityTooltip />,
           hasInfoIcon: true,
         },
-        { label: 'Type', id: 'type', width: '14%' },
-        { label: 'Artist', id: 'artist', width: '10%' },
-        { label: 'Power', id: 'powerNumeric', width: '5%', align: 'center' },
-        { label: 'Toughness', id: 'toughnessNumeric', width: '6%', align: 'center' },
-        { label: 'Loyalty', id: 'loyaltyNumeric', width: '5%', align: 'center' },
+        { label: 'Type', id: 'type', width: '100px' },
+        { label: 'Artist', id: 'artist', width: '100px' },
+        { label: 'Power', id: 'powerNumeric', width: '100px', align: 'center' },
+        { label: 'Toughness', id: 'toughnessNumeric', width: '100px', align: 'center' },
+        { label: 'Loyalty', id: 'loyaltyNumeric', width: '100px', align: 'center' },
         {
           label: 'Price',
           id: currentPriceType as SortByOption,
-          width: '10%',
+          // width: '15%',
           tooltip: <PriceTooltip />,
           hasInfoIcon: true,
         },
@@ -654,6 +654,7 @@ const CardTable = React.memo(
               width={header.width}
               align={header.align || 'left'}
               sx={{
+                minWidth: header.width,
                 '& .MuiTableSortLabel-root': {
                   width: '100%',
                   justifyContent: header.align === 'center' ? 'center' : 'flex-start',
@@ -726,9 +727,9 @@ const CardTable = React.memo(
 
         // Add the name cell with hover functionality
         cells.push(
-          <TableCell 
-            key="name" 
-            component="th" 
+          <TableCell
+            key="name"
+            component="th"
             scope="row"
             onMouseEnter={() => !isLoading && showCardPreview(card)}
             onMouseLeave={hideCardPreview}
@@ -821,7 +822,16 @@ const CardTable = React.memo(
 
         return <>{cells}</>;
       },
-      [display, headerIndicesMap, isLoading, preparePriceData, currentPriceType, formatNumeric, showCardPreview, hideCardPreview],
+      [
+        display,
+        headerIndicesMap,
+        isLoading,
+        preparePriceData,
+        currentPriceType,
+        formatNumeric,
+        showCardPreview,
+        hideCardPreview,
+      ],
     );
 
     return (

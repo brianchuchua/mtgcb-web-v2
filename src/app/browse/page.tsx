@@ -58,13 +58,13 @@ const CardDisplay = ({
   // Table settings
   const [tableSetIsVisible] = useLocalStorage('tableSetIsVisible', true);
   const [tableCollectorNumberIsVisible] = useLocalStorage('tableCollectorNumberIsVisible', true);
-  const [tableMtgcbNumberIsVisible] = useLocalStorage('tableMtgcbNumberIsVisible', true);
+  const [tableMtgcbNumberIsVisible] = useLocalStorage('tableMtgcbNumberIsVisible', false);
   const [tableRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
-  const [tableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', true);
+  const [tableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', false);
   const [tableArtistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
-  const [tablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', true);
-  const [tableToughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', true);
-  const [tableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', true);
+  const [tablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', false);
+  const [tableToughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', false);
+  const [tableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', false);
   const [tablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
 
   // Store the current view mode in localStorage

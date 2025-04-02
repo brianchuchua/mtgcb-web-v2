@@ -22,7 +22,7 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
   );
   const [tableMtgcbNumberIsVisible, setTableMtgcbNumberIsVisible] = useLocalStorage(
     'tableMtgcbNumberIsVisible',
-    true,
+    false,
   );
   const [tableRarityIsVisible, setTableRarityIsVisible] = useLocalStorage(
     'tableRarityIsVisible',
@@ -30,21 +30,21 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
   );
   const [tablePowerIsVisible, setTablePowerIsVisible] = useLocalStorage(
     'tablePowerIsVisible',
-    true,
+    false,
   );
   const [tableToughnessIsVisible, setTableToughnessIsVisible] = useLocalStorage(
     'tableToughnessIsVisible',
-    true,
+    false,
   );
   const [tableLoyaltyIsVisible, setTableLoyaltyIsVisible] = useLocalStorage(
     'tableLoyaltyIsVisible',
-    true,
+    false,
   );
   const [tablePriceIsVisible, setTablePriceIsVisible] = useLocalStorage(
     'tablePriceIsVisible',
     true,
   );
-  const [tableTypeIsVisible, setTableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', true);
+  const [tableTypeIsVisible, setTableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', false);
   const [tableArtistIsVisible, setTableArtistIsVisible] = useLocalStorage(
     'tableArtistIsVisible',
     false,
