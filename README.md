@@ -11,7 +11,6 @@
 
 - Implement a better table view that also allows configuration and server-side sorting.
 - Compare with other good tools and see which fields I should show or add on the table.
-- Make mousing over the whole table row pop up an image preview.
 - Table columns probably need good fixed widths so toggling on and off is smooth.
 - Support mana value sorting and then pretty display on the table
 - Table view should show card image on hover.
@@ -65,6 +64,7 @@
 - Collection statistics
 - Before open sourcing, full automation suite and readability refactor -- make it work, make it fast, make it clean
 - Bad data detector
+- Before going open source: Clean up all the vibe coding and make it more my style
 
 ## Known Bugs
 

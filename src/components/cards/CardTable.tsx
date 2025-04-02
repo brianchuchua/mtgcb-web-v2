@@ -16,7 +16,7 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TableVirtuoso } from 'react-virtuoso';
 import { CardItemProps } from './CardItem';
@@ -26,6 +26,7 @@ import { usePriceType } from '@/hooks/usePriceType';
 import { selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
 import { SortByOption, SortOrderOption } from '@/types/browse';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
 
 export interface CardTableProps {
   /**
@@ -94,6 +95,40 @@ const PriceLink = styled('a')(({ theme }) => ({
   },
 }));
 
+// Define props for styled components that need setName
+interface CardImageProps {
+  setName?: string;
+}
+
+// Fixed-position card image container
+const CardPreviewContainer = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'setName',
+})<CardImageProps>(({ theme, setName }) => ({
+  position: 'fixed',
+  zIndex: 1300,
+  width: '399px',
+  height: 'calc(399px * 1.393)',
+  overflow: 'hidden',
+  pointerEvents: 'none',
+  borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[6],
+  display: 'none',
+}));
+
+// Card image with dynamic border radius
+const CardPreviewImage = styled('img', {
+  shouldForwardProp: (prop) => prop !== 'setName',
+})<CardImageProps>(({ theme, setName }) => ({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  objectFit: 'contain',
+  borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
+}));
+
 /**
  * A virtualized table view for displaying card data with sortable columns
  */
@@ -103,6 +138,15 @@ const CardTable = React.memo(
     const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
     const currentSortOrder = useSelector(selectSortOrder) || 'asc';
     const currentPriceType = usePriceType();
+
+    // Refs for mouse tracking
+    const mousePositionRef = useRef({ x: 0, y: 0 });
+    const hoverCardRef = useRef<HTMLDivElement | null>(null);
+    const currentCardRef = useRef<string | null>(null);
+    const previewContainerRef = useRef<HTMLDivElement | null>(null);
+    const previewImageRef = useRef<HTMLImageElement | null>(null);
+    const loadingRef = useRef<HTMLDivElement | null>(null);
+    const errorRef = useRef<HTMLDivElement | null>(null);
 
     // Load column visibility preferences from localStorage
     const [setIsVisible, setSetIsVisible] = useLocalStorage('tableSetIsVisible', true);
@@ -158,6 +202,209 @@ const CardTable = React.memo(
         displaySettings?.priceIsVisible !== undefined
           ? displaySettings.priceIsVisible
           : tablePriceIsVisible,
+    };
+
+    // Initialize the hover preview element
+    useEffect(() => {
+      if (typeof document === 'undefined') return;
+
+      // Create container
+      const container = document.createElement('div');
+      container.id = 'card-preview-container';
+      container.style.position = 'fixed';
+      container.style.zIndex = '9999';
+      container.style.width = '299px';
+      container.style.height = 'calc(299px * 1.393)';
+      container.style.borderRadius = '5%';
+      container.style.overflow = 'hidden';
+      container.style.backgroundColor = '#1c2025';
+      container.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+      container.style.display = 'none';
+      container.style.pointerEvents = 'none';
+      document.body.appendChild(container);
+
+      // Create loading indicator
+      const loadingDiv = document.createElement('div');
+      loadingDiv.style.position = 'absolute';
+      loadingDiv.style.top = '0';
+      loadingDiv.style.left = '0';
+      loadingDiv.style.width = '100%';
+      loadingDiv.style.height = '100%';
+      loadingDiv.style.display = 'flex';
+      loadingDiv.style.alignItems = 'center';
+      loadingDiv.style.justifyContent = 'center';
+      loadingDiv.style.backgroundColor = '#1c2025';
+
+      const spinner = document.createElement('div');
+      spinner.style.width = '40px';
+      spinner.style.height = '40px';
+      spinner.style.border = '4px solid #f3f3f3';
+      spinner.style.borderTop = '4px solid #3f51b5';
+      spinner.style.borderRadius = '50%';
+
+      // Add the spinner animation
+      const keyframes = `
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `;
+      const style = document.createElement('style');
+      style.textContent = keyframes;
+      document.head.appendChild(style);
+
+      spinner.style.animation = 'spin 1s linear infinite';
+      loadingDiv.appendChild(spinner);
+      container.appendChild(loadingDiv);
+
+      // Create error message
+      const errorDiv = document.createElement('div');
+      errorDiv.style.position = 'absolute';
+      errorDiv.style.top = '0';
+      errorDiv.style.left = '0';
+      errorDiv.style.width = '100%';
+      errorDiv.style.height = '100%';
+      errorDiv.style.display = 'none';
+      errorDiv.style.flexDirection = 'column';
+      errorDiv.style.alignItems = 'center';
+      errorDiv.style.justifyContent = 'center';
+      errorDiv.style.backgroundColor = '#f9f9f9';
+      errorDiv.style.borderRadius = '5%';
+
+      const errorTitle = document.createElement('div');
+      errorTitle.style.fontWeight = 'bold';
+      errorTitle.style.fontSize = '16px';
+      errorTitle.style.marginBottom = '8px';
+
+      const errorMessage = document.createElement('div');
+      errorMessage.textContent = 'Image not available';
+      errorMessage.style.fontSize = '14px';
+      errorMessage.style.opacity = '0.7';
+
+      errorDiv.appendChild(errorTitle);
+      errorDiv.appendChild(errorMessage);
+      container.appendChild(errorDiv);
+
+      // Create image element
+      const img = document.createElement('img');
+      img.style.position = 'absolute';
+      img.style.top = '0';
+      img.style.left = '0';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'contain';
+      img.style.display = 'none';
+
+      img.onload = () => {
+        img.style.display = 'block';
+        loadingDiv.style.display = 'none';
+        errorDiv.style.display = 'none';
+      };
+
+      img.onerror = () => {
+        img.style.display = 'none';
+        loadingDiv.style.display = 'none';
+        errorDiv.style.display = 'flex';
+
+        // Set the card name in the error message
+        if (currentCardRef.current) {
+          const card = cards.find((c) => c.id === currentCardRef.current);
+          if (card) {
+            errorTitle.textContent = card.name;
+          }
+        }
+      };
+
+      container.appendChild(img);
+
+      // Set the refs
+      hoverCardRef.current = container;
+      previewImageRef.current = img;
+      loadingRef.current = loadingDiv;
+      errorRef.current = errorDiv;
+
+      // Add global mouse move listener using requestAnimationFrame
+      let ticking = false;
+
+      const handleMouseMove = (e: MouseEvent) => {
+        mousePositionRef.current = { x: e.clientX, y: e.clientY };
+
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            if (hoverCardRef.current && hoverCardRef.current.style.display !== 'none') {
+              const x = mousePositionRef.current.x + 50; // 50px to the right
+              const y = mousePositionRef.current.y - 35; // 35px above
+
+              hoverCardRef.current.style.left = `${x}px`;
+              hoverCardRef.current.style.top = `${y}px`;
+            }
+            ticking = false;
+          });
+
+          ticking = true;
+        }
+      };
+
+      document.addEventListener('mousemove', handleMouseMove);
+
+      // Clean up function
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        if (hoverCardRef.current) {
+          document.body.removeChild(hoverCardRef.current);
+          hoverCardRef.current = null;
+        }
+        document.head.removeChild(style);
+      };
+    }, []);
+
+    // Handle showing card preview
+    const showCardPreview = (card: CardItemProps) => {
+      if (!hoverCardRef.current || !previewImageRef.current) return;
+
+      // Only load a new image if it's a different card
+      if (currentCardRef.current !== card.id) {
+        currentCardRef.current = card.id;
+
+        // Update border radius based on set
+        const borderRadius = card.setName === 'Limited Edition Alpha' ? '7%' : '5%';
+        hoverCardRef.current.style.borderRadius = borderRadius;
+
+        // Reset UI state
+        if (previewImageRef.current) {
+          previewImageRef.current.style.display = 'none';
+        }
+
+        if (loadingRef.current) {
+          loadingRef.current.style.display = 'flex';
+        }
+
+        if (errorRef.current) {
+          errorRef.current.style.display = 'none';
+        }
+
+        // Show the container
+        hoverCardRef.current.style.display = 'block';
+
+        // Position immediately to avoid flicker
+        const x = mousePositionRef.current.x + 50;
+        const y = mousePositionRef.current.y - 35;
+        hoverCardRef.current.style.left = `${x}px`;
+        hoverCardRef.current.style.top = `${y}px`;
+
+        // Set the image source to trigger loading
+        previewImageRef.current.src = getCardImageUrl(card.id);
+      } else if (hoverCardRef.current.style.display === 'none') {
+        // If same card but container was hidden, show it again
+        hoverCardRef.current.style.display = 'block';
+      }
+    };
+
+    // Handle hiding card preview
+    const hideCardPreview = () => {
+      if (hoverCardRef.current) {
+        hoverCardRef.current.style.display = 'none';
+      }
     };
 
     // Custom tooltip components
@@ -253,7 +500,7 @@ const CardTable = React.memo(
     }, [allTableHeaders, display]);
 
     // Create a ref to store the previous cards for smooth transitions
-    const prevCardsRef = React.useRef(cards || []);
+    const prevCardsRef = useRef(cards || []);
 
     // Update the ref when not loading and we have cards
     React.useEffect(() => {
@@ -343,19 +590,21 @@ const CardTable = React.memo(
       );
     }
 
-    // Custom table row component that includes click handling
+    // Custom table row component that includes hover handling
     const CustomTableRow = React.useCallback(
       (props: any) => {
         const { index, item, ...restProps } = props;
         return (
           <StyledTableRow
             onClick={() => handleCardClick(item.id)}
+            onMouseEnter={() => !isLoading && showCardPreview(item)}
+            onMouseLeave={hideCardPreview}
             style={{ pointerEvents: tablePointerEvents }}
             {...restProps}
           />
         );
       },
-      [handleCardClick, tablePointerEvents],
+      [handleCardClick, tablePointerEvents, isLoading],
     );
 
     // Define MUI table components
