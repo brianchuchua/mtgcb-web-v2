@@ -75,9 +75,12 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({ settingGroups, pa
 
   const open = Boolean(anchorEl);
 
+  // Determine panel title based on panel ID
+  const panelTitle = panelId.includes('Table') ? 'Table Settings' : 'Card Display Settings';
+
   return (
     <>
-      <Tooltip title="Display Settings">
+      <Tooltip title={panelTitle}>
         <IconButton
           size="small"
           aria-controls={open ? panelId : undefined}
@@ -132,7 +135,7 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({ settingGroups, pa
         <SettingsPanelContent>
           <SettingsHeader>
             <Typography variant="subtitle1" fontWeight={600} color="primary">
-              Card Display Settings
+              {panelTitle}
             </Typography>
           </SettingsHeader>
 

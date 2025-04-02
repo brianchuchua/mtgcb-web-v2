@@ -9,10 +9,29 @@ import {
 import { PriceType } from '@/types/pricing';
 
 export const useCardSettingGroups = (): CardSettingGroup[] => {
-  // Card visibility settings
+  // Card Gallery visibility settings
   const [nameIsVisible, setNameIsVisible] = useLocalStorage('cardNameIsVisible', true);
   const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
   const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
+
+  // Card Table column visibility settings
+  const [tableSetIsVisible, setTableSetIsVisible] = useLocalStorage('tableSetIsVisible', true);
+  const [tableCollectorNumberIsVisible, setTableCollectorNumberIsVisible] = useLocalStorage(
+    'tableCollectorNumberIsVisible',
+    true,
+  );
+  const [tableMtgcbNumberIsVisible, setTableMtgcbNumberIsVisible] = useLocalStorage(
+    'tableMtgcbNumberIsVisible',
+    true,
+  );
+  const [tableRarityIsVisible, setTableRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
+  const [tablePowerIsVisible, setTablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', true);
+  const [tableToughnessIsVisible, setTableToughnessIsVisible] = useLocalStorage(
+    'tableToughnessIsVisible',
+    true,
+  );
+  const [tableLoyaltyIsVisible, setTableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', true);
+  const [tablePriceIsVisible, setTablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
 
   // Layout settings
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cardsPerRow', 4);
@@ -28,34 +47,12 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
     setDisplayPriceType(value as unknown as PriceType);
   };
 
-  return [
-    {
-      label: 'Show Fields',
-      type: 'toggle',
-      settings: [
-        {
-          key: 'name',
-          label: 'Name',
-          isVisible: nameIsVisible,
-          setVisibility: setNameIsVisible,
-          type: 'toggle',
-        },
-        {
-          key: 'set',
-          label: 'Set',
-          isVisible: setIsVisible,
-          setVisibility: setSetIsVisible,
-          type: 'toggle',
-        },
-        {
-          key: 'price',
-          label: 'Price',
-          isVisible: priceIsVisible,
-          setVisibility: setPriceIsVisible,
-          type: 'toggle',
-        },
-      ],
-    },
+  // Get current view mode to determine which settings to show
+  const [viewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
+
+  // Base settings groups that are always available
+  const settingGroups: CardSettingGroup[] = [
+    // Price Settings (always shown)
     {
       label: 'Price Settings',
       type: 'select',
@@ -74,43 +71,153 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
           ],
         },
       ],
-    },
-    {
-      label: 'Layout Settings',
-      type: 'select',
-      settings: [
-        {
-          key: 'cardsPerRow',
-          label: 'Cards per row (desktop only)',
-          value: cardsPerRow,
-          setValue: setCardsPerRow,
-          type: 'select',
-          options: [
-            { value: 1, label: '1' },
-            { value: 2, label: '2' },
-            { value: 3, label: '3' },
-            { value: 4, label: '4' },
-            { value: 5, label: '5' },
-            { value: 6, label: '6' },
-          ],
-        },
-      ],
-    },
-    {
-      label: 'Card Size',
-      type: 'slider',
-      settings: [
-        {
-          key: 'cardSizeMargin',
-          label: 'Shrink cards (desktop only)',
-          value: cardSizeMargin,
-          setValue: setCardSizeMargin,
-          min: 0,
-          max: 40,
-          step: 1,
-          type: 'slider',
-        },
-      ],
-    },
+    }
   ];
+  
+  // Create card gallery settings group (only shown in grid view)
+  const cardGallerySettings: CardSettingGroup = {
+    label: 'Card Fields',
+    type: 'toggle',
+    settings: [
+      {
+        key: 'name',
+        label: 'Name',
+        isVisible: nameIsVisible,
+        setVisibility: setNameIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'set',
+        label: 'Set',
+        isVisible: setIsVisible,
+        setVisibility: setSetIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'price',
+        label: 'Price',
+        isVisible: priceIsVisible,
+        setVisibility: setPriceIsVisible,
+        type: 'toggle',
+      },
+    ],
+  };
+  
+  // Create card layout settings (only shown in grid view)
+  const cardLayoutSettings: CardSettingGroup = {
+    label: 'Layout Settings',
+    type: 'select',
+    settings: [
+      {
+        key: 'cardsPerRow',
+        label: 'Cards per row (desktop only)',
+        value: cardsPerRow,
+        setValue: setCardsPerRow,
+        type: 'select',
+        options: [
+          { value: 1, label: '1' },
+          { value: 2, label: '2' },
+          { value: 3, label: '3' },
+          { value: 4, label: '4' },
+          { value: 5, label: '5' },
+          { value: 6, label: '6' },
+        ],
+      },
+    ],
+  };
+  
+  // Create card size settings (only shown in grid view)
+  const cardSizeSettings: CardSettingGroup = {
+    label: 'Card Size',
+    type: 'slider',
+    settings: [
+      {
+        key: 'cardSizeMargin',
+        label: 'Shrink cards (desktop only)',
+        value: cardSizeMargin,
+        setValue: setCardSizeMargin,
+        min: 0,
+        max: 40,
+        step: 1,
+        type: 'slider',
+      },
+    ],
+  };
+  
+  // Create table column settings (only shown in table view)
+  const tableColumnSettings: CardSettingGroup = {
+    label: 'Table Columns',
+    type: 'toggle',
+    settings: [
+      {
+        key: 'tableSet',
+        label: 'Set',
+        isVisible: tableSetIsVisible,
+        setVisibility: setTableSetIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableCollectorNumber',
+        label: 'Collector #',
+        isVisible: tableCollectorNumberIsVisible,
+        setVisibility: setTableCollectorNumberIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableMtgcbNumber',
+        label: 'MTG CB #',
+        isVisible: tableMtgcbNumberIsVisible,
+        setVisibility: setTableMtgcbNumberIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableRarity',
+        label: 'Rarity',
+        isVisible: tableRarityIsVisible,
+        setVisibility: setTableRarityIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tablePower',
+        label: 'Power',
+        isVisible: tablePowerIsVisible,
+        setVisibility: setTablePowerIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableToughness',
+        label: 'Toughness',
+        isVisible: tableToughnessIsVisible,
+        setVisibility: setTableToughnessIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableLoyalty',
+        label: 'Loyalty',
+        isVisible: tableLoyaltyIsVisible,
+        setVisibility: setTableLoyaltyIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tablePrice',
+        label: 'Price',
+        isVisible: tablePriceIsVisible,
+        setVisibility: setTablePriceIsVisible,
+        type: 'toggle',
+      },
+    ],
+  };
+
+  // Add appropriate setting groups based on view mode
+  if (viewMode === 'grid') {
+    // For grid view, show card gallery settings
+    settingGroups.unshift(cardGallerySettings);
+    settingGroups.push(cardLayoutSettings);
+    settingGroups.push(cardSizeSettings);
+  } else {
+    // For table view, show table column settings
+    settingGroups.unshift(tableColumnSettings);
+  }
+
+  return settingGroups;
 };

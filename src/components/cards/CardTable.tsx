@@ -15,12 +15,13 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { alpha, styled } from '@mui/material/styles';
 import React, { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TableVirtuoso } from 'react-virtuoso';
 import { CardItemProps } from './CardItem';
 import CardPrice from './CardPrice';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePriceType } from '@/hooks/usePriceType';
 import { selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
 import { SortByOption, SortOrderOption } from '@/types/browse';
@@ -41,6 +42,20 @@ export interface CardTableProps {
    * Callback when a card is clicked
    */
   onCardClick?: (cardId: string) => void;
+
+  /**
+   * Display settings for table columns
+   */
+  displaySettings?: {
+    setIsVisible?: boolean;
+    collectorNumberIsVisible?: boolean;
+    mtgcbNumberIsVisible?: boolean;
+    rarityIsVisible?: boolean;
+    powerIsVisible?: boolean;
+    toughnessIsVisible?: boolean;
+    loyaltyIsVisible?: boolean;
+    priceIsVisible?: boolean;
+  };
 }
 
 // Define table headers with their corresponding sort options
@@ -83,11 +98,67 @@ const PriceLink = styled('a')(({ theme }) => ({
  * A virtualized table view for displaying card data with sortable columns
  */
 const CardTable = React.memo(
-  ({ cards, isLoading = false, onCardClick }: CardTableProps) => {
+  ({ cards, isLoading = false, onCardClick, displaySettings }: CardTableProps) => {
     const dispatch = useDispatch();
     const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
     const currentSortOrder = useSelector(selectSortOrder) || 'asc';
     const currentPriceType = usePriceType();
+
+    // Load column visibility preferences from localStorage
+    const [setIsVisible, setSetIsVisible] = useLocalStorage('tableSetIsVisible', true);
+    const [collectorNumberIsVisible, setCollectorNumberIsVisible] = useLocalStorage(
+      'tableCollectorNumberIsVisible',
+      true,
+    );
+    const [mtgcbNumberIsVisible, setMtgcbNumberIsVisible] = useLocalStorage(
+      'tableMtgcbNumberIsVisible',
+      true,
+    );
+    const [rarityIsVisible, setRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
+    const [powerIsVisible, setPowerIsVisible] = useLocalStorage('tablePowerIsVisible', true);
+    const [toughnessIsVisible, setToughnessIsVisible] = useLocalStorage(
+      'tableToughnessIsVisible',
+      true,
+    );
+    const [loyaltyIsVisible, setLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', true);
+    const [tablePriceIsVisible, setTablePriceIsVisible] = useLocalStorage(
+      'tablePriceIsVisible',
+      true,
+    );
+
+    // Use either provided display settings or localStorage values
+    const display = {
+      setIsVisible:
+        displaySettings?.setIsVisible !== undefined ? displaySettings.setIsVisible : setIsVisible,
+      collectorNumberIsVisible:
+        displaySettings?.collectorNumberIsVisible !== undefined
+          ? displaySettings.collectorNumberIsVisible
+          : collectorNumberIsVisible,
+      mtgcbNumberIsVisible:
+        displaySettings?.mtgcbNumberIsVisible !== undefined
+          ? displaySettings.mtgcbNumberIsVisible
+          : mtgcbNumberIsVisible,
+      rarityIsVisible:
+        displaySettings?.rarityIsVisible !== undefined
+          ? displaySettings.rarityIsVisible
+          : rarityIsVisible,
+      powerIsVisible:
+        displaySettings?.powerIsVisible !== undefined
+          ? displaySettings.powerIsVisible
+          : powerIsVisible,
+      toughnessIsVisible:
+        displaySettings?.toughnessIsVisible !== undefined
+          ? displaySettings.toughnessIsVisible
+          : toughnessIsVisible,
+      loyaltyIsVisible:
+        displaySettings?.loyaltyIsVisible !== undefined
+          ? displaySettings.loyaltyIsVisible
+          : loyaltyIsVisible,
+      priceIsVisible:
+        displaySettings?.priceIsVisible !== undefined
+          ? displaySettings.priceIsVisible
+          : tablePriceIsVisible,
+    };
 
     // Custom tooltip components
     const ReleaseDateTooltip = () => (
@@ -119,7 +190,7 @@ const CardTable = React.memo(
     );
 
     // Table headers with corresponding sort options
-    const tableHeaders: TableHeader[] = useMemo(
+    const allTableHeaders: TableHeader[] = useMemo(
       () => [
         { label: 'Name', id: 'name', width: '25%' },
         {
@@ -157,6 +228,29 @@ const CardTable = React.memo(
       ],
       [currentPriceType],
     );
+
+    // Filter the table headers based on visibility settings
+    const tableHeaders = useMemo(() => {
+      return allTableHeaders.filter((header) => {
+        if (header.id === 'name') return true; // Always show name column
+        if (header.id === 'releasedAt') return display.setIsVisible;
+        if (header.id === 'collectorNumber') return display.collectorNumberIsVisible;
+        if (header.id === 'mtgcbCollectorNumber') return display.mtgcbNumberIsVisible;
+        if (header.id === 'rarityNumeric') return display.rarityIsVisible;
+        if (header.id === 'powerNumeric') return display.powerIsVisible;
+        if (header.id === 'toughnessNumeric') return display.toughnessIsVisible;
+        if (header.id === 'loyaltyNumeric') return display.loyaltyIsVisible;
+        if (
+          header.id === 'market' ||
+          header.id === 'low' ||
+          header.id === 'average' ||
+          header.id === 'high' ||
+          header.id === 'foil'
+        )
+          return display.priceIsVisible;
+        return true;
+      });
+    }, [allTableHeaders, display]);
 
     // Create a ref to store the previous cards for smooth transitions
     const prevCardsRef = React.useRef(cards || []);
@@ -350,24 +444,84 @@ const CardTable = React.memo(
       [tableHeaders, currentSortBy, currentSortOrder, handleSortClick],
     );
 
+    // Map header IDs to their indices in the table header array
+    const headerIndicesMap = useMemo(() => {
+      const map = new Map<string, number>();
+      tableHeaders.forEach((header, index) => {
+        if (header.id) {
+          map.set(header.id, index);
+        }
+      });
+      return map;
+    }, [tableHeaders]);
+
     // Row content renderer for the TableVirtuoso
     const rowContent = React.useCallback(
       (index: number, card: CardItemProps) => {
-        return (
-          <React.Fragment>
-            <TableCell component="th" scope="row">
-              <ClickableText>{card.name}</ClickableText>
-            </TableCell>
-            <TableCell>{card.setName || (isLoading ? '' : 'Unknown')}</TableCell>
-            <TableCell>{card.collectorNumber || (isLoading ? '' : 'N/A')}</TableCell>
-            <TableCell>{card.mtgcbCollectorNumber || (isLoading ? '' : 'N/A')}</TableCell>
-            <TableCell>{card.rarity || (isLoading ? '' : 'N/A')}</TableCell>
-            <TableCell sx={{ textAlign: 'center' }}>{formatNumeric(card.powerNumeric)}</TableCell>
-            <TableCell sx={{ textAlign: 'center' }}>
+        // Create an array to hold the cells for this row
+        const cells = [];
+
+        // Always add the name cell (first column)
+        cells.push(
+          <TableCell key="name" component="th" scope="row">
+            <ClickableText>{card.name}</ClickableText>
+          </TableCell>,
+        );
+
+        // Check if each column should be displayed and add corresponding cell
+        if (display.setIsVisible && headerIndicesMap.has('releasedAt')) {
+          cells.push(
+            <TableCell key="set">{card.setName || (isLoading ? '' : 'Unknown')}</TableCell>,
+          );
+        }
+
+        if (display.collectorNumberIsVisible && headerIndicesMap.has('collectorNumber')) {
+          cells.push(
+            <TableCell key="collectorNumber">
+              {card.collectorNumber || (isLoading ? '' : 'N/A')}
+            </TableCell>,
+          );
+        }
+
+        if (display.mtgcbNumberIsVisible && headerIndicesMap.has('mtgcbCollectorNumber')) {
+          cells.push(
+            <TableCell key="mtgcbNumber">
+              {card.mtgcbCollectorNumber || (isLoading ? '' : 'N/A')}
+            </TableCell>,
+          );
+        }
+
+        if (display.rarityIsVisible && headerIndicesMap.has('rarityNumeric')) {
+          cells.push(<TableCell key="rarity">{card.rarity || (isLoading ? '' : 'N/A')}</TableCell>);
+        }
+
+        if (display.powerIsVisible && headerIndicesMap.has('powerNumeric')) {
+          cells.push(
+            <TableCell key="power" sx={{ textAlign: 'center' }}>
+              {formatNumeric(card.powerNumeric)}
+            </TableCell>,
+          );
+        }
+
+        if (display.toughnessIsVisible && headerIndicesMap.has('toughnessNumeric')) {
+          cells.push(
+            <TableCell key="toughness" sx={{ textAlign: 'center' }}>
               {formatNumeric(card.toughnessNumeric)}
-            </TableCell>
-            <TableCell sx={{ textAlign: 'center' }}>{formatNumeric(card.loyaltyNumeric)}</TableCell>
-            <TableCell>
+            </TableCell>,
+          );
+        }
+
+        if (display.loyaltyIsVisible && headerIndicesMap.has('loyaltyNumeric')) {
+          cells.push(
+            <TableCell key="loyalty" sx={{ textAlign: 'center' }}>
+              {formatNumeric(card.loyaltyNumeric)}
+            </TableCell>,
+          );
+        }
+
+        if (display.priceIsVisible && headerIndicesMap.has(currentPriceType as string)) {
+          cells.push(
+            <TableCell key="price">
               <PriceLink
                 href={generateTCGPlayerLink(
                   'tcgplayerId' in card ? card.tcgplayerId : undefined,
@@ -384,11 +538,13 @@ const CardTable = React.memo(
                   centered={false}
                 />
               </PriceLink>
-            </TableCell>
-          </React.Fragment>
-        );
+            </TableCell>,
+          );
+        }
+
+        return <>{cells}</>;
       },
-      [isLoading, preparePriceData, currentPriceType, formatNumeric],
+      [display, headerIndicesMap, isLoading, preparePriceData, currentPriceType, formatNumeric],
     );
 
     return (
@@ -428,13 +584,20 @@ const CardTable = React.memo(
       </Box>
     );
   },
-  (prevProps, nextProps) => {
+  (prevProps: CardTableProps, nextProps: CardTableProps): boolean => {
     // Custom comparison for memo
     // Only re-render if these specific props change
-    return (
-      prevProps.isLoading === nextProps.isLoading &&
-      prevProps.onCardClick === nextProps.onCardClick &&
-      prevProps.cards === nextProps.cards
+    const displaySettingsEqual =
+      (!prevProps.displaySettings && !nextProps.displaySettings) ||
+      (prevProps.displaySettings &&
+        nextProps.displaySettings &&
+        JSON.stringify(prevProps.displaySettings) === JSON.stringify(nextProps.displaySettings));
+
+    return Boolean(
+      (prevProps.isLoading ?? false) === (nextProps.isLoading ?? false) &&
+        prevProps.onCardClick === nextProps.onCardClick &&
+        prevProps.cards === nextProps.cards &&
+        displaySettingsEqual,
     );
   },
 );

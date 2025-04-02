@@ -24,10 +24,11 @@ import {
   useTheme,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import CardSettingsPanel from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 // TODO: Assess memoization needs here given I'm using React Compiler
 export interface CardGalleryPaginationProps {
@@ -124,11 +125,21 @@ const PageSizeControl = React.memo(
     pageSize,
     onPageSizeChange,
     pageSizeOptions,
+    viewMode,
   }: {
     pageSize: number;
     onPageSizeChange: (size: number) => void;
     pageSizeOptions: number[];
+    viewMode: 'grid' | 'table';
   }) => {
+    // Store current view mode in localStorage to make it available to useCardSettingGroups
+    const [, setPreferredViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
+    
+    // Update preferred view mode when it changes
+    useEffect(() => {
+      setPreferredViewMode(viewMode);
+    }, [viewMode, setPreferredViewMode]);
+    
     const cardSettingGroups = useCardSettingGroups();
 
     // Memoize handler
@@ -177,7 +188,10 @@ const PageSizeControl = React.memo(
 
         {/* Card display settings with margin left */}
         <Box sx={{ ml: 1 }}>
-          <CardSettingsPanel settingGroups={cardSettingGroups} panelId="cardGallerySettings" />
+          <CardSettingsPanel 
+            settingGroups={cardSettingGroups} 
+            panelId={viewMode === 'grid' ? 'cardGallerySettings' : 'cardTableSettings'} 
+          />
         </Box>
       </PageSizeSelector>
     );
@@ -435,6 +449,7 @@ export const CardGalleryPagination = React.memo(
                       pageSize={pageSize}
                       onPageSizeChange={onPageSizeChange}
                       pageSizeOptions={pageSizeOptions}
+                      viewMode={viewMode}
                     />
 
                     {/* View mode toggles aligned with dropdown */}
@@ -475,6 +490,7 @@ export const CardGalleryPagination = React.memo(
                 pageSize={pageSize}
                 onPageSizeChange={onPageSizeChange}
                 pageSizeOptions={pageSizeOptions}
+                viewMode={viewMode}
               />
             </RightSection>
           </TopPaginationLayout>

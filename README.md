@@ -10,6 +10,8 @@
 ### Next
 
 - Implement a better table view that also allows configuration and server-side sorting.
+- Compare with other good tools and see which fields I should show or add on the table.
+- Make mousing over the whole table row pop up an image preview.
 - Table columns probably need good fixed widths so toggling on and off is smooth.
 - Support mana value sorting and then pretty display on the table
 - Table view should show card image on hover.

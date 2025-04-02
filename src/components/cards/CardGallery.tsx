@@ -131,15 +131,22 @@ const CardGallery = React.memo(
       </CardGalleryWrapper>
     );
   },
-  (prevProps, nextProps) => {
+  (prevProps, nextProps): boolean => {
     // Custom comparison function for memo
     // Only re-render if these props have changed
-    return (
+    const displaySettingsEqual =
+      (!prevProps.displaySettings && !nextProps.displaySettings) ||
+      (prevProps.displaySettings &&
+        nextProps.displaySettings &&
+        JSON.stringify(prevProps.displaySettings) === JSON.stringify(nextProps.displaySettings));
+
+    return !!(
       prevProps.isLoading === nextProps.isLoading &&
       prevProps.cardsPerRow === nextProps.cardsPerRow &&
       prevProps.galleryWidth === nextProps.galleryWidth &&
       prevProps.onCardClick === nextProps.onCardClick &&
-      prevProps.cards === nextProps.cards
+      prevProps.cards === nextProps.cards &&
+      displaySettingsEqual
     );
   },
 );

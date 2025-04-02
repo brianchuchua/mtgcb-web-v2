@@ -49,7 +49,29 @@ const CardDisplay = ({
         }))
     : cardItems;
 
+  // Gallery settings
   const [cardsPerRow] = useLocalStorage<number>('cardsPerRow', 4);
+  const [nameIsVisible] = useLocalStorage('cardNameIsVisible', true);
+  const [setIsVisible] = useLocalStorage('cardSetIsVisible', true);
+  const [priceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
+
+  // Table settings
+  const [tableSetIsVisible] = useLocalStorage('tableSetIsVisible', true);
+  const [tableCollectorNumberIsVisible] = useLocalStorage('tableCollectorNumberIsVisible', true);
+  const [tableMtgcbNumberIsVisible] = useLocalStorage('tableMtgcbNumberIsVisible', true);
+  const [tableRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
+  const [tablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', true);
+  const [tableToughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', true);
+  const [tableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', true);
+  const [tablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
+
+  // Store the current view mode in localStorage
+  const [, setPreferredViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
+  
+  // Update preferred view mode whenever it changes
+  useEffect(() => {
+    setPreferredViewMode(viewMode);
+  }, [viewMode, setPreferredViewMode]);
 
   return viewMode === 'grid' ? (
     <CardGallery
@@ -59,9 +81,29 @@ const CardDisplay = ({
       cardsPerRow={cardsPerRow}
       galleryWidth={95}
       onCardClick={onCardClick}
+      displaySettings={{
+        nameIsVisible,
+        setIsVisible,
+        priceIsVisible,
+      }}
     />
   ) : (
-    <CardTable key="table" cards={displayCards} isLoading={isLoading} onCardClick={onCardClick} />
+    <CardTable 
+      key="table" 
+      cards={displayCards} 
+      isLoading={isLoading} 
+      onCardClick={onCardClick}
+      displaySettings={{
+        setIsVisible: tableSetIsVisible,
+        collectorNumberIsVisible: tableCollectorNumberIsVisible,
+        mtgcbNumberIsVisible: tableMtgcbNumberIsVisible,
+        rarityIsVisible: tableRarityIsVisible,
+        powerIsVisible: tablePowerIsVisible,
+        toughnessIsVisible: tableToughnessIsVisible,
+        loyaltyIsVisible: tableLoyaltyIsVisible,
+        priceIsVisible: tablePriceIsVisible,
+      }} 
+    />
   );
 };
 
