@@ -134,12 +134,12 @@ const PageSizeControl = React.memo(
   }) => {
     // Store current view mode in localStorage to make it available to useCardSettingGroups
     const [, setPreferredViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
-    
+
     // Update preferred view mode when it changes
     useEffect(() => {
       setPreferredViewMode(viewMode);
     }, [viewMode, setPreferredViewMode]);
-    
+
     const cardSettingGroups = useCardSettingGroups();
 
     // Memoize handler
@@ -188,9 +188,9 @@ const PageSizeControl = React.memo(
 
         {/* Card display settings with margin left */}
         <Box sx={{ ml: 1 }}>
-          <CardSettingsPanel 
-            settingGroups={cardSettingGroups} 
-            panelId={viewMode === 'grid' ? 'cardGallerySettings' : 'cardTableSettings'} 
+          <CardSettingsPanel
+            settingGroups={cardSettingGroups}
+            panelId={viewMode === 'grid' ? 'cardGallerySettings' : 'cardTableSettings'}
           />
         </Box>
       </PageSizeSelector>
@@ -546,7 +546,7 @@ CardGalleryPagination.displayName = 'CardGalleryPagination';
 const PaginationContainer = styled(Box)(({ theme }) => ({
   margin: `${theme.spacing(2)} auto`,
   width: '95%',
-  padding: theme.spacing(0, 2),
+  padding: theme.spacing(0, 1),
 
   // Match CardGallery's responsive widths
   [theme.breakpoints.down('md')]: {

@@ -9,14 +9,9 @@
 
 ### Next
 
-- Implement a better table view that also allows configuration and server-side sorting.
-- Compare with other good tools and see which fields I should show or add on the table.
-- Table columns probably need good fixed widths so toggling on and off is smooth.
 - Support mana value sorting and then pretty display on the table
 - Table view should link to set page from the set name
-- Perfect table view styling, widths of columns and column configuration (make settings contextual to table or grid too)
 - Should move grid/table view away from the url and instead use localstorage
-- Look at padding of "showing X cards" and number-of-pages dropdown on table view and other views.
 - Special should really come after mythic, not before common, change in API and update tooltip in table view
 - Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
 - Clean up BrowseSearchForm into smaller components

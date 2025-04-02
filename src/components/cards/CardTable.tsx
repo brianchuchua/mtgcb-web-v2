@@ -15,7 +15,8 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { alpha, styled } from '@mui/material/styles';
+import { alpha, styled, useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { TableVirtuoso } from 'react-virtuoso';
@@ -61,11 +62,21 @@ export interface CardTableProps {
   };
 }
 
+// Define responsive width for different breakpoints
+interface ResponsiveWidth {
+  xs?: string;
+  sm?: string;
+  md?: string;
+  lg?: string;
+  xl?: string;
+  default: string;
+}
+
 // Define table headers with their corresponding sort options
 interface TableHeader {
   label: string;
   id: SortByOption | null;
-  width?: string;
+  width?: string | ResponsiveWidth;
   align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
   tooltip?: React.ReactNode;
   hasInfoIcon?: boolean;
@@ -140,6 +151,42 @@ const CardTable = React.memo(
     const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
     const currentSortOrder = useSelector(selectSortOrder) || 'asc';
     const currentPriceType = usePriceType();
+
+    // Get the theme for responsive calculations
+    const theme = useTheme();
+    
+    // Define media queries using Material UI's useMediaQuery
+    const isXs = useMediaQuery(theme.breakpoints.down('sm'));
+    const isSm = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+    const isMd = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+    const isLg = useMediaQuery(theme.breakpoints.between('lg', 'xl'));
+    const isXl = useMediaQuery(theme.breakpoints.up('xl'));
+    
+    // Server-side rendering safe responsive width function
+    const getResponsiveWidth = useCallback(
+      (width: string | ResponsiveWidth): string => {
+        if (typeof width === 'string') {
+          return width;
+        }
+        
+        // Safely determine which breakpoint we're at
+        if (isXs && width.xs) {
+          return width.xs;
+        } else if (isSm && width.sm) {
+          return width.sm;
+        } else if (isMd && width.md) {
+          return width.md;
+        } else if (isLg && width.lg) {
+          return width.lg;
+        } else if (isXl && width.xl) {
+          return width.xl;
+        }
+        
+        // Default width if no breakpoint matches
+        return width.default;
+      },
+      [isXs, isSm, isMd, isLg, isXl]
+    );
 
     // Refs for mouse tracking
     const mousePositionRef = useRef({ x: 0, y: 0 });
@@ -451,38 +498,103 @@ const CardTable = React.memo(
     // Table headers with corresponding sort options
     const allTableHeaders: TableHeader[] = useMemo(
       () => [
-        { label: 'Name', id: 'name', width: '300px' },
+        {
+          label: '#',
+          id: 'collectorNumber',
+          width: {
+            default: '60px',
+          },
+        },
+        {
+          label: 'M#',
+          id: 'mtgcbCollectorNumber',
+          width: {
+            default: '60px',
+          },
+          tooltip: <MtgcbNumberTooltip />,
+          hasInfoIcon: true,
+        },
+        {
+          label: 'Name',
+          id: 'name',
+          width: {
+            xs: '150px',
+            sm: '200px',
+            md: '250px',
+            default: '300px',
+          },
+        },
         {
           label: 'Set',
           id: 'releasedAt',
-          width: '250px',
+          width: {
+            xs: '120px',
+            sm: '150px',
+            md: '200px',
+            default: '250px',
+          },
           tooltip: <ReleaseDateTooltip />,
-          hasInfoIcon: true,
-        },
-        { label: '#', id: 'collectorNumber', width: '80px' },
-        {
-          label: 'MTG CB #',
-          id: 'mtgcbCollectorNumber',
-          width: '80px',
-          tooltip: <MtgcbNumberTooltip />,
           hasInfoIcon: true,
         },
         {
           label: 'Rarity',
           id: 'rarityNumeric',
-          width: '100px',
+          width: {
+            default: '100px',
+          },
           tooltip: <RarityTooltip />,
           hasInfoIcon: true,
         },
-        { label: 'Type', id: 'type', width: '200px' },
-        { label: 'Artist', id: 'artist', width: '150px' },
-        { label: 'Power', id: 'powerNumeric', width: '100px', align: 'center' },
-        { label: 'Toughness', id: 'toughnessNumeric', width: '100px', align: 'center' },
-        { label: 'Loyalty', id: 'loyaltyNumeric', width: '100px', align: 'center' },
+        {
+          label: 'Type',
+          id: 'type',
+          width: {
+            xs: '120px',
+            sm: '150px',
+            default: '250px',
+          },
+        },
+        {
+          label: 'Artist',
+          id: 'artist',
+          width: {
+            xs: '100px',
+            sm: '120px',
+            default: '150px',
+          },
+        },
+        {
+          label: 'Power',
+          id: 'powerNumeric',
+          width: {
+            default: '100px',
+          },
+          align: 'center',
+        },
+        {
+          label: 'Toughness',
+          id: 'toughnessNumeric',
+          width: {
+            default: '100px',
+          },
+          align: 'center',
+        },
+        {
+          label: 'Loyalty',
+          id: 'loyaltyNumeric',
+          width: {
+            default: '100px',
+          },
+          align: 'center',
+        },
         {
           label: 'Price',
           id: currentPriceType as SortByOption,
-          width: '200px',
+          width: {
+            xs: '100px',
+            sm: '150px',
+            default: '200px',
+          },
           tooltip: <PriceTooltip />,
           hasInfoIcon: true,
         },
@@ -493,10 +605,10 @@ const CardTable = React.memo(
     // Filter the table headers based on visibility settings
     const tableHeaders = useMemo(() => {
       return allTableHeaders.filter((header) => {
-        if (header.id === 'name') return true; // Always show name column
-        if (header.id === 'releasedAt') return display.setIsVisible;
         if (header.id === 'collectorNumber') return display.collectorNumberIsVisible;
         if (header.id === 'mtgcbCollectorNumber') return display.mtgcbNumberIsVisible;
+        if (header.id === 'name') return true; // Always show name column
+        if (header.id === 'releasedAt') return display.setIsVisible;
         if (header.id === 'rarityNumeric') return display.rarityIsVisible;
         if (header.id === 'type') return display.typeIsVisible;
         if (header.id === 'artist') return display.artistIsVisible;
@@ -515,12 +627,15 @@ const CardTable = React.memo(
       });
     }, [allTableHeaders, display]);
 
-    // Calculate total width based on visible columns
+    // Calculate total width based on visible columns and current theme
     const totalTableWidth = useMemo(() => {
       const width = tableHeaders.reduce((total, header) => {
-        // Parse pixel values from width strings like "350px"
         if (header.width) {
-          const widthNum = parseInt(header.width, 10);
+          // Get the responsive width for the current breakpoint
+          const responsiveWidth = getResponsiveWidth(header.width);
+
+          // Parse pixel values from width strings like "350px"
+          const widthNum = parseInt(responsiveWidth, 10);
           if (!isNaN(widthNum)) {
             return total + widthNum;
           }
@@ -531,7 +646,7 @@ const CardTable = React.memo(
 
       // Add some buffer for borders, padding, etc.
       return Math.max(width, 800); // Ensure minimum width
-    }, [tableHeaders]);
+    }, [tableHeaders, getResponsiveWidth]);
 
     // Create a ref to store the previous cards for smooth transitions
     const prevCardsRef = useRef(cards || []);
@@ -676,69 +791,75 @@ const CardTable = React.memo(
     };
 
     // Fixed header content for the TableVirtuoso
-    const fixedHeaderContent = React.useCallback(
-      () => (
+    const fixedHeaderContent = React.useCallback(() => {
+      return (
         <TableRow>
-          {tableHeaders.map((header) => (
-            <TableCell
-              key={header.label}
-              width={header.width}
-              align={header.align || 'left'}
-              sx={{
-                minWidth: header.width,
-                width: header.width,
-                '& .MuiTableSortLabel-root': {
-                  width: '100%',
-                  justifyContent: header.align === 'center' ? 'center' : 'flex-start',
-                  // This makes the icon not take space when hidden
-                  '& .MuiTableSortLabel-icon': {
-                    opacity: 0,
-                    position: header.align === 'center' ? 'absolute' : 'static',
-                    right: 0,
-                  },
-                  '&.Mui-active .MuiTableSortLabel-icon': {
-                    opacity: 1,
-                    position: 'static',
-                  },
-                },
-              }}
-            >
-              {header.id ? (
-                <TableSortLabel
-                  active={currentSortBy === header.id}
-                  direction={currentSortBy === header.id ? currentSortOrder : 'asc'}
-                  onClick={() => handleSortClick(header.id)}
-                  hideSortIcon={header.align === 'center' && currentSortBy !== header.id}
-                  sx={{
-                    display: 'flex',
+          {tableHeaders.map((header) => {
+            // Get responsive width for this breakpoint
+            const responsiveWidth = header.width
+              ? getResponsiveWidth(header.width)
+              : undefined;
+
+            return (
+              <TableCell
+                key={header.label}
+                width={responsiveWidth}
+                align={header.align || 'left'}
+                sx={{
+                  minWidth: responsiveWidth,
+                  width: responsiveWidth,
+                  '& .MuiTableSortLabel-root': {
                     width: '100%',
                     justifyContent: header.align === 'center' ? 'center' : 'flex-start',
-                  }}
-                >
-                  {header.label}
-                  {header.tooltip && header.hasInfoIcon && (
-                    <Tooltip title={header.tooltip} placement="top">
-                      <InfoOutlinedIcon
-                        color="disabled"
-                        sx={{
-                          cursor: 'help',
-                          fontSize: '0.875rem',
-                          ml: 0.5,
-                          verticalAlign: 'middle',
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                </TableSortLabel>
-              ) : (
-                header.label
-              )}
-            </TableCell>
-          ))}
+                    // This makes the icon not take space when hidden
+                    '& .MuiTableSortLabel-icon': {
+                      opacity: 0,
+                      position: header.align === 'center' ? 'absolute' : 'static',
+                      right: 0,
+                    },
+                    '&.Mui-active .MuiTableSortLabel-icon': {
+                      opacity: 1,
+                      position: 'static',
+                    },
+                  },
+                }}
+              >
+                {header.id ? (
+                  <TableSortLabel
+                    active={currentSortBy === header.id}
+                    direction={currentSortBy === header.id ? currentSortOrder : 'asc'}
+                    onClick={() => handleSortClick(header.id)}
+                    hideSortIcon={header.align === 'center' && currentSortBy !== header.id}
+                    sx={{
+                      display: 'flex',
+                      width: '100%',
+                      justifyContent: header.align === 'center' ? 'center' : 'flex-start',
+                    }}
+                  >
+                    {header.label}
+                    {header.tooltip && header.hasInfoIcon && (
+                      <Tooltip title={header.tooltip} placement="top">
+                        <InfoOutlinedIcon
+                          color="disabled"
+                          sx={{
+                            cursor: 'help',
+                            fontSize: '0.875rem',
+                            ml: 0.5,
+                            verticalAlign: 'middle',
+                          }}
+                        />
+                      </Tooltip>
+                    )}
+                  </TableSortLabel>
+                ) : (
+                  header.label
+                )}
+              </TableCell>
+            );
+          })}
         </TableRow>
-      ),
-      [tableHeaders, currentSortBy, currentSortOrder, handleSortClick],
-    );
+      );
+    }, [tableHeaders, currentSortBy, currentSortOrder, handleSortClick, getResponsiveWidth]);
 
     // Map header IDs to their indices in the table header array
     const headerIndicesMap = useMemo(() => {
@@ -756,6 +877,22 @@ const CardTable = React.memo(
       (index: number, card: CardItemProps) => {
         // Create an array to hold the cells for this row
         const cells = [];
+
+        if (display.collectorNumberIsVisible && headerIndicesMap.has('collectorNumber')) {
+          cells.push(
+            <TableCell key="collectorNumber">
+              {card.collectorNumber || (isLoading ? '' : 'N/A')}
+            </TableCell>,
+          );
+        }
+
+        if (display.mtgcbNumberIsVisible && headerIndicesMap.has('mtgcbCollectorNumber')) {
+          cells.push(
+            <TableCell key="mtgcbNumber">
+              {card.mtgcbCollectorNumber || (isLoading ? '' : 'N/A')}
+            </TableCell>,
+          );
+        }
 
         // Add the name cell with hover functionality
         cells.push(
@@ -777,24 +914,12 @@ const CardTable = React.memo(
           );
         }
 
-        if (display.collectorNumberIsVisible && headerIndicesMap.has('collectorNumber')) {
-          cells.push(
-            <TableCell key="collectorNumber">
-              {card.collectorNumber || (isLoading ? '' : 'N/A')}
-            </TableCell>,
-          );
-        }
-
-        if (display.mtgcbNumberIsVisible && headerIndicesMap.has('mtgcbCollectorNumber')) {
-          cells.push(
-            <TableCell key="mtgcbNumber">
-              {card.mtgcbCollectorNumber || (isLoading ? '' : 'N/A')}
-            </TableCell>,
-          );
-        }
-
         if (display.rarityIsVisible && headerIndicesMap.has('rarityNumeric')) {
-          cells.push(<TableCell key="rarity">{card.rarity || (isLoading ? '' : 'N/A')}</TableCell>);
+          cells.push(
+            <TableCell key="rarity">
+              {formatRarity(card.rarity) || (isLoading ? '' : 'N/A')}
+            </TableCell>,
+          );
         }
 
         if (display.typeIsVisible && headerIndicesMap.has('type')) {
@@ -926,5 +1051,9 @@ const CardTable = React.memo(
 
 // For better debugging in React DevTools
 CardTable.displayName = 'CardTable';
+
+function formatRarity(rarity: string): string {
+  return rarity.charAt(0).toUpperCase() + rarity.slice(1).toLowerCase();
+}
 
 export default CardTable;
