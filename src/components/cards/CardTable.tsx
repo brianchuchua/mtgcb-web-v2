@@ -451,19 +451,19 @@ const CardTable = React.memo(
     // Table headers with corresponding sort options
     const allTableHeaders: TableHeader[] = useMemo(
       () => [
-        { label: 'Name', id: 'name', width: '350px' },
+        { label: 'Name', id: 'name', width: '300px' },
         {
           label: 'Set',
           id: 'releasedAt',
-          width: '350px',
+          width: '250px',
           tooltip: <ReleaseDateTooltip />,
           hasInfoIcon: true,
         },
-        { label: 'Collector #', id: 'collectorNumber', width: '100px' },
+        { label: '#', id: 'collectorNumber', width: '80px' },
         {
           label: 'MTG CB #',
           id: 'mtgcbCollectorNumber',
-          width: '100px',
+          width: '80px',
           tooltip: <MtgcbNumberTooltip />,
           hasInfoIcon: true,
         },
@@ -474,15 +474,15 @@ const CardTable = React.memo(
           tooltip: <RarityTooltip />,
           hasInfoIcon: true,
         },
-        { label: 'Type', id: 'type', width: '100px' },
-        { label: 'Artist', id: 'artist', width: '100px' },
+        { label: 'Type', id: 'type', width: '200px' },
+        { label: 'Artist', id: 'artist', width: '150px' },
         { label: 'Power', id: 'powerNumeric', width: '100px', align: 'center' },
         { label: 'Toughness', id: 'toughnessNumeric', width: '100px', align: 'center' },
         { label: 'Loyalty', id: 'loyaltyNumeric', width: '100px', align: 'center' },
         {
           label: 'Price',
           id: currentPriceType as SortByOption,
-          // width: '15%',
+          width: '200px',
           tooltip: <PriceTooltip />,
           hasInfoIcon: true,
         },
@@ -514,6 +514,24 @@ const CardTable = React.memo(
         return true;
       });
     }, [allTableHeaders, display]);
+
+    // Calculate total width based on visible columns
+    const totalTableWidth = useMemo(() => {
+      const width = tableHeaders.reduce((total, header) => {
+        // Parse pixel values from width strings like "350px"
+        if (header.width) {
+          const widthNum = parseInt(header.width, 10);
+          if (!isNaN(widthNum)) {
+            return total + widthNum;
+          }
+        }
+        // Default column width if not specified
+        return total + 100;
+      }, 0);
+
+      // Add some buffer for borders, padding, etc.
+      return Math.max(width, 800); // Ensure minimum width
+    }, [tableHeaders]);
 
     // Create a ref to store the previous cards for smooth transitions
     const prevCardsRef = useRef(cards || []);
@@ -624,7 +642,17 @@ const CardTable = React.memo(
     // Define MUI table components
     const VirtuosoTableComponents = {
       Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-        <TableContainer component={Paper} {...props} ref={ref} />
+        <TableContainer
+          component={Paper}
+          {...props}
+          ref={ref}
+          sx={{
+            width: `${totalTableWidth}px`,
+            maxWidth: '100%',
+            overflowX: 'auto',
+            ...props.sx,
+          }}
+        />
       )),
       Table: (props: React.ComponentProps<typeof Table>) => (
         <Table
@@ -633,6 +661,8 @@ const CardTable = React.memo(
           aria-label="card table"
           sx={{
             borderCollapse: 'separate', // Fix for virtuoso rendering
+            width: `${totalTableWidth}px`,
+            tableLayout: 'fixed',
             ...props.sx,
           }}
         />
@@ -655,6 +685,7 @@ const CardTable = React.memo(
               align={header.align || 'left'}
               sx={{
                 minWidth: header.width,
+                width: header.width,
                 '& .MuiTableSortLabel-root': {
                   width: '100%',
                   justifyContent: header.align === 'center' ? 'center' : 'flex-start',
@@ -854,9 +885,12 @@ const CardTable = React.memo(
           style={{
             height: 'calc(100vh - 250px)', // Adjust height as needed
             minHeight: '400px',
+            width: `${totalTableWidth}px`,
+            maxWidth: '100%',
             transition: 'opacity 0.2s ease',
             opacity: tableOpacity,
             filter: isLoading ? 'blur(2px)' : 'none',
+            margin: '0 auto',
           }}
           data={tableCards}
           components={VirtuosoTableComponents}

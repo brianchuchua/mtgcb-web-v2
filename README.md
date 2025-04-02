@@ -9,6 +9,7 @@
 
 ### Next
 
+- Make virtuoso table use vertical scrollbar of main page
 - Implement a better table view that also allows configuration and server-side sorting.
 - Compare with other good tools and see which fields I should show or add on the table.
 - Table columns probably need good fixed widths so toggling on and off is smooth.
@@ -26,6 +27,7 @@
 
 ## Later
 
+- 1024x768 testing of table view and gridview and menus with sidenav open (or determine target resolution)
 - Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
 - Clean up MTG CB collector number
 - Make a cool stats page
