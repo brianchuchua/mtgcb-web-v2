@@ -13,7 +13,6 @@
 - Compare with other good tools and see which fields I should show or add on the table.
 - Table columns probably need good fixed widths so toggling on and off is smooth.
 - Support mana value sorting and then pretty display on the table
-- Table view should show card image on hover.
 - Table view should link to set page from the set name
 - Perfect table view styling, widths of columns and column configuration (make settings contextual to table or grid too)
 - Should move grid/table view away from the url and instead use localstorage
@@ -26,6 +25,7 @@
 
 ## Later
 
+- S3 image storage is costing a lot of money, look into alternatives like Cloudflare R2, Vercel Blob Storage, Cloudflare Images, Digital Ocean Spaces, etc.
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
 - Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
 - Handle sideways cards and flip cards

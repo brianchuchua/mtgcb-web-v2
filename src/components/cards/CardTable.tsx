@@ -597,14 +597,12 @@ const CardTable = React.memo(
         return (
           <StyledTableRow
             onClick={() => handleCardClick(item.id)}
-            onMouseEnter={() => !isLoading && showCardPreview(item)}
-            onMouseLeave={hideCardPreview}
             style={{ pointerEvents: tablePointerEvents }}
             {...restProps}
           />
         );
       },
-      [handleCardClick, tablePointerEvents, isLoading],
+      [handleCardClick, tablePointerEvents],
     );
 
     // Define MUI table components
@@ -710,9 +708,15 @@ const CardTable = React.memo(
         // Create an array to hold the cells for this row
         const cells = [];
 
-        // Always add the name cell (first column)
+        // Add the name cell with hover functionality
         cells.push(
-          <TableCell key="name" component="th" scope="row">
+          <TableCell 
+            key="name" 
+            component="th" 
+            scope="row"
+            onMouseEnter={() => !isLoading && showCardPreview(card)}
+            onMouseLeave={hideCardPreview}
+          >
             <ClickableText>{card.name}</ClickableText>
           </TableCell>,
         );
@@ -793,7 +797,7 @@ const CardTable = React.memo(
 
         return <>{cells}</>;
       },
-      [display, headerIndicesMap, isLoading, preparePriceData, currentPriceType, formatNumeric],
+      [display, headerIndicesMap, isLoading, preparePriceData, currentPriceType, formatNumeric, showCardPreview, hideCardPreview],
     );
 
     return (
