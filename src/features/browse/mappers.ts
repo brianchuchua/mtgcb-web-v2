@@ -13,6 +13,8 @@ export const mapApiCardToCardItem = (card: CardModel): CardItemProps => {
     collectorNumber: card.collectorNumber || undefined,
     mtgcbCollectorNumber: card.mtgcbCollectorNumber || undefined,
     rarity: card.rarity || undefined,
+    type: card.type || undefined,
+    artist: card.artist || undefined,
     tcgplayerId: card.tcgplayerId || undefined,
     powerNumeric: card.powerNumeric || undefined,
     toughnessNumeric: card.toughnessNumeric || undefined,

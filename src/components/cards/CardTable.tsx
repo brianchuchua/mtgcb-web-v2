@@ -52,6 +52,8 @@ export interface CardTableProps {
     collectorNumberIsVisible?: boolean;
     mtgcbNumberIsVisible?: boolean;
     rarityIsVisible?: boolean;
+    typeIsVisible?: boolean;
+    artistIsVisible?: boolean;
     powerIsVisible?: boolean;
     toughnessIsVisible?: boolean;
     loyaltyIsVisible?: boolean;
@@ -159,6 +161,8 @@ const CardTable = React.memo(
       true,
     );
     const [rarityIsVisible, setRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
+    const [typeIsVisible, setTypeIsVisible] = useLocalStorage('tableTypeIsVisible', true);
+    const [artistIsVisible, setArtistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
     const [powerIsVisible, setPowerIsVisible] = useLocalStorage('tablePowerIsVisible', true);
     const [toughnessIsVisible, setToughnessIsVisible] = useLocalStorage(
       'tableToughnessIsVisible',
@@ -186,6 +190,14 @@ const CardTable = React.memo(
         displaySettings?.rarityIsVisible !== undefined
           ? displaySettings.rarityIsVisible
           : rarityIsVisible,
+      typeIsVisible:
+        displaySettings?.typeIsVisible !== undefined
+          ? displaySettings.typeIsVisible
+          : typeIsVisible,
+      artistIsVisible:
+        displaySettings?.artistIsVisible !== undefined
+          ? displaySettings.artistIsVisible
+          : artistIsVisible,
       powerIsVisible:
         displaySettings?.powerIsVisible !== undefined
           ? displaySettings.powerIsVisible
@@ -439,11 +451,11 @@ const CardTable = React.memo(
     // Table headers with corresponding sort options
     const allTableHeaders: TableHeader[] = useMemo(
       () => [
-        { label: 'Name', id: 'name', width: '25%' },
+        { label: 'Name', id: 'name', width: '20%' },
         {
           label: 'Set',
           id: 'releasedAt',
-          width: '16%',
+          width: '12%',
           tooltip: <ReleaseDateTooltip />,
           hasInfoIcon: true,
         },
@@ -451,24 +463,26 @@ const CardTable = React.memo(
         {
           label: 'MTG CB #',
           id: 'mtgcbCollectorNumber',
-          width: '10%',
+          width: '8%',
           tooltip: <MtgcbNumberTooltip />,
           hasInfoIcon: true,
         },
         {
           label: 'Rarity',
           id: 'rarityNumeric',
-          width: '7%',
+          width: '6%',
           tooltip: <RarityTooltip />,
           hasInfoIcon: true,
         },
-        { label: 'Power', id: 'powerNumeric', width: '6%', align: 'center' },
-        { label: 'Toughness', id: 'toughnessNumeric', width: '7%', align: 'center' },
-        { label: 'Loyalty', id: 'loyaltyNumeric', width: '6%', align: 'center' },
+        { label: 'Type', id: 'type', width: '14%' },
+        { label: 'Artist', id: 'artist', width: '10%' },
+        { label: 'Power', id: 'powerNumeric', width: '5%', align: 'center' },
+        { label: 'Toughness', id: 'toughnessNumeric', width: '6%', align: 'center' },
+        { label: 'Loyalty', id: 'loyaltyNumeric', width: '5%', align: 'center' },
         {
           label: 'Price',
           id: currentPriceType as SortByOption,
-          width: '12%',
+          width: '10%',
           tooltip: <PriceTooltip />,
           hasInfoIcon: true,
         },
@@ -484,6 +498,8 @@ const CardTable = React.memo(
         if (header.id === 'collectorNumber') return display.collectorNumberIsVisible;
         if (header.id === 'mtgcbCollectorNumber') return display.mtgcbNumberIsVisible;
         if (header.id === 'rarityNumeric') return display.rarityIsVisible;
+        if (header.id === 'type') return display.typeIsVisible;
+        if (header.id === 'artist') return display.artistIsVisible;
         if (header.id === 'powerNumeric') return display.powerIsVisible;
         if (header.id === 'toughnessNumeric') return display.toughnessIsVisible;
         if (header.id === 'loyaltyNumeric') return display.loyaltyIsVisible;
@@ -746,6 +762,14 @@ const CardTable = React.memo(
 
         if (display.rarityIsVisible && headerIndicesMap.has('rarityNumeric')) {
           cells.push(<TableCell key="rarity">{card.rarity || (isLoading ? '' : 'N/A')}</TableCell>);
+        }
+
+        if (display.typeIsVisible && headerIndicesMap.has('type')) {
+          cells.push(<TableCell key="type">{card.type || (isLoading ? '' : 'N/A')}</TableCell>);
+        }
+
+        if (display.artistIsVisible && headerIndicesMap.has('artist')) {
+          cells.push(<TableCell key="artist">{card.artist || (isLoading ? '' : 'N/A')}</TableCell>);
         }
 
         if (display.powerIsVisible && headerIndicesMap.has('powerNumeric')) {

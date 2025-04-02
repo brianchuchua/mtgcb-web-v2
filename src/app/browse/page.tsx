@@ -60,6 +60,8 @@ const CardDisplay = ({
   const [tableCollectorNumberIsVisible] = useLocalStorage('tableCollectorNumberIsVisible', true);
   const [tableMtgcbNumberIsVisible] = useLocalStorage('tableMtgcbNumberIsVisible', true);
   const [tableRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
+  const [tableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', true);
+  const [tableArtistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
   const [tablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', true);
   const [tableToughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', true);
   const [tableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', true);
@@ -98,6 +100,8 @@ const CardDisplay = ({
         collectorNumberIsVisible: tableCollectorNumberIsVisible,
         mtgcbNumberIsVisible: tableMtgcbNumberIsVisible,
         rarityIsVisible: tableRarityIsVisible,
+        typeIsVisible: tableTypeIsVisible,
+        artistIsVisible: tableArtistIsVisible,
         powerIsVisible: tablePowerIsVisible,
         toughnessIsVisible: tableToughnessIsVisible,
         loyaltyIsVisible: tableLoyaltyIsVisible,
@@ -149,6 +153,8 @@ export default function BrowsePage() {
         'mtgcbCollectorNumber',
         'rarity',
         'rarityNumeric',
+        'type',
+        'artist',
         'powerNumeric',
         'toughnessNumeric',
         'loyaltyNumeric',

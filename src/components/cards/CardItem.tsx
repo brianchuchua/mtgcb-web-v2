@@ -17,6 +17,8 @@ export interface CardItemProps {
   collectorNumber?: string;
   mtgcbCollectorNumber?: string;
   rarity?: string;
+  type?: string;
+  artist?: string;
   powerNumeric?: string;
   toughnessNumeric?: string;
   loyaltyNumeric?: string;
@@ -60,6 +62,8 @@ const CardItem = ({
   tcgplayerId,
   collectorNumber,
   rarity,
+  type,
+  artist,
   prices,
   low,
   average,

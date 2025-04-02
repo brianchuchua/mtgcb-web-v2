@@ -24,14 +24,31 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
     'tableMtgcbNumberIsVisible',
     true,
   );
-  const [tableRarityIsVisible, setTableRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
-  const [tablePowerIsVisible, setTablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', true);
+  const [tableRarityIsVisible, setTableRarityIsVisible] = useLocalStorage(
+    'tableRarityIsVisible',
+    true,
+  );
+  const [tablePowerIsVisible, setTablePowerIsVisible] = useLocalStorage(
+    'tablePowerIsVisible',
+    true,
+  );
   const [tableToughnessIsVisible, setTableToughnessIsVisible] = useLocalStorage(
     'tableToughnessIsVisible',
     true,
   );
-  const [tableLoyaltyIsVisible, setTableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', true);
-  const [tablePriceIsVisible, setTablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
+  const [tableLoyaltyIsVisible, setTableLoyaltyIsVisible] = useLocalStorage(
+    'tableLoyaltyIsVisible',
+    true,
+  );
+  const [tablePriceIsVisible, setTablePriceIsVisible] = useLocalStorage(
+    'tablePriceIsVisible',
+    true,
+  );
+  const [tableTypeIsVisible, setTableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', true);
+  const [tableArtistIsVisible, setTableArtistIsVisible] = useLocalStorage(
+    'tableArtistIsVisible',
+    false,
+  );
 
   // Layout settings
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cardsPerRow', 4);
@@ -71,9 +88,9 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
           ],
         },
       ],
-    }
+    },
   ];
-  
+
   // Create card gallery settings group (only shown in grid view)
   const cardGallerySettings: CardSettingGroup = {
     label: 'Card Fields',
@@ -102,7 +119,7 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
       },
     ],
   };
-  
+
   // Create card layout settings (only shown in grid view)
   const cardLayoutSettings: CardSettingGroup = {
     label: 'Layout Settings',
@@ -125,7 +142,7 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
       },
     ],
   };
-  
+
   // Create card size settings (only shown in grid view)
   const cardSizeSettings: CardSettingGroup = {
     label: 'Card Size',
@@ -143,7 +160,7 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
       },
     ],
   };
-  
+
   // Create table column settings (only shown in table view)
   const tableColumnSettings: CardSettingGroup = {
     label: 'Table Columns',
@@ -175,6 +192,20 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
         label: 'Rarity',
         isVisible: tableRarityIsVisible,
         setVisibility: setTableRarityIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableType',
+        label: 'Type',
+        isVisible: tableTypeIsVisible,
+        setVisibility: setTableTypeIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableArtist',
+        label: 'Artist',
+        isVisible: tableArtistIsVisible,
+        setVisibility: setTableArtistIsVisible,
         type: 'toggle',
       },
       {

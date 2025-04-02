@@ -25,6 +25,7 @@
 
 ## Later
 
+- Make a cool stats page
 - S3 image storage is costing a lot of money, look into alternatives like Cloudflare R2, Vercel Blob Storage, Cloudflare Images, Digital Ocean Spaces, etc.
 - BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
 - Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
