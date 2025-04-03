@@ -18,7 +18,13 @@ import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePriceType } from '@/hooks/usePriceType';
-import { selectSearchParams, selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
+import {
+  selectSearchParams,
+  selectSortBy,
+  selectSortOrder,
+  setSortBy,
+  setSortOrder,
+} from '@/redux/slices/browseSlice';
 import { BrowsePagination, SortByOption } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 
@@ -97,22 +103,15 @@ const CardDisplay = ({
     priceIsVisible,
   };
 
-  // Flag to use new virtualized components
-  const [useNewComponents] = useLocalStorage('useNewComponents', true);
-  
   // Table column configuration
   const tableColumns = useCardTableColumns(
     { priceType: currentPriceType, displaySettings: tableDisplaySettings },
-    currentSortBy
+    currentSortBy,
   );
-  
+
   // Card row renderer
-  const renderCardRow = useCardRowRenderer(
-    currentPriceType,
-    tableDisplaySettings,
-    onCardClick
-  );
-  
+  const renderCardRow = useCardRowRenderer(currentPriceType, tableDisplaySettings, onCardClick);
+
   // Handle sort change
   const handleSortChange = (columnId: string) => {
     if (columnId) {
@@ -151,33 +150,20 @@ const CardDisplay = ({
   }
 
   // Table view
-  if (useNewComponents) {
-    return (
-      <VirtualizedTable
-        key="browse-card-table"
-        items={displayCards}
-        columns={tableColumns}
-        renderRowContent={renderCardRow}
-        isLoading={isLoading}
-        sortBy={currentSortBy}
-        sortOrder={currentSortOrder}
-        onSortChange={handleSortChange}
-        emptyMessage="No cards found"
-        computeItemKey={(index) => displayCards[index]?.id || index}
-        onClick={onCardClick}
-        getItemId={(card) => card.id}
-      />
-    );
-  }
-
-  // Fallback to original CardTable if needed
   return (
-    <CardTable
-      key="table"
-      cards={displayCards}
+    <VirtualizedTable
+      key="browse-card-table"
+      items={displayCards}
+      columns={tableColumns}
+      renderRowContent={renderCardRow}
       isLoading={isLoading}
-      onCardClick={onCardClick}
-      displaySettings={tableDisplaySettings}
+      sortBy={currentSortBy}
+      sortOrder={currentSortOrder}
+      onSortChange={handleSortChange}
+      emptyMessage="No cards found"
+      computeItemKey={(index) => displayCards[index]?.id || index}
+      onClick={onCardClick}
+      getItemId={(card) => card.id}
     />
   );
 };
