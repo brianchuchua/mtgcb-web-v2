@@ -40,6 +40,7 @@ export type SortByOption =
   | 'powerNumeric'
   | 'toughnessNumeric'
   | 'loyaltyNumeric'
+  | 'convertedManaCost'
   | 'market'
   | 'low'
   | 'average'

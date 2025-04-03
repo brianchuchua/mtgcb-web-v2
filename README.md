@@ -9,7 +9,6 @@
 
 ### Next
 
-- Improve readability of CardTable
 - Support mana value sorting and then pretty display on the table
 - Table view should link to set page from the set name
 - Should move grid/table view away from the url and instead use localstorage
@@ -19,6 +18,7 @@
 - Sort by market price descending should be nulls last -- look at sorting values that can be null in general
 - Add ability to save searches (even independently of collection goals, a saved searches section)
 - Catch up on minor typescript errors
+- Subset stuff
 
 ## Later
 
@@ -65,7 +65,7 @@
 - Collection statistics
 - Before open sourcing, full automation suite and readability refactor -- make it work, make it fast, make it clean
 - Bad data detector
-- Before going open source: Clean up all the vibe coding and make it more my style
+- Before going open source: Clean up all the vibe coding and make it more my style, refactor and reduce file sizes, break up more
 
 ## Known Bugs
 
@@ -134,3 +134,17 @@ td {
   text-align: right;
 }
 ```
+
+### Coding Style
+
+1. Functional programming approach with pure functions in TypeScript
+2. React components as constants with arrow functions rather than function declarations
+3. Main component/highest level logic at the top, with smaller subunits below
+4. Interfaces and types placed after the components that use them
+5. No unnecessary comments - prefer self-documenting code instead
+6. Descriptive variable names that clearly convey intent
+7. Named boolean expressions as constants to make conditionals more readable
+8. Minimal use of memoization when using React compiler (Next.js)
+9. Defensive programming (e.g., null/undefined checks in utility functions)
+10. Clean, organized code with logical groupings of related functionality
+11. Code reading like well-written prose.

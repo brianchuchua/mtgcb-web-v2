@@ -391,6 +391,7 @@ const BrowseSearchForm = () => {
                 <MenuItem value="powerNumeric">Power</MenuItem>
                 <MenuItem value="toughnessNumeric">Toughness</MenuItem>
                 <MenuItem value="loyaltyNumeric">Loyalty</MenuItem>
+                <MenuItem value="convertedManaCost">Mana Value</MenuItem>
                 <MenuItem value="market">
                   Price (Market)
                   {isPriceMismatched('market') && <WarningTooltip priceType="Market" />}
