@@ -4,20 +4,22 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { Box, Typography } from '@mui/material';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import CardItemRenderer from '@/components/cards/CardItemRenderer';
 import CardTable from '@/components/cards/CardTable';
+import { useCardRowRenderer, useCardTableColumns } from '@/components/cards/CardTableRenderer';
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
+import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { CardGalleryPagination } from '@/components/pagination';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePriceType } from '@/hooks/usePriceType';
-import { selectSearchParams } from '@/redux/slices/browseSlice';
-import { BrowsePagination } from '@/types/browse';
+import { selectSearchParams, selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
+import { BrowsePagination, SortByOption } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 
 interface CardDisplayProps {
@@ -35,6 +37,10 @@ const CardDisplay = ({
   onCardClick,
   pageSize,
 }: CardDisplayProps) => {
+  const dispatch = useDispatch();
+  const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
+  const currentSortOrder = useSelector(selectSortOrder) || 'asc';
+
   const displayCards = isLoading
     ? Array(pageSize)
         .fill(0)
@@ -63,15 +69,62 @@ const CardDisplay = ({
   const [tableRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
   const [tableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', false);
   const [tableArtistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
+  const [tableManaCostIsVisible] = useLocalStorage('tableManaCostIsVisible', true);
   const [tablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', false);
   const [tableToughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', false);
   const [tableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', false);
   const [tablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
 
+  // Card table settings
+  const tableDisplaySettings = {
+    setIsVisible: tableSetIsVisible,
+    collectorNumberIsVisible: tableCollectorNumberIsVisible,
+    mtgcbNumberIsVisible: tableMtgcbNumberIsVisible,
+    rarityIsVisible: tableRarityIsVisible,
+    typeIsVisible: tableTypeIsVisible,
+    artistIsVisible: tableArtistIsVisible,
+    manaCostIsVisible: tableManaCostIsVisible,
+    powerIsVisible: tablePowerIsVisible,
+    toughnessIsVisible: tableToughnessIsVisible,
+    loyaltyIsVisible: tableLoyaltyIsVisible,
+    priceIsVisible: tablePriceIsVisible,
+  };
+
+  // Card gallery settings
   const cardDisplaySettings = {
     nameIsVisible,
     setIsVisible,
     priceIsVisible,
+  };
+
+  // Flag to use new virtualized components
+  const [useNewComponents] = useLocalStorage('useNewComponents', true);
+  
+  // Table column configuration
+  const tableColumns = useCardTableColumns(
+    { priceType: currentPriceType, displaySettings: tableDisplaySettings },
+    currentSortBy
+  );
+  
+  // Card row renderer
+  const renderCardRow = useCardRowRenderer(
+    currentPriceType,
+    tableDisplaySettings,
+    onCardClick
+  );
+  
+  // Handle sort change
+  const handleSortChange = (columnId: string) => {
+    if (columnId) {
+      const isClickingCurrentSortColumn = columnId === currentSortBy;
+      if (isClickingCurrentSortColumn) {
+        const newOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+        dispatch(setSortOrder(newOrder));
+      } else {
+        dispatch(setSortBy(columnId as SortByOption));
+        dispatch(setSortOrder('asc'));
+      }
+    }
   };
 
   if (viewMode === 'grid') {
@@ -97,24 +150,34 @@ const CardDisplay = ({
     );
   }
 
+  // Table view
+  if (useNewComponents) {
+    return (
+      <VirtualizedTable
+        key="browse-card-table"
+        items={displayCards}
+        columns={tableColumns}
+        renderRowContent={renderCardRow}
+        isLoading={isLoading}
+        sortBy={currentSortBy}
+        sortOrder={currentSortOrder}
+        onSortChange={handleSortChange}
+        emptyMessage="No cards found"
+        computeItemKey={(index) => displayCards[index]?.id || index}
+        onClick={onCardClick}
+        getItemId={(card) => card.id}
+      />
+    );
+  }
+
+  // Fallback to original CardTable if needed
   return (
     <CardTable
       key="table"
       cards={displayCards}
       isLoading={isLoading}
       onCardClick={onCardClick}
-      displaySettings={{
-        setIsVisible: tableSetIsVisible,
-        collectorNumberIsVisible: tableCollectorNumberIsVisible,
-        mtgcbNumberIsVisible: tableMtgcbNumberIsVisible,
-        rarityIsVisible: tableRarityIsVisible,
-        typeIsVisible: tableTypeIsVisible,
-        artistIsVisible: tableArtistIsVisible,
-        powerIsVisible: tablePowerIsVisible,
-        toughnessIsVisible: tableToughnessIsVisible,
-        loyaltyIsVisible: tableLoyaltyIsVisible,
-        priceIsVisible: tablePriceIsVisible,
-      }}
+      displaySettings={tableDisplaySettings}
     />
   );
 };

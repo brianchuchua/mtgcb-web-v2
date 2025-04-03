@@ -9,7 +9,6 @@
 
 ### Next
 
-- Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
 - browse sets page and searches
 - Subset stuff in search filters
 - Catch up on minor typescript errors
