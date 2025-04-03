@@ -67,14 +67,6 @@ const CardDisplay = ({
   const [tableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', false);
   const [tablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
 
-  // Store the current view mode in localStorage
-  const [, setPreferredViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
-  
-  // Update preferred view mode whenever it changes
-  useEffect(() => {
-    setPreferredViewMode(viewMode);
-  }, [viewMode, setPreferredViewMode]);
-
   return viewMode === 'grid' ? (
     <CardGallery
       key="gallery"
@@ -90,10 +82,10 @@ const CardDisplay = ({
       }}
     />
   ) : (
-    <CardTable 
-      key="table" 
-      cards={displayCards} 
-      isLoading={isLoading} 
+    <CardTable
+      key="table"
+      cards={displayCards}
+      isLoading={isLoading}
       onCardClick={onCardClick}
       displaySettings={{
         setIsVisible: tableSetIsVisible,
@@ -106,7 +98,7 @@ const CardDisplay = ({
         toughnessIsVisible: tableToughnessIsVisible,
         loyaltyIsVisible: tableLoyaltyIsVisible,
         priceIsVisible: tablePriceIsVisible,
-      }} 
+      }}
     />
   );
 };
@@ -122,10 +114,15 @@ export default function BrowsePage() {
   const urlSearchParams = useSearchParams();
   const reduxSearchParams = useSelector(selectSearchParams);
 
+  const [preferredViewMode, setPreferredViewMode] = useLocalStorage<'grid' | 'table'>(
+    'preferredViewMode',
+    'grid',
+  );
+
   const [pagination, setPagination] = useState<BrowsePagination>({
     currentPage: Math.max(parseInt(urlSearchParams.get('page') || '1', 10), 1),
     pageSize: Math.min(Math.max(parseInt(urlSearchParams.get('pageSize') || '24', 10), 1), 500),
-    viewMode: urlSearchParams.get('view') === 'table' ? 'table' : 'grid',
+    viewMode: preferredViewMode,
   });
 
   useInitializeBrowseFromUrl();
@@ -219,7 +216,7 @@ export default function BrowsePage() {
 
   useEffect(() => {
     const params = new URLSearchParams();
-    const defaults = { currentPage: 1, pageSize: 24, viewMode: 'grid' };
+    const defaults = { currentPage: 1, pageSize: 24 };
 
     // Add pagination parameters
     pagination.currentPage > defaults.currentPage
@@ -229,10 +226,6 @@ export default function BrowsePage() {
     pagination.pageSize !== defaults.pageSize
       ? params.set('pageSize', pagination.pageSize.toString())
       : params.delete('pageSize');
-
-    pagination.viewMode !== defaults.viewMode
-      ? params.set('view', pagination.viewMode)
-      : params.delete('view');
 
     // Add search parameters from Redux
     if (reduxSearchParams.name) {
@@ -324,9 +317,13 @@ export default function BrowsePage() {
     setPagination((prev) => ({ ...prev, pageSize: limitedSize, currentPage: 1 }));
   }, []);
 
-  const handleViewModeChange = useCallback((mode: 'grid' | 'table') => {
-    setPagination((prev) => ({ ...prev, viewMode: mode }));
-  }, []);
+  const handleViewModeChange = useCallback(
+    (mode: 'grid' | 'table') => {
+      setPagination((prev) => ({ ...prev, viewMode: mode }));
+      setPreferredViewMode(mode);
+    },
+    [setPreferredViewMode],
+  );
 
   const handleCardClick = useCallback(
     (cardId: string) => {
@@ -350,6 +347,16 @@ export default function BrowsePage() {
     [totalItems, pagination.pageSize],
   );
 
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  const isInitialLoading = !initialLoadComplete && !searchResult?.data && !error;
+
+  useEffect(() => {
+    if ((searchResult?.data || error) && !initialLoadComplete) {
+      setInitialLoadComplete(true);
+    }
+  }, [searchResult?.data, error, initialLoadComplete]);
+
   const paginationProps = {
     currentPage: pagination.currentPage,
     totalPages: totalPages || 1,
@@ -360,6 +367,7 @@ export default function BrowsePage() {
     onPageSizeChange: handlePageSizeChange,
     onViewModeChange: handleViewModeChange,
     isLoading: isApiLoading,
+    isInitialLoading: isInitialLoading,
   };
 
   return (

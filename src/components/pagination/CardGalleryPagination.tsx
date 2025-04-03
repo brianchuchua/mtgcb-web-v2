@@ -24,7 +24,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CardSettingsPanel from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
@@ -43,9 +43,9 @@ export interface CardGalleryPaginationProps {
   onViewModeChange: (viewMode: 'grid' | 'table') => void;
   isOnBottom?: boolean;
   isLoading?: boolean;
+  isInitialLoading?: boolean;
 }
 
-// Memoized Search Button for mobile view
 const MobileSearchButton = React.memo(() => {
   const { setMobileOpen } = useDashboardContext();
 
@@ -71,18 +71,36 @@ const MobileSearchButton = React.memo(() => {
 
 MobileSearchButton.displayName = 'MobileSearchButton';
 
-// Create separate memoized components for sub-sections
 const ViewModeToggle = React.memo(
   ({
     viewMode,
     onViewModeChange,
     isSmallScreen,
+    isLoading = false,
+    isInitialLoading = false,
   }: {
     viewMode: 'grid' | 'table';
     onViewModeChange: (mode: 'grid' | 'table') => void;
     isSmallScreen: boolean;
+    isLoading?: boolean;
+    isInitialLoading?: boolean;
   }) => {
-    // Memoize handlers
+    const [isFullyLoaded, setIsFullyLoaded] = useState(!isInitialLoading);
+
+    useEffect(() => {
+      let timer: NodeJS.Timeout;
+
+      if (!isInitialLoading && !isFullyLoaded) {
+        timer = setTimeout(() => setIsFullyLoaded(true), 50);
+      } else if (isInitialLoading && isFullyLoaded) {
+        setIsFullyLoaded(false);
+      }
+
+      return () => {
+        if (timer) clearTimeout(timer);
+      };
+    }, [isInitialLoading, isFullyLoaded]);
+
     const handleGridClick = useCallback(() => {
       onViewModeChange('grid');
     }, [onViewModeChange]);
@@ -95,20 +113,24 @@ const ViewModeToggle = React.memo(
       <ViewModeToggleGroup>
         <Tooltip title="Grid view">
           <Button
-            variant={viewMode === 'grid' ? 'contained' : 'outlined'}
+            variant={!isFullyLoaded ? 'outlined' : viewMode === 'grid' ? 'contained' : 'outlined'}
             size="small"
             onClick={handleGridClick}
             startIcon={<GridViewIcon />}
+            disabled={!isFullyLoaded}
+            sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
           >
             Grid
           </Button>
         </Tooltip>
         <Tooltip title="Table view">
           <Button
-            variant={viewMode === 'table' ? 'contained' : 'outlined'}
+            variant={!isFullyLoaded ? 'outlined' : viewMode === 'table' ? 'contained' : 'outlined'}
             size="small"
             onClick={handleTableClick}
             startIcon={<TableRowsIcon />}
+            disabled={!isFullyLoaded}
+            sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
           >
             Table
           </Button>
@@ -132,14 +154,6 @@ const PageSizeControl = React.memo(
     pageSizeOptions: number[];
     viewMode: 'grid' | 'table';
   }) => {
-    // Store current view mode in localStorage to make it available to useCardSettingGroups
-    const [, setPreferredViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
-
-    // Update preferred view mode when it changes
-    useEffect(() => {
-      setPreferredViewMode(viewMode);
-    }, [viewMode, setPreferredViewMode]);
-
     const cardSettingGroups = useCardSettingGroups();
 
     // Memoize handler
@@ -356,6 +370,7 @@ export const CardGalleryPagination = React.memo(
     onViewModeChange,
     isOnBottom = false,
     isLoading = false,
+    isInitialLoading = false,
   }: CardGalleryPaginationProps) => {
     const theme = useTheme();
     // Use md breakpoint (900px) to determine small screens
@@ -458,6 +473,8 @@ export const CardGalleryPagination = React.memo(
                         viewMode={viewMode}
                         onViewModeChange={onViewModeChange}
                         isSmallScreen={isSmallScreen}
+                        isLoading={isLoading}
+                        isInitialLoading={isInitialLoading}
                       />
                     </Box>
                   </RightControlsGroup>
@@ -471,6 +488,8 @@ export const CardGalleryPagination = React.memo(
                     viewMode={viewMode}
                     onViewModeChange={onViewModeChange}
                     isSmallScreen={isSmallScreen}
+                    isLoading={isLoading}
+                    isInitialLoading={isInitialLoading}
                   />
                 </ViewToggleContainer>
               )}

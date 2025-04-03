@@ -9,18 +9,19 @@
 
 ### Next
 
-- Table view should link to set page from the set name
-- Should move grid/table view away from the url and instead use localstorage
+- Bug: Mana cost shows on load even if it's checked off
 - Special should really come after mythic, not before common, change in API and update tooltip in table view
 - Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
 - Clean up BrowseSearchForm into smaller components
 - Sort by market price descending should be nulls last -- look at sorting values that can be null in general
 - Add ability to save searches (even independently of collection goals, a saved searches section)
 - Catch up on minor typescript errors
-- Subset stuff
+- Subset stuff in search filters
+- set page with subsets handled
 
 ## Later
 
+- Set names (in table and grid view) should link to the set page
 - 1024x768 testing of table view and gridview and menus with sidenav open (or determine target resolution)
 - Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
 - Clean up MTG CB collector number

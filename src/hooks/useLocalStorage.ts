@@ -29,13 +29,10 @@ export function useLocalStorage<T>(
     }
   };
 
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
+  const [storedValue, setStoredValue] = useState<T>(() => readValue());
 
   // Listen for changes to this localStorage key from any component
   useEffect(() => {
-    // Set initial value
-    setStoredValue(readValue());
-
     // Create a custom handler that only responds to our custom events
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === key && e.newValue) {
