@@ -125,6 +125,15 @@ export default function BrowsePage() {
     viewMode: preferredViewMode,
   });
 
+  useEffect(() => {
+    if (pagination.viewMode !== preferredViewMode) {
+      setPagination((prev) => ({
+        ...prev,
+        viewMode: preferredViewMode,
+      }));
+    }
+  }, [preferredViewMode, pagination.viewMode]);
+
   useInitializeBrowseFromUrl();
 
   const apiParams = useMemo(() => {

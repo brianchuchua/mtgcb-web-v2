@@ -8,7 +8,7 @@ import {
 } from '@/components/cards/CardSettingsPanel';
 import { PriceType } from '@/types/pricing';
 
-export const useCardSettingGroups = (): CardSettingGroup[] => {
+export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
   // Card Gallery visibility settings
   const [nameIsVisible, setNameIsVisible] = useLocalStorage('cardNameIsVisible', true);
   const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
@@ -68,8 +68,8 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
     setDisplayPriceType(value as unknown as PriceType);
   };
 
-  // Get current view mode to determine which settings to show
-  const [viewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
+  const [localStorageViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
+  const viewMode = explicitViewMode || localStorageViewMode;
 
   // Base settings groups that are always available
   const settingGroups: CardSettingGroup[] = [

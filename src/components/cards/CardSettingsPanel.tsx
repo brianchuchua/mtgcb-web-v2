@@ -59,9 +59,14 @@ export interface CardSettingGroup {
 interface CardSettingsPanelProps {
   settingGroups: CardSettingGroup[];
   panelId: string;
+  panelTitle?: string;
 }
 
-const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({ settingGroups, panelId }) => {
+const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({
+  settingGroups,
+  panelId,
+  panelTitle = panelId.includes('Table') ? 'Table Settings' : 'Card Display Settings',
+}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const theme = useTheme();
 
@@ -74,9 +79,6 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({ settingGroups, pa
   };
 
   const open = Boolean(anchorEl);
-
-  // Determine panel title based on panel ID
-  const panelTitle = panelId.includes('Table') ? 'Table Settings' : 'Card Display Settings';
 
   return (
     <>

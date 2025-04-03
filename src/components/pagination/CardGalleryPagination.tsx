@@ -88,17 +88,12 @@ const ViewModeToggle = React.memo(
     const [isFullyLoaded, setIsFullyLoaded] = useState(!isInitialLoading);
 
     useEffect(() => {
-      let timer: NodeJS.Timeout;
-
-      if (!isInitialLoading && !isFullyLoaded) {
-        timer = setTimeout(() => setIsFullyLoaded(true), 50);
-      } else if (isInitialLoading && isFullyLoaded) {
+      if (isInitialLoading) {
         setIsFullyLoaded(false);
+      } else if (!isFullyLoaded) {
+        const timer = setTimeout(() => setIsFullyLoaded(true), 16);
+        return () => clearTimeout(timer);
       }
-
-      return () => {
-        if (timer) clearTimeout(timer);
-      };
     }, [isInitialLoading, isFullyLoaded]);
 
     const handleGridClick = useCallback(() => {
@@ -112,28 +107,34 @@ const ViewModeToggle = React.memo(
     return (
       <ViewModeToggleGroup>
         <Tooltip title="Grid view">
-          <Button
-            variant={!isFullyLoaded ? 'outlined' : viewMode === 'grid' ? 'contained' : 'outlined'}
-            size="small"
-            onClick={handleGridClick}
-            startIcon={<GridViewIcon />}
-            disabled={!isFullyLoaded}
-            sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
-          >
-            Grid
-          </Button>
+          <span>
+            <Button
+              variant={!isFullyLoaded ? 'outlined' : viewMode === 'grid' ? 'contained' : 'outlined'}
+              size="small"
+              onClick={handleGridClick}
+              startIcon={<GridViewIcon />}
+              disabled={!isFullyLoaded}
+              sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
+            >
+              Grid
+            </Button>
+          </span>
         </Tooltip>
         <Tooltip title="Table view">
-          <Button
-            variant={!isFullyLoaded ? 'outlined' : viewMode === 'table' ? 'contained' : 'outlined'}
-            size="small"
-            onClick={handleTableClick}
-            startIcon={<TableRowsIcon />}
-            disabled={!isFullyLoaded}
-            sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
-          >
-            Table
-          </Button>
+          <span>
+            <Button
+              variant={
+                !isFullyLoaded ? 'outlined' : viewMode === 'table' ? 'contained' : 'outlined'
+              }
+              size="small"
+              onClick={handleTableClick}
+              startIcon={<TableRowsIcon />}
+              disabled={!isFullyLoaded}
+              sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
+            >
+              Table
+            </Button>
+          </span>
         </Tooltip>
       </ViewModeToggleGroup>
     );
@@ -154,7 +155,7 @@ const PageSizeControl = React.memo(
     pageSizeOptions: number[];
     viewMode: 'grid' | 'table';
   }) => {
-    const cardSettingGroups = useCardSettingGroups();
+    const cardSettingGroups = useCardSettingGroups(viewMode);
 
     // Memoize handler
     const handlePageSizeChange = useCallback(
@@ -205,6 +206,7 @@ const PageSizeControl = React.memo(
           <CardSettingsPanel
             settingGroups={cardSettingGroups}
             panelId={viewMode === 'grid' ? 'cardGallerySettings' : 'cardTableSettings'}
+            panelTitle={viewMode === 'grid' ? 'Card Display Settings' : 'Table Settings'}
           />
         </Box>
       </PageSizeSelector>

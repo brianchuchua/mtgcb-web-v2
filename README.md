@@ -9,14 +9,10 @@
 
 ### Next
 
-- Bug: Mana cost shows on load even if it's checked off
-- Special should really come after mythic, not before common, change in API and update tooltip in table view
-- Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
-- Clean up BrowseSearchForm into smaller components
-- Sort by market price descending should be nulls last -- look at sorting values that can be null in general
-- Add ability to save searches (even independently of collection goals, a saved searches section)
-- Catch up on minor typescript errors
 - Subset stuff in search filters
+- Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
+- Sort by market price descending should be nulls last -- look at sorting values that can be null in general
+- Catch up on minor typescript errors
 - set page with subsets handled
 
 ## Later
@@ -66,6 +62,9 @@
 - Before open sourcing, full automation suite and readability refactor -- make it work, make it fast, make it clean
 - Bad data detector
 - Before going open source: Clean up all the vibe coding and make it more my style, refactor and reduce file sizes, break up more
+- update rarityNumeric to have special be 6 instead of 1 in production `update "Card" set "rarityNumeric" = 6 where "rarityNumeric" = 1;`
+- Clean up BrowseSearchForm into smaller components
+- Add ability to save searches (even independently of collection goals, a saved searches section)
 
 ## Known Bugs
 

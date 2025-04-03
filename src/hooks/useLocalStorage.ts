@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const createStorageEvent = (key: string, newValue: string) => {
   return new StorageEvent('localStorage', {
@@ -29,7 +29,27 @@ export function useLocalStorage<T>(
     }
   };
 
-  const [storedValue, setStoredValue] = useState<T>(() => readValue());
+  const hasHydrated = useRef(false);
+
+  const getInitialState = () => {
+    if (typeof window === 'undefined' || !hasHydrated.current) {
+      return initialValue;
+    }
+    return readValue();
+  };
+
+  const [storedValue, setStoredValue] = useState<T>(getInitialState);
+
+  useEffect(() => {
+    if (hasHydrated.current) return;
+
+    hasHydrated.current = true;
+
+    const valueFromStorage = readValue();
+    if (JSON.stringify(valueFromStorage) !== JSON.stringify(storedValue)) {
+      setStoredValue(valueFromStorage);
+    }
+  }, []);
 
   // Listen for changes to this localStorage key from any component
   useEffect(() => {
