@@ -19,6 +19,8 @@ export interface CardItemProps {
   rarity?: string;
   type?: string;
   artist?: string;
+  manaCost?: string;
+  convertedManaCost?: string;
   powerNumeric?: string;
   toughnessNumeric?: string;
   loyaltyNumeric?: string;

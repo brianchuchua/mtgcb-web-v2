@@ -15,6 +15,8 @@ export const mapApiCardToCardItem = (card: CardModel): CardItemProps => {
     rarity: card.rarity || undefined,
     type: card.type || undefined,
     artist: card.artist || undefined,
+    manaCost: card.manaCost || undefined,
+    convertedManaCost: card.convertedManaCost || undefined,
     tcgplayerId: card.tcgplayerId || undefined,
     powerNumeric: card.powerNumeric || undefined,
     toughnessNumeric: card.toughnessNumeric || undefined,

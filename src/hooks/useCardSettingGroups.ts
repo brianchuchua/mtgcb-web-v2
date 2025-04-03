@@ -28,6 +28,10 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
     'tableRarityIsVisible',
     true,
   );
+  const [tableManaCostIsVisible, setTableManaCostIsVisible] = useLocalStorage(
+    'tableManaCostIsVisible',
+    false,
+  );
   const [tablePowerIsVisible, setTablePowerIsVisible] = useLocalStorage(
     'tablePowerIsVisible',
     false,
@@ -206,6 +210,13 @@ export const useCardSettingGroups = (): CardSettingGroup[] => {
         label: 'Artist',
         isVisible: tableArtistIsVisible,
         setVisibility: setTableArtistIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableManaCost',
+        label: 'Mana Cost',
+        isVisible: tableManaCostIsVisible,
+        setVisibility: setTableManaCostIsVisible,
         type: 'toggle',
       },
       {

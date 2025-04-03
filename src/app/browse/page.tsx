@@ -155,6 +155,8 @@ export default function BrowsePage() {
         'rarityNumeric',
         'type',
         'artist',
+        'manaCost',
+        'convertedManaCost',
         'powerNumeric',
         'toughnessNumeric',
         'loyaltyNumeric',

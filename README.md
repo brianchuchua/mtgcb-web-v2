@@ -9,7 +9,6 @@
 
 ### Next
 
-- Support mana value sorting and then pretty display on the table
 - Table view should link to set page from the set name
 - Should move grid/table view away from the url and instead use localstorage
 - Special should really come after mythic, not before common, change in API and update tooltip in table view
@@ -72,6 +71,7 @@
 - Moderate (UX): The search form has prefilling and styling issues.
 - Moderate: Logout isn't redirecting the user -- probably want them back to the login page.
 - Minor: When logging out of a page that requires authentication, redirectTo is set to the page you were on during logout.
+- Minor: Mana doesn't render properly in table view for Kozilek, Compleated
 
 ## UX Thoughts
 

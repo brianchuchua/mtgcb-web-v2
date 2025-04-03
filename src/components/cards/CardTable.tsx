@@ -40,6 +40,7 @@ export interface CardTableProps {
     rarityIsVisible?: boolean;
     typeIsVisible?: boolean;
     artistIsVisible?: boolean;
+    manaCostIsVisible?: boolean;
     powerIsVisible?: boolean;
     toughnessIsVisible?: boolean;
     loyaltyIsVisible?: boolean;
@@ -83,6 +84,7 @@ const CardTable = ({ cards, isLoading = false, onCardClick, displaySettings }: C
   const [rarityIsVisible, setRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
   const [typeIsVisible, setTypeIsVisible] = useLocalStorage('tableTypeIsVisible', true);
   const [artistIsVisible, setArtistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
+  const [manaCostIsVisible, setManaCostIsVisible] = useLocalStorage('tableManaCostIsVisible', true);
   const [powerIsVisible, setPowerIsVisible] = useLocalStorage('tablePowerIsVisible', true);
   const [toughnessIsVisible, setToughnessIsVisible] = useLocalStorage(
     'tableToughnessIsVisible',
@@ -116,6 +118,10 @@ const CardTable = ({ cards, isLoading = false, onCardClick, displaySettings }: C
       displaySettings?.artistIsVisible !== undefined
         ? displaySettings.artistIsVisible
         : artistIsVisible,
+    manaCostIsVisible:
+      displaySettings?.manaCostIsVisible !== undefined
+        ? displaySettings.manaCostIsVisible
+        : manaCostIsVisible,
     powerIsVisible:
       displaySettings?.powerIsVisible !== undefined
         ? displaySettings.powerIsVisible
@@ -175,6 +181,14 @@ const CardTable = ({ cards, isLoading = false, onCardClick, displaySettings }: C
     <div>
       <div>Sort by MTG CB Collector Number</div>
       <div>Custom sequential numbering system used by MTG Collection Builder</div>
+    </div>
+  );
+
+  // Tooltip components
+  const ManaCostTooltip = () => (
+    <div>
+      <div>Sort by mana value</div>
+      <div>Shows the mana symbols, but sorts by converted mana cost</div>
     </div>
   );
 
@@ -240,6 +254,18 @@ const CardTable = ({ cards, isLoading = false, onCardClick, displaySettings }: C
       },
     },
     {
+      label: 'Mana',
+      id: 'convertedManaCost',
+      width: {
+        xs: '90px',
+        sm: '100px',
+        md: '120px',
+        default: '120px',
+      },
+      tooltip: <ManaCostTooltip />,
+      hasInfoIcon: true,
+    },
+    {
       label: 'Power',
       id: 'powerNumeric',
       width: { default: '100px' },
@@ -279,6 +305,7 @@ const CardTable = ({ cards, isLoading = false, onCardClick, displaySettings }: C
     if (header.id === 'rarityNumeric') return display.rarityIsVisible;
     if (header.id === 'type') return display.typeIsVisible;
     if (header.id === 'artist') return display.artistIsVisible;
+    if (header.id === 'convertedManaCost') return display.manaCostIsVisible;
     if (header.id === 'powerNumeric') return display.powerIsVisible;
     if (header.id === 'toughnessNumeric') return display.toughnessIsVisible;
     if (header.id === 'loyaltyNumeric') return display.loyaltyIsVisible;
@@ -756,6 +783,26 @@ const CardTable = ({ cards, isLoading = false, onCardClick, displaySettings }: C
       cells.push(<TableCell key="artist">{card.artist || (isLoading ? '' : 'N/A')}</TableCell>);
     }
 
+    const shouldShowManaCost =
+      display.manaCostIsVisible && headerIndicesMap.has('convertedManaCost');
+    if (shouldShowManaCost) {
+      cells.push(
+        <TableCell
+          key="manaCost"
+          sx={{
+            whiteSpace: 'nowrap',
+            maxWidth: '120px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+            {formatManaSymbols(card.manaCost) || (isLoading ? '' : '')}
+          </Box>
+        </TableCell>,
+      );
+    }
+
     const shouldShowPower = display.powerIsVisible && headerIndicesMap.has('powerNumeric');
     if (shouldShowPower) {
       cells.push(
@@ -851,7 +898,7 @@ const CardTable = ({ cards, isLoading = false, onCardClick, displaySettings }: C
       />
     </Box>
   );
-}
+};
 
 // Interfaces and types
 interface ResponsiveWidth {
@@ -891,6 +938,162 @@ const PriceLink = styled('a')(({ theme }) => ({
 }));
 
 // Utility functions
+/**
+ * Gets a human-readable name for a mana symbol
+ */
+function getSymbolName(symbol: string): string {
+  // Handle half mana symbols
+  if (symbol.startsWith('H')) {
+    const color = symbol.substring(1);
+    return `Half ${getSymbolName(color)}`;
+  }
+
+  switch (symbol.toLowerCase()) {
+    case 'w':
+      return 'White Mana';
+    case 'u':
+      return 'Blue Mana';
+    case 'b':
+      return 'Black Mana';
+    case 'r':
+      return 'Red Mana';
+    case 'g':
+      return 'Green Mana';
+    case 'c':
+      return 'Colorless Mana';
+    case 'x':
+      return 'X Mana';
+    case 't':
+      return 'Tap Symbol';
+    case 'q':
+      return 'Untap Symbol';
+    case 's':
+      return 'Snow Mana';
+    case 'e':
+      return 'Energy Counter';
+    case 'p':
+      return 'Phyrexian Mana';
+    case '∞':
+    case 'infinity':
+      return 'Infinity Mana';
+    case '½':
+    case '1/2':
+      return 'Half Generic Mana';
+    default:
+      // For generic mana costs (numbers)
+      if (/^\d+$/.test(symbol)) {
+        return `${symbol} Generic Mana`;
+      }
+      // For Phyrexian mana like w/p or c/p
+      if (symbol.includes('/p')) {
+        const color = symbol.split('/')[0];
+        return `Phyrexian ${getSymbolName(color)}`;
+      }
+      // For hybrid mana like w/u
+      if (symbol.includes('/')) {
+        const [color1, color2] = symbol.split('/');
+        return `Hybrid ${getSymbolName(color1)}/${getSymbolName(color2)}`;
+      }
+      return symbol;
+  }
+}
+
+/**
+ * Formats a mana cost string into mana symbols
+ * Uses the manaFormatter utility but with smaller icons and margins
+ */
+function formatManaSymbols(manaCost: string | null | undefined): React.ReactNode {
+  if (!manaCost) return null;
+
+  // Regular expression to match mana symbols in the format {X}
+  const symbolRegex = /\{([^}]+)\}/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+
+  // Find all mana symbols and convert them to spans with appropriate classes
+  while ((match = symbolRegex.exec(manaCost)) !== null) {
+    const [fullMatch, symbol] = match;
+    const startIndex = match.index;
+
+    // Add any text before the current symbol
+    if (startIndex > lastIndex) {
+      parts.push(manaCost.substring(lastIndex, startIndex));
+    }
+
+    // Add the symbol with the appropriate class, using ms-1x for smaller size
+    // and adding a small margin between symbols
+
+    // Handle special cases with different class structures
+    if (symbol.startsWith('H')) {
+      // Half mana like {HW}
+      const color = symbol.substring(1).toLowerCase();
+      parts.push(
+        <i
+          key={`${symbol}-${startIndex}`}
+          className={`ms ms-${color} ms-half ms-cost ms-1x`}
+          style={{ margin: '1px' }}
+          aria-label={`Half ${getSymbolName(color)}`}
+        />,
+      );
+    } else if (symbol.includes('/p')) {
+      // Phyrexian mana like {W/P} or {C/P}
+      const color = symbol.split('/')[0].toLowerCase();
+      // For colorless phyrexian, we use ms-cp
+      parts.push(
+        <i
+          key={`${symbol}-${startIndex}`}
+          className={`ms ms-${color}p ms-cost ms-1x`}
+          style={{ margin: '1px' }}
+          aria-label={getSymbolName(symbol)}
+        />,
+      );
+    } else if (symbol.includes('/')) {
+      // Hybrid mana like {W/U}
+      // For hybrid, we use the format "ms-wu" for W/U hybrid
+      const colors = symbol.toLowerCase().split('/').join('');
+      parts.push(
+        <i
+          key={`${symbol}-${startIndex}`}
+          className={`ms ms-${colors} ms-cost ms-1x`}
+          style={{ margin: '1px' }}
+          aria-label={getSymbolName(symbol)}
+        />,
+      );
+    } else {
+      // Regular mana symbol
+      parts.push(
+        <i
+          key={`${symbol}-${startIndex}`}
+          className={`ms ms-${symbol.toLowerCase()} ms-cost ms-1x`}
+          style={{ margin: '1px' }}
+          aria-label={getSymbolName(symbol)}
+        />,
+      );
+    }
+
+    lastIndex = startIndex + fullMatch.length;
+  }
+
+  // Add any remaining text
+  if (lastIndex < manaCost.length) {
+    parts.push(manaCost.substring(lastIndex));
+  }
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        maxWidth: '100%',
+      }}
+    >
+      {parts}
+    </span>
+  );
+}
+
 function formatRarity(rarity: string | null | undefined): string {
   if (!rarity) return '';
   return rarity.charAt(0).toUpperCase() + rarity.slice(1).toLowerCase();
