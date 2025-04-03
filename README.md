@@ -9,6 +9,7 @@
 
 ### Next
 
+- Improve readability of CardTable
 - Support mana value sorting and then pretty display on the table
 - Table view should link to set page from the set name
 - Should move grid/table view away from the url and instead use localstorage
