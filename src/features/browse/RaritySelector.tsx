@@ -10,7 +10,7 @@ const RARITY_MAP = [
   { name: 'Uncommon', value: 3 },
   { name: 'Rare', value: 4 },
   { name: 'Mythic', value: 5 },
-  { name: 'Special', value: 1 },
+  { name: 'Special', value: 6 },
 ];
 
 const RaritySelector = () => {

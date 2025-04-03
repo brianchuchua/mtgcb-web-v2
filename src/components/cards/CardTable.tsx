@@ -173,7 +173,7 @@ const CardTable = ({ cards, isLoading = false, onCardClick, displaySettings }: C
   const RarityTooltip = () => (
     <div>
       <div>Sort by rarity</div>
-      <div>Common → Uncommon → Rare → Mythic</div>
+      <div>Common → Uncommon → Rare → Mythic → Special</div>
     </div>
   );
 
