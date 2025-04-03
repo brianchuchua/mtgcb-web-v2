@@ -1,22 +1,21 @@
 'use client';
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { Box, Divider, Typography } from '@mui/material';
-import { skipToken } from '@reduxjs/toolkit/query';
+import { Box, Typography } from '@mui/material';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery } from '@/api/browse/browseApi';
-import { CardApiParams, CardModel, CardSearchData } from '@/api/browse/types';
-import { mtgcbApi } from '@/api/mtgcbApi';
-import { ApiResponse } from '@/api/types/apiTypes';
-import CardGallery from '@/components/cards/CardGallery';
+import { CardModel } from '@/api/browse/types';
+import CardItemRenderer from '@/components/cards/CardItemRenderer';
 import CardTable from '@/components/cards/CardTable';
+import VirtualizedGallery from '@/components/common/VirtualizedGallery';
 import { CardGalleryPagination } from '@/components/pagination';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { usePriceType } from '@/hooks/usePriceType';
 import { selectSearchParams } from '@/redux/slices/browseSlice';
 import { BrowsePagination } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
@@ -51,9 +50,11 @@ const CardDisplay = ({
 
   // Gallery settings
   const [cardsPerRow] = useLocalStorage<number>('cardsPerRow', 4);
+  const [cardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
   const [nameIsVisible] = useLocalStorage('cardNameIsVisible', true);
   const [setIsVisible] = useLocalStorage('cardSetIsVisible', true);
   const [priceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
+  const currentPriceType = usePriceType();
 
   // Table settings
   const [tableSetIsVisible] = useLocalStorage('tableSetIsVisible', true);
@@ -67,21 +68,36 @@ const CardDisplay = ({
   const [tableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', false);
   const [tablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
 
-  return viewMode === 'grid' ? (
-    <CardGallery
-      key="gallery"
-      cards={displayCards}
-      isLoading={isLoading}
-      cardsPerRow={cardsPerRow}
-      galleryWidth={95}
-      onCardClick={onCardClick}
-      displaySettings={{
-        nameIsVisible,
-        setIsVisible,
-        priceIsVisible,
-      }}
-    />
-  ) : (
+  const cardDisplaySettings = {
+    nameIsVisible,
+    setIsVisible,
+    priceIsVisible,
+  };
+
+  if (viewMode === 'grid') {
+    return (
+      <VirtualizedGallery
+        key="browse-card-gallery"
+        items={displayCards}
+        renderItem={(card, index) => (
+          <CardItemRenderer
+            card={card}
+            settings={cardDisplaySettings}
+            priceType={currentPriceType}
+            onClick={onCardClick}
+          />
+        )}
+        isLoading={isLoading}
+        columnsPerRow={cardsPerRow}
+        galleryWidth={95}
+        horizontalPadding={cardSizeMargin}
+        emptyMessage="No cards found"
+        computeItemKey={(index) => displayCards[index]?.id || index}
+      />
+    );
+  }
+
+  return (
     <CardTable
       key="table"
       cards={displayCards}
@@ -102,11 +118,6 @@ const CardDisplay = ({
     />
   );
 };
-
-// Debug view as a separate component
-interface DebugViewProps {
-  searchResult: ApiResponse<CardSearchData>;
-}
 
 export default function BrowsePage() {
   const router = useRouter();

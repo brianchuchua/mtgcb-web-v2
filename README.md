@@ -9,9 +9,9 @@
 
 ### Next
 
-- Subset stuff in search filters
 - Before doing a set gallery, clean up the browse page's components to be more modular and more in my code style
-- Sort by market price descending should be nulls last -- look at sorting values that can be null in general
+- browse sets page and searches
+- Subset stuff in search filters
 - Catch up on minor typescript errors
 - set page with subsets handled
 
