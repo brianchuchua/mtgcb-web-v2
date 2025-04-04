@@ -14,7 +14,6 @@ import VirtualizedGallery from '@/components/common/VirtualizedGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { CardGalleryPagination } from '@/components/pagination';
 import SetDisplay from '@/components/sets/SetDisplay';
-import SetSettingsPanel from '@/components/sets/SetSettingsPanel';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { mapApiCardsToCardItems, mapApiSetsToSetItems } from '@/features/browse/mappers';
 import { useCardSetSettingGroups } from '@/hooks/useCardSetSettingGroups';
@@ -560,6 +559,12 @@ export default function BrowsePage() {
     }
   }, [viewContentType, cardsSearchResult?.data, setsSearchResult?.data, error, initialLoadComplete]);
 
+  // Get display settings for sets
+  const setDisplaySettings = useSetDisplaySettings(pagination.viewMode);
+
+  // Get setting groups based on content type and view mode
+  const settingGroups = useCardSetSettingGroups(viewContentType, pagination.viewMode);
+
   const paginationProps = {
     currentPage: pagination.currentPage,
     totalPages: totalPages || 1,
@@ -571,13 +576,9 @@ export default function BrowsePage() {
     onViewModeChange: handleViewModeChange,
     isLoading: isApiLoading,
     isInitialLoading: isInitialLoading,
+    contentType: viewContentType, // Pass the content type to the pagination component
+    settingGroups, // Pass the setting groups directly
   };
-
-  // Get display settings for sets
-  const setDisplaySettings = useSetDisplaySettings(pagination.viewMode);
-
-  // Get setting groups based on content type and view mode
-  const settingGroups = useCardSetSettingGroups(viewContentType, pagination.viewMode);
 
   // Update page title to reflect content type
   useEffect(() => {
@@ -588,22 +589,7 @@ export default function BrowsePage() {
     <Box>
       <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Browse' }]} />
 
-      {/* Page Settings */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Box>
-          {viewContentType === 'cards' ? (
-            <Box>
-              {/* Existing CardSettingsPanel will be shown automatically in CardGalleryPagination */}
-            </Box>
-          ) : (
-            <SetSettingsPanel
-              settingGroups={settingGroups}
-              panelId={`set${pagination.viewMode === 'grid' ? 'Gallery' : 'Table'}Settings`}
-              panelTitle={`Set ${pagination.viewMode === 'grid' ? 'Display' : 'Table'} Settings`}
-            />
-          )}
-        </Box>
-      </Box>
+      {/* Settings are moved to CardGalleryPagination (which needs to be renamed) */}
 
       <CardGalleryPagination {...paginationProps} />
 

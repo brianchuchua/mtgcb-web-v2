@@ -44,6 +44,8 @@ export interface CardGalleryPaginationProps {
   isOnBottom?: boolean;
   isLoading?: boolean;
   isInitialLoading?: boolean;
+  contentType?: 'cards' | 'sets'; // Add content type prop
+  settingGroups?: CardSettingGroup[]; // Add setting groups prop
 }
 
 const MobileSearchButton = React.memo(() => {
@@ -149,13 +151,18 @@ const PageSizeControl = React.memo(
     onPageSizeChange,
     pageSizeOptions,
     viewMode,
+    contentType = 'cards',
+    customSettingGroups,
   }: {
     pageSize: number;
     onPageSizeChange: (size: number) => void;
     pageSizeOptions: number[];
     viewMode: 'grid' | 'table';
+    contentType?: 'cards' | 'sets';
+    customSettingGroups?: CardSettingGroup[];
   }) => {
-    const cardSettingGroups = useCardSettingGroups(viewMode);
+    // If custom setting groups are provided, use them, otherwise use the hook
+    const cardSettingGroups = customSettingGroups || useCardSettingGroups(viewMode);
 
     // Memoize handler
     const handlePageSizeChange = useCallback(
@@ -173,7 +180,7 @@ const PageSizeControl = React.memo(
         {!isSmallScreen ? (
           // Desktop view
           <Typography variant="body1" color="text.secondary" sx={{ mr: 1, whiteSpace: 'nowrap' }}>
-            Cards per page:
+            {contentType === 'cards' ? 'Cards' : 'Sets'} per page:
           </Typography>
         ) : null}
         {isSmallScreen && (
@@ -182,7 +189,7 @@ const PageSizeControl = React.memo(
             color="text.secondary"
             sx={{ mr: 1, fontSize: '0.875rem', whiteSpace: 'nowrap' }}
           >
-            Cards:
+            {contentType === 'cards' ? 'Cards' : 'Sets'}:
           </Typography>
         )}
         <FormControl size="small" variant="outlined">
@@ -201,12 +208,12 @@ const PageSizeControl = React.memo(
           </Select>
         </FormControl>
 
-        {/* Card display settings with margin left */}
+        {/* Card/Set display settings with margin left */}
         <Box sx={{ ml: 1 }}>
           <CardSettingsPanel
             settingGroups={cardSettingGroups}
-            panelId={viewMode === 'grid' ? 'cardGallerySettings' : 'cardTableSettings'}
-            panelTitle={viewMode === 'grid' ? 'Card Display Settings' : 'Table Settings'}
+            panelId={`${contentType}${viewMode === 'grid' ? 'Gallery' : 'Table'}Settings`}
+            contentType={contentType}
           />
         </Box>
       </PageSizeSelector>
@@ -373,6 +380,8 @@ export const CardGalleryPagination = React.memo(
     isOnBottom = false,
     isLoading = false,
     isInitialLoading = false,
+    contentType = 'cards',
+    settingGroups,
   }: CardGalleryPaginationProps) => {
     const theme = useTheme();
     // Use md breakpoint (900px) to determine small screens
@@ -406,7 +415,7 @@ export const CardGalleryPagination = React.memo(
               {!isSmallScreen && !isLoading && (
                 <ItemRangeInfo>
                   <Typography variant="body1" color="text.secondary">
-                    Showing {startItem}-{endItem} of {totalItems} cards
+                    Showing {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
                   </Typography>
                 </ItemRangeInfo>
               )}
@@ -453,7 +462,7 @@ export const CardGalleryPagination = React.memo(
                             whiteSpace: 'nowrap',
                           }}
                         >
-                          {startItem}-{endItem} of {totalItems}
+                          {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
                         </Typography>
                       )}
                     </MobileInfoRow>
@@ -467,6 +476,8 @@ export const CardGalleryPagination = React.memo(
                       onPageSizeChange={onPageSizeChange}
                       pageSizeOptions={pageSizeOptions}
                       viewMode={viewMode}
+                      contentType={contentType}
+                      customSettingGroups={settingGroups}
                     />
 
                     {/* View mode toggles aligned with dropdown */}
@@ -512,6 +523,8 @@ export const CardGalleryPagination = React.memo(
                 onPageSizeChange={onPageSizeChange}
                 pageSizeOptions={pageSizeOptions}
                 viewMode={viewMode}
+                contentType={contentType}
+                customSettingGroups={settingGroups}
               />
             </RightSection>
           </TopPaginationLayout>
@@ -555,7 +568,8 @@ export const CardGalleryPagination = React.memo(
       prevProps.isOnBottom === nextProps.isOnBottom &&
       prevProps.onPageChange === nextProps.onPageChange &&
       prevProps.onPageSizeChange === nextProps.onPageSizeChange &&
-      prevProps.onViewModeChange === nextProps.onViewModeChange
+      prevProps.onViewModeChange === nextProps.onViewModeChange &&
+      prevProps.contentType === nextProps.contentType
     );
   },
 );

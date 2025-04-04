@@ -60,13 +60,21 @@ interface CardSettingsPanelProps {
   settingGroups: CardSettingGroup[];
   panelId: string;
   panelTitle?: string;
+  contentType?: 'cards' | 'sets';
 }
 
 const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({
   settingGroups,
   panelId,
-  panelTitle = panelId.includes('Table') ? 'Table Settings' : 'Card Display Settings',
+  contentType = 'cards',
+  panelTitle,
 }) => {
+  // Determine the panel title based on content type and view mode
+  const derivedPanelTitle = panelTitle || (
+    contentType === 'cards' 
+      ? (panelId.includes('Table') ? 'Card Table Settings' : 'Card Display Settings')
+      : (panelId.includes('Table') ? 'Set Table Settings' : 'Set Display Settings')
+  );
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const theme = useTheme();
 
@@ -82,7 +90,7 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({
 
   return (
     <>
-      <Tooltip title={panelTitle}>
+      <Tooltip title={derivedPanelTitle}>
         <IconButton
           size="small"
           aria-controls={open ? panelId : undefined}
@@ -137,7 +145,7 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({
         <SettingsPanelContent>
           <SettingsHeader>
             <Typography variant="subtitle1" fontWeight={600} color="primary">
-              {panelTitle}
+              {derivedPanelTitle}
             </Typography>
           </SettingsHeader>
 
