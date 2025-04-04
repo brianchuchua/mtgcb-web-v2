@@ -47,6 +47,16 @@ export function useInitializeBrowseFromUrl() {
     }
   }, [currentType]);
   
+  // Immediate first render effect to set content type ASAP
+  // This runs before other effects and helps prevent initial content flash
+  useEffect(() => {
+    const contentTypeParam = urlSearchParams.get('contentType');
+    if (contentTypeParam === 'sets') {
+      dispatch(setViewContentType('sets'));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  
   // Handle initial URL-based initialization
   useEffect(() => {
     // Only run this effect once on first mount

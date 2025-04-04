@@ -36,6 +36,7 @@ import debounce from 'lodash.debounce';
 import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'next/navigation';
 import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ColorSelector from '@/features/browse/ColorSelector';
@@ -75,9 +76,20 @@ const BrowseSearchForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const initialCheckDone = useRef(false);
   const prevDisplayPriceType = useRef<string | null>(null);
-
-  // Get content type
-  const contentType = useSelector(selectViewContentType);
+  const urlSearchParams = useSearchParams();
+  const initialRenderComplete = useRef(false);
+  
+  // Check content type from URL directly - this prevents flash during initial render
+  const urlContentType = urlSearchParams.get('contentType');
+  const initialContentType = urlContentType === 'sets' ? 'sets' : 'cards';
+  
+  // Get content type from Redux store
+  const reduxContentType = useSelector(selectViewContentType);
+  
+  // Use URL content type on initial render, then switch to Redux state
+  const contentType = !initialRenderComplete.current && urlContentType === 'sets' 
+    ? 'sets' 
+    : reduxContentType;
 
   // Get type-specific Redux state
   const reduxCardName = useSelector(selectCardSearchName) || '';
@@ -121,6 +133,16 @@ const BrowseSearchForm = () => {
   useEffect(() => {
     setLocalArtist(reduxArtist);
   }, [reduxArtist]);
+  
+  // Mark initial render as complete after a short delay
+  useEffect(() => {
+    if (!initialRenderComplete.current) {
+      const timer = setTimeout(() => {
+        initialRenderComplete.current = true;
+      }, 100); // Small delay to ensure content is displayed before potential change
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   // When display price type changes, check if current sort is a price sort and update if needed
   useEffect(() => {
