@@ -9,10 +9,9 @@
 
 ### Next
 
+- Bug with state bleeding from card name to set name
+- perfect browse sets table and search filter options
 - browse sets page and searches (merge to main after clean-up when finished)
-- move set table settings
-- improve transition when switching from view cards and view sets
-- view cards / view sets flashes the wrong value briefly on load
 - pageSize should be a localStorage item, not in the url
 - paginating too far in the future in the url bug may be back
 - Subset stuff in search filters

@@ -2,11 +2,12 @@ import debounce from 'lodash.debounce';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { selectSearchParams } from '@/redux/slices/browseSlice';
+import { selectSearchParams, selectViewContentType } from '@/redux/slices/browseSlice';
 import { BrowsePagination } from '@/types/browse';
 
 export const useSyncBrowseUrl = () => {
   const searchParams = useSelector(selectSearchParams);
+  const viewContentType = useSelector(selectViewContentType);
   const router = useRouter();
   const pathname = usePathname();
   const currentSearchParams = useSearchParams();
@@ -21,11 +22,28 @@ export const useSyncBrowseUrl = () => {
   const prevUrlRef = useRef<string | null>(null);
 
   const createUrlParams = useCallback(() => {
+    // Create new params each time
+    // Don't preserve old params - this ensures we properly switch between the two naming formats
     const params = new URLSearchParams();
+    
+    // Set content type if we're in sets view (consistent with browse page)
+    if (viewContentType === 'sets') {
+      params.set('contentType', 'sets');
+    }
 
-    // Search params
+    // Search params - use different parameter names depending on content type
     if (searchParams.name) {
-      params.set('name', searchParams.name);
+      if (viewContentType === 'sets') {
+        // For sets view, use setName parameter
+        params.set('setName', searchParams.name);
+      } else {
+        // For cards view, use name parameter
+        params.set('name', searchParams.name);
+      }
+    } else {
+      // Clear both name parameters if no search name is present
+      params.delete('name');
+      params.delete('setName');
     }
 
     if (searchParams.oracleText) {
@@ -77,7 +95,7 @@ export const useSyncBrowseUrl = () => {
     }
 
     return params;
-  }, [searchParams, pagination]);
+  }, [searchParams, pagination, viewContentType]);
 
   useEffect(() => {
     const updateUrl = debounce(() => {
@@ -97,5 +115,5 @@ export const useSyncBrowseUrl = () => {
 
     updateUrl();
     return () => updateUrl.cancel();
-  }, [createUrlParams, router, pathname, currentSearchParams]);
+  }, [createUrlParams, router, pathname, currentSearchParams, viewContentType]);
 };

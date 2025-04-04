@@ -409,7 +409,19 @@ export default function BrowsePage() {
     
     // Add name parameter depending on current view
     if (activeSearchParams.name) {
-      params.set('name', activeSearchParams.name);
+      if (viewContentType === 'sets') {
+        // For sets view, use setName parameter
+        params.set('setName', activeSearchParams.name);
+        params.delete('name'); // Ensure no conflicting parameter
+      } else {
+        // For cards view, use name parameter
+        params.set('name', activeSearchParams.name);
+        params.delete('setName'); // Ensure no conflicting parameter
+      }
+    } else {
+      // Clear both parameters if empty
+      params.delete('name');
+      params.delete('setName');
     }
 
     // Add card-specific parameters when in cards view

@@ -105,6 +105,7 @@ export function useInitializeBrowseFromUrl() {
     
     // Common parameters that may apply to either content type
     const name = urlSearchParams.get('name');
+    const setName = urlSearchParams.get('setName');
     const sortBy = urlSearchParams.get('sortBy');
     const sortOrder = urlSearchParams.get('sortOrder');
     
@@ -125,8 +126,11 @@ export function useInitializeBrowseFromUrl() {
       const excludeSets = urlSearchParams.get('excludeSets');
       
       // Sets name field for cards
-      if (effectiveContentType === 'cards' && name) {
-        dispatch(setCardSearchName(name));
+      if (effectiveContentType === 'cards') {
+        // Only use 'name' parameter for cards view
+        if (name) {
+          dispatch(setCardSearchName(name));
+        }
       }
       
       // Process colors
@@ -213,8 +217,12 @@ export function useInitializeBrowseFromUrl() {
     // Initialize set parameters if needed
     if (!hasSetParams) {
       // Set name field for sets
-      if (effectiveContentType === 'sets' && name) {
-        dispatch(setSetSearchName(name));
+      if (effectiveContentType === 'sets') {
+        // Prefer the dedicated setName parameter, fall back to name for backwards compatibility
+        const setNameValue = setName || name;
+        if (setNameValue) {
+          dispatch(setSetSearchName(setNameValue));
+        }
       }
       
       // Set sort parameters for sets if we're in sets view
