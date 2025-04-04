@@ -1,36 +1,33 @@
 import { CardModel } from '@/api/browse/types';
 import { CardItemProps } from '@/components/cards/CardItem';
+import { Set } from '@/types/sets';
 
 /**
- * Maps a card from the API model to the CardItem component props
+ * Maps cards from the API to the format used by CardItem components
  */
-export const mapApiCardToCardItem = (card: CardModel): CardItemProps => {
-  return {
+export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
+  return cards.map((card) => ({
     id: card.id,
     name: card.name,
-    setCode: card.tcgplayerSetCode?.toLowerCase() || card.setId?.toLowerCase(),
-    setName: card.setName || undefined,
-    collectorNumber: card.collectorNumber || undefined,
-    mtgcbCollectorNumber: card.mtgcbCollectorNumber || undefined,
-    rarity: card.rarity || undefined,
-    type: card.type || undefined,
-    artist: card.artist || undefined,
-    manaCost: card.manaCost || undefined,
-    convertedManaCost: card.convertedManaCost || undefined,
-    tcgplayerId: card.tcgplayerId || undefined,
-    powerNumeric: card.powerNumeric || undefined,
-    toughnessNumeric: card.toughnessNumeric || undefined,
-    loyaltyNumeric: card.loyaltyNumeric || undefined,
-
-    // Raw price values directly from API
+    setId: card.setId,
+    setName: card.setName,
+    collectorNumber: card.collectorNumber,
+    mtgcbCollectorNumber: card.mtgcbCollectorNumber,
+    rarity: card.rarity,
+    rarityNumeric: card.rarityNumeric,
+    type: card.type,
+    artist: card.artist || '',
+    manaCost: card.manaCost || '',
+    convertedManaCost: card.convertedManaCost?.toString() || '',
+    powerNumeric: card.powerNumeric || null,
+    toughnessNumeric: card.toughnessNumeric || null,
+    loyaltyNumeric: card.loyaltyNumeric || null,
     market: card.market,
     low: card.low,
     average: card.average,
     high: card.high,
     foil: card.foil,
-
-    // New format price data
-    prices: {
+    prices: card.prices || {
       normal: {
         market: card.market ? parseFloat(card.market) : null,
         low: card.low ? parseFloat(card.low) : null,
@@ -46,12 +43,18 @@ export const mapApiCardToCardItem = (card: CardModel): CardItemProps => {
           }
         : null,
     },
-  };
+    tcgplayerId: card.tcgplayerId,
+    releaseDate: card.releaseDate,
+  }));
 };
 
 /**
- * Maps an array of API cards to CardItem props
+ * Maps sets from the API to the format used by SetItem components
  */
-export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
-  return cards.map(mapApiCardToCardItem);
+export const mapApiSetsToSetItems = (sets: Set[]): Set[] => {
+  // The SetModel from the API already matches our Set interface
+  // This mapper exists for consistency and potential future transformations
+  return sets.map((set) => ({
+    ...set
+  }));
 };

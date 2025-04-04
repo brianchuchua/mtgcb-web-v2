@@ -14,8 +14,9 @@ import {
 } from '@/types/browse';
 
 // Initialize with empty state - let the useInitializeBrowseFromUrl handle population
-const initialState: BrowseState = {
+const initialState: BrowseState & { viewContentType: 'cards' | 'sets' } = {
   searchParams: {},
+  viewContentType: 'cards',
 };
 
 export const browseSlice = createSlice({
@@ -101,6 +102,9 @@ export const browseSlice = createSlice({
     resetSearch: (state) => {
       state.searchParams = {};
     },
+    setViewContentType: (state, action: PayloadAction<'cards' | 'sets'>) => {
+      state.viewContentType = action.payload;
+    },
   },
 });
 
@@ -118,6 +122,7 @@ export const {
   setSortOrder,
   setSearchParams,
   resetSearch,
+  setViewContentType,
 } = browseSlice.actions;
 
 export const selectSearchParams = (state: RootState) => state.browse.searchParams;
@@ -133,5 +138,6 @@ export const selectOneResultPerCardName = (state: RootState) =>
   state.browse.searchParams.oneResultPerCardName;
 export const selectSortBy = (state: RootState) => state.browse.searchParams.sortBy;
 export const selectSortOrder = (state: RootState) => state.browse.searchParams.sortOrder;
+export const selectViewContentType = (state: RootState) => state.browse.viewContentType;
 
 export default browseSlice.reducer;

@@ -64,6 +64,7 @@
 - update rarityNumeric to have special be 6 instead of 1 in production `update "Card" set "rarityNumeric" = 6 where "rarityNumeric" = 1;`
 - Clean up BrowseSearchForm into smaller components
 - Add ability to save searches (even independently of collection goals, a saved searches section)
+- Allow sorting by set names alphabetically in card view
 
 ## Known Bugs
 

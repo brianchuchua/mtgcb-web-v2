@@ -17,7 +17,7 @@ export const mtgcbApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Auth', 'Cards'],
+  tagTypes: ['Auth', 'Cards', 'Sets'],
   endpoints: () => ({}),
 });
 

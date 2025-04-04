@@ -5,7 +5,7 @@ import { Box, Typography } from '@mui/material';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery } from '@/api/browse/browseApi';
+import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import CardItemRenderer from '@/components/cards/CardItemRenderer';
 import CardTable from '@/components/cards/CardTable';
@@ -13,18 +13,24 @@ import { useCardRowRenderer, useCardTableColumns } from '@/components/cards/Card
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { CardGalleryPagination } from '@/components/pagination';
+import SetDisplay from '@/components/sets/SetDisplay';
+import SetSettingsPanel from '@/components/sets/SetSettingsPanel';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { mapApiCardsToCardItems } from '@/features/browse/mappers';
+import { mapApiCardsToCardItems, mapApiSetsToSetItems } from '@/features/browse/mappers';
+import { useCardSetSettingGroups } from '@/hooks/useCardSetSettingGroups';
 import { useInitializeBrowseFromUrl } from '@/hooks/useInitializeBrowseFromUrl';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePriceType } from '@/hooks/usePriceType';
+import { useSetDisplaySettings } from '@/hooks/useSetDisplaySettings';
 import {
   selectSearchParams,
   selectSortBy,
   selectSortOrder,
+  selectViewContentType,
   setSortBy,
   setSortOrder,
 } from '@/redux/slices/browseSlice';
+import { Set } from '@/types/sets';
 import { BrowsePagination, SortByOption } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 
@@ -173,7 +179,9 @@ export default function BrowsePage() {
   const pathname = usePathname();
   const urlSearchParams = useSearchParams();
   const reduxSearchParams = useSelector(selectSearchParams);
+  const dispatch = useDispatch();
 
+  const viewContentType = useSelector(selectViewContentType);
   const [preferredViewMode, setPreferredViewMode] = useLocalStorage<'grid' | 'table'>(
     'preferredViewMode',
     'grid',
@@ -196,8 +204,9 @@ export default function BrowsePage() {
 
   useInitializeBrowseFromUrl();
 
-  const apiParams = useMemo(() => {
-    const params = buildApiParamsFromSearchParams(reduxSearchParams);
+  // Card API params
+  const cardApiParams = useMemo(() => {
+    const params = buildApiParamsFromSearchParams(reduxSearchParams, 'cards');
     return {
       ...params,
       limit: pagination.pageSize,
@@ -231,12 +240,40 @@ export default function BrowsePage() {
     };
   }, [reduxSearchParams, pagination]);
 
+  // Set API params
+  const setApiParams = useMemo(() => {
+    const params = buildApiParamsFromSearchParams(reduxSearchParams, 'sets');
+    return {
+      ...params,
+      limit: pagination.pageSize,
+      offset: (pagination.currentPage - 1) * pagination.pageSize,
+      // Use the sort parameters from the redux store if provided, otherwise use defaults
+      sortBy: params.sortBy || 'name',
+      sortDirection: params.sortDirection || ('asc' as const),
+      select: [
+        'name',
+        'slug',
+        'code',
+        'setType',
+        'category',
+        'releasedAt',
+        'cardCount',
+        'iconUrl',
+        'isDraftable',
+      ],
+    };
+  }, [reduxSearchParams, pagination]);
+
   const nextPageApiParams = useMemo(
     () =>
       pagination.currentPage >= 1
-        ? getNextPageParams(apiParams, pagination.currentPage, pagination.pageSize)
+        ? getNextPageParams(
+            viewContentType === 'cards' ? cardApiParams : setApiParams,
+            pagination.currentPage,
+            pagination.pageSize
+          )
         : null,
-    [apiParams, pagination.currentPage, pagination.pageSize],
+    [viewContentType, cardApiParams, setApiParams, pagination.currentPage, pagination.pageSize],
   );
 
   const queryConfig = {
@@ -245,13 +282,29 @@ export default function BrowsePage() {
     refetchOnReconnect: false,
   };
 
+  // Fetch cards or sets based on content type
   const {
-    data: searchResult,
-    isFetching: isApiLoading,
-    error,
-  } = useGetCardsQuery(apiParams, queryConfig);
+    data: cardsSearchResult,
+    isFetching: isCardsApiLoading,
+    error: cardsError,
+  } = useGetCardsQuery(cardApiParams, { 
+    ...queryConfig,
+    skip: viewContentType !== 'cards',
+  });
 
-  const prefetchNextPage = useGetCardsPrefetch('getCards');
+  const {
+    data: setsSearchResult,
+    isFetching: isSetsApiLoading,
+    error: setsError,
+  } = useGetSetsQuery(setApiParams, { 
+    ...queryConfig,
+    skip: viewContentType !== 'sets',
+  });
+
+  const isApiLoading = viewContentType === 'cards' ? isCardsApiLoading : isSetsApiLoading;
+  const error = viewContentType === 'cards' ? cardsError : setsError;
+
+  const prefetchNextPage = useGetCardsPrefetch(viewContentType === 'cards' ? 'getCards' : 'getSets');
 
   useEffect(() => {
     if (!nextPageApiParams || isApiLoading) return;
@@ -283,6 +336,7 @@ export default function BrowsePage() {
     reduxSearchParamsRef.current = reduxSearchParams;
   }, [reduxSearchParams, pagination.currentPage]);
 
+  // Add content type to URL
   useEffect(() => {
     const params = new URLSearchParams();
     const defaults = { currentPage: 1, pageSize: 24 };
@@ -295,6 +349,11 @@ export default function BrowsePage() {
     pagination.pageSize !== defaults.pageSize
       ? params.set('pageSize', pagination.pageSize.toString())
       : params.delete('pageSize');
+
+    // Add content type parameter
+    if (viewContentType !== 'cards') {
+      params.set('contentType', viewContentType);
+    }
 
     // Add search parameters from Redux
     if (reduxSearchParams.name) {
@@ -374,7 +433,7 @@ export default function BrowsePage() {
     const newSearch = params.toString();
     const newUrl = newSearch ? `${pathname}?${newSearch}` : pathname;
     router.replace(newUrl, { scroll: false });
-  }, [pagination, reduxSearchParams, pathname, router]);
+  }, [pagination, reduxSearchParams, pathname, router, viewContentType]);
 
   const handlePageChange = useCallback((page: number) => {
     const validPage = Math.max(page, 1);
@@ -401,14 +460,34 @@ export default function BrowsePage() {
     [router],
   );
 
+  const handleSetClick = useCallback(
+    (set: Set) => {
+      // Navigate to cards filtered by this set
+      router.push(`/browse?includeSets=${set.id}`);
+    },
+    [router],
+  );
+
+  // Map API data to component props
   const cardItems = useMemo(
-    () => (searchResult?.data ? mapApiCardsToCardItems(searchResult.data.cards || []) : []),
-    [searchResult?.data],
+    () => (cardsSearchResult?.data ? mapApiCardsToCardItems(cardsSearchResult.data.cards || []) : []),
+    [cardsSearchResult?.data],
+  );
+
+  const setItems = useMemo(
+    () => (setsSearchResult?.data ? mapApiSetsToSetItems(setsSearchResult.data.sets || []) : []),
+    [setsSearchResult?.data],
   );
 
   const totalItems = useMemo(
-    () => searchResult?.data?.totalCount || 0,
-    [searchResult?.data?.totalCount],
+    () => {
+      if (viewContentType === 'cards') {
+        return cardsSearchResult?.data?.totalCount || 0;
+      } else {
+        return setsSearchResult?.data?.totalCount || 0;
+      }
+    },
+    [viewContentType, cardsSearchResult?.data?.totalCount, setsSearchResult?.data?.totalCount],
   );
 
   const totalPages = useMemo(
@@ -417,14 +496,13 @@ export default function BrowsePage() {
   );
 
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-
-  const isInitialLoading = !initialLoadComplete && !searchResult?.data && !error;
+  const isInitialLoading = !initialLoadComplete && !((viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data) && !error;
 
   useEffect(() => {
-    if ((searchResult?.data || error) && !initialLoadComplete) {
+    if (((viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data || error) && !initialLoadComplete) {
       setInitialLoadComplete(true);
     }
-  }, [searchResult?.data, error, initialLoadComplete]);
+  }, [viewContentType, cardsSearchResult?.data, setsSearchResult?.data, error, initialLoadComplete]);
 
   const paginationProps = {
     currentPage: pagination.currentPage,
@@ -439,9 +517,35 @@ export default function BrowsePage() {
     isInitialLoading: isInitialLoading,
   };
 
+  // Get display settings for sets
+  const setDisplaySettings = useSetDisplaySettings(pagination.viewMode);
+
+  // Get setting groups based on content type and view mode
+  const settingGroups = useCardSetSettingGroups(viewContentType, pagination.viewMode);
+
+  // Update page title to reflect content type
+  useEffect(() => {
+    document.title = `Browse ${viewContentType === 'cards' ? 'Cards' : 'Sets'} | MTG Collection Builder`;
+  }, [viewContentType]);
+
   return (
     <Box>
       <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Browse' }]} />
+
+      {/* Page Settings */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        {viewContentType === 'cards' ? (
+          <Box>
+            {/* Existing CardSettingsPanel will be shown automatically in CardGalleryPagination */}
+          </Box>
+        ) : (
+          <SetSettingsPanel
+            settingGroups={settingGroups}
+            panelId={`set${pagination.viewMode === 'grid' ? 'Gallery' : 'Table'}Settings`}
+            panelTitle={`Set ${pagination.viewMode === 'grid' ? 'Display' : 'Table'} Settings`}
+          />
+        )}
+      </Box>
 
       <CardGalleryPagination {...paginationProps} />
 
@@ -468,21 +572,47 @@ export default function BrowsePage() {
             }}
           />
           <Typography variant="h6" gutterBottom fontWeight="bold" color="error.main">
-            Unable to load cards
+            Unable to load {viewContentType}
           </Typography>
           <Typography color="text.primary">
-            There was a problem fetching card data. Please try again later.
+            There was a problem fetching data. Please try again later.
           </Typography>
         </Box>
       )}
 
-      <CardDisplay
-        cardItems={cardItems}
-        isLoading={isApiLoading}
-        viewMode={pagination.viewMode}
-        onCardClick={handleCardClick}
-        pageSize={pagination.pageSize}
-      />
+      {viewContentType === 'cards' ? (
+        <CardDisplay
+          cardItems={cardItems}
+          isLoading={isCardsApiLoading}
+          viewMode={pagination.viewMode}
+          onCardClick={handleCardClick}
+          pageSize={pagination.pageSize}
+        />
+      ) : (
+        <SetDisplay
+          setItems={setItems}
+          isLoading={isSetsApiLoading}
+          viewMode={pagination.viewMode}
+          onSetClick={handleSetClick}
+          pageSize={pagination.pageSize}
+          displaySettings={{
+            grid: {
+              nameIsVisible: setDisplaySettings.nameIsVisible,
+              codeIsVisible: setDisplaySettings.codeIsVisible,
+              releaseDateIsVisible: setDisplaySettings.releaseDateIsVisible,
+              cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
+            },
+            table: {
+              codeIsVisible: setDisplaySettings.codeIsVisible,
+              cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
+              releaseDateIsVisible: setDisplaySettings.releaseDateIsVisible,
+              typeIsVisible: setDisplaySettings.typeIsVisible,
+              categoryIsVisible: setDisplaySettings.categoryIsVisible,
+              isDraftableIsVisible: setDisplaySettings.isDraftableIsVisible,
+            },
+          }}
+        />
+      )}
 
       <CardGalleryPagination {...paginationProps} isOnBottom={true} />
     </Box>

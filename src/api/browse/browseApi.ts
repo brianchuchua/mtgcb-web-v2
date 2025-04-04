@@ -1,6 +1,7 @@
-import { CardApiParams, CardSearchData } from './types';
+import { CardApiParams, CardSearchData, SetApiParams } from './types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
+import { SetsSearchResult } from '@/types/sets';
 
 export const browseApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -33,6 +34,26 @@ export const browseApi = mtgcbApi.injectEndpoints({
       keepUnusedDataFor: 300, // 5 minutes
       providesTags: ['Cards'],
     }),
+
+    getSets: builder.query<ApiResponse<SetsSearchResult>, SetApiParams>({
+      query: (params) => ({
+        url: '/sets/search',
+        method: 'POST',
+        body: params,
+      }),
+      serializeQueryArgs: ({ queryArgs }) => {
+        if (!queryArgs) return '';
+
+        const { limit = 24, offset = 0, sortBy, sortDirection = 'asc', ...rest } = queryArgs;
+        const paginationKey = `limit=${limit}&offset=${offset}`;
+        const sortKey = sortBy ? `&sort=${sortBy}:${sortDirection}` : '';
+        const filterKey = JSON.stringify(rest);
+
+        return `${paginationKey}${sortKey}${filterKey}`;
+      },
+      keepUnusedDataFor: 300, // 5 minutes
+      providesTags: ['Sets'],
+    }),
   }),
   overrideExisting: false,
 });
@@ -40,6 +61,7 @@ export const browseApi = mtgcbApi.injectEndpoints({
 export const {
   useSearchCardsMutation,
   useGetCardsQuery,
+  useGetSetsQuery,
   usePrefetch: useGetCardsPrefetch,
   endpoints,
 } = browseApi;
@@ -51,10 +73,10 @@ export const {
  * @param pageSize Items per page
  */
 export const getNextPageParams = (
-  currentParams: CardApiParams,
+  currentParams: CardApiParams | SetApiParams,
   currentPage: number,
   pageSize: number,
-): CardApiParams => {
+): CardApiParams | SetApiParams => {
   return {
     ...currentParams,
     offset: currentPage * pageSize, // Calculate next page offset

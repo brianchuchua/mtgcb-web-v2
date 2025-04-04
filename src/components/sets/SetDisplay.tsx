@@ -1,0 +1,124 @@
+'use client';
+
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import VirtualizedGallery from '@/components/common/VirtualizedGallery';
+import VirtualizedTable from '@/components/common/VirtualizedTable';
+import { useSetTableRenderers } from './SetTableRenderer';
+import SetItemRenderer from './SetItemRenderer';
+import { Set } from '@/types/sets';
+import { selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
+import { SortByOption } from '@/types/browse';
+
+interface SetDisplayProps {
+  setItems: Set[];
+  isLoading: boolean;
+  viewMode: 'grid' | 'table';
+  onSetClick: (set: Set) => void;
+  pageSize: number;
+  displaySettings: {
+    grid: {
+      nameIsVisible?: boolean;
+      codeIsVisible?: boolean;
+      releaseDateIsVisible?: boolean;
+      cardCountIsVisible?: boolean;
+    };
+    table: {
+      codeIsVisible?: boolean;
+      cardCountIsVisible?: boolean;
+      releaseDateIsVisible?: boolean;
+      typeIsVisible?: boolean;
+      categoryIsVisible?: boolean;
+      isDraftableIsVisible?: boolean;
+    };
+  };
+}
+
+const SetDisplay: React.FC<SetDisplayProps> = ({
+  setItems,
+  isLoading,
+  viewMode,
+  onSetClick,
+  pageSize,
+  displaySettings,
+}) => {
+  const dispatch = useDispatch();
+  const currentSortBy = useSelector(selectSortBy) || 'name';
+  const currentSortOrder = useSelector(selectSortOrder) || 'asc';
+
+  // Create skeleton loading items if needed
+  const displaySets = isLoading
+    ? Array(pageSize)
+        .fill(0)
+        .map((_, index) => ({
+          id: `skeleton-${index}`,
+          name: '',
+          slug: '',
+          code: '',
+          isLoadingSkeleton: true,
+        }))
+    : setItems;
+
+  // Get the appropriate renderers for table view
+  const { columns, renderRowContent } = useSetTableRenderers(
+    displaySettings.table,
+    currentSortBy,
+    onSetClick
+  );
+
+  // Handle sort change
+  const handleSortChange = (columnId: string) => {
+    if (columnId) {
+      const isClickingCurrentSortColumn = columnId === currentSortBy;
+      if (isClickingCurrentSortColumn) {
+        const newOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+        dispatch(setSortOrder(newOrder));
+      } else {
+        dispatch(setSortBy(columnId as SortByOption));
+        dispatch(setSortOrder('asc'));
+      }
+    }
+  };
+
+  if (viewMode === 'grid') {
+    return (
+      <VirtualizedGallery
+        key="browse-set-gallery"
+        items={displaySets}
+        renderItem={(set, index) => (
+          <SetItemRenderer
+            set={set}
+            settings={displaySettings.grid}
+            onClick={onSetClick}
+          />
+        )}
+        isLoading={isLoading}
+        columnsPerRow={4} // Default to 4 sets per row
+        galleryWidth={95}
+        horizontalPadding={0}
+        emptyMessage="No sets found"
+        computeItemKey={(index) => displaySets[index]?.id || index}
+      />
+    );
+  }
+
+  // Table view
+  return (
+    <VirtualizedTable
+      key="browse-set-table"
+      items={displaySets}
+      columns={columns}
+      renderRowContent={renderRowContent}
+      isLoading={isLoading}
+      sortBy={currentSortBy}
+      sortOrder={currentSortOrder}
+      onSortChange={handleSortChange}
+      emptyMessage="No sets found"
+      computeItemKey={(index) => displaySets[index]?.id || index}
+      onClick={onSetClick}
+      getItemId={(set) => set.id}
+    />
+  );
+};
+
+export default SetDisplay;

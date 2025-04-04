@@ -1,14 +1,17 @@
 'use client';
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
+import StyleIcon from '@mui/icons-material/Style';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
   Box,
   Button,
+  Divider,
   FormControl,
   FormControlLabel,
   InputAdornment,
@@ -20,7 +23,10 @@ import {
   Stack,
   Switch,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
+  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -46,12 +52,14 @@ import {
   selectSearchName,
   selectSortBy,
   selectSortOrder,
+  selectViewContentType,
   setArtist,
   setOneResultPerCardName,
   setOracleText,
   setSearchName,
   setSortBy,
   setSortOrder,
+  setViewContentType,
 } from '@/redux/slices/browseSlice';
 import { SortByOption, SortOrderOption } from '@/types/browse';
 import { PriceType } from '@/types/pricing';
@@ -65,13 +73,16 @@ const BrowseSearchForm = () => {
   const initialCheckDone = useRef(false);
   const prevDisplayPriceType = useRef<string | null>(null);
 
+  // Redux state
   const reduxName = useSelector(selectSearchName) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
   const reduxArtist = useSelector(selectArtist) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
   const reduxSortBy = useSelector(selectSortBy) || 'releasedAt';
   const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
+  const contentType = useSelector(selectViewContentType);
 
+  // Local state for input fields
   const [localName, setLocalName] = useState(reduxName);
   const [localOracleText, setLocalOracleText] = useState(reduxOracleText);
   const [localArtist, setLocalArtist] = useState(reduxArtist);
@@ -226,6 +237,12 @@ const BrowseSearchForm = () => {
     setMobileOpen(false);
   };
 
+  const handleContentTypeChange = (_event: React.MouseEvent<HTMLElement>, newContentType: 'cards' | 'sets') => {
+    if (newContentType !== null) {
+      dispatch(setViewContentType(newContentType));
+    }
+  };
+
   // Helper function to convert string price type to enum value
   const getPriceTypeEnum = (priceType: string): number => {
     switch (priceType) {
@@ -294,6 +311,31 @@ const BrowseSearchForm = () => {
               </Button>
             </Box>
           )}
+
+          {/* Content Type Toggle */}
+          <Box sx={{ mb: 1 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              Content Type
+            </Typography>
+            <ToggleButtonGroup
+              value={contentType}
+              exclusive
+              onChange={handleContentTypeChange}
+              aria-label="content type"
+              size="small"
+              fullWidth
+            >
+              <ToggleButton value="cards" aria-label="cards">
+                <StyleIcon sx={{ mr: 1 }} /> Cards
+              </ToggleButton>
+              <ToggleButton value="sets" aria-label="sets">
+                <LibraryAddCheckIcon sx={{ mr: 1 }} /> Sets
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+
+          <Divider />
+
           <TextField
             fullWidth
             label="Card Name"

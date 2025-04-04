@@ -1,104 +1,105 @@
-'use client';
-
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
-import { setSearchParams } from '@/redux/slices/browseSlice';
-import { BrowseSearchParams, ColorMatchType, SortByOption, SortOrderOption, StatFilters } from '@/types/browse';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectSearchParams,
+  selectViewContentType,
+  setColors,
+  setOneResultPerCardName,
+  setRarities,
+  setSearchName,
+  setSearchParams,
+  setSets,
+  setSortBy,
+  setSortOrder,
+  setTypes,
+  setViewContentType,
+} from '@/redux/slices/browseSlice';
+import { ColorFilter, RarityFilter, SetFilter, TypeFilter } from '@/types/browse';
 
-export const useInitializeBrowseFromUrl = () => {
+export function useInitializeBrowseFromUrl() {
+  const urlSearchParams = useSearchParams();
+  const reduxSearchParams = useSelector(selectSearchParams);
+  const viewContentType = useSelector(selectViewContentType);
   const dispatch = useDispatch();
-  const searchParams = useSearchParams();
-  const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
+    // Check if we already have search params in Redux
+    const hasExistingParams = Object.keys(reduxSearchParams).length > 0;
 
-    const params: BrowseSearchParams = {};
-
-    // Handle name
-    const name = searchParams.get('name');
-    if (name) {
-      params.name = name;
+    // Skip initialization if we already have search params
+    if (hasExistingParams) {
+      return;
     }
 
-    // Handle oracle text
-    const oracleText = searchParams.get('oracleText');
-    if (oracleText) {
-      params.oracleText = oracleText;
+    // Get content type
+    const contentTypeParam = urlSearchParams.get('contentType');
+    if (contentTypeParam === 'sets' && viewContentType !== 'sets') {
+      dispatch(setViewContentType('sets'));
     }
 
-    // Handle artist
-    const artist = searchParams.get('artist');
-    if (artist) {
-      params.artist = artist;
-    }
+    // Process URL parameters
+    const name = urlSearchParams.get('name');
+    const oracleText = urlSearchParams.get('oracleText');
+    const artist = urlSearchParams.get('artist');
+    const oneResultPerCardName = urlSearchParams.get('oneResultPerCardName') === 'true';
+    const colorless = urlSearchParams.get('colorless') === 'true';
+    const colors = urlSearchParams.get('colors');
+    const colorMatchType = urlSearchParams.get('colorMatchType');
+    const includeTypes = urlSearchParams.get('includeTypes');
+    const excludeTypes = urlSearchParams.get('excludeTypes');
+    const includeRarities = urlSearchParams.get('includeRarities');
+    const excludeRarities = urlSearchParams.get('excludeRarities');
+    const includeSets = urlSearchParams.get('includeSets');
+    const excludeSets = urlSearchParams.get('excludeSets');
+    const sortBy = urlSearchParams.get('sortBy');
+    const sortOrder = urlSearchParams.get('sortOrder');
 
-    // Handle oneResultPerCardName
-    const oneResultPerCardName = searchParams.get('oneResultPerCardName') === 'true';
-    if (oneResultPerCardName) {
-      params.oneResultPerCardName = true;
-    }
-
-    // Handle color params
-    const colorless = searchParams.get('colorless') === 'true';
-    const colors = searchParams.get('colors');
-    const colorMatchType = (searchParams.get('colorMatchType') || 'exactly') as ColorMatchType;
-
-    if (colorless) {
-      params.colors = {
-        colors: [],
-        matchType: 'exactly',
-        includeColorless: true,
+    // Process colors
+    if (colors || colorless) {
+      const colorFilter: ColorFilter = {
+        colors: colors ? colors.split(',') : [],
+        matchType: (colorMatchType as 'exactly' | 'atLeast' | 'atMost') || 'exactly',
+        includeColorless: colorless,
       };
-    } else if (colors) {
-      params.colors = {
-        colors: colors.split(','),
-        matchType: colorMatchType,
-        includeColorless: false,
-      };
+      dispatch(setColors(colorFilter));
     }
 
-    // Handle type params
-    const includeTypes = searchParams.get('includeTypes');
-    const excludeTypes = searchParams.get('excludeTypes');
-
+    // Process types
     if (includeTypes || excludeTypes) {
-      params.types = {
+      const typeFilter: TypeFilter = {
         include: includeTypes ? includeTypes.split('|') : [],
         exclude: excludeTypes ? excludeTypes.split('|') : [],
       };
+      dispatch(setTypes(typeFilter));
     }
 
-    // Handle rarity params
-    const includeRarities = searchParams.get('includeRarities');
-    const excludeRarities = searchParams.get('excludeRarities');
-
+    // Process rarities
     if (includeRarities || excludeRarities) {
-      params.rarities = {
+      const rarityFilter: RarityFilter = {
         include: includeRarities ? includeRarities.split('|') : [],
         exclude: excludeRarities ? excludeRarities.split('|') : [],
       };
+      dispatch(setRarities(rarityFilter));
     }
 
-    // Handle set params
-    const includeSets = searchParams.get('includeSets');
-    const excludeSets = searchParams.get('excludeSets');
-
+    // Process sets
     if (includeSets || excludeSets) {
-      params.sets = {
+      const setFilter: SetFilter = {
         include: includeSets ? includeSets.split('|') : [],
         exclude: excludeSets ? excludeSets.split('|') : [],
       };
+      dispatch(setSets(setFilter));
     }
 
-    const stats = searchParams.get('stats');
-    if (stats) {
-      const statFilters: StatFilters = {};
+    // Process stats (complex parameters like power, toughness, cmc)
+    const statsParam = urlSearchParams.get('stats');
+    if (statsParam) {
+      const statFilters: { [key: string]: string[] } = {};
 
-      // Format: convertedManaCost=gte2|lt5,power=gte2
-      stats.split(',').forEach((group) => {
+      // Format: "power=gte1|lte3,toughness=gte2"
+      const statGroups = statsParam.split(',');
+      statGroups.forEach((group) => {
         const [attribute, conditions] = group.split('=');
         if (attribute && conditions) {
           statFilters[attribute] = conditions.split('|');
@@ -106,21 +107,57 @@ export const useInitializeBrowseFromUrl = () => {
       });
 
       if (Object.keys(statFilters).length > 0) {
-        params.stats = statFilters;
+        dispatch(setStats(statFilters));
       }
     }
 
-    // Handle sorting parameters
-    const sortBy = searchParams.get('sortBy') as SortByOption | null;
+    // Process individual parameters
+    if (name) {
+      dispatch(setSearchName(name));
+    }
+
+    if (oracleText) {
+      dispatch(setOracleText(oracleText));
+    }
+
+    if (artist) {
+      dispatch(setArtist(artist));
+    }
+
+    if (oneResultPerCardName) {
+      dispatch(setOneResultPerCardName(true));
+    }
+
     if (sortBy) {
-      params.sortBy = sortBy;
+      dispatch(setSortBy(sortBy as any));
     }
 
-    const sortOrder = searchParams.get('sortOrder') as SortOrderOption | null;
     if (sortOrder) {
-      params.sortOrder = sortOrder;
+      dispatch(setSortOrder(sortOrder as 'asc' | 'desc'));
     }
+  }, [urlSearchParams, reduxSearchParams, viewContentType, dispatch]);
+}
 
-    dispatch(setSearchParams(params));
-  }, [dispatch, searchParams]);
-};
+// Helper function to extract the stats parameter
+function setStats(statFilters: { [key: string]: string[] }) {
+  return {
+    type: 'browse/setStats',
+    payload: statFilters,
+  };
+}
+
+// Helper function for oracle text
+function setOracleText(text: string) {
+  return {
+    type: 'browse/setOracleText',
+    payload: text,
+  };
+}
+
+// Helper function for artist
+function setArtist(artist: string) {
+  return {
+    type: 'browse/setArtist',
+    payload: artist,
+  };
+}
