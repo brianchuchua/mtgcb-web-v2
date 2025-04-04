@@ -187,11 +187,22 @@ export default function BrowsePage() {
     'grid',
   );
 
-  const [pagination, setPagination] = useState<BrowsePagination>({
+  // Separate pagination state for cards and sets
+  const [cardsPagination, setCardsPagination] = useState<BrowsePagination>({
     currentPage: Math.max(parseInt(urlSearchParams.get('page') || '1', 10), 1),
     pageSize: Math.min(Math.max(parseInt(urlSearchParams.get('pageSize') || '24', 10), 1), 500),
     viewMode: preferredViewMode,
   });
+
+  const [setsPagination, setSetsPagination] = useState<BrowsePagination>({
+    currentPage: Math.max(parseInt(urlSearchParams.get('page') || '1', 10), 1),
+    pageSize: Math.min(Math.max(parseInt(urlSearchParams.get('pageSize') || '24', 10), 1), 500),
+    viewMode: preferredViewMode,
+  });
+
+  // Get the current pagination based on content type
+  const pagination = viewContentType === 'cards' ? cardsPagination : setsPagination;
+  const setPagination = viewContentType === 'cards' ? setCardsPagination : setSetsPagination;
 
   useEffect(() => {
     if (pagination.viewMode !== preferredViewMode) {
@@ -200,7 +211,7 @@ export default function BrowsePage() {
         viewMode: preferredViewMode,
       }));
     }
-  }, [preferredViewMode, pagination.viewMode]);
+  }, [preferredViewMode, pagination.viewMode, setPagination]);
 
   useInitializeBrowseFromUrl();
 
@@ -209,8 +220,8 @@ export default function BrowsePage() {
     const params = buildApiParamsFromSearchParams(reduxSearchParams, 'cards');
     return {
       ...params,
-      limit: pagination.pageSize,
-      offset: (pagination.currentPage - 1) * pagination.pageSize,
+      limit: cardsPagination.pageSize,
+      offset: (cardsPagination.currentPage - 1) * cardsPagination.pageSize,
       // Use the sort parameters from the redux store if provided, otherwise use defaults
       sortBy: params.sortBy || 'releasedAt',
       sortDirection: params.sortDirection || ('asc' as const),
@@ -238,15 +249,15 @@ export default function BrowsePage() {
         'releaseDate',
       ] as Array<keyof CardModel>,
     };
-  }, [reduxSearchParams, pagination]);
+  }, [reduxSearchParams, cardsPagination]);
 
   // Set API params
   const setApiParams = useMemo(() => {
     const params = buildApiParamsFromSearchParams(reduxSearchParams, 'sets');
     return {
       ...params,
-      limit: pagination.pageSize,
-      offset: (pagination.currentPage - 1) * pagination.pageSize,
+      limit: setsPagination.pageSize,
+      offset: (setsPagination.currentPage - 1) * setsPagination.pageSize,
       // Use the sort parameters from the redux store if provided, otherwise use defaults
       sortBy: params.sortBy || 'name',
       sortDirection: params.sortDirection || ('asc' as const),
@@ -262,18 +273,26 @@ export default function BrowsePage() {
         'isDraftable',
       ],
     };
-  }, [reduxSearchParams, pagination]);
+  }, [reduxSearchParams, setsPagination]);
 
   const nextPageApiParams = useMemo(
-    () =>
-      pagination.currentPage >= 1
-        ? getNextPageParams(
-            viewContentType === 'cards' ? cardApiParams : setApiParams,
-            pagination.currentPage,
-            pagination.pageSize
-          )
-        : null,
-    [viewContentType, cardApiParams, setApiParams, pagination.currentPage, pagination.pageSize],
+    () => {
+      if (viewContentType === 'cards' && cardsPagination.currentPage >= 1) {
+        return getNextPageParams(
+          cardApiParams,
+          cardsPagination.currentPage,
+          cardsPagination.pageSize
+        );
+      } else if (viewContentType === 'sets' && setsPagination.currentPage >= 1) {
+        return getNextPageParams(
+          setApiParams,
+          setsPagination.currentPage,
+          setsPagination.pageSize
+        );
+      }
+      return null;
+    },
+    [viewContentType, cardApiParams, setApiParams, cardsPagination, setsPagination],
   );
 
   const queryConfig = {
@@ -329,25 +348,30 @@ export default function BrowsePage() {
     const hasSearchParamsChanged =
       JSON.stringify(reduxSearchParamsRef.current) !== JSON.stringify(reduxSearchParams);
 
-    if (hasSearchParamsChanged && pagination.currentPage !== 1) {
-      setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    if (hasSearchParamsChanged) {
+      if (viewContentType === 'cards' && cardsPagination.currentPage !== 1) {
+        setCardsPagination((prev) => ({ ...prev, currentPage: 1 }));
+      } else if (viewContentType === 'sets' && setsPagination.currentPage !== 1) {
+        setSetsPagination((prev) => ({ ...prev, currentPage: 1 }));
+      }
     }
 
     reduxSearchParamsRef.current = reduxSearchParams;
-  }, [reduxSearchParams, pagination.currentPage]);
+  }, [reduxSearchParams, viewContentType, cardsPagination.currentPage, setsPagination.currentPage]);
 
   // Add content type to URL
   useEffect(() => {
     const params = new URLSearchParams();
     const defaults = { currentPage: 1, pageSize: 24 };
+    const currentPagination = viewContentType === 'cards' ? cardsPagination : setsPagination;
 
     // Add pagination parameters
-    pagination.currentPage > defaults.currentPage
-      ? params.set('page', pagination.currentPage.toString())
+    currentPagination.currentPage > defaults.currentPage
+      ? params.set('page', currentPagination.currentPage.toString())
       : params.delete('page');
 
-    pagination.pageSize !== defaults.pageSize
-      ? params.set('pageSize', pagination.pageSize.toString())
+    currentPagination.pageSize !== defaults.pageSize
+      ? params.set('pageSize', currentPagination.pageSize.toString())
       : params.delete('pageSize');
 
     // Add content type parameter
@@ -433,24 +457,24 @@ export default function BrowsePage() {
     const newSearch = params.toString();
     const newUrl = newSearch ? `${pathname}?${newSearch}` : pathname;
     router.replace(newUrl, { scroll: false });
-  }, [pagination, reduxSearchParams, pathname, router, viewContentType]);
+  }, [cardsPagination, setsPagination, reduxSearchParams, pathname, router, viewContentType]);
 
   const handlePageChange = useCallback((page: number) => {
     const validPage = Math.max(page, 1);
     setPagination((prev) => ({ ...prev, currentPage: validPage }));
-  }, []);
+  }, [setPagination]);
 
   const handlePageSizeChange = useCallback((size: number) => {
     const limitedSize = Math.min(Math.max(size, 1), 500);
     setPagination((prev) => ({ ...prev, pageSize: limitedSize, currentPage: 1 }));
-  }, []);
+  }, [setPagination]);
 
   const handleViewModeChange = useCallback(
     (mode: 'grid' | 'table') => {
       setPagination((prev) => ({ ...prev, viewMode: mode }));
       setPreferredViewMode(mode);
     },
-    [setPreferredViewMode],
+    [setPreferredViewMode, setPagination],
   );
 
   const handleCardClick = useCallback(
@@ -584,17 +608,17 @@ export default function BrowsePage() {
         <CardDisplay
           cardItems={cardItems}
           isLoading={isCardsApiLoading}
-          viewMode={pagination.viewMode}
+          viewMode={cardsPagination.viewMode}
           onCardClick={handleCardClick}
-          pageSize={pagination.pageSize}
+          pageSize={cardsPagination.pageSize}
         />
       ) : (
         <SetDisplay
           setItems={setItems}
           isLoading={isSetsApiLoading}
-          viewMode={pagination.viewMode}
+          viewMode={setsPagination.viewMode}
           onSetClick={handleSetClick}
-          pageSize={pagination.pageSize}
+          pageSize={setsPagination.pageSize}
           displaySettings={{
             grid: {
               nameIsVisible: setDisplaySettings.nameIsVisible,
