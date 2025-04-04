@@ -23,7 +23,8 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePriceType } from '@/hooks/usePriceType';
 import { useSetDisplaySettings } from '@/hooks/useSetDisplaySettings';
 import {
-  selectSearchParams,
+  selectCardSearchParams,
+  selectSetSearchParams,
   selectSortBy,
   selectSortOrder,
   selectViewContentType,
@@ -178,7 +179,8 @@ export default function BrowsePage() {
   const router = useRouter();
   const pathname = usePathname();
   const urlSearchParams = useSearchParams();
-  const reduxSearchParams = useSelector(selectSearchParams);
+  const reduxCardSearchParams = useSelector(selectCardSearchParams);
+  const reduxSetSearchParams = useSelector(selectSetSearchParams);
   const dispatch = useDispatch();
 
   const viewContentType = useSelector(selectViewContentType);
@@ -217,7 +219,7 @@ export default function BrowsePage() {
 
   // Card API params
   const cardApiParams = useMemo(() => {
-    const params = buildApiParamsFromSearchParams(reduxSearchParams, 'cards');
+    const params = buildApiParamsFromSearchParams(reduxCardSearchParams, 'cards');
     return {
       ...params,
       limit: cardsPagination.pageSize,
@@ -249,11 +251,11 @@ export default function BrowsePage() {
         'releaseDate',
       ] as Array<keyof CardModel>,
     };
-  }, [reduxSearchParams, cardsPagination]);
+  }, [reduxCardSearchParams, cardsPagination]);
 
   // Set API params
   const setApiParams = useMemo(() => {
-    const params = buildApiParamsFromSearchParams(reduxSearchParams, 'sets');
+    const params = buildApiParamsFromSearchParams(reduxSetSearchParams, 'sets');
     return {
       ...params,
       limit: setsPagination.pageSize,
@@ -273,7 +275,7 @@ export default function BrowsePage() {
         'isDraftable',
       ],
     };
-  }, [reduxSearchParams, setsPagination]);
+  }, [reduxSetSearchParams, setsPagination]);
 
   const nextPageApiParams = useMemo(
     () => {
@@ -301,6 +303,11 @@ export default function BrowsePage() {
     refetchOnReconnect: false,
   };
 
+  // Explicitly calculate skip params with protection against undefined values
+  const contentTypeForSkip = viewContentType || 'cards'; // Default to cards if undefined
+  const shouldSkipCardsQuery = contentTypeForSkip !== 'cards';
+  const shouldSkipSetsQuery = contentTypeForSkip !== 'sets';
+  
   // Fetch cards or sets based on content type
   const {
     data: cardsSearchResult,
@@ -308,7 +315,7 @@ export default function BrowsePage() {
     error: cardsError,
   } = useGetCardsQuery(cardApiParams, { 
     ...queryConfig,
-    skip: viewContentType !== 'cards',
+    skip: shouldSkipCardsQuery,
   });
 
   const {
@@ -317,9 +324,9 @@ export default function BrowsePage() {
     error: setsError,
   } = useGetSetsQuery(setApiParams, { 
     ...queryConfig,
-    skip: viewContentType !== 'sets',
+    skip: shouldSkipSetsQuery,
   });
-
+  
   const isApiLoading = viewContentType === 'cards' ? isCardsApiLoading : isSetsApiLoading;
   const error = viewContentType === 'cards' ? cardsError : setsError;
 
@@ -336,32 +343,49 @@ export default function BrowsePage() {
   }, [prefetchNextPage, nextPageApiParams, isApiLoading]);
 
   // Reset pagination to page 1 when search parameters change
-  const reduxSearchParamsRef = useRef(reduxSearchParams);
+  const reduxCardSearchParamsRef = useRef(reduxCardSearchParams);
+  const reduxSetSearchParamsRef = useRef(reduxSetSearchParams);
+  
   useEffect(() => {
     // Skip on first render
-    if (reduxSearchParamsRef.current === reduxSearchParams) {
-      reduxSearchParamsRef.current = reduxSearchParams;
+    if (reduxCardSearchParamsRef.current === reduxCardSearchParams) {
+      reduxCardSearchParamsRef.current = reduxCardSearchParams;
       return;
     }
 
     // Only reset pagination if search params (not pagination params) have changed
     const hasSearchParamsChanged =
-      JSON.stringify(reduxSearchParamsRef.current) !== JSON.stringify(reduxSearchParams);
+      JSON.stringify(reduxCardSearchParamsRef.current) !== JSON.stringify(reduxCardSearchParams);
 
-    if (hasSearchParamsChanged) {
-      if (viewContentType === 'cards' && cardsPagination.currentPage !== 1) {
-        setCardsPagination((prev) => ({ ...prev, currentPage: 1 }));
-      } else if (viewContentType === 'sets' && setsPagination.currentPage !== 1) {
-        setSetsPagination((prev) => ({ ...prev, currentPage: 1 }));
-      }
+    if (hasSearchParamsChanged && viewContentType === 'cards' && cardsPagination.currentPage !== 1) {
+      setCardsPagination((prev) => ({ ...prev, currentPage: 1 }));
     }
 
-    reduxSearchParamsRef.current = reduxSearchParams;
-  }, [reduxSearchParams, viewContentType, cardsPagination.currentPage, setsPagination.currentPage]);
+    reduxCardSearchParamsRef.current = reduxCardSearchParams;
+  }, [reduxCardSearchParams, viewContentType, cardsPagination.currentPage]);
+  
+  useEffect(() => {
+    // Skip on first render
+    if (reduxSetSearchParamsRef.current === reduxSetSearchParams) {
+      reduxSetSearchParamsRef.current = reduxSetSearchParams;
+      return;
+    }
+
+    // Only reset pagination if search params (not pagination params) have changed
+    const hasSearchParamsChanged =
+      JSON.stringify(reduxSetSearchParamsRef.current) !== JSON.stringify(reduxSetSearchParams);
+
+    if (hasSearchParamsChanged && viewContentType === 'sets' && setsPagination.currentPage !== 1) {
+      setSetsPagination((prev) => ({ ...prev, currentPage: 1 }));
+    }
+
+    reduxSetSearchParamsRef.current = reduxSetSearchParams;
+  }, [reduxSetSearchParams, viewContentType, setsPagination.currentPage]);
 
   // Add content type to URL
   useEffect(() => {
-    const params = new URLSearchParams();
+    // Use existing URL parameters as a base to preserve other parameters
+    const params = new URLSearchParams(urlSearchParams.toString());
     const defaults = { currentPage: 1, pageSize: 24 };
     const currentPagination = viewContentType === 'cards' ? cardsPagination : setsPagination;
 
@@ -374,90 +398,98 @@ export default function BrowsePage() {
       ? params.set('pageSize', currentPagination.pageSize.toString())
       : params.delete('pageSize');
 
-    // Add content type parameter
-    if (viewContentType !== 'cards') {
-      params.set('contentType', viewContentType);
+    // Add content type parameter (always preserve sets, remove if cards to keep URLs clean)
+    if (viewContentType === 'sets') {
+      params.set('contentType', 'sets');
+    } else {
+      params.delete('contentType');
     }
 
-    // Add search parameters from Redux
-    if (reduxSearchParams.name) {
-      params.set('name', reduxSearchParams.name);
+    // Get the currently active search params based on view type
+    const activeSearchParams = viewContentType === 'cards' ? reduxCardSearchParams : reduxSetSearchParams;
+    
+    // Add name parameter depending on current view
+    if (activeSearchParams.name) {
+      params.set('name', activeSearchParams.name);
     }
 
-    if (reduxSearchParams.oracleText) {
-      params.set('oracleText', reduxSearchParams.oracleText);
-    }
+    // Add card-specific parameters when in cards view
+    if (viewContentType === 'cards') {
+      if (reduxCardSearchParams.oracleText) {
+        params.set('oracleText', reduxCardSearchParams.oracleText);
+      }
 
-    if (reduxSearchParams.artist) {
-      params.set('artist', reduxSearchParams.artist);
-    }
+      if (reduxCardSearchParams.artist) {
+        params.set('artist', reduxCardSearchParams.artist);
+      }
 
-    if (reduxSearchParams.oneResultPerCardName) {
-      params.set('oneResultPerCardName', 'true');
-    }
+      if (reduxCardSearchParams.oneResultPerCardName) {
+        params.set('oneResultPerCardName', 'true');
+      }
 
-    if (reduxSearchParams.colors) {
-      if (reduxSearchParams.colors.includeColorless) {
-        params.set('colorless', 'true');
-      } else if (reduxSearchParams.colors.colors.length > 0) {
-        params.set('colors', reduxSearchParams.colors.colors.join(','));
-        params.set('colorMatchType', reduxSearchParams.colors.matchType);
+      if (reduxCardSearchParams.colors) {
+        if (reduxCardSearchParams.colors.includeColorless) {
+          params.set('colorless', 'true');
+        } else if (reduxCardSearchParams.colors.colors.length > 0) {
+          params.set('colors', reduxCardSearchParams.colors.colors.join(','));
+          params.set('colorMatchType', reduxCardSearchParams.colors.matchType);
+        }
+      }
+
+      if (reduxCardSearchParams.types) {
+        if (reduxCardSearchParams.types.include.length > 0) {
+          params.set('includeTypes', reduxCardSearchParams.types.include.join('|'));
+        }
+        if (reduxCardSearchParams.types.exclude.length > 0) {
+          params.set('excludeTypes', reduxCardSearchParams.types.exclude.join('|'));
+        }
+      }
+
+      // Add rarity parameters to URL
+      if (reduxCardSearchParams.rarities) {
+        if (reduxCardSearchParams.rarities.include.length > 0) {
+          params.set('includeRarities', reduxCardSearchParams.rarities.include.join('|'));
+        }
+        if (reduxCardSearchParams.rarities.exclude.length > 0) {
+          params.set('excludeRarities', reduxCardSearchParams.rarities.exclude.join('|'));
+        }
+      }
+
+      // Add set parameters to URL
+      if (reduxCardSearchParams.sets) {
+        if (reduxCardSearchParams.sets.include.length > 0) {
+          params.set('includeSets', reduxCardSearchParams.sets.include.join('|'));
+        }
+        if (reduxCardSearchParams.sets.exclude.length > 0) {
+          params.set('excludeSets', reduxCardSearchParams.sets.exclude.join('|'));
+        }
+      }
+
+      if (reduxCardSearchParams.stats) {
+        // Format each stat group as: attribute=condition1|condition2
+        const statParams = Object.entries(reduxCardSearchParams.stats)
+          .filter(([_, conditions]) => conditions.length > 0)
+          .map(([attribute, conditions]) => `${attribute}=${conditions.join('|')}`);
+
+        if (statParams.length > 0) {
+          params.set('stats', statParams.join(','));
+        }
       }
     }
 
-    if (reduxSearchParams.types) {
-      if (reduxSearchParams.types.include.length > 0) {
-        params.set('includeTypes', reduxSearchParams.types.include.join('|'));
-      }
-      if (reduxSearchParams.types.exclude.length > 0) {
-        params.set('excludeTypes', reduxSearchParams.types.exclude.join('|'));
-      }
+    // Add sorting parameters to URL from the active view type
+    if (activeSearchParams.sortBy) {
+      params.set('sortBy', activeSearchParams.sortBy);
     }
 
-    // Add rarity parameters to URL
-    if (reduxSearchParams.rarities) {
-      if (reduxSearchParams.rarities.include.length > 0) {
-        params.set('includeRarities', reduxSearchParams.rarities.include.join('|'));
-      }
-      if (reduxSearchParams.rarities.exclude.length > 0) {
-        params.set('excludeRarities', reduxSearchParams.rarities.exclude.join('|'));
-      }
-    }
-
-    // Add set parameters to URL
-    if (reduxSearchParams.sets) {
-      if (reduxSearchParams.sets.include.length > 0) {
-        params.set('includeSets', reduxSearchParams.sets.include.join('|'));
-      }
-      if (reduxSearchParams.sets.exclude.length > 0) {
-        params.set('excludeSets', reduxSearchParams.sets.exclude.join('|'));
-      }
-    }
-
-    if (reduxSearchParams.stats) {
-      // Format each stat group as: attribute=condition1|condition2
-      const statParams = Object.entries(reduxSearchParams.stats)
-        .filter(([_, conditions]) => conditions.length > 0)
-        .map(([attribute, conditions]) => `${attribute}=${conditions.join('|')}`);
-
-      if (statParams.length > 0) {
-        params.set('stats', statParams.join(','));
-      }
-    }
-
-    // Add sorting parameters to URL
-    if (reduxSearchParams.sortBy) {
-      params.set('sortBy', reduxSearchParams.sortBy);
-    }
-
-    if (reduxSearchParams.sortOrder) {
-      params.set('sortOrder', reduxSearchParams.sortOrder);
+    if (activeSearchParams.sortOrder) {
+      params.set('sortOrder', activeSearchParams.sortOrder);
     }
 
     const newSearch = params.toString();
     const newUrl = newSearch ? `${pathname}?${newSearch}` : pathname;
     router.replace(newUrl, { scroll: false });
-  }, [cardsPagination, setsPagination, reduxSearchParams, pathname, router, viewContentType]);
+  }, [cardsPagination, setsPagination, reduxCardSearchParams, reduxSetSearchParams, pathname, router, viewContentType]);
 
   const handlePageChange = useCallback((page: number) => {
     const validPage = Math.max(page, 1);
@@ -558,17 +590,19 @@ export default function BrowsePage() {
 
       {/* Page Settings */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        {viewContentType === 'cards' ? (
-          <Box>
-            {/* Existing CardSettingsPanel will be shown automatically in CardGalleryPagination */}
-          </Box>
-        ) : (
-          <SetSettingsPanel
-            settingGroups={settingGroups}
-            panelId={`set${pagination.viewMode === 'grid' ? 'Gallery' : 'Table'}Settings`}
-            panelTitle={`Set ${pagination.viewMode === 'grid' ? 'Display' : 'Table'} Settings`}
-          />
-        )}
+        <Box>
+          {viewContentType === 'cards' ? (
+            <Box>
+              {/* Existing CardSettingsPanel will be shown automatically in CardGalleryPagination */}
+            </Box>
+          ) : (
+            <SetSettingsPanel
+              settingGroups={settingGroups}
+              panelId={`set${pagination.viewMode === 'grid' ? 'Gallery' : 'Table'}Settings`}
+              panelTitle={`Set ${pagination.viewMode === 'grid' ? 'Display' : 'Table'} Settings`}
+            />
+          )}
+        </Box>
       </Box>
 
       <CardGalleryPagination {...paginationProps} />
@@ -603,7 +637,7 @@ export default function BrowsePage() {
           </Typography>
         </Box>
       )}
-
+      
       {viewContentType === 'cards' ? (
         <CardDisplay
           cardItems={cardItems}

@@ -6,6 +6,7 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
 import StyleIcon from '@mui/icons-material/Style';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
@@ -47,16 +48,18 @@ import { usePriceType } from '@/hooks/usePriceType';
 import {
   resetSearch,
   selectArtist,
+  selectCardSearchName,
   selectOneResultPerCardName,
   selectOracleText,
-  selectSearchName,
+  selectSetSearchName,
   selectSortBy,
   selectSortOrder,
   selectViewContentType,
   setArtist,
+  setCardSearchName,
   setOneResultPerCardName,
   setOracleText,
-  setSearchName,
+  setSetSearchName,
   setSortBy,
   setSortOrder,
   setViewContentType,
@@ -73,17 +76,21 @@ const BrowseSearchForm = () => {
   const initialCheckDone = useRef(false);
   const prevDisplayPriceType = useRef<string | null>(null);
 
-  // Redux state
-  const reduxName = useSelector(selectSearchName) || '';
+  // Get content type
+  const contentType = useSelector(selectViewContentType);
+
+  // Get type-specific Redux state
+  const reduxCardName = useSelector(selectCardSearchName) || '';
+  const reduxSetName = useSelector(selectSetSearchName) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
   const reduxArtist = useSelector(selectArtist) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
   const reduxSortBy = useSelector(selectSortBy) || 'releasedAt';
   const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
-  const contentType = useSelector(selectViewContentType);
 
-  // Local state for input fields
-  const [localName, setLocalName] = useState(reduxName);
+  // Local state for input fields - separate for cards and sets
+  const [localCardName, setLocalCardName] = useState(reduxCardName);
+  const [localSetName, setLocalSetName] = useState(reduxSetName);
   const [localOracleText, setLocalOracleText] = useState(reduxOracleText);
   const [localArtist, setLocalArtist] = useState(reduxArtist);
 
@@ -95,14 +102,22 @@ const BrowseSearchForm = () => {
   const priceSettings = cardSettings?.[1]?.settings?.[0] as CardSelectSetting | undefined;
   const setDisplayPriceType = priceSettings?.setValue;
 
+  // Sync card name state when redux value changes
   useEffect(() => {
-    setLocalName(reduxName);
-  }, [reduxName]);
+    setLocalCardName(reduxCardName);
+  }, [reduxCardName]);
 
+  // Sync set name state when redux value changes
+  useEffect(() => {
+    setLocalSetName(reduxSetName);
+  }, [reduxSetName]);
+
+  // Sync oracle text when redux value changes
   useEffect(() => {
     setLocalOracleText(reduxOracleText);
   }, [reduxOracleText]);
 
+  // Sync artist when redux value changes
   useEffect(() => {
     setLocalArtist(reduxArtist);
   }, [reduxArtist]);
@@ -158,9 +173,17 @@ const BrowseSearchForm = () => {
     initialCheckDone.current = true;
   }, [reduxSortBy, displayPriceType, enqueueSnackbar]);
 
-  const debouncedNameDispatch = useCallback(
+  // Separate debounced handlers for cards and sets
+  const debouncedCardNameDispatch = useCallback(
     debounce((value: string) => {
-      dispatch(setSearchName(value));
+      dispatch(setCardSearchName(value));
+    }, 300),
+    [dispatch],
+  );
+
+  const debouncedSetNameDispatch = useCallback(
+    debounce((value: string) => {
+      dispatch(setSetSearchName(value));
     }, 300),
     [dispatch],
   );
@@ -179,10 +202,17 @@ const BrowseSearchForm = () => {
     [dispatch],
   );
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handlers for different content types
+  const handleCardNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    setLocalName(newValue);
-    debouncedNameDispatch(newValue);
+    setLocalCardName(newValue);
+    debouncedCardNameDispatch(newValue);
+  };
+
+  const handleSetNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setLocalSetName(newValue);
+    debouncedSetNameDispatch(newValue);
   };
 
   const handleOracleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -207,6 +237,7 @@ const BrowseSearchForm = () => {
 
     // Check if this is a price-based sort that doesn't match display setting
     if (
+      contentType === 'cards' &&
       isPriceSort(newSortBy) &&
       newSortBy !== displayPriceType &&
       newSortBy !== 'foil' &&
@@ -237,9 +268,40 @@ const BrowseSearchForm = () => {
     setMobileOpen(false);
   };
 
-  const handleContentTypeChange = (_event: React.MouseEvent<HTMLElement>, newContentType: 'cards' | 'sets') => {
-    if (newContentType !== null) {
-      dispatch(setViewContentType(newContentType));
+  const handleContentTypeChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    newContentType: 'cards' | 'sets' | null,
+  ) => {
+    // Critical fix: Don't allow null (deselection)
+    if (newContentType === null) {
+      return; // Don't allow deselecting both buttons
+    }
+
+    // No need to log this change
+    dispatch(setViewContentType(newContentType));
+
+    // Reset content-specific fields
+    if (newContentType === 'cards') {
+      // Will switch to cards - no need to clear card-specific fields
+    } else {
+      // Will switch to sets - clear card-specific fields
+      dispatch(setOracleText(''));
+      dispatch(setArtist(''));
+      dispatch(setOneResultPerCardName(false));
+      // Also reset any other card-specific fields...
+    }
+  };
+
+  // Direct click handlers for the toggle buttons
+  const handleCardsClick = () => {
+    if (contentType !== 'cards') {
+      dispatch(setViewContentType('cards'));
+    }
+  };
+
+  const handleSetsClick = () => {
+    if (contentType !== 'sets') {
+      dispatch(setViewContentType('sets'));
     }
   };
 
@@ -293,6 +355,175 @@ const BrowseSearchForm = () => {
     </Box>
   );
 
+  // Render card-specific form fields
+  const renderCardSearchFields = () => (
+    <>
+      <TextField
+        fullWidth
+        label="Card Name"
+        value={localCardName}
+        onChange={handleCardNameChange}
+        placeholder="Search by card name"
+        margin="dense"
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="disabled" />
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
+      <TextField
+        fullWidth
+        label="Oracle Text"
+        value={localOracleText}
+        onChange={handleOracleChange}
+        placeholder="Search card text"
+        margin="dense"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Tooltip title={<OracleTextTooltip />} placement="right">
+                <InfoOutlinedIcon color="disabled" sx={{ cursor: 'help' }} />
+              </Tooltip>
+            </InputAdornment>
+          ),
+        }}
+      />
+      <TextField
+        fullWidth
+        label="Artist"
+        value={localArtist}
+        onChange={handleArtistChange}
+        placeholder="Search by artist name"
+        margin="dense"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon color="disabled" />
+            </InputAdornment>
+          ),
+        }}
+      />
+      <TypeSelector />
+      <ColorSelector />
+      <RaritySelector />
+      <SetSelector />
+      <FormControlLabel
+        control={
+          <Switch
+            checked={reduxOneResultPerCardName}
+            onChange={handleOneResultPerCardNameChange}
+            name="oneResultPerCardName"
+            color="primary"
+            size="small"
+            sx={{ marginRight: '3px' }}
+          />
+        }
+        label="Hide duplicate printings"
+      />
+      <StatSearch />
+    </>
+  );
+
+  // Render set-specific form fields
+  const renderSetSearchFields = () => (
+    <>
+      <TextField
+        fullWidth
+        label="Set Name"
+        value={localSetName}
+        onChange={handleSetNameChange}
+        placeholder="Search by set name"
+        margin="dense"
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="disabled" />
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
+      {/* Add more set-specific fields if needed in the future */}
+    </>
+  );
+
+  // Get sort options based on content type
+  const getSortOptions = () => {
+    if (contentType === 'cards') {
+      return [
+        <MenuItem key="name" value="name">
+          Name
+        </MenuItem>,
+        <MenuItem key="releasedAt" value="releasedAt">
+          Release Date
+        </MenuItem>,
+        <MenuItem key="collectorNumber" value="collectorNumber">
+          Collector Number
+        </MenuItem>,
+        <MenuItem key="mtgcbCollectorNumber" value="mtgcbCollectorNumber">
+          MTG CB Collector Number
+        </MenuItem>,
+        <MenuItem key="rarityNumeric" value="rarityNumeric">
+          Rarity
+        </MenuItem>,
+        <MenuItem key="powerNumeric" value="powerNumeric">
+          Power
+        </MenuItem>,
+        <MenuItem key="toughnessNumeric" value="toughnessNumeric">
+          Toughness
+        </MenuItem>,
+        <MenuItem key="loyaltyNumeric" value="loyaltyNumeric">
+          Loyalty
+        </MenuItem>,
+        <MenuItem key="convertedManaCost" value="convertedManaCost">
+          Mana Value
+        </MenuItem>,
+        <MenuItem key="market" value="market">
+          Price (Market)
+          {isPriceMismatched('market') && <WarningTooltip priceType="Market" />}
+        </MenuItem>,
+        <MenuItem key="low" value="low">
+          Price (Low)
+          {isPriceMismatched('low') && <WarningTooltip priceType="Low" />}
+        </MenuItem>,
+        <MenuItem key="average" value="average">
+          Price (Average)
+          {isPriceMismatched('average') && <WarningTooltip priceType="Average" />}
+        </MenuItem>,
+        <MenuItem key="high" value="high">
+          Price (High)
+          {isPriceMismatched('high') && <WarningTooltip priceType="High" />}
+        </MenuItem>,
+        <MenuItem key="foil" value="foil">
+          Price (Foil)
+        </MenuItem>,
+      ];
+    } else {
+      return [
+        <MenuItem key="name" value="name">
+          Name
+        </MenuItem>,
+        <MenuItem key="code" value="code">
+          Code
+        </MenuItem>,
+        <MenuItem key="releasedAt" value="releasedAt">
+          Release Date
+        </MenuItem>,
+        <MenuItem key="cardCount" value="cardCount">
+          Card Count
+        </MenuItem>,
+        <MenuItem key="setType" value="setType">
+          Set Type
+        </MenuItem>,
+      ];
+    }
+  };
+
   return (
     <FormWrapper>
       <Form sx={{ paddingTop: 0.5 }}>
@@ -314,103 +545,35 @@ const BrowseSearchForm = () => {
 
           {/* Content Type Toggle */}
           <Box sx={{ mb: 1 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Content Type
-            </Typography>
-            <ToggleButtonGroup
-              value={contentType}
-              exclusive
-              onChange={handleContentTypeChange}
-              aria-label="content type"
-              size="small"
-              fullWidth
-            >
-              <ToggleButton value="cards" aria-label="cards">
-                <StyleIcon sx={{ mr: 1 }} /> Cards
-              </ToggleButton>
-              <ToggleButton value="sets" aria-label="sets">
-                <LibraryAddCheckIcon sx={{ mr: 1 }} /> Sets
-              </ToggleButton>
-            </ToggleButtonGroup>
+            {/* Simple button-based toggle for maximum reliability */}
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant={contentType === 'cards' ? 'contained' : 'outlined'}
+                size="small"
+                onClick={handleCardsClick}
+                startIcon={<StyleIcon sx={{ transform: 'scaleY(-1)' }} />}
+                fullWidth
+              >
+                View Cards
+              </Button>
+              <Button
+                variant={contentType === 'sets' ? 'contained' : 'outlined'}
+                size="small"
+                onClick={handleSetsClick}
+                startIcon={<ViewModuleIcon />}
+                fullWidth
+              >
+                View Sets
+              </Button>
+            </Stack>
           </Box>
 
           <Divider />
 
-          <TextField
-            fullWidth
-            label="Card Name"
-            value={localName}
-            onChange={handleNameChange}
-            placeholder="Search by card name"
-            margin="dense"
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon color="disabled" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <TextField
-            fullWidth
-            label="Oracle Text"
-            value={localOracleText}
-            onChange={handleOracleChange}
-            placeholder="Search card text"
-            margin="dense"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Tooltip title={<OracleTextTooltip />} placement="right">
-                    <InfoOutlinedIcon color="disabled" sx={{ cursor: 'help' }} />
-                  </Tooltip>
-                </InputAdornment>
-              ),
-            }}
-          />
-          <TextField
-            fullWidth
-            label="Artist"
-            value={localArtist}
-            onChange={handleArtistChange}
-            placeholder="Search by artist name"
-            margin="dense"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon color="disabled" />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <TypeSelector />
-          <ColorSelector />
-          <RaritySelector />
-          <SetSelector />
-          <FormControlLabel
-            control={
-              <Switch
-                checked={reduxOneResultPerCardName}
-                onChange={handleOneResultPerCardNameChange}
-                name="oneResultPerCardName"
-                color="primary"
-                size="small"
-                sx={{ marginRight: '3px' }}
-              />
-            }
-            label="Hide duplicate printings"
-            sx={
-              {
-                // TODO: Debating these styles, leaving them here for now
-                // border: '1px solid #616161',
-                // borderRadius: '4px',
-                // padding: '8px',
-              }
-            }
-          />
-          <StatSearch />
+          {/* Render different form fields based on content type */}
+          {contentType === 'cards' ? renderCardSearchFields() : renderSetSearchFields()}
+
+          {/* Sort options - different for cards vs sets */}
           <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
             <FormControl size="small" sx={{ width: '65%' }}>
               <InputLabel id="sort-by-label">Sort By</InputLabel>
@@ -425,32 +588,7 @@ const BrowseSearchForm = () => {
                   </InputAdornment>
                 }
               >
-                <MenuItem value="name">Name</MenuItem>
-                <MenuItem value="releasedAt">Release Date</MenuItem>
-                <MenuItem value="collectorNumber">Collector Number</MenuItem>
-                <MenuItem value="mtgcbCollectorNumber">MTG CB Collector Number</MenuItem>
-                <MenuItem value="rarityNumeric">Rarity</MenuItem>
-                <MenuItem value="powerNumeric">Power</MenuItem>
-                <MenuItem value="toughnessNumeric">Toughness</MenuItem>
-                <MenuItem value="loyaltyNumeric">Loyalty</MenuItem>
-                <MenuItem value="convertedManaCost">Mana Value</MenuItem>
-                <MenuItem value="market">
-                  Price (Market)
-                  {isPriceMismatched('market') && <WarningTooltip priceType="Market" />}
-                </MenuItem>
-                <MenuItem value="low">
-                  Price (Low)
-                  {isPriceMismatched('low') && <WarningTooltip priceType="Low" />}
-                </MenuItem>
-                <MenuItem value="average">
-                  Price (Average)
-                  {isPriceMismatched('average') && <WarningTooltip priceType="Average" />}
-                </MenuItem>
-                <MenuItem value="high">
-                  Price (High)
-                  {isPriceMismatched('high') && <WarningTooltip priceType="High" />}
-                </MenuItem>
-                <MenuItem value="foil">Price (Foil)</MenuItem>
+                {getSortOptions()}
               </Select>
             </FormControl>
             <FormControl size="small" sx={{ width: '35%' }}>
