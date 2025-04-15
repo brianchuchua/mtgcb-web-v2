@@ -12,6 +12,7 @@ import {
   StatFilters,
   TypeFilter,
   SetCategoryFilter,
+  SetTypeFilter,
 } from '@/types/browse';
 
 // Initialize with default pagination values for both card and set views
@@ -129,6 +130,13 @@ export const browseSlice = createSlice({
         delete state.setsSearchParams.setCategories;
       } else {
         state.setsSearchParams.setCategories = action.payload;
+      }
+    },
+    setSetTypes: (state, action: PayloadAction<SetTypeFilter>) => {
+      if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
+        delete state.setsSearchParams.setTypes;
+      } else {
+        state.setsSearchParams.setTypes = action.payload;
       }
     },
     setOneResultPerCardName: (state, action: PayloadAction<boolean>) => {
@@ -301,6 +309,7 @@ export const {
   setSets,
   setStats,
   setSetCategories,
+  setSetTypes,
   setOneResultPerCardName,
   setSortBy,
   setSortOrder,
@@ -358,6 +367,7 @@ export const selectSetSortOrder = (state: RootState) => state.browse.setsSearchP
 export const selectSetCurrentPage = (state: RootState) => state.browse.setsSearchParams.currentPage || 1;
 export const selectSetPageSize = (state: RootState) => state.browse.setsSearchParams.pageSize || 24;
 export const selectSetCategories = (state: RootState) => state.browse.setsSearchParams.setCategories;
+export const selectSetTypes = (state: RootState) => state.browse.setsSearchParams.setTypes;
 
 // Content type selector
 export const selectViewContentType = (state: RootState) => state.browse.viewContentType;

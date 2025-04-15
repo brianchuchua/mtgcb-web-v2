@@ -206,6 +206,30 @@ export const buildApiParamsFromSearchParams = (
         apiParams.category = categoryFilter;
       }
     }
+    
+    // Add set type filtering
+    if (searchParams.setTypes) {
+      const includeTypes = searchParams.setTypes.include;
+      const excludeTypes = searchParams.setTypes.exclude;
+
+      // Build the filter object
+      const typeFilter: any = {};
+      
+      // Handle inclusions with OR
+      if (includeTypes.length > 0) {
+        typeFilter.OR = includeTypes.map(value => `"${value}"`);
+      }
+      
+      // Handle exclusions with NOT
+      if (excludeTypes.length > 0) {
+        typeFilter.NOT = excludeTypes.map(value => `"${value}"`);
+      }
+      
+      // Only set the filter if we have either inclusions or exclusions
+      if (Object.keys(typeFilter).length > 0) {
+        apiParams.setType = typeFilter;
+      }
+    }
   }
 
   return apiParams;

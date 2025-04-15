@@ -38,6 +38,7 @@ import ColorSelector from '@/features/browse/ColorSelector';
 import RaritySelector from '@/features/browse/RaritySelector';
 import SetCategorySelector from '@/features/browse/SetCategorySelector';
 import SetSelector from '@/features/browse/SetSelector';
+import SetTypeSelector from '@/features/browse/SetTypeSelector';
 import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
@@ -433,6 +434,7 @@ const BrowseSearchForm = () => {
         }}
       />
       <SetCategorySelector />
+      <SetTypeSelector />
     </>
   );
 
