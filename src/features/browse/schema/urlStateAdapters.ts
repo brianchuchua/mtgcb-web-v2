@@ -6,7 +6,7 @@ const schemaToReduxKeyMap: Record<string, string> = {
   oracleText: 'oracleText',
   artist: 'artist',
   oneResultPerCardName: 'oneResultPerCardName',
-  setName: 'setName',
+  setName: 'name',
   colors: 'colors',
   types: 'types',
   rarities: 'rarities',
@@ -61,11 +61,10 @@ export function parseUrlToState(
 }
 
 const reduxToSchemaKeyMap: Record<string, string | [string, string]> = {
-  name: 'cardName',
+  name: ['cardName', 'setName'],
   oracleText: 'oracleText',
   artist: 'artist',
   oneResultPerCardName: 'oneResultPerCardName',
-  setName: 'setName',
   colors: 'colors',
   types: 'types',
   rarities: 'rarities',

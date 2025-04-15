@@ -9,10 +9,8 @@
 
 ### Next
 
-- Continue with the current refactor, code review this one carefully
-- Fix typing issues
-- Commit and merge
 - Add missing set search fields
+- Fix typing issues
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - Page title flashing when toggling between cards and sets
 - Make sure cardsPageSize can't be exploited
