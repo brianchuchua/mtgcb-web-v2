@@ -24,6 +24,7 @@
 - Catch up on minor typescript errors
 - set page with subsets handled
 - Patron request: Add card number to card name, perhaps as a setting
+- Clean up code base to be more my style -- some of the vibe coding results aren't as readable as my style
 
 ## Later
 
