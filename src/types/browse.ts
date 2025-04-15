@@ -21,6 +21,11 @@ export interface SetFilter {
   exclude: string[];
 }
 
+export interface SetCategoryFilter {
+  include: string[];
+  exclude: string[];
+}
+
 export interface StatCondition {
   attribute: string;
   operator: string;
@@ -57,6 +62,7 @@ export interface BrowseSearchParams {
   rarities?: RarityFilter;
   sets?: SetFilter;
   stats?: StatFilters;
+  setCategories?: SetCategoryFilter;
   oneResultPerCardName?: boolean;
   sortBy?: SortByOption;
   sortOrder?: SortOrderOption;

@@ -173,6 +173,19 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     urlParam: 'setName',
     defaultValue: '',
   },
+  setCategories: {
+    type: 'inclusionExclusion',
+    mode: 'sets',
+    urlParams: {
+      include: 'includeCategories',
+      exclude: 'excludeCategories',
+    },
+    separator: '|',
+    defaultValue: {
+      include: [],
+      exclude: [],
+    },
+  },
   colors: {
     type: 'colorFilter',
     mode: 'cards',

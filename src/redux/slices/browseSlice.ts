@@ -11,6 +11,7 @@ import {
   SortOrderOption,
   StatFilters,
   TypeFilter,
+  SetCategoryFilter,
 } from '@/types/browse';
 
 // Initialize with default pagination values for both card and set views
@@ -113,7 +114,6 @@ export const browseSlice = createSlice({
       }
     },
     setStats: (state, action: PayloadAction<StatFilters>) => {
-      // Cards-specific field
       const hasConditions = Object.values(action.payload).some(
         (conditions) => conditions.length > 0,
       );
@@ -122,6 +122,13 @@ export const browseSlice = createSlice({
         delete state.cardsSearchParams.stats;
       } else {
         state.cardsSearchParams.stats = action.payload;
+      }
+    },
+    setSetCategories: (state, action: PayloadAction<SetCategoryFilter>) => {
+      if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
+        delete state.setsSearchParams.setCategories;
+      } else {
+        state.setsSearchParams.setCategories = action.payload;
       }
     },
     setOneResultPerCardName: (state, action: PayloadAction<boolean>) => {
@@ -293,6 +300,7 @@ export const {
   setRarities,
   setSets,
   setStats,
+  setSetCategories,
   setOneResultPerCardName,
   setSortBy,
   setSortOrder,
@@ -349,6 +357,7 @@ export const selectSetSortBy = (state: RootState) => state.browse.setsSearchPara
 export const selectSetSortOrder = (state: RootState) => state.browse.setsSearchParams.sortOrder;
 export const selectSetCurrentPage = (state: RootState) => state.browse.setsSearchParams.currentPage || 1;
 export const selectSetPageSize = (state: RootState) => state.browse.setsSearchParams.pageSize || 24;
+export const selectSetCategories = (state: RootState) => state.browse.setsSearchParams.setCategories;
 
 // Content type selector
 export const selectViewContentType = (state: RootState) => state.browse.viewContentType;

@@ -36,6 +36,7 @@ import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ColorSelector from '@/features/browse/ColorSelector';
 import RaritySelector from '@/features/browse/RaritySelector';
+import SetCategorySelector from '@/features/browse/SetCategorySelector';
 import SetSelector from '@/features/browse/SetSelector';
 import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
@@ -431,7 +432,7 @@ const BrowseSearchForm = () => {
           },
         }}
       />
-      {/* Add more set-specific fields if needed in the future */}
+      <SetCategorySelector />
     </>
   );
 

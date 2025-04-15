@@ -79,7 +79,10 @@ export interface SetApiParams {
   name?: string;
   code?: string;
   setType?: string;
-  category?: string;
+  category?: string | {
+    OR?: string[];
+    NOT?: string[];
+  };
   releasedAt?: string;
   isDraftable?: boolean;
   limit?: number;

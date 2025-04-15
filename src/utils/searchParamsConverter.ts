@@ -181,8 +181,32 @@ export const buildApiParamsFromSearchParams = (
     }
   }
 
-  // Add set-specific parameters if needed in the future
-  // Currently, sets only need the common parameters (name, sorting)
+  // Add set-specific parameters
+  if (contentType === 'sets') {
+    // Add set category filtering
+    if (searchParams.setCategories) {
+      const includeCategories = searchParams.setCategories.include;
+      const excludeCategories = searchParams.setCategories.exclude;
+
+      // Build the filter object
+      const categoryFilter: any = {};
+      
+      // Handle inclusions with OR
+      if (includeCategories.length > 0) {
+        categoryFilter.OR = includeCategories.map(value => `"${value}"`);
+      }
+      
+      // Handle exclusions with NOT
+      if (excludeCategories.length > 0) {
+        categoryFilter.NOT = excludeCategories.map(value => `"${value}"`);
+      }
+      
+      // Only set the filter if we have either inclusions or exclusions
+      if (Object.keys(categoryFilter).length > 0) {
+        apiParams.category = categoryFilter;
+      }
+    }
+  }
 
   return apiParams;
 };
