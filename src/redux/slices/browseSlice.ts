@@ -13,14 +13,24 @@ import {
   TypeFilter,
 } from '@/types/browse';
 
-// Initialize with empty state - let the useInitializeBrowseFromUrl handle population
+// Initialize with default pagination values for both card and set views
 const initialState: {
   cardsSearchParams: BrowseSearchParams;
   setsSearchParams: BrowseSearchParams;
   viewContentType: 'cards' | 'sets';
 } = {
-  cardsSearchParams: {},
-  setsSearchParams: {},
+  cardsSearchParams: {
+    // Default pagination for cards
+    currentPage: 1,
+    pageSize: 24,
+    viewMode: 'grid',
+  },
+  setsSearchParams: {
+    // Default pagination for sets
+    currentPage: 1,
+    pageSize: 24,
+    viewMode: 'grid',
+  },
   viewContentType: 'cards', // Default to cards view
 };
 
@@ -132,24 +142,129 @@ export const browseSlice = createSlice({
       const searchParams = state.viewContentType === 'cards' ? state.cardsSearchParams : state.setsSearchParams;
       searchParams.sortOrder = action.payload;
     },
+    // Add new pagination reducers
+    setPagination: (state, action: PayloadAction<{ currentPage?: number; pageSize?: number; viewMode?: 'grid' | 'table' }>) => {
+      if (state.viewContentType === 'cards') {
+        // Create a new reference to trigger re-renders properly
+        state.cardsSearchParams = {
+          ...state.cardsSearchParams,
+          ...(action.payload.currentPage !== undefined ? { currentPage: action.payload.currentPage } : {}),
+          ...(action.payload.pageSize !== undefined ? { pageSize: action.payload.pageSize } : {}),
+          ...(action.payload.viewMode !== undefined ? { viewMode: action.payload.viewMode } : {})
+        };
+      } else {
+        // Create a new reference to trigger re-renders properly
+        state.setsSearchParams = {
+          ...state.setsSearchParams,
+          ...(action.payload.currentPage !== undefined ? { currentPage: action.payload.currentPage } : {}),
+          ...(action.payload.pageSize !== undefined ? { pageSize: action.payload.pageSize } : {}),
+          ...(action.payload.viewMode !== undefined ? { viewMode: action.payload.viewMode } : {})
+        };
+      }
+    },
+    setCardPagination: (state, action: PayloadAction<{ currentPage?: number; pageSize?: number; viewMode?: 'grid' | 'table' }>) => {
+      // Create a new reference to trigger re-renders properly
+      state.cardsSearchParams = {
+        ...state.cardsSearchParams,
+        ...(action.payload.currentPage !== undefined ? { currentPage: action.payload.currentPage } : {}),
+        ...(action.payload.pageSize !== undefined ? { pageSize: action.payload.pageSize } : {}),
+        ...(action.payload.viewMode !== undefined ? { viewMode: action.payload.viewMode } : {})
+      };
+    },
+    setSetPagination: (state, action: PayloadAction<{ currentPage?: number; pageSize?: number; viewMode?: 'grid' | 'table' }>) => {
+      // Create a new reference to trigger re-renders properly
+      state.setsSearchParams = {
+        ...state.setsSearchParams,
+        ...(action.payload.currentPage !== undefined ? { currentPage: action.payload.currentPage } : {}),
+        ...(action.payload.pageSize !== undefined ? { pageSize: action.payload.pageSize } : {}),
+        ...(action.payload.viewMode !== undefined ? { viewMode: action.payload.viewMode } : {})
+      };
+    },
     setCardSearchParams: (state, action: PayloadAction<BrowseSearchParams>) => {
-      state.cardsSearchParams = action.payload;
+      // Preserve pagination if not provided in the payload
+      const pagination = {
+        currentPage: state.cardsSearchParams.currentPage || 1,
+        pageSize: state.cardsSearchParams.pageSize || 24,
+        viewMode: state.cardsSearchParams.viewMode || 'grid',
+      };
+      
+      state.cardsSearchParams = {
+        ...action.payload,
+        // Keep current pagination unless explicitly overridden
+        currentPage: action.payload.currentPage !== undefined ? action.payload.currentPage : pagination.currentPage,
+        pageSize: action.payload.pageSize !== undefined ? action.payload.pageSize : pagination.pageSize,
+        viewMode: action.payload.viewMode !== undefined ? action.payload.viewMode : pagination.viewMode,
+      };
     },
     setSetSearchParams: (state, action: PayloadAction<BrowseSearchParams>) => {
-      state.setsSearchParams = action.payload;
+      // Preserve pagination if not provided in the payload
+      const pagination = {
+        currentPage: state.setsSearchParams.currentPage || 1,
+        pageSize: state.setsSearchParams.pageSize || 24,
+        viewMode: state.setsSearchParams.viewMode || 'grid',
+      };
+      
+      state.setsSearchParams = {
+        ...action.payload,
+        // Keep current pagination unless explicitly overridden
+        currentPage: action.payload.currentPage !== undefined ? action.payload.currentPage : pagination.currentPage,
+        pageSize: action.payload.pageSize !== undefined ? action.payload.pageSize : pagination.pageSize,
+        viewMode: action.payload.viewMode !== undefined ? action.payload.viewMode : pagination.viewMode,
+      };
     },
     resetSearch: (state) => {
-      // Reset the current view type's search params
+      // Reset the current view type's search params but preserve pagination
+      const pagination = state.viewContentType === 'cards' 
+        ? {
+            currentPage: state.cardsSearchParams.currentPage || 1,
+            pageSize: state.cardsSearchParams.pageSize || 24,
+            viewMode: state.cardsSearchParams.viewMode || 'grid',
+          }
+        : {
+            currentPage: state.setsSearchParams.currentPage || 1,
+            pageSize: state.setsSearchParams.pageSize || 24,
+            viewMode: state.setsSearchParams.viewMode || 'grid',
+          };
+      
       if (state.viewContentType === 'cards') {
-        state.cardsSearchParams = {};
+        state.cardsSearchParams = {
+          currentPage: pagination.currentPage,
+          pageSize: pagination.pageSize,
+          viewMode: pagination.viewMode,
+        };
       } else {
-        state.setsSearchParams = {};
+        state.setsSearchParams = {
+          currentPage: pagination.currentPage,
+          pageSize: pagination.pageSize,
+          viewMode: pagination.viewMode,
+        };
       }
     },
     resetAllSearches: (state) => {
-      // Reset both cards and sets search params
-      state.cardsSearchParams = {};
-      state.setsSearchParams = {};
+      // Reset both cards and sets search params but preserve pagination
+      const cardsPagination = {
+        currentPage: state.cardsSearchParams.currentPage || 1,
+        pageSize: state.cardsSearchParams.pageSize || 24,
+        viewMode: state.cardsSearchParams.viewMode || 'grid',
+      };
+      
+      const setsPagination = {
+        currentPage: state.setsSearchParams.currentPage || 1,
+        pageSize: state.setsSearchParams.pageSize || 24,
+        viewMode: state.setsSearchParams.viewMode || 'grid',
+      };
+      
+      state.cardsSearchParams = {
+        currentPage: cardsPagination.currentPage,
+        pageSize: cardsPagination.pageSize,
+        viewMode: cardsPagination.viewMode,
+      };
+      
+      state.setsSearchParams = {
+        currentPage: setsPagination.currentPage,
+        pageSize: setsPagination.pageSize,
+        viewMode: setsPagination.viewMode,
+      };
     },
     setViewContentType: (state, action: PayloadAction<'cards' | 'sets'>) => {
       // Skip action if it would reapply the same value
@@ -181,6 +296,9 @@ export const {
   setOneResultPerCardName,
   setSortBy,
   setSortOrder,
+  setPagination,
+  setCardPagination,
+  setSetPagination,
   setCardSearchParams,
   setSetSearchParams,
   resetSearch,
@@ -201,6 +319,13 @@ export const selectSortBy = (state: RootState) =>
 export const selectSortOrder = (state: RootState) => 
   state.browse.viewContentType === 'cards' ? state.browse.cardsSearchParams.sortOrder : state.browse.setsSearchParams.sortOrder;
 
+// Add pagination selectors
+export const selectCurrentPage = (state: RootState) =>
+  state.browse.viewContentType === 'cards' ? state.browse.cardsSearchParams.currentPage || 1 : state.browse.setsSearchParams.currentPage || 1;
+
+export const selectPageSize = (state: RootState) =>
+  state.browse.viewContentType === 'cards' ? state.browse.cardsSearchParams.pageSize || 24 : state.browse.setsSearchParams.pageSize || 24;
+
 // Card-specific selectors 
 export const selectCardSearchParams = (state: RootState) => state.browse.cardsSearchParams;
 export const selectCardSearchName = (state: RootState) => state.browse.cardsSearchParams.name;
@@ -214,12 +339,16 @@ export const selectStats = (state: RootState) => state.browse.cardsSearchParams.
 export const selectOneResultPerCardName = (state: RootState) => state.browse.cardsSearchParams.oneResultPerCardName;
 export const selectCardSortBy = (state: RootState) => state.browse.cardsSearchParams.sortBy;
 export const selectCardSortOrder = (state: RootState) => state.browse.cardsSearchParams.sortOrder;
+export const selectCardCurrentPage = (state: RootState) => state.browse.cardsSearchParams.currentPage || 1;
+export const selectCardPageSize = (state: RootState) => state.browse.cardsSearchParams.pageSize || 24;
 
 // Set-specific selectors
 export const selectSetSearchParams = (state: RootState) => state.browse.setsSearchParams;
 export const selectSetSearchName = (state: RootState) => state.browse.setsSearchParams.name;
 export const selectSetSortBy = (state: RootState) => state.browse.setsSearchParams.sortBy;
 export const selectSetSortOrder = (state: RootState) => state.browse.setsSearchParams.sortOrder;
+export const selectSetCurrentPage = (state: RootState) => state.browse.setsSearchParams.currentPage || 1;
+export const selectSetPageSize = (state: RootState) => state.browse.setsSearchParams.pageSize || 24;
 
 // Content type selector
 export const selectViewContentType = (state: RootState) => state.browse.viewContentType;

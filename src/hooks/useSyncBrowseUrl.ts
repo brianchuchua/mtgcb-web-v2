@@ -14,8 +14,8 @@ export const useSyncBrowseUrl = () => {
 
   // Use local pagination instead of from redux
   const [pagination, setPagination] = useState<BrowsePagination>({
-    currentPage: parseInt(currentSearchParams.get('page') || '1', 10),
-    pageSize: parseInt(currentSearchParams.get('pageSize') || '24', 10),
+    currentPage: parseInt(currentSearchParams.get(viewContentType === 'cards' ? 'cardsPage' : 'setsPage') || '1', 10),
+    pageSize: parseInt(currentSearchParams.get(viewContentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '24', 10),
     viewMode: currentSearchParams.get('view') === 'table' ? 'table' : 'grid',
   });
 
@@ -79,14 +79,14 @@ export const useSyncBrowseUrl = () => {
       }
     }
 
-    // Pagination params
+    // Pagination params with content-type specific parameters
     if (pagination.currentPage > 1) {
-      params.set('page', pagination.currentPage.toString());
+      params.set(viewContentType === 'cards' ? 'cardsPage' : 'setsPage', pagination.currentPage.toString());
     }
 
     if (pagination.pageSize !== 24) {
       // Only add if not default
-      params.set('pageSize', pagination.pageSize.toString());
+      params.set(viewContentType === 'cards' ? 'cardsPageSize' : 'setsPageSize', pagination.pageSize.toString());
     }
 
     if (pagination.viewMode !== 'grid') {

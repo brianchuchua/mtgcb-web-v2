@@ -60,6 +60,9 @@ export interface BrowseSearchParams {
   oneResultPerCardName?: boolean;
   sortBy?: SortByOption;
   sortOrder?: SortOrderOption;
+  currentPage?: number;
+  pageSize?: number;
+  viewMode?: 'grid' | 'table';
 }
 
 export interface BrowsePagination {

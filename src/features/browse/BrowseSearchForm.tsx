@@ -7,7 +7,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
 import StyleIcon from '@mui/icons-material/Style';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
   Box,
@@ -24,10 +23,7 @@ import {
   Stack,
   Switch,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
-  Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -36,7 +32,6 @@ import debounce from 'lodash.debounce';
 import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'next/navigation';
 import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ColorSelector from '@/features/browse/ColorSelector';
@@ -76,20 +71,10 @@ const BrowseSearchForm = () => {
   const { enqueueSnackbar } = useSnackbar();
   const initialCheckDone = useRef(false);
   const prevDisplayPriceType = useRef<string | null>(null);
-  const urlSearchParams = useSearchParams();
   const initialRenderComplete = useRef(false);
-  
-  // Check content type from URL directly - this prevents flash during initial render
-  const urlContentType = urlSearchParams.get('contentType');
-  const initialContentType = urlContentType === 'sets' ? 'sets' : 'cards';
-  
+
   // Get content type from Redux store
-  const reduxContentType = useSelector(selectViewContentType);
-  
-  // Use URL content type on initial render, then switch to Redux state
-  const contentType = !initialRenderComplete.current && urlContentType === 'sets' 
-    ? 'sets' 
-    : reduxContentType;
+  const contentType = useSelector(selectViewContentType);
 
   // Get type-specific Redux state
   const reduxCardName = useSelector(selectCardSearchName) || '';
@@ -133,7 +118,7 @@ const BrowseSearchForm = () => {
   useEffect(() => {
     setLocalArtist(reduxArtist);
   }, [reduxArtist]);
-  
+
   // Mark initial render as complete after a short delay
   useEffect(() => {
     if (!initialRenderComplete.current) {
@@ -288,30 +273,6 @@ const BrowseSearchForm = () => {
 
   const handleSeeResults = () => {
     setMobileOpen(false);
-  };
-
-  const handleContentTypeChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newContentType: 'cards' | 'sets' | null,
-  ) => {
-    // Critical fix: Don't allow null (deselection)
-    if (newContentType === null) {
-      return; // Don't allow deselecting both buttons
-    }
-
-    // No need to log this change
-    dispatch(setViewContentType(newContentType));
-
-    // Reset content-specific fields
-    if (newContentType === 'cards') {
-      // Will switch to cards - no need to clear card-specific fields
-    } else {
-      // Will switch to sets - clear card-specific fields
-      dispatch(setOracleText(''));
-      dispatch(setArtist(''));
-      dispatch(setOneResultPerCardName(false));
-      // Also reset any other card-specific fields...
-    }
   };
 
   // Direct click handlers for the toggle buttons

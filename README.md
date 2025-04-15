@@ -9,7 +9,13 @@
 
 ### Next
 
-- Bug with state bleeding from card name to set name
+- Continue with the current refactor, code review this one carefully
+- Fix typing issues
+- Commit and merge
+- Add missing set search fields
+- Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
+- Page title flashing when toggling between cards and sets
+- Make sure cardsPageSize can't be exploited
 - perfect browse sets table and search filter options
 - browse sets page and searches (merge to main after clean-up when finished)
 - pageSize should be a localStorage item, not in the url
@@ -17,6 +23,7 @@
 - Subset stuff in search filters
 - Catch up on minor typescript errors
 - set page with subsets handled
+- Patron request: Add card number to card name, perhaps as a setting
 
 ## Later
 
@@ -26,7 +33,7 @@
 - Clean up MTG CB collector number
 - Make a cool stats page
 - S3 image storage is costing a lot of money, look into alternatives like Cloudflare R2, Vercel Blob Storage, Cloudflare Images, Digital Ocean Spaces, etc.
-- BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set.
+- BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set. Need to tiebreak with card release date.
 - Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
 - Handle sideways cards and flip cards
 - Collection valuation, fall back to available prices using the same logic

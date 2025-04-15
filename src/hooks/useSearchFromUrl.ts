@@ -21,9 +21,15 @@ export const useSearchFromUrl = () => {
   const [searchCards, { data: searchResult, isLoading, error }] = useSearchCardsMutation();
   const searchParams = useSearchParams();
 
-  // Get pagination state from URL
-  const currentPage = parseInt(searchParams.get('page') || '1', 10);
-  const pageSize = parseInt(searchParams.get('pageSize') || '24', 10);
+  const contentType = searchParams.get('contentType') === 'sets' ? 'sets' : 'cards';
+  const currentPage = parseInt(
+    searchParams.get(contentType === 'cards' ? 'cardsPage' : 'setsPage') || '1',
+    10,
+  );
+  const pageSize = parseInt(
+    searchParams.get(contentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '24',
+    10,
+  );
 
   useEffect(() => {
     const apiParams: CardApiParams = {

@@ -235,18 +235,20 @@ const NavigationControls = React.memo(
     isLoading: boolean;
     isSmallScreen: boolean;
   }) => {
+    const page = parseInt(String(currentPage), 10) || 1;
+
     // Memoize handlers
     const handleFirstPage = useCallback(() => {
       onPageChange(1);
     }, [onPageChange]);
 
     const handlePreviousPage = useCallback(() => {
-      onPageChange(currentPage - 1);
-    }, [onPageChange, currentPage]);
+      onPageChange(page - 1);
+    }, [onPageChange, page]);
 
     const handleNextPage = useCallback(() => {
-      onPageChange(currentPage + 1);
-    }, [onPageChange, currentPage]);
+      onPageChange(page + 1);
+    }, [onPageChange, page]);
 
     const handleLastPage = useCallback(() => {
       onPageChange(totalPages);
@@ -258,7 +260,7 @@ const NavigationControls = React.memo(
       const result: number[] = [];
 
       // Calculate start and end page numbers
-      let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+      let startPage = Math.max(1, page - Math.floor(visiblePages / 2));
       let endPage = Math.min(totalPages, startPage + visiblePages - 1);
 
       // Adjust if we're near the end
@@ -272,7 +274,7 @@ const NavigationControls = React.memo(
       }
 
       return result;
-    }, [currentPage, totalPages, isSmallScreen]);
+    }, [page, totalPages, isSmallScreen]);
 
     return (
       <PaginationControls>
@@ -281,7 +283,7 @@ const NavigationControls = React.memo(
           <span>
             <IconButton
               onClick={handleFirstPage}
-              disabled={currentPage === 1 || isLoading}
+              disabled={page === 1 || isLoading}
               size="small"
               color="primary"
             >
@@ -295,7 +297,7 @@ const NavigationControls = React.memo(
           <span>
             <IconButton
               onClick={handlePreviousPage}
-              disabled={currentPage === 1 || isLoading}
+              disabled={page === 1 || isLoading}
               size="small"
               color="primary"
             >
@@ -307,20 +309,23 @@ const NavigationControls = React.memo(
         {/* Page number buttons - only show on non-mobile */}
         {!isSmallScreen && (
           <PageNumbers>
-            {pageNumbers.map((page) => {
-              // Memoize click handler for each page button
-              const handlePageClick = () => onPageChange(page);
+            {pageNumbers.map((pageNum) => {
+              // Use a separate callback for each page button to avoid closure issues
+              const handlePageClick = () => {
+                console.log('Clicked page button:', pageNum);
+                onPageChange(pageNum);
+              };
 
               return (
                 <PageButton
-                  key={page}
-                  variant={currentPage === page ? 'contained' : 'outlined'}
+                  key={pageNum}
+                  variant={page === pageNum ? 'contained' : 'outlined'}
                   onClick={handlePageClick}
                   disabled={isLoading}
                   size="small"
-                  current={currentPage === page}
+                  current={page === pageNum}
                 >
-                  {page}
+                  {pageNum}
                 </PageButton>
               );
             })}
@@ -332,7 +337,7 @@ const NavigationControls = React.memo(
           <span>
             <IconButton
               onClick={handleNextPage}
-              disabled={currentPage === totalPages || isLoading}
+              disabled={page === totalPages || isLoading}
               size="small"
               color="primary"
             >
@@ -346,7 +351,7 @@ const NavigationControls = React.memo(
           <span>
             <IconButton
               onClick={handleLastPage}
-              disabled={currentPage === totalPages || isLoading}
+              disabled={page === totalPages || isLoading}
               size="small"
               color="primary"
             >
@@ -384,19 +389,35 @@ export const CardGalleryPagination = React.memo(
     settingGroups,
   }: CardGalleryPaginationProps) => {
     const theme = useTheme();
+
+    const [localCurrentPage, setLocalCurrentPage] = useState(currentPage);
+
+    useEffect(() => {
+      setLocalCurrentPage(currentPage);
+    }, [currentPage]);
+
+    const handlePageChange = useCallback(
+      (page: number) => {
+        setLocalCurrentPage(page);
+
+        onPageChange(page);
+      },
+      [onPageChange],
+    );
+
     // Use md breakpoint (900px) to determine small screens
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
     const isMediumScreen = useMediaQuery('(min-width:900px) and (max-width:1199px)');
 
     // Calculate the range of items being shown
     const startItem = useMemo(
-      () => Math.min(totalItems, (currentPage - 1) * pageSize + 1),
-      [totalItems, currentPage, pageSize],
+      () => Math.min(totalItems, (localCurrentPage - 1) * pageSize + 1),
+      [totalItems, localCurrentPage, pageSize],
     );
 
     const endItem = useMemo(
-      () => Math.min(totalItems, currentPage * pageSize),
-      [totalItems, currentPage, pageSize],
+      () => Math.min(totalItems, localCurrentPage * pageSize),
+      [totalItems, localCurrentPage, pageSize],
     );
 
     // Handle scrolling back to top - memoize to prevent recreation
@@ -415,7 +436,8 @@ export const CardGalleryPagination = React.memo(
               {!isSmallScreen && !isLoading && (
                 <ItemRangeInfo>
                   <Typography variant="body1" color="text.secondary">
-                    Showing {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
+                    Showing {startItem}-{endItem} of {totalItems}{' '}
+                    {contentType === 'cards' ? 'cards' : 'sets'}
                   </Typography>
                 </ItemRangeInfo>
               )}
@@ -427,9 +449,9 @@ export const CardGalleryPagination = React.memo(
               {!isSmallScreen && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
                   <NavigationControls
-                    currentPage={currentPage}
+                    currentPage={localCurrentPage}
                     totalPages={totalPages}
-                    onPageChange={onPageChange}
+                    onPageChange={handlePageChange}
                     isLoading={isLoading}
                     isSmallScreen={isSmallScreen}
                   />
@@ -443,9 +465,9 @@ export const CardGalleryPagination = React.memo(
                   <PaginationControlsGroup>
                     {/* Pagination controls */}
                     <NavigationControls
-                      currentPage={currentPage}
+                      currentPage={localCurrentPage}
                       totalPages={totalPages}
-                      onPageChange={onPageChange}
+                      onPageChange={handlePageChange}
                       isLoading={isLoading}
                       isSmallScreen={isSmallScreen}
                     />
@@ -462,7 +484,8 @@ export const CardGalleryPagination = React.memo(
                             whiteSpace: 'nowrap',
                           }}
                         >
-                          {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
+                          {startItem}-{endItem} of {totalItems}{' '}
+                          {contentType === 'cards' ? 'cards' : 'sets'}
                         </Typography>
                       )}
                     </MobileInfoRow>
@@ -553,23 +576,6 @@ export const CardGalleryPagination = React.memo(
           </BottomPaginationLayout>
         )}
       </PaginationContainer>
-    );
-  },
-  (prevProps, nextProps) => {
-    // Custom comparison function for memo
-    // Only re-render when these specific props change
-    return (
-      prevProps.currentPage === nextProps.currentPage &&
-      prevProps.totalPages === nextProps.totalPages &&
-      prevProps.pageSize === nextProps.pageSize &&
-      prevProps.totalItems === nextProps.totalItems &&
-      prevProps.viewMode === nextProps.viewMode &&
-      prevProps.isLoading === nextProps.isLoading &&
-      prevProps.isOnBottom === nextProps.isOnBottom &&
-      prevProps.onPageChange === nextProps.onPageChange &&
-      prevProps.onPageSizeChange === nextProps.onPageSizeChange &&
-      prevProps.onViewModeChange === nextProps.onViewModeChange &&
-      prevProps.contentType === nextProps.contentType
     );
   },
 );
