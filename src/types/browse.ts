@@ -70,6 +70,7 @@ export interface BrowseSearchParams {
   setCategories?: SetCategoryFilter;
   setTypes?: SetTypeFilter;
   oneResultPerCardName?: boolean;
+  showSubsets?: boolean;
   sortBy?: SortByOption;
   sortOrder?: SortOrderOption;
   currentPage?: number;

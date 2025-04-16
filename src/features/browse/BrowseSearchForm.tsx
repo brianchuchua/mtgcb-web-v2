@@ -50,6 +50,7 @@ import {
   selectOneResultPerCardName,
   selectOracleText,
   selectSetSearchName,
+  selectShowSubsets,
   selectSortBy,
   selectSortOrder,
   selectViewContentType,
@@ -58,6 +59,7 @@ import {
   setOneResultPerCardName,
   setOracleText,
   setSetSearchName,
+  setShowSubsets,
   setSortBy,
   setSortOrder,
   setViewContentType,
@@ -84,6 +86,7 @@ const BrowseSearchForm = () => {
   const reduxOracleText = useSelector(selectOracleText) || '';
   const reduxArtist = useSelector(selectArtist) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
+  const reduxShowSubsets = useSelector(selectShowSubsets);
   const reduxSortBy = useSelector(selectSortBy) || 'releasedAt';
   const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
 
@@ -238,6 +241,10 @@ const BrowseSearchForm = () => {
 
   const handleOneResultPerCardNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setOneResultPerCardName(e.target.checked));
+  };
+
+  const handleShowSubsetsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setShowSubsets(e.target.checked));
   };
 
   const handleSortByChange = (e: SelectChangeEvent<SortByOption>) => {
@@ -435,6 +442,19 @@ const BrowseSearchForm = () => {
       />
       <SetCategorySelector />
       <SetTypeSelector />
+      <FormControlLabel
+        control={
+          <Switch
+            checked={reduxShowSubsets}
+            onChange={handleShowSubsetsChange}
+            name="showSubsets"
+            color="primary"
+            size="small"
+            sx={{ marginRight: '3px' }}
+          />
+        }
+        label="Show subsets"
+      />
     </>
   );
 

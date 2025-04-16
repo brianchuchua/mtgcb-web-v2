@@ -199,6 +199,12 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       exclude: [],
     },
   },
+  showSubsets: {
+    type: 'boolean',
+    mode: 'sets',
+    urlParam: 'showSubsets',
+    defaultValue: true,
+  },
   colors: {
     type: 'colorFilter',
     mode: 'cards',

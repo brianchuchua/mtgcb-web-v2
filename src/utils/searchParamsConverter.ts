@@ -20,7 +20,7 @@ export const buildApiParamsFromSearchParams = (
   if (searchParams.sortBy) {
     apiParams.sortBy = searchParams.sortBy;
   }
-  
+
   if (searchParams.sortOrder) {
     apiParams.sortDirection = searchParams.sortOrder;
   }
@@ -94,17 +94,17 @@ export const buildApiParamsFromSearchParams = (
         // Handle includes with OR logic (card has any of the selected rarities)
         if (includeRarities.length > 0) {
           apiParams.rarityNumeric = {
-            OR: includeRarities.map(value => `=${value}`)
+            OR: includeRarities.map((value) => `=${value}`),
           };
         }
-        
+
         // Handle excludes with AND logic (card has none of the excluded rarities)
         if (excludeRarities.length > 0) {
           if (!apiParams.rarityNumeric) {
             apiParams.rarityNumeric = {};
           }
-          
-          apiParams.rarityNumeric.AND = excludeRarities.map(value => `!=${value}`);
+
+          apiParams.rarityNumeric.AND = excludeRarities.map((value) => `!=${value}`);
         }
       }
     }
@@ -118,17 +118,17 @@ export const buildApiParamsFromSearchParams = (
         if (includeSets.length > 0) {
           // For numeric IDs, use direct values in an OR array
           apiParams.setId = {
-            OR: includeSets
+            OR: includeSets,
           };
         }
-        
+
         if (excludeSets.length > 0) {
           if (!apiParams.setId) {
             apiParams.setId = {};
           }
-          
+
           // For exclusions, use direct values in an AND array with != operator
-          apiParams.setId.AND = excludeSets.map(value => `!=${value}`);
+          apiParams.setId.AND = excludeSets.map((value) => `!=${value}`);
         }
       }
     }
@@ -149,7 +149,7 @@ export const buildApiParamsFromSearchParams = (
 
           // Filter out empty values and transform the valid ones
           const transformedConditions = conditions
-            .filter(cond => {
+            .filter((cond) => {
               // Check if condition has a value
               for (const urlOp of Object.keys(OPERATOR_MAP)) {
                 if (cond.startsWith(urlOp)) {
@@ -190,23 +190,23 @@ export const buildApiParamsFromSearchParams = (
 
       // Build the filter object
       const categoryFilter: any = {};
-      
+
       // Handle inclusions with OR
       if (includeCategories.length > 0) {
-        categoryFilter.OR = includeCategories.map(value => `"${value}"`);
+        categoryFilter.OR = includeCategories.map((value) => `"${value}"`);
       }
-      
+
       // Handle exclusions with NOT
       if (excludeCategories.length > 0) {
-        categoryFilter.NOT = excludeCategories.map(value => `"${value}"`);
+        categoryFilter.NOT = excludeCategories.map((value) => `"${value}"`);
       }
-      
+
       // Only set the filter if we have either inclusions or exclusions
       if (Object.keys(categoryFilter).length > 0) {
         apiParams.category = categoryFilter;
       }
     }
-    
+
     // Add set type filtering
     if (searchParams.setTypes) {
       const includeTypes = searchParams.setTypes.include;
@@ -214,21 +214,25 @@ export const buildApiParamsFromSearchParams = (
 
       // Build the filter object
       const typeFilter: any = {};
-      
+
       // Handle inclusions with OR
       if (includeTypes.length > 0) {
-        typeFilter.OR = includeTypes.map(value => `"${value}"`);
+        typeFilter.OR = includeTypes.map((value) => `"${value}"`);
       }
-      
+
       // Handle exclusions with NOT
       if (excludeTypes.length > 0) {
-        typeFilter.NOT = excludeTypes.map(value => `"${value}"`);
+        typeFilter.NOT = excludeTypes.map((value) => `"${value}"`);
       }
-      
+
       // Only set the filter if we have either inclusions or exclusions
       if (Object.keys(typeFilter).length > 0) {
         apiParams.setType = typeFilter;
       }
+    }
+
+    if (searchParams.showSubsets === false) {
+      apiParams.parentSetId = null;
     }
   }
 
