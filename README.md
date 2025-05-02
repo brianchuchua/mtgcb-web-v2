@@ -9,7 +9,7 @@
 
 ### Next
 
-- Improve toggle setting layout -- nice border, i symbol to explain, etc.
+- Check feature parity with the old site
 - Fix typing issues
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - Page title flashing when toggling between cards and sets

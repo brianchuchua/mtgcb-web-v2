@@ -403,19 +403,30 @@ const BrowseSearchForm = () => {
       <ColorSelector />
       <RaritySelector />
       <SetSelector />
-      <FormControlLabel
-        control={
-          <Switch
-            checked={reduxOneResultPerCardName}
-            onChange={handleOneResultPerCardNameChange}
-            name="oneResultPerCardName"
-            color="primary"
-            size="small"
-            sx={{ marginRight: '3px' }}
-          />
-        }
-        label="Hide duplicate printings"
-      />
+      <Paper
+        variant="outlined"
+        sx={{
+          borderColor: (theme) => theme.palette.grey[700],
+          mt: 1.5,
+          p: 1,
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <FormControlLabel
+          control={
+            <Switch
+              checked={reduxOneResultPerCardName}
+              onChange={handleOneResultPerCardNameChange}
+              name="oneResultPerCardName"
+              color="primary"
+              size="small"
+              sx={{ marginRight: '3px' }}
+            />
+          }
+          label="Hide duplicate printings"
+        />
+      </Paper>
       <StatSearch />
     </>
   );
@@ -442,19 +453,48 @@ const BrowseSearchForm = () => {
       />
       <SetCategorySelector />
       <SetTypeSelector />
-      <FormControlLabel
-        control={
-          <Switch
-            checked={reduxShowSubsets}
-            onChange={handleShowSubsetsChange}
-            name="showSubsets"
-            color="primary"
-            size="small"
-            sx={{ marginRight: '3px' }}
-          />
-        }
-        label="Show subsets"
-      />
+      <Paper
+        variant="outlined"
+        sx={{
+          borderColor: (theme) => theme.palette.grey[700],
+          mt: 1.5,
+          p: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <FormControlLabel
+          control={
+            <Switch
+              checked={reduxShowSubsets}
+              onChange={handleShowSubsetsChange}
+              name="showSubsets"
+              color="primary"
+              size="small"
+              sx={{ marginRight: '3px' }}
+            />
+          }
+          label={
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              Show subsets
+              <Tooltip
+                title={
+                  <div dangerouslySetInnerHTML={{ 
+                    __html: "Subsets are a piece of a larger set. <br /><br />Example: Tempest has a subset named Tempest Prerelease Promos." 
+                  }} />
+                }
+                placement="right"
+              >
+                <InfoOutlinedIcon
+                  fontSize="small"
+                  sx={{ ml: 0.5, cursor: 'help', color: 'text.secondary' }}
+                />
+              </Tooltip>
+            </Box>
+          }
+        />
+      </Paper>
     </>
   );
 
