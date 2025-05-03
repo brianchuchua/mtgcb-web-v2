@@ -28,23 +28,8 @@ const formatSetType = (type: string | null): string => {
 // Set table helper hooks and components
 export const useSetTableColumns = (
   { displaySettings }: SetTableRendererProps,
-  currentSortBy: string
+  currentSortBy: string,
 ): TableColumn<Set>[] => {
-  // Tooltip components
-  const ReleaseDateTooltip = () => (
-    <Box>
-      <Box>Sort by release date</Box>
-      <Box>Sets are sorted chronologically</Box>
-    </Box>
-  );
-
-  const CardCountTooltip = () => (
-    <Box>
-      <Box>Sort by card count</Box>
-      <Box>Number of cards in the set</Box>
-    </Box>
-  );
-
   // Define all possible columns
   const allColumns: TableColumn<Set>[] = [
     {
@@ -69,8 +54,6 @@ export const useSetTableColumns = (
       id: 'cardCount',
       label: 'Cards',
       width: { default: '90px' },
-      align: 'right',
-      tooltip: <CardCountTooltip />,
       hasInfoIcon: true,
       sortable: true,
     },
@@ -78,7 +61,6 @@ export const useSetTableColumns = (
       id: 'releasedAt',
       label: 'Release Date',
       width: { default: '140px' },
-      tooltip: <ReleaseDateTooltip />,
       hasInfoIcon: true,
       sortable: true,
     },
@@ -119,8 +101,8 @@ export const useSetTableColumns = (
 
 // Set row renderer - this renders the cells for each set
 export const useSetRowRenderer = (
-  displaySettings: SetTableRendererProps["displaySettings"],
-  onSetClick?: (set: Set) => void
+  displaySettings: SetTableRendererProps['displaySettings'],
+  onSetClick?: (set: Set) => void,
 ) => {
   const renderSetRow = (index: number, set: Set) => {
     // Create a collection of cells based on visible columns
@@ -132,67 +114,51 @@ export const useSetRowRenderer = (
         <TableCell key="code" align="center">
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
             {set.iconUrl && (
-              <img
-                src={set.iconUrl}
-                alt={set.code || ''}
-                style={{ width: 20, height: 20 }}
-              />
+              <img src={set.iconUrl} alt={set.code || ''} style={{ width: 20, height: 20 }} />
             )}
             {set.code || 'N/A'}
           </Box>
-        </TableCell>
+        </TableCell>,
       );
     }
-    
+
     // Set Name Cell (always shown)
     cells.push(
       <TableCell key="name" component="th" scope="row">
         <ClickableText>{set.name}</ClickableText>
-      </TableCell>
+      </TableCell>,
     );
-    
+
     // Card Count Cell
     if (displaySettings.cardCountIsVisible !== false) {
       cells.push(
         <TableCell key="cardCount" align="right">
           {set.cardCount ? parseInt(set.cardCount).toLocaleString() : 'N/A'}
-        </TableCell>
+        </TableCell>,
       );
     }
-    
+
     // Release Date Cell
     if (displaySettings.releaseDateIsVisible !== false) {
-      cells.push(
-        <TableCell key="releasedAt">
-          {formatDate(set.releasedAt)}
-        </TableCell>
-      );
+      cells.push(<TableCell key="releasedAt">{formatDate(set.releasedAt)}</TableCell>);
     }
-    
+
     // Set Type Cell
     if (displaySettings.typeIsVisible !== false) {
-      cells.push(
-        <TableCell key="setType">
-          {formatSetType(set.setType)}
-        </TableCell>
-      );
+      cells.push(<TableCell key="setType">{formatSetType(set.setType)}</TableCell>);
     }
-    
+
     // Category Cell
     if (displaySettings.categoryIsVisible !== false) {
-      cells.push(
-        <TableCell key="category">
-          {set.category || 'N/A'}
-        </TableCell>
-      );
+      cells.push(<TableCell key="category">{set.category || 'N/A'}</TableCell>);
     }
-    
+
     // Draftable Cell
     if (displaySettings.isDraftableIsVisible !== false) {
       cells.push(
         <TableCell key="isDraftable" align="center">
           {set.isDraftable ? 'Yes' : 'No'}
-        </TableCell>
+        </TableCell>,
       );
     }
 
@@ -204,13 +170,13 @@ export const useSetRowRenderer = (
 
 // Export a combined hook for ease of use
 export const useSetTableRenderers = (
-  displaySettings: SetTableRendererProps["displaySettings"],
+  displaySettings: SetTableRendererProps['displaySettings'],
   currentSortBy: string,
-  onSetClick?: (set: Set) => void
+  onSetClick?: (set: Set) => void,
 ) => {
   const columns = useSetTableColumns({ displaySettings }, currentSortBy);
   const renderRowContent = useSetRowRenderer(displaySettings, onSetClick);
-  
+
   return { columns, renderRowContent };
 };
 

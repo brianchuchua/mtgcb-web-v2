@@ -122,7 +122,7 @@ const VirtualizedTable = <T,>({
     return total + 100; // Default width
   }, 0);
 
-  const finalTableWidth = tableWidth || Math.max(totalTableWidth, 800); // Minimum width
+  const finalTableWidth = tableWidth || Math.max(totalTableWidth, 350); // Minimum width
 
   // Custom table row for virtualization
   const CustomTableRow = (props: any) => {
@@ -165,8 +165,7 @@ const VirtualizedTable = <T,>({
         aria-label="virtualized table"
         sx={{
           borderCollapse: 'separate',
-          width: `${finalTableWidth}px`,
-          tableLayout: 'fixed',
+          width: '100%',
           ...props.sx,
         }}
       />
@@ -194,6 +193,7 @@ const VirtualizedTable = <T,>({
               sx={{
                 minWidth: responsiveWidth,
                 width: responsiveWidth,
+                maxWidth: responsiveWidth,
                 '& .MuiTableSortLabel-root': {
                   width: '100%',
                   justifyContent: column.align === 'center' ? 'center' : 'flex-start',

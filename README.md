@@ -13,9 +13,11 @@
   - View cards form: Done
   - View sets form: Done
   - Cards gallery view: Done
-  - Cards table view: TBD
-  - Sets gallery view: TBD
-  - Sets table view: TBD
+  - Cards table view: Done
+  - Sets gallery view: Stubbed (needs cost to complete interface and UI overhaul)
+  - Sets table view: Done (other than handling set logos)
+- Proper set logo handling
+- Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
 - Fix typing issues
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - Page title flashing when toggling between cards and sets
@@ -82,6 +84,7 @@
 - Clean up BrowseSearchForm into smaller components
 - Add ability to save searches (even independently of collection goals, a saved searches section)
 - Allow sorting by set names alphabetically in card view
+- Table exporting to CSV
 
 ## Known Bugs
 
