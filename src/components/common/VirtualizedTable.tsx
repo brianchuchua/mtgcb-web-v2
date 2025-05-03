@@ -122,7 +122,7 @@ const VirtualizedTable = <T,>({
     return total + 100; // Default width
   }, 0);
 
-  const finalTableWidth = tableWidth || Math.max(totalTableWidth, 350); // Minimum width
+  const finalTableWidth = tableWidth || Math.max(totalTableWidth + 50, 350); // Minimum width
 
   // Custom table row for virtualization
   const CustomTableRow = (props: any) => {

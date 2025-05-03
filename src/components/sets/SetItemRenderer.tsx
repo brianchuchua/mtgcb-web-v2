@@ -2,6 +2,7 @@
 
 import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
 import React from 'react';
+import SetIcon from '@/components/sets/SetIcon';
 import { Set } from '@/types/sets';
 import { formatDate } from '@/utils/dateUtils';
 
@@ -28,8 +29,8 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, onClic
   };
 
   return (
-    <Card 
-      sx={{ 
+    <Card
+      sx={{
         cursor: onClick ? 'pointer' : 'default',
         height: '100%',
         display: 'flex',
@@ -39,7 +40,7 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, onClic
           transform: 'translateY(-2px)',
           boxShadow: 3,
         },
-      }} 
+      }}
       onClick={handleClick}
     >
       <CardMedia
@@ -53,28 +54,24 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, onClic
           justifyContent: 'center',
         }}
       >
-        {!isSkeletonLoading && set.iconUrl && (
-          <Box 
-            component="img"
-            src={set.iconUrl}
-            alt={set.name}
+        {!isSkeletonLoading && set.code && (
+          <Box
             sx={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              maxWidth: '75%',
-              maxHeight: '75%',
-              width: 'auto',
-              height: 'auto',
+              fontSize: '3rem',
             }}
-          />
+          >
+            <SetIcon code={set.code} size="5x" fixedWidth />
+          </Box>
         )}
-        {!isSkeletonLoading && !set.iconUrl && (
-          <Typography 
-            variant="h5" 
+        {!isSkeletonLoading && !set.code && (
+          <Typography
+            variant="h5"
             component="div"
-            sx={{ 
+            sx={{
               position: 'absolute',
               top: '50%',
               left: '50%',
@@ -82,18 +79,18 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, onClic
               color: 'text.secondary',
             }}
           >
-            {set.code || '?'}
+            {'?'}
           </Typography>
         )}
       </CardMedia>
-      
+
       <CardContent sx={{ flexGrow: 1, pt: 1.5, pb: 1.5 }}>
         {settings.nameIsVisible !== false && (
-          <Typography 
-            variant="body1" 
+          <Typography
+            variant="body1"
             component="div"
-            fontWeight="500" 
-            gutterBottom 
+            fontWeight="500"
+            gutterBottom
             sx={{
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -105,53 +102,81 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, onClic
             }}
           >
             {isSkeletonLoading ? (
-              <Box sx={{ height: 16, width: '80%', bgcolor: 'action.disabledBackground', borderRadius: 0.5 }} />
+              <Box
+                sx={{
+                  height: 16,
+                  width: '80%',
+                  bgcolor: 'action.disabledBackground',
+                  borderRadius: 0.5,
+                }}
+              />
             ) : (
               set.name
             )}
           </Typography>
         )}
-        
+
         <Box sx={{ mt: 0.5 }}>
           {settings.codeIsVisible !== false && (
-            <Typography 
+            <Typography
               variant="body2"
-              component="div" 
+              component="div"
               color="text.secondary"
               sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
             >
               {isSkeletonLoading ? (
-                <Box sx={{ height: 14, width: '40%', bgcolor: 'action.disabledBackground', borderRadius: 0.5 }} />
+                <Box
+                  sx={{
+                    height: 14,
+                    width: '40%',
+                    bgcolor: 'action.disabledBackground',
+                    borderRadius: 0.5,
+                  }}
+                />
               ) : (
                 <>Code: {set.code || 'N/A'}</>
               )}
             </Typography>
           )}
-          
+
           {settings.cardCountIsVisible !== false && (
-            <Typography 
+            <Typography
               variant="body2"
-              component="div" 
+              component="div"
               color="text.secondary"
               sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}
             >
               {isSkeletonLoading ? (
-                <Box sx={{ height: 14, width: '60%', bgcolor: 'action.disabledBackground', borderRadius: 0.5 }} />
+                <Box
+                  sx={{
+                    height: 14,
+                    width: '60%',
+                    bgcolor: 'action.disabledBackground',
+                    borderRadius: 0.5,
+                  }}
+                />
               ) : (
                 <>Cards: {set.cardCount ? parseInt(set.cardCount).toLocaleString() : 'N/A'}</>
               )}
             </Typography>
           )}
-          
+
           {settings.releaseDateIsVisible !== false && (
-            <Typography 
+            <Typography
               variant="body2"
-              component="div" 
+              component="div"
               color="text.secondary"
               sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}
             >
               {isSkeletonLoading ? (
-                <Box sx={{ height: 14, width: '70%', bgcolor: 'action.disabledBackground', borderRadius: 0.5 }} />
+                <Box
+                  sx={{
+                    height: 14,
+                    width: '70%',
+                    bgcolor: 'action.disabledBackground',
+                    borderRadius: 0.5,
+                  }}
+                />
               ) : (
                 <>Released: {formatDate(set.releasedAt, { year: 'numeric', month: 'short' })}</>
               )}

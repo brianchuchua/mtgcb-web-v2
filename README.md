@@ -15,8 +15,7 @@
   - Cards gallery view: Done
   - Cards table view: Done
   - Sets gallery view: Stubbed (needs cost to complete interface and UI overhaul)
-  - Sets table view: Done (other than handling set logos)
-- Proper set logo handling
+  - Sets table view: Done
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
 - Fix typing issues
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)

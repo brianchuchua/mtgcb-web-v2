@@ -5,6 +5,7 @@ import { Box, TableCell, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
 import { TableColumn } from '@/components/common/VirtualizedTable';
+import SetIcon from '@/components/sets/SetIcon';
 import { Set } from '@/types/sets';
 import { formatDate } from '@/utils/dateUtils';
 
@@ -113,9 +114,7 @@ export const useSetRowRenderer = (
       cells.push(
         <TableCell key="code" align="center">
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-            {set.iconUrl && (
-              <img src={set.iconUrl} alt={set.code || ''} style={{ width: 20, height: 20 }} />
-            )}
+            {set.code && <SetIcon code={set.code} size="2x" fixedWidth />}
             {set.code || 'N/A'}
           </Box>
         </TableCell>,
