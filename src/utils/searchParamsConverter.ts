@@ -16,6 +16,11 @@ export const buildApiParamsFromSearchParams = (
     apiParams.name = searchParams.name;
   }
 
+  // Add set code for sets
+  if (contentType === 'sets' && searchParams.code) {
+    apiParams.code = searchParams.code;
+  }
+
   // Add sorting parameters
   if (searchParams.sortBy) {
     apiParams.sortBy = searchParams.sortBy;

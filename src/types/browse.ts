@@ -60,6 +60,7 @@ export type SortOrderOption = 'asc' | 'desc';
 
 export interface BrowseSearchParams {
   name?: string;
+  code?: string;
   oracleText?: string;
   artist?: string;
   colors?: ColorFilter;

@@ -12,6 +12,7 @@ import {
   setOneResultPerCardName,
   setOracleText,
   setRarities,
+  setSetCode,
   setSetSearchName,
   setSetSearchParams,
   setSets,
@@ -222,6 +223,12 @@ export function useInitializeBrowseFromUrl() {
         const setNameValue = setName || name;
         if (setNameValue) {
           dispatch(setSetSearchName(setNameValue));
+        }
+        
+        // Get code from URL
+        const code = urlSearchParams.get('code');
+        if (code) {
+          dispatch(setSetCode(code));
         }
       }
       

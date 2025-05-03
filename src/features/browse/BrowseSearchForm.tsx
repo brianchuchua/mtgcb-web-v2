@@ -49,6 +49,7 @@ import {
   selectCardSearchName,
   selectOneResultPerCardName,
   selectOracleText,
+  selectSetCode,
   selectSetSearchName,
   selectShowSubsets,
   selectSortBy,
@@ -58,6 +59,7 @@ import {
   setCardSearchName,
   setOneResultPerCardName,
   setOracleText,
+  setSetCode,
   setSetSearchName,
   setShowSubsets,
   setSortBy,
@@ -83,6 +85,7 @@ const BrowseSearchForm = () => {
   // Get type-specific Redux state
   const reduxCardName = useSelector(selectCardSearchName) || '';
   const reduxSetName = useSelector(selectSetSearchName) || '';
+  const reduxSetCode = useSelector(selectSetCode) || '';
   const reduxOracleText = useSelector(selectOracleText) || '';
   const reduxArtist = useSelector(selectArtist) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
@@ -93,6 +96,7 @@ const BrowseSearchForm = () => {
   // Local state for input fields - separate for cards and sets
   const [localCardName, setLocalCardName] = useState(reduxCardName);
   const [localSetName, setLocalSetName] = useState(reduxSetName);
+  const [localSetCode, setLocalSetCode] = useState(reduxSetCode);
   const [localOracleText, setLocalOracleText] = useState(reduxOracleText);
   const [localArtist, setLocalArtist] = useState(reduxArtist);
 
@@ -113,6 +117,11 @@ const BrowseSearchForm = () => {
   useEffect(() => {
     setLocalSetName(reduxSetName);
   }, [reduxSetName]);
+
+  // Sync set code state when redux value changes
+  useEffect(() => {
+    setLocalSetCode(reduxSetCode);
+  }, [reduxSetCode]);
 
   // Sync oracle text when redux value changes
   useEffect(() => {
@@ -200,6 +209,13 @@ const BrowseSearchForm = () => {
     [dispatch],
   );
 
+  const debouncedSetCodeDispatch = useCallback(
+    debounce((value: string) => {
+      dispatch(setSetCode(value));
+    }, 300),
+    [dispatch],
+  );
+
   const debouncedOracleDispatch = useCallback(
     debounce((value: string) => {
       dispatch(setOracleText(value));
@@ -225,6 +241,12 @@ const BrowseSearchForm = () => {
     const newValue = e.target.value;
     setLocalSetName(newValue);
     debouncedSetNameDispatch(newValue);
+  };
+
+  const handleSetCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setLocalSetCode(newValue);
+    debouncedSetCodeDispatch(newValue);
   };
 
   const handleOracleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -440,6 +462,23 @@ const BrowseSearchForm = () => {
         value={localSetName}
         onChange={handleSetNameChange}
         placeholder="Search by set name"
+        margin="dense"
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="disabled" />
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
+      <TextField
+        fullWidth
+        label="Set Code"
+        value={localSetCode}
+        onChange={handleSetCodeChange}
+        placeholder="Search by set code"
         margin="dense"
         slotProps={{
           input: {

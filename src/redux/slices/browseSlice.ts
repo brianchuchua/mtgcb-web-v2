@@ -68,6 +68,14 @@ export const browseSlice = createSlice({
         state.setsSearchParams.name = action.payload;
       }
     },
+    setSetCode: (state, action: PayloadAction<string>) => {
+      // Explicitly for sets view
+      if (action.payload === '') {
+        delete state.setsSearchParams.code;
+      } else {
+        state.setsSearchParams.code = action.payload;
+      }
+    },
     setOracleText: (state, action: PayloadAction<string>) => {
       // Cards-specific field
       if (action.payload === '') {
@@ -348,6 +356,7 @@ export const {
   setSearchName,
   setCardSearchName,
   setSetSearchName,
+  setSetCode,
   setOracleText,
   setArtist,
   setColors,
@@ -425,6 +434,7 @@ export const selectCardPageSize = (state: RootState) =>
 // Set-specific selectors
 export const selectSetSearchParams = (state: RootState) => state.browse.setsSearchParams;
 export const selectSetSearchName = (state: RootState) => state.browse.setsSearchParams.name;
+export const selectSetCode = (state: RootState) => state.browse.setsSearchParams.code;
 export const selectSetSortBy = (state: RootState) => state.browse.setsSearchParams.sortBy;
 export const selectSetSortOrder = (state: RootState) => state.browse.setsSearchParams.sortOrder;
 export const selectSetCurrentPage = (state: RootState) =>

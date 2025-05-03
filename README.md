@@ -9,7 +9,13 @@
 
 ### Next
 
-- Check feature parity with the old site
+- Check feature parity for browse page with with the old site
+  - View cards form: Done
+  - View sets form: Done
+  - Cards gallery view: Done
+  - Cards table view: TBD
+  - Sets gallery view: TBD
+  - Sets table view: TBD
 - Fix typing issues
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - Page title flashing when toggling between cards and sets

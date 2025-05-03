@@ -173,6 +173,12 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     urlParam: 'setName',
     defaultValue: '',
   },
+  code: {
+    type: 'string',
+    mode: 'sets',
+    urlParam: 'code',
+    defaultValue: '',
+  },
   setCategories: {
     type: 'inclusionExclusion',
     mode: 'sets',
