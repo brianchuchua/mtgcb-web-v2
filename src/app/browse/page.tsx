@@ -1,7 +1,7 @@
 'use client';
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,6 +33,165 @@ import { SortByOption } from '@/types/browse';
 import { Set } from '@/types/sets';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 
+export default function BrowsePage() {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const viewContentType = useSelector(selectViewContentType);
+  const reduxCardSearchParams = useSelector(selectCardSearchParams);
+  const reduxSetSearchParams = useSelector(selectSetSearchParams);
+
+  const { pagination, updatePagination } = useBrowseStateSync();
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
+  const [preferredCardViewMode, setPreferredCardViewMode] = useLocalStorage<'grid' | 'table'>(
+    'preferredCardViewMode',
+    'grid',
+  );
+  const [preferredSetViewMode, setPreferredSetViewMode] = useLocalStorage<'grid' | 'table'>(
+    'preferredSetViewMode',
+    'grid',
+  );
+
+  const cardApiParams = useCardApiParams(reduxCardSearchParams, pagination);
+  const setApiParams = useSetApiParams(reduxSetSearchParams, pagination);
+  const nextPageApiParams = useNextPageApiParams(viewContentType, cardApiParams, setApiParams, pagination);
+
+  const queryConfig = {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  };
+
+  const contentTypeForSkip = viewContentType || 'cards';
+  const shouldSkipCardsQuery = contentTypeForSkip !== 'cards';
+  const shouldSkipSetsQuery = contentTypeForSkip !== 'sets';
+
+  const {
+    data: cardsSearchResult,
+    isFetching: isCardsApiLoading,
+    error: cardsError,
+  } = useGetCardsQuery(cardApiParams, {
+    ...queryConfig,
+    skip: shouldSkipCardsQuery,
+  });
+
+  const {
+    data: setsSearchResult,
+    isFetching: isSetsApiLoading,
+    error: setsError,
+  } = useGetSetsQuery(setApiParams, {
+    ...queryConfig,
+    skip: shouldSkipSetsQuery,
+  });
+
+  const isApiLoading = viewContentType === 'cards' ? isCardsApiLoading : isSetsApiLoading;
+  const error = viewContentType === 'cards' ? cardsError : setsError;
+  const cardItems = useMemo(
+    () => (cardsSearchResult?.data ? mapApiCardsToCardItems(cardsSearchResult.data.cards || []) : []),
+    [cardsSearchResult?.data],
+  );
+  const setItems = useMemo(
+    () => (setsSearchResult?.data ? mapApiSetsToSetItems(setsSearchResult.data.sets || []) : []),
+    [setsSearchResult?.data],
+  );
+
+  const totalItems = useTotalItems(viewContentType, cardsSearchResult, setsSearchResult);
+  const totalPages = useMemo(() => Math.ceil(totalItems / pagination.pageSize), [totalItems, pagination.pageSize]);
+
+  const isInitialLoading =
+    !initialLoadComplete && !(viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data && !error;
+
+  const prefetchNextPage = useGetCardsPrefetch(viewContentType === 'cards' ? 'getCards' : 'getSets');
+  usePrefetchNextPage(prefetchNextPage, nextPageApiParams, isApiLoading);
+
+  const setDisplaySettings = useSetDisplaySettings(pagination.viewMode);
+  const settingGroups = useCardSetSettingGroups(viewContentType, pagination.viewMode);
+
+  const handleCardClick = useCardClickHandler(router);
+  const handleSetClick = useSetClickHandler(router);
+  const handlePageChange = usePageChangeHandler(updatePagination);
+  const handlePageSizeChange = usePageSizeChangeHandler(updatePagination);
+  const handleViewModeChange = useViewModeChangeHandler(
+    viewContentType,
+    setPreferredCardViewMode,
+    setPreferredSetViewMode,
+  );
+
+  const reduxCardSearchParamsRef = useRef(reduxCardSearchParams);
+  const reduxSetSearchParamsRef = useRef(reduxSetSearchParams);
+  useResetPaginationOnParamsChange(
+    reduxCardSearchParams,
+    reduxCardSearchParamsRef,
+    viewContentType,
+    'cards',
+    pagination,
+    updatePagination,
+  );
+  useResetPaginationOnParamsChange(
+    reduxSetSearchParams,
+    reduxSetSearchParamsRef,
+    viewContentType,
+    'sets',
+    pagination,
+    updatePagination,
+  );
+
+  useEffect(() => {
+    if (((viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data || error) && !initialLoadComplete) {
+      setInitialLoadComplete(true);
+    }
+  }, [viewContentType, cardsSearchResult?.data, setsSearchResult?.data, error, initialLoadComplete]);
+
+  useEffect(() => {
+    document.title = `Browse ${viewContentType === 'cards' ? 'Cards' : 'Sets'} | MTG Collection Builder`;
+  }, [viewContentType]);
+
+  const paginationProps = {
+    currentPage: pagination.currentPage,
+    totalPages: totalPages || 1,
+    pageSize: pagination.pageSize,
+    totalItems,
+    viewMode: pagination.viewMode,
+    onPageChange: handlePageChange,
+    onPageSizeChange: handlePageSizeChange,
+    onViewModeChange: handleViewModeChange,
+    isLoading: isApiLoading,
+    isInitialLoading: isInitialLoading,
+    contentType: viewContentType,
+    settingGroups,
+  };
+
+  return (
+    <Box>
+      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Browse' }]} />
+      <CardGalleryPagination {...paginationProps} />
+
+      {error && <ErrorDisplay viewContentType={viewContentType} />}
+
+      {viewContentType === 'cards' ? (
+        <CardDisplay
+          cardItems={cardItems}
+          isLoading={isCardsApiLoading}
+          viewMode={pagination.viewMode}
+          onCardClick={handleCardClick}
+          pageSize={pagination.pageSize}
+        />
+      ) : (
+        <SetDisplay
+          setItems={setItems}
+          isLoading={isSetsApiLoading}
+          viewMode={pagination.viewMode}
+          onSetClick={handleSetClick}
+          pageSize={pagination.pageSize}
+          displaySettings={createSetDisplaySettings(setDisplaySettings)}
+        />
+      )}
+
+      <CardGalleryPagination {...paginationProps} isOnBottom={true} />
+    </Box>
+  );
+}
+
 interface CardDisplayProps {
   cardItems: ReturnType<typeof mapApiCardsToCardItems>;
   isLoading: boolean;
@@ -46,119 +205,141 @@ const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick, pageSize }: 
   const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
   const currentSortOrder = useSelector(selectSortOrder) || 'asc';
 
-  const displayCards = isLoading
-    ? Array(pageSize)
-        .fill(0)
-        .map((_, index) => ({
-          id: `skeleton-${index}`,
-          name: '',
-          setName: '',
-          collectorNumber: '',
-          rarity: '',
-          isLoadingSkeleton: true,
-        }))
-    : cardItems;
+  const displayCards = generateDisplayCards(cardItems, isLoading, pageSize);
 
-  // Gallery settings
-  const [cardsPerRow] = useLocalStorage<number>('cardsPerRow', 4);
-  const [cardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
-  const [nameIsVisible] = useLocalStorage('cardNameIsVisible', true);
-  const [setIsVisible] = useLocalStorage('cardSetIsVisible', true);
-  const [priceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
+  const gallerySettings = useGallerySettings();
   const currentPriceType = usePriceType();
 
-  // Table settings
-  const [tableSetIsVisible] = useLocalStorage('tableSetIsVisible', true);
-  const [tableCollectorNumberIsVisible] = useLocalStorage('tableCollectorNumberIsVisible', true);
-  const [tableMtgcbNumberIsVisible] = useLocalStorage('tableMtgcbNumberIsVisible', false);
-  const [tableRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
-  const [tableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', false);
-  const [tableArtistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
-  const [tableManaCostIsVisible] = useLocalStorage('tableManaCostIsVisible', true);
-  const [tablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', false);
-  const [tableToughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', false);
-  const [tableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', false);
-  const [tablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
+  const tableSettings = useTableSettings();
 
-  // Card table settings
-  const tableDisplaySettings = {
-    setIsVisible: tableSetIsVisible,
-    collectorNumberIsVisible: tableCollectorNumberIsVisible,
-    mtgcbNumberIsVisible: tableMtgcbNumberIsVisible,
-    rarityIsVisible: tableRarityIsVisible,
-    typeIsVisible: tableTypeIsVisible,
-    artistIsVisible: tableArtistIsVisible,
-    manaCostIsVisible: tableManaCostIsVisible,
-    powerIsVisible: tablePowerIsVisible,
-    toughnessIsVisible: tableToughnessIsVisible,
-    loyaltyIsVisible: tableLoyaltyIsVisible,
-    priceIsVisible: tablePriceIsVisible,
-  };
-
-  // Card gallery settings
   const cardDisplaySettings = {
-    nameIsVisible,
-    setIsVisible,
-    priceIsVisible,
+    nameIsVisible: gallerySettings.nameIsVisible,
+    setIsVisible: gallerySettings.setIsVisible,
+    priceIsVisible: gallerySettings.priceIsVisible,
   };
 
-  // Table column configuration
   const tableColumns = useCardTableColumns(
-    { priceType: currentPriceType, displaySettings: tableDisplaySettings },
+    { priceType: currentPriceType, displaySettings: tableSettings },
     currentSortBy,
   );
 
-  // Card row renderer
-  const renderCardRow = useCardRowRenderer(currentPriceType, tableDisplaySettings, onCardClick);
+  const renderCardRow = useCardRowRenderer(currentPriceType, tableSettings, onCardClick);
 
-  // Handle sort change
   const handleSortChange = (columnId: string) => {
-    if (columnId) {
-      const isClickingCurrentSortColumn = columnId === currentSortBy;
-      if (isClickingCurrentSortColumn) {
-        const newOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
-        dispatch(setSortOrder(newOrder));
-      } else {
-        dispatch(setSortBy(columnId as SortByOption));
-        dispatch(setSortOrder('asc'));
-      }
+    if (!columnId) return;
+
+    const isClickingCurrentSortColumn = columnId === currentSortBy;
+    if (isClickingCurrentSortColumn) {
+      const newOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+      dispatch(setSortOrder(newOrder));
+    } else {
+      dispatch(setSortBy(columnId as SortByOption));
+      dispatch(setSortOrder('asc'));
     }
   };
 
   if (viewMode === 'grid') {
     return (
-      <VirtualizedGallery
-        key="browse-card-gallery"
-        items={displayCards}
-        renderItem={(card, index) => (
-          <CardItemRenderer
-            card={card}
-            settings={cardDisplaySettings}
-            priceType={currentPriceType}
-            onClick={onCardClick}
-          />
-        )}
+      <CardGridView
+        displayCards={displayCards}
+        cardDisplaySettings={cardDisplaySettings}
+        priceType={currentPriceType}
+        onCardClick={onCardClick}
         isLoading={isLoading}
-        columnsPerRow={cardsPerRow}
-        galleryWidth={95}
-        horizontalPadding={cardSizeMargin}
-        emptyMessage="No cards found"
-        computeItemKey={(index) => displayCards[index]?.id || index}
+        gallerySettings={gallerySettings}
       />
     );
   }
 
-  // Table view
   return (
-    <VirtualizedTable
-      key="browse-card-table"
-      items={displayCards}
-      columns={tableColumns}
+    <CardTableView
+      displayCards={displayCards}
+      tableColumns={tableColumns}
       renderRowContent={renderCardRow}
       isLoading={isLoading}
       sortBy={currentSortBy}
       sortOrder={currentSortOrder}
       onSortChange={handleSortChange}
+      onCardClick={onCardClick}
+    />
+  );
+};
+
+interface CardGridViewProps {
+  displayCards: any[];
+  cardDisplaySettings: {
+    nameIsVisible: boolean;
+    setIsVisible: boolean;
+    priceIsVisible: boolean;
+  };
+  priceType: string;
+  onCardClick: (cardId: string) => void;
+  isLoading: boolean;
+  gallerySettings: {
+    cardsPerRow: number;
+    cardSizeMargin: number;
+    nameIsVisible: boolean;
+    setIsVisible: boolean;
+    priceIsVisible: boolean;
+  };
+}
+
+const CardGridView = ({
+  displayCards,
+  cardDisplaySettings,
+  priceType,
+  onCardClick,
+  isLoading,
+  gallerySettings,
+}: CardGridViewProps) => {
+  return (
+    <VirtualizedGallery
+      key="browse-card-gallery"
+      items={displayCards}
+      renderItem={(card) => (
+        <CardItemRenderer card={card} settings={cardDisplaySettings} priceType={priceType} onClick={onCardClick} />
+      )}
+      isLoading={isLoading}
+      columnsPerRow={gallerySettings.cardsPerRow}
+      galleryWidth={95}
+      horizontalPadding={gallerySettings.cardSizeMargin}
+      emptyMessage="No cards found"
+      computeItemKey={(index) => displayCards[index]?.id || index}
+    />
+  );
+};
+
+interface CardTableViewProps {
+  displayCards: any[];
+  tableColumns: any[];
+  renderRowContent: any;
+  isLoading: boolean;
+  sortBy: string;
+  sortOrder: string;
+  onSortChange: (columnId: string) => void;
+  onCardClick: (cardId: string) => void;
+}
+
+const CardTableView = ({
+  displayCards,
+  tableColumns,
+  renderRowContent,
+  isLoading,
+  sortBy,
+  sortOrder,
+  onSortChange,
+  onCardClick,
+}: CardTableViewProps) => {
+  return (
+    <VirtualizedTable
+      key="browse-card-table"
+      items={displayCards}
+      columns={tableColumns}
+      renderRowContent={renderRowContent}
+      isLoading={isLoading}
+      sortBy={sortBy}
+      sortOrder={sortOrder}
+      onSortChange={onSortChange}
       emptyMessage="No cards found"
       computeItemKey={(index) => displayCards[index]?.id || index}
       onClick={onCardClick}
@@ -167,32 +348,51 @@ const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick, pageSize }: 
   );
 };
 
-export default function BrowsePage() {
-  const router = useRouter();
-  const dispatch = useDispatch();
-  const viewContentType = useSelector(selectViewContentType);
-  const reduxCardSearchParams = useSelector(selectCardSearchParams);
-  const reduxSetSearchParams = useSelector(selectSetSearchParams);
+interface ErrorDisplayProps {
+  viewContentType: string;
+}
 
-  const { pagination, updatePagination } = useBrowseStateSync();
-
-  const [preferredCardViewMode, setPreferredCardViewMode] = useLocalStorage<'grid' | 'table'>(
-    'preferredCardViewMode',
-    'grid',
+const ErrorDisplay = ({ viewContentType }: ErrorDisplayProps) => {
+  return (
+    <ErrorContainer mb={3}>
+      <ErrorIcon />
+      <ErrorTitle variant="h6" gutterBottom fontWeight="bold" color="error.main">
+        Unable to load {viewContentType}
+      </ErrorTitle>
+      <Typography color="text.primary">There was a problem fetching data. Please try again later.</Typography>
+    </ErrorContainer>
   );
-  const [preferredSetViewMode, setPreferredSetViewMode] = useLocalStorage<'grid' | 'table'>(
-    'preferredSetViewMode',
-    'grid',
-  );
+};
 
-  // Card API params
-  const cardApiParams = useMemo(() => {
+const ErrorContainer = styled(Box)({
+  textAlign: 'center',
+  padding: 24,
+  borderRadius: 4,
+  border: '1px solid',
+  borderColor: 'rgba(211, 47, 47, 0.3)',
+  backgroundColor: 'rgba(211, 47, 47, 0.03)',
+  maxWidth: '800px',
+  margin: '0 auto',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+});
+
+const ErrorIcon = styled(ErrorOutlineIcon)({
+  fontSize: 40,
+  color: 'error.main',
+  marginBottom: 8,
+});
+
+const ErrorTitle = styled(Typography)({
+  fontWeight: 'bold',
+});
+
+function useCardApiParams(reduxCardSearchParams: any, pagination: any) {
+  return useMemo(() => {
     const params = buildApiParamsFromSearchParams(reduxCardSearchParams, 'cards');
     return {
       ...params,
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
-      // Use the sort parameters from the redux store if provided, otherwise use defaults
       sortBy: params.sortBy || 'releasedAt',
       sortDirection: params.sortDirection || ('asc' as const),
       select: [
@@ -220,22 +420,24 @@ export default function BrowsePage() {
       ] as Array<keyof CardModel>,
     };
   }, [reduxCardSearchParams, pagination]);
+}
 
-  // Set API params
-  const setApiParams = useMemo(() => {
+function useSetApiParams(reduxSetSearchParams: any, pagination: any) {
+  return useMemo(() => {
     const params = buildApiParamsFromSearchParams(reduxSetSearchParams, 'sets');
     return {
       ...params,
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
-      // Use the sort parameters from the redux store if provided, otherwise use defaults
       sortBy: params.sortBy || 'name',
       sortDirection: params.sortDirection || ('asc' as const),
       select: ['name', 'slug', 'code', 'setType', 'category', 'releasedAt', 'cardCount', 'iconUrl', 'isDraftable'],
     };
   }, [reduxSetSearchParams, pagination]);
+}
 
-  const nextPageApiParams = useMemo(() => {
+function useNextPageApiParams(viewContentType: string, cardApiParams: any, setApiParams: any, pagination: any) {
+  return useMemo(() => {
     if (viewContentType === 'cards' && pagination.currentPage >= 1) {
       return getNextPageParams(cardApiParams, pagination.currentPage, pagination.pageSize);
     } else if (viewContentType === 'sets' && pagination.currentPage >= 1) {
@@ -243,42 +445,19 @@ export default function BrowsePage() {
     }
     return null;
   }, [viewContentType, cardApiParams, setApiParams, pagination]);
+}
 
-  const queryConfig = {
-    refetchOnMountOrArgChange: false,
-    refetchOnFocus: false,
-    refetchOnReconnect: false,
-  };
+function useTotalItems(viewContentType: string, cardsSearchResult: any, setsSearchResult: any) {
+  return useMemo(() => {
+    if (viewContentType === 'cards') {
+      return cardsSearchResult?.data?.totalCount || 0;
+    } else {
+      return setsSearchResult?.data?.totalCount || 0;
+    }
+  }, [viewContentType, cardsSearchResult?.data?.totalCount, setsSearchResult?.data?.totalCount]);
+}
 
-  // Explicitly calculate skip params with protection against undefined values
-  const contentTypeForSkip = viewContentType || 'cards'; // Default to cards if undefined
-  const shouldSkipCardsQuery = contentTypeForSkip !== 'cards';
-  const shouldSkipSetsQuery = contentTypeForSkip !== 'sets';
-
-  // Fetch cards or sets based on content type
-  const {
-    data: cardsSearchResult,
-    isFetching: isCardsApiLoading,
-    error: cardsError,
-  } = useGetCardsQuery(cardApiParams, {
-    ...queryConfig,
-    skip: shouldSkipCardsQuery,
-  });
-
-  const {
-    data: setsSearchResult,
-    isFetching: isSetsApiLoading,
-    error: setsError,
-  } = useGetSetsQuery(setApiParams, {
-    ...queryConfig,
-    skip: shouldSkipSetsQuery,
-  });
-
-  const isApiLoading = viewContentType === 'cards' ? isCardsApiLoading : isSetsApiLoading;
-  const error = viewContentType === 'cards' ? cardsError : setsError;
-
-  const prefetchNextPage = useGetCardsPrefetch(viewContentType === 'cards' ? 'getCards' : 'getSets');
-
+function usePrefetchNextPage(prefetchNextPage: any, nextPageApiParams: any, isApiLoading: boolean) {
   useEffect(() => {
     if (!nextPageApiParams || isApiLoading) return;
 
@@ -288,79 +467,52 @@ export default function BrowsePage() {
 
     return () => clearTimeout(prefetchTimer);
   }, [prefetchNextPage, nextPageApiParams, isApiLoading]);
+}
 
-  // Reset pagination to page 1 when search parameters change
-  const reduxCardSearchParamsRef = useRef(reduxCardSearchParams);
-  const reduxSetSearchParamsRef = useRef(reduxSetSearchParams);
+function useCardClickHandler(router: any) {
+  return useCallback(
+    (cardId: string) => {
+      router.push(`/browse/cards/${cardId}`);
+    },
+    [router],
+  );
+}
 
-  useEffect(() => {
-    // Skip on first render
-    if (reduxCardSearchParamsRef.current === reduxCardSearchParams) {
-      reduxCardSearchParamsRef.current = reduxCardSearchParams;
-      return;
-    }
+function useSetClickHandler(router: any) {
+  return useCallback(
+    (set: Set) => {
+      router.push(`/browse?includeSets=${set.id}`);
+    },
+    [router],
+  );
+}
 
-    const filterOutPaginationParams = (params: any) => {
-      const { currentPage, pageSize, pagination, ...filteredParams } = params;
-      return filteredParams;
-    };
-
-    // Only reset pagination if search params (not pagination params) have changed
-    const filteredCurrentParams = filterOutPaginationParams(reduxCardSearchParams);
-    const filteredPrevParams = filterOutPaginationParams(reduxCardSearchParamsRef.current);
-
-    const hasSearchParamsChanged = JSON.stringify(filteredPrevParams) !== JSON.stringify(filteredCurrentParams);
-
-    if (hasSearchParamsChanged && viewContentType === 'cards' && pagination.currentPage !== 1) {
-      updatePagination({ currentPage: 1 });
-    }
-
-    reduxCardSearchParamsRef.current = reduxCardSearchParams;
-  }, [reduxCardSearchParams, viewContentType, pagination.currentPage, updatePagination]);
-
-  useEffect(() => {
-    // Skip on first render
-    if (reduxSetSearchParamsRef.current === reduxSetSearchParams) {
-      reduxSetSearchParamsRef.current = reduxSetSearchParams;
-      return;
-    }
-
-    const filterOutPaginationParams = (params: any) => {
-      const { currentPage, pageSize, pagination, ...filteredParams } = params;
-      return filteredParams;
-    };
-
-    // Only reset pagination if search params (not pagination params) have changed
-    const filteredCurrentParams = filterOutPaginationParams(reduxSetSearchParams);
-    const filteredPrevParams = filterOutPaginationParams(reduxSetSearchParamsRef.current);
-
-    const hasSearchParamsChanged = JSON.stringify(filteredPrevParams) !== JSON.stringify(filteredCurrentParams);
-
-    if (hasSearchParamsChanged && viewContentType === 'sets' && pagination.currentPage !== 1) {
-      updatePagination({ currentPage: 1 });
-    }
-
-    reduxSetSearchParamsRef.current = reduxSetSearchParams;
-  }, [reduxSetSearchParams, viewContentType, pagination.currentPage, updatePagination]);
-
-  const handlePageChange = useCallback(
+function usePageChangeHandler(updatePagination: (params: any) => void) {
+  return useCallback(
     (page: number) => {
       const validPage = Math.max(page, 1);
       updatePagination({ currentPage: validPage });
     },
     [updatePagination],
   );
+}
 
-  const handlePageSizeChange = useCallback(
+function usePageSizeChangeHandler(updatePagination: (params: any) => void) {
+  return useCallback(
     (size: number) => {
       const limitedSize = Math.min(Math.max(size, 1), 500);
       updatePagination({ pageSize: limitedSize, currentPage: 1 });
     },
     [updatePagination],
   );
+}
 
-  // Handle view mode change based on content type
-  const handleViewModeChange = useCallback(
+function useViewModeChangeHandler(
+  viewContentType: string,
+  setPreferredCardViewMode: (mode: 'grid' | 'table') => void,
+  setPreferredSetViewMode: (mode: 'grid' | 'table') => void,
+) {
+  return useCallback(
     (mode: 'grid' | 'table') => {
       if (viewContentType === 'cards') {
         setPreferredCardViewMode(mode);
@@ -370,153 +522,117 @@ export default function BrowsePage() {
     },
     [viewContentType, setPreferredCardViewMode, setPreferredSetViewMode],
   );
+}
 
-  const handleCardClick = useCallback(
-    (cardId: string) => {
-      router.push(`/browse/cards/${cardId}`);
-    },
-    [router],
-  );
-
-  const handleSetClick = useCallback(
-    (set: Set) => {
-      // Navigate to cards filtered by this set
-      router.push(`/browse?includeSets=${set.id}`);
-    },
-    [router],
-  );
-
-  // Map API data to component props
-  const cardItems = useMemo(
-    () => (cardsSearchResult?.data ? mapApiCardsToCardItems(cardsSearchResult.data.cards || []) : []),
-    [cardsSearchResult?.data],
-  );
-
-  const setItems = useMemo(
-    () => (setsSearchResult?.data ? mapApiSetsToSetItems(setsSearchResult.data.sets || []) : []),
-    [setsSearchResult?.data],
-  );
-
-  const totalItems = useMemo(() => {
-    if (viewContentType === 'cards') {
-      return cardsSearchResult?.data?.totalCount || 0;
-    } else {
-      return setsSearchResult?.data?.totalCount || 0;
-    }
-  }, [viewContentType, cardsSearchResult?.data?.totalCount, setsSearchResult?.data?.totalCount]);
-
-  const totalPages = useMemo(() => Math.ceil(totalItems / pagination.pageSize), [totalItems, pagination.pageSize]);
-
-  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
-  const isInitialLoading =
-    !initialLoadComplete && !(viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data && !error;
-
+function useResetPaginationOnParamsChange(
+  currentParams: any,
+  paramsRef: any,
+  viewContentType: string,
+  contentType: string,
+  pagination: any,
+  updatePagination: (params: any) => void,
+) {
   useEffect(() => {
-    if (((viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data || error) && !initialLoadComplete) {
-      setInitialLoadComplete(true);
+    // Skip on first render
+    if (paramsRef.current === currentParams) {
+      paramsRef.current = currentParams;
+      return;
     }
-  }, [viewContentType, cardsSearchResult?.data, setsSearchResult?.data, error, initialLoadComplete]);
 
-  // Get display settings for sets
-  const setDisplaySettings = useSetDisplaySettings(pagination.viewMode);
+    const filteredCurrentParams = filterOutPaginationParams(currentParams);
+    const filteredPrevParams = filterOutPaginationParams(paramsRef.current);
 
-  // Get setting groups based on content type and view mode
-  const settingGroups = useCardSetSettingGroups(viewContentType, pagination.viewMode);
+    const hasSearchParamsChanged = JSON.stringify(filteredPrevParams) !== JSON.stringify(filteredCurrentParams);
 
-  const paginationProps = {
-    currentPage: pagination.currentPage,
-    totalPages: totalPages || 1,
-    pageSize: pagination.pageSize,
-    totalItems,
-    viewMode: pagination.viewMode,
-    onPageChange: handlePageChange,
-    onPageSizeChange: handlePageSizeChange,
-    onViewModeChange: handleViewModeChange,
-    isLoading: isApiLoading,
-    isInitialLoading: isInitialLoading,
-    contentType: viewContentType,
-    settingGroups,
+    if (hasSearchParamsChanged && viewContentType === contentType && pagination.currentPage !== 1) {
+      updatePagination({ currentPage: 1 });
+    }
+
+    paramsRef.current = currentParams;
+  }, [currentParams, viewContentType, pagination.currentPage, updatePagination, contentType]);
+}
+
+function useGallerySettings() {
+  const [cardsPerRow] = useLocalStorage<number>('cardsPerRow', 4);
+  const [cardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
+  const [nameIsVisible] = useLocalStorage('cardNameIsVisible', true);
+  const [setIsVisible] = useLocalStorage('cardSetIsVisible', true);
+  const [priceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
+
+  return {
+    cardsPerRow,
+    cardSizeMargin,
+    nameIsVisible,
+    setIsVisible,
+    priceIsVisible,
   };
+}
 
-  // Update page title to reflect content type
-  useEffect(() => {
-    document.title = `Browse ${viewContentType === 'cards' ? 'Cards' : 'Sets'} | MTG Collection Builder`;
-  }, [viewContentType]);
+function useTableSettings() {
+  const [setIsVisible] = useLocalStorage('tableSetIsVisible', true);
+  const [collectorNumberIsVisible] = useLocalStorage('tableCollectorNumberIsVisible', true);
+  const [mtgcbNumberIsVisible] = useLocalStorage('tableMtgcbNumberIsVisible', false);
+  const [rarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
+  const [typeIsVisible] = useLocalStorage('tableTypeIsVisible', false);
+  const [artistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
+  const [manaCostIsVisible] = useLocalStorage('tableManaCostIsVisible', true);
+  const [powerIsVisible] = useLocalStorage('tablePowerIsVisible', false);
+  const [toughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', false);
+  const [loyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', false);
+  const [priceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
 
-  return (
-    <Box>
-      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Browse' }]} />
+  return {
+    setIsVisible,
+    collectorNumberIsVisible,
+    mtgcbNumberIsVisible,
+    rarityIsVisible,
+    typeIsVisible,
+    artistIsVisible,
+    manaCostIsVisible,
+    powerIsVisible,
+    toughnessIsVisible,
+    loyaltyIsVisible,
+    priceIsVisible,
+  };
+}
 
-      {/* Settings are moved to CardGalleryPagination (which needs to be renamed) */}
+function filterOutPaginationParams(params: any) {
+  const { currentPage, pageSize, pagination, ...filteredParams } = params;
+  return filteredParams;
+}
 
-      <CardGalleryPagination {...paginationProps} />
+function generateDisplayCards(cardItems: any[], isLoading: boolean, pageSize: number) {
+  if (!isLoading) return cardItems;
 
-      {error && (
-        <Box
-          mb={3}
-          sx={{
-            textAlign: 'center',
-            p: 3,
-            borderRadius: 1,
-            border: '1px solid',
-            borderColor: 'rgba(211, 47, 47, 0.3)',
-            bgcolor: 'rgba(211, 47, 47, 0.03)',
-            maxWidth: '800px',
-            mx: 'auto',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-          }}
-        >
-          <ErrorOutlineIcon
-            sx={{
-              fontSize: 40,
-              color: 'error.main',
-              mb: 1,
-            }}
-          />
-          <Typography variant="h6" gutterBottom fontWeight="bold" color="error.main">
-            Unable to load {viewContentType}
-          </Typography>
-          <Typography color="text.primary">There was a problem fetching data. Please try again later.</Typography>
-        </Box>
-      )}
+  return Array(pageSize)
+    .fill(0)
+    .map((_, index) => ({
+      id: `skeleton-${index}`,
+      name: '',
+      setName: '',
+      collectorNumber: '',
+      rarity: '',
+      isLoadingSkeleton: true,
+    }));
+}
 
-      {viewContentType === 'cards' ? (
-        <CardDisplay
-          cardItems={cardItems}
-          isLoading={isCardsApiLoading}
-          viewMode={pagination.viewMode}
-          onCardClick={handleCardClick}
-          pageSize={pagination.pageSize}
-        />
-      ) : (
-        <SetDisplay
-          setItems={setItems}
-          isLoading={isSetsApiLoading}
-          viewMode={pagination.viewMode}
-          onSetClick={handleSetClick}
-          pageSize={pagination.pageSize}
-          displaySettings={{
-            grid: {
-              nameIsVisible: setDisplaySettings.nameIsVisible,
-              codeIsVisible: setDisplaySettings.codeIsVisible,
-              releaseDateIsVisible: setDisplaySettings.releaseDateIsVisible,
-              typeIsVisible: setDisplaySettings.typeIsVisible,
-              categoryIsVisible: setDisplaySettings.categoryIsVisible,
-              cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
-            },
-            table: {
-              codeIsVisible: setDisplaySettings.codeIsVisible,
-              cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
-              releaseDateIsVisible: setDisplaySettings.releaseDateIsVisible,
-              typeIsVisible: setDisplaySettings.typeIsVisible,
-              categoryIsVisible: setDisplaySettings.categoryIsVisible,
-              isDraftableIsVisible: setDisplaySettings.isDraftableIsVisible,
-            },
-          }}
-        />
-      )}
-
-      <CardGalleryPagination {...paginationProps} isOnBottom={true} />
-    </Box>
-  );
+function createSetDisplaySettings(setDisplaySettings: any) {
+  return {
+    grid: {
+      nameIsVisible: setDisplaySettings.nameIsVisible,
+      codeIsVisible: setDisplaySettings.codeIsVisible,
+      releaseDateIsVisible: setDisplaySettings.releaseDateIsVisible,
+      typeIsVisible: setDisplaySettings.typeIsVisible,
+      categoryIsVisible: setDisplaySettings.categoryIsVisible,
+      cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
+    },
+    table: {
+      codeIsVisible: setDisplaySettings.codeIsVisible,
+      cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
+      releaseDateIsVisible: setDisplaySettings.releaseDateIsVisible,
+      typeIsVisible: setDisplaySettings.typeIsVisible,
+      categoryIsVisible: setDisplaySettings.categoryIsVisible,
+      isDraftableIsVisible: setDisplaySettings.isDraftableIsVisible,
+    },
+  };
 }
