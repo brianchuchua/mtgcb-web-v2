@@ -31,11 +31,7 @@ export interface SetSettingsPanelProps {
 /**
  * Panel for configuring set display settings
  */
-export const SetSettingsPanel: React.FC<SetSettingsPanelProps> = ({
-  settingGroups,
-  panelId,
-  panelTitle,
-}) => {
+export const SetSettingsPanel: React.FC<SetSettingsPanelProps> = ({ settingGroups, panelId, panelTitle }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -51,13 +47,7 @@ export const SetSettingsPanel: React.FC<SetSettingsPanelProps> = ({
 
   return (
     <>
-      <Button
-        startIcon={<SettingsIcon />}
-        variant="outlined"
-        size="small"
-        aria-describedby={id}
-        onClick={handleClick}
-      >
+      <Button startIcon={<SettingsIcon />} variant="outlined" size="small" aria-describedby={id} onClick={handleClick}>
         Settings
       </Button>
       <Popover

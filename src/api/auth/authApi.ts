@@ -71,10 +71,7 @@ export const authApi = mtgcbApi.injectEndpoints({
         body: data,
       }),
     }),
-    validatePasswordReset: builder.mutation<
-      ApiResponse<void>,
-      Omit<ValidatePasswordResetRequest, 'privateKey'>
-    >({
+    validatePasswordReset: builder.mutation<ApiResponse<void>, Omit<ValidatePasswordResetRequest, 'privateKey'>>({
       query: (data) => ({
         url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/validate-password-reset`,
         method: 'POST',

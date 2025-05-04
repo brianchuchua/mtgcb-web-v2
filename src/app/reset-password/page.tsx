@@ -53,8 +53,7 @@ export default function ResetPasswordPage() {
         setIsTokenValid(result.success);
         if (!result.success) {
           setValidationError(
-            result.error?.message ||
-              'This password reset link is invalid or has expired. Please request a new one.',
+            result.error?.message || 'This password reset link is invalid or has expired. Please request a new one.',
           );
         }
       } catch (error: any) {
@@ -96,8 +95,7 @@ export default function ResetPasswordPage() {
     } catch (error: any) {
       const errorData = error.data as ApiResponse<void>;
       const message =
-        errorData?.error?.message ||
-        'There was a problem resetting the password. Please try again in a moment.';
+        errorData?.error?.message || 'There was a problem resetting the password. Please try again in a moment.';
 
       setError('root', {
         type: 'manual',
@@ -181,13 +179,7 @@ export default function ResetPasswordPage() {
           </Box>
 
           <SubmitButtonWrapper>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              isSubmitting={isSubmitting}
-            >
+            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting}>
               Reset Password
             </Button>
           </SubmitButtonWrapper>

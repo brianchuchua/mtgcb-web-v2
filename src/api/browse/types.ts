@@ -78,14 +78,18 @@ export interface CardApiParams {
 export interface SetApiParams {
   name?: string;
   code?: string;
-  setType?: string | {
-    OR?: string[];
-    NOT?: string[];
-  };
-  category?: string | {
-    OR?: string[];
-    NOT?: string[];
-  };
+  setType?:
+    | string
+    | {
+        OR?: string[];
+        NOT?: string[];
+      };
+  category?:
+    | string
+    | {
+        OR?: string[];
+        NOT?: string[];
+      };
   parentSetId?: null;
   releasedAt?: string;
   isDraftable?: boolean;

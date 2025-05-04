@@ -1,7 +1,7 @@
 'use client';
 
-import { useLocalStorage } from './useLocalStorage';
 import { useCardSettingGroups } from './useCardSettingGroups';
+import { useLocalStorage } from './useLocalStorage';
 import { useSetSettingGroups } from './useSetSettingGroups';
 import { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 
@@ -11,12 +11,12 @@ import { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
  */
 export const useCardSetSettingGroups = (
   contentType: 'cards' | 'sets',
-  viewMode: 'grid' | 'table'
+  viewMode: 'grid' | 'table',
 ): CardSettingGroup[] => {
   // Always call both hooks to maintain hook order consistency
   const cardSettings = useCardSettingGroups(viewMode);
   const setSettings = useSetSettingGroups(viewMode);
-  
+
   // Return the appropriate settings based on content type
   return contentType === 'cards' ? cardSettings : setSettings;
 };

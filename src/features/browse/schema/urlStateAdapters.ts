@@ -133,12 +133,7 @@ export function convertStateToUrlParams(
   return params;
 }
 
-function parseStringParameter(
-  state: any,
-  key: string,
-  searchParams: URLSearchParams,
-  config: ParameterConfig,
-) {
+function parseStringParameter(state: any, key: string, searchParams: URLSearchParams, config: ParameterConfig) {
   if (config.type !== 'string') return;
 
   const value = searchParams.get(config.urlParam || key);
@@ -147,12 +142,7 @@ function parseStringParameter(
   }
 }
 
-function parseNumberParameter(
-  state: any,
-  key: string,
-  searchParams: URLSearchParams,
-  config: ParameterConfig,
-) {
+function parseNumberParameter(state: any, key: string, searchParams: URLSearchParams, config: ParameterConfig) {
   if (config.type !== 'number') return;
 
   const value = searchParams.get(config.urlParam || key);
@@ -161,12 +151,7 @@ function parseNumberParameter(
   }
 }
 
-function parseBooleanParameter(
-  state: any,
-  key: string,
-  searchParams: URLSearchParams,
-  config: ParameterConfig,
-) {
+function parseBooleanParameter(state: any, key: string, searchParams: URLSearchParams, config: ParameterConfig) {
   if (config.type !== 'boolean') return;
 
   const value = searchParams.get(config.urlParam || key);
@@ -175,12 +160,7 @@ function parseBooleanParameter(
   }
 }
 
-function parseEnumParameter(
-  state: any,
-  key: string,
-  searchParams: URLSearchParams,
-  config: ParameterConfig,
-) {
+function parseEnumParameter(state: any, key: string, searchParams: URLSearchParams, config: ParameterConfig) {
   if (config.type !== 'enum') return;
 
   const value = searchParams.get(config.urlParam || key);
@@ -208,12 +188,7 @@ function parseInclusionExclusionParameter(
   }
 }
 
-function parseColorFilterParameter(
-  state: any,
-  key: string,
-  searchParams: URLSearchParams,
-  config: ParameterConfig,
-) {
+function parseColorFilterParameter(state: any, key: string, searchParams: URLSearchParams, config: ParameterConfig) {
   if (config.type !== 'colorFilter') return;
 
   const colorsValue = searchParams.get(config.urlParams.colors);
@@ -229,12 +204,7 @@ function parseColorFilterParameter(
   }
 }
 
-function parseStatFilterParameter(
-  state: any,
-  key: string,
-  searchParams: URLSearchParams,
-  config: ParameterConfig,
-) {
+function parseStatFilterParameter(state: any, key: string, searchParams: URLSearchParams, config: ParameterConfig) {
   if (config.type !== 'statFilter') return;
 
   const statsValue = searchParams.get(config.urlParam || key);
@@ -257,12 +227,7 @@ function parseStatFilterParameter(
   }
 }
 
-function addStringParameter(
-  params: URLSearchParams,
-  value: string,
-  config: ParameterConfig,
-  key: string,
-) {
+function addStringParameter(params: URLSearchParams, value: string, config: ParameterConfig, key: string) {
   if (config.type !== 'string') return;
 
   if (value && value !== '') {
@@ -271,12 +236,7 @@ function addStringParameter(
   }
 }
 
-function addNumberParameter(
-  params: URLSearchParams,
-  value: number,
-  config: ParameterConfig,
-  key: string,
-) {
+function addNumberParameter(params: URLSearchParams, value: number, config: ParameterConfig, key: string) {
   if (config.type !== 'number') return;
 
   if (value !== undefined && value !== null) {
@@ -287,12 +247,7 @@ function addNumberParameter(
   }
 }
 
-function addBooleanParameter(
-  params: URLSearchParams,
-  value: boolean,
-  config: ParameterConfig,
-  key: string,
-) {
+function addBooleanParameter(params: URLSearchParams, value: boolean, config: ParameterConfig, key: string) {
   if (config.type !== 'boolean') return;
 
   if (value !== undefined && value !== null) {
@@ -300,12 +255,7 @@ function addBooleanParameter(
   }
 }
 
-function addEnumParameter(
-  params: URLSearchParams,
-  value: string,
-  config: ParameterConfig,
-  key: string,
-) {
+function addEnumParameter(params: URLSearchParams, value: string, config: ParameterConfig, key: string) {
   if (config.type !== 'enum') return;
 
   if (value && value !== config.defaultValue) {
@@ -329,11 +279,7 @@ function addInclusionExclusionParameter(
   }
 }
 
-function addColorFilterParameter(
-  params: URLSearchParams,
-  value: ColorFilter,
-  config: ParameterConfig,
-) {
+function addColorFilterParameter(params: URLSearchParams, value: ColorFilter, config: ParameterConfig) {
   if (config.type !== 'colorFilter') return;
 
   if (value.colors && value.colors.length > 0) {
@@ -346,16 +292,10 @@ function addColorFilterParameter(
   }
 }
 
-function addStatFilterParameter(
-  params: URLSearchParams,
-  value: StatFilters,
-  config: ParameterConfig,
-) {
+function addStatFilterParameter(params: URLSearchParams, value: StatFilters, config: ParameterConfig) {
   if (config.type !== 'statFilter') return;
 
-  const hasConditions = Object.values(value).some(
-    (conditions) => conditions && conditions.length > 0,
-  );
+  const hasConditions = Object.values(value).some((conditions) => conditions && conditions.length > 0);
 
   if (hasConditions) {
     // Format each stat group as: attribute=condition1|condition2

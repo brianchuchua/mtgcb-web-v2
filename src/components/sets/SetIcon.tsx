@@ -56,14 +56,7 @@ const SetIcon: React.FC<SetIconProps> = ({
       }
     : {};
 
-  return (
-    <Box
-      component="i"
-      className={classes}
-      style={{ ...shadowStyle, ...style }}
-      aria-hidden="true"
-    />
-  );
+  return <Box component="i" className={classes} style={{ ...shadowStyle, ...style }} aria-hidden="true" />;
 };
 
 export default SetIcon;

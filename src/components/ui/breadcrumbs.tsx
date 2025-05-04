@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  Box,
-  Breadcrumbs as MuiBreadcrumbs,
-  Link as MuiLink,
-  SxProps,
-  Theme,
-  Typography,
-} from '@mui/material';
+import { Box, Breadcrumbs as MuiBreadcrumbs, Link as MuiLink, SxProps, Theme, Typography } from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -23,12 +16,7 @@ interface BreadcrumbsProps {
   includeHome?: boolean;
 }
 
-export default function Breadcrumbs({
-  items,
-  autoGenerate = false,
-  sx = {},
-  includeHome = false,
-}: BreadcrumbsProps) {
+export default function Breadcrumbs({ items, autoGenerate = false, sx = {}, includeHome = false }: BreadcrumbsProps) {
   const pathname = usePathname();
 
   let breadcrumbs = items || (autoGenerate ? generatePathBreadcrumbs(pathname) : []);
@@ -52,13 +40,7 @@ export default function Breadcrumbs({
               {crumb.label}
             </Typography>
           ) : (
-            <MuiLink
-              component={Link}
-              href={crumb.href || '#'}
-              key={crumb.label}
-              underline="hover"
-              color="inherit"
-            >
+            <MuiLink component={Link} href={crumb.href || '#'} key={crumb.label} underline="hover" color="inherit">
               {crumb.label}
             </MuiLink>
           );

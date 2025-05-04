@@ -30,9 +30,7 @@ const AutocompleteWithNegation = ({
     e.stopPropagation(); // Prevent the Autocomplete from opening
 
     // Toggle the exclude property for the clicked option
-    const updatedOptions = selectedOptions.map((opt, i) =>
-      i === index ? { ...opt, exclude: !opt.exclude } : opt,
-    );
+    const updatedOptions = selectedOptions.map((opt, i) => (i === index ? { ...opt, exclude: !opt.exclude } : opt));
 
     setSelectedOptionsRemotely(updatedOptions);
   };
@@ -45,9 +43,7 @@ const AutocompleteWithNegation = ({
       onChange={handleChange}
       groupBy={(option) => option.category}
       getOptionLabel={(option) => option.label}
-      isOptionEqualToValue={(option, value) =>
-        option.value === value.value && option.exclude === value.exclude
-      }
+      isOptionEqualToValue={(option, value) => option.value === value.value && option.exclude === value.exclude}
       renderInput={(params) => <TextField {...params} label={label} />}
       renderTags={(tagValue, getTagProps) =>
         tagValue.map((option, index) => {
@@ -56,9 +52,7 @@ const AutocompleteWithNegation = ({
           return (
             <Tooltip
               key={option.value}
-              title={
-                option.exclude ? '(Click to include this option)' : '(Click to exclude this option)'
-              }
+              title={option.exclude ? '(Click to include this option)' : '(Click to exclude this option)'}
             >
               <Chip
                 {...props}
@@ -79,9 +73,7 @@ const AutocompleteWithNegation = ({
         </div>
       )}
       filterOptions={(options, { inputValue }) => {
-        return options.filter((option) =>
-          option.label.toLowerCase().includes(inputValue.toLowerCase()),
-        );
+        return options.filter((option) => option.label.toLowerCase().includes(inputValue.toLowerCase()));
       }}
       sx={{
         '& .MuiAutocomplete-tag': {

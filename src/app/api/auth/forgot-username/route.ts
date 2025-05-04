@@ -5,20 +5,17 @@ export async function POST(request: NextRequest) {
     const { email, recaptchaToken } = await request.json();
 
     // Call the actual API with the private key and recaptcha token
-    const apiResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL}/auth/forgot-username`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          privateKey: process.env.MTGCB_API_PRIVATE_KEY,
-          recaptchaToken,
-        }),
+    const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL}/auth/forgot-username`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify({
+        email,
+        privateKey: process.env.MTGCB_API_PRIVATE_KEY,
+        recaptchaToken,
+      }),
+    });
 
     const data = await apiResponse.json();
 

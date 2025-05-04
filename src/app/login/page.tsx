@@ -79,9 +79,7 @@ export default function LoginPage() {
       }
     } catch (error: any) {
       const errorData = error.data as ApiResponse<LoginData>;
-      const message =
-        errorData?.error?.message ||
-        'There was a problem trying to login. Please try again in a moment.';
+      const message = errorData?.error?.message || 'There was a problem trying to login. Please try again in a moment.';
 
       setError('root', {
         type: 'manual',
@@ -183,13 +181,7 @@ export default function LoginPage() {
               mb: 2,
             }}
           >
-            <Button
-              href="/signup"
-              variant="outlined"
-              color="secondary"
-              fullWidth
-              data-testid="signup-button"
-            >
+            <Button href="/signup" variant="outlined" color="secondary" fullWidth data-testid="signup-button">
               Don't have an account? Sign Up
             </Button>
           </Box>

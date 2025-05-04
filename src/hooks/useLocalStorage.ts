@@ -11,10 +11,7 @@ const createStorageEvent = (key: string, newValue: string) => {
   });
 };
 
-export function useLocalStorage<T>(
-  key: string,
-  initialValue: T,
-): [T, (value: T | ((val: T) => T)) => void] {
+export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] {
   const readValue = (): T => {
     if (typeof window === 'undefined') {
       return initialValue;

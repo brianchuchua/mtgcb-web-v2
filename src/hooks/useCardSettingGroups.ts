@@ -1,11 +1,7 @@
 'use client';
 
 import { useLocalStorage } from './useLocalStorage';
-import {
-  CardSelectSetting,
-  CardSettingGroup,
-  CardSliderSetting,
-} from '@/components/cards/CardSettingsPanel';
+import { CardSelectSetting, CardSettingGroup, CardSliderSetting } from '@/components/cards/CardSettingsPanel';
 import { PriceType } from '@/types/pricing';
 
 export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
@@ -20,49 +16,22 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
     'tableCollectorNumberIsVisible',
     true,
   );
-  const [tableMtgcbNumberIsVisible, setTableMtgcbNumberIsVisible] = useLocalStorage(
-    'tableMtgcbNumberIsVisible',
-    false,
-  );
-  const [tableRarityIsVisible, setTableRarityIsVisible] = useLocalStorage(
-    'tableRarityIsVisible',
-    true,
-  );
-  const [tableManaCostIsVisible, setTableManaCostIsVisible] = useLocalStorage(
-    'tableManaCostIsVisible',
-    false,
-  );
-  const [tablePowerIsVisible, setTablePowerIsVisible] = useLocalStorage(
-    'tablePowerIsVisible',
-    false,
-  );
-  const [tableToughnessIsVisible, setTableToughnessIsVisible] = useLocalStorage(
-    'tableToughnessIsVisible',
-    false,
-  );
-  const [tableLoyaltyIsVisible, setTableLoyaltyIsVisible] = useLocalStorage(
-    'tableLoyaltyIsVisible',
-    false,
-  );
-  const [tablePriceIsVisible, setTablePriceIsVisible] = useLocalStorage(
-    'tablePriceIsVisible',
-    true,
-  );
+  const [tableMtgcbNumberIsVisible, setTableMtgcbNumberIsVisible] = useLocalStorage('tableMtgcbNumberIsVisible', false);
+  const [tableRarityIsVisible, setTableRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
+  const [tableManaCostIsVisible, setTableManaCostIsVisible] = useLocalStorage('tableManaCostIsVisible', false);
+  const [tablePowerIsVisible, setTablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', false);
+  const [tableToughnessIsVisible, setTableToughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', false);
+  const [tableLoyaltyIsVisible, setTableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', false);
+  const [tablePriceIsVisible, setTablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
   const [tableTypeIsVisible, setTableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', false);
-  const [tableArtistIsVisible, setTableArtistIsVisible] = useLocalStorage(
-    'tableArtistIsVisible',
-    false,
-  );
+  const [tableArtistIsVisible, setTableArtistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
 
   // Layout settings
   const [cardsPerRow, setCardsPerRow] = useLocalStorage('cardsPerRow', 4);
   const [cardSizeMargin, setCardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
 
   // Price display setting
-  const [displayPriceType, setDisplayPriceType] = useLocalStorage<PriceType>(
-    'displayPriceType',
-    PriceType.Market,
-  );
+  const [displayPriceType, setDisplayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
 
   const handleSetPriceType = (value: number): void => {
     setDisplayPriceType(value as unknown as PriceType);

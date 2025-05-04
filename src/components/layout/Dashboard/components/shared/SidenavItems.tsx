@@ -91,12 +91,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
         <Collapse in={isNavExpanded} timeout="auto">
           <List disablePadding>
             <ListItem disablePadding>
-              <ListItemButton
-                component={Link}
-                href="/"
-                selected={pathname === '/'}
-                onClick={handleClick}
-              >
+              <ListItemButton component={Link} href="/" selected={pathname === '/'} onClick={handleClick}>
                 <ListItemIcon>
                   <HomeIcon />
                 </ListItemIcon>

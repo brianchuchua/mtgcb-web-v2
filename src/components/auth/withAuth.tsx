@@ -14,8 +14,7 @@ export function withAuth<T extends object>(WrappedComponent: React.ComponentType
 
     useEffect(() => {
       if (!isLoading && !isAuthenticated) {
-        const currentPath =
-          pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
+        const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
         const encodedPath = encodeURIComponent(currentPath);
         router.push(`/login?redirectTo=${encodedPath}`);
       }

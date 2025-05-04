@@ -172,9 +172,7 @@ const VirtualizedTable = <T,>({
     ),
     TableHead,
     TableRow: CustomTableRow,
-    TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
-      <TableBody {...props} ref={ref} />
-    )),
+    TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => <TableBody {...props} ref={ref} />),
   };
 
   // Fixed header content

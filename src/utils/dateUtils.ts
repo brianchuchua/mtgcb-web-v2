@@ -6,18 +6,18 @@
  */
 export const formatDate = (
   dateString: string | null | undefined,
-  options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' }
+  options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' },
 ): string => {
   if (!dateString) return 'Unknown';
-  
+
   try {
     const date = new Date(dateString);
-    
+
     // Check if date is valid
     if (isNaN(date.getTime())) {
       return 'Invalid date';
     }
-    
+
     return date.toLocaleDateString('en-US', options);
   } catch (e) {
     console.error('Error formatting date:', e);

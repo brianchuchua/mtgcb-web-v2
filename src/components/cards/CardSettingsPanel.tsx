@@ -70,11 +70,15 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({
   panelTitle,
 }) => {
   // Determine the panel title based on content type and view mode
-  const derivedPanelTitle = panelTitle || (
-    contentType === 'cards' 
-      ? (panelId.includes('Table') ? 'Card Table Settings' : 'Card Display Settings')
-      : (panelId.includes('Table') ? 'Set Table Settings' : 'Set Display Settings')
-  );
+  const derivedPanelTitle =
+    panelTitle ||
+    (contentType === 'cards'
+      ? panelId.includes('Table')
+        ? 'Card Table Settings'
+        : 'Card Display Settings'
+      : panelId.includes('Table')
+        ? 'Set Table Settings'
+        : 'Set Display Settings');
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const theme = useTheme();
 
@@ -230,9 +234,7 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({
                         : // Slider controls
                           (settingGroup.settings as CardSliderSetting[]).map((setting) => (
                             <Box key={setting.key} sx={{ py: 0.75, px: 1 }}>
-                              <Box
-                                sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}
-                              >
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                                 <Typography variant="body2" sx={{ fontWeight: 400 }}>
                                   {setting.label}
                                 </Typography>

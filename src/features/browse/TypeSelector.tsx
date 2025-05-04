@@ -79,15 +79,13 @@ const TypeSelector = () => {
   const selectedOptions = selectedTypes
     ? [
         ...selectedTypes.include.map((type) => ({
-          category:
-            mappedTypes.find((t) => t.value === type.replace(/"/g, ''))?.category || 'Unknown',
+          category: mappedTypes.find((t) => t.value === type.replace(/"/g, ''))?.category || 'Unknown',
           label: type.replace(/"/g, ''),
           value: type.replace(/"/g, ''),
           exclude: false,
         })),
         ...selectedTypes.exclude.map((type) => ({
-          category:
-            mappedTypes.find((t) => t.value === type.replace(/"/g, ''))?.category || 'Unknown',
+          category: mappedTypes.find((t) => t.value === type.replace(/"/g, ''))?.category || 'Unknown',
           label: type.replace(/"/g, ''),
           value: type.replace(/"/g, ''),
           exclude: true,

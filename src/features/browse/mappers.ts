@@ -55,6 +55,6 @@ export const mapApiSetsToSetItems = (sets: Set[]): Set[] => {
   // The SetModel from the API already matches our Set interface
   // This mapper exists for consistency and potential future transformations
   return sets.map((set) => ({
-    ...set
+    ...set,
   }));
 };

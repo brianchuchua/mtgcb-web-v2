@@ -9,7 +9,7 @@ import { PriceType } from '@/types/pricing';
  */
 export function usePriceType(): PriceType {
   const [priceType, setPriceType] = useState<PriceType>(PriceType.Market);
-  
+
   useEffect(() => {
     // Initialize from localStorage
     const getPriceTypeFromStorage = (): PriceType => {
@@ -21,9 +21,9 @@ export function usePriceType(): PriceType {
         return PriceType.Market;
       }
     };
-    
+
     setPriceType(getPriceTypeFromStorage());
-    
+
     // Listen for changes to this localStorage key
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'displayPriceType' && e.newValue) {
@@ -34,7 +34,7 @@ export function usePriceType(): PriceType {
         }
       }
     };
-    
+
     // Custom event for same-page updates
     const handleCustomEvent = (e: Event) => {
       const storageEvent = e as StorageEvent;
@@ -46,17 +46,17 @@ export function usePriceType(): PriceType {
         }
       }
     };
-    
+
     // Add event listeners
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('localStorage', handleCustomEvent as EventListener);
-    
+
     // Clean up
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('localStorage', handleCustomEvent as EventListener);
     };
   }, []);
-  
+
   return priceType;
 }

@@ -42,11 +42,7 @@ function ProfileContent() {
   const {
     register: registerPassword,
     handleSubmit: handlePasswordSubmit,
-    formState: {
-      errors: passwordErrors,
-      isSubmitting: isPasswordSubmitting,
-      isValid: passwordIsValid,
-    },
+    formState: { errors: passwordErrors, isSubmitting: isPasswordSubmitting, isValid: passwordIsValid },
     watch: watchPassword,
     reset: resetPassword,
   } = useForm<PasswordFormData>({
@@ -58,8 +54,7 @@ function ProfileContent() {
 
   // Track profile form changes
   useEffect(() => {
-    const hasChanges =
-      profileValues.username !== user?.username || profileValues.email !== user?.email;
+    const hasChanges = profileValues.username !== user?.username || profileValues.email !== user?.email;
     setHasProfileChanges(hasChanges);
   }, [profileValues, user]);
 
@@ -202,8 +197,7 @@ function ProfileContent() {
             <TextField
               {...registerPassword('confirmPassword', {
                 required: 'Please confirm your new password',
-                validate: (value) =>
-                  value === passwordFormValues.password || 'The passwords do not match',
+                validate: (value) => value === passwordFormValues.password || 'The passwords do not match',
               })}
               margin="normal"
               fullWidth
@@ -235,8 +229,8 @@ function ProfileContent() {
               This section is in progress. :)
               <br />
               <br />
-              Immortal/Reserved List tier patrons will get the ability to customize a card to
-              represent their collection in a hall of fame.
+              Immortal/Reserved List tier patrons will get the ability to customize a card to represent their collection
+              in a hall of fame.
             </Typography>
           </CardContent>
         </Paper>

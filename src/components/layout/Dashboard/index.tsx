@@ -17,11 +17,7 @@ const Dashboard = ({ children, sidenavWidth = 320 }: DashboardProps) => {
 
   return (
     <DashboardProvider sidenavWidth={sidenavWidth}>
-      {isMobile ? (
-        <DashboardMobile>{children}</DashboardMobile>
-      ) : (
-        <DashboardDesktop>{children}</DashboardDesktop>
-      )}
+      {isMobile ? <DashboardMobile>{children}</DashboardMobile> : <DashboardDesktop>{children}</DashboardDesktop>}
     </DashboardProvider>
   );
 };

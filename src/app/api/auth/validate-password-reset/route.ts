@@ -5,19 +5,16 @@ export async function POST(request: NextRequest) {
     const { token } = await request.json();
 
     // Call the actual API with the private key
-    const apiResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL}/auth/validate-password-reset`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token,
-          privateKey: process.env.MTGCB_API_PRIVATE_KEY,
-        }),
+    const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL}/auth/validate-password-reset`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify({
+        token,
+        privateKey: process.env.MTGCB_API_PRIVATE_KEY,
+      }),
+    });
 
     const data = await apiResponse.json();
 

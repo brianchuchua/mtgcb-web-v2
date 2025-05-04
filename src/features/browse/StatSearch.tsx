@@ -4,18 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import RemoveIcon from '@mui/icons-material/Remove';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import {
-  Box,
-  Button,
-  IconButton,
-  MenuItem,
-  Paper,
-  Select,
-  Stack,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, Button, IconButton, MenuItem, Paper, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { useEffect, useRef, useState } from 'react';
@@ -151,11 +140,7 @@ const StatSearch = () => {
     }
 
     // If display price type changed and we have active filters
-    if (
-      prevDisplayPriceType.current !== displayPriceType &&
-      filtersActive &&
-      conditions.length > 0
-    ) {
+    if (prevDisplayPriceType.current !== displayPriceType && filtersActive && conditions.length > 0) {
       let hasChangedFilters = false;
 
       // Update any price filter conditions to match the new display price type
@@ -238,23 +223,15 @@ const StatSearch = () => {
     userModified.current = true;
 
     // Check if changing to a price attribute that doesn't match display price
-    if (
-      isPriceAttribute(newValue) &&
-      newValue !== displayPriceType &&
-      newValue !== 'foil' &&
-      setDisplayPriceType
-    ) {
+    if (isPriceAttribute(newValue) && newValue !== displayPriceType && newValue !== 'foil' && setDisplayPriceType) {
       // Update display price type to match filter
       const priceTypeValue = getPriceTypeEnum(newValue);
       setDisplayPriceType(priceTypeValue);
 
       // Show notification
-      enqueueSnackbar(
-        `Changed your display price setting to ${newValue} to match your filter selection.`,
-        {
-          variant: 'info',
-        },
-      );
+      enqueueSnackbar(`Changed your display price setting to ${newValue} to match your filter selection.`, {
+        variant: 'info',
+      });
     }
 
     const newConditions = [...conditions];
@@ -326,11 +303,7 @@ const StatSearch = () => {
 
   // Function to determine if a price option is mismatched with the display setting
   const isPriceMismatched = (priceAttribute: string): boolean => {
-    return (
-      isPriceAttribute(priceAttribute) &&
-      priceAttribute !== displayPriceType &&
-      priceAttribute !== 'foil'
-    );
+    return isPriceAttribute(priceAttribute) && priceAttribute !== displayPriceType && priceAttribute !== 'foil';
   };
 
   // Special component to make tooltips work with disabled MenuItems
@@ -354,13 +327,7 @@ const StatSearch = () => {
   return (
     <>
       {!filtersActive ? (
-        <Button
-          variant="outlined"
-          startIcon={<FilterListIcon />}
-          onClick={activateFilters}
-          fullWidth
-          sx={{ mt: 1 }}
-        >
+        <Button variant="outlined" startIcon={<FilterListIcon />} onClick={activateFilters} fullWidth sx={{ mt: 1 }}>
           Add Stat Filters
         </Button>
       ) : (

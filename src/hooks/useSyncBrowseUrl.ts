@@ -15,7 +15,10 @@ export const useSyncBrowseUrl = () => {
   // Use local pagination instead of from redux
   const [pagination, setPagination] = useState<BrowsePagination>({
     currentPage: parseInt(currentSearchParams.get(viewContentType === 'cards' ? 'cardsPage' : 'setsPage') || '1', 10),
-    pageSize: parseInt(currentSearchParams.get(viewContentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '24', 10),
+    pageSize: parseInt(
+      currentSearchParams.get(viewContentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '24',
+      10,
+    ),
     viewMode: currentSearchParams.get('view') === 'table' ? 'table' : 'grid',
   });
 
@@ -25,7 +28,7 @@ export const useSyncBrowseUrl = () => {
     // Create new params each time
     // Don't preserve old params - this ensures we properly switch between the two naming formats
     const params = new URLSearchParams();
-    
+
     // Set content type if we're in sets view (consistent with browse page)
     if (viewContentType === 'sets') {
       params.set('contentType', 'sets');

@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  CircularProgress,
-  Button as MuiButton,
-  ButtonProps as MuiButtonProps,
-} from '@mui/material';
+import { CircularProgress, Button as MuiButton, ButtonProps as MuiButtonProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
 

@@ -54,8 +54,8 @@ export const browseApi = mtgcbApi.injectEndpoints({
       keepUnusedDataFor: 300, // 5 minutes
       providesTags: ['Sets'],
     }),
-    
-    getSetTypes: builder.query<ApiResponse<{label: string, value: string, category: string}[]>, void>({
+
+    getSetTypes: builder.query<ApiResponse<{ label: string; value: string; category: string }[]>, void>({
       query: () => ({
         url: '/sets/types',
         method: 'GET',

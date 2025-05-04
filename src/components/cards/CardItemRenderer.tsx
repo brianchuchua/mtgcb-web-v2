@@ -32,12 +32,7 @@ const CardItemRenderer = ({
   };
 
   return (
-    <CardItem
-      {...card}
-      onClick={onClick ? handleCardClick : undefined}
-      display={settings}
-      priceType={priceType}
-    />
+    <CardItem {...card} onClick={onClick ? handleCardClick : undefined} display={settings} priceType={priceType} />
   );
 };
 

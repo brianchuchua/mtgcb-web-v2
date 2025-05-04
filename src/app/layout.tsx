@@ -30,16 +30,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link
-          href="//cdn.jsdelivr.net/npm/mana-font@latest/css/mana.css"
-          rel="stylesheet"
-          type="text/css"
-        />
-        <link
-          href="//cdn.jsdelivr.net/npm/keyrune@latest/css/keyrune.css"
-          rel="stylesheet"
-          type="text/css"
-        />
+        <link href="//cdn.jsdelivr.net/npm/mana-font@latest/css/mana.css" rel="stylesheet" type="text/css" />
+        <link href="//cdn.jsdelivr.net/npm/keyrune@latest/css/keyrune.css" rel="stylesheet" type="text/css" />
       </head>
       <body className={roboto.variable}>
         <AppRouterCacheProvider>

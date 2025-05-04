@@ -340,8 +340,7 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
 
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          const isCardPreviewVisible =
-            hoverCardRef.current && hoverCardRef.current.style.display !== 'none';
+          const isCardPreviewVisible = hoverCardRef.current && hoverCardRef.current.style.display !== 'none';
           if (isCardPreviewVisible) {
             const x = mousePositionRef.current.x + 50; // 50px to the right
             const y = mousePositionRef.current.y - 35; // 35px above
@@ -415,8 +414,8 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
 // Card row renderer - this is what actually renders the cells for each card
 export const useCardRowRenderer = (
   priceType: PriceType,
-  displaySettings: CardTableRendererProps["displaySettings"],
-  onCardClick?: (cardId: string) => void
+  displaySettings: CardTableRendererProps['displaySettings'],
+  onCardClick?: (cardId: string) => void,
 ) => {
   const { showCardPreview, hideCardPreview } = useCardPreviewEffect([]);
 
@@ -426,20 +425,12 @@ export const useCardRowRenderer = (
 
     // Collector Number Cell
     if (displaySettings.collectorNumberIsVisible) {
-      cells.push(
-        <TableCell key="collectorNumber">
-          {card.collectorNumber || 'N/A'}
-        </TableCell>
-      );
+      cells.push(<TableCell key="collectorNumber">{card.collectorNumber || 'N/A'}</TableCell>);
     }
 
     // MTG CB Number Cell
     if (displaySettings.mtgcbNumberIsVisible) {
-      cells.push(
-        <TableCell key="mtgcbNumber">
-          {card.mtgcbCollectorNumber || 'N/A'}
-        </TableCell>
-      );
+      cells.push(<TableCell key="mtgcbNumber">{card.mtgcbCollectorNumber || 'N/A'}</TableCell>);
     }
 
     // Card Name Cell (always shown)
@@ -452,35 +443,27 @@ export const useCardRowRenderer = (
         onMouseLeave={hideCardPreview}
       >
         <ClickableText>{card.name}</ClickableText>
-      </TableCell>
+      </TableCell>,
     );
 
     // Set Cell
     if (displaySettings.setIsVisible) {
-      cells.push(
-        <TableCell key="set">{card.setName || 'Unknown'}</TableCell>
-      );
+      cells.push(<TableCell key="set">{card.setName || 'Unknown'}</TableCell>);
     }
 
     // Rarity Cell
     if (displaySettings.rarityIsVisible) {
-      cells.push(
-        <TableCell key="rarity">{formatRarity(card.rarity) || 'N/A'}</TableCell>
-      );
+      cells.push(<TableCell key="rarity">{formatRarity(card.rarity) || 'N/A'}</TableCell>);
     }
 
     // Type Cell
     if (displaySettings.typeIsVisible) {
-      cells.push(
-        <TableCell key="type">{card.type || 'N/A'}</TableCell>
-      );
+      cells.push(<TableCell key="type">{card.type || 'N/A'}</TableCell>);
     }
 
     // Artist Cell
     if (displaySettings.artistIsVisible) {
-      cells.push(
-        <TableCell key="artist">{card.artist || 'N/A'}</TableCell>
-      );
+      cells.push(<TableCell key="artist">{card.artist || 'N/A'}</TableCell>);
     }
 
     // Mana Cost Cell
@@ -498,7 +481,7 @@ export const useCardRowRenderer = (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
             {formatManaSymbols(card.manaCost) || ''}
           </Box>
-        </TableCell>
+        </TableCell>,
       );
     }
 
@@ -507,7 +490,7 @@ export const useCardRowRenderer = (
       cells.push(
         <TableCell key="power" sx={{ textAlign: 'center' }}>
           {formatNumeric(card.powerNumeric)}
-        </TableCell>
+        </TableCell>,
       );
     }
 
@@ -516,7 +499,7 @@ export const useCardRowRenderer = (
       cells.push(
         <TableCell key="toughness" sx={{ textAlign: 'center' }}>
           {formatNumeric(card.toughnessNumeric)}
-        </TableCell>
+        </TableCell>,
       );
     }
 
@@ -525,7 +508,7 @@ export const useCardRowRenderer = (
       cells.push(
         <TableCell key="loyalty" sx={{ textAlign: 'center' }}>
           {formatNumeric(card.loyaltyNumeric)}
-        </TableCell>
+        </TableCell>,
       );
     }
 
@@ -534,22 +517,14 @@ export const useCardRowRenderer = (
       cells.push(
         <TableCell key="price">
           <PriceLink
-            href={generateTCGPlayerLink(
-              'tcgplayerId' in card ? card.tcgplayerId : undefined,
-              card.name
-            )}
+            href={generateTCGPlayerLink('tcgplayerId' in card ? card.tcgplayerId : undefined, card.name)}
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()} // Prevent row click when clicking price
           >
-            <CardPrice
-              prices={preparePriceData(card)}
-              isLoading={false}
-              priceType={priceType}
-              centered={false}
-            />
+            <CardPrice prices={preparePriceData(card)} isLoading={false} priceType={priceType} centered={false} />
           </PriceLink>
-        </TableCell>
+        </TableCell>,
       );
     }
 

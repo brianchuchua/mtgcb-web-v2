@@ -22,14 +22,8 @@ export const useSearchFromUrl = () => {
   const searchParams = useSearchParams();
 
   const contentType = searchParams.get('contentType') === 'sets' ? 'sets' : 'cards';
-  const currentPage = parseInt(
-    searchParams.get(contentType === 'cards' ? 'cardsPage' : 'setsPage') || '1',
-    10,
-  );
-  const pageSize = parseInt(
-    searchParams.get(contentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '24',
-    10,
-  );
+  const currentPage = parseInt(searchParams.get(contentType === 'cards' ? 'cardsPage' : 'setsPage') || '1', 10);
+  const pageSize = parseInt(searchParams.get(contentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '24', 10);
 
   useEffect(() => {
     const apiParams: CardApiParams = {

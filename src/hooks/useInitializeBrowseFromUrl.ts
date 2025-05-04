@@ -30,16 +30,16 @@ export function useInitializeBrowseFromUrl() {
   const reduxCardSearchParams = useSelector(selectCardSearchParams);
   const reduxSetSearchParams = useSelector(selectSetSearchParams);
   const dispatch = useDispatch();
-  
+
   // Track if this is the first initialization
   const isFirstInitRef = useRef(true);
 
   // Track when the user makes an explicit selection
   const userSelectionRef = useRef<'cards' | 'sets' | null>(null);
-  
+
   // Current content type value
   const currentType = viewContentType;
-  
+
   // Track when viewContentType changes
   useEffect(() => {
     // If content type changes, consider it a user selection
@@ -47,7 +47,7 @@ export function useInitializeBrowseFromUrl() {
       userSelectionRef.current = currentType;
     }
   }, [currentType]);
-  
+
   // Immediate first render effect to set content type ASAP
   // This runs before other effects and helps prevent initial content flash
   useEffect(() => {
@@ -55,19 +55,19 @@ export function useInitializeBrowseFromUrl() {
     if (contentTypeParam === 'sets') {
       dispatch(setViewContentType('sets'));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   // Handle initial URL-based initialization
   useEffect(() => {
     // Only run this effect once on first mount
     if (!isFirstInitRef.current) {
       return;
     }
-    
+
     // Get content type from URL
     const contentTypeParam = urlSearchParams.get('contentType');
-    
+
     // Always respect the URL parameter on initial load
     if (contentTypeParam === 'sets') {
       // Make sure we're explicitly forcing the value 'sets' for type safety
@@ -79,7 +79,7 @@ export function useInitializeBrowseFromUrl() {
       dispatch(setViewContentType('cards'));
       // Don't set user selection since this is default behavior
     }
-    
+
     // Mark first initialization as complete
     isFirstInitRef.current = false;
   }, [dispatch, urlSearchParams]);
@@ -87,29 +87,29 @@ export function useInitializeBrowseFromUrl() {
   useEffect(() => {
     // This effect is for initializing search parameters, not content type
     // Content type is already handled in the previous effect
-    
+
     // Skip initialization if we already have data in the redux store
     const hasCardParams = Object.keys(reduxCardSearchParams).length > 0;
     const hasSetParams = Object.keys(reduxSetSearchParams).length > 0;
-    
+
     // If both types already have params, skip initialization
     if (hasCardParams && hasSetParams) {
       return;
     }
-    
+
     // Get content type from URL to determine which params to process
     const contentTypeParam = urlSearchParams.get('contentType');
-    
+
     // Determine which content type we're initializing for
     // Prioritize URL parameter over current Redux state since this is initial loading
     const effectiveContentType = contentTypeParam === 'sets' ? 'sets' : 'cards';
-    
+
     // Common parameters that may apply to either content type
     const name = urlSearchParams.get('name');
     const setName = urlSearchParams.get('setName');
     const sortBy = urlSearchParams.get('sortBy');
     const sortOrder = urlSearchParams.get('sortOrder');
-    
+
     // Initialize card parameters if needed
     if (!hasCardParams) {
       // Process card-specific URL parameters
@@ -125,7 +125,7 @@ export function useInitializeBrowseFromUrl() {
       const excludeRarities = urlSearchParams.get('excludeRarities');
       const includeSets = urlSearchParams.get('includeSets');
       const excludeSets = urlSearchParams.get('excludeSets');
-      
+
       // Sets name field for cards
       if (effectiveContentType === 'cards') {
         // Only use 'name' parameter for cards view
@@ -133,7 +133,7 @@ export function useInitializeBrowseFromUrl() {
           dispatch(setCardSearchName(name));
         }
       }
-      
+
       // Process colors
       if (colors || colorless) {
         const colorFilter: ColorFilter = {
@@ -202,7 +202,7 @@ export function useInitializeBrowseFromUrl() {
       if (oneResultPerCardName) {
         dispatch(setOneResultPerCardName(true));
       }
-      
+
       // Set sort parameters for cards if we're in cards view
       if (effectiveContentType === 'cards') {
         if (sortBy) {
@@ -224,14 +224,14 @@ export function useInitializeBrowseFromUrl() {
         if (setNameValue) {
           dispatch(setSetSearchName(setNameValue));
         }
-        
+
         // Get code from URL
         const code = urlSearchParams.get('code');
         if (code) {
           dispatch(setSetCode(code));
         }
       }
-      
+
       // Set sort parameters for sets if we're in sets view
       if (effectiveContentType === 'sets') {
         if (sortBy) {

@@ -1,10 +1,10 @@
 'use client';
 
-import { useDispatch, useSelector } from 'react-redux';
-import AutocompleteWithNegation, { Option } from '@/components/ui/AutocompleteWithNegation';
-import { useGetSetTypesQuery } from '@/api/browse/browseApi';
-import { selectSetTypes, setSetTypes } from '@/redux/slices/browseSlice';
 import { LinearProgress } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { useGetSetTypesQuery } from '@/api/browse/browseApi';
+import AutocompleteWithNegation, { Option } from '@/components/ui/AutocompleteWithNegation';
+import { selectSetTypes, setSetTypes } from '@/redux/slices/browseSlice';
 
 const SetTypeSelector = () => {
   const dispatch = useDispatch();

@@ -55,11 +55,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   if (!prices) {
     return (
-      <Typography
-        variant="subtitle1"
-        fontWeight="medium"
-        textAlign={centered ? 'center' : 'inherit'}
-      >
+      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}>
         N/A
       </Typography>
     );
@@ -70,11 +66,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   if (!normalPriceData && !foilPriceData) {
     return (
-      <Typography
-        variant="subtitle1"
-        fontWeight="medium"
-        textAlign={centered ? 'center' : 'inherit'}
-      >
+      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}>
         N/A
       </Typography>
     );
@@ -96,32 +88,16 @@ const CardPrice: React.FC<CardPriceProps> = ({
     if (!normalPriceData) return null;
 
     // Try to get the selected price type first
-    if (
-      priceType === PriceType.Market &&
-      normalPriceData.market !== null &&
-      normalPriceData.market !== undefined
-    ) {
+    if (priceType === PriceType.Market && normalPriceData.market !== null && normalPriceData.market !== undefined) {
       return { price: normalPriceData.market, type: PriceType.Market, isFallback: false };
     }
-    if (
-      priceType === PriceType.Low &&
-      normalPriceData.low !== null &&
-      normalPriceData.low !== undefined
-    ) {
+    if (priceType === PriceType.Low && normalPriceData.low !== null && normalPriceData.low !== undefined) {
       return { price: normalPriceData.low, type: PriceType.Low, isFallback: false };
     }
-    if (
-      priceType === PriceType.Average &&
-      normalPriceData.average !== null &&
-      normalPriceData.average !== undefined
-    ) {
+    if (priceType === PriceType.Average && normalPriceData.average !== null && normalPriceData.average !== undefined) {
       return { price: normalPriceData.average, type: PriceType.Average, isFallback: false };
     }
-    if (
-      priceType === PriceType.High &&
-      normalPriceData.high !== null &&
-      normalPriceData.high !== undefined
-    ) {
+    if (priceType === PriceType.High && normalPriceData.high !== null && normalPriceData.high !== undefined) {
       return { price: normalPriceData.high, type: PriceType.High, isFallback: false };
     }
 
@@ -232,9 +208,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
             <Typography variant="subtitle1" fontWeight="medium">
               {formatPrice(normalPrice)} ({formatPrice(foilPrice)} foil)
             </Typography>
-            {isFallback && (
-              <InfoIcon fontSize="small" color="action" sx={{ ml: 0.5, fontSize: '1rem' }} />
-            )}
+            {isFallback && <InfoIcon fontSize="small" color="action" sx={{ ml: 0.5, fontSize: '1rem' }} />}
           </Box>
         </Box>
       </Tooltip>
@@ -257,9 +231,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
             <Typography variant="subtitle1" fontWeight="medium">
               {formatPrice(normalPrice)}
             </Typography>
-            {isFallback && (
-              <InfoIcon fontSize="small" color="action" sx={{ ml: 0.5, fontSize: '1rem' }} />
-            )}
+            {isFallback && <InfoIcon fontSize="small" color="action" sx={{ ml: 0.5, fontSize: '1rem' }} />}
           </Box>
         </Box>
       </Tooltip>
@@ -282,9 +254,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
               {formatPrice(foilPrice)} foil
             </Typography>
             {/* Only show the info icon if this is NOT a foil-only card */}
-            {!isFoilOnlyCard && (
-              <InfoIcon fontSize="small" color="action" sx={{ ml: 0.5, fontSize: '1rem' }} />
-            )}
+            {!isFoilOnlyCard && <InfoIcon fontSize="small" color="action" sx={{ ml: 0.5, fontSize: '1rem' }} />}
           </Box>
         </Box>
       </Tooltip>
@@ -294,11 +264,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
   // No prices available
   return (
     <Tooltip title="No prices available">
-      <Typography
-        variant="subtitle1"
-        fontWeight="medium"
-        textAlign={centered ? 'center' : 'inherit'}
-      >
+      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}>
         N/A
       </Typography>
     </Tooltip>

@@ -5,10 +5,7 @@
  * @param cardName - The name of the card (used as a fallback if no ID is provided)
  * @returns The affiliate link to TCGPlayer
  */
-export const generateTCGPlayerLink = (
-  tcgplayerId?: string | number | null,
-  cardName?: string,
-): string => {
+export const generateTCGPlayerLink = (tcgplayerId?: string | number | null, cardName?: string): string => {
   // If we have a TCGPlayer ID, link directly to the product
   if (tcgplayerId) {
     const targetUrl = `https://www.tcgplayer.com/product/${tcgplayerId}`;

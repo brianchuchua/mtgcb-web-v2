@@ -73,18 +73,14 @@ export default function ForgotPasswordPage() {
           type: 'manual',
           message: result.error?.message || 'Password reset request failed. Please try again.',
         });
-        enqueueSnackbar(
-          result.error?.message || 'Password reset request failed. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        enqueueSnackbar(result.error?.message || 'Password reset request failed. Please try again.', {
+          variant: 'error',
+        });
       }
     } catch (error: any) {
       const errorData = error.data as ApiResponse<void>;
       const message =
-        errorData?.error?.message ||
-        'There was a problem requesting a password reset. Please try again in a moment.';
+        errorData?.error?.message || 'There was a problem requesting a password reset. Please try again in a moment.';
 
       setError('root', {
         type: 'manual',
@@ -104,8 +100,7 @@ export default function ForgotPasswordPage() {
           Forgot Password
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }}>
-          Enter your username and email address and we'll send you instructions to reset your
-          password.
+          Enter your username and email address and we'll send you instructions to reset your password.
         </Typography>
         <ForgotPasswordForm noValidate onSubmit={handleSubmit(onSubmit)}>
           <TextField
@@ -156,13 +151,7 @@ export default function ForgotPasswordPage() {
           </Box>
 
           <SubmitButtonWrapper>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              isSubmitting={isSubmitting}
-            >
+            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting}>
               Send Reset Instructions
             </Button>
           </SubmitButtonWrapper>
@@ -182,19 +171,11 @@ export default function ForgotPasswordPage() {
 
           <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>
             This site is protected by reCAPTCHA and the Google{' '}
-            <Link
-              href="https://policies.google.com/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
               Privacy Policy
             </Link>{' '}
             and{' '}
-            <Link
-              href="https://policies.google.com/terms"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <Link href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">
               Terms of Service
             </Link>{' '}
             apply.

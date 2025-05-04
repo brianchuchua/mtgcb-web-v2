@@ -24,7 +24,7 @@ const SetSelector = () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL}/sets/all`);
         const data = await response.json();
-        
+
         if (data.success && data.data.sets) {
           // Sort sets by releasedAt in descending order (newest first)
           const sortedSets = [...data.data.sets].sort((a, b) => {
@@ -32,14 +32,14 @@ const SetSelector = () => {
           });
           setAllSets(sortedSets);
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error('Error fetching sets:', error);
         setLoading(false);
       }
     };
-    
+
     fetchSets();
   }, []);
 

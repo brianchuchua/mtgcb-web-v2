@@ -71,18 +71,14 @@ export default function ForgotUsernamePage() {
           type: 'manual',
           message: result.error?.message || 'Username recovery request failed. Please try again.',
         });
-        enqueueSnackbar(
-          result.error?.message || 'Username recovery request failed. Please try again.',
-          {
-            variant: 'error',
-          },
-        );
+        enqueueSnackbar(result.error?.message || 'Username recovery request failed. Please try again.', {
+          variant: 'error',
+        });
       }
     } catch (error: any) {
       const errorData = error.data as ApiResponse<void>;
       const message =
-        errorData?.error?.message ||
-        'There was a problem requesting username recovery. Please try again in a moment.';
+        errorData?.error?.message || 'There was a problem requesting username recovery. Please try again in a moment.';
 
       setError('root', {
         type: 'manual',
@@ -135,13 +131,7 @@ export default function ForgotUsernamePage() {
           </Box>
 
           <SubmitButtonWrapper>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              isSubmitting={isSubmitting}
-            >
+            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting}>
               Recover Username
             </Button>
           </SubmitButtonWrapper>
@@ -161,19 +151,11 @@ export default function ForgotUsernamePage() {
 
           <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>
             This site is protected by reCAPTCHA and the Google{' '}
-            <Link
-              href="https://policies.google.com/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
               Privacy Policy
             </Link>{' '}
             and{' '}
-            <Link
-              href="https://policies.google.com/terms"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <Link href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">
               Terms of Service
             </Link>{' '}
             apply.

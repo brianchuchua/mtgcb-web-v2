@@ -65,11 +65,7 @@ const VirtualizedGallery = <T,>({
   };
 
   return (
-    <GalleryWrapper
-      columnsPerRow={columnsPerRow}
-      galleryWidth={galleryWidth}
-      horizontalPadding={horizontalPadding}
-    >
+    <GalleryWrapper columnsPerRow={columnsPerRow} galleryWidth={galleryWidth} horizontalPadding={horizontalPadding}>
       <VirtuosoGrid
         useWindowScroll // Use window scroll instead of creating a scrollable container
         totalCount={items.length}
@@ -92,8 +88,7 @@ interface GalleryWrapperProps {
 }
 
 const GalleryWrapper = styled(Box, {
-  shouldForwardProp: (prop) =>
-    prop !== 'columnsPerRow' && prop !== 'galleryWidth' && prop !== 'horizontalPadding',
+  shouldForwardProp: (prop) => prop !== 'columnsPerRow' && prop !== 'galleryWidth' && prop !== 'horizontalPadding',
 })<GalleryWrapperProps>(({ theme, columnsPerRow, galleryWidth, horizontalPadding }) => ({
   width: `${galleryWidth}%`,
   margin: '0 auto',

@@ -157,12 +157,9 @@ const BrowseSearchForm = () => {
       if (isPriceSort(reduxSortBy) && reduxSortBy !== displayPriceType && reduxSortBy !== 'foil') {
         // Update the sort to match the new display price
         dispatch(setSortBy(displayPriceType as SortByOption));
-        enqueueSnackbar(
-          `Changed your sort to ${displayPriceType} prices to match your display price setting.`,
-          {
-            variant: 'info',
-          },
-        );
+        enqueueSnackbar(`Changed your sort to ${displayPriceType} prices to match your display price setting.`, {
+          variant: 'info',
+        });
       }
 
       // Update previous value
@@ -285,12 +282,9 @@ const BrowseSearchForm = () => {
       const priceTypeValue = getPriceTypeEnum(newSortBy);
       setDisplayPriceType(priceTypeValue);
 
-      enqueueSnackbar(
-        `Changed your display price setting to ${newSortBy} to match your sort selection.`,
-        {
-          variant: 'info',
-        },
-      );
+      enqueueSnackbar(`Changed your display price setting to ${newSortBy} to match your sort selection.`, {
+        variant: 'info',
+      });
     }
   };
 
@@ -337,13 +331,7 @@ const BrowseSearchForm = () => {
 
   // Function to check if a sort option is price-related
   const isPriceSort = (option: string): boolean => {
-    return (
-      option === 'market' ||
-      option === 'low' ||
-      option === 'average' ||
-      option === 'high' ||
-      option === 'foil'
-    );
+    return option === 'market' || option === 'low' || option === 'average' || option === 'high' || option === 'foil';
   };
 
   // Function to determine if a price option is mismatched with the display setting
@@ -519,16 +507,16 @@ const BrowseSearchForm = () => {
               Show subsets
               <Tooltip
                 title={
-                  <div dangerouslySetInnerHTML={{ 
-                    __html: "Subsets are a piece of a larger set. <br /><br />Example: Tempest has a subset named Tempest Prerelease Promos." 
-                  }} />
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        'Subsets are a piece of a larger set. <br /><br />Example: Tempest has a subset named Tempest Prerelease Promos.',
+                    }}
+                  />
                 }
                 placement="right"
               >
-                <InfoOutlinedIcon
-                  fontSize="small"
-                  sx={{ ml: 0.5, cursor: 'help', color: 'text.secondary' }}
-                />
+                <InfoOutlinedIcon fontSize="small" sx={{ ml: 0.5, cursor: 'help', color: 'text.secondary' }} />
               </Tooltip>
             </Box>
           }
@@ -616,13 +604,7 @@ const BrowseSearchForm = () => {
           {/* Only show the See Results button on mobile */}
           {isMobile && (
             <Box sx={{ mt: 3, mb: 2 }}>
-              <Button
-                variant="contained"
-                fullWidth
-                color="primary"
-                onClick={handleSeeResults}
-                size="large"
-              >
+              <Button variant="contained" fullWidth color="primary" onClick={handleSeeResults} size="large">
                 View Search Results
               </Button>
             </Box>
@@ -678,23 +660,13 @@ const BrowseSearchForm = () => {
             </FormControl>
             <FormControl size="small" sx={{ width: '35%' }}>
               <InputLabel id="sort-order-label">Order</InputLabel>
-              <Select
-                labelId="sort-order-label"
-                value={reduxSortOrder}
-                label="Order"
-                onChange={handleSortOrderChange}
-              >
+              <Select labelId="sort-order-label" value={reduxSortOrder} label="Order" onChange={handleSortOrderChange}>
                 <MenuItem value="asc">ASC</MenuItem>
                 <MenuItem value="desc">DESC</MenuItem>
               </Select>
             </FormControl>
           </Stack>
-          <Button
-            variant="outlined"
-            startIcon={<RestartAltIcon />}
-            onClick={handleResetSearch}
-            sx={{ mt: 1 }}
-          >
+          <Button variant="outlined" startIcon={<RestartAltIcon />} onClick={handleResetSearch} sx={{ mt: 1 }}>
             Reset Search
           </Button>
         </Stack>

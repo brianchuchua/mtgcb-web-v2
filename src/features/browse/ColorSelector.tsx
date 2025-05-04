@@ -87,11 +87,7 @@ const ColorSelector = () => {
             <i className={`ms ms-${color.toLowerCase()} ms-cost ms-2x`} />
           </ColorButton>
         ))}
-        <ColorButton
-          size="small"
-          onClick={() => handleColorClick('C')}
-          isSelected={includeColorless}
-        >
+        <ColorButton size="small" onClick={() => handleColorClick('C')} isSelected={includeColorless}>
           <i className="ms ms-c ms-cost ms-2x" />
         </ColorButton>
       </ColorSelect>

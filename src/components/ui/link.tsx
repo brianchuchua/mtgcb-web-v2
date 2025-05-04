@@ -12,13 +12,7 @@ interface LinkProps extends Omit<MuiLinkProps, 'href'> {
   naked?: boolean;
 }
 
-export function Link({
-  href,
-  activeClassName = 'active',
-  className: classNameProps,
-  naked,
-  ...other
-}: LinkProps) {
+export function Link({ href, activeClassName = 'active', className: classNameProps, naked, ...other }: LinkProps) {
   const pathname = usePathname();
   const isActive = pathname === href;
   const className = clsx(classNameProps, {
@@ -33,13 +27,5 @@ export function Link({
     );
   }
 
-  return (
-    <MuiLink
-      component={NextLink}
-      className={className}
-      href={href}
-      sx={{ textDecoration: 'none' }}
-      {...other}
-    />
-  );
+  return <MuiLink component={NextLink} className={className} href={href} sx={{ textDecoration: 'none' }} {...other} />;
 }
