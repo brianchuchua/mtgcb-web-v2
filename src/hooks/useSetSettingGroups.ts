@@ -1,24 +1,30 @@
 'use client';
 
 import { useLocalStorage } from './useLocalStorage';
-import {
-  CardSettingGroup,
-} from '@/components/cards/CardSettingsPanel';
+import { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 
 export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
   // Set Gallery visibility settings
   const [nameIsVisible, setNameIsVisible] = useLocalStorage('setNameIsVisible', true);
   const [codeIsVisible, setCodeIsVisible] = useLocalStorage('setCodeIsVisible', true);
   const [releaseDateIsVisible, setReleaseDateIsVisible] = useLocalStorage('setReleaseDateIsVisible', true);
+  const [typeIsVisible, setTypeIsVisible] = useLocalStorage('setTypeIsVisible', true);
+  const [categoryIsVisible, setCategoryIsVisible] = useLocalStorage('setCategoryIsVisible', true);
   const [cardCountIsVisible, setCardCountIsVisible] = useLocalStorage('setCardCountIsVisible', true);
 
   // Set Table column visibility settings
   const [tableCodeIsVisible, setTableCodeIsVisible] = useLocalStorage('tableSetCodeIsVisible', true);
   const [tableCardCountIsVisible, setTableCardCountIsVisible] = useLocalStorage('tableSetCardCountIsVisible', true);
-  const [tableReleaseDateIsVisible, setTableReleaseDateIsVisible] = useLocalStorage('tableSetReleaseDateIsVisible', true);
+  const [tableReleaseDateIsVisible, setTableReleaseDateIsVisible] = useLocalStorage(
+    'tableSetReleaseDateIsVisible',
+    true,
+  );
   const [tableTypeIsVisible, setTableTypeIsVisible] = useLocalStorage('tableSetTypeIsVisible', true);
   const [tableCategoryIsVisible, setTableCategoryIsVisible] = useLocalStorage('tableSetCategoryIsVisible', false);
-  const [tableIsDraftableIsVisible, setTableIsDraftableIsVisible] = useLocalStorage('tableSetIsDraftableIsVisible', false);
+  const [tableIsDraftableIsVisible, setTableIsDraftableIsVisible] = useLocalStorage(
+    'tableSetIsDraftableIsVisible',
+    false,
+  );
 
   // Layout settings
   const [setsPerRow, setSetsPerRow] = useLocalStorage('setsPerRow', 4);
@@ -53,6 +59,20 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
         label: 'Release Date',
         isVisible: releaseDateIsVisible,
         setVisibility: setReleaseDateIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'category',
+        label: 'Category',
+        isVisible: categoryIsVisible,
+        setVisibility: setCategoryIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'type',
+        label: 'Type',
+        isVisible: typeIsVisible,
+        setVisibility: setTypeIsVisible,
         type: 'toggle',
       },
       {

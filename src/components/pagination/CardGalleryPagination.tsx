@@ -125,9 +125,7 @@ const ViewModeToggle = React.memo(
         <Tooltip title="Table view">
           <span>
             <Button
-              variant={
-                !isFullyLoaded ? 'outlined' : viewMode === 'table' ? 'contained' : 'outlined'
-              }
+              variant={!isFullyLoaded ? 'outlined' : viewMode === 'table' ? 'contained' : 'outlined'}
               size="small"
               onClick={handleTableClick}
               startIcon={<TableRowsIcon />}
@@ -184,11 +182,7 @@ const PageSizeControl = React.memo(
           </Typography>
         ) : null}
         {isSmallScreen && (
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ mr: 1, fontSize: '0.875rem', whiteSpace: 'nowrap' }}
-          >
+          <Typography variant="body2" color="text.secondary" sx={{ mr: 1, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
             {contentType === 'cards' ? 'Cards' : 'Sets'}:
           </Typography>
         )}
@@ -281,12 +275,7 @@ const NavigationControls = React.memo(
         {/* First page button */}
         <Tooltip title="First page">
           <span>
-            <IconButton
-              onClick={handleFirstPage}
-              disabled={page === 1 || isLoading}
-              size="small"
-              color="primary"
-            >
+            <IconButton onClick={handleFirstPage} disabled={page === 1 || isLoading} size="small" color="primary">
               <FirstPageIcon />
             </IconButton>
           </span>
@@ -295,12 +284,7 @@ const NavigationControls = React.memo(
         {/* Previous page button */}
         <Tooltip title="Previous page">
           <span>
-            <IconButton
-              onClick={handlePreviousPage}
-              disabled={page === 1 || isLoading}
-              size="small"
-              color="primary"
-            >
+            <IconButton onClick={handlePreviousPage} disabled={page === 1 || isLoading} size="small" color="primary">
               <ChevronLeftIcon />
             </IconButton>
           </span>
@@ -312,7 +296,6 @@ const NavigationControls = React.memo(
             {pageNumbers.map((pageNum) => {
               // Use a separate callback for each page button to avoid closure issues
               const handlePageClick = () => {
-                console.log('Clicked page button:', pageNum);
                 onPageChange(pageNum);
               };
 
@@ -374,9 +357,7 @@ export const CardGalleryPagination = React.memo(
     currentPage,
     totalPages,
     pageSize,
-    pageSizeOptions = [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 25, 50, 100, 200, 300, 400, 500,
-    ],
+    pageSizeOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 25, 50, 100, 200, 300, 400, 500],
     totalItems,
     viewMode,
     onPageChange,
@@ -436,8 +417,7 @@ export const CardGalleryPagination = React.memo(
               {!isSmallScreen && !isLoading && (
                 <ItemRangeInfo>
                   <Typography variant="body1" color="text.secondary">
-                    Showing {startItem}-{endItem} of {totalItems}{' '}
-                    {contentType === 'cards' ? 'cards' : 'sets'}
+                    Showing {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
                   </Typography>
                 </ItemRangeInfo>
               )}
@@ -484,8 +464,7 @@ export const CardGalleryPagination = React.memo(
                             whiteSpace: 'nowrap',
                           }}
                         >
-                          {startItem}-{endItem} of {totalItems}{' '}
-                          {contentType === 'cards' ? 'cards' : 'sets'}
+                          {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
                         </Typography>
                       )}
                     </MobileInfoRow>

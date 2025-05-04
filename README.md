@@ -16,6 +16,10 @@
   - Cards table view: Done
   - Sets gallery view: Stubbed (needs cost to complete interface and UI overhaul)
   - Sets table view: Done
+- ISO8601 for date rendering
+- Costs to complete on sets gallery page
+- Bug: Sorting by release date in set gallery view, saw weird behavior, maybe interplay with table sorting -- includeSets=310 in URL too
+- Not seeing localStorage initialization on load
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
 - Fix typing issues
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
@@ -140,8 +144,7 @@ th.rotated-text > div {
   left: 0;
   width: 100%;
   text-align: left;
-  transform: translate(calc(100% - var(--table-border-width) / 2), var(--table-border-width))
-    rotate(315deg);
+  transform: translate(calc(100% - var(--table-border-width) / 2), var(--table-border-width)) rotate(315deg);
   transform-origin: 0% calc(100% - var(--table-border-width));
 }
 th.rotated-text > div > span {

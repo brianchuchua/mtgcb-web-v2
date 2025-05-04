@@ -52,11 +52,6 @@ test.describe('Login Page', () => {
   test('should redirect to collection page after login', async ({ page }) => {
     await page.route('http://local.mtgcb.com:5000/auth/login', async (route) => {
       const request = route.request();
-      console.log('Login request:', {
-        method: request.method(),
-        headers: request.headers(),
-        postData: request.postData(),
-      });
 
       await route.fulfill({
         status: 200,

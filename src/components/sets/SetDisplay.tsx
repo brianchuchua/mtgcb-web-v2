@@ -2,13 +2,13 @@
 
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import SetItemRenderer from './SetItemRenderer';
+import { useSetTableRenderers } from './SetTableRenderer';
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
-import { useSetTableRenderers } from './SetTableRenderer';
-import SetItemRenderer from './SetItemRenderer';
-import { Set } from '@/types/sets';
 import { selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
 import { SortByOption } from '@/types/browse';
+import { Set } from '@/types/sets';
 
 interface SetDisplayProps {
   setItems: Set[];
@@ -21,6 +21,8 @@ interface SetDisplayProps {
       nameIsVisible?: boolean;
       codeIsVisible?: boolean;
       releaseDateIsVisible?: boolean;
+      typeIsVisible?: boolean;
+      categoryIsVisible?: boolean;
       cardCountIsVisible?: boolean;
     };
     table: {
@@ -60,11 +62,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
     : setItems;
 
   // Get the appropriate renderers for table view
-  const { columns, renderRowContent } = useSetTableRenderers(
-    displaySettings.table,
-    currentSortBy,
-    onSetClick
-  );
+  const { columns, renderRowContent } = useSetTableRenderers(displaySettings.table, currentSortBy, onSetClick);
 
   // Handle sort change
   const handleSortChange = (columnId: string) => {
@@ -85,13 +83,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
       <VirtualizedGallery
         key="browse-set-gallery"
         items={displaySets}
-        renderItem={(set, index) => (
-          <SetItemRenderer
-            set={set}
-            settings={displaySettings.grid}
-            onClick={onSetClick}
-          />
-        )}
+        renderItem={(set, index) => <SetItemRenderer set={set} settings={displaySettings.grid} />}
         isLoading={isLoading}
         columnsPerRow={4} // Default to 4 sets per row
         galleryWidth={95}

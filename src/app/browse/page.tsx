@@ -5,12 +5,7 @@ import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  getNextPageParams,
-  useGetCardsPrefetch,
-  useGetCardsQuery,
-  useGetSetsQuery,
-} from '@/api/browse/browseApi';
+import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import CardItemRenderer from '@/components/cards/CardItemRenderer';
 import { useCardRowRenderer, useCardTableColumns } from '@/components/cards/CardTableRenderer';
@@ -46,13 +41,7 @@ interface CardDisplayProps {
   pageSize: number;
 }
 
-const CardDisplay = ({
-  cardItems,
-  isLoading,
-  viewMode,
-  onCardClick,
-  pageSize,
-}: CardDisplayProps) => {
+const CardDisplay = ({ cardItems, isLoading, viewMode, onCardClick, pageSize }: CardDisplayProps) => {
   const dispatch = useDispatch();
   const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
   const currentSortOrder = useSelector(selectSortOrder) || 'asc';
@@ -242,17 +231,7 @@ export default function BrowsePage() {
       // Use the sort parameters from the redux store if provided, otherwise use defaults
       sortBy: params.sortBy || 'name',
       sortDirection: params.sortDirection || ('asc' as const),
-      select: [
-        'name',
-        'slug',
-        'code',
-        'setType',
-        'category',
-        'releasedAt',
-        'cardCount',
-        'iconUrl',
-        'isDraftable',
-      ],
+      select: ['name', 'slug', 'code', 'setType', 'category', 'releasedAt', 'cardCount', 'iconUrl', 'isDraftable'],
     };
   }, [reduxSetSearchParams, pagination]);
 
@@ -298,9 +277,7 @@ export default function BrowsePage() {
   const isApiLoading = viewContentType === 'cards' ? isCardsApiLoading : isSetsApiLoading;
   const error = viewContentType === 'cards' ? cardsError : setsError;
 
-  const prefetchNextPage = useGetCardsPrefetch(
-    viewContentType === 'cards' ? 'getCards' : 'getSets',
-  );
+  const prefetchNextPage = useGetCardsPrefetch(viewContentType === 'cards' ? 'getCards' : 'getSets');
 
   useEffect(() => {
     if (!nextPageApiParams || isApiLoading) return;
@@ -332,11 +309,9 @@ export default function BrowsePage() {
     const filteredCurrentParams = filterOutPaginationParams(reduxCardSearchParams);
     const filteredPrevParams = filterOutPaginationParams(reduxCardSearchParamsRef.current);
 
-    const hasSearchParamsChanged =
-      JSON.stringify(filteredPrevParams) !== JSON.stringify(filteredCurrentParams);
+    const hasSearchParamsChanged = JSON.stringify(filteredPrevParams) !== JSON.stringify(filteredCurrentParams);
 
     if (hasSearchParamsChanged && viewContentType === 'cards' && pagination.currentPage !== 1) {
-      console.log('Resetting cards pagination due to search params change');
       updatePagination({ currentPage: 1 });
     }
 
@@ -359,11 +334,9 @@ export default function BrowsePage() {
     const filteredCurrentParams = filterOutPaginationParams(reduxSetSearchParams);
     const filteredPrevParams = filterOutPaginationParams(reduxSetSearchParamsRef.current);
 
-    const hasSearchParamsChanged =
-      JSON.stringify(filteredPrevParams) !== JSON.stringify(filteredCurrentParams);
+    const hasSearchParamsChanged = JSON.stringify(filteredPrevParams) !== JSON.stringify(filteredCurrentParams);
 
     if (hasSearchParamsChanged && viewContentType === 'sets' && pagination.currentPage !== 1) {
-      console.log('Resetting sets pagination due to search params change');
       updatePagination({ currentPage: 1 });
     }
 
@@ -415,8 +388,7 @@ export default function BrowsePage() {
 
   // Map API data to component props
   const cardItems = useMemo(
-    () =>
-      cardsSearchResult?.data ? mapApiCardsToCardItems(cardsSearchResult.data.cards || []) : [],
+    () => (cardsSearchResult?.data ? mapApiCardsToCardItems(cardsSearchResult.data.cards || []) : []),
     [cardsSearchResult?.data],
   );
 
@@ -433,31 +405,17 @@ export default function BrowsePage() {
     }
   }, [viewContentType, cardsSearchResult?.data?.totalCount, setsSearchResult?.data?.totalCount]);
 
-  const totalPages = useMemo(
-    () => Math.ceil(totalItems / pagination.pageSize),
-    [totalItems, pagination.pageSize],
-  );
+  const totalPages = useMemo(() => Math.ceil(totalItems / pagination.pageSize), [totalItems, pagination.pageSize]);
 
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const isInitialLoading =
-    !initialLoadComplete &&
-    !(viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data &&
-    !error;
+    !initialLoadComplete && !(viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data && !error;
 
   useEffect(() => {
-    if (
-      ((viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data || error) &&
-      !initialLoadComplete
-    ) {
+    if (((viewContentType === 'cards' ? cardsSearchResult : setsSearchResult)?.data || error) && !initialLoadComplete) {
       setInitialLoadComplete(true);
     }
-  }, [
-    viewContentType,
-    cardsSearchResult?.data,
-    setsSearchResult?.data,
-    error,
-    initialLoadComplete,
-  ]);
+  }, [viewContentType, cardsSearchResult?.data, setsSearchResult?.data, error, initialLoadComplete]);
 
   // Get display settings for sets
   const setDisplaySettings = useSetDisplaySettings(pagination.viewMode);
@@ -518,9 +476,7 @@ export default function BrowsePage() {
           <Typography variant="h6" gutterBottom fontWeight="bold" color="error.main">
             Unable to load {viewContentType}
           </Typography>
-          <Typography color="text.primary">
-            There was a problem fetching data. Please try again later.
-          </Typography>
+          <Typography color="text.primary">There was a problem fetching data. Please try again later.</Typography>
         </Box>
       )}
 
@@ -544,6 +500,8 @@ export default function BrowsePage() {
               nameIsVisible: setDisplaySettings.nameIsVisible,
               codeIsVisible: setDisplaySettings.codeIsVisible,
               releaseDateIsVisible: setDisplaySettings.releaseDateIsVisible,
+              typeIsVisible: setDisplaySettings.typeIsVisible,
+              categoryIsVisible: setDisplaySettings.categoryIsVisible,
               cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
             },
             table: {

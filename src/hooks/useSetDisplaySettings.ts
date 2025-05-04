@@ -1,3 +1,5 @@
+'use client';
+
 import { useLocalStorage } from './useLocalStorage';
 
 export const useSetDisplaySettings = (viewMode: 'grid' | 'table') => {
@@ -5,6 +7,8 @@ export const useSetDisplaySettings = (viewMode: 'grid' | 'table') => {
   const [nameIsVisible] = useLocalStorage('setNameIsVisible', true);
   const [codeIsVisible] = useLocalStorage('setCodeIsVisible', true);
   const [releaseDateIsVisible] = useLocalStorage('setReleaseDateIsVisible', true);
+  const [typeIsVisible] = useLocalStorage('setTypeIsVisible', true);
+  const [categoryIsVisible] = useLocalStorage('setCategoryIsVisible', true);
   const [cardCountIsVisible] = useLocalStorage('setCardCountIsVisible', true);
 
   // Table view settings
@@ -20,6 +24,8 @@ export const useSetDisplaySettings = (viewMode: 'grid' | 'table') => {
       nameIsVisible,
       codeIsVisible,
       releaseDateIsVisible,
+      typeIsVisible,
+      categoryIsVisible,
       cardCountIsVisible,
     };
   }
