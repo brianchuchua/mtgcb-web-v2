@@ -2,6 +2,7 @@
 
 import { useLocalStorage } from './useLocalStorage';
 import { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
+import { PriceType } from '@/types/pricing';
 
 export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
   // Set Gallery visibility settings
@@ -29,11 +30,39 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
   // Layout settings
   const [setsPerRow, setSetsPerRow] = useLocalStorage('setsPerRow', 4);
 
+  // Shared price display setting - uses the same key as card settings
+  const [displayPriceType, setDisplayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
+
+  const handleSetPriceType = (value: number): void => {
+    setDisplayPriceType(value as unknown as PriceType);
+  };
+
   const [localStorageViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
   const viewMode = explicitViewMode || localStorageViewMode;
 
   // Base settings groups that are always available
-  const settingGroups: CardSettingGroup[] = [];
+  const settingGroups: CardSettingGroup[] = [
+    // Price Settings (always shown)
+    {
+      label: 'Price Settings',
+      type: 'select',
+      settings: [
+        {
+          key: 'priceType',
+          label: '',
+          value: displayPriceType as unknown as number,
+          setValue: handleSetPriceType,
+          type: 'select',
+          options: [
+            { value: PriceType.Market as unknown as number, label: 'Market' },
+            { value: PriceType.Low as unknown as number, label: 'Low' },
+            { value: PriceType.Average as unknown as number, label: 'Average' },
+            { value: PriceType.High as unknown as number, label: 'High' },
+          ],
+        },
+      ],
+    },
+  ];
 
   // Create set gallery settings group (only shown in grid view)
   const setGallerySettings: CardSettingGroup = {

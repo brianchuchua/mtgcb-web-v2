@@ -1,13 +1,15 @@
 'use client';
 
-import { Box, Card, CardContent, Typography, styled } from '@mui/material';
+import { Box, Button, Card, CardContent, Typography, styled } from '@mui/material';
 import React from 'react';
+import { CostToComplete } from '@/api/sets/types';
 import SetIcon from '@/components/sets/SetIcon';
 import { Set } from '@/types/sets';
 import capitalize from '@/utils/capitalize';
+import { formatPrice } from '@/utils/formatters';
 
 // TODO: Loading skeleton once I know the height of the box after implementing the cost to complete stuff
-const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings }) => {
+const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, costToComplete }) => {
   return (
     <SetBoxWrapper>
       <SetBoxContent>
@@ -20,6 +22,8 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings }) => {
         <SetReleaseDate set={set} isVisible={settings.releaseDateIsVisible} />
         <SetIconDisplay set={set} />
         <SetCardCount set={set} isVisible={settings.cardCountIsVisible} />
+
+        {!isSkeleton(set) && costToComplete && <CostToPurchaseSection costToComplete={costToComplete} />}
       </SetBoxContent>
     </SetBoxWrapper>
   );
@@ -37,6 +41,7 @@ export interface SetItemSettings {
 interface SetItemRendererProps {
   set: Set;
   settings: SetItemSettings;
+  costToComplete?: CostToComplete;
 }
 
 function isSkeleton(value: unknown): value is { isLoadingSkeleton: boolean } {
@@ -162,5 +167,92 @@ function formatSetCategoryAndType(set: Set, showCategory?: boolean, showType?: b
   if (type) return type;
   return 'Special Set';
 }
+
+interface CostToPurchaseSectionProps {
+  costToComplete: CostToComplete;
+}
+
+const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({ costToComplete }) => {
+  return (
+    <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}>
+      <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1, textAlign: 'center' }}>
+        Costs to purchase:
+      </Typography>
+
+      <CostToCompleteRow
+        label="1x of all cards"
+        cost={costToComplete.oneOfEachCard}
+        onBuy1x={() => console.log('Buy 1x of each card')}
+        onBuy4x={() => console.log('Buy 4x of each card')}
+      />
+
+      <CostToCompleteRow
+        label="1x mythics"
+        cost={costToComplete.oneOfEachMythic}
+        onBuy1x={() => console.log('Buy 1x of each mythic')}
+        onBuy4x={() => console.log('Buy 4x of each mythic')}
+      />
+
+      <CostToCompleteRow
+        label="1x rares"
+        cost={costToComplete.oneOfEachRare}
+        onBuy1x={() => console.log('Buy 1x of each rare')}
+        onBuy4x={() => console.log('Buy 4x of each rare')}
+      />
+
+      <CostToCompleteRow
+        label="1x uncommons"
+        cost={costToComplete.oneOfEachUncommon}
+        onBuy1x={() => console.log('Buy 1x of each uncommon')}
+        onBuy4x={() => console.log('Buy 4x of each uncommon')}
+      />
+
+      <CostToCompleteRow
+        label="1x commons"
+        cost={costToComplete.oneOfEachCommon}
+        onBuy1x={() => console.log('Buy 1x of each common')}
+        onBuy4x={() => console.log('Buy 4x of each common')}
+      />
+    </Box>
+  );
+};
+
+interface CostToCompleteRowProps {
+  label: string;
+  cost: number;
+  onBuy1x: () => void;
+  onBuy4x: () => void;
+}
+
+const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({ label, cost, onBuy1x, onBuy4x }) => {
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+      <Typography variant="body2" color="textSecondary" sx={{ flexBasis: '30%', flexShrink: 0 }}>
+        {label}:
+      </Typography>
+      <Typography variant="body2" color="textSecondary" sx={{ flexBasis: '30%', textAlign: 'right', pr: 1 }}>
+        {formatPrice(cost)}
+      </Typography>
+      <Box sx={{ display: 'flex', gap: 0.5, flexBasis: '40%' }}>
+        <Button
+          variant="outlined"
+          size="small"
+          sx={{ fontSize: '0.7rem', py: 0.2, minWidth: 'auto' }}
+          onClick={onBuy1x}
+        >
+          Buy 1x
+        </Button>
+        <Button
+          variant="outlined"
+          size="small"
+          sx={{ fontSize: '0.7rem', py: 0.2, minWidth: 'auto' }}
+          onClick={onBuy4x}
+        >
+          Buy 4x
+        </Button>
+      </Box>
+    </Box>
+  );
+};
 
 export default SetItemRenderer;

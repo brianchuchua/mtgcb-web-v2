@@ -7,6 +7,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
+import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
+import { useSetPriceType } from '@/hooks/useSetPriceType';
 import CardItemRenderer from '@/components/cards/CardItemRenderer';
 import { useCardRowRenderer, useCardTableColumns } from '@/components/cards/CardTableRenderer';
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
@@ -83,6 +85,15 @@ export default function BrowsePage() {
     ...queryConfig,
     skip: shouldSkipSetsQuery,
   });
+
+  const setPriceType = useSetPriceType();
+  
+  const { data: costToCompleteData } = useGetCostToCompleteQuery(
+    { priceType: setPriceType },
+    { ...queryConfig, skip: shouldSkipSetsQuery },
+  );
+
+  console.log(costToCompleteData);
 
   const isApiLoading = viewContentType === 'cards' ? isCardsApiLoading : isSetsApiLoading;
   const error = viewContentType === 'cards' ? cardsError : setsError;
@@ -184,6 +195,7 @@ export default function BrowsePage() {
           onSetClick={handleSetClick}
           pageSize={pagination.pageSize}
           displaySettings={createSetDisplaySettings(setDisplaySettings)}
+          costToCompleteData={costToCompleteData?.data}
         />
       )}
 

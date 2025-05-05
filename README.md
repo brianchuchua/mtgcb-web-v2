@@ -17,8 +17,9 @@
   - Sets gallery view: Stubbed (needs cost to complete interface and UI overhaul)
   - Sets table view: Done
 - ISO8601 for date rendering
-- Costs to complete on sets gallery page
-- Bug: Sorting by release date in set gallery view, saw weird behavior, maybe interplay with table sorting -- includeSets=310 in URL too
+- Costs to complete on sets gallery page (implement actual funcionality)
+- Buy this set sealed button
+- Bug: Sorting by release date in set gallery view, saw weird behavior, maybe interplay with table sorting
 - Not seeing localStorage initialization on load
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
 - Fix typing issues
