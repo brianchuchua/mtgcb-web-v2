@@ -12,6 +12,7 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
   const [typeIsVisible, setTypeIsVisible] = useLocalStorage('setTypeIsVisible', true);
   const [categoryIsVisible, setCategoryIsVisible] = useLocalStorage('setCategoryIsVisible', true);
   const [cardCountIsVisible, setCardCountIsVisible] = useLocalStorage('setCardCountIsVisible', true);
+  const [costsIsVisible, setCostsIsVisible] = useLocalStorage('setCostsIsVisible', true);
 
   // Set Table column visibility settings
   const [tableCodeIsVisible, setTableCodeIsVisible] = useLocalStorage('tableSetCodeIsVisible', true);
@@ -109,6 +110,13 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
         label: 'Card Count',
         isVisible: cardCountIsVisible,
         setVisibility: setCardCountIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'costs',
+        label: 'Costs to Purchase',
+        isVisible: costsIsVisible,
+        setVisibility: setCostsIsVisible,
         type: 'toggle',
       },
     ],

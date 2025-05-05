@@ -637,6 +637,7 @@ function createSetDisplaySettings(setDisplaySettings: any) {
       typeIsVisible: setDisplaySettings.typeIsVisible,
       categoryIsVisible: setDisplaySettings.categoryIsVisible,
       cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
+      costsIsVisible: setDisplaySettings.costsIsVisible,
     },
     table: {
       codeIsVisible: setDisplaySettings.codeIsVisible,

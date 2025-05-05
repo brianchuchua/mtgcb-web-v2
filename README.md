@@ -20,6 +20,7 @@
 - Costs to complete on sets gallery page (implement actual funcionality)
 - Buy this set sealed button
 - Bug: Sorting by release date in set gallery view, saw weird behavior, maybe interplay with table sorting
+- Refactor browse page file to be very lean, just do orchestration and then render the components
 - Not seeing localStorage initialization on load
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
 - Fix typing issues

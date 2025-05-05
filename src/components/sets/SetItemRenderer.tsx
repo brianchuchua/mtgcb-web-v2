@@ -23,7 +23,12 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, costTo
         <SetIconDisplay set={set} />
         <SetCardCount set={set} isVisible={settings.cardCountIsVisible} />
 
-        {!isSkeleton(set) && costToComplete && <CostToPurchaseSection costToComplete={costToComplete} />}
+        {!isSkeleton(set) && costToComplete && (
+          <CostToPurchaseSection 
+            costToComplete={costToComplete} 
+            isVisible={settings.costsIsVisible} 
+          />
+        )}
       </SetBoxContent>
     </SetBoxWrapper>
   );
@@ -36,6 +41,7 @@ export interface SetItemSettings {
   typeIsVisible?: boolean;
   categoryIsVisible?: boolean;
   cardCountIsVisible?: boolean;
+  costsIsVisible?: boolean;
 }
 
 interface SetItemRendererProps {
@@ -170,9 +176,12 @@ function formatSetCategoryAndType(set: Set, showCategory?: boolean, showType?: b
 
 interface CostToPurchaseSectionProps {
   costToComplete: CostToComplete;
+  isVisible?: boolean;
 }
 
-const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({ costToComplete }) => {
+const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({ costToComplete, isVisible = true }) => {
+  if (!isVisible) return null;
+  
   return (
     <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}>
       <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1, textAlign: 'center' }}>
