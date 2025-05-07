@@ -441,7 +441,17 @@ function useSetApiParams(reduxSetSearchParams: any, pagination: any) {
       offset: (pagination.currentPage - 1) * pagination.pageSize,
       sortBy: params.sortBy || 'releasedAt',
       sortDirection: params.sortDirection || ('asc' as const),
-      select: ['name', 'slug', 'code', 'setType', 'category', 'releasedAt', 'cardCount', 'isDraftable'],
+      select: [
+        'name',
+        'slug',
+        'code',
+        'setType',
+        'category',
+        'releasedAt',
+        'cardCount',
+        'isDraftable',
+        'sealedProductUrl',
+      ],
     };
   }, [reduxSetSearchParams, pagination]);
 }

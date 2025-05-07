@@ -60,7 +60,8 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
           return;
         }
 
-        const importString = formatMassImportString(validCards, count);
+        const isDraftCube = countType === 'draftcube';
+        const importString = formatMassImportString(validCards, count, isDraftCube);
         const formTarget = getFormTarget();
 
         submitToTCGPlayer(importString, formTarget);

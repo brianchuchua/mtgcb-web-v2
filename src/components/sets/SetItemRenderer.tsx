@@ -7,6 +7,7 @@ import SetIcon from '@/components/sets/SetIcon';
 import TCGPlayerMassImportButton from '@/components/tcgplayer/TCGPlayerMassImportButton';
 import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { Set } from '@/types/sets';
+import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder';
 import capitalize from '@/utils/capitalize';
 import { formatPrice } from '@/utils/formatters';
 
@@ -26,7 +27,12 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, costTo
         <SetCardCount set={set} isVisible={settings.cardCountIsVisible} />
 
         {!isSkeleton(set) && costToComplete && (
-          <CostToPurchaseSection costToComplete={costToComplete} isVisible={settings.costsIsVisible} setId={set.id} />
+          <CostToPurchaseSection
+            costToComplete={costToComplete}
+            isVisible={settings.costsIsVisible}
+            setId={set.id}
+            set={set}
+          />
         )}
       </SetBoxContent>
     </SetBoxWrapper>
@@ -65,6 +71,10 @@ const SetBoxContent = styled(CardContent)(({ theme }) => ({
   flexGrow: 1,
   paddingTop: theme.spacing(1.5),
   paddingBottom: theme.spacing(1.5),
+  // Overriding the default padding for the last child since it's considering all of these as the last child
+  '&:last-child': {
+    paddingBottom: theme.spacing(1.5),
+  },
 }));
 
 type SetNameProps = {
@@ -178,6 +188,7 @@ interface CostToPurchaseSectionProps {
   isVisible?: boolean;
   setId: string;
   includeSubsetsInSets?: boolean;
+  set?: Set;
 }
 
 const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({
@@ -185,6 +196,7 @@ const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({
   isVisible = true,
   setId,
   includeSubsetsInSets = false,
+  set,
 }) => {
   if (!isVisible) return null;
 
@@ -243,6 +255,41 @@ const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({
           countType="common"
           includeSubsetsInSets={includeSubsetsInSets}
         />
+
+        {set?.isDraftable && (
+          <CostToCompleteRow
+            label="Draft Cube"
+            cost={costToComplete.draftCube}
+            setId={setId}
+            countType="draftcube"
+            includeSubsetsInSets={includeSubsetsInSets}
+            singleButton
+          />
+        )}
+
+        {set?.sealedProductUrl && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              mt: 1.5,
+            }}
+          >
+            <Button
+              variant="outlined"
+              href={generateTCGPlayerSealedProductLink(set.sealedProductUrl, set.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+              size="small"
+              sx={{
+                textTransform: 'none',
+                py: 0.5,
+              }}
+            >
+              Buy this set sealed
+            </Button>
+          </Box>
+        )}
       </Box>
     </Box>
   );
@@ -254,6 +301,7 @@ interface CostToCompleteRowProps {
   setId: string;
   countType: CountType;
   includeSubsetsInSets?: boolean;
+  singleButton?: boolean;
 }
 
 const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({
@@ -262,6 +310,7 @@ const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({
   setId,
   countType,
   includeSubsetsInSets = false,
+  singleButton = false,
 }) => {
   return (
     <Box
@@ -296,22 +345,36 @@ const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({
           flexShrink: 0,
         }}
       >
-        <TCGPlayerMassImportButton
-          setId={setId}
-          count={1}
-          countType={countType}
-          includeSubsetsInSets={includeSubsetsInSets}
-        >
-          Buy 1x
-        </TCGPlayerMassImportButton>
-        <TCGPlayerMassImportButton
-          setId={setId}
-          count={4}
-          countType={countType}
-          includeSubsetsInSets={includeSubsetsInSets}
-        >
-          Buy 4x
-        </TCGPlayerMassImportButton>
+        {singleButton ? (
+          <TCGPlayerMassImportButton
+            setId={setId}
+            count={1}
+            countType={countType}
+            includeSubsetsInSets={includeSubsetsInSets}
+            sx={{ width: '100%', textTransform: 'none' }}
+          >
+            Buy draft cube
+          </TCGPlayerMassImportButton>
+        ) : (
+          <>
+            <TCGPlayerMassImportButton
+              setId={setId}
+              count={1}
+              countType={countType}
+              includeSubsetsInSets={includeSubsetsInSets}
+            >
+              Buy 1x
+            </TCGPlayerMassImportButton>
+            <TCGPlayerMassImportButton
+              setId={setId}
+              count={4}
+              countType={countType}
+              includeSubsetsInSets={includeSubsetsInSets}
+            >
+              Buy 4x
+            </TCGPlayerMassImportButton>
+          </>
+        )}
       </Box>
     </Box>
   );

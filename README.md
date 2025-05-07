@@ -9,21 +9,10 @@
 
 ### Next
 
-- Check feature parity for browse page with with the old site
-  - View cards form: Done
-  - View sets form: Done
-  - Cards gallery view: Done
-  - Cards table view: Done
-  - Sets gallery view: Stubbed (needs cost to complete interface and UI overhaul)
-  - Sets table view: Done
 - ISO8601 for date rendering
-- Costs to complete on sets gallery page (implement actual funcionality)
-- Buy this set sealed button
-- Draft cube button for draftable sets
-- Include subsets in sets funcitonality. How far should this go? Impact Buy buttons too?
+- Include subsets in sets functionality. How far should this go? Impact Buy buttons too?
 - Refactor all components to be top-down readable.
 - Refactor browse page file to be very lean, just do orchestration and then render the components
-- Not seeing localStorage initialization on load
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
 - Fix typing issues
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
