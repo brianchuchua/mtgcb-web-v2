@@ -11,11 +11,25 @@ import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder
 import capitalize from '@/utils/capitalize';
 import { formatPrice } from '@/utils/formatters';
 
-// TODO: Loading skeleton once I know the height of the box after implementing the cost to complete stuff
 const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, costToComplete }) => {
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  // Use useEffect to trigger the fade-in animation after component mount
+  React.useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  if (isSkeleton(set)) {
+    return (
+      <SetBoxWrapper sx={{ opacity: 0.7, height: '399px' }}>
+        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: '399px' }}></SetBoxContent>
+      </SetBoxWrapper>
+    );
+  }
+
   return (
     <SetBoxWrapper>
-      <SetBoxContent>
+      <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out' }}>
         <SetNameAndCode set={set} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} />
         <SetCategoryAndType
           set={set}
@@ -26,7 +40,7 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, costTo
         <SetIconDisplay set={set} />
         <SetCardCount set={set} isVisible={settings.cardCountIsVisible} />
 
-        {!isSkeleton(set) && costToComplete && (
+        {costToComplete && (
           <CostToPurchaseSection
             costToComplete={costToComplete}
             isVisible={settings.costsIsVisible}
@@ -64,7 +78,7 @@ const SetBoxWrapper = styled(Card)(({}) => ({
   display: 'flex',
   flexDirection: 'column',
   border: '1px solid rgba(255, 255, 255, 0.12)',
-  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+  transition: 'opacity 0.1s ease-in-out',
 }));
 
 const SetBoxContent = styled(CardContent)(({ theme }) => ({
@@ -135,20 +149,12 @@ const SetReleaseDate: React.FC<SetReleaseDateProps> = ({ set, isVisible = true }
 
   return (
     <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-      {isSkeleton(set) ? (
-        <SkeletonBar sx={{ width: '70%' }} />
-      ) : set.releasedAt ? (
-        new Date(set.releasedAt).toISOString().split('T')[0]
-      ) : (
-        ''
-      )}
+      {set.releasedAt ? new Date(set.releasedAt).toISOString().split('T')[0] : ''}
     </Typography>
   );
 };
 
 const SetIconDisplay: React.FC<{ set: Set }> = ({ set }) => {
-  if (isSkeleton(set)) return <Box sx={{ height: 40 }} />;
-
   return <Box sx={{ textAlign: 'center', m: 0.5 }}>{set.code && <SetIcon code={set.code} size="5x" fixedWidth />}</Box>;
 };
 
@@ -161,17 +167,10 @@ const SetCardCount: React.FC<SetCardCountProps> = ({ set, isVisible = true }) =>
 
   return (
     <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 0.5 }}>
-      {isSkeleton(set) ? <SkeletonBar sx={{ width: '60%' }} /> : set.cardCount ? `${set.cardCount} cards` : 'N/A'}
+      {set.cardCount ? `${set.cardCount} cards` : 'N/A'}
     </Typography>
   );
 };
-
-const SkeletonBar = styled(Box)<{ width?: string }>(({ theme, width }) => ({
-  height: 14,
-  width,
-  backgroundColor: theme.palette.action.disabledBackground,
-  borderRadius: 4,
-}));
 
 function formatSetCategoryAndType(set: Set, showCategory?: boolean, showType?: boolean) {
   const category = showCategory && set.category ? capitalize(set.category) : null;
