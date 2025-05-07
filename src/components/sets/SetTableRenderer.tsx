@@ -7,7 +7,7 @@ import React from 'react';
 import { TableColumn } from '@/components/common/VirtualizedTable';
 import SetIcon from '@/components/sets/SetIcon';
 import { Set } from '@/types/sets';
-import { formatDate } from '@/utils/dateUtils';
+import { formatISODate } from '@/utils/dateUtils';
 
 export interface SetTableRendererProps {
   displaySettings: {
@@ -139,7 +139,7 @@ export const useSetRowRenderer = (
 
     // Release Date Cell
     if (displaySettings.releaseDateIsVisible !== false) {
-      cells.push(<TableCell key="releasedAt">{formatDate(set.releasedAt)}</TableCell>);
+      cells.push(<TableCell key="releasedAt">{formatISODate(set.releasedAt)}</TableCell>);
     }
 
     // Set Type Cell

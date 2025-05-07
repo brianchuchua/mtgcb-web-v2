@@ -9,6 +9,7 @@ import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { Set } from '@/types/sets';
 import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder';
 import capitalize from '@/utils/capitalize';
+import { formatISODate } from '@/utils/dateUtils';
 import { formatPrice } from '@/utils/formatters';
 
 const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, costToComplete }) => {
@@ -149,7 +150,7 @@ const SetReleaseDate: React.FC<SetReleaseDateProps> = ({ set, isVisible = true }
 
   return (
     <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-      {set.releasedAt ? new Date(set.releasedAt).toISOString().split('T')[0] : ''}
+      {formatISODate(set.releasedAt)}
     </Typography>
   );
 };
