@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
-import { useSetPriceType } from '@/hooks/useSetPriceType';
 import CardItemRenderer from '@/components/cards/CardItemRenderer';
 import { useCardRowRenderer, useCardTableColumns } from '@/components/cards/CardTableRenderer';
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
@@ -22,6 +21,7 @@ import { useCardSetSettingGroups } from '@/hooks/useCardSetSettingGroups';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePriceType } from '@/hooks/usePriceType';
 import { useSetDisplaySettings } from '@/hooks/useSetDisplaySettings';
+import { useSetPriceType } from '@/hooks/useSetPriceType';
 import {
   selectCardSearchParams,
   selectSetSearchParams,
@@ -87,13 +87,11 @@ export default function BrowsePage() {
   });
 
   const setPriceType = useSetPriceType();
-  
+
   const { data: costToCompleteData } = useGetCostToCompleteQuery(
     { priceType: setPriceType },
     { ...queryConfig, skip: shouldSkipSetsQuery },
   );
-
-  console.log(costToCompleteData);
 
   const isApiLoading = viewContentType === 'cards' ? isCardsApiLoading : isSetsApiLoading;
   const error = viewContentType === 'cards' ? cardsError : setsError;
@@ -441,9 +439,9 @@ function useSetApiParams(reduxSetSearchParams: any, pagination: any) {
       ...params,
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
-      sortBy: params.sortBy || 'name',
+      sortBy: params.sortBy || 'releasedAt',
       sortDirection: params.sortDirection || ('asc' as const),
-      select: ['name', 'slug', 'code', 'setType', 'category', 'releasedAt', 'cardCount', 'iconUrl', 'isDraftable'],
+      select: ['name', 'slug', 'code', 'setType', 'category', 'releasedAt', 'cardCount', 'isDraftable'],
     };
   }, [reduxSetSearchParams, pagination]);
 }

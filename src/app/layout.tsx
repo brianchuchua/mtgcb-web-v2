@@ -7,6 +7,7 @@ import { ReactNode } from 'react';
 import Dashboard from '@/components/layout/Dashboard';
 import SnackbarProvider from '@/components/providers/NotistackProvider';
 import ReCaptchaProvider from '@/components/providers/ReCaptchaProvider';
+import { TCGPlayerProvider } from '@/context/TCGPlayerContext';
 import StoreProvider from '@/redux/StoreProvider';
 import darkTheme from '@/styles/darkTheme';
 
@@ -40,7 +41,9 @@ export default function RootLayout({
             <StoreProvider>
               <ReCaptchaProvider>
                 <SnackbarProvider>
-                  <Dashboard>{children}</Dashboard>
+                  <TCGPlayerProvider>
+                    <Dashboard>{children}</Dashboard>
+                  </TCGPlayerProvider>
                 </SnackbarProvider>
               </ReCaptchaProvider>
             </StoreProvider>

@@ -4,6 +4,8 @@ import { Box, Button, Card, CardContent, Typography, styled } from '@mui/materia
 import React from 'react';
 import { CostToComplete } from '@/api/sets/types';
 import SetIcon from '@/components/sets/SetIcon';
+import TCGPlayerMassImportButton from '@/components/tcgplayer/TCGPlayerMassImportButton';
+import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { Set } from '@/types/sets';
 import capitalize from '@/utils/capitalize';
 import { formatPrice } from '@/utils/formatters';
@@ -24,10 +26,7 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, costTo
         <SetCardCount set={set} isVisible={settings.cardCountIsVisible} />
 
         {!isSkeleton(set) && costToComplete && (
-          <CostToPurchaseSection 
-            costToComplete={costToComplete} 
-            isVisible={settings.costsIsVisible} 
-          />
+          <CostToPurchaseSection costToComplete={costToComplete} isVisible={settings.costsIsVisible} setId={set.id} />
         )}
       </SetBoxContent>
     </SetBoxWrapper>
@@ -177,51 +176,74 @@ function formatSetCategoryAndType(set: Set, showCategory?: boolean, showType?: b
 interface CostToPurchaseSectionProps {
   costToComplete: CostToComplete;
   isVisible?: boolean;
+  setId: string;
+  includeSubsetsInSets?: boolean;
 }
 
-const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({ costToComplete, isVisible = true }) => {
+const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({
+  costToComplete,
+  isVisible = true,
+  setId,
+  includeSubsetsInSets = false,
+}) => {
   if (!isVisible) return null;
-  
+
   return (
-    <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}>
-      <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1, textAlign: 'center' }}>
+    <Box
+      sx={{
+        mt: 2,
+        pt: 2,
+        borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1 }}>
         Costs to purchase:
       </Typography>
 
-      <CostToCompleteRow
-        label="1x of all cards"
-        cost={costToComplete.oneOfEachCard}
-        onBuy1x={() => console.log('Buy 1x of each card')}
-        onBuy4x={() => console.log('Buy 4x of each card')}
-      />
+      <Box sx={{ width: '100%', maxWidth: '350px' }}>
+        <CostToCompleteRow
+          label="All cards"
+          cost={costToComplete.oneOfEachCard}
+          setId={setId}
+          countType="all"
+          includeSubsetsInSets={includeSubsetsInSets}
+        />
 
-      <CostToCompleteRow
-        label="1x mythics"
-        cost={costToComplete.oneOfEachMythic}
-        onBuy1x={() => console.log('Buy 1x of each mythic')}
-        onBuy4x={() => console.log('Buy 4x of each mythic')}
-      />
+        <CostToCompleteRow
+          label="Mythics"
+          cost={costToComplete.oneOfEachMythic}
+          setId={setId}
+          countType="mythic"
+          includeSubsetsInSets={includeSubsetsInSets}
+        />
 
-      <CostToCompleteRow
-        label="1x rares"
-        cost={costToComplete.oneOfEachRare}
-        onBuy1x={() => console.log('Buy 1x of each rare')}
-        onBuy4x={() => console.log('Buy 4x of each rare')}
-      />
+        <CostToCompleteRow
+          label="Rares"
+          cost={costToComplete.oneOfEachRare}
+          setId={setId}
+          countType="rare"
+          includeSubsetsInSets={includeSubsetsInSets}
+        />
 
-      <CostToCompleteRow
-        label="1x uncommons"
-        cost={costToComplete.oneOfEachUncommon}
-        onBuy1x={() => console.log('Buy 1x of each uncommon')}
-        onBuy4x={() => console.log('Buy 4x of each uncommon')}
-      />
+        <CostToCompleteRow
+          label="Uncommons"
+          cost={costToComplete.oneOfEachUncommon}
+          setId={setId}
+          countType="uncommon"
+          includeSubsetsInSets={includeSubsetsInSets}
+        />
 
-      <CostToCompleteRow
-        label="1x commons"
-        cost={costToComplete.oneOfEachCommon}
-        onBuy1x={() => console.log('Buy 1x of each common')}
-        onBuy4x={() => console.log('Buy 4x of each common')}
-      />
+        <CostToCompleteRow
+          label="Commons"
+          cost={costToComplete.oneOfEachCommon}
+          setId={setId}
+          countType="common"
+          includeSubsetsInSets={includeSubsetsInSets}
+        />
+      </Box>
     </Box>
   );
 };
@@ -229,36 +251,67 @@ const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({ costToCom
 interface CostToCompleteRowProps {
   label: string;
   cost: number;
-  onBuy1x: () => void;
-  onBuy4x: () => void;
+  setId: string;
+  countType: CountType;
+  includeSubsetsInSets?: boolean;
 }
 
-const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({ label, cost, onBuy1x, onBuy4x }) => {
+const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({
+  label,
+  cost,
+  setId,
+  countType,
+  includeSubsetsInSets = false,
+}) => {
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-      <Typography variant="body2" color="textSecondary" sx={{ flexBasis: '30%', flexShrink: 0 }}>
-        {label}:
-      </Typography>
-      <Typography variant="body2" color="textSecondary" sx={{ flexBasis: '30%', textAlign: 'right', pr: 1 }}>
-        {formatPrice(cost)}
-      </Typography>
-      <Box sx={{ display: 'flex', gap: 0.5, flexBasis: '40%' }}>
-        <Button
-          variant="outlined"
-          size="small"
-          sx={{ fontSize: '0.7rem', py: 0.2, minWidth: 'auto' }}
-          onClick={onBuy1x}
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) 111px',
+        alignItems: 'center',
+        mb: 1,
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          pr: 1.5,
+        }}
+      >
+        <Typography variant="body2" color="textSecondary">
+          {label}:
+        </Typography>
+        <Typography variant="body2" color="textSecondary">
+          {formatPrice(cost)}
+        </Typography>
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: 0.5,
+          width: '111px',
+          flexShrink: 0,
+        }}
+      >
+        <TCGPlayerMassImportButton
+          setId={setId}
+          count={1}
+          countType={countType}
+          includeSubsetsInSets={includeSubsetsInSets}
         >
           Buy 1x
-        </Button>
-        <Button
-          variant="outlined"
-          size="small"
-          sx={{ fontSize: '0.7rem', py: 0.2, minWidth: 'auto' }}
-          onClick={onBuy4x}
+        </TCGPlayerMassImportButton>
+        <TCGPlayerMassImportButton
+          setId={setId}
+          count={4}
+          countType={countType}
+          includeSubsetsInSets={includeSubsetsInSets}
         >
           Buy 4x
-        </Button>
+        </TCGPlayerMassImportButton>
       </Box>
     </Box>
   );

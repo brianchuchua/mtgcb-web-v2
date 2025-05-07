@@ -16,6 +16,8 @@ export interface CardModel {
   toughnessNumeric: string | null;
   loyaltyNumeric: string | null;
   tcgplayerId: string | null;
+  tcgplayerName?: string | null;
+  tcgplayerSetCode?: string | null;
   market: string | null;
   low: string | null;
   average: string | null;

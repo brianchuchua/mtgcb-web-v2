@@ -19,7 +19,9 @@
 - ISO8601 for date rendering
 - Costs to complete on sets gallery page (implement actual funcionality)
 - Buy this set sealed button
-- Bug: Sorting by release date in set gallery view, saw weird behavior, maybe interplay with table sorting
+- Draft cube button for draftable sets
+- Include subsets in sets funcitonality. How far should this go? Impact Buy buttons too?
+- Refactor all components to be top-down readable.
 - Refactor browse page file to be very lean, just do orchestration and then render the components
 - Not seeing localStorage initialization on load
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name

@@ -122,7 +122,6 @@ const GalleryWrapper = styled(Box, {
   [theme.breakpoints.down('sm')]: {
     width: '100%',
     maxWidth: '100vw',
-    padding: theme.spacing(1),
     boxSizing: 'border-box',
     '& .virtualized-gallery-grid': {
       gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
