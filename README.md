@@ -9,8 +9,10 @@
 
 ### Next
 
-- ISO8601 for date rendering
-- Include subsets in sets functionality. How far should this go? Impact Buy buttons too?
+- Include subsets in sets functionality. How far should this go? Impact Buy buttons too? <-- Should be everywhere
+  - It looks like the API has includeSubsetsInSets defaulted to false. Not yet implemented on the back-end perhaps.
+  - Mostly working, but will need to pass it all the way to TCGPlayer.
+  - Subset data may need to be cleaned up.
 - Refactor all components to be top-down readable.
 - Refactor browse page file to be very lean, just do orchestration and then render the components
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
@@ -28,6 +30,7 @@
 - Patron request: Add card number to card name, perhaps as a setting
 - Clean up code base to be more my style -- some of the vibe coding results aren't as readable as my style
 - API Concern: compare "archenemy" set types to NOT "archenemy" set types -- there's an unaccounted for difference in the results length
+- Nuke placeholder error state and improve
 
 ## Later
 

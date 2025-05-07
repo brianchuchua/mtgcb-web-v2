@@ -7,7 +7,13 @@ import { useSetTableRenderers } from './SetTableRenderer';
 import { CostToComplete } from '@/api/sets/types';
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
-import { selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
+import {
+  selectIncludeSubsetsInSet,
+  selectSortBy,
+  selectSortOrder,
+  setSortBy,
+  setSortOrder,
+} from '@/redux/slices/browseSlice';
 import { SortByOption } from '@/types/browse';
 import { Set } from '@/types/sets';
 
@@ -52,6 +58,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   const dispatch = useDispatch();
   const currentSortBy = useSelector(selectSortBy) || 'name';
   const currentSortOrder = useSelector(selectSortOrder) || 'asc';
+  const includeSubsetsInSet = useSelector(selectIncludeSubsetsInSet);
 
   // Create skeleton loading items if needed
   const displaySets = isLoading
@@ -89,14 +96,18 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
         key="browse-set-gallery"
         items={displaySets}
         renderItem={(set, index) => {
-          // Find the cost to complete data for this set
-          const costToComplete = costToCompleteData?.sets?.find(s => s.id === set.id)?.costToComplete;
-          
-          return <SetItemRenderer 
-            set={set} 
-            settings={displaySettings.grid} 
-            costToComplete={costToComplete}
-          />;
+          const targetSet = costToCompleteData?.sets?.find((s) => s.id === set.id);
+          const costToComplete = targetSet?.costToComplete;
+          const cardCountIncludingSubsets = targetSet?.cardCountIncludingSubsets;
+          return (
+            <SetItemRenderer
+              set={set}
+              settings={displaySettings.grid}
+              costToComplete={costToComplete}
+              includeSubsetsInSets={includeSubsetsInSet}
+              cardCountIncludingSubsets={cardCountIncludingSubsets}
+            />
+          );
         }}
         isLoading={isLoading}
         columnsPerRow={4} // Default to 4 sets per row

@@ -11,6 +11,7 @@ export interface Set {
   blockId: string | null;
   parentSetId: string | null;
   cardCount: string | null;
+  cardCountIncludingSubsets: string | null;
   iconUrl: string | null;
   sealedProductUrl: string | null;
   isDraftable: boolean;

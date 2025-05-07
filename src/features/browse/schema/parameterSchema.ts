@@ -211,6 +211,12 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     urlParam: 'showSubsets',
     defaultValue: true,
   },
+  includeSubsetsInSet: {
+    type: 'boolean',
+    mode: 'sets',
+    urlParam: 'includeSubsetsInSet',
+    defaultValue: false,
+  },
   colors: {
     type: 'colorFilter',
     mode: 'cards',

@@ -20,6 +20,8 @@ const schemaToReduxKeyMap: Record<string, string> = {
   setsPage: 'currentPage',
   setsPageSize: 'pageSize',
   viewContentType: 'viewContentType',
+  showSubsets: 'showSubsets',
+  includeSubsetsInSet: 'includeSubsetsInSet',
 };
 
 export function parseUrlToState(
@@ -77,6 +79,8 @@ const reduxToSchemaKeyMap: Record<string, string | [string, string]> = {
   currentPage: ['cardsPage', 'setsPage'],
   pageSize: ['cardsPageSize', 'setsPageSize'],
   viewContentType: 'viewContentType',
+  showSubsets: 'showSubsets',
+  includeSubsetsInSet: 'includeSubsetsInSet',
 };
 
 export function convertStateToUrlParams(

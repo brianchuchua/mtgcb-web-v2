@@ -24,6 +24,7 @@ import { useSetDisplaySettings } from '@/hooks/useSetDisplaySettings';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import {
   selectCardSearchParams,
+  selectIncludeSubsetsInSet,
   selectSetSearchParams,
   selectSortBy,
   selectSortOrder,
@@ -88,8 +89,13 @@ export default function BrowsePage() {
 
   const setPriceType = useSetPriceType();
 
+  const includeSubsetsInSet = useSelector(selectIncludeSubsetsInSet);
+
   const { data: costToCompleteData } = useGetCostToCompleteQuery(
-    { priceType: setPriceType },
+    {
+      priceType: setPriceType,
+      includeSubsetsInSets: includeSubsetsInSet,
+    },
     { ...queryConfig, skip: shouldSkipSetsQuery },
   );
 

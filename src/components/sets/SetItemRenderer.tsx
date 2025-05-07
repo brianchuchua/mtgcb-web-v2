@@ -12,7 +12,13 @@ import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
 import { formatPrice } from '@/utils/formatters';
 
-const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, costToComplete }) => {
+const SetItemRenderer: React.FC<SetItemRendererProps> = ({
+  set,
+  settings,
+  costToComplete,
+  cardCountIncludingSubsets,
+  includeSubsetsInSets = false,
+}) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
   // Use useEffect to trigger the fade-in animation after component mount
@@ -39,7 +45,12 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({ set, settings, costTo
         />
         <SetReleaseDate set={set} isVisible={settings.releaseDateIsVisible} />
         <SetIconDisplay set={set} />
-        <SetCardCount set={set} isVisible={settings.cardCountIsVisible} />
+        <SetCardCount
+          set={set}
+          isVisible={settings.cardCountIsVisible}
+          includeSubsetsInSets={includeSubsetsInSets}
+          cardCountIncludingSubsets={cardCountIncludingSubsets}
+        />
 
         {costToComplete && (
           <CostToPurchaseSection
@@ -68,6 +79,8 @@ interface SetItemRendererProps {
   set: Set;
   settings: SetItemSettings;
   costToComplete?: CostToComplete;
+  cardCountIncludingSubsets?: string | null;
+  includeSubsetsInSets?: boolean;
 }
 
 function isSkeleton(value: unknown): value is { isLoadingSkeleton: boolean } {
@@ -162,13 +175,22 @@ const SetIconDisplay: React.FC<{ set: Set }> = ({ set }) => {
 type SetCardCountProps = {
   set: Set;
   isVisible?: boolean;
+  includeSubsetsInSets?: boolean;
+  cardCountIncludingSubsets?: string | null;
 };
-const SetCardCount: React.FC<SetCardCountProps> = ({ set, isVisible = true }) => {
+const SetCardCount: React.FC<SetCardCountProps> = ({
+  set,
+  cardCountIncludingSubsets,
+  isVisible = true,
+  includeSubsetsInSets = false,
+}) => {
   if (!isVisible) return null;
+
+  const cardCount = includeSubsetsInSets ? cardCountIncludingSubsets : set.cardCount;
 
   return (
     <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 0.5 }}>
-      {set.cardCount ? `${set.cardCount} cards` : 'N/A'}
+      {cardCount ? `${cardCount} cards` : 'N/A'}
     </Typography>
   );
 };

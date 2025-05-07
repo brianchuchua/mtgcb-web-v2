@@ -47,6 +47,7 @@ import {
   resetSearch,
   selectArtist,
   selectCardSearchName,
+  selectIncludeSubsetsInSet,
   selectOneResultPerCardName,
   selectOracleText,
   selectSetCode,
@@ -57,6 +58,7 @@ import {
   selectViewContentType,
   setArtist,
   setCardSearchName,
+  setIncludeSubsetsInSet,
   setOneResultPerCardName,
   setOracleText,
   setSetCode,
@@ -90,6 +92,7 @@ const BrowseSearchForm = () => {
   const reduxArtist = useSelector(selectArtist) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
   const reduxShowSubsets = useSelector(selectShowSubsets);
+  const reduxIncludeSubsetsInSet = useSelector(selectIncludeSubsetsInSet);
   const reduxSortBy = useSelector(selectSortBy) || 'releasedAt';
   const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
 
@@ -266,6 +269,10 @@ const BrowseSearchForm = () => {
     dispatch(setShowSubsets(e.target.checked));
   };
 
+  const handleIncludeSubsetsInSetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setIncludeSubsetsInSet(e.target.checked));
+  };
+
   const handleSortByChange = (e: SelectChangeEvent<SortByOption>) => {
     const newSortBy = e.target.value as SortByOption;
     dispatch(setSortBy(newSortBy));
@@ -418,12 +425,14 @@ const BrowseSearchForm = () => {
         sx={{
           borderColor: (theme) => theme.palette.grey[700],
           mt: 1.5,
-          p: 1,
+          padding: '8px 8px 8px 1px', // Toggle overflows 7px on the right
           display: 'flex',
           justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <FormControlLabel
+          sx={{ margin: 0 }}
           control={
             <Switch
               checked={reduxOneResultPerCardName}
@@ -434,7 +443,7 @@ const BrowseSearchForm = () => {
               sx={{ marginRight: '3px' }}
             />
           }
-          label="Hide duplicate printings"
+          label={<Box sx={{ display: 'flex', alignItems: 'center' }}>Hide duplicate printings</Box>}
         />
       </Paper>
       <StatSearch />
@@ -485,13 +494,14 @@ const BrowseSearchForm = () => {
         sx={{
           borderColor: (theme) => theme.palette.grey[700],
           mt: 1.5,
-          p: 1,
+          padding: '8px 8px 8px 1px', // Toggle overflows 7px on the right
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
         }}
       >
         <FormControlLabel
+          sx={{ margin: 0 }}
           control={
             <Switch
               checked={reduxShowSubsets}
@@ -510,7 +520,50 @@ const BrowseSearchForm = () => {
                   <div
                     dangerouslySetInnerHTML={{
                       __html:
-                        'Subsets are a piece of a larger set. <br /><br />Example: Tempest has a subset named Tempest Prerelease Promos.',
+                        'Subsets are a piece of a larger set. <br /><br />Example: Tempest has subsets named Tempest Prerelease Promos and The List: Tempest.',
+                    }}
+                  />
+                }
+                placement="right"
+              >
+                <InfoOutlinedIcon fontSize="small" sx={{ ml: 0.5, cursor: 'help', color: 'text.secondary' }} />
+              </Tooltip>
+            </Box>
+          }
+        />
+      </Paper>
+      <Paper
+        variant="outlined"
+        sx={{
+          borderColor: (theme) => theme.palette.grey[700],
+          mt: 1.5,
+          padding: '8px 8px 8px 1px', // Toggle overflows 7px on the right
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <FormControlLabel
+          sx={{ margin: 0 }}
+          control={
+            <Switch
+              checked={reduxIncludeSubsetsInSet}
+              onChange={handleIncludeSubsetsInSetChange}
+              name="includeSubsetsInSet"
+              color="primary"
+              size="small"
+              sx={{ marginRight: '3px' }}
+            />
+          }
+          label={
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              Track subsets with main set
+              <Tooltip
+                title={
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        'When enabled, the cost to complete will include subset cards in the calculation. <br /><br />Example: The cost to complete Tempest will include cards from Tempest Prerelease Promos and The List: Tempest.',
                     }}
                   />
                 }
