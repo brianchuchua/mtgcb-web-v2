@@ -70,7 +70,9 @@ export const browseApi = mtgcbApi.injectEndpoints({
 export const {
   useSearchCardsMutation,
   useGetCardsQuery,
+  useLazyGetCardsQuery,
   useGetSetsQuery,
+  useLazyGetSetsQuery,
   useGetSetTypesQuery,
   usePrefetch: useGetCardsPrefetch,
   endpoints,

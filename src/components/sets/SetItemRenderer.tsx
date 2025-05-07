@@ -58,6 +58,7 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({
             isVisible={settings.costsIsVisible}
             setId={set.id}
             set={set}
+            includeSubsetsInSets={includeSubsetsInSets}
           />
         )}
       </SetBoxContent>

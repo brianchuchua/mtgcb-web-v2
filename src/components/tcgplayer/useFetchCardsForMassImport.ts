@@ -1,74 +1,86 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useGetCardsQuery } from '@/api/browse/browseApi';
-import { CardApiParams, CardModel } from '@/api/browse/types';
+import { useCallback, useState } from 'react';
+import { useLazyGetCardsQuery, useLazyGetSetsQuery } from '@/api/browse/browseApi';
 
 export type CountType = 'all' | 'mythic' | 'rare' | 'uncommon' | 'common' | 'draftcube';
 
 interface UseFetchCardsForMassImportProps {
   setId: string;
   countType: CountType;
-  enabled?: boolean;
   includeSubsetsInSets?: boolean;
 }
 
 export const useFetchCardsForMassImport = ({
   setId,
   countType,
-  enabled = false,
   includeSubsetsInSets = false,
 }: UseFetchCardsForMassImportProps) => {
-  const [cardsWithTcgId, setCardsWithTcgId] = useState<CardModel[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const params: CardApiParams = {
-    select: ['name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode'],
-    limit: 500,
-    setId: {
-      OR: [setId],
-    },
-  };
+  // Use lazy query hooks from RTK Query
+  const [getSets, { isLoading: isLoadingSets, error: setsError }] = useLazyGetSetsQuery();
+  const [getCards, { isLoading: isLoadingCards, error: cardsError }] = useLazyGetCardsQuery();
 
-  const {
-    data: response,
-    isFetching,
-    isError,
-    error,
-    refetch,
-  } = useGetCardsQuery(params, {
-    skip: !enabled,
-  });
-
-  useEffect(() => {
-    if (!enabled || !response?.data?.cards) return;
-
+  const fetchCards = useCallback(async () => {
     setIsProcessing(true);
 
     try {
-      let filteredByRarity = response.data.cards;
+      let allSetIds = [setId];
 
+      // If we need to include subsets AND this is not a draft cube, fetch them first
+      // Draft cubes should only be from the main set, never include subsets
+      if (includeSubsetsInSets && countType !== 'draftcube') {
+        const setsResult = await getSets(
+          {
+            parentSetId: setId,
+            limit: 100,
+          },
+          true, // Force refetch
+        );
+
+        if (setsResult.data?.data?.sets?.length > 0) {
+          const subsetIds = setsResult.data.data.sets.map((set) => set.id);
+          allSetIds = [setId, ...subsetIds];
+        }
+      }
+
+      // Now fetch cards with all the relevant setIds
+      const cardsResult = await getCards(
+        {
+          select: ['name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode'],
+          limit: 500,
+          setId: {
+            OR: allSetIds,
+          },
+        },
+        true, // Force refetch
+      );
+
+      if (!cardsResult.data?.data?.cards) {
+        return [];
+      }
+
+      // Filter by rarity if needed
+      let filteredByRarity = cardsResult.data.data.cards;
       if (countType !== 'all' && countType !== 'draftcube') {
-        filteredByRarity = response.data.cards.filter(
+        filteredByRarity = cardsResult.data.data.cards.filter(
           (card) => card.rarity && card.rarity.toLowerCase() === countType.toLowerCase(),
         );
       }
 
-      const filteredCards = filteredByRarity.filter((card) => card.tcgplayerId);
-
-      setCardsWithTcgId(filteredCards.length > 0 ? filteredCards : []);
-    } catch (err) {
-      setCardsWithTcgId([]);
+      const filteredCards = filteredByRarity;
+      return filteredCards;
+    } catch (error) {
+      return [];
     } finally {
       setIsProcessing(false);
     }
-  }, [response, enabled, setId, countType]);
+  }, [setId, countType, includeSubsetsInSets, getSets, getCards]);
 
   return {
-    cards: cardsWithTcgId,
-    isLoading: isFetching || isProcessing,
-    isError,
-    error,
-    refetch,
+    fetchCards,
+    isLoading: isLoadingSets || isLoadingCards || isProcessing,
+    isError: !!setsError || !!cardsError,
   };
 };

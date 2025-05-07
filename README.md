@@ -10,9 +10,6 @@
 ### Next
 
 - Include subsets in sets functionality. How far should this go? Impact Buy buttons too? <-- Should be everywhere
-  - It looks like the API has includeSubsetsInSets defaulted to false. Not yet implemented on the back-end perhaps.
-  - Mostly working, but will need to pass it all the way to TCGPlayer.
-  - Subset data may need to be cleaned up.
 - Refactor all components to be top-down readable.
 - Refactor browse page file to be very lean, just do orchestration and then render the components
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
@@ -84,6 +81,7 @@
 - Add ability to save searches (even independently of collection goals, a saved searches section)
 - Allow sorting by set names alphabetically in card view
 - Table exporting to CSV
+- Subset data may need to be cleaned up.
 
 ## Known Bugs
 

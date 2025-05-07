@@ -1,7 +1,8 @@
 'use client';
 
 import { Button, ButtonProps, CircularProgress } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { useSnackbar } from 'notistack';
+import { useCallback, useState } from 'react';
 import { useFetchCardsForMassImport } from './useFetchCardsForMassImport';
 import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
@@ -25,66 +26,55 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
   ...buttonProps
 }) => {
   const { submitToTCGPlayer } = useTCGPlayer();
-  const [triggerFetch, setTriggerFetch] = useState(false);
-  const [processingForm, setProcessingForm] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const [localIsLoading, setLocalIsLoading] = useState(false);
 
   const {
-    cards,
-    isLoading: isLoadingCards,
+    fetchCards,
+    isLoading: isHookLoading,
     isError,
   } = useFetchCardsForMassImport({
     setId,
     countType,
-    enabled: triggerFetch,
     includeSubsetsInSets,
   });
 
-  const handleClick = useCallback(() => {
-    if (!isLoadingCards && !processingForm) {
-      setTriggerFetch(true);
-    }
-  }, [setId, count, countType, isLoadingCards, processingForm]);
+  const handleClick = useCallback(async () => {
+    if (isHookLoading || localIsLoading) return;
 
-  useEffect(() => {
-    if (!triggerFetch || isLoadingCards) return;
+    try {
+      setLocalIsLoading(true);
 
-    const processCards = async () => {
-      try {
-        setProcessingForm(true);
+      const cards = await fetchCards();
 
-        const validCards = cards || [];
-
-        if (validCards.length === 0) {
-          // TODO: An error toast perhaps, should be rare
-          setTriggerFetch(false);
-          return;
-        }
-
-        const isDraftCube = countType === 'draftcube';
-        const importString = formatMassImportString(validCards, count, isDraftCube);
-        const formTarget = getFormTarget();
-
-        submitToTCGPlayer(importString, formTarget);
-
-        setTriggerFetch(false);
-      } catch (error) {
-        alert('There was an error preparing your card list. Please try again.');
-        setTriggerFetch(false);
-      } finally {
-        setProcessingForm(false);
+      if (!cards || cards.length === 0) {
+        enqueueSnackbar('No matching cards found with TCGPlayer IDs.', { variant: 'error' });
+        return;
       }
-    };
 
-    if (cards && cards.length > 0) {
-      processCards();
+      const isDraftCube = countType === 'draftcube';
+      const importString = formatMassImportString(cards, count, isDraftCube);
+
+      const formTarget = getFormTarget();
+      submitToTCGPlayer(importString, formTarget);
+    } catch (error) {
+      enqueueSnackbar('There was an error preparing your card list. Please try again.', { variant: 'error' });
+    } finally {
+      setLocalIsLoading(false);
     }
-  }, [cards, count, setId, countType, triggerFetch, isLoadingCards, submitToTCGPlayer]);
+  }, [
+    setId,
+    count,
+    countType,
+    isHookLoading,
+    localIsLoading,
+    fetchCards,
+    submitToTCGPlayer,
+    includeSubsetsInSets,
+    enqueueSnackbar,
+  ]);
 
-  if (isError && triggerFetch) {
-    setTriggerFetch(false);
-  }
-
-  const isLoading = isLoadingCards || processingForm;
+  const isLoading = isHookLoading || localIsLoading;
 
   return (
     <Button
@@ -101,7 +91,7 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
       }}
       {...buttonProps}
     >
-      {children || `Buy ${count}x`}
+      {isLoading ? <CircularProgress size={16} color="inherit" /> : children || `Buy ${count}x`}
     </Button>
   );
 };
