@@ -43,11 +43,24 @@ export function useBrowseStateSync() {
 
     dispatch(setViewContentType(effectiveContentType));
 
+    // Get the cardsPage parameter explicitly to ensure it's preserved
+    const cardsPageParam = urlSearchParams.get('cardsPage');
     const cardParams = parseUrlToState(urlSearchParams, 'cards');
+    
+    // If cardsPage was in the URL, make sure it's explicitly set in the params
+    if (cardsPageParam) {
+      cardParams.currentPage = parseInt(cardsPageParam, 10);
+    }
 
     dispatch(setCardSearchParams(cardParams));
 
+    // Do the same for sets pagination
+    const setsPageParam = urlSearchParams.get('setsPage');
     const setParams = parseUrlToState(urlSearchParams, 'sets');
+    
+    if (setsPageParam) {
+      setParams.currentPage = parseInt(setsPageParam, 10);
+    }
 
     dispatch(setSetSearchParams(setParams));
 

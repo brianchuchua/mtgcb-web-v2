@@ -5,7 +5,6 @@ import { Box, Typography, styled } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { PriceType } from '@/types/pricing';
 import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
@@ -34,6 +33,7 @@ import {
   setSortOrder,
 } from '@/redux/slices/browseSlice';
 import { SortByOption } from '@/types/browse';
+import { PriceType } from '@/types/pricing';
 import { Set } from '@/types/sets';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 
@@ -559,9 +559,18 @@ function useResetPaginationOnParamsChange(
   pagination: any,
   updatePagination: (params: any) => void,
 ) {
+  const isFirstLoadRef = useRef(true);
+
   useEffect(() => {
     // Skip on first render
     if (paramsRef.current === currentParams) {
+      paramsRef.current = currentParams;
+      return;
+    }
+
+    // Don't reset pagination on the first parameter change after initial URL load
+    if (isFirstLoadRef.current) {
+      isFirstLoadRef.current = false;
       paramsRef.current = currentParams;
       return;
     }
@@ -571,6 +580,7 @@ function useResetPaginationOnParamsChange(
 
     const hasSearchParamsChanged = JSON.stringify(filteredPrevParams) !== JSON.stringify(filteredCurrentParams);
 
+    // Only reset to page 1 if the user actually changed search parameters through UI interactions
     if (hasSearchParamsChanged && viewContentType === contentType && pagination.currentPage !== 1) {
       updatePagination({ currentPage: 1 });
     }

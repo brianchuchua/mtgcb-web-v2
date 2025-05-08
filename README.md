@@ -9,13 +9,12 @@
 
 ### Next
 
-- Bug: cardsPage url param is not being respected
+- Make sure cardsPageSize can't be exploited
 - Refactor all components to be top-down readable.
 - Refactor browse page file to be very lean, just do orchestration and then render the components
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - Page title flashing when toggling between cards and sets
-- Make sure cardsPageSize can't be exploited
 - perfect browse sets table and search filter options
 - browse sets page and searches (merge to main after clean-up when finished)
 - pageSize should be a localStorage item, not in the url

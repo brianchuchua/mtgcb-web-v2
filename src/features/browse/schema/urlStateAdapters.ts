@@ -107,7 +107,9 @@ export function convertStateToUrlParams(
 
     if (!config || (config.mode !== currentMode && config.mode !== 'both')) return;
 
-    if (value === config.defaultValue) return;
+    // Always include pagination parameters regardless of if they match default values
+    const isPaginationParam = reduxKey === 'currentPage' || reduxKey === 'pageSize';
+    if (!isPaginationParam && value === config.defaultValue) return;
 
     switch (config.type) {
       case 'string':
@@ -250,8 +252,9 @@ function addNumberParameter(params: URLSearchParams, value: number, config: Para
   if (config.type !== 'number') return;
 
   if (value !== undefined && value !== null) {
-    // Only add if not default value
-    if (value !== config.defaultValue) {
+    // Handle pagination params (cardsPage, setsPage, cardsPageSize, setsPageSize) differently
+    const isPaginationParam = key === 'cardsPage' || key === 'setsPage' || key === 'cardsPageSize' || key === 'setsPageSize';
+    if (isPaginationParam || value !== config.defaultValue) {
       params.set(config.urlParam || key, value.toString());
     }
   }
