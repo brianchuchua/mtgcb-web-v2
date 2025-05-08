@@ -5,6 +5,7 @@ import { Box, Typography, styled } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { PriceType } from '@/types/pricing';
 import { getNextPageParams, useGetCardsPrefetch, useGetCardsQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
@@ -199,7 +200,7 @@ export default function BrowsePage() {
           onSetClick={handleSetClick}
           pageSize={pagination.pageSize}
           displaySettings={createSetDisplaySettings(setDisplaySettings)}
-          costToCompleteData={costToCompleteData?.data}
+          costToCompleteData={costToCompleteData?.data || undefined}
         />
       )}
 
@@ -288,7 +289,7 @@ interface CardGridViewProps {
     setIsVisible: boolean;
     priceIsVisible: boolean;
   };
-  priceType: string;
+  priceType: PriceType;
   onCardClick: (cardId: string) => void;
   isLoading: boolean;
   gallerySettings: {
@@ -331,7 +332,7 @@ interface CardTableViewProps {
   renderRowContent: any;
   isLoading: boolean;
   sortBy: string;
-  sortOrder: string;
+  sortOrder: 'asc' | 'desc';
   onSortChange: (columnId: string) => void;
   onCardClick: (cardId: string) => void;
 }

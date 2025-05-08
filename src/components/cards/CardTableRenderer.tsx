@@ -522,7 +522,7 @@ export const useCardRowRenderer = (
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()} // Prevent row click when clicking price
           >
-            <CardPrice prices={preparePriceData(card)} isLoading={false} priceType={priceType} centered={false} />
+            <CardPrice prices={preparePriceData(card) || null} isLoading={false} priceType={priceType} centered={false} />
           </PriceLink>
         </TableCell>,
       );

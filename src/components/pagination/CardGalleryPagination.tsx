@@ -25,7 +25,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import CardSettingsPanel from '@/components/cards/CardSettingsPanel';
+import CardSettingsPanel, { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { useLocalStorage } from '@/hooks/useLocalStorage';

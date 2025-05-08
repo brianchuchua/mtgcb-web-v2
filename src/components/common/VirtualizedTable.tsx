@@ -144,7 +144,7 @@ const VirtualizedTable = <T,>({
 
   // Table virtualization components
   const VirtuosoTableComponents = {
-    Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
+    Scroller: React.forwardRef<HTMLDivElement, any>((props, ref) => (
       <TableContainer
         component={Paper}
         {...props}
@@ -154,11 +154,11 @@ const VirtualizedTable = <T,>({
           maxWidth: '100%',
           overflowX: 'auto',
           overflowY: 'hidden',
-          ...props.sx,
+          ...(props.sx || {}),
         }}
       />
     )),
-    Table: (props: React.ComponentProps<typeof Table>) => (
+    Table: (props: React.ComponentProps<typeof Table> & { sx?: any }) => (
       <Table
         {...props}
         size="small"
@@ -166,7 +166,7 @@ const VirtualizedTable = <T,>({
         sx={{
           borderCollapse: 'separate',
           width: '100%',
-          ...props.sx,
+          ...(props.sx || {}),
         }}
       />
     ),

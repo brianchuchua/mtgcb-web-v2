@@ -111,25 +111,31 @@ export function convertStateToUrlParams(
 
     switch (config.type) {
       case 'string':
-        addStringParameter(params, value, config, schemaKey);
+        addStringParameter(params, String(value), config, schemaKey);
         break;
       case 'number':
-        addNumberParameter(params, value, config, schemaKey);
+        addNumberParameter(params, Number(value), config, schemaKey);
         break;
       case 'boolean':
-        addBooleanParameter(params, value, config, schemaKey);
+        addBooleanParameter(params, Boolean(value), config, schemaKey);
         break;
       case 'enum':
-        addEnumParameter(params, value, config, schemaKey);
+        addEnumParameter(params, String(value), config, schemaKey);
         break;
       case 'inclusionExclusion':
-        addInclusionExclusionParameter(params, value, config);
+        if (typeof value === 'object' && 'include' in value && 'exclude' in value) {
+          addInclusionExclusionParameter(params, value as { include: string[]; exclude: string[] }, config);
+        }
         break;
       case 'colorFilter':
-        addColorFilterParameter(params, value, config);
+        if (typeof value === 'object' && 'colors' in value) {
+          addColorFilterParameter(params, value as ColorFilter, config);
+        }
         break;
       case 'statFilter':
-        addStatFilterParameter(params, value, config);
+        if (typeof value === 'object') {
+          addStatFilterParameter(params, value as StatFilters, config);
+        }
         break;
     }
   });

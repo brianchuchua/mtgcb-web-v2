@@ -17,6 +17,14 @@ import {
 import { SortByOption } from '@/types/browse';
 import { Set } from '@/types/sets';
 
+type SkeletonSet = {
+  id: string;
+  name: string;
+  slug: string;
+  code: string;
+  isLoadingSkeleton: boolean;
+};
+
 interface SetDisplayProps {
   setItems: Set[];
   isLoading: boolean;
@@ -69,8 +77,15 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
           name: '',
           slug: '',
           code: '',
+          scryfallId: '', // Adding required Set fields for type compatibility
+          tcgplayerId: null,
+          setType: '',
+          category: '',
+          releasedAt: null,
+          cardCount: 0,
+          isDraftable: false,
           isLoadingSkeleton: true,
-        }))
+        } as unknown as Set))
     : setItems;
 
   // Get the appropriate renderers for table view
@@ -132,7 +147,12 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
       onSortChange={handleSortChange}
       emptyMessage="No sets found"
       computeItemKey={(index) => displaySets[index]?.id || index}
-      onClick={onSetClick}
+      onClick={(itemId: string) => {
+        const set = displaySets.find(s => s.id === itemId);
+        if (set && !('isLoadingSkeleton' in set)) {
+          onSetClick(set);
+        }
+      }}
       getItemId={(set) => set.id}
     />
   );
