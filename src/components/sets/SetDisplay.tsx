@@ -32,6 +32,7 @@ export interface SetDisplayProps {
       categoryIsVisible?: boolean;
       cardCountIsVisible?: boolean;
       costsIsVisible?: boolean;
+      setsPerRow?: number;
     };
     table: {
       codeIsVisible?: boolean;
@@ -124,7 +125,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
           );
         }}
         isLoading={isLoading}
-        columnsPerRow={4} // Default to 4 sets per row
+        columnsPerRow={displaySettings.grid.setsPerRow || 4}
         galleryWidth={100}
         horizontalPadding={0}
         emptyMessage="No sets found"

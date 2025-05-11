@@ -89,6 +89,8 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
     [gallerySettings],
   );
 
+  const [setsPerRow] = useLocalStorage<number>('setsPerRow', 4);
+
   // Formatted set display settings
   const formattedSetDisplaySettings = useMemo(
     () => ({
@@ -100,6 +102,7 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
         categoryIsVisible: Boolean(setDisplaySettings.categoryIsVisible),
         cardCountIsVisible: Boolean(setDisplaySettings.cardCountIsVisible),
         costsIsVisible: Boolean(setDisplaySettings.costsIsVisible),
+        setsPerRow: setsPerRow,
       },
       table: {
         codeIsVisible: Boolean(setDisplaySettings.codeIsVisible),
@@ -110,7 +113,7 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
         isDraftableIsVisible: Boolean(setDisplaySettings.isDraftableIsVisible),
       },
     }),
-    [setDisplaySettings],
+    [setDisplaySettings, setsPerRow],
   );
 
   return {

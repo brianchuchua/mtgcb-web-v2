@@ -125,6 +125,7 @@ export const SetNameAndCode: React.FC<SetNameProps> = ({ set, nameIsVisible = tr
 const SetNameTypography = styled(Typography)(({ theme }) => ({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
   textAlign: 'center',
   fontWeight: 500,
   color: theme.palette.primary.main,
