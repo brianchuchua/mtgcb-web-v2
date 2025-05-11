@@ -29,7 +29,7 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
   );
 
   // Layout settings
-  const [setsPerRow, setSetsPerRow] = useLocalStorage('setsPerRow', 4);
+  const [setsPerRow, setSetsPerRow] = useLocalStorage('setsPerRow', 0); // Default to 0 (responsive)
 
   // Shared price display setting - uses the same key as card settings
   const [displayPriceType, setDisplayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
@@ -129,11 +129,12 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
     settings: [
       {
         key: 'setsPerRow',
-        label: 'Sets per row (desktop only)',
+        label: 'Sets per row',
         value: setsPerRow,
         setValue: setSetsPerRow,
         type: 'select',
         options: [
+          { value: 0, label: 'Auto' },
           { value: 1, label: '1' },
           { value: 2, label: '2' },
           { value: 3, label: '3' },

@@ -89,7 +89,7 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
     [gallerySettings],
   );
 
-  const [setsPerRow] = useLocalStorage<number>('setsPerRow', 4);
+  const [setsPerRow] = useLocalStorage<number>('setsPerRow', 0); // Default to 0 (responsive)
 
   // Formatted set display settings
   const formattedSetDisplaySettings = useMemo(

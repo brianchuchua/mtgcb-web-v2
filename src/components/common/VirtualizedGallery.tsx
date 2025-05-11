@@ -100,7 +100,12 @@ const GalleryWrapper = styled(Box, {
   // Style for the gallery grid container
   '& .virtualized-gallery-grid': {
     display: 'grid',
-    gridTemplateColumns: `repeat(${columnsPerRow}, minmax(0, 1fr))`,
+    // If columnsPerRow is 0 (responsive), use a responsive grid based on breakpoints
+    // Otherwise, use the user's explicit choice
+    gridTemplateColumns:
+      columnsPerRow === 0
+        ? undefined // Will be overridden by the breakpoint styles below
+        : `repeat(${columnsPerRow}, minmax(0, 1fr))`,
     gap: theme.spacing(2),
     width: '100%',
   },
@@ -118,6 +123,37 @@ const GalleryWrapper = styled(Box, {
     padding: 0,
     margin: 0,
   },
+
+  // Responsive grid styles for when columnsPerRow is 0 (responsive)
+  ...(columnsPerRow === 0 && {
+    [theme.breakpoints.up('xl')]: {
+      '& .virtualized-gallery-grid': {
+        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+      },
+    },
+    [theme.breakpoints.between('lg', 'xl')]: {
+      '& .virtualized-gallery-grid': {
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+      },
+    },
+    [theme.breakpoints.between('md', 'lg')]: {
+      '& .virtualized-gallery-grid': {
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      },
+    },
+    '@media (min-width: 700px) and (max-width: 899px)': {
+      '& .virtualized-gallery-grid': {
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+      },
+    },
+    '@media (min-width: 600px) and (max-width: 699px)': {
+      '& .virtualized-gallery-grid': {
+        gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+      },
+    },
+  }),
+
+  // Small screen layout (applies to both responsive and fixed layouts)
   [theme.breakpoints.down('sm')]: {
     width: '100%',
     maxWidth: '100vw',

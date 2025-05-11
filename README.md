@@ -9,9 +9,9 @@
 
 ### Next
 
-- I'm also going to move pagesize from the url to localStorage after this code review
-- Bug: Sets per row setting doesn't do anything, should just be removed
-- Possible bug: When selecting a set to view like SLD, it may not be including the subsets in the main browse view like the legacy new site.
+- Improve setsPerRow to take initial screen size into account -- and I guess cardsPerRow too. Should also take sidenav state into account, maybe.
+- UX: "Sets per page" is offscreen at 1024x768 on desktop with the sidenav open. We should do the compact mode for the pagination there.
+- Possible bug: When selecting a set to view like SLD, it may not be including the subsets in the main browse view like the legacy new site. This may be an isSubsetGroup functionality issue.
 - Improve "Loading..." state.
 - Reconsider the ssr/'use client' stuff in browse page since I don't want to hurt SEO or social previews
 - Big picture:

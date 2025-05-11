@@ -125,7 +125,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
           );
         }}
         isLoading={isLoading}
-        columnsPerRow={displaySettings.grid.setsPerRow || 4}
+        columnsPerRow={displaySettings.grid.setsPerRow !== undefined ? displaySettings.grid.setsPerRow : 4}
         galleryWidth={100}
         horizontalPadding={0}
         emptyMessage="No sets found"
