@@ -1,9 +1,11 @@
 import debounce from 'lodash.debounce';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { convertStateToUrlParams, parseUrlToState } from '@/features/browse/schema/urlStateAdapters';
+import { useCardsPageSize } from '@/hooks/useCardsPageSize';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useSetsPageSize } from '@/hooks/useSetsPageSize';
 import {
   selectCardSearchParams,
   selectSetSearchParams,
@@ -29,11 +31,18 @@ export function useBrowseStateSync() {
   const [setView] = useLocalStorage<'grid' | 'table'>('preferredSetViewMode', 'grid');
   const viewMode = viewType === 'cards' ? cardView : setView;
 
+  const [cardsPageSize] = useCardsPageSize();
+  const [setsPageSize] = useSetsPageSize();
+
+  // Track if we need to update Redux state with localStorage values
+  const hasLoadedFromLocalStorage = useRef(false);
+
   const hasInit = useRef(false);
   const prevView = useRef(viewType);
   const lastUrlPushed = useRef<string | undefined>(undefined);
 
   // TODO: Consider using named functions for useEffects for readability
+  // TODO: Still not happy with the readability of this code
   /** ------------------------------------------------------------------
    *  Initialise Redux from the URL exactly once
    * ------------------------------------------------------------------ */
@@ -43,12 +52,33 @@ export function useBrowseStateSync() {
     const initialView = search.get('contentType') === 'sets' ? 'sets' : 'cards';
     dispatch(setViewContentType(initialView));
 
-    dispatch(setCardSearchParams({ ...parseUrlToState(search, 'cards'), currentPage: 1 }));
-    dispatch(setSetSearchParams({ ...parseUrlToState(search, 'sets'), currentPage: 1 }));
+    // Parse URL state but override pagination with localStorage values
+    const cardsUrlState = parseUrlToState(search, 'cards');
+    const setsUrlState = parseUrlToState(search, 'sets');
+
+    // Initialize with localStorage values for page size
+    dispatch(
+      setCardSearchParams({
+        ...cardsUrlState,
+        currentPage: 1,
+        pageSize: cardsPageSize,
+      }),
+    );
+
+    dispatch(
+      setSetSearchParams({
+        ...setsUrlState,
+        currentPage: 1,
+        pageSize: setsPageSize,
+      }),
+    );
 
     prevView.current = initialView;
     hasInit.current = true;
-  }, [dispatch, search]);
+
+    // Mark that we've already loaded from localStorage during initialization
+    hasLoadedFromLocalStorage.current = true;
+  }, [dispatch, search, cardsPageSize, setsPageSize]);
 
   /** ------------------------------------------------------------------
    *  When the *view type* changes, rewrite the URL
@@ -58,17 +88,12 @@ export function useBrowseStateSync() {
 
     const params = new URLSearchParams(search);
     params.set('contentType', viewType);
-    params.delete('view'); // old viewMode param no longer valid
-
-    const { pageSize = 24 } = viewType === 'cards' ? cardState : setState;
-    const sizeKey = viewType === 'cards' ? 'cardsPageSize' : 'setsPageSize';
-    pageSize !== 24 ? params.set(sizeKey, `${pageSize}`) : params.delete(sizeKey);
 
     const url = params.toString() ? `${pathname}?${params}` : pathname;
     router.replace(url, { scroll: false });
 
     prevView.current = viewType;
-  }, [viewType, search, pathname, router, cardState, setState]);
+  }, [viewType, search, pathname, router]);
 
   /** ------------------------------------------------------------------
    *  When *search state* changes, rewrite the URL (debounced)
@@ -93,7 +118,7 @@ export function useBrowseStateSync() {
   }, [viewType, cardState, setState, pathname, router]);
 
   /** ------------------------------------------------------------------
-   *  4️⃣  Reset currentPage ⇢ 1 when criteria change
+   *  4️⃣  Reset currentPage ⇢ 1 when criteria change
    * ------------------------------------------------------------------ */
   const prevCriteria = useRef({ cards: '', sets: '' });
 
@@ -114,6 +139,22 @@ export function useBrowseStateSync() {
     prevCriteria.current = { cards: cardsJSON, sets: setsJSON };
   }, [viewType, cardState, setState, dispatch]);
 
+  // Ensure Redux state reflects localStorage values
+  useEffect(() => {
+    if (!hasInit.current || hasLoadedFromLocalStorage.current) return;
+
+    // Update Redux state with localStorage values
+    const currentPageSize = viewType === 'cards' ? cardState.pageSize : setState.pageSize;
+    const localStoragePageSize = viewType === 'cards' ? cardsPageSize : setsPageSize;
+
+    // Only update if values differ
+    if (currentPageSize !== localStoragePageSize) {
+      dispatch(setPagination({ pageSize: localStoragePageSize }));
+    }
+
+    hasLoadedFromLocalStorage.current = true;
+  }, [hasInit, viewType, cardState.pageSize, setState.pageSize, cardsPageSize, setsPageSize, dispatch]);
+
   const updatePagination = useCallback(
     (update: Partial<BrowsePagination>) => dispatch(setPagination(update)),
     [dispatch],
@@ -121,10 +162,12 @@ export function useBrowseStateSync() {
 
   const activeState = viewType === 'cards' ? cardState : setState;
 
+  const pageSize = viewType === 'cards' ? cardsPageSize : setsPageSize;
+
   return {
     pagination: {
       currentPage: activeState.currentPage ?? 1,
-      pageSize: activeState.pageSize ?? 24,
+      pageSize: pageSize,
       viewMode,
     },
     updatePagination,
