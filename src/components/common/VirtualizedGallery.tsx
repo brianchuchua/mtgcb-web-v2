@@ -103,7 +103,6 @@ const GalleryWrapper = styled(Box, {
     gridTemplateColumns: `repeat(${columnsPerRow}, minmax(0, 1fr))`,
     gap: theme.spacing(2),
     width: '100%',
-    padding: theme.spacing(0.5),
   },
 
   // Additional styles for Virtuoso

@@ -91,7 +91,7 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
       }}
       {...buttonProps}
     >
-      {isLoading ? <CircularProgress size={16} color="inherit" /> : children || `Buy ${count}x`}
+      {children || `Buy ${count}x`}
     </Button>
   );
 };

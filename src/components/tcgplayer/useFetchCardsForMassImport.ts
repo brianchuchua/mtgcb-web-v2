@@ -33,13 +33,12 @@ export const useFetchCardsForMassImport = ({
       if (includeSubsetsInSets && countType !== 'draftcube') {
         const setsResult = await getSets(
           {
-            [setId]: true,
-            limit: 100,
+            parentSetId: setId,
           },
           true, // Force refetch
         );
 
-        if (setsResult.data && setsResult.data.data && setsResult.data.data.sets && setsResult.data.data.sets.length > 0) {
+        if (setsResult?.data?.data?.sets && setsResult?.data?.data?.sets?.length > 0) {
           const subsetIds = setsResult.data.data.sets.map((set) => set.id);
           allSetIds = [setId, ...subsetIds];
         }

@@ -15,13 +15,11 @@ const schemaToReduxKeyMap: Record<string, string> = {
   stats: 'stats',
   sortBy: 'sortBy',
   sortOrder: 'sortOrder',
-  cardsPage: 'currentPage',
   cardsPageSize: 'pageSize',
-  setsPage: 'currentPage',
   setsPageSize: 'pageSize',
   viewContentType: 'viewContentType',
   showSubsets: 'showSubsets',
-  includeSubsetsInSet: 'includeSubsetsInSet',
+  includeSubsetsInSets: 'includeSubsetsInSets',
 };
 
 export function parseUrlToState(
@@ -76,11 +74,10 @@ const reduxToSchemaKeyMap: Record<string, string | [string, string]> = {
   stats: 'stats',
   sortBy: 'sortBy',
   sortOrder: 'sortOrder',
-  currentPage: ['cardsPage', 'setsPage'],
   pageSize: ['cardsPageSize', 'setsPageSize'],
   viewContentType: 'viewContentType',
   showSubsets: 'showSubsets',
-  includeSubsetsInSet: 'includeSubsetsInSet',
+  includeSubsetsInSets: 'includeSubsetsInSets',
 };
 
 export function convertStateToUrlParams(
@@ -108,7 +105,7 @@ export function convertStateToUrlParams(
     if (!config || (config.mode !== currentMode && config.mode !== 'both')) return;
 
     // Always include pagination parameters regardless of if they match default values
-    const isPaginationParam = reduxKey === 'currentPage' || reduxKey === 'pageSize';
+    const isPaginationParam = reduxKey === 'pageSize';
     if (!isPaginationParam && value === config.defaultValue) return;
 
     switch (config.type) {
@@ -252,8 +249,8 @@ function addNumberParameter(params: URLSearchParams, value: number, config: Para
   if (config.type !== 'number') return;
 
   if (value !== undefined && value !== null) {
-    // Handle pagination params (cardsPage, setsPage, cardsPageSize, setsPageSize) differently
-    const isPaginationParam = key === 'cardsPage' || key === 'setsPage' || key === 'cardsPageSize' || key === 'setsPageSize';
+    // Handle pagination params (cardsPageSize, setsPageSize) differently
+    const isPaginationParam = key === 'cardsPageSize' || key === 'setsPageSize';
     if (isPaginationParam || value !== config.defaultValue) {
       params.set(config.urlParam || key, value.toString());
     }

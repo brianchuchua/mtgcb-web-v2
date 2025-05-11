@@ -86,23 +86,11 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     options: ['cards', 'sets'],
     defaultValue: 'cards',
   },
-  cardsPage: {
-    type: 'number',
-    mode: 'cards',
-    urlParam: 'cardsPage',
-    defaultValue: 1,
-  },
   cardsPageSize: {
     type: 'number',
     mode: 'cards',
     urlParam: 'cardsPageSize',
     defaultValue: 24,
-  },
-  setsPage: {
-    type: 'number',
-    mode: 'sets',
-    urlParam: 'setsPage',
-    defaultValue: 1,
   },
   setsPageSize: {
     type: 'number',
@@ -211,10 +199,10 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     urlParam: 'showSubsets',
     defaultValue: true,
   },
-  includeSubsetsInSet: {
+  includeSubsetsInSets: {
     type: 'boolean',
     mode: 'sets',
-    urlParam: 'includeSubsetsInSet',
+    urlParam: 'includeSubsetsInSets',
     defaultValue: false,
   },
   colors: {

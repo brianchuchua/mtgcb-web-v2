@@ -1,7 +1,6 @@
 'use client';
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
@@ -47,7 +46,7 @@ import {
   resetSearch,
   selectArtist,
   selectCardSearchName,
-  selectIncludeSubsetsInSet,
+  selectIncludeSubsetsInSets,
   selectOneResultPerCardName,
   selectOracleText,
   selectSetCode,
@@ -71,6 +70,7 @@ import {
 import { SortByOption, SortOrderOption } from '@/types/browse';
 import { PriceType } from '@/types/pricing';
 
+// TODO: This can use a component <> logic split like I did with the browse page
 const BrowseSearchForm = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -92,7 +92,7 @@ const BrowseSearchForm = () => {
   const reduxArtist = useSelector(selectArtist) || '';
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
   const reduxShowSubsets = useSelector(selectShowSubsets);
-  const reduxIncludeSubsetsInSet = useSelector(selectIncludeSubsetsInSet);
+  const reduxIncludeSubsetsInSet = useSelector(selectIncludeSubsetsInSets);
   const reduxSortBy = useSelector(selectSortBy) || 'releasedAt';
   const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
 
@@ -549,7 +549,7 @@ const BrowseSearchForm = () => {
             <Switch
               checked={reduxIncludeSubsetsInSet}
               onChange={handleIncludeSubsetsInSetChange}
-              name="includeSubsetsInSet"
+              name="includeSubsetsInSets"
               color="primary"
               size="small"
               sx={{ marginRight: '3px' }}

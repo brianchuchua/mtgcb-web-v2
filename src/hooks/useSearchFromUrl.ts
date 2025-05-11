@@ -22,7 +22,7 @@ export const useSearchFromUrl = () => {
   const searchParams = useSearchParams();
 
   const contentType = searchParams.get('contentType') === 'sets' ? 'sets' : 'cards';
-  const currentPage = parseInt(searchParams.get(contentType === 'cards' ? 'cardsPage' : 'setsPage') || '1', 10);
+  const currentPage = 1;
   const pageSize = parseInt(searchParams.get(contentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '24', 10);
 
   useEffect(() => {
@@ -138,7 +138,7 @@ export const useSearchFromUrl = () => {
     }
 
     searchCards(apiParams);
-  }, [searchCards, searchParams, currentPage, pageSize]);
+  }, [searchCards, searchParams, pageSize]);
 
   return { searchResult, isLoading, error };
 };

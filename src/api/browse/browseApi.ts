@@ -74,7 +74,7 @@ export const {
   useGetSetsQuery,
   useLazyGetSetsQuery,
   useGetSetTypesQuery,
-  usePrefetch: useGetCardsPrefetch,
+  usePrefetch, // TODO: Rename -- this can get cards or sets
   endpoints,
 } = browseApi;
 

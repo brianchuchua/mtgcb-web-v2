@@ -22,22 +22,22 @@ export const useSetDisplaySettings = (viewMode: 'grid' | 'table') => {
 
   if (viewMode === 'grid') {
     return {
-      nameIsVisible,
-      codeIsVisible,
-      releaseDateIsVisible,
-      typeIsVisible,
-      categoryIsVisible,
-      cardCountIsVisible,
-      costsIsVisible,
+      nameIsVisible: Boolean(nameIsVisible),
+      codeIsVisible: Boolean(codeIsVisible),
+      releaseDateIsVisible: Boolean(releaseDateIsVisible),
+      typeIsVisible: Boolean(typeIsVisible),
+      categoryIsVisible: Boolean(categoryIsVisible),
+      cardCountIsVisible: Boolean(cardCountIsVisible),
+      costsIsVisible: Boolean(costsIsVisible),
     };
   }
 
   return {
-    codeIsVisible: tableCodeIsVisible,
-    cardCountIsVisible: tableCardCountIsVisible,
-    releaseDateIsVisible: tableReleaseDateIsVisible,
-    typeIsVisible: tableTypeIsVisible,
-    categoryIsVisible: tableCategoryIsVisible,
-    isDraftableIsVisible: tableIsDraftableIsVisible,
+    codeIsVisible: Boolean(tableCodeIsVisible),
+    cardCountIsVisible: Boolean(tableCardCountIsVisible),
+    releaseDateIsVisible: Boolean(tableReleaseDateIsVisible),
+    typeIsVisible: Boolean(tableTypeIsVisible),
+    categoryIsVisible: Boolean(tableCategoryIsVisible),
+    isDraftableIsVisible: Boolean(tableIsDraftableIsVisible),
   };
 };

@@ -1,6 +1,6 @@
 import debounce from 'lodash.debounce';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { convertStateToUrlParams, parseUrlToState } from '@/features/browse/schema/urlStateAdapters';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -19,139 +19,113 @@ export function useBrowseStateSync() {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
-  const urlSearchParams = useSearchParams();
+  const search = useSearchParams();
 
-  const viewContentType = useSelector(selectViewContentType);
-  const cardSearchParams = useSelector(selectCardSearchParams);
-  const setSearchParams = useSelector(selectSetSearchParams);
+  const viewType = useSelector(selectViewContentType);
+  const cardState = useSelector(selectCardSearchParams);
+  const setState = useSelector(selectSetSearchParams);
 
-  const [preferredCardViewMode] = useLocalStorage<'grid' | 'table'>('preferredCardViewMode', 'grid');
-  const [preferredSetViewMode] = useLocalStorage<'grid' | 'table'>('preferredSetViewMode', 'grid');
+  const [cardView] = useLocalStorage<'grid' | 'table'>('preferredCardViewMode', 'grid');
+  const [setView] = useLocalStorage<'grid' | 'table'>('preferredSetViewMode', 'grid');
+  const viewMode = viewType === 'cards' ? cardView : setView;
 
-  const currentViewMode = viewContentType === 'cards' ? preferredCardViewMode : preferredSetViewMode;
+  const hasInit = useRef(false);
+  const prevView = useRef(viewType);
+  const lastUrlPushed = useRef<string | undefined>(undefined);
 
-  const prevUrlRef = useRef<string | null>(null);
-
-  const initializedRef = useRef(false);
-  const prevContentTypeRef = useRef(viewContentType);
-
+  // TODO: Consider using named functions for useEffects for readability
+  /** ------------------------------------------------------------------
+   *  Initialise Redux from the URL exactly once
+   * ------------------------------------------------------------------ */
   useEffect(() => {
-    if (initializedRef.current) return;
+    if (hasInit.current) return;
 
-    const contentTypeParam = urlSearchParams.get('contentType');
-    const effectiveContentType = contentTypeParam === 'sets' ? 'sets' : 'cards';
+    const initialView = search.get('contentType') === 'sets' ? 'sets' : 'cards';
+    dispatch(setViewContentType(initialView));
 
-    dispatch(setViewContentType(effectiveContentType));
+    dispatch(setCardSearchParams({ ...parseUrlToState(search, 'cards'), currentPage: 1 }));
+    dispatch(setSetSearchParams({ ...parseUrlToState(search, 'sets'), currentPage: 1 }));
 
-    // Get the cardsPage parameter explicitly to ensure it's preserved
-    const cardsPageParam = urlSearchParams.get('cardsPage');
-    const cardParams = parseUrlToState(urlSearchParams, 'cards');
-    
-    // If cardsPage was in the URL, make sure it's explicitly set in the params
-    if (cardsPageParam) {
-      cardParams.currentPage = parseInt(cardsPageParam, 10);
-    }
+    prevView.current = initialView;
+    hasInit.current = true;
+  }, [dispatch, search]);
 
-    dispatch(setCardSearchParams(cardParams));
-
-    // Do the same for sets pagination
-    const setsPageParam = urlSearchParams.get('setsPage');
-    const setParams = parseUrlToState(urlSearchParams, 'sets');
-    
-    if (setsPageParam) {
-      setParams.currentPage = parseInt(setsPageParam, 10);
-    }
-
-    dispatch(setSetSearchParams(setParams));
-
-    initializedRef.current = true;
-    prevContentTypeRef.current = effectiveContentType;
-  }, [urlSearchParams, dispatch]);
-
+  /** ------------------------------------------------------------------
+   *  When the *view type* changes, rewrite the URL
+   * ------------------------------------------------------------------ */
   useEffect(() => {
-    if (!initializedRef.current) return;
+    if (!hasInit.current || viewType === prevView.current) return;
 
-    if (viewContentType !== prevContentTypeRef.current) {
-      const params = new URLSearchParams(urlSearchParams.toString());
+    const params = new URLSearchParams(search);
+    params.set('contentType', viewType);
+    params.delete('view'); // old viewMode param no longer valid
 
-      params.set('contentType', viewContentType);
+    const { pageSize = 24 } = viewType === 'cards' ? cardState : setState;
+    const sizeKey = viewType === 'cards' ? 'cardsPageSize' : 'setsPageSize';
+    pageSize !== 24 ? params.set(sizeKey, `${pageSize}`) : params.delete(sizeKey);
 
-      params.delete('view');
+    const url = params.toString() ? `${pathname}?${params}` : pathname;
+    router.replace(url, { scroll: false });
 
-      const newContentTypeParam = viewContentType === 'cards' ? 'cardsPage' : 'setsPage';
-      const newContentTypeSizeParam = viewContentType === 'cards' ? 'cardsPageSize' : 'setsPageSize';
+    prevView.current = viewType;
+  }, [viewType, search, pathname, router, cardState, setState]);
 
-      const currentParams = viewContentType === 'cards' ? cardSearchParams : setSearchParams;
-      const currentPage = currentParams.currentPage || 1;
-      const pageSize = currentParams.pageSize || 24;
-
-      if (currentPage > 1) {
-        params.set(newContentTypeParam, currentPage.toString());
-      } else {
-        params.delete(newContentTypeParam);
-      }
-
-      if (pageSize !== 24) {
-        params.set(newContentTypeSizeParam, pageSize.toString());
-      } else {
-        params.delete(newContentTypeSizeParam);
-      }
-
-      const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
-      router.replace(newUrl, { scroll: false });
-
-      prevContentTypeRef.current = viewContentType;
-    }
-  }, [viewContentType, urlSearchParams, pathname, router, cardSearchParams, setSearchParams]);
-
+  /** ------------------------------------------------------------------
+   *  When *search state* changes, rewrite the URL (debounced)
+   * ------------------------------------------------------------------ */
   useEffect(() => {
-    if (!initializedRef.current) return;
+    if (!hasInit.current || viewType !== prevView.current) return;
 
-    if (viewContentType !== prevContentTypeRef.current) return;
+    const sync = debounce(() => {
+      const state = viewType === 'cards' ? cardState : setState;
+      const params = convertStateToUrlParams(state, viewType);
+      params.set('contentType', viewType);
 
-    const updateUrl = debounce(() => {
-      const searchState = viewContentType === 'cards' ? cardSearchParams : setSearchParams;
-
-      const newParams = convertStateToUrlParams(searchState, viewContentType);
-
-      newParams.set('contentType', viewContentType);
-
-      const newSearch = newParams.toString();
-      const currentSearch = urlSearchParams.toString();
-
-      if (newSearch !== currentSearch) {
-        const newUrl = newSearch ? `${pathname}?${newSearch}` : pathname;
-
-        if (newUrl !== prevUrlRef.current) {
-          prevUrlRef.current = newUrl;
-          router.replace(newUrl, { scroll: false });
-        }
+      const url = params.toString() ? `${pathname}?${params}` : pathname;
+      if (url !== lastUrlPushed.current) {
+        lastUrlPushed.current = url;
+        router.replace(url, { scroll: false });
       }
     }, 100);
 
-    updateUrl();
-    return () => updateUrl.cancel();
-  }, [viewContentType, cardSearchParams, setSearchParams, router, pathname, urlSearchParams]);
+    sync();
+    return sync.cancel;
+  }, [viewType, cardState, setState, pathname, router]);
+
+  /** ------------------------------------------------------------------
+   *  4️⃣  Reset currentPage ⇢ 1 when criteria change
+   * ------------------------------------------------------------------ */
+  const prevCriteria = useRef({ cards: '', sets: '' });
+
+  useEffect(() => {
+    if (!hasInit.current) return;
+
+    const stripMeta = ({ currentPage, pageSize, viewMode, ...rest }: any) => rest;
+
+    const cardsJSON = JSON.stringify(stripMeta(cardState));
+    const setsJSON = JSON.stringify(stripMeta(setState));
+
+    if (viewType === 'cards' && cardsJSON !== prevCriteria.current.cards) {
+      dispatch(setPagination({ currentPage: 1 }));
+    } else if (viewType === 'sets' && setsJSON !== prevCriteria.current.sets) {
+      dispatch(setPagination({ currentPage: 1 }));
+    }
+
+    prevCriteria.current = { cards: cardsJSON, sets: setsJSON };
+  }, [viewType, cardState, setState, dispatch]);
 
   const updatePagination = useCallback(
-    (paginationUpdates: Partial<BrowsePagination>) => {
-      dispatch(
-        setPagination({
-          currentPage: paginationUpdates.currentPage,
-          pageSize: paginationUpdates.pageSize,
-        }),
-      );
-    },
+    (update: Partial<BrowsePagination>) => dispatch(setPagination(update)),
     [dispatch],
   );
 
-  const currentSearchParams = viewContentType === 'cards' ? cardSearchParams : setSearchParams;
+  const activeState = viewType === 'cards' ? cardState : setState;
 
   return {
     pagination: {
-      currentPage: currentSearchParams.currentPage || 1,
-      pageSize: currentSearchParams.pageSize || 24,
-      viewMode: currentViewMode,
+      currentPage: activeState.currentPage ?? 1,
+      pageSize: activeState.pageSize ?? 24,
+      viewMode,
     },
     updatePagination,
   };

@@ -72,7 +72,7 @@ export interface BrowseSearchParams {
   setTypes?: SetTypeFilter;
   oneResultPerCardName?: boolean;
   showSubsets?: boolean;
-  includeSubsetsInSet?: boolean;
+  includeSubsetsInSets?: boolean;
   sortBy?: SortByOption;
   sortOrder?: SortOrderOption;
   currentPage?: number;

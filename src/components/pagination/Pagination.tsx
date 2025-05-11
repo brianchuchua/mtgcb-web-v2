@@ -28,10 +28,10 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CardSettingsPanel, { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 // TODO: Assess memoization needs here given I'm using React Compiler
-export interface CardGalleryPaginationProps {
+// TODO: This component is a mess and not my coding style. Refactor it.
+export interface PaginationProps {
   currentPage: number;
   totalPages: number;
   pageSize: number;
@@ -41,7 +41,7 @@ export interface CardGalleryPaginationProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onViewModeChange: (viewMode: 'grid' | 'table') => void;
-  isOnBottom?: boolean;
+  position?: string;
   isLoading?: boolean;
   isInitialLoading?: boolean;
   contentType?: 'cards' | 'sets'; // Add content type prop
@@ -352,7 +352,7 @@ NavigationControls.displayName = 'NavigationControls';
 /**
  * A responsive pagination component for the card gallery
  */
-export const CardGalleryPagination = React.memo(
+export const Pagination = React.memo(
   ({
     currentPage,
     totalPages,
@@ -363,12 +363,12 @@ export const CardGalleryPagination = React.memo(
     onPageChange,
     onPageSizeChange,
     onViewModeChange,
-    isOnBottom = false,
+    position = 'top',
     isLoading = false,
     isInitialLoading = false,
     contentType = 'cards',
     settingGroups,
-  }: CardGalleryPaginationProps) => {
+  }: PaginationProps) => {
     const theme = useTheme();
 
     const [localCurrentPage, setLocalCurrentPage] = useState(currentPage);
@@ -405,6 +405,8 @@ export const CardGalleryPagination = React.memo(
     const scrollToTop = useCallback(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, []);
+
+    const isOnBottom = position === 'bottom';
 
     return (
       <PaginationContainer>
@@ -560,15 +562,13 @@ export const CardGalleryPagination = React.memo(
 );
 
 // For better debugging in React DevTools
-CardGalleryPagination.displayName = 'CardGalleryPagination';
+Pagination.displayName = 'Pagination';
 
 // Styled components
 const PaginationContainer = styled(Box)(({ theme }) => ({
   margin: `${theme.spacing(2)} auto`,
-  width: '95%',
-  padding: theme.spacing(0, 1),
 
-  // Match CardGallery's responsive widths
+  // Match 's responsive widths
   [theme.breakpoints.down('md')]: {
     width: '98%',
   },
@@ -738,4 +738,4 @@ const RightControlsGroup = styled(Box)(({ theme }) => ({
   alignItems: 'flex-end', // Right align contents
 }));
 
-export default CardGalleryPagination;
+export default Pagination;

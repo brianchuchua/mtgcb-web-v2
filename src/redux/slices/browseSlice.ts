@@ -33,7 +33,7 @@ const initialState: {
     pageSize: 24,
     viewMode: 'grid',
     showSubsets: true,
-    includeSubsetsInSet: false,
+    includeSubsetsInSets: false,
   },
   viewContentType: 'cards', // Default to cards view
 };
@@ -151,7 +151,7 @@ export const browseSlice = createSlice({
       state.setsSearchParams.showSubsets = action.payload;
     },
     setIncludeSubsetsInSet: (state, action: PayloadAction<boolean>) => {
-      state.setsSearchParams.includeSubsetsInSet = action.payload;
+      state.setsSearchParams.includeSubsetsInSets = action.payload;
     },
     setOneResultPerCardName: (state, action: PayloadAction<boolean>) => {
       // Cards-specific field
@@ -417,8 +417,7 @@ export const selectSetPageSize = (state: RootState) => state.browse.setsSearchPa
 export const selectSetCategories = (state: RootState) => state.browse.setsSearchParams.setCategories;
 export const selectSetTypes = (state: RootState) => state.browse.setsSearchParams.setTypes;
 export const selectShowSubsets = (state: RootState) => state.browse.setsSearchParams.showSubsets !== false;
-export const selectIncludeSubsetsInSet = (state: RootState) =>
-  !!state.browse.setsSearchParams.includeSubsetsInSet;
+export const selectIncludeSubsetsInSets = (state: RootState) => !!state.browse.setsSearchParams.includeSubsetsInSets;
 
 // Content type selector
 export const selectViewContentType = (state: RootState) => state.browse.viewContentType;

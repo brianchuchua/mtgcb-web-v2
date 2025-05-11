@@ -1,4 +1,4 @@
-import CardGalleryPagination from './CardGalleryPagination';
-import ContentTypeToggle from './ContentTypeToggle';
+import ContentTypeToggle from '@/components/pagination/ContentTypeToggle';
+import Pagination from '@/components/pagination/Pagination';
 
-export { CardGalleryPagination, ContentTypeToggle };
+export { Pagination, ContentTypeToggle };
