@@ -8,7 +8,7 @@ import { CostToComplete } from '@/api/sets/types';
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import {
-  selectIncludeSubsetsInSet,
+  selectIncludeSubsetsInSets,
   selectSortBy,
   selectSortOrder,
   setSortBy,
@@ -17,15 +17,7 @@ import {
 import { SortByOption } from '@/types/browse';
 import { Set } from '@/types/sets';
 
-type SkeletonSet = {
-  id: string;
-  name: string;
-  slug: string;
-  code: string;
-  isLoadingSkeleton: boolean;
-};
-
-interface SetDisplayProps {
+export interface SetDisplayProps {
   setItems: Set[];
   isLoading: boolean;
   viewMode: 'grid' | 'table';
@@ -39,6 +31,7 @@ interface SetDisplayProps {
       typeIsVisible?: boolean;
       categoryIsVisible?: boolean;
       cardCountIsVisible?: boolean;
+      costsIsVisible?: boolean;
     };
     table: {
       codeIsVisible?: boolean;
@@ -49,9 +42,12 @@ interface SetDisplayProps {
       isDraftableIsVisible?: boolean;
     };
   };
-  costToCompleteData?: {
-    sets: Array<Set & { costToComplete?: CostToComplete }>;
-  };
+  costToCompleteData?:
+    | Record<string, CostToComplete>
+    | {
+        sets: Array<Set & { costToComplete?: CostToComplete }>;
+      };
+  includeSubsetsInSets?: boolean;
 }
 
 const SetDisplay: React.FC<SetDisplayProps> = ({
@@ -66,26 +62,29 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   const dispatch = useDispatch();
   const currentSortBy = useSelector(selectSortBy) || 'name';
   const currentSortOrder = useSelector(selectSortOrder) || 'asc';
-  const includeSubsetsInSet = useSelector(selectIncludeSubsetsInSet);
+  const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
   // Create skeleton loading items if needed
   const displaySets = isLoading
     ? Array(pageSize)
         .fill(0)
-        .map((_, index) => ({
-          id: `skeleton-${index}`,
-          name: '',
-          slug: '',
-          code: '',
-          scryfallId: '', // Adding required Set fields for type compatibility
-          tcgplayerId: null,
-          setType: '',
-          category: '',
-          releasedAt: null,
-          cardCount: 0,
-          isDraftable: false,
-          isLoadingSkeleton: true,
-        } as unknown as Set))
+        .map(
+          (_, index) =>
+            ({
+              id: `skeleton-${index}`,
+              name: '',
+              slug: '',
+              code: '',
+              scryfallId: '', // Adding required Set fields for type compatibility
+              tcgplayerId: null,
+              setType: '',
+              category: '',
+              releasedAt: null,
+              cardCount: 0,
+              isDraftable: false,
+              isLoadingSkeleton: true,
+            }) as unknown as Set,
+        )
     : setItems;
 
   // Get the appropriate renderers for table view
@@ -119,14 +118,14 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
               set={set}
               settings={displaySettings.grid}
               costToComplete={costToComplete}
-              includeSubsetsInSets={includeSubsetsInSet}
+              includeSubsetsInSets={includeSubsetsInSets}
               cardCountIncludingSubsets={cardCountIncludingSubsets}
             />
           );
         }}
         isLoading={isLoading}
         columnsPerRow={4} // Default to 4 sets per row
-        galleryWidth={95}
+        galleryWidth={100}
         horizontalPadding={0}
         emptyMessage="No sets found"
         computeItemKey={(index) => displaySets[index]?.id || index}
@@ -148,7 +147,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
       emptyMessage="No sets found"
       computeItemKey={(index) => displaySets[index]?.id || index}
       onClick={(itemId: string) => {
-        const set = displaySets.find(s => s.id === itemId);
+        const set = displaySets.find((s) => s.id === itemId);
         if (set && !('isLoadingSkeleton' in set)) {
           onSetClick(set);
         }
