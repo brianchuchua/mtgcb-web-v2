@@ -13,6 +13,7 @@ import {
   Button,
   FormControl,
   IconButton,
+  InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -390,6 +391,7 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
 }) => {
   const cardSettingGroups = customSettingGroups || useCardSettingGroups(viewMode);
   const isSmallScreen = useMediaQuery('(max-width:899px)');
+  const labelId = `${contentType}-per-page-label`;
 
   const handlePageSizeChange = useCallback(
     (event: SelectChangeEvent<number>) => {
@@ -401,21 +403,14 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
 
   return (
     <PageSizeSelector>
-      {!isSmallScreen ? (
-        <Typography variant="body1" color="text.secondary" sx={{ mr: 1, whiteSpace: 'nowrap' }}>
-          {contentType === 'cards' ? 'Cards' : 'Sets'} per page:
-        </Typography>
-      ) : (
-        <Typography variant="body2" color="text.secondary" sx={{ mr: 1, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
-          {contentType === 'cards' ? 'Cards' : 'Sets'}:
-        </Typography>
-      )}
-      <FormControl size="small" variant="outlined">
+      <FormControl size="small" variant="outlined" sx={{ minWidth: 70 }}>
+        <InputLabel id={labelId}>{contentType === 'cards' ? 'Cards' : 'Sets'}</InputLabel>
         <Select
+          labelId={labelId}
           value={pageSize}
           onChange={handlePageSizeChange}
           renderValue={(value) => <>{value}</>}
-          inputProps={{ 'aria-label': 'Cards per page' }}
+          label={`${contentType === 'cards' ? 'Cards' : 'Sets'}`}
           sx={{ minWidth: 70 }}
         >
           {pageSizeOptions.map((option) => (
@@ -628,10 +623,6 @@ const ViewModeToggleGroup = styled(Stack)(({ theme }) => ({
 const ItemRangeInfo = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
-  minWidth: '200px',
-  '& .MuiTypography-root': {
-    whiteSpace: 'nowrap',
-  },
 }));
 
 const PageSizeSelector = styled(Box)(({ theme }) => ({

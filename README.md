@@ -2,14 +2,8 @@
 
 ## Now
 
-### Can't Reproduce, Keeping An Eye On
-
-- iPad mini, 1024 x 768, pagination controls are too wide if sidenav is open, maybe needs to be responsive to that
-- vertical mode, also borked -- goes too wide, general issues with both, will look at next
-
 ### Next
 
-- UX: "Sets per page" and "Cards per page" is offscreen at 1024x768 on desktop with the sidenav open. We should do the compact mode for the pagination there. Problem really starts at 1150px.
 - Possible bug: When selecting a set to view like SLD, it may not be including the subsets in the main browse view like the legacy new site. This may be an isSubsetGroup functionality issue.
 - Improve "Loading..." state.
 - Reconsider the ssr/'use client' stuff in browse page since I don't want to hurt SEO or social previews
