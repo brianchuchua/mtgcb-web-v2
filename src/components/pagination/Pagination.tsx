@@ -13,7 +13,6 @@ import {
   Button,
   FormControl,
   IconButton,
-  InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -29,8 +28,168 @@ import CardSettingsPanel, { CardSettingGroup } from '@/components/cards/CardSett
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 
-// TODO: Assess memoization needs here given I'm using React Compiler
-// TODO: This component is a mess and not my coding style. Refactor it.
+const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  totalPages,
+  pageSize,
+  pageSizeOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 25, 50, 100, 200, 300, 400, 500],
+  totalItems,
+  viewMode,
+  onPageChange,
+  onPageSizeChange,
+  onViewModeChange,
+  position = 'top',
+  isLoading = false,
+  isInitialLoading = false,
+  contentType = 'cards',
+  settingGroups,
+}) => {
+  const theme = useTheme();
+  const [localCurrentPage, setLocalCurrentPage] = useState(currentPage);
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isOnBottom = position === 'bottom';
+
+  useEffect(() => {
+    setLocalCurrentPage(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setLocalCurrentPage(page);
+      onPageChange(page);
+    },
+    [onPageChange],
+  );
+
+  const startItem = useMemo(
+    () => Math.min(totalItems, (localCurrentPage - 1) * pageSize + 1),
+    [totalItems, localCurrentPage, pageSize],
+  );
+
+  const endItem = useMemo(
+    () => Math.min(totalItems, localCurrentPage * pageSize),
+    [totalItems, localCurrentPage, pageSize],
+  );
+
+  const scrollToTop = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  return (
+    <PaginationContainer>
+      {!isOnBottom ? (
+        <TopPaginationLayout>
+          <LeftSection>
+            {!isSmallScreen && !isLoading && (
+              <ItemRangeDisplay
+                startItem={startItem}
+                endItem={endItem}
+                totalItems={totalItems}
+                contentType={contentType}
+                isSmallScreen={false}
+              />
+            )}
+          </LeftSection>
+
+          <CenterSection>
+            {!isSmallScreen && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                <NavigationControls
+                  currentPage={localCurrentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  isLoading={isLoading}
+                  isSmallScreen={isSmallScreen}
+                />
+              </Box>
+            )}
+
+            {isSmallScreen && (
+              <MobileControlsRow>
+                <PaginationControlsGroup>
+                  <NavigationControls
+                    currentPage={localCurrentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    isLoading={isLoading}
+                    isSmallScreen={isSmallScreen}
+                  />
+
+                  <MobileInfoRow>
+                    {!isLoading && (
+                      <ItemRangeDisplay
+                        startItem={startItem}
+                        endItem={endItem}
+                        totalItems={totalItems}
+                        contentType={contentType}
+                        isSmallScreen={true}
+                      />
+                    )}
+                  </MobileInfoRow>
+                </PaginationControlsGroup>
+
+                <RightControlsGroup>
+                  <PageSizeControl
+                    pageSize={pageSize}
+                    onPageSizeChange={onPageSizeChange}
+                    pageSizeOptions={pageSizeOptions}
+                    viewMode={viewMode}
+                    contentType={contentType}
+                    customSettingGroups={settingGroups}
+                  />
+
+                  <Box sx={{ mt: 1 }}>
+                    <ViewModeToggle
+                      viewMode={viewMode}
+                      onViewModeChange={onViewModeChange}
+                      isSmallScreen={isSmallScreen}
+                      isLoading={isLoading}
+                      isInitialLoading={isInitialLoading}
+                    />
+                  </Box>
+                </RightControlsGroup>
+              </MobileControlsRow>
+            )}
+
+            {!isSmallScreen && (
+              <ViewToggleContainer>
+                <ViewModeToggle
+                  viewMode={viewMode}
+                  onViewModeChange={onViewModeChange}
+                  isSmallScreen={isSmallScreen}
+                  isLoading={isLoading}
+                  isInitialLoading={isInitialLoading}
+                />
+              </ViewToggleContainer>
+            )}
+
+            {isSmallScreen && <MobileSearchButton />}
+          </CenterSection>
+
+          <RightSection
+            sx={{
+              display: isSmallScreen ? 'none' : 'flex',
+            }}
+          >
+            <PageSizeControl
+              pageSize={pageSize}
+              onPageSizeChange={onPageSizeChange}
+              pageSizeOptions={pageSizeOptions}
+              viewMode={viewMode}
+              contentType={contentType}
+              customSettingGroups={settingGroups}
+            />
+          </RightSection>
+        </TopPaginationLayout>
+      ) : (
+        <BottomPaginationLayout>
+          <BackToTopButton onClick={scrollToTop} isLoading={isLoading} />
+        </BottomPaginationLayout>
+      )}
+    </PaginationContainer>
+  );
+};
+
 export interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -44,11 +203,80 @@ export interface PaginationProps {
   position?: string;
   isLoading?: boolean;
   isInitialLoading?: boolean;
-  contentType?: 'cards' | 'sets'; // Add content type prop
-  settingGroups?: CardSettingGroup[]; // Add setting groups prop
+  contentType?: 'cards' | 'sets';
+  settingGroups?: CardSettingGroup[];
 }
 
-const MobileSearchButton = React.memo(() => {
+Pagination.displayName = 'Pagination';
+
+interface ItemRangeDisplayProps {
+  startItem: number;
+  endItem: number;
+  totalItems: number;
+  contentType: 'cards' | 'sets';
+  isSmallScreen: boolean;
+}
+
+const ItemRangeDisplay: React.FC<ItemRangeDisplayProps> = ({
+  startItem,
+  endItem,
+  totalItems,
+  contentType,
+  isSmallScreen,
+}) => {
+  if (isSmallScreen) {
+    return (
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          fontSize: '0.825rem',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
+      </Typography>
+    );
+  }
+
+  return (
+    <ItemRangeInfo>
+      <Typography variant="body1" color="text.secondary">
+        Showing {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
+      </Typography>
+    </ItemRangeInfo>
+  );
+};
+
+interface BackToTopButtonProps {
+  onClick: () => void;
+  isLoading: boolean;
+}
+
+const BackToTopButton: React.FC<BackToTopButtonProps> = ({ onClick, isLoading }) => {
+  return (
+    <BackToTopButtonContainer>
+      <Button
+        variant="outlined"
+        size="medium"
+        onClick={onClick}
+        color="primary"
+        startIcon={<KeyboardArrowUpIcon />}
+        sx={{
+          px: 3,
+          py: 0.75,
+          borderRadius: 4,
+          opacity: isLoading ? 0 : 1,
+          transition: 'opacity 2.0s',
+        }}
+      >
+        Back to top
+      </Button>
+    </BackToTopButtonContainer>
+  );
+};
+
+const MobileSearchButton: React.FC = () => {
   const { setMobileOpen } = useDashboardContext();
 
   const handleSearchClick = useCallback(() => {
@@ -69,506 +297,256 @@ const MobileSearchButton = React.memo(() => {
       </Button>
     </SearchButtonContainer>
   );
-});
+};
 
 MobileSearchButton.displayName = 'MobileSearchButton';
 
-const ViewModeToggle = React.memo(
-  ({
-    viewMode,
-    onViewModeChange,
-    isSmallScreen,
-    isLoading = false,
-    isInitialLoading = false,
-  }: {
-    viewMode: 'grid' | 'table';
-    onViewModeChange: (mode: 'grid' | 'table') => void;
-    isSmallScreen: boolean;
-    isLoading?: boolean;
-    isInitialLoading?: boolean;
-  }) => {
-    const [isFullyLoaded, setIsFullyLoaded] = useState(!isInitialLoading);
+interface ViewModeToggleProps {
+  viewMode: 'grid' | 'table';
+  onViewModeChange: (mode: 'grid' | 'table') => void;
+  isSmallScreen: boolean;
+  isLoading?: boolean;
+  isInitialLoading?: boolean;
+}
 
-    useEffect(() => {
-      if (isInitialLoading) {
-        setIsFullyLoaded(false);
-      } else if (!isFullyLoaded) {
-        const timer = setTimeout(() => setIsFullyLoaded(true), 16);
-        return () => clearTimeout(timer);
-      }
-    }, [isInitialLoading, isFullyLoaded]);
+const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
+  viewMode,
+  onViewModeChange,
+  isSmallScreen,
+  isLoading = false,
+  isInitialLoading = false,
+}) => {
+  const [isFullyLoaded, setIsFullyLoaded] = useState(!isInitialLoading);
 
-    const handleGridClick = useCallback(() => {
-      onViewModeChange('grid');
-    }, [onViewModeChange]);
+  useEffect(() => {
+    if (isInitialLoading) {
+      setIsFullyLoaded(false);
+    } else if (!isFullyLoaded) {
+      const timer = setTimeout(() => setIsFullyLoaded(true), 16);
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialLoading, isFullyLoaded]);
 
-    const handleTableClick = useCallback(() => {
-      onViewModeChange('table');
-    }, [onViewModeChange]);
+  const handleGridClick = useCallback(() => {
+    onViewModeChange('grid');
+  }, [onViewModeChange]);
 
-    return (
-      <ViewModeToggleGroup>
-        <Tooltip title="Grid view">
-          <span>
-            <Button
-              variant={!isFullyLoaded ? 'outlined' : viewMode === 'grid' ? 'contained' : 'outlined'}
-              size="small"
-              onClick={handleGridClick}
-              startIcon={<GridViewIcon />}
-              disabled={!isFullyLoaded}
-              sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
-            >
-              Grid
-            </Button>
-          </span>
-        </Tooltip>
-        <Tooltip title="Table view">
-          <span>
-            <Button
-              variant={!isFullyLoaded ? 'outlined' : viewMode === 'table' ? 'contained' : 'outlined'}
-              size="small"
-              onClick={handleTableClick}
-              startIcon={<TableRowsIcon />}
-              disabled={!isFullyLoaded}
-              sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
-            >
-              Table
-            </Button>
-          </span>
-        </Tooltip>
-      </ViewModeToggleGroup>
-    );
-  },
-);
+  const handleTableClick = useCallback(() => {
+    onViewModeChange('table');
+  }, [onViewModeChange]);
+
+  return (
+    <ViewModeToggleGroup>
+      <Tooltip title="Grid view">
+        <span>
+          <Button
+            variant={!isFullyLoaded ? 'outlined' : viewMode === 'grid' ? 'contained' : 'outlined'}
+            size="small"
+            onClick={handleGridClick}
+            startIcon={<GridViewIcon />}
+            disabled={!isFullyLoaded}
+            sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
+          >
+            Grid
+          </Button>
+        </span>
+      </Tooltip>
+      <Tooltip title="Table view">
+        <span>
+          <Button
+            variant={!isFullyLoaded ? 'outlined' : viewMode === 'table' ? 'contained' : 'outlined'}
+            size="small"
+            onClick={handleTableClick}
+            startIcon={<TableRowsIcon />}
+            disabled={!isFullyLoaded}
+            sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
+          >
+            Table
+          </Button>
+        </span>
+      </Tooltip>
+    </ViewModeToggleGroup>
+  );
+};
 
 ViewModeToggle.displayName = 'ViewModeToggle';
 
-const PageSizeControl = React.memo(
-  ({
-    pageSize,
-    onPageSizeChange,
-    pageSizeOptions,
-    viewMode,
-    contentType = 'cards',
-    customSettingGroups,
-  }: {
-    pageSize: number;
-    onPageSizeChange: (size: number) => void;
-    pageSizeOptions: number[];
-    viewMode: 'grid' | 'table';
-    contentType?: 'cards' | 'sets';
-    customSettingGroups?: CardSettingGroup[];
-  }) => {
-    // If custom setting groups are provided, use them, otherwise use the hook
-    const cardSettingGroups = customSettingGroups || useCardSettingGroups(viewMode);
+interface PageSizeControlProps {
+  pageSize: number;
+  onPageSizeChange: (size: number) => void;
+  pageSizeOptions: number[];
+  viewMode: 'grid' | 'table';
+  contentType?: 'cards' | 'sets';
+  customSettingGroups?: CardSettingGroup[];
+}
 
-    // Memoize handler
-    const handlePageSizeChange = useCallback(
-      (event: SelectChangeEvent<number>) => {
-        const newPageSize = Number(event.target.value);
-        onPageSizeChange(newPageSize);
-      },
-      [onPageSizeChange],
-    );
+const PageSizeControl: React.FC<PageSizeControlProps> = ({
+  pageSize,
+  onPageSizeChange,
+  pageSizeOptions,
+  viewMode,
+  contentType = 'cards',
+  customSettingGroups,
+}) => {
+  const cardSettingGroups = customSettingGroups || useCardSettingGroups(viewMode);
+  const isSmallScreen = useMediaQuery('(max-width:899px)');
 
-    const isSmallScreen = useMediaQuery('(max-width:899px)');
+  const handlePageSizeChange = useCallback(
+    (event: SelectChangeEvent<number>) => {
+      const newPageSize = Number(event.target.value);
+      onPageSizeChange(newPageSize);
+    },
+    [onPageSizeChange],
+  );
 
-    return (
-      <PageSizeSelector>
-        {!isSmallScreen ? (
-          // Desktop view
-          <Typography variant="body1" color="text.secondary" sx={{ mr: 1, whiteSpace: 'nowrap' }}>
-            {contentType === 'cards' ? 'Cards' : 'Sets'} per page:
-          </Typography>
-        ) : null}
-        {isSmallScreen && (
-          <Typography variant="body2" color="text.secondary" sx={{ mr: 1, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
-            {contentType === 'cards' ? 'Cards' : 'Sets'}:
-          </Typography>
-        )}
-        <FormControl size="small" variant="outlined">
-          <Select
-            value={pageSize}
-            onChange={handlePageSizeChange}
-            renderValue={(value) => <>{value}</>}
-            inputProps={{ 'aria-label': 'Cards per page' }}
-            sx={{ minWidth: 70 }}
-          >
-            {pageSizeOptions.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+  return (
+    <PageSizeSelector>
+      {!isSmallScreen ? (
+        <Typography variant="body1" color="text.secondary" sx={{ mr: 1, whiteSpace: 'nowrap' }}>
+          {contentType === 'cards' ? 'Cards' : 'Sets'} per page:
+        </Typography>
+      ) : (
+        <Typography variant="body2" color="text.secondary" sx={{ mr: 1, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+          {contentType === 'cards' ? 'Cards' : 'Sets'}:
+        </Typography>
+      )}
+      <FormControl size="small" variant="outlined">
+        <Select
+          value={pageSize}
+          onChange={handlePageSizeChange}
+          renderValue={(value) => <>{value}</>}
+          inputProps={{ 'aria-label': 'Cards per page' }}
+          sx={{ minWidth: 70 }}
+        >
+          {pageSizeOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
-        {/* Card/Set display settings with margin left */}
-        <Box sx={{ ml: 1 }}>
-          <CardSettingsPanel
-            settingGroups={cardSettingGroups}
-            panelId={`${contentType}${viewMode === 'grid' ? 'Gallery' : 'Table'}Settings`}
-            contentType={contentType}
-          />
-        </Box>
-      </PageSizeSelector>
-    );
-  },
-);
+      <Box sx={{ ml: 1 }}>
+        <CardSettingsPanel
+          settingGroups={cardSettingGroups}
+          panelId={`${contentType}${viewMode === 'grid' ? 'Gallery' : 'Table'}Settings`}
+          contentType={contentType}
+        />
+      </Box>
+    </PageSizeSelector>
+  );
+};
 
-const NavigationControls = React.memo(
-  ({
-    currentPage,
-    totalPages,
-    onPageChange,
-    isLoading,
-    isSmallScreen,
-  }: {
-    currentPage: number;
-    totalPages: number;
-    onPageChange: (page: number) => void;
-    isLoading: boolean;
-    isSmallScreen: boolean;
-  }) => {
-    const page = parseInt(String(currentPage), 10) || 1;
+interface NavigationControlsProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  isLoading: boolean;
+  isSmallScreen: boolean;
+}
 
-    // Memoize handlers
-    const handleFirstPage = useCallback(() => {
-      onPageChange(1);
-    }, [onPageChange]);
+const NavigationControls: React.FC<NavigationControlsProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+  isLoading,
+  isSmallScreen,
+}) => {
+  const page = parseInt(String(currentPage), 10) || 1;
 
-    const handlePreviousPage = useCallback(() => {
-      onPageChange(page - 1);
-    }, [onPageChange, page]);
+  const handleFirstPage = useCallback(() => {
+    onPageChange(1);
+  }, [onPageChange]);
 
-    const handleNextPage = useCallback(() => {
-      onPageChange(page + 1);
-    }, [onPageChange, page]);
+  const handlePreviousPage = useCallback(() => {
+    onPageChange(page - 1);
+  }, [onPageChange, page]);
 
-    const handleLastPage = useCallback(() => {
-      onPageChange(totalPages);
-    }, [onPageChange, totalPages]);
+  const handleNextPage = useCallback(() => {
+    onPageChange(page + 1);
+  }, [onPageChange, page]);
 
-    // Memoize page numbers array
-    const pageNumbers = useMemo(() => {
-      const visiblePages = isSmallScreen ? 3 : 5;
-      const result: number[] = [];
+  const handleLastPage = useCallback(() => {
+    onPageChange(totalPages);
+  }, [onPageChange, totalPages]);
 
-      // Calculate start and end page numbers
-      let startPage = Math.max(1, page - Math.floor(visiblePages / 2));
-      let endPage = Math.min(totalPages, startPage + visiblePages - 1);
+  const pageNumbers = useMemo(() => {
+    const visiblePages = isSmallScreen ? 3 : 5;
+    const result: number[] = [];
 
-      // Adjust if we're near the end
-      if (endPage - startPage + 1 < visiblePages) {
-        startPage = Math.max(1, endPage - visiblePages + 1);
-      }
+    let startPage = Math.max(1, page - Math.floor(visiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + visiblePages - 1);
 
-      // Generate the array of page numbers
-      for (let i = startPage; i <= endPage; i++) {
-        result.push(i);
-      }
+    if (endPage - startPage + 1 < visiblePages) {
+      startPage = Math.max(1, endPage - visiblePages + 1);
+    }
 
-      return result;
-    }, [page, totalPages, isSmallScreen]);
+    for (let i = startPage; i <= endPage; i++) {
+      result.push(i);
+    }
 
-    return (
-      <PaginationControls>
-        {/* First page button */}
-        <Tooltip title="First page">
-          <span>
-            <IconButton onClick={handleFirstPage} disabled={page === 1 || isLoading} size="small" color="primary">
-              <FirstPageIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
+    return result;
+  }, [page, totalPages, isSmallScreen]);
 
-        {/* Previous page button */}
-        <Tooltip title="Previous page">
-          <span>
-            <IconButton onClick={handlePreviousPage} disabled={page === 1 || isLoading} size="small" color="primary">
-              <ChevronLeftIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
+  return (
+    <PaginationControls>
+      <Tooltip title="First page">
+        <span>
+          <IconButton onClick={handleFirstPage} disabled={page === 1 || isLoading} size="small" color="primary">
+            <FirstPageIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
 
-        {/* Page number buttons - only show on non-mobile */}
-        {!isSmallScreen && (
-          <PageNumbers>
-            {pageNumbers.map((pageNum) => {
-              // Use a separate callback for each page button to avoid closure issues
-              const handlePageClick = () => {
-                onPageChange(pageNum);
-              };
+      <Tooltip title="Previous page">
+        <span>
+          <IconButton onClick={handlePreviousPage} disabled={page === 1 || isLoading} size="small" color="primary">
+            <ChevronLeftIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
 
-              return (
-                <PageButton
-                  key={pageNum}
-                  variant={page === pageNum ? 'contained' : 'outlined'}
-                  onClick={handlePageClick}
-                  disabled={isLoading}
-                  size="small"
-                  current={page === pageNum}
-                >
-                  {pageNum}
-                </PageButton>
-              );
-            })}
-          </PageNumbers>
-        )}
-
-        {/* Next page button */}
-        <Tooltip title="Next page">
-          <span>
-            <IconButton
-              onClick={handleNextPage}
-              disabled={page === totalPages || isLoading}
+      {!isSmallScreen && (
+        <PageNumbers>
+          {pageNumbers.map((pageNum) => (
+            <PageButton
+              key={pageNum}
+              variant={page === pageNum ? 'contained' : 'outlined'}
+              onClick={() => onPageChange(pageNum)}
+              disabled={isLoading}
               size="small"
-              color="primary"
+              current={page === pageNum}
             >
-              <ChevronRightIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
+              {pageNum}
+            </PageButton>
+          ))}
+        </PageNumbers>
+      )}
 
-        {/* Last page button */}
-        <Tooltip title="Last page">
-          <span>
-            <IconButton
-              onClick={handleLastPage}
-              disabled={page === totalPages || isLoading}
-              size="small"
-              color="primary"
-            >
-              <LastPageIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-      </PaginationControls>
-    );
-  },
-);
+      <Tooltip title="Next page">
+        <span>
+          <IconButton onClick={handleNextPage} disabled={page === totalPages || isLoading} size="small" color="primary">
+            <ChevronRightIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+
+      <Tooltip title="Last page">
+        <span>
+          <IconButton onClick={handleLastPage} disabled={page === totalPages || isLoading} size="small" color="primary">
+            <LastPageIcon />
+          </IconButton>
+        </span>
+      </Tooltip>
+    </PaginationControls>
+  );
+};
 
 NavigationControls.displayName = 'NavigationControls';
 
-/**
- * A responsive pagination component for the card gallery
- */
-export const Pagination = React.memo(
-  ({
-    currentPage,
-    totalPages,
-    pageSize,
-    pageSizeOptions = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 16, 20, 24, 25, 50, 100, 200, 300, 400, 500],
-    totalItems,
-    viewMode,
-    onPageChange,
-    onPageSizeChange,
-    onViewModeChange,
-    position = 'top',
-    isLoading = false,
-    isInitialLoading = false,
-    contentType = 'cards',
-    settingGroups,
-  }: PaginationProps) => {
-    const theme = useTheme();
-
-    const [localCurrentPage, setLocalCurrentPage] = useState(currentPage);
-
-    useEffect(() => {
-      setLocalCurrentPage(currentPage);
-    }, [currentPage]);
-
-    const handlePageChange = useCallback(
-      (page: number) => {
-        setLocalCurrentPage(page);
-
-        onPageChange(page);
-      },
-      [onPageChange],
-    );
-
-    // Use md breakpoint (900px) to determine small screens
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
-    const isMediumScreen = useMediaQuery('(min-width:900px) and (max-width:1199px)');
-
-    // Calculate the range of items being shown
-    const startItem = useMemo(
-      () => Math.min(totalItems, (localCurrentPage - 1) * pageSize + 1),
-      [totalItems, localCurrentPage, pageSize],
-    );
-
-    const endItem = useMemo(
-      () => Math.min(totalItems, localCurrentPage * pageSize),
-      [totalItems, localCurrentPage, pageSize],
-    );
-
-    // Handle scrolling back to top - memoize to prevent recreation
-    const scrollToTop = useCallback(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, []);
-
-    const isOnBottom = position === 'bottom';
-
-    return (
-      <PaginationContainer>
-        {!isOnBottom ? (
-          // Top pagination with all controls in a single row on desktop
-          <TopPaginationLayout>
-            {/* Left section with item range info - only visible on desktop */}
-            <LeftSection>
-              {/* Item range display - only show on desktop */}
-              {!isSmallScreen && !isLoading && (
-                <ItemRangeInfo>
-                  <Typography variant="body1" color="text.secondary">
-                    Showing {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
-                  </Typography>
-                </ItemRangeInfo>
-              )}
-            </LeftSection>
-
-            {/* Center section with pagination controls */}
-            <CenterSection>
-              {/* Desktop layout - centered navigation controls */}
-              {!isSmallScreen && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                  <NavigationControls
-                    currentPage={localCurrentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                    isLoading={isLoading}
-                    isSmallScreen={isSmallScreen}
-                  />
-                </Box>
-              )}
-
-              {/* Mobile layout (for xs and sm) with two columns in one row */}
-              {isSmallScreen && (
-                <MobileControlsRow>
-                  {/* Left column: pagination controls and compact info */}
-                  <PaginationControlsGroup>
-                    {/* Pagination controls */}
-                    <NavigationControls
-                      currentPage={localCurrentPage}
-                      totalPages={totalPages}
-                      onPageChange={handlePageChange}
-                      isLoading={isLoading}
-                      isSmallScreen={isSmallScreen}
-                    />
-
-                    {/* Mobile layout - range and page info in one row */}
-                    <MobileInfoRow>
-                      {/* Compact item range - "1-24 of 100" */}
-                      {!isLoading && (
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            fontSize: '0.825rem',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
-                        </Typography>
-                      )}
-                    </MobileInfoRow>
-                  </PaginationControlsGroup>
-
-                  {/* Right column: page size selector and view mode toggles */}
-                  <RightControlsGroup>
-                    {/* Cards dropdown right-aligned */}
-                    <PageSizeControl
-                      pageSize={pageSize}
-                      onPageSizeChange={onPageSizeChange}
-                      pageSizeOptions={pageSizeOptions}
-                      viewMode={viewMode}
-                      contentType={contentType}
-                      customSettingGroups={settingGroups}
-                    />
-
-                    {/* View mode toggles aligned with dropdown */}
-                    <Box sx={{ mt: 1 }}>
-                      <ViewModeToggle
-                        viewMode={viewMode}
-                        onViewModeChange={onViewModeChange}
-                        isSmallScreen={isSmallScreen}
-                        isLoading={isLoading}
-                        isInitialLoading={isInitialLoading}
-                      />
-                    </Box>
-                  </RightControlsGroup>
-                </MobileControlsRow>
-              )}
-
-              {/* Desktop view: View mode toggles centered */}
-              {!isSmallScreen && (
-                <ViewToggleContainer>
-                  <ViewModeToggle
-                    viewMode={viewMode}
-                    onViewModeChange={onViewModeChange}
-                    isSmallScreen={isSmallScreen}
-                    isLoading={isLoading}
-                    isInitialLoading={isInitialLoading}
-                  />
-                </ViewToggleContainer>
-              )}
-
-              {/* Mobile search button - visible on all small screens */}
-              {isSmallScreen && <MobileSearchButton />}
-            </CenterSection>
-
-            {/* Right section with page size selector - only visible on desktop screens */}
-            <RightSection
-              sx={{
-                // Only display on desktop screens (≥ 900px)
-                display: isSmallScreen ? 'none' : 'flex',
-              }}
-            >
-              <PageSizeControl
-                pageSize={pageSize}
-                onPageSizeChange={onPageSizeChange}
-                pageSizeOptions={pageSizeOptions}
-                viewMode={viewMode}
-                contentType={contentType}
-                customSettingGroups={settingGroups}
-              />
-            </RightSection>
-          </TopPaginationLayout>
-        ) : (
-          // Bottom pagination - simpler layout
-          <BottomPaginationLayout>
-            {/* Only Back to top button with icon */}
-            <BackToTopButton>
-              <Button
-                variant="outlined"
-                size="medium"
-                onClick={scrollToTop}
-                color="primary"
-                startIcon={<KeyboardArrowUpIcon />}
-                sx={{
-                  px: 3,
-                  py: 0.75,
-                  borderRadius: 4,
-                  opacity: isLoading ? 0 : 1,
-                  transition: 'opacity 2.0s',
-                }}
-              >
-                Back to top
-              </Button>
-            </BackToTopButton>
-          </BottomPaginationLayout>
-        )}
-      </PaginationContainer>
-    );
-  },
-);
-
-// For better debugging in React DevTools
-Pagination.displayName = 'Pagination';
-
-// Styled components
 const PaginationContainer = styled(Box)(({ theme }) => ({
   margin: `${theme.spacing(2)} auto`,
 
-  // Match 's responsive widths
   [theme.breakpoints.down('md')]: {
     width: '98%',
   },
@@ -584,7 +562,6 @@ const TopPaginationLayout = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   width: '100%',
-  // Change layout on all small screens (below md)
   [theme.breakpoints.down('md')]: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -608,13 +585,12 @@ const SearchButtonContainer = styled(Box)(({ theme }) => ({
 const LeftSection = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  width: '240px', // Fixed width to prevent shifting
+  width: '240px',
   justifyContent: 'flex-start',
-  // Change layout on all small screens (below md)
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 1,
-    justifyContent: 'center', // Center on mobile
+    justifyContent: 'center',
   },
 }));
 
@@ -624,7 +600,6 @@ const CenterSection = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   flex: 1,
-  // Change layout on all small screens (below md)
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 3,
@@ -636,12 +611,11 @@ const RightSection = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
-  width: '240px', // Fixed width to match LeftSection
-  // Change layout on all small screens (below md)
+  width: '240px',
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 2,
-    justifyContent: 'center', // Center on mobile
+    justifyContent: 'center',
   },
 }));
 
@@ -654,16 +628,15 @@ const ViewModeToggleGroup = styled(Stack)(({ theme }) => ({
 const ItemRangeInfo = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
-  minWidth: '200px', // Ensure text has enough space to not wrap
+  minWidth: '200px',
   '& .MuiTypography-root': {
-    whiteSpace: 'nowrap', // Prevent text wrapping
+    whiteSpace: 'nowrap',
   },
 }));
 
 const PageSizeSelector = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  // Change layout on all small screens (below md)
   [theme.breakpoints.down('md')]: {
     justifyContent: 'center',
   },
@@ -683,14 +656,13 @@ const PageNumbers = styled(Box)(({ theme }) => ({
 
 const PageButton = styled(Button, {
   shouldForwardProp: (prop) => prop !== 'current',
-})<{ current?: boolean }>(({ theme, current }) => ({
+})<{ current?: boolean }>(({ theme }) => ({
   minWidth: '36px',
   width: '36px',
   height: '36px',
   padding: 0,
 }));
 
-// New component for displaying both range and page information in one row on mobile
 const MobileInfoRow = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
@@ -699,7 +671,7 @@ const MobileInfoRow = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(0.5),
 }));
 
-const BackToTopButton = styled(Box)(({ theme }) => ({
+const BackToTopButtonContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   margin: theme.spacing(3, 0, 1, 0),
@@ -709,7 +681,6 @@ const ViewToggleContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   marginTop: theme.spacing(1.5),
-  // Reduce spacing on smaller screens
   [theme.breakpoints.down('md')]: {
     marginTop: theme.spacing(1),
   },
@@ -724,18 +695,16 @@ const MobileControlsRow = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
 }));
 
-// For grouping pagination controls and page indicator vertically
-const PaginationControlsGroup = styled(Box)(({ theme }) => ({
+const PaginationControlsGroup = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
 }));
 
-// For grouping page size and view mode toggles vertically
-const RightControlsGroup = styled(Box)(({ theme }) => ({
+const RightControlsGroup = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'flex-end', // Right align contents
+  alignItems: 'flex-end',
 }));
 
 export default Pagination;
