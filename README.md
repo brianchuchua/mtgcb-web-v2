@@ -5,12 +5,15 @@
 ### Next
 
 - Big picture:
-  - Implement set pages
+  - Add support for subsets in a set page
+  - Test these changes on mobile
+  - Make a stubbed card page with fixed slugs that are just window dressing
   - Implement collection view mode
   - Implement collection edit page
   - Implement collection edit mode
   - Look around for feature parity
   - Add cool new stuff
+- Move the card number to the card name
 - Refactor all components to be top-down readable.
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)

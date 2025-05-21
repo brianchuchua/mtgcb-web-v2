@@ -4,6 +4,7 @@ export interface CardModel {
   scryfallId: string;
   setId: string;
   setName: string;
+  setSlug: string;
   rarity: string;
   rarityNumeric: number;
   collectorNumber: string;
@@ -79,6 +80,7 @@ export interface CardApiParams {
 
 export interface SetApiParams {
   name?: string;
+  slug?: string;
   code?: string;
   setType?:
     | string
@@ -92,7 +94,7 @@ export interface SetApiParams {
         OR?: string[];
         NOT?: string[];
       };
-  parentSetId?: null;
+  parentSetId?: string | null;
   releasedAt?: string;
   isDraftable?: boolean;
   limit?: number;

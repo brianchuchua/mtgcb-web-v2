@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Button, Card, CardContent, Typography, styled } from '@mui/material';
+import Link from 'next/link';
 import React from 'react';
 import { CostToComplete } from '@/api/sets/types';
 import SetIcon from '@/components/sets/SetIcon';
@@ -115,10 +116,21 @@ type SetNameProps = {
 export const SetNameAndCode: React.FC<SetNameProps> = ({ set, nameIsVisible = true, codeIsVisible = true }) => {
   if (!nameIsVisible) return null;
 
+  const displayName = codeIsVisible ? `${set.name} (${set.code})` : set.name;
+
   return (
-    <SetNameTypography variant="body1" fontWeight="500">
-      {codeIsVisible ? `${set.name} (${set.code})` : set.name}
-    </SetNameTypography>
+    <Link
+      href={`/browse/sets/${set.slug}`}
+      style={{
+        textDecoration: 'none',
+        color: 'inherit',
+      }}
+      onClick={(e) => e.stopPropagation()} // Prevent card click when clicking set name
+    >
+      <SetNameTypography variant="body1" fontWeight="500">
+        {displayName}
+      </SetNameTypography>
+    </Link>
   );
 };
 
@@ -129,6 +141,10 @@ const SetNameTypography = styled(Typography)(({ theme }) => ({
   textAlign: 'center',
   fontWeight: 500,
   color: theme.palette.primary.main,
+  cursor: 'pointer',
+  '&:hover': {
+    textDecoration: 'underline',
+  },
 }));
 
 type SetCategoryAndTypeProps = {

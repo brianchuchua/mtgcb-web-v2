@@ -206,6 +206,7 @@ export interface PaginationProps {
   isInitialLoading?: boolean;
   contentType?: 'cards' | 'sets';
   settingGroups?: CardSettingGroup[];
+  hideContentTypeToggle?: boolean;
 }
 
 Pagination.displayName = 'Pagination';

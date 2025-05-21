@@ -10,6 +10,8 @@ This document outlines the preferred code style for the MTG CB Web project.
 - Use descriptive function and variable names
 - Apply single-responsibility principle to component design
 - Create small, focused functions that do one thing well
+- Almost never write commments; prefer self-documenting code
+- Always use the '@/' alias for imports
 
 ## React Components
 
@@ -118,3 +120,7 @@ MTG Collection Builder (MTG CB) is a web application for Magic: The Gathering ca
 1. Make it work
 2. Make it fast
 3. Make it clean
+
+### Type Checking
+
+- `yarn type-check`

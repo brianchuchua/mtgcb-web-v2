@@ -29,6 +29,7 @@ import {
 import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
 import { useSnackbar } from 'notistack';
+import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
@@ -80,6 +81,10 @@ const BrowseSearchForm = () => {
   const initialCheckDone = useRef(false);
   const prevDisplayPriceType = useRef<string | null>(null);
   const initialRenderComplete = useRef(false);
+  
+  // Check if we're on a set-specific page
+  const pathname = usePathname();
+  const isSetPage = pathname?.includes('/browse/sets/') || false;
 
   // Get content type from Redux store
   const contentType = useSelector(selectViewContentType);
@@ -419,7 +424,8 @@ const BrowseSearchForm = () => {
       <TypeSelector />
       <ColorSelector />
       <RaritySelector />
-      <SetSelector />
+      {/* Hide SetSelector on set pages since we're already filtering by a specific set */}
+      {!isSetPage && <SetSelector />}
       <Paper
         variant="outlined"
         sx={{
@@ -663,30 +669,32 @@ const BrowseSearchForm = () => {
             </Box>
           )}
 
-          {/* Content Type Toggle */}
-          <Box sx={{ mb: 1 }}>
-            {/* Simple button-based toggle for maximum reliability */}
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant={contentType === 'cards' ? 'contained' : 'outlined'}
-                size="small"
-                onClick={handleCardsClick}
-                startIcon={<StyleIcon sx={{ transform: 'scaleY(-1)' }} />}
-                fullWidth
-              >
-                View Cards
-              </Button>
-              <Button
-                variant={contentType === 'sets' ? 'contained' : 'outlined'}
-                size="small"
-                onClick={handleSetsClick}
-                startIcon={<ViewModuleIcon />}
-                fullWidth
-              >
-                View Sets
-              </Button>
-            </Stack>
-          </Box>
+          {/* Content Type Toggle - Hide on set pages since we're always viewing cards */}
+          {!isSetPage && (
+            <Box sx={{ mb: 1 }}>
+              {/* Simple button-based toggle for maximum reliability */}
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant={contentType === 'cards' ? 'contained' : 'outlined'}
+                  size="small"
+                  onClick={handleCardsClick}
+                  startIcon={<StyleIcon sx={{ transform: 'scaleY(-1)' }} />}
+                  fullWidth
+                >
+                  View Cards
+                </Button>
+                <Button
+                  variant={contentType === 'sets' ? 'contained' : 'outlined'}
+                  size="small"
+                  onClick={handleSetsClick}
+                  startIcon={<ViewModuleIcon />}
+                  fullWidth
+                >
+                  View Sets
+                </Button>
+              </Stack>
+            </Box>
+          )}
 
           <Divider />
 

@@ -63,7 +63,7 @@ export const SearchForms = () => {
       <Divider />
       <Collapse in={isExpanded} timeout="auto">
         <Box>
-          {pathname === '/browse' && <BrowseSearchForm />}
+          {pathname?.startsWith('/browse') && <BrowseSearchForm />}
           {/* Add other forms here later, like:
             pathname.startsWith('/collections') && <CollectionSearchForm />
             etc...

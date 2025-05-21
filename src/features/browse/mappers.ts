@@ -11,6 +11,7 @@ export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
     name: card.name,
     setId: card.setId,
     setName: card.setName,
+    setSlug: card.setSlug,
     collectorNumber: card.collectorNumber,
     mtgcbCollectorNumber: card.mtgcbCollectorNumber || undefined,
     rarity: card.rarity,

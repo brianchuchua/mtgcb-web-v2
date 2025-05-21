@@ -3,6 +3,7 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, TableCell, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import Link from 'next/link';
 import React, { useEffect, useRef } from 'react';
 import { CardItemProps } from './CardItem';
 import CardPrice from './CardPrice';
@@ -448,7 +449,26 @@ export const useCardRowRenderer = (
 
     // Set Cell
     if (displaySettings.setIsVisible) {
-      cells.push(<TableCell key="set">{card.setName || 'Unknown'}</TableCell>);
+      cells.push(
+        <TableCell key="set">
+          {card.setName && card.setSlug ? (
+            <Link
+              href={`/browse/sets/${card.setSlug}`}
+              style={{
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+              onClick={(e) => e.stopPropagation()} // Prevent row click when clicking set link
+            >
+              <SetLinkText>
+                {card.setName}
+              </SetLinkText>
+            </Link>
+          ) : (
+            card.setName || 'Unknown'
+          )}
+        </TableCell>
+      );
     }
 
     // Rarity Cell
@@ -744,4 +764,12 @@ const PriceLink = styled('a')(({ theme }) => ({
   '&:hover': {
     textDecoration: 'underline',
   },
+}));
+
+const SetLinkText = styled(Typography)(({ theme }) => ({
+  '&:hover': {
+    textDecoration: 'underline',
+    color: theme.palette.primary.main,
+  },
+  cursor: 'pointer',
 }));

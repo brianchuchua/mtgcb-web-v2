@@ -46,7 +46,7 @@ export interface SetDisplayProps {
   costToCompleteData?:
     | Record<string, CostToComplete>
     | {
-        sets: Array<Set & { costToComplete?: CostToComplete }>;
+        sets: Array<Set & { costToComplete?: CostToComplete; cardCountIncludingSubsets?: number }>;
       };
   includeSubsetsInSets?: boolean;
 }
@@ -111,7 +111,9 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
         key="browse-set-gallery"
         items={displaySets}
         renderItem={(set, index) => {
-          const targetSet = costToCompleteData?.sets?.find((s) => s.id === set.id);
+          const targetSet = costToCompleteData && 'sets' in costToCompleteData && Array.isArray(costToCompleteData.sets)
+            ? costToCompleteData.sets.find((s: Set & { costToComplete?: CostToComplete; cardCountIncludingSubsets?: number }) => s.id === set.id)
+            : undefined;
           const costToComplete = targetSet?.costToComplete;
           const cardCountIncludingSubsets = targetSet?.cardCountIncludingSubsets;
           return (

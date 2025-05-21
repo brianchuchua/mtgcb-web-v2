@@ -2,6 +2,7 @@
 
 import { Box, Card, CardContent, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import CardPrice from './CardPrice';
 import { PriceType } from '@/types/pricing';
@@ -12,6 +13,7 @@ export interface CardItemProps {
   name: string;
   setCode?: string;
   setName?: string;
+  setSlug?: string;
   isLoadingSkeleton?: boolean;
   tcgplayerId?: number | string;
   collectorNumber?: string;
@@ -61,6 +63,7 @@ const CardItem = ({
   name,
   setCode,
   setName,
+  setSlug,
   tcgplayerId,
   collectorNumber,
   rarity,
@@ -254,7 +257,31 @@ const CardItem = ({
                 maxWidth: '100%',
               }}
             >
-              {setName || 'Unknown Set'} #{collectorNumber || '??'}
+              {setName && setSlug ? (
+                <Link
+                  href={`/browse/sets/${setSlug}`}
+                  style={{
+                    color: 'inherit',
+                    textDecoration: 'none',
+                  }}
+                  onClick={(e) => e.stopPropagation()} // Prevent card click when clicking set link
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      '&:hover': {
+                        textDecoration: 'underline',
+                        color: (theme) => theme.palette.primary.main,
+                      },
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {setName}
+                  </Box>
+                </Link>
+              ) : (
+                setName || 'Unknown Set'
+              )} #{collectorNumber || '??'}
             </Typography>
           )}
 
