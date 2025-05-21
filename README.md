@@ -4,7 +4,6 @@
 
 ### Next
 
-- Possible bug: When selecting a set to view like SLD, it may not be including the subsets in the main browse view like the legacy new site. This may be an isSubsetGroup functionality issue.
 - Improve "Loading..." state.
 - Reconsider the ssr/'use client' stuff in browse page since I don't want to hurt SEO or social previews
 - Big picture:

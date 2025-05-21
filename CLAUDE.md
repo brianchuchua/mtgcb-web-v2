@@ -71,3 +71,50 @@ const StyledComponent = styled(MuiComponent)(({ theme }) => ({
 - Group related components, interfaces, and utility functions together
 - Export default the main component of a file
 - Export named components/functions that may be reused elsewhere
+
+## Project Information
+
+### Project Overview
+
+MTG Collection Builder (MTG CB) is a web application for Magic: The Gathering card collectors to track their collection and its value. The application allows users to browse cards and sets, manage their collection, and view pricing information from TCGPlayer.
+
+### Tech Stack
+
+- **Framework**: Next.js 15.x with React 19
+- **UI Library**: Material-UI (MUI) 6.x
+- **State Management**: Redux Toolkit with RTK Query
+- **Styling**: Emotion (CSS-in-JS)
+- **Form Handling**: React Hook Form
+- **Virtualization**: React Virtuoso for performant card lists
+- **Testing**: Playwright for end-to-end testing
+- **TypeScript**: Strict typing throughout the codebase
+
+### Key Features
+
+- Browse Magic: The Gathering cards and sets
+- Toggle between grid and table views
+- Set display preferences for cards and tables
+- Filter cards by various attributes (color, set, type, etc.)
+- Sort results by different criteria
+- User authentication system
+- Collection management
+- TCGPlayer integration for pricing data and affiliate links
+- Responsive design for desktop and mobile devices
+
+### Project Structure
+
+- `/src/api`: API service definitions using RTK Query
+- `/src/app`: Next.js App Router pages and layout components
+- `/src/components`: Reusable UI components
+- `/src/features`: Feature-specific components and logic
+- `/src/hooks`: Custom React hooks
+- `/src/redux`: Redux store configuration and slices
+- `/src/styles`: Global styling and theme
+- `/src/types`: TypeScript type definitions
+- `/src/utils`: Utility functions
+
+### Development Workflow
+
+1. Make it work
+2. Make it fast
+3. Make it clean
