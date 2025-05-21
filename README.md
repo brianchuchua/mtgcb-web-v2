@@ -4,8 +4,6 @@
 
 ### Next
 
-- Improve "Loading..." state.
-- Reconsider the ssr/'use client' stuff in browse page since I don't want to hurt SEO or social previews
 - Big picture:
   - Implement set pages
   - Implement collection view mode

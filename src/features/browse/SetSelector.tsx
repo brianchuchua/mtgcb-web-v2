@@ -87,7 +87,7 @@ const SetSelector = () => {
   };
 
   if (loading) {
-    return <div>Loading sets...</div>;
+    return <div style={{ paddingLeft: '9px' }}>Loading sets...</div>;
   }
 
   return (
