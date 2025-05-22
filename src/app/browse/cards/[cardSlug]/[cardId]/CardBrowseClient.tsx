@@ -1,18 +1,33 @@
 'use client';
 
-import { Box, Typography, Paper, Grid, Chip, Skeleton, Link, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+// TODO: This is an AI-generated stub and it's a mess.
+import {
+  Box,
+  Chip,
+  Grid,
+  Link,
+  Paper,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
 import NextLink from 'next/link';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
+import CardPrice from '@/components/cards/CardPrice';
 import SetIcon from '@/components/sets/SetIcon';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import CardPrice from '@/components/cards/CardPrice';
-import { formatISODate } from '@/utils/dateUtils';
-import capitalize from '@/utils/capitalize';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import capitalize from '@/utils/capitalize';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
+import { formatISODate } from '@/utils/dateUtils';
 
 interface CardBrowseClientProps {
   cardId: string;
@@ -28,80 +43,83 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
     isSuccess,
     isLoading,
     error,
-  } = useGetCardsQuery({
-    id: cardId, // Filter by specific card ID
-    limit: 1,
-    offset: 0,
-    select: [
-      'id',
-      'name',
-      'scryfallId',
-      'setId',
-      'setName',
-      'setSlug',
-      'rarity',
-      'rarityNumeric',
-      'collectorNumber',
-      'mtgcbCollectorNumber',
-      'type',
-      'artist',
-      'manaCost',
-      'convertedManaCost',
-      'powerNumeric',
-      'toughnessNumeric',
-      'loyaltyNumeric',
-      'tcgplayerId',
-      'tcgplayerName',
-      'tcgplayerSetCode',
-      'market',
-      'low',
-      'average',
-      'high',
-      'foil',
-      'prices',
-      'releaseDate',
-    ] as Array<keyof CardModel>,
-  }, {
-    skip: !cardId,
-  });
+  } = useGetCardsQuery(
+    {
+      id: cardId, // Filter by specific card ID
+      limit: 1,
+      offset: 0,
+      select: [
+        'id',
+        'name',
+        'scryfallId',
+        'setId',
+        'setName',
+        'setSlug',
+        'rarity',
+        'rarityNumeric',
+        'collectorNumber',
+        'mtgcbCollectorNumber',
+        'type',
+        'artist',
+        'manaCost',
+        'convertedManaCost',
+        'powerNumeric',
+        'toughnessNumeric',
+        'loyaltyNumeric',
+        'tcgplayerId',
+        'tcgplayerName',
+        'tcgplayerSetCode',
+        'market',
+        'low',
+        'average',
+        'high',
+        'foil',
+        'prices',
+        'releaseDate',
+      ] as Array<keyof CardModel>,
+    },
+    {
+      skip: !cardId,
+    },
+  );
 
   const card = cardsData?.data?.cards?.[0];
   const cardName = isLoading ? 'Loading...' : card?.name || 'Card not found';
 
   // Query for other printings of the same card
-  const {
-    data: otherPrintingsData,
-    isLoading: isOtherPrintingsLoading,
-  } = useGetCardsQuery({
-    name: card?.name, // Search by the card name (pureName)
-    limit: 50, // Get up to 50 other printings
-    offset: 0,
-    sortBy: 'releaseDate',
-    sortDirection: 'desc',
-    select: [
-      'id',
-      'name',
-      'setId',
-      'setName',
-      'setSlug',
-      'collectorNumber',
-      'rarity',
-      'market',
-      'low',
-      'average',
-      'high',
-      'foil',
-      'prices',
-      'releaseDate',
-    ] as Array<keyof CardModel>,
-  }, {
-    skip: !card?.name, // Don't run until we have the card name
-  });
+  const { data: otherPrintingsData, isLoading: isOtherPrintingsLoading } = useGetCardsQuery(
+    {
+      name: card?.name, // Search by the card name (pureName)
+      limit: 50, // Get up to 50 other printings
+      offset: 0,
+      sortBy: 'releaseDate',
+      sortDirection: 'desc',
+      select: [
+        'id',
+        'name',
+        'setId',
+        'setName',
+        'setSlug',
+        'collectorNumber',
+        'rarity',
+        'market',
+        'low',
+        'average',
+        'high',
+        'foil',
+        'prices',
+        'releaseDate',
+      ] as Array<keyof CardModel>,
+    },
+    {
+      skip: !card?.name, // Don't run until we have the card name
+    },
+  );
 
   // Filter out the current card from other printings
   const otherPrintings = useMemo(() => {
     if (!otherPrintingsData?.data?.cards || !cardId) return [];
-    return otherPrintingsData.data.cards.filter(printing => printing.id !== cardId);
+    return otherPrintingsData.data.cards.filter((printing) => printing.id !== cardId);
   }, [otherPrintingsData?.data?.cards, cardId]);
 
   // Get image URL using the same pattern as CardItem component
@@ -135,7 +153,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
           items={[
             { label: 'Home', href: '/' },
             { label: 'Browse', href: '/browse' },
-            { label: 'Loading...' }
+            { label: 'Cards', href: '/browse?contentType=cards' },
           ]}
         />
         <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}>Loading...</Box>
@@ -150,7 +168,8 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
           items={[
             { label: 'Home', href: '/' },
             { label: 'Browse', href: '/browse' },
-            { label: 'Card not found' }
+            { label: 'Cards', href: '/browse?contentType=cards' },
+            { label: 'Card not found' },
           ]}
         />
         <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}>Card not found</Box>
@@ -160,7 +179,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
 
   const formatManaCost = (manaCost: string | null) => {
     if (!manaCost) return 'N/A';
-    // This is a simple version - you might want to enhance with mana symbols
+    // This is a simple version - I might want to enhance with mana symbols
     return manaCost;
   };
 
@@ -178,12 +197,13 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
 
   return (
     <Box>
-      <Breadcrumbs 
+      <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
           { label: 'Browse', href: '/browse' },
-          { label: cardName }
-        ]} 
+          { label: 'Cards', href: '/browse?contentType=cards' },
+          { label: cardName },
+        ]}
       />
 
       <Grid container spacing={{ xs: 2, md: 4 }} sx={{ mt: 1 }}>
@@ -285,9 +305,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                   Set
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  {card?.setSlug && (
-                    <SetIcon code={card.setSlug} size="lg" fixedWidth />
-                  )}
+                  {card?.setSlug && <SetIcon code={card.setSlug} size="lg" fixedWidth />}
                   {card?.setName && card?.setSlug ? (
                     <NextLink href={`/browse/sets/${card.setSlug}`} passHref>
                       <Link
@@ -305,9 +323,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                       </Link>
                     </NextLink>
                   ) : (
-                    <Typography variant="body1">
-                      {card?.setName || 'Unknown Set'}
-                    </Typography>
+                    <Typography variant="body1">{card?.setName || 'Unknown Set'}</Typography>
                   )}
                 </Box>
               </Grid>
@@ -415,18 +431,18 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
           {/* Pricing Information */}
           {card && (
             <Box sx={{ mt: { xs: 2, md: 3 } }}>
-              <Typography 
-                variant="h5" 
-                fontWeight="500" 
-                sx={{ 
-                  mb: 2, 
+              <Typography
+                variant="h5"
+                fontWeight="500"
+                sx={{
+                  mb: 2,
                   color: (theme) => theme.palette.primary.main,
                   fontSize: { xs: '1.25rem', sm: '1.5rem' },
                 }}
               >
                 Pricing
               </Typography>
-              
+
               {/* Create structured price data */}
               {(() => {
                 const priceData = card.prices || {
@@ -436,20 +452,22 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                     average: card.average ? parseFloat(card.average) : null,
                     high: card.high ? parseFloat(card.high) : null,
                   },
-                  foil: card.foil ? {
-                    market: parseFloat(card.foil),
-                    low: null,
-                    average: null,
-                    high: null,
-                  } : null,
+                  foil: card.foil
+                    ? {
+                        market: parseFloat(card.foil),
+                        low: null,
+                        average: null,
+                        high: null,
+                      }
+                    : null,
                 };
 
-                const hasNormalPrices = priceData.normal && (
-                  priceData.normal.market || 
-                  priceData.normal.low || 
-                  priceData.normal.average || 
-                  priceData.normal.high
-                );
+                const hasNormalPrices =
+                  priceData.normal &&
+                  (priceData.normal.market ||
+                    priceData.normal.low ||
+                    priceData.normal.average ||
+                    priceData.normal.high);
 
                 const hasFoilPrices = priceData.foil && priceData.foil.market;
 
@@ -472,7 +490,9 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                           {priceData.normal?.market && (
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body2" color="text.secondary">Market:</Typography>
+                              <Typography variant="body2" color="text.secondary">
+                                Market:
+                              </Typography>
                               <Typography variant="body1" fontWeight="medium">
                                 ${priceData.normal.market.toFixed(2)}
                               </Typography>
@@ -480,26 +500,26 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                           )}
                           {priceData.normal?.low && (
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body2" color="text.secondary">Low:</Typography>
-                              <Typography variant="body1">
-                                ${priceData.normal.low.toFixed(2)}
+                              <Typography variant="body2" color="text.secondary">
+                                Low:
                               </Typography>
+                              <Typography variant="body1">${priceData.normal.low.toFixed(2)}</Typography>
                             </Box>
                           )}
                           {priceData.normal?.average && (
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body2" color="text.secondary">Average:</Typography>
-                              <Typography variant="body1">
-                                ${priceData.normal.average.toFixed(2)}
+                              <Typography variant="body2" color="text.secondary">
+                                Average:
                               </Typography>
+                              <Typography variant="body1">${priceData.normal.average.toFixed(2)}</Typography>
                             </Box>
                           )}
                           {priceData.normal?.high && (
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="body2" color="text.secondary">High:</Typography>
-                              <Typography variant="body1">
-                                ${priceData.normal.high.toFixed(2)}
+                              <Typography variant="body2" color="text.secondary">
+                                High:
                               </Typography>
+                              <Typography variant="body1">${priceData.normal.high.toFixed(2)}</Typography>
                             </Box>
                           )}
                         </Box>
@@ -514,7 +534,9 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                         </Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography variant="body2" color="text.secondary">Market:</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Market:
+                            </Typography>
                             <Typography variant="body1" fontWeight="medium">
                               ${priceData.foil?.market?.toFixed(2) || '0.00'}
                             </Typography>
@@ -558,11 +580,11 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
       {/* Other Printings Section */}
       {card && (otherPrintings.length > 0 || isOtherPrintingsLoading) && (
         <Box sx={{ mt: 4 }}>
-          <Typography 
-            variant="h4" 
-            fontWeight="600" 
-            sx={{ 
-              mb: 3, 
+          <Typography
+            variant="h4"
+            fontWeight="600"
+            sx={{
+              mb: 3,
               color: (theme) => theme.palette.primary.main,
               fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.125rem' },
             }}
@@ -582,22 +604,26 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 'bold' }}>Set</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', sm: 'table-cell' } }}>Collector #</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', sm: 'table-cell' } }}>
+                      Collector #
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Rarity</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', md: 'table-cell' } }}>Release Date</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold', display: { xs: 'none', md: 'table-cell' } }}>
+                      Release Date
+                    </TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>Market Price</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {otherPrintings.map((printing) => {
-                    const marketPrice = printing.prices?.normal?.market || 
-                                     (printing.market ? parseFloat(printing.market) : null);
-                    
+                    const marketPrice =
+                      printing.prices?.normal?.market || (printing.market ? parseFloat(printing.market) : null);
+
                     return (
-                      <TableRow 
+                      <TableRow
                         key={printing.id}
-                        sx={{ 
-                          '&:hover': { 
+                        sx={{
+                          '&:hover': {
                             backgroundColor: (theme) => theme.palette.action.hover,
                           },
                         }}
@@ -605,9 +631,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                         {/* Set Name with Icon */}
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            {printing.setSlug && (
-                              <SetIcon code={printing.setSlug} size="1x" fixedWidth />
-                            )}
+                            {printing.setSlug && <SetIcon code={printing.setSlug} size="1x" fixedWidth />}
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                               {printing.setName && printing.setSlug ? (
                                 <NextLink href={`/browse/sets/${printing.setSlug}`} passHref>
@@ -652,9 +676,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
 
                         {/* Collector Number */}
                         <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
-                          <Typography variant="body2">
-                            {printing.collectorNumber || 'N/A'}
-                          </Typography>
+                          <Typography variant="body2">{printing.collectorNumber || 'N/A'}</Typography>
                         </TableCell>
 
                         {/* Rarity */}
@@ -665,11 +687,16 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                             variant="outlined"
                             color={(() => {
                               switch (printing.rarity?.toLowerCase()) {
-                                case 'common': return 'default';
-                                case 'uncommon': return 'info';
-                                case 'rare': return 'warning';
-                                case 'mythic rare': return 'error';
-                                default: return 'default';
+                                case 'common':
+                                  return 'default';
+                                case 'uncommon':
+                                  return 'info';
+                                case 'rare':
+                                  return 'warning';
+                                case 'mythic rare':
+                                  return 'error';
+                                default:
+                                  return 'default';
                               }
                             })()}
                           />

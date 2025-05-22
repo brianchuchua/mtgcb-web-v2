@@ -187,7 +187,22 @@ const SetReleaseDate: React.FC<SetReleaseDateProps> = ({ set, isVisible = true }
 };
 
 const SetIconDisplay: React.FC<{ set: Set }> = ({ set }) => {
-  return <Box sx={{ textAlign: 'center', m: 0.5 }}>{set.code && <SetIcon code={set.code} size="5x" fixedWidth />}</Box>;
+  return (
+    <Box sx={{ textAlign: 'center', m: 0.5 }}>
+      {set.code && (
+        <Link
+          href={`/browse/sets/${set.slug}`}
+          style={{
+            textDecoration: 'none',
+            color: 'inherit',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <SetIcon code={set.code} size="5x" fixedWidth />
+        </Link>
+      )}
+    </Box>
+  );
 };
 
 type SetCardCountProps = {

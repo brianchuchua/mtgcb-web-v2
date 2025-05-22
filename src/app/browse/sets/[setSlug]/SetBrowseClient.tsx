@@ -3,12 +3,12 @@
 import { Box, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import SubsetSection from './SubsetSection';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import SubsetSection from './SubsetSection';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
@@ -26,7 +26,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   const browseController = useBrowseController();
   const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
-  
+
   // Get current search parameters to pass to subsets
   const cardSearchParams = useSelector(selectCardSearchParams);
   const currentSetsFilter = useSelector(selectSets);
@@ -42,17 +42,14 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
 
   const set = setsData?.data?.sets?.[0];
 
-  const {
-    data: subsetsData,
-    isLoading: isSubsetsLoading,
-  } = useGetSetsQuery(
+  const { data: subsetsData, isLoading: isSubsetsLoading } = useGetSetsQuery(
     {
       parentSetId: set?.id,
       limit: 100,
     },
     {
       skip: !set?.id,
-    }
+    },
   );
 
   useEffect(() => {
@@ -75,12 +72,11 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
     if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
       const set = setsData.data.sets[0];
       const expectedSetId = set.id;
-      
+
       // Check if current sets filter doesn't include this set
-      const hasCorrectSetFilter = currentSetsFilter && 
-        currentSetsFilter.include && 
-        currentSetsFilter.include.includes(expectedSetId);
-      
+      const hasCorrectSetFilter =
+        currentSetsFilter && currentSetsFilter.include && currentSetsFilter.include.includes(expectedSetId);
+
       if (!hasCorrectSetFilter) {
         const setFilter: SetFilter = {
           include: [expectedSetId],
@@ -92,7 +88,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   }, [dispatch, setsData, isSuccess, currentSetsFilter]);
 
   const subsets = subsetsData?.data?.sets || [];
-  const setName = isSetLoading ? 'Loading...' : set?.name || 'Set not found';
+  const setName = isSetLoading ? '' : set?.name || 'Set not found';
 
   const handleSubsetSelect = useCallback((subsetId: string) => {
     // First, open/expand the subset
@@ -119,9 +115,13 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
     return (
       <Box>
         <Breadcrumbs
-          items={[{ label: 'Home', href: '/' }, { label: 'Browse', href: '/browse' }, { label: 'Loading...' }]}
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Browse', href: '/browse' },
+            { label: 'Sets', href: '/browse?contentType=sets' },
+          ]}
         />
-        <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}>Loading...</Box>
+        <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}></Box>
       </Box>
     );
   }
@@ -130,7 +130,12 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
     return (
       <Box>
         <Breadcrumbs
-          items={[{ label: 'Home', href: '/' }, { label: 'Browse', href: '/browse' }, { label: 'Set not found' }]}
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Browse', href: '/browse' },
+            { label: 'Sets', href: '/browse?contentType=sets' },
+            { label: 'Set not found' },
+          ]}
         />
         <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}>Set not found</Box>
       </Box>
@@ -149,7 +154,14 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
 
   return (
     <Box>
-      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Browse', href: '/browse' }, { label: setName }]} />
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Browse', href: '/browse' },
+          { label: 'Sets', href: '/browse?contentType=sets' },
+          { label: setName },
+        ]}
+      />
 
       <Box
         sx={{
@@ -208,11 +220,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
         </>
       )}
 
-      <Pagination
-        {...browseController.paginationProps}
-        position="bottom"
-        hideContentTypeToggle={true}
-      />
+      <Pagination {...browseController.paginationProps} position="bottom" hideContentTypeToggle={true} />
 
       {subsets.length > 0 && (
         <Box sx={{ mt: 4 }}>

@@ -11,6 +11,8 @@
   - Look around for feature parity
   - Add cool new stuff
   - Finish cards page -- just a stub right now, needs actual UX work and fixes, grid/table view, etc.
+- CardBrowseClient is a mess and is using deprecated Grid
+- Minor UX: Update breadcrumbs to include Sets or Cards
 - Minor UX bug: 1 cards instead of 1 card
 - includeSets in URL while on the sets page is a little weird
 - Add hover effect to set icons
