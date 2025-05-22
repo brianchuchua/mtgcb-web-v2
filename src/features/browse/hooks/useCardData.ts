@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
+import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 
 interface UseCardDataProps {
@@ -90,8 +91,13 @@ export function useCardData({ searchParams, pagination, skip }: UseCardDataProps
   }, [items, isLoading, pagination.pageSize]);
 
   const handleCardClick = useCallback(
-    (cardId: string) => {
-      router.push(`/browse/cards/${cardId}`);
+    (cardId: string, cardName?: string) => {
+      if (cardName) {
+        const cardUrl = generateCardUrl(cardName, cardId);
+        router.push(cardUrl);
+      } else {
+        router.push(`/browse/cards/unknown/${cardId}`);
+      }
     },
     [router],
   );

@@ -5,13 +5,14 @@
 ### Next
 
 - Big picture:
-  - Make a stubbed card page with fixed slugs that are just window dressing
   - Implement collection view mode
   - Implement collection edit page
   - Implement collection edit mode
   - Look around for feature parity
   - Add cool new stuff
+  - Finish cards page -- just a stub right now, needs actual UX work and fixes, grid/table view, etc.
 - Minor UX bug: 1 cards instead of 1 card
+- includeSets in URL while on the sets page is a little weird
 - Add hover effect to set icons
 - Find deprecated uses of PaperProps
 - Add link from child set to parent set
@@ -111,6 +112,10 @@
 - Make a button on mobile to open filters side menu
 - Need to search by flavorName too
 - Evaluate if custom image sizes cause performance issues that can be avoided
+
+## Patron Requests
+
+- Basic deck completion -- paste in a deck list and get a report/buy button for missing cards.
 
 ## New TCGPlayer Affiliate Links
 

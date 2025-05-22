@@ -113,7 +113,7 @@ export interface CardData {
   isLoading: boolean;
   error: any;
   apiArgs: any;
-  handleCardClick: (cardId: string) => void;
+  handleCardClick: (cardId: string, cardName?: string) => void;
 }
 
 /**
@@ -149,7 +149,7 @@ export interface CardsProps {
   loading: boolean;
   viewMode: ViewMode;
   onSort: (columnId: string) => void;
-  onCardClick: (cardId: string) => void;
+  onCardClick: (cardId: string, cardName?: string) => void;
   pageSize: number;
   sortBy: string;
   sortOrder: 'asc' | 'desc';

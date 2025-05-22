@@ -25,6 +25,7 @@ import { usePriceType } from '@/hooks/usePriceType';
 import { selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
 import { SortByOption } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
+import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 
 interface UseIndependentBrowseControllerProps {
   setId: string;
@@ -160,8 +161,14 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
   }, [dispatch, sortBy, sortOrder]);
 
   const handleCardClick = useCallback(
-    (cardId: string) => {
-      router.push(`/browse/cards/${cardId}`);
+    (cardId: string, cardName?: string) => {
+      if (cardName) {
+        const cardUrl = generateCardUrl(cardName, cardId);
+        router.push(cardUrl);
+      } else {
+        // Fallback to old format if no name is available
+        router.push(`/browse/cards/unknown/${cardId}`);
+      }
     },
     [router],
   );

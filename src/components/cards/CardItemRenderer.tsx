@@ -12,7 +12,7 @@ export interface CardItemRendererProps {
     priceIsVisible?: boolean;
   };
   priceType?: PriceType;
-  onClick?: (cardId: string) => void;
+  onClick?: (cardId: string, cardName?: string) => void;
 }
 
 const CardItemRenderer = ({
@@ -27,7 +27,7 @@ const CardItemRenderer = ({
 }: CardItemRendererProps) => {
   const handleCardClick = () => {
     if (onClick) {
-      onClick(card.id);
+      onClick(card.id, card.name);
     }
   };
 

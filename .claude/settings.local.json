@@ -1,6 +1,9 @@
 {
   "permissions": {
-    "allow": ["Bash(yarn type-check)"],
+    "allow": [
+      "Bash(yarn type-check)",
+      "Bash(mkdir:*)"
+    ],
     "deny": []
   }
 }
