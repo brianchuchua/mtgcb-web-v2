@@ -1,16 +1,18 @@
 'use client';
 
 import { Box, Typography } from '@mui/material';
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { Pagination } from '@/components/pagination';
+import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
+import SubsetSection from './SubsetSection';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
-import { setSets, setViewContentType } from '@/redux/slices/browseSlice';
+import { selectCardSearchParams, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
 import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
@@ -22,6 +24,12 @@ interface SetBrowseClientProps {
 export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   const dispatch = useDispatch();
   const browseController = useBrowseController();
+  const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const subsetToggleRefs = useRef<Record<string, () => void>>({});
+  
+  // Get current search parameters to pass to subsets
+  const cardSearchParams = useSelector(selectCardSearchParams);
+  const currentSetsFilter = useSelector(selectSets);
 
   const {
     data: setsData,
@@ -31,6 +39,21 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
     limit: 1,
     slug: setSlug,
   });
+
+  const set = setsData?.data?.sets?.[0];
+
+  const {
+    data: subsetsData,
+    isLoading: isSubsetsLoading,
+  } = useGetSetsQuery(
+    {
+      parentSetId: set?.id,
+      limit: 100,
+    },
+    {
+      skip: !set?.id,
+    }
+  );
 
   useEffect(() => {
     dispatch(setViewContentType('cards'));
@@ -47,8 +70,45 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
     }
   }, [dispatch, setsData, isSuccess, setSlug]);
 
-  const set = setsData?.data?.sets?.[0];
+  // Re-apply set filter if it gets cleared (e.g., by reset search)
+  useEffect(() => {
+    if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
+      const set = setsData.data.sets[0];
+      const expectedSetId = set.id;
+      
+      // Check if current sets filter doesn't include this set
+      const hasCorrectSetFilter = currentSetsFilter && 
+        currentSetsFilter.include && 
+        currentSetsFilter.include.includes(expectedSetId);
+      
+      if (!hasCorrectSetFilter) {
+        const setFilter: SetFilter = {
+          include: [expectedSetId],
+          exclude: [],
+        };
+        dispatch(setSets(setFilter));
+      }
+    }
+  }, [dispatch, setsData, isSuccess, currentSetsFilter]);
+
+  const subsets = subsetsData?.data?.sets || [];
   const setName = isSetLoading ? 'Loading...' : set?.name || 'Set not found';
+
+  const handleSubsetSelect = useCallback((subsetId: string) => {
+    // First, open/expand the subset
+    const toggleFunction = subsetToggleRefs.current[subsetId];
+    if (toggleFunction) {
+      toggleFunction();
+    }
+
+    // Then scroll to it after a brief delay to allow expansion
+    setTimeout(() => {
+      const element = subsetRefs.current[subsetId];
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }, []);
 
   const isCardGridView = browseController.view === 'cards' && browseController.viewMode === 'grid';
   const isCardTableView = browseController.view === 'cards' && browseController.viewMode === 'table';
@@ -135,6 +195,8 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
       <Pagination
         {...browseController.paginationProps}
         hideContentTypeToggle={true}
+        subsets={subsets}
+        onSubsetSelect={handleSubsetSelect}
       />
 
       {browseController.error ? (
@@ -151,6 +213,29 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
         position="bottom"
         hideContentTypeToggle={true}
       />
+
+      {subsets.length > 0 && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h5" fontWeight="500" sx={{ mb: 3, color: (theme) => theme.palette.primary.main }}>
+            Subsets
+          </Typography>
+          {subsets.map((subset) => (
+            <SubsetSection
+              key={subset.id}
+              subset={subset}
+              searchParams={cardSearchParams}
+              ref={(el) => {
+                if (el) {
+                  subsetRefs.current[subset.id] = el;
+                }
+              }}
+              onRegisterToggle={(toggleFn) => {
+                subsetToggleRefs.current[subset.id] = toggleFn;
+              }}
+            />
+          ))}
+        </Box>
+      )}
     </Box>
   );
 }

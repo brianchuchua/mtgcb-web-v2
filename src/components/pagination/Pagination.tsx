@@ -27,6 +27,7 @@ import { styled } from '@mui/material/styles';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CardSettingsPanel, { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
+import SubsetDropdown from './SubsetDropdown';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -44,6 +45,8 @@ const Pagination: React.FC<PaginationProps> = ({
   isInitialLoading = false,
   contentType = 'cards',
   settingGroups,
+  subsets = [],
+  onSubsetSelect,
 }) => {
   const theme = useTheme();
   const [localCurrentPage, setLocalCurrentPage] = useState(currentPage);
@@ -137,6 +140,8 @@ const Pagination: React.FC<PaginationProps> = ({
                     viewMode={viewMode}
                     contentType={contentType}
                     customSettingGroups={settingGroups}
+                    subsets={subsets}
+                    onSubsetSelect={onSubsetSelect}
                   />
 
                   <Box sx={{ mt: 1 }}>
@@ -179,6 +184,8 @@ const Pagination: React.FC<PaginationProps> = ({
               viewMode={viewMode}
               contentType={contentType}
               customSettingGroups={settingGroups}
+              subsets={subsets}
+              onSubsetSelect={onSubsetSelect}
             />
           </RightSection>
         </TopPaginationLayout>
@@ -207,6 +214,8 @@ export interface PaginationProps {
   contentType?: 'cards' | 'sets';
   settingGroups?: CardSettingGroup[];
   hideContentTypeToggle?: boolean;
+  subsets?: any[];
+  onSubsetSelect?: (subsetId: string) => void;
 }
 
 Pagination.displayName = 'Pagination';
@@ -380,6 +389,8 @@ interface PageSizeControlProps {
   viewMode: 'grid' | 'table';
   contentType?: 'cards' | 'sets';
   customSettingGroups?: CardSettingGroup[];
+  subsets?: any[];
+  onSubsetSelect?: (subsetId: string) => void;
 }
 
 const PageSizeControl: React.FC<PageSizeControlProps> = ({
@@ -389,6 +400,8 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
   viewMode,
   contentType = 'cards',
   customSettingGroups,
+  subsets = [],
+  onSubsetSelect,
 }) => {
   const cardSettingGroups = customSettingGroups || useCardSettingGroups(viewMode);
   const isSmallScreen = useMediaQuery('(max-width:899px)');
@@ -421,6 +434,10 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
           ))}
         </Select>
       </FormControl>
+
+      {subsets.length > 0 && onSubsetSelect && (
+        <SubsetDropdown subsets={subsets} onSubsetSelect={onSubsetSelect} />
+      )}
 
       <Box sx={{ ml: 1 }}>
         <CardSettingsPanel

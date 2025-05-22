@@ -5,16 +5,19 @@
 ### Next
 
 - Big picture:
-  - Add support for subsets in a set page
-  - Test these changes on mobile
   - Make a stubbed card page with fixed slugs that are just window dressing
   - Implement collection view mode
   - Implement collection edit page
   - Implement collection edit mode
   - Look around for feature parity
   - Add cool new stuff
+- Minor UX bug: 1 cards instead of 1 card
+- Add hover effect to set icons
+- Find deprecated uses of PaperProps
+- Add link from child set to parent set
 - Move the card number to the card name
 - Refactor all components to be top-down readable.
+- Bug: Reset Search doesn't clear the stat filters graphically.
 - Annoying: On mobile, the hover over card name is doing the whole row, not just the card name
 - Minor Bug: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - Page title flashing when toggling between cards and sets
