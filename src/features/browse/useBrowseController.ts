@@ -46,7 +46,11 @@ import {
   selectViewContentType,
 } from '@/redux/slices/browseSlice';
 
-export function useBrowseController(): BrowseControllerResult {
+interface UseBrowseControllerOptions {
+  skipCostToComplete?: boolean;
+}
+
+export function useBrowseController(options?: UseBrowseControllerOptions): BrowseControllerResult {
   const currentView = useSelector(selectViewContentType) ?? 'cards'; // "cards" | "sets"
   const cardSearchParams = useSelector(selectCardSearchParams);
   const setSearchParams = useSelector(selectSetSearchParams);
@@ -70,6 +74,7 @@ export function useBrowseController(): BrowseControllerResult {
     pagination,
     skip: currentView !== 'sets',
     includeSubsets: includeSubsetsInSets,
+    skipCostToComplete: options?.skipCostToComplete,
   });
 
   // Visibility flags and setting groups

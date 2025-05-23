@@ -6,7 +6,8 @@
 
 - Big picture:
 - Implement collection view mode
-  - Collection summary
+  - Collection summary (audit main page's set view (filters), then move on the cards view)
+    - Need to do a full analysis of how the page currently works and consider a custom API to do all the work, especially since there are custom sorts and filters that need to happen to be at parity with the legacy experience
   - Collection set page
   - Implement collection edit page
   - Implement collection edit mode
@@ -31,7 +32,9 @@
   - Improve flashing of the browsesearchform when viewing the set page, you first see the card view, then it switches to the set view
   - Verify Buy Draft Cube with KTK once I can see the cards I own
   - Serious bug: Been getting Database connection failed: error: sorry, too many clients already too often, something is up
+  - Bug: Draft cube calculation when track subsets with sets in on, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir
 
+- default sort order should perhaps be released date descending
 - going mythic color, consider not changing the color of the progress bar, or changing it to green maybe
 - Audit API failure error state in collection page
 - Add title tags to all set and card links
@@ -61,7 +64,9 @@
 - Audit back and forward button
 - Confetti when hitting 100%, see legacy implementation
 - FNM Promos are a interesting corner case -- it's a subset group, but also has a child set, General FNM Promos. Need to test everything.
--
+- Patron request: Highlight recently updated card in some way, perhaps the input box or the price
+- Home page, call to action to register or login
+- Iterate on the complete collection animation for the circular progress bar
 
 ## Later
 

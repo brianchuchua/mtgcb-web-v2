@@ -33,7 +33,7 @@ export const useCollectionBrowseController = ({
   const includeSubsetsInSets = useAppSelector(
     (state) => state.browse.setsSearchParams.includeSubsetsInSets ?? false
   );
-  const browseController = useBrowseController();
+  const browseController = useBrowseController({ skipCostToComplete: true });
   
   // Use RTK Query with automatic caching
   const { data: collectionResponse, isLoading: isLoadingCollection } = useGetCollectionSummaryQuery({

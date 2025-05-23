@@ -15,13 +15,14 @@ interface UseSetDataProps {
   };
   skip: boolean;
   includeSubsets: boolean;
+  skipCostToComplete?: boolean;
 }
 
 /**
  * Fetches and processes set data
  * Handles API params, cost-to-complete data, and transforms API data to view model
  */
-export function useSetData({ searchParams, pagination, skip, includeSubsets }: UseSetDataProps) {
+export function useSetData({ searchParams, pagination, skip, includeSubsets, skipCostToComplete = false }: UseSetDataProps) {
   const router = useRouter();
   const setPriceType = useSetPriceType();
 
@@ -67,7 +68,7 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets }: U
       priceType: setPriceType,
       includeSubsetsInSets: includeSubsets,
     },
-    { ...queryConfig, skip },
+    { ...queryConfig, skip: skip || skipCostToComplete },
   );
 
   const items = useMemo(
