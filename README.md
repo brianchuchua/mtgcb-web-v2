@@ -5,14 +5,37 @@
 ### Next
 
 - Big picture:
-  - Implement collection view mode
+- Implement collection view mode
+  - Collection summary
+  - Collection set page
   - Implement collection edit page
   - Implement collection edit mode
+  - Privacy mode
   - Look around for feature parity
   - Add cool new stuff
-  - Finish cards page -- just a stub right now, needs actual UX work and fixes, grid/table view, etc.
+  - Finish cards page -- just a stub right now, needs actual UX work and fixes, grid/table view, etc. Search Options need to be hidden.
+  - Collection card page
+- Going mythic / green setting
+- Current feature work:
+
+  - figure out best way to handle figuring out which cards are missing from a user's collection, is there an api to get their cards in a set
+    - old api had a tcgplayerMassImportForUserLegacy method that took a setId, whether to include subsets in sets, and what kind of count was desired and returned the list of cards they needed
+    - So perhaps I shouldn't have had the logic for this for the main browse view to be on the client side
+    - Then again, it's kind a client concern. Arguable.
+    - Either way, I don't have an endpoint to get a user's collection for a set yet, so I need to add that
+  - Fix failing unit tests in api
+  - Make sure 99% doesn't round to 100%
+  - Need to stop the refreshing the whole page when changing price type or resizing the window
+  - Need the sidenav menu, including the special filters and sorting options -- may need server side support since original implementation was client side in the legacy new app
+  - Need to link into the specific set pages showing card quantities
+  - Improve flashing of the browsesearchform when viewing the set page, you first see the card view, then it switches to the set view
+  - Verify Buy Draft Cube with KTK once I can see the cards I own
+  - Serious bug: Been getting Database connection failed: error: sorry, too many clients already too often, something is up
+
+- going mythic color, consider not changing the color of the progress bar, or changing it to green maybe
+- Audit API failure error state in collection page
+- Add title tags to all set and card links
 - CardBrowseClient is a mess and is using deprecated Grid
-- Minor UX: Update breadcrumbs to include Sets or Cards
 - Minor UX bug: 1 cards instead of 1 card
 - includeSets in URL while on the sets page is a little weird
 - Add hover effect to set icons
@@ -29,7 +52,6 @@
 - pageSize should be a localStorage item, not in the url
 - paginating too far in the future in the url bug may be back
 - Subset stuff in search filters
-- set page with subsets handled
 - Patron request: Add card number to card name, perhaps as a setting
 - Clean up code base to be more my style -- some of the vibe coding results aren't as readable as my style
 - API Concern: compare "archenemy" set types to NOT "archenemy" set types -- there's an unaccounted for difference in the results length
@@ -37,10 +59,12 @@
 - Test API and database outages
 - Plan for system wide messages
 - Audit back and forward button
+- Confetti when hitting 100%, see legacy implementation
+- FNM Promos are a interesting corner case -- it's a subset group, but also has a child set, General FNM Promos. Need to test everything.
+-
 
 ## Later
 
-- Set names (in table and grid view) should link to the set page
 - 1024x768 testing of table view and gridview and menus with sidenav open (or determine target resolution)
 - Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
 - Clean up MTG CB collector number

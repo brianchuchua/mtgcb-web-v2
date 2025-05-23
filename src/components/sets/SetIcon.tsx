@@ -44,12 +44,13 @@ const SetIcon: React.FC<SetIconProps> = ({
     `ss-${normalizedCode}`,
     `ss-${size}`,
     ...(rarity ? [`ss-${rarity}`] : []),
+    ...(rarity && rarity !== 'common' ? ['ss-grad'] : []),
     ...(fixedWidth ? ['ss-fw'] : []),
     className,
   ].join(' ');
 
-  // Simulates a 1px white stroke around the icon
-  const shadowStyle = border
+  // Simulates a 1px white stroke around the icon (only for common rarity)
+  const shadowStyle = border && rarity === 'common'
     ? {
         textShadow:
           'rgb(255, 255, 255) -1px -1px 0px, rgb(255, 255, 255) 1px -1px 0px, rgb(255, 255, 255) -1px 1px 0px, rgb(255, 255, 255) 1px 1px 0px',

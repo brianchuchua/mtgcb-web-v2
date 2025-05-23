@@ -17,13 +17,14 @@ export const SearchForms = () => {
   };
 
   // Only render the component if we're on a page that needs a search form
-  if (!pathname?.startsWith('/browse')) {
+  if (!pathname?.startsWith('/browse') && !pathname?.startsWith('/collections')) {
     return null;
   }
 
   // Get the appropriate title based on the current route
   const getFormTitle = () => {
     if (pathname === '/browse') return 'Search Options';
+    if (pathname?.startsWith('/collections')) return 'Search Options';
     // Add other form titles here as needed
     return 'Search Options';
   };
@@ -63,9 +64,9 @@ export const SearchForms = () => {
       <Divider />
       <Collapse in={isExpanded} timeout="auto">
         <Box>
-          {pathname?.startsWith('/browse') && <BrowseSearchForm />}
+          {(pathname?.startsWith('/browse') || pathname?.startsWith('/collections')) && <BrowseSearchForm />}
           {/* Add other forms here later, like:
-            pathname.startsWith('/collections') && <CollectionSearchForm />
+            pathname.startsWith('/inventory') && <InventorySearchForm />
             etc...
           */}
         </Box>

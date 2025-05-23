@@ -15,6 +15,7 @@ interface TCGPlayerMassImportButtonProps extends Omit<ButtonProps, 'onClick'> {
   countType: CountType;
   children?: React.ReactNode;
   includeSubsetsInSets?: boolean;
+  userId?: number; // Optional - when provided, only missing cards will be included
 }
 
 const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
@@ -23,6 +24,7 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
   countType,
   children,
   includeSubsetsInSets = false,
+  userId,
   ...buttonProps
 }) => {
   const { submitToTCGPlayer } = useTCGPlayer();
@@ -37,6 +39,8 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
     setId,
     countType,
     includeSubsetsInSets,
+    userId,
+    count,
   });
 
   const handleClick = useCallback(async () => {
@@ -48,7 +52,19 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
       const cards = await fetchCards();
 
       if (!cards || cards.length === 0) {
-        enqueueSnackbar('No matching cards found with TCGPlayer IDs.', { variant: 'error' });
+        // Show a softer message when user has collection context (already owns all cards)
+        if (userId) {
+          const isDraftCube = countType === 'draftcube';
+          if (isDraftCube) {
+            enqueueSnackbar('You already have all the cards needed for a draft cube!', { variant: 'info' });
+          } else if (countType === 'all') {
+            enqueueSnackbar('You already own all cards in this set!', { variant: 'info' });
+          } else {
+            enqueueSnackbar(`You already own all ${countType} cards in this set!`, { variant: 'info' });
+          }
+        } else {
+          enqueueSnackbar('No matching cards found with TCGPlayer IDs.', { variant: 'error' });
+        }
         return;
       }
 
@@ -71,6 +87,7 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
     fetchCards,
     submitToTCGPlayer,
     includeSubsetsInSets,
+    userId,
     enqueueSnackbar,
   ]);
 

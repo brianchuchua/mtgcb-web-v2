@@ -2,8 +2,12 @@
 
 import { CardModel } from '@/api/browse/types';
 
+export interface CardWithQuantity extends CardModel {
+  neededQuantity?: number;
+}
+
 export const formatMassImportString = (
-  cards: CardModel[], 
+  cards: (CardModel | CardWithQuantity)[], 
   quantity: number = 1,
   isDraftCube: boolean = false
 ): string => {
@@ -26,8 +30,11 @@ export const formatMassImportString = (
 
       let cardQuantity = quantity;
       
-      // For draft cube, use 4x for commons/uncommons and 1x for rares/mythics
-      if (isDraftCube && card.rarity) {
+      // Use neededQuantity if provided (for collection context)
+      if ('neededQuantity' in card && card.neededQuantity !== undefined) {
+        cardQuantity = card.neededQuantity;
+      } else if (isDraftCube && card.rarity) {
+        // For draft cube, use 4x for commons/uncommons and 1x for rares/mythics
         const rarity = card.rarity.toLowerCase();
         cardQuantity = (rarity === 'common' || rarity === 'uncommon') ? 4 : 1;
       }
