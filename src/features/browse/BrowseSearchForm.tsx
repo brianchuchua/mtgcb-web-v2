@@ -28,13 +28,14 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
-import { useSnackbar } from 'notistack';
 import { usePathname } from 'next/navigation';
+import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ColorSelector from '@/features/browse/ColorSelector';
+import CompletionStatusSelector from '@/features/browse/CompletionStatusSelector';
 import RaritySelector from '@/features/browse/RaritySelector';
 import SetCategorySelector from '@/features/browse/SetCategorySelector';
 import SetSelector from '@/features/browse/SetSelector';
@@ -81,10 +82,13 @@ const BrowseSearchForm = () => {
   const initialCheckDone = useRef(false);
   const prevDisplayPriceType = useRef<string | null>(null);
   const initialRenderComplete = useRef(false);
-  
+
   // Check if we're on a set-specific page
   const pathname = usePathname();
   const isSetPage = pathname?.includes('/browse/sets/') || false;
+
+  // Check if this is a collection page (to show collection-specific sort options)
+  const isCollectionPage = pathname?.startsWith('/collections/') || false;
 
   // Get content type from Redux store
   const contentType = useSelector(selectViewContentType);
@@ -495,6 +499,8 @@ const BrowseSearchForm = () => {
       />
       <SetCategorySelector />
       <SetTypeSelector />
+      {/* Only show completion status filter when viewing a collection */}
+      {isCollectionPage && <CompletionStatusSelector />}
       <Paper
         variant="outlined"
         sx={{
@@ -636,7 +642,8 @@ const BrowseSearchForm = () => {
         </MenuItem>,
       ];
     } else {
-      return [
+      // Base set sort options
+      const baseOptions = [
         <MenuItem key="name" value="name">
           Name
         </MenuItem>,
@@ -653,6 +660,24 @@ const BrowseSearchForm = () => {
           Set Type
         </MenuItem>,
       ];
+
+      // Add collection-specific sort options when viewing a collection
+      if (isCollectionPage) {
+        const collectionOptions = [
+          <MenuItem key="percentageCollected" value="percentageCollected">
+            Completion %
+          </MenuItem>,
+          <MenuItem key="totalValue" value="totalValue">
+            Current Set Value
+          </MenuItem>,
+          <MenuItem key="costToComplete.oneOfEachCard" value="costToComplete.oneOfEachCard">
+            Cost to Complete
+          </MenuItem>,
+        ];
+        return [...baseOptions, ...collectionOptions];
+      }
+
+      return baseOptions;
     }
   };
 

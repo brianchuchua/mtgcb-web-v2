@@ -6,9 +6,9 @@
 
 - Big picture:
 - Implement collection view mode
-  - Collection summary (audit main page's set view (filters), then move on the cards view)
-    - Need to do a full analysis of how the page currently works and consider a custom API to do all the work, especially since there are custom sorts and filters that need to happen to be at parity with the legacy experience
-  - Collection set page
+  - Implement collection table for the set view (mostly done by accident already, needs filter toggles)
+  - Collection set page, may keep existing api call, or make a new consolidated one
+  - Implement collection card gallery, hen do the same for the cards view endpoint, make a new one enhanced to take a userId, blend search and user data
   - Implement collection edit page
   - Implement collection edit mode
   - Privacy mode
@@ -33,7 +33,14 @@
   - Verify Buy Draft Cube with KTK once I can see the cards I own
   - Serious bug: Been getting Database connection failed: error: sorry, too many clients already too often, something is up
   - Bug: Draft cube calculation when track subsets with sets in on, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir
+  - remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
 
+- Check 99% completed (like gatecrash), shows all the little rounding bugs
+- Consider having main menu collapse by default on pages that have the search options open
+- Serious bug: Scrolling far down during the virtualization of the set grid view by clicking halfway through scrollbar while viewing 500 sets, jumping up and down in a loop
+- it would be nice if pagination didn't change when changing track subsets with main set or price type
+- audit caching of collection apis when user updates collection -- and of api calls in general in this repo
+- evaluate stickyness of contentType when navigating between pages
 - default sort order should perhaps be released date descending
 - going mythic color, consider not changing the color of the progress bar, or changing it to green maybe
 - Audit API failure error state in collection page
@@ -70,6 +77,7 @@
 
 ## Later
 
+- Sonarcube integration
 - 1024x768 testing of table view and gridview and menus with sidenav open (or determine target resolution)
 - Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
 - Clean up MTG CB collector number

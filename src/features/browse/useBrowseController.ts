@@ -48,6 +48,7 @@ import {
 
 interface UseBrowseControllerOptions {
   skipCostToComplete?: boolean;
+  userId?: number;
 }
 
 export function useBrowseController(options?: UseBrowseControllerOptions): BrowseControllerResult {
@@ -75,6 +76,7 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
     skip: currentView !== 'sets',
     includeSubsets: includeSubsetsInSets,
     skipCostToComplete: options?.skipCostToComplete,
+    userId: options?.userId,
   });
 
   // Visibility flags and setting groups
@@ -232,6 +234,8 @@ function buildSetPayload({
           : undefined
         : undefined,
       includeSubsetsInSets,
+      username: setData.username,
+      collectionSummary: setData.collectionSummary,
     },
   };
 }

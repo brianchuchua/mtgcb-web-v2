@@ -121,6 +121,9 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       'code',
       'cardCount',
       'setType',
+      'totalValue',
+      'costToComplete.oneOfEachCard',
+      'percentageCollected',
     ],
     defaultValue: 'releasedAt',
   },
@@ -204,6 +207,19 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     mode: 'sets',
     urlParam: 'includeSubsetsInSets',
     defaultValue: false,
+  },
+  completionStatus: {
+    type: 'inclusionExclusion',
+    mode: 'sets',
+    urlParams: {
+      include: 'includeCompletionStatus',
+      exclude: 'excludeCompletionStatus',
+    },
+    separator: '|',
+    defaultValue: {
+      include: [],
+      exclude: [],
+    },
   },
   colors: {
     type: 'colorFilter',

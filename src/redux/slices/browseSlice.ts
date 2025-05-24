@@ -5,6 +5,7 @@ import {
   BrowseState,
   ColorFilter,
   ColorMatchType,
+  CompletionStatusFilter,
   RarityFilter,
   SetCategoryFilter,
   SetFilter,
@@ -152,6 +153,13 @@ export const browseSlice = createSlice({
     },
     setIncludeSubsetsInSet: (state, action: PayloadAction<boolean>) => {
       state.setsSearchParams.includeSubsetsInSets = action.payload;
+    },
+    setCompletionStatus: (state, action: PayloadAction<CompletionStatusFilter>) => {
+      if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
+        delete state.setsSearchParams.completionStatus;
+      } else {
+        state.setsSearchParams.completionStatus = action.payload;
+      }
     },
     setOneResultPerCardName: (state, action: PayloadAction<boolean>) => {
       // Cards-specific field
@@ -349,6 +357,7 @@ export const {
   setSetTypes,
   setShowSubsets,
   setIncludeSubsetsInSet,
+  setCompletionStatus,
   setOneResultPerCardName,
   setSortBy,
   setSortOrder,
@@ -418,6 +427,7 @@ export const selectSetCategories = (state: RootState) => state.browse.setsSearch
 export const selectSetTypes = (state: RootState) => state.browse.setsSearchParams.setTypes;
 export const selectShowSubsets = (state: RootState) => state.browse.setsSearchParams.showSubsets !== false;
 export const selectIncludeSubsetsInSets = (state: RootState) => !!state.browse.setsSearchParams.includeSubsetsInSets;
+export const selectCompletionStatus = (state: RootState) => state.browse.setsSearchParams.completionStatus;
 
 // Content type selector
 export const selectViewContentType = (state: RootState) => state.browse.viewContentType;

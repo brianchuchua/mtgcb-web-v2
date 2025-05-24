@@ -127,6 +127,14 @@ export interface SetData {
   apiArgs: any;
   costToComplete: any;
   handleSetClick: (set: any) => void;
+  username?: string;
+  collectionSummary?: {
+    totalCardsCollected?: number;
+    uniquePrintingsCollected?: number;
+    numberOfCardsInMagic?: number;
+    percentageCollected?: number;
+    totalValue?: number;
+  };
 }
 
 /**
@@ -174,6 +182,14 @@ export interface SetsProps {
   displaySettings: SetDisplaySettings;
   costToCompleteData: any;
   includeSubsetsInSets: boolean;
+  username?: string;
+  collectionSummary?: {
+    totalCardsCollected?: number;
+    uniquePrintingsCollected?: number;
+    numberOfCardsInMagic?: number;
+    percentageCollected?: number;
+    totalValue?: number;
+  };
 }
 
 /**

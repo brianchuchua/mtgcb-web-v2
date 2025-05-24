@@ -16,19 +16,20 @@ interface UseSetDataProps {
   skip: boolean;
   includeSubsets: boolean;
   skipCostToComplete?: boolean;
+  userId?: number;
 }
 
 /**
  * Fetches and processes set data
  * Handles API params, cost-to-complete data, and transforms API data to view model
  */
-export function useSetData({ searchParams, pagination, skip, includeSubsets, skipCostToComplete = false }: UseSetDataProps) {
+export function useSetData({ searchParams, pagination, skip, includeSubsets, skipCostToComplete = false, userId }: UseSetDataProps) {
   const router = useRouter();
   const setPriceType = useSetPriceType();
 
   const apiArgs = useMemo(() => {
     const params = buildApiParamsFromSearchParams(searchParams, 'sets');
-    return {
+    const baseArgs = {
       ...params,
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
@@ -46,7 +47,19 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
         'sealedProductUrl',
       ],
     };
-  }, [searchParams, pagination]);
+
+    // Add collection parameters if userId is provided
+    if (userId) {
+      return {
+        ...baseArgs,
+        userId,
+        priceType: setPriceType,
+        includeSubsetsInSets: includeSubsets,
+      };
+    }
+
+    return baseArgs;
+  }, [searchParams, pagination, userId, setPriceType, includeSubsets]);
 
   const queryConfig = {
     refetchOnMountOrArgChange: false,
@@ -93,5 +106,13 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
     apiArgs,
     costToComplete: costToCompleteData?.data,
     handleSetClick,
+    username: setsSearchResult?.data?.username,
+    collectionSummary: setsSearchResult?.data ? {
+      totalCardsCollected: setsSearchResult.data.totalCardsCollected,
+      uniquePrintingsCollected: setsSearchResult.data.uniquePrintingsCollected,
+      numberOfCardsInMagic: setsSearchResult.data.numberOfCardsInMagic,
+      percentageCollected: setsSearchResult.data.percentageCollected,
+      totalValue: setsSearchResult.data.totalValue,
+    } : undefined,
   };
 }

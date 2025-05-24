@@ -102,4 +102,12 @@ export interface SetApiParams {
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
   select?: string[];
+  // Collection-specific parameters
+  userId?: number;
+  priceType?: 'market' | 'low' | 'average' | 'high';
+  includeSubsetsInSets?: boolean;
+  completionStatus?: {
+    OR?: string[];
+    NOT?: string[];
+  };
 }

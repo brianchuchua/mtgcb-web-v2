@@ -3,7 +3,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CollectionSetItemRenderer } from './CollectionSetItemRenderer';
-import { useSetTableRenderers } from '@/components/sets/SetTableRenderer';
+import { useCollectionSetTableRenderers } from '@/components/collections/CollectionSetTableRenderer';
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { SetDisplayProps } from '@/components/sets/SetDisplay';
@@ -64,8 +64,8 @@ export const CollectionSetDisplay: React.FC<CollectionSetDisplayProps> = ({
         )
     : setItems;
 
-  // Get the appropriate renderers for table view
-  const { columns, renderRowContent } = useSetTableRenderers(displaySettings.table, currentSortBy, onSetClick);
+  // Get the appropriate renderers for table view with collection-specific columns
+  const { columns, renderRowContent } = useCollectionSetTableRenderers(displaySettings.table, currentSortBy, onSetClick);
 
   // Handle sort change
   const handleSortChange = (columnId: string) => {

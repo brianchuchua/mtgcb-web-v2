@@ -1,3 +1,5 @@
+import { CostToComplete } from '@/api/collections/types';
+
 export interface Set {
   id: string;
   name: string;
@@ -19,6 +21,12 @@ export interface Set {
   subsetGroupId: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+  // Collection fields (when userId is provided)
+  totalCardsCollectedInSet?: number;
+  uniquePrintingsCollectedInSet?: number;
+  percentageCollected?: number;
+  totalValue?: number;
+  costToComplete?: CostToComplete;
 }
 
 export interface SetsSearchResult {
@@ -26,4 +34,11 @@ export interface SetsSearchResult {
   limit: number;
   offset: number;
   sets: Set[];
+  // Collection summary fields (present when userId is provided)
+  username?: string;
+  totalCardsCollected?: number;
+  uniquePrintingsCollected?: number;
+  numberOfCardsInMagic?: number;
+  percentageCollected?: number;
+  totalValue?: number;
 }

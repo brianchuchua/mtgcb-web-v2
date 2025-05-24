@@ -20,6 +20,9 @@ const schemaToReduxKeyMap: Record<string, string> = {
   viewContentType: 'viewContentType',
   showSubsets: 'showSubsets',
   includeSubsetsInSets: 'includeSubsetsInSets',
+  setCategories: 'setCategories',
+  setTypes: 'setTypes',
+  completionStatus: 'completionStatus',
 };
 
 export function parseUrlToState(
@@ -78,6 +81,9 @@ const reduxToSchemaKeyMap: Record<string, string | [string, string]> = {
   viewContentType: 'viewContentType',
   showSubsets: 'showSubsets',
   includeSubsetsInSets: 'includeSubsetsInSets',
+  setCategories: 'setCategories',
+  setTypes: 'setTypes',
+  completionStatus: 'completionStatus',
 };
 
 export function convertStateToUrlParams(

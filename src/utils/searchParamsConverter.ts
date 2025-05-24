@@ -239,6 +239,26 @@ export const buildApiParamsFromSearchParams = (
     if (searchParams.showSubsets === false) {
       apiParams.parentSetId = null;
     }
+
+    // Add completion status for collections
+    if (searchParams.completionStatus) {
+      const includeStatuses = searchParams.completionStatus.include;
+      const excludeStatuses = searchParams.completionStatus.exclude;
+      
+      if (includeStatuses.length > 0 || excludeStatuses.length > 0) {
+        const statusFilter: any = {};
+        
+        if (includeStatuses.length > 0) {
+          statusFilter.OR = includeStatuses;
+        }
+        
+        if (excludeStatuses.length > 0) {
+          statusFilter.NOT = excludeStatuses;
+        }
+        
+        apiParams.completionStatus = statusFilter;
+      }
+    }
   }
 
   return apiParams;

@@ -31,6 +31,11 @@ export interface SetTypeFilter {
   exclude: string[];
 }
 
+export interface CompletionStatusFilter {
+  include: string[];
+  exclude: string[];
+}
+
 export interface StatCondition {
   attribute: string;
   operator: string;
@@ -55,7 +60,11 @@ export type SortByOption =
   | 'low'
   | 'average'
   | 'high'
-  | 'foil';
+  | 'foil'
+  // Collection-specific sort options
+  | 'totalValue'
+  | 'costToComplete.oneOfEachCard'
+  | 'percentageCollected';
 export type SortOrderOption = 'asc' | 'desc';
 
 export interface BrowseSearchParams {
@@ -78,6 +87,7 @@ export interface BrowseSearchParams {
   currentPage?: number;
   pageSize?: number;
   viewMode?: 'grid' | 'table';
+  completionStatus?: CompletionStatusFilter;
 }
 
 export interface BrowsePagination {
