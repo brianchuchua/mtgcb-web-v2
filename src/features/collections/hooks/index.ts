@@ -1,0 +1,1 @@
+export { useCollectionDisplaySettings } from './useCollectionDisplaySettings';

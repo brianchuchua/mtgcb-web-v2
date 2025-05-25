@@ -654,7 +654,7 @@ const BrowseSearchForm = () => {
           Release Date
         </MenuItem>,
         <MenuItem key="cardCount" value="cardCount">
-          Card Count
+          Cards In Set
         </MenuItem>,
         <MenuItem key="setType" value="setType">
           Set Type

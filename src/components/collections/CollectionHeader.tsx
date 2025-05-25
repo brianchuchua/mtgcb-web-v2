@@ -1,19 +1,7 @@
-import { Box, LinearProgress, Typography, keyframes } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
-
-// Animation for completed collection - sliding gradient
-const slideGradientAnimation = keyframes`
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-`;
+import { CollectionProgressBar } from './CollectionProgressBar';
 
 interface CollectionHeaderProps {
   username: string;
@@ -32,43 +20,6 @@ const HeaderContainer = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const ProgressBarContainer = styled(Box)(({ theme }) => ({
-  position: 'relative',
-  width: '100%',
-  maxWidth: '400px',
-  marginTop: theme.spacing(1),
-}));
-
-const StyledLinearProgress = styled(LinearProgress, {
-  shouldForwardProp: (prop) => prop !== 'percentageCollected',
-})<{ percentageCollected: number }>(({ theme, percentageCollected }) => ({
-    height: 24,
-    borderRadius: 12,
-    width: '100%',
-    '& .MuiLinearProgress-bar': {
-      background:
-        percentageCollected === 100
-          ? 'linear-gradient(270deg, #BF4427 0%, #E85D39 25%, #FFB347 50%, #E85D39 75%, #BF4427 100%)'
-          : 'linear-gradient(45deg, #90CAF9 0%, #1976D2 100%)',
-      backgroundSize: percentageCollected === 100 ? '200% 200%' : 'auto',
-      animation: percentageCollected === 100 ? `${slideGradientAnimation} 6s ease-in-out infinite` : 'none',
-      borderRadius: 12,
-    },
-  }),
-);
-
-const ProgressLabel = styled(Typography)(({ theme }) => ({
-  position: 'absolute',
-  left: '50%',
-  top: '50%',
-  transform: 'translate(-50%, -50%)',
-  fontWeight: 'bold',
-  color: theme.palette.common.white,
-  textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
-  fontSize: '0.875rem',
-  lineHeight: 1,
-  paddingTop: '1px',
-}));
 
 export const CollectionHeader: React.FC<CollectionHeaderProps> = ({
   username,
@@ -101,14 +52,13 @@ export const CollectionHeader: React.FC<CollectionHeaderProps> = ({
       </Typography>
 
       <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <ProgressBarContainer>
-          <StyledLinearProgress
-            variant="determinate"
-            value={percentageCollected}
-            percentageCollected={percentageCollected}
-          />
-          <ProgressLabel>{percentageCollected}% collected</ProgressLabel>
-        </ProgressBarContainer>
+        <CollectionProgressBar
+          percentage={percentageCollected}
+          height={24}
+          showLabel={true}
+          labelFormat="long"
+          maxWidth="400px"
+        />
       </Box>
     </HeaderContainer>
   );

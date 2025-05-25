@@ -4,6 +4,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, TableCell, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
+import { CollectionProgressBar } from './CollectionProgressBar';
 import { TableColumn } from '@/components/common/VirtualizedTable';
 import SetIcon from '@/components/sets/SetIcon';
 import { Set } from '@/types/sets';
@@ -17,6 +18,9 @@ export interface CollectionSetTableRendererProps {
     typeIsVisible?: boolean;
     categoryIsVisible?: boolean;
     isDraftableIsVisible?: boolean;
+    completionIsVisible?: boolean;
+    costToCompleteIsVisible?: boolean;
+    valueIsVisible?: boolean;
   };
 }
 
@@ -74,8 +78,8 @@ export const useCollectionSetTableColumns = (
     },
     {
       id: 'costToComplete.oneOfEachCard',
-      label: 'Cost to Complete',
-      width: { default: '140px' },
+      label: '$ to Complete',
+      width: { default: '150px' },
       align: 'right',
       sortable: true,
     },
@@ -112,9 +116,9 @@ export const useCollectionSetTableColumns = (
     if (column.id === 'code') return displaySettings.codeIsVisible !== false;
     if (column.id === 'name') return true; // Always show name
     if (column.id === 'cardCount') return displaySettings.cardCountIsVisible !== false;
-    if (column.id === 'percentageCollected') return true; // Always show for collections
-    if (column.id === 'totalValue') return true; // Always show for collections
-    if (column.id === 'costToComplete.oneOfEachCard') return true; // Always show for collections
+    if (column.id === 'percentageCollected') return displaySettings.completionIsVisible !== false;
+    if (column.id === 'totalValue') return displaySettings.valueIsVisible !== false;
+    if (column.id === 'costToComplete.oneOfEachCard') return displaySettings.costToCompleteIsVisible !== false;
     if (column.id === 'releasedAt') return displaySettings.releaseDateIsVisible !== false;
     if (column.id === 'setType') return displaySettings.typeIsVisible !== false;
     if (column.id === 'category') return displaySettings.categoryIsVisible !== false;
@@ -156,41 +160,64 @@ export const useCollectionSetRowRenderer = (
     if (displaySettings.cardCountIsVisible !== false) {
       cells.push(
         <TableCell key="cardCount" align="right">
-          {set.cardCount ? parseInt(set.cardCount).toLocaleString() : 'N/A'}
+          {set.cardCount && set.uniquePrintingsCollectedInSet !== undefined ? (
+            <Typography variant="body2">
+              {set.uniquePrintingsCollectedInSet.toLocaleString()}/{parseInt(set.cardCount).toLocaleString()}
+            </Typography>
+          ) : set.cardCount ? (
+            parseInt(set.cardCount).toLocaleString()
+          ) : (
+            'N/A'
+          )}
         </TableCell>,
       );
     }
 
     // Percentage Collected Cell (collection-specific)
-    cells.push(
-      <TableCell key="percentageCollected" align="center">
-        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-          {set.percentageCollected !== undefined ? `${Math.round(set.percentageCollected)}%` : 'N/A'}
-        </Typography>
-      </TableCell>,
-    );
+    if (displaySettings.completionIsVisible !== false) {
+      cells.push(
+        <TableCell key="percentageCollected" align="center">
+          {set.percentageCollected !== undefined ? (
+            <CollectionProgressBar
+              percentage={set.percentageCollected}
+              height={16}
+              showLabel={true}
+              labelFormat="short"
+              minWidth="80px"
+              maxWidth="100px"
+            />
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              N/A
+            </Typography>
+          )}
+        </TableCell>,
+      );
+    }
 
     // Total Value Cell (collection-specific)
-    cells.push(
-      <TableCell key="totalValue" align="right">
-        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-          {set.totalValue !== undefined 
-            ? `$${set.totalValue.toFixed(2)}`
-            : 'N/A'}
-        </Typography>
-      </TableCell>,
-    );
+    if (displaySettings.valueIsVisible !== false) {
+      cells.push(
+        <TableCell key="totalValue" align="right">
+          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+            {set.totalValue !== undefined ? `$${set.totalValue.toFixed(2)}` : 'N/A'}
+          </Typography>
+        </TableCell>,
+      );
+    }
 
     // Cost to Complete Cell (collection-specific)
-    cells.push(
-      <TableCell key="costToComplete" align="right">
-        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-          {set.costToComplete?.oneOfEachCard !== undefined 
-            ? `$${set.costToComplete.oneOfEachCard.toFixed(2)}`
-            : 'N/A'}
-        </Typography>
-      </TableCell>,
-    );
+    if (displaySettings.costToCompleteIsVisible !== false) {
+      cells.push(
+        <TableCell key="costToComplete" align="right">
+          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+            {set.costToComplete?.oneOfEachCard !== undefined
+              ? `$${set.costToComplete.oneOfEachCard.toFixed(2)}`
+              : 'N/A'}
+          </Typography>
+        </TableCell>,
+      );
+    }
 
     // Release Date Cell
     if (displaySettings.releaseDateIsVisible !== false) {

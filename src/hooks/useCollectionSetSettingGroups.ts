@@ -4,8 +4,8 @@ import { useLocalStorage } from './useLocalStorage';
 import { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 import { PriceType } from '@/types/pricing';
 
-export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
-  // Set Gallery visibility settings
+export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
+  // Set Gallery visibility settings (reuse existing ones)
   const [nameIsVisible, setNameIsVisible] = useLocalStorage('setNameIsVisible', true);
   const [codeIsVisible, setCodeIsVisible] = useLocalStorage('setCodeIsVisible', true);
   const [releaseDateIsVisible, setReleaseDateIsVisible] = useLocalStorage('setReleaseDateIsVisible', true);
@@ -14,7 +14,7 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
   const [cardCountIsVisible, setCardCountIsVisible] = useLocalStorage('setCardCountIsVisible', true);
   const [costsIsVisible, setCostsIsVisible] = useLocalStorage('setCostsIsVisible', true);
 
-  // Set Table column visibility settings
+  // Collection-specific table column visibility settings
   const [tableCodeIsVisible, setTableCodeIsVisible] = useLocalStorage('tableSetCodeIsVisible', true);
   const [tableCardCountIsVisible, setTableCardCountIsVisible] = useLocalStorage('tableSetCardCountIsVisible', true);
   const [tableReleaseDateIsVisible, setTableReleaseDateIsVisible] = useLocalStorage(
@@ -27,6 +27,17 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
     'tableSetIsDraftableIsVisible',
     false,
   );
+
+  // New collection-specific columns
+  const [tableCompletionIsVisible, setTableCompletionIsVisible] = useLocalStorage(
+    'tableCollectionCompletionIsVisible',
+    true,
+  );
+  const [tableCostToCompleteIsVisible, setTableCostToCompleteIsVisible] = useLocalStorage(
+    'tableCollectionCostToCompleteIsVisible',
+    true,
+  );
+  const [tableValueIsVisible, setTableValueIsVisible] = useLocalStorage('tableCollectionValueIsVisible', true);
 
   // Layout settings
   const [setsPerRow, setSetsPerRow] = useLocalStorage('setsPerRow', 0); // Default to 0 (responsive)
@@ -163,6 +174,27 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
         label: 'Cards In Set',
         isVisible: tableCardCountIsVisible,
         setVisibility: setTableCardCountIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableCompletion',
+        label: 'Completion',
+        isVisible: tableCompletionIsVisible,
+        setVisibility: setTableCompletionIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableValue',
+        label: 'Value',
+        isVisible: tableValueIsVisible,
+        setVisibility: setTableValueIsVisible,
+        type: 'toggle',
+      },
+      {
+        key: 'tableCostToComplete',
+        label: '$ to Complete',
+        isVisible: tableCostToCompleteIsVisible,
+        setVisibility: setTableCostToCompleteIsVisible,
         type: 'toggle',
       },
       {

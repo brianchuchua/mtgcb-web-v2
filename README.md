@@ -6,8 +6,7 @@
 
 - Big picture:
 - Implement collection view mode
-  - Implement collection table for the set view (mostly done by accident already, needs filter toggles)
-  - Collection set page, may keep existing api call, or make a new consolidated one
+  - Collection set page, may keep existing api call, or make a new consolidated one -- or actually, can just use the current one but fix the api call to use that setId, yeah?
   - Implement collection card gallery, hen do the same for the cards view endpoint, make a new one enhanced to take a userId, blend search and user data
   - Implement collection edit page
   - Implement collection edit mode
@@ -33,11 +32,13 @@
   - Verify Buy Draft Cube with KTK once I can see the cards I own
   - Serious bug: Been getting Database connection failed: error: sorry, too many clients already too often, something is up
   - Bug: Draft cube calculation when track subsets with sets in on, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir
+  - Bug: Duel Decks: Anthology, with and without subsets with main sets setting 99% vs 100% complete
   - remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
 
+- set table settings needs to be sorted in same order as table, same for the cards table settings
 - Check 99% completed (like gatecrash), shows all the little rounding bugs
 - Consider having main menu collapse by default on pages that have the search options open
-- Serious bug: Scrolling far down during the virtualization of the set grid view by clicking halfway through scrollbar while viewing 500 sets, jumping up and down in a loop
+- Serious bug: Scrolling far down during the virtualization of the set grid view by clicking halfway through scrollbar while viewing 500 sets, jumping up and down in a loop -- maybe need to render further down or something?
 - it would be nice if pagination didn't change when changing track subsets with main set or price type
 - audit caching of collection apis when user updates collection -- and of api calls in general in this repo
 - evaluate stickyness of contentType when navigating between pages
@@ -77,6 +78,7 @@
 
 ## Later
 
+- Consult with an UX designer
 - Sonarcube integration
 - 1024x768 testing of table view and gridview and menus with sidenav open (or determine target resolution)
 - Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
