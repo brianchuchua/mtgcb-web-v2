@@ -6,6 +6,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Box, Button, IconButton, MenuItem, Paper, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { usePathname } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +17,7 @@ import { selectSearchParams, selectStats, setStats } from '@/redux/slices/browse
 import { StatCondition, StatFilters } from '@/types/browse';
 import { PriceType } from '@/types/pricing';
 
-const STAT_ATTRIBUTES = [
+const BASE_STAT_ATTRIBUTES = [
   { label: 'Mana Value', value: 'convertedManaCost' },
   { label: 'Power', value: 'powerNumeric' },
   { label: 'Toughness', value: 'toughnessNumeric' },
@@ -26,6 +27,12 @@ const STAT_ATTRIBUTES = [
   { label: 'Price (Average)', value: 'average' },
   { label: 'Price (High)', value: 'high' },
   { label: 'Price (Foil)', value: 'foil' },
+];
+
+const COLLECTION_STAT_ATTRIBUTES = [
+  { label: 'Quantity (Regular)', value: 'quantityReg' },
+  { label: 'Quantity (Foil)', value: 'quantityFoil' },
+  { label: 'Quantity (Total)', value: 'quantityAll' },
 ];
 
 const OPERATORS = [
@@ -86,14 +93,28 @@ const isPriceAttribute = (attribute: string): boolean => {
   return ['market', 'low', 'average', 'high', 'foil'].includes(attribute);
 };
 
+// Helper to determine if an attribute is a quantity attribute
+const isQuantityAttribute = (attribute: string): boolean => {
+  return ['quantityReg', 'quantityFoil', 'quantityAll'].includes(attribute);
+};
+
 const StatSearch = () => {
   const dispatch = useDispatch();
+  const pathname = usePathname();
   const { enqueueSnackbar } = useSnackbar();
   const reduxStats = useSelector(selectStats);
   const searchParams = useSelector(selectSearchParams);
   const userModified = useRef(false);
   const [conditions, setConditions] = useState<StatCondition[]>(() => parseReduxStats(reduxStats));
   const prevDisplayPriceType = useRef<string | null>(null);
+
+  // Check if we're on a collection page
+  const isCollectionPage = pathname?.startsWith('/collections/') || false;
+
+  // Get the available stat attributes based on whether we're on a collection page
+  const STAT_ATTRIBUTES = isCollectionPage 
+    ? [...BASE_STAT_ATTRIBUTES, ...COLLECTION_STAT_ATTRIBUTES]
+    : BASE_STAT_ATTRIBUTES;
 
   // Get the current display price type
   const displayPriceType = usePriceType();
@@ -284,6 +305,9 @@ const StatSearch = () => {
     if (isDecimalNumberInput(attribute)) {
       return '0.00';
     }
+    if (isQuantityAttribute(attribute)) {
+      return '0';
+    }
     return '';
   };
 
@@ -295,6 +319,7 @@ const StatSearch = () => {
         step: 'any', // Disables step arrows
       };
     }
+    // For quantities and other numeric attributes
     return {
       min: '0',
       step: '1',

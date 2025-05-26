@@ -46,10 +46,14 @@ export interface CardItemProps {
   high?: string | null;
   market?: string | null;
   foil?: string | null;
+  // Collection quantities
+  quantityReg?: number;
+  quantityFoil?: number;
   display?: {
     nameIsVisible?: boolean;
     setIsVisible?: boolean;
     priceIsVisible?: boolean;
+    quantityIsVisible?: boolean;
   };
   priceType?: PriceType; // Price type to display
   onClick?: () => void;
@@ -75,10 +79,13 @@ const CardItem = ({
   high,
   market,
   foil,
+  quantityReg,
+  quantityFoil,
   display = {
     nameIsVisible: true,
     setIsVisible: true,
     priceIsVisible: true,
+    quantityIsVisible: false,
   },
   priceType = PriceType.Market,
   onClick,
@@ -88,7 +95,7 @@ const CardItem = ({
   const [imageError, setImageError] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
-  const { nameIsVisible, setIsVisible, priceIsVisible } = display;
+  const { nameIsVisible, setIsVisible, priceIsVisible, quantityIsVisible = false } = display;
 
   // If this is a loading skeleton, render an invisible placeholder
   if (isLoadingSkeleton) {
@@ -220,7 +227,7 @@ const CardItem = ({
         )}
       </CardImageContainer>
 
-      {(nameIsVisible || setIsVisible || priceIsVisible) && (
+      {(nameIsVisible || setIsVisible || priceIsVisible || quantityIsVisible) && (
         <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
           {nameIsVisible && (
             <Typography
@@ -281,7 +288,8 @@ const CardItem = ({
                 </Link>
               ) : (
                 setName || 'Unknown Set'
-              )} #{collectorNumber || '??'}
+              )}{' '}
+              #{collectorNumber || '??'}
             </Typography>
           )}
 
@@ -303,6 +311,21 @@ const CardItem = ({
               }}
             >
               <CardPrice prices={priceData} isLoading={isLoadingSkeleton} priceType={priceType} />
+            </Box>
+          )}
+
+          {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && (
+            <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center', gap: 1 }}>
+              {quantityReg !== undefined && (
+                <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                  {quantityReg}x Regular
+                </Typography>
+              )}
+              {quantityFoil !== undefined && (
+                <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                  {quantityFoil}x Foil
+                </Typography>
+              )}
             </Box>
           )}
         </CardContent>

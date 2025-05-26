@@ -593,7 +593,7 @@ const BrowseSearchForm = () => {
   // Get sort options based on content type
   const getSortOptions = () => {
     if (contentType === 'cards') {
-      return [
+      const baseCardOptions = [
         <MenuItem key="name" value="name">
           Name
         </MenuItem>,
@@ -641,6 +641,24 @@ const BrowseSearchForm = () => {
           Price (Foil)
         </MenuItem>,
       ];
+      
+      // Add collection-specific sort options when viewing a collection
+      if (isCollectionPage) {
+        const collectionCardOptions = [
+          <MenuItem key="quantityReg" value="quantityReg">
+            Quantity (Regular)
+          </MenuItem>,
+          <MenuItem key="quantityFoil" value="quantityFoil">
+            Quantity (Foil)
+          </MenuItem>,
+          <MenuItem key="quantityAll" value="quantityAll">
+            Quantity (Total)
+          </MenuItem>,
+        ];
+        return [...baseCardOptions, ...collectionCardOptions];
+      }
+      
+      return baseCardOptions;
     } else {
       // Base set sort options
       const baseOptions = [

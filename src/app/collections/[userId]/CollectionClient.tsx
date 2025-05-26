@@ -7,8 +7,8 @@ import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisplay';
 import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Pagination } from '@/components/pagination';
-import { SetsProps } from '@/features/browse/types';
-import { ErrorBanner } from '@/features/browse/views';
+import { CardsProps, SetsProps } from '@/features/browse/types';
+import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 
 interface CollectionClientProps {
@@ -16,7 +16,7 @@ interface CollectionClientProps {
 }
 
 export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) => {
-  const { view, error, paginationProps, setsProps } = useCollectionBrowseController({ userId });
+  const { view, viewMode, error, paginationProps, setsProps, cardsProps } = useCollectionBrowseController({ userId });
 
   // Create collection sets map from the sets data
   const collectionSets = useMemo(() => {
@@ -71,10 +71,28 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
   }, [setsProps]);
 
   // Show loading state only on initial load
-  const isLoading = setsProps && 'isLoading' in setsProps ? setsProps.isLoading : false;
+  const isLoading = view === 'sets' 
+    ? (setsProps && 'isLoading' in setsProps ? setsProps.isLoading : false)
+    : (cardsProps && 'loading' in cardsProps ? cardsProps.loading : false);
+    
   const collectionSummary = setsProps && 'collectionSummary' in setsProps ? setsProps.collectionSummary : null;
 
-  if (!collectionSummary && isLoading) {
+  // For cards view, we don't need collection summary to render
+  if (view === 'cards' && (!cardsProps || !('items' in cardsProps))) {
+    if (isLoading) {
+      return (
+        <CenteredContainer>
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+            <CircularProgress />
+          </Box>
+        </CenteredContainer>
+      );
+    }
+    return null;
+  }
+
+  // For sets view, we need collection summary
+  if (view === 'sets' && !collectionSummary && isLoading) {
     return (
       <CenteredContainer>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
@@ -84,26 +102,28 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
     );
   }
 
-  if (!collectionSummary) {
+  if (view === 'sets' && !collectionSummary) {
     return null;
   }
 
   return (
     <>
-      <CollectionHeader
-        username={setsProps.username || ''}
-        uniquePrintingsCollected={collectionSummary.uniquePrintingsCollected || 0}
-        numberOfCardsInMagic={collectionSummary.numberOfCardsInMagic || 0}
-        totalCardsCollected={collectionSummary.totalCardsCollected || 0}
-        percentageCollected={collectionSummary.percentageCollected || 0}
-        totalValue={collectionSummary.totalValue || 0}
-      />
+      {collectionSummary && (
+        <CollectionHeader
+          username={setsProps.username || ''}
+          uniquePrintingsCollected={collectionSummary.uniquePrintingsCollected || 0}
+          numberOfCardsInMagic={collectionSummary.numberOfCardsInMagic || 0}
+          totalCardsCollected={collectionSummary.totalCardsCollected || 0}
+          percentageCollected={collectionSummary.percentageCollected || 0}
+          totalValue={collectionSummary.totalValue || 0}
+        />
+      )}
 
       <Pagination {...paginationProps} />
 
-      {error && <ErrorBanner type="sets" />}
+      {error && <ErrorBanner type={view} />}
 
-      {/* Only show sets view for collections */}
+      {/* Show sets view for collections */}
       {view === 'sets' && 'setItems' in setsProps && setsProps.setItems && (
         <CollectionSetDisplay
           {...(setsProps as SetsProps)}
@@ -112,6 +132,14 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
             collectionSets,
           }}
         />
+      )}
+
+      {/* Show cards view for collections */}
+      {view === 'cards' && cardsProps && 'items' in cardsProps && (
+        <>
+          {viewMode === 'grid' && <CardGrid {...(cardsProps as CardsProps)} />}
+          {viewMode === 'table' && <CardTable {...(cardsProps as CardsProps)} />}
+        </>
       )}
     </>
   );

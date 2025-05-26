@@ -68,6 +68,7 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
     searchParams: cardSearchParams,
     pagination,
     skip: currentView !== 'cards',
+    userId: options?.userId,
   });
 
   const setData = useSetData({

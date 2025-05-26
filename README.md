@@ -6,8 +6,7 @@
 
 - Big picture:
 - Implement collection view mode
-  - Collection set page, may keep existing api call, or make a new consolidated one -- or actually, can just use the current one but fix the api call to use that setId, yeah?
-  - Implement collection card gallery, hen do the same for the cards view endpoint, make a new one enhanced to take a userId, blend search and user data
+  - Collection set page, may keep existing api call, or make a new consolidated one -- or actually, can just use the current one but fix the api call to use that setId, yeah? Can just have Claude follow the same pattern.
   - Implement collection edit page
   - Implement collection edit mode
   - Privacy mode
@@ -17,6 +16,8 @@
   - Collection card page
 - Going mythic / green setting
 - Current feature work:
+
+- think about where to render reg and foil in table view, probably next to the card name
 
   - figure out best way to handle figuring out which cards are missing from a user's collection, is there an api to get their cards in a set
     - old api had a tcgplayerMassImportForUserLegacy method that took a setId, whether to include subsets in sets, and what kind of count was desired and returned the list of cards they needed
@@ -34,7 +35,10 @@
   - Bug: Draft cube calculation when track subsets with sets in on, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir
   - Bug: Duel Decks: Anthology, with and without subsets with main sets setting 99% vs 100% complete
   - remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
+  - remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
 
+- Probably use different api calls for userId vs non-userId so that I can use tags to invalidate the userId ones when a collection is updated
+- tech debt in API = const allMatchingSets = await findSetsByQuery(fastify, whereClause, orderClause, 10000, 0, select); <-- will break if more than 10000 sets
 - set table settings needs to be sorted in same order as table, same for the cards table settings
 - Check 99% completed (like gatecrash), shows all the little rounding bugs
 - Consider having main menu collapse by default on pages that have the search options open
@@ -75,6 +79,7 @@
 - Patron request: Highlight recently updated card in some way, perhaps the input box or the price
 - Home page, call to action to register or login
 - Iterate on the complete collection animation for the circular progress bar
+- Smarter knowledge if cards can be foil -- check status of scryfall data for this
 
 ## Later
 

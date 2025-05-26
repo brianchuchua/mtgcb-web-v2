@@ -46,6 +46,9 @@ export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
     },
     tcgplayerId: card.tcgplayerId !== null ? card.tcgplayerId : undefined,
     releaseDate: card.releaseDate,
+    // Include quantity fields if present
+    quantityReg: card.quantityReg,
+    quantityFoil: card.quantityFoil,
   }));
 };
 

@@ -14,44 +14,53 @@ interface UseCardDataProps {
     pageSize: number;
   };
   skip: boolean;
+  userId?: number;
 }
 
-export function useCardData({ searchParams, pagination, skip }: UseCardDataProps) {
+export function useCardData({ searchParams, pagination, skip, userId }: UseCardDataProps) {
   const router = useRouter();
 
   const apiArgs = useMemo(() => {
     const params = buildApiParamsFromSearchParams(searchParams, 'cards');
+    const selectFields: Array<keyof CardModel> = [
+      'name',
+      'setId',
+      'setName',
+      'tcgplayerId',
+      'market',
+      'low',
+      'average',
+      'high',
+      'foil',
+      'collectorNumber',
+      'mtgcbCollectorNumber',
+      'rarity',
+      'rarityNumeric',
+      'type',
+      'artist',
+      'manaCost',
+      'convertedManaCost',
+      'powerNumeric',
+      'toughnessNumeric',
+      'loyaltyNumeric',
+      'releaseDate',
+    ];
+    
+    // Add quantity fields when userId is present
+    if (userId) {
+      selectFields.push('quantityReg', 'quantityFoil');
+    }
+    
     return {
       ...params,
+      ...(userId && { userId }),
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
       sortBy: params.sortBy || 'releasedAt',
       sortDirection: params.sortDirection || ('asc' as const),
-      select: [
-        'name',
-        'setId',
-        'setName',
-        'tcgplayerId',
-        'market',
-        'low',
-        'average',
-        'high',
-        'foil',
-        'collectorNumber',
-        'mtgcbCollectorNumber',
-        'rarity',
-        'rarityNumeric',
-        'type',
-        'artist',
-        'manaCost',
-        'convertedManaCost',
-        'powerNumeric',
-        'toughnessNumeric',
-        'loyaltyNumeric',
-        'releaseDate',
-      ] as Array<keyof CardModel>,
+      select: selectFields,
     };
-  }, [searchParams, pagination]);
+  }, [searchParams, pagination, userId]);
 
   const queryConfig = {
     refetchOnMountOrArgChange: false,

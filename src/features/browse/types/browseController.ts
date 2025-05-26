@@ -50,6 +50,7 @@ export interface TableSettings {
   toughnessIsVisible: boolean;
   loyaltyIsVisible: boolean;
   priceIsVisible: boolean;
+  quantityIsVisible?: boolean;
 }
 
 /**
@@ -59,6 +60,7 @@ export interface CardDisplaySettings {
   nameIsVisible: boolean;
   setIsVisible: boolean;
   priceIsVisible: boolean;
+  quantityIsVisible?: boolean;
 }
 
 /**

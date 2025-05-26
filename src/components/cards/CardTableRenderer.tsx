@@ -26,6 +26,7 @@ export interface CardTableRendererProps {
     toughnessIsVisible?: boolean;
     loyaltyIsVisible?: boolean;
     priceIsVisible?: boolean;
+    quantityIsVisible?: boolean;
   };
 }
 
@@ -67,6 +68,21 @@ export const useCardTableColumns = (
     <div>
       <div>Sort by mana value</div>
       <div>Shows the mana symbols, but sorts by converted mana cost</div>
+    </div>
+  );
+
+  // Tooltip components for quantity columns
+  const QuantityRegTooltip = () => (
+    <div>
+      <div>Sort by regular quantity</div>
+      <div>Number of non-foil copies in your collection</div>
+    </div>
+  );
+
+  const QuantityFoilTooltip = () => (
+    <div>
+      <div>Sort by foil quantity</div>
+      <div>Number of foil copies in your collection</div>
     </div>
   );
 
@@ -184,6 +200,24 @@ export const useCardTableColumns = (
       hasInfoIcon: true,
       sortable: true,
     },
+    {
+      id: 'quantityReg',
+      label: 'Reg',
+      width: { default: '60px' },
+      align: 'center',
+      tooltip: <QuantityRegTooltip />,
+      hasInfoIcon: true,
+      sortable: true,
+    },
+    {
+      id: 'quantityFoil',
+      label: 'Foil',
+      width: { default: '60px' },
+      align: 'center',
+      tooltip: <QuantityFoilTooltip />,
+      hasInfoIcon: true,
+      sortable: true,
+    },
   ];
 
   // Filter columns based on visibility settings
@@ -208,6 +242,10 @@ export const useCardTableColumns = (
       column.id === 'foil';
 
     if (isPriceColumn) return displaySettings.priceIsVisible;
+    
+    if (column.id === 'quantityReg' || column.id === 'quantityFoil') {
+      return displaySettings.quantityIsVisible ?? false;
+    }
 
     return true;
   });
@@ -544,6 +582,20 @@ export const useCardRowRenderer = (
           >
             <CardPrice prices={preparePriceData(card) || null} isLoading={false} priceType={priceType} centered={false} />
           </PriceLink>
+        </TableCell>,
+      );
+    }
+
+    // Quantity Cells
+    if (displaySettings.quantityIsVisible) {
+      cells.push(
+        <TableCell key="quantityReg" sx={{ textAlign: 'center' }}>
+          {card.quantityReg !== undefined ? card.quantityReg : '-'}
+        </TableCell>,
+      );
+      cells.push(
+        <TableCell key="quantityFoil" sx={{ textAlign: 'center' }}>
+          {card.quantityFoil !== undefined ? card.quantityFoil : '-'}
         </TableCell>,
       );
     }
