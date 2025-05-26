@@ -116,6 +116,14 @@ export interface CardData {
   error: any;
   apiArgs: any;
   handleCardClick: (cardId: string, cardName?: string) => void;
+  username?: string;
+  collectionSummary?: {
+    totalCardsCollected?: number;
+    uniquePrintingsCollected?: number;
+    numberOfCardsInMagic?: number;
+    percentageCollected?: number;
+    totalValue?: number;
+  };
 }
 
 /**
@@ -167,6 +175,14 @@ export interface CardsProps {
   tableSettings: TableSettings;
   cardDisplaySettings: CardDisplaySettings;
   priceType: PriceType;
+  username?: string;
+  collectionSummary?: {
+    totalCardsCollected?: number;
+    uniquePrintingsCollected?: number;
+    numberOfCardsInMagic?: number;
+    percentageCollected?: number;
+    totalValue?: number;
+  };
 }
 
 /**

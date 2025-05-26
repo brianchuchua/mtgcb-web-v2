@@ -3,6 +3,7 @@
 import { Box, Card, CardContent, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import CardPrice from './CardPrice';
 import { PriceType } from '@/types/pricing';
@@ -94,8 +95,13 @@ const CardItem = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
+  const pathname = usePathname();
 
   const { nameIsVisible, setIsVisible, priceIsVisible, quantityIsVisible = false } = display;
+
+  // Check if we're in a collection view and extract userId
+  const collectionMatch = pathname?.match(/^\/collections\/(\d+)/);
+  const userId = collectionMatch ? collectionMatch[1] : null;
 
   // If this is a loading skeleton, render an invisible placeholder
   if (isLoadingSkeleton) {
@@ -266,7 +272,7 @@ const CardItem = ({
             >
               {setName && setSlug ? (
                 <Link
-                  href={`/browse/sets/${setSlug}`}
+                  href={userId ? `/collections/${userId}/${setSlug}` : `/browse/sets/${setSlug}`}
                   style={{
                     color: 'inherit',
                     textDecoration: 'none',

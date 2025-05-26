@@ -75,24 +75,17 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
     ? (setsProps && 'isLoading' in setsProps ? setsProps.isLoading : false)
     : (cardsProps && 'loading' in cardsProps ? cardsProps.loading : false);
     
-  const collectionSummary = setsProps && 'collectionSummary' in setsProps ? setsProps.collectionSummary : null;
+  const collectionSummary = view === 'sets' 
+    ? (setsProps && 'collectionSummary' in setsProps ? setsProps.collectionSummary : null)
+    : (cardsProps && 'collectionSummary' in cardsProps ? cardsProps.collectionSummary : null);
+  
+  const username = view === 'sets'
+    ? (setsProps && 'username' in setsProps ? setsProps.username : '')
+    : (cardsProps && 'username' in cardsProps ? cardsProps.username : '');
 
-  // For cards view, we don't need collection summary to render
-  if (view === 'cards' && (!cardsProps || !('items' in cardsProps))) {
-    if (isLoading) {
-      return (
-        <CenteredContainer>
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-            <CircularProgress />
-          </Box>
-        </CenteredContainer>
-      );
-    }
-    return null;
-  }
-
-  // For sets view, we need collection summary
-  if (view === 'sets' && !collectionSummary && isLoading) {
+  // Show loading state for initial load
+  if (isLoading && ((view === 'cards' && (!cardsProps || !('items' in cardsProps))) || 
+                    (view === 'sets' && (!setsProps || !('setItems' in setsProps))))) {
     return (
       <CenteredContainer>
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
@@ -102,15 +95,11 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
     );
   }
 
-  if (view === 'sets' && !collectionSummary) {
-    return null;
-  }
-
   return (
     <>
       {collectionSummary && (
         <CollectionHeader
-          username={setsProps.username || ''}
+          username={username || ''}
           uniquePrintingsCollected={collectionSummary.uniquePrintingsCollected || 0}
           numberOfCardsInMagic={collectionSummary.numberOfCardsInMagic || 0}
           totalCardsCollected={collectionSummary.totalCardsCollected || 0}

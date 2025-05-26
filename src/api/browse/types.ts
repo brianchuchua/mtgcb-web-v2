@@ -49,6 +49,13 @@ export interface CardSearchData {
   totalCount: number;
   limit: number;
   offset: number;
+  // Collection summary fields (only present when userId is provided)
+  username?: string;
+  totalCardsCollected?: number;
+  uniquePrintingsCollected?: number;
+  numberOfCardsInMagic?: number;
+  percentageCollected?: number;
+  totalValue?: number;
 }
 
 export interface CardApiParams {

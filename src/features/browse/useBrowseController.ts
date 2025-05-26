@@ -171,6 +171,8 @@ function buildCardPayload({
       tableSettings: displaySettings.tableSettings,
       cardDisplaySettings: displaySettings.cardDisplaySettings,
       priceType: displaySettings.priceType,
+      username: cardData.username,
+      collectionSummary: cardData.collectionSummary,
     },
 
     /* No setsProps while in Card mode */

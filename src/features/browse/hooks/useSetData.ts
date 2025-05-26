@@ -93,9 +93,13 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
 
   const handleSetClick = useCallback(
     (set: Set) => {
-      router.push(`/browse?includeSets=${set.id}`);
+      if (userId) {
+        router.push(`/collections/${userId}/${set.slug}`);
+      } else {
+        router.push(`/browse?includeSets=${set.id}`);
+      }
     },
-    [router],
+    [router, userId],
   );
 
   return {

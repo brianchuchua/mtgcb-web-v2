@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
+import { usePriceType } from '@/hooks/usePriceType';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 
@@ -19,6 +20,7 @@ interface UseCardDataProps {
 
 export function useCardData({ searchParams, pagination, skip, userId }: UseCardDataProps) {
   const router = useRouter();
+  const priceType = usePriceType();
 
   const apiArgs = useMemo(() => {
     const params = buildApiParamsFromSearchParams(searchParams, 'cards');
@@ -53,14 +55,14 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     
     return {
       ...params,
-      ...(userId && { userId }),
+      ...(userId && { userId, priceType }),
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
       sortBy: params.sortBy || 'releasedAt',
       sortDirection: params.sortDirection || ('asc' as const),
       select: selectFields,
     };
-  }, [searchParams, pagination, userId]);
+  }, [searchParams, pagination, userId, priceType]);
 
   const queryConfig = {
     refetchOnMountOrArgChange: false,
@@ -119,5 +121,13 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     error,
     apiArgs,
     handleCardClick,
+    username: cardsSearchResult?.data?.username,
+    collectionSummary: cardsSearchResult?.data ? {
+      totalCardsCollected: cardsSearchResult.data.totalCardsCollected,
+      uniquePrintingsCollected: cardsSearchResult.data.uniquePrintingsCollected,
+      numberOfCardsInMagic: cardsSearchResult.data.numberOfCardsInMagic,
+      percentageCollected: cardsSearchResult.data.percentageCollected,
+      totalValue: cardsSearchResult.data.totalValue,
+    } : undefined,
   };
 }

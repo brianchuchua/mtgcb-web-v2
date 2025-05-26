@@ -6,7 +6,6 @@
 
 - Big picture:
 - Implement collection view mode
-  - Collection set page, may keep existing api call, or make a new consolidated one -- or actually, can just use the current one but fix the api call to use that setId, yeah? Can just have Claude follow the same pattern.
   - Implement collection edit page
   - Implement collection edit mode
   - Privacy mode
@@ -16,7 +15,8 @@
   - Collection card page
 - Going mythic / green setting
 - Current feature work:
-
+- collection page should default to sets view, some links to collection set missing
+- skeleton loader for collection header to prevent vertical shift when loading
 - think about where to render reg and foil in table view, probably next to the card name
 
   - figure out best way to handle figuring out which cards are missing from a user's collection, is there an api to get their cards in a set

@@ -85,7 +85,10 @@ const BrowseSearchForm = () => {
 
   // Check if we're on a set-specific page
   const pathname = usePathname();
-  const isSetPage = pathname?.includes('/browse/sets/') || false;
+  const isSetPage =
+    pathname?.includes('/browse/sets/') ||
+    (pathname?.includes('/collections/') && pathname?.split('/').length > 3) ||
+    false;
 
   // Check if this is a collection page (to show collection-specific sort options)
   const isCollectionPage = pathname?.startsWith('/collections/') || false;
@@ -641,7 +644,7 @@ const BrowseSearchForm = () => {
           Price (Foil)
         </MenuItem>,
       ];
-      
+
       // Add collection-specific sort options when viewing a collection
       if (isCollectionPage) {
         const collectionCardOptions = [
@@ -657,7 +660,7 @@ const BrowseSearchForm = () => {
         ];
         return [...baseCardOptions, ...collectionCardOptions];
       }
-      
+
       return baseCardOptions;
     } else {
       // Base set sort options

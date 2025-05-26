@@ -4,6 +4,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, TableCell, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import React, { useEffect, useRef } from 'react';
 import { CardItemProps } from './CardItem';
 import CardPrice from './CardPrice';
@@ -457,8 +458,12 @@ export const useCardRowRenderer = (
   onCardClick?: (cardId: string) => void,
 ) => {
   const { showCardPreview, hideCardPreview } = useCardPreviewEffect([]);
+  const pathname = usePathname();
 
   const renderCardRow = (index: number, card: CardItemProps) => {
+    // Check if we're in a collection view and extract userId
+    const collectionMatch = pathname?.match(/^\/collections\/(\d+)/);
+    const userId = collectionMatch ? collectionMatch[1] : null;
     // Create a collection of cells based on visible columns
     const cells = [];
 
@@ -491,7 +496,7 @@ export const useCardRowRenderer = (
         <TableCell key="set">
           {card.setName && card.setSlug ? (
             <Link
-              href={`/browse/sets/${card.setSlug}`}
+              href={userId ? `/collections/${userId}/${card.setSlug}` : `/browse/sets/${card.setSlug}`}
               style={{
                 color: 'inherit',
                 textDecoration: 'none',

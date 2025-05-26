@@ -6,7 +6,7 @@ import React from 'react';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { CostToComplete } from '@/api/sets/types';
 import SetIcon from '@/components/sets/SetIcon';
-import { SetCategoryAndType, SetItemSettings, SetNameAndCode } from '@/components/sets/SetItemRenderer';
+import { SetCategoryAndType, SetItemSettings } from '@/components/sets/SetItemRenderer';
 import TCGPlayerMassImportButton from '@/components/tcgplayer/TCGPlayerMassImportButton';
 import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { Set } from '@/types/sets';
@@ -52,9 +52,52 @@ const SetBoxContent = styled(CardContent)(({ theme }) => ({
   },
 }));
 
+const SetNameTypography = styled(Typography)(({ theme }) => ({
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  textAlign: 'center',
+  fontWeight: 500,
+  color: theme.palette.primary.main,
+  cursor: 'pointer',
+  '&:hover': {
+    textDecoration: 'underline',
+  },
+}));
+
 function isSkeleton(value: unknown): value is { isLoadingSkeleton: boolean } {
   return typeof value === 'object' && value !== null && 'isLoadingSkeleton' in value;
 }
+
+// Collection-aware SetNameAndCode component
+type SetNameProps = {
+  set: Set;
+  nameIsVisible?: boolean;
+  codeIsVisible?: boolean;
+  userId?: number;
+};
+
+const SetNameAndCode: React.FC<SetNameProps> = ({ set, nameIsVisible = true, codeIsVisible = true, userId }) => {
+  if (!nameIsVisible) return null;
+
+  const displayName = codeIsVisible ? `${set.name} (${set.code})` : set.name;
+  const href = userId ? `/collections/${userId}/${set.slug}` : `/browse/sets/${set.slug}`;
+
+  return (
+    <Link
+      href={href}
+      style={{
+        textDecoration: 'none',
+        color: 'inherit',
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <SetNameTypography variant="body1" fontWeight="500">
+        {displayName}
+      </SetNameTypography>
+    </Link>
+  );
+};
 
 const SetReleaseDate: React.FC<{ set: Set; isVisible?: boolean }> = ({ set, isVisible = true }) => {
   if (!isVisible) return null;
@@ -66,7 +109,7 @@ const SetReleaseDate: React.FC<{ set: Set; isVisible?: boolean }> = ({ set, isVi
   );
 };
 
-const SetIconDisplay: React.FC<{ set: Set; collectionData?: CollectionSetSummary }> = ({ set, collectionData }) => {
+const SetIconDisplay: React.FC<{ set: Set; collectionData?: CollectionSetSummary; userId?: number }> = ({ set, collectionData, userId }) => {
   const percentageCollected = collectionData?.percentageCollected || 0;
 
   // Determine rarity based on percentage
@@ -83,7 +126,7 @@ const SetIconDisplay: React.FC<{ set: Set; collectionData?: CollectionSetSummary
     <Box sx={{ textAlign: 'center', m: 0.5 }}>
       {set.code && (
         <Link
-          href={`/browse/sets/${set.slug}`}
+          href={userId ? `/collections/${userId}/${set.slug}` : `/browse/sets/${set.slug}`}
           style={{
             textDecoration: 'none',
             color: 'inherit',
@@ -431,14 +474,14 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
   return (
     <SetBoxWrapper>
       <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out' }}>
-        <SetNameAndCode set={set} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} />
+        <SetNameAndCode set={set} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} userId={userId} />
         <SetCategoryAndType
           set={set}
           isCategoryVisible={settings.categoryIsVisible}
           isTypeVisible={settings.typeIsVisible}
         />
         <SetReleaseDate set={set} isVisible={settings.releaseDateIsVisible} />
-        <SetIconDisplay set={set} collectionData={collectionData} />
+        <SetIconDisplay set={set} collectionData={collectionData} userId={userId} />
         <CollectionCardCount
           set={set}
           collectionData={collectionData}
