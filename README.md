@@ -15,9 +15,9 @@
   - Collection card page
 - Going mythic / green setting
 - Current feature work:
-- collection page should default to sets view, some links to collection set missing
 - skeleton loader for collection header to prevent vertical shift when loading
 - think about where to render reg and foil in table view, probably next to the card name
+- Improve UX across the board
 
   - figure out best way to handle figuring out which cards are missing from a user's collection, is there an api to get their cards in a set
     - old api had a tcgplayerMassImportForUserLegacy method that took a setId, whether to include subsets in sets, and what kind of count was desired and returned the list of cards they needed

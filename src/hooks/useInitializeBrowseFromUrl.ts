@@ -75,8 +75,8 @@ export function useInitializeBrowseFromUrl() {
       // Also mark this as a user selection to prevent override
       userSelectionRef.current = 'sets';
     } else {
-      // Default to cards if no content type in URL
-      dispatch(setViewContentType('cards'));
+      // Default to sets if no content type in URL
+      dispatch(setViewContentType('sets'));
       // Don't set user selection since this is default behavior
     }
 

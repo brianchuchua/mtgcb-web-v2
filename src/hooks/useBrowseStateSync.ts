@@ -49,7 +49,7 @@ export function useBrowseStateSync() {
   useEffect(() => {
     if (hasInit.current) return;
 
-    const initialView = search.get('contentType') === 'sets' ? 'sets' : 'cards';
+    const initialView = search.get('contentType') === 'cards' ? 'cards' : 'sets';
     dispatch(setViewContentType(initialView));
 
     // Parse URL state but override pagination with localStorage values

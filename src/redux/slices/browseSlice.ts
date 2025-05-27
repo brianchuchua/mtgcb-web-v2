@@ -36,7 +36,7 @@ const initialState: {
     showSubsets: true,
     includeSubsetsInSets: false,
   },
-  viewContentType: 'cards', // Default to cards view
+  viewContentType: 'sets', // Default to sets view
 };
 
 export const browseSlice = createSlice({
