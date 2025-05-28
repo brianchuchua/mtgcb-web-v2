@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import CardItemRenderer from '@/components/cards/CardItemRenderer';
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
 import { PriceType } from '@/types/pricing';
@@ -23,23 +23,37 @@ interface CardGridProps {
     priceIsVisible: boolean;
   };
   priceType: PriceType;
+  isOwnCollection?: boolean;
 }
 
-const CardGrid: React.FC<CardGridProps> = ({
+const CardGridComponent: React.FC<CardGridProps> = ({
   items,
   loading,
   onCardClick,
   gallerySettings,
   cardDisplaySettings,
   priceType,
+  isOwnCollection = false,
 }) => {
+  // Memoize the render function to prevent unnecessary re-renders
+  const renderItem = useCallback(
+    (card: any) => (
+      <CardItemRenderer 
+        card={card} 
+        settings={cardDisplaySettings} 
+        priceType={priceType} 
+        onClick={onCardClick}
+        isOwnCollection={isOwnCollection}
+      />
+    ),
+    [cardDisplaySettings, priceType, onCardClick, isOwnCollection]
+  );
+  
   return (
     <VirtualizedGallery
       key="browse-card-gallery"
       items={items}
-      renderItem={(card) => (
-        <CardItemRenderer card={card} settings={cardDisplaySettings} priceType={priceType} onClick={onCardClick} />
-      )}
+      renderItem={renderItem}
       isLoading={loading}
       columnsPerRow={gallerySettings.cardsPerRow}
       galleryWidth={100}
@@ -49,5 +63,7 @@ const CardGrid: React.FC<CardGridProps> = ({
     />
   );
 };
+
+const CardGrid = React.memo(CardGridComponent);
 
 export default CardGrid;

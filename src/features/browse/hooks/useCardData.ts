@@ -72,7 +72,8 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
 
   const {
     data: cardsSearchResult,
-    isFetching: isLoading,
+    isLoading,
+    isFetching,
     error,
   } = useGetCardsQuery(apiArgs, {
     ...queryConfig,
@@ -87,9 +88,8 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
   const total = cardsSearchResult?.data?.totalCount || 0;
 
   const displayItems = useMemo(() => {
-    if (!isLoading) return items;
-
-    return Array(pagination.pageSize)
+    // Only show skeletons on initial load, not on refetch
+    if (isLoading && !cardsSearchResult) return Array(pagination.pageSize)
       .fill(0)
       .map((_, index) => ({
         id: `skeleton-${index}`,
@@ -99,7 +99,9 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
         rarity: '',
         isLoadingSkeleton: true,
       }));
-  }, [items, isLoading, pagination.pageSize]);
+    
+    return items;
+  }, [items, isLoading, pagination.pageSize, cardsSearchResult]);
 
   const handleCardClick = useCallback(
     (cardId: string, cardName?: string) => {
@@ -117,7 +119,8 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     items: displayItems,
     rawItems: items,
     total,
-    isLoading,
+    isLoading: isLoading && !cardsSearchResult, // Only true on initial load
+    isFetching,
     error,
     apiArgs,
     handleCardClick,

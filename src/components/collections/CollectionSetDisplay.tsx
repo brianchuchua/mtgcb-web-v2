@@ -26,7 +26,7 @@ export interface CollectionSetDisplayProps extends Omit<SetDisplayProps, 'setIte
   } | null;
 }
 
-export const CollectionSetDisplay: React.FC<CollectionSetDisplayProps> = ({
+const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
   setItems,
   isLoading,
   viewMode,
@@ -139,3 +139,5 @@ export const CollectionSetDisplay: React.FC<CollectionSetDisplayProps> = ({
     />
   );
 };
+
+export const CollectionSetDisplay = React.memo(CollectionSetDisplayComponent);

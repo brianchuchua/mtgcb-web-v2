@@ -4,8 +4,9 @@ import { Box, Card, CardContent, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import CardPrice from './CardPrice';
+import { EditableCardQuantity } from './EditableCardQuantity';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
@@ -58,12 +59,13 @@ export interface CardItemProps {
   };
   priceType?: PriceType; // Price type to display
   onClick?: () => void;
+  isOwnCollection?: boolean;
 }
 
 /**
  * A reusable card component that displays an MTG card with image, name, set, and price information
  */
-const CardItem = ({
+const CardItemComponent = ({
   id,
   name,
   setCode,
@@ -91,6 +93,7 @@ const CardItem = ({
   priceType = PriceType.Market,
   onClick,
   isLoadingSkeleton = false,
+  isOwnCollection = false,
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -235,6 +238,17 @@ const CardItem = ({
 
       {(nameIsVisible || setIsVisible || priceIsVisible || quantityIsVisible) && (
         <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
+          {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && isOwnCollection && (
+            <Box sx={{ mb: 1 }}>
+              <EditableCardQuantity
+                cardId={parseInt(id)}
+                cardName={name}
+                quantityReg={quantityReg || 0}
+                quantityFoil={quantityFoil || 0}
+              />
+            </Box>
+          )}
+
           {nameIsVisible && (
             <Typography
               variant="h6"
@@ -320,7 +334,7 @@ const CardItem = ({
             </Box>
           )}
 
-          {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && (
+          {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && !isOwnCollection && (
             <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center', gap: 1 }}>
               {quantityReg !== undefined && (
                 <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
@@ -339,6 +353,32 @@ const CardItem = ({
     </StyledCard>
   );
 };
+
+const CardItem = React.memo(CardItemComponent, (prevProps, nextProps) => {
+  // Skip re-render if all relevant props are the same
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.name === nextProps.name &&
+    prevProps.quantityReg === nextProps.quantityReg &&
+    prevProps.quantityFoil === nextProps.quantityFoil &&
+    prevProps.isOwnCollection === nextProps.isOwnCollection &&
+    prevProps.priceType === nextProps.priceType &&
+    prevProps.isLoadingSkeleton === nextProps.isLoadingSkeleton &&
+    // Deep compare display settings
+    prevProps.display?.nameIsVisible === nextProps.display?.nameIsVisible &&
+    prevProps.display?.setIsVisible === nextProps.display?.setIsVisible &&
+    prevProps.display?.priceIsVisible === nextProps.display?.priceIsVisible &&
+    prevProps.display?.quantityIsVisible === nextProps.display?.quantityIsVisible &&
+    // Compare prices if they're visible
+    (!prevProps.display?.priceIsVisible || (
+      prevProps.market === nextProps.market &&
+      prevProps.low === nextProps.low &&
+      prevProps.average === nextProps.average &&
+      prevProps.high === nextProps.high &&
+      prevProps.foil === nextProps.foil
+    ))
+  );
+});
 
 // Styled components
 interface CardElementProps {

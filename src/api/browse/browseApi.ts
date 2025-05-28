@@ -32,7 +32,13 @@ export const browseApi = mtgcbApi.injectEndpoints({
         return `${paginationKey}${sortKey}${filterKey}`;
       },
       keepUnusedDataFor: 300, // 5 minutes
-      providesTags: ['Cards'],
+      providesTags: (result, error, arg) => {
+        const tags: Array<{ type: 'Cards'; id?: string }> = [{ type: 'Cards' }];
+        if (arg.userId) {
+          tags.push({ type: 'Cards', id: `user-${arg.userId}` });
+        }
+        return tags;
+      },
     }),
 
     getSets: builder.query<ApiResponse<SetsSearchResult>, SetApiParams>({
@@ -52,7 +58,13 @@ export const browseApi = mtgcbApi.injectEndpoints({
         return `${paginationKey}${sortKey}${filterKey}`;
       },
       keepUnusedDataFor: 300, // 5 minutes
-      providesTags: ['Sets'],
+      providesTags: (result, error, arg) => {
+        const tags: Array<{ type: 'Sets'; id?: string }> = [{ type: 'Sets' }];
+        if (arg.userId) {
+          tags.push({ type: 'Sets', id: `user-${arg.userId}` });
+        }
+        return tags;
+      },
     }),
 
     getSetTypes: builder.query<ApiResponse<{ label: string; value: string; category: string }[]>, void>({

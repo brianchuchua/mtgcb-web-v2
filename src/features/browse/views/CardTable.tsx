@@ -26,6 +26,7 @@ interface CardTableProps {
     loyaltyIsVisible: boolean;
     priceIsVisible: boolean;
   };
+  isOwnCollection?: boolean;
 }
 
 const CardTable: React.FC<CardTableProps> = ({
@@ -37,6 +38,7 @@ const CardTable: React.FC<CardTableProps> = ({
   onCardClick,
   priceType,
   tableSettings,
+  isOwnCollection = false,
 }) => {
   const tableColumns = useCardTableColumns(
     { priceType, displaySettings: tableSettings },

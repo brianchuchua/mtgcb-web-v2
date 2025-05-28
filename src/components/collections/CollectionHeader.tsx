@@ -21,7 +21,7 @@ const HeaderContainer = styled(Box)(({ theme }) => ({
 }));
 
 
-export const CollectionHeader: React.FC<CollectionHeaderProps> = ({
+const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
   username,
   uniquePrintingsCollected,
   numberOfCardsInMagic,
@@ -63,3 +63,14 @@ export const CollectionHeader: React.FC<CollectionHeaderProps> = ({
     </HeaderContainer>
   );
 };
+
+export const CollectionHeader = React.memo(CollectionHeaderComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.username === nextProps.username &&
+    prevProps.uniquePrintingsCollected === nextProps.uniquePrintingsCollected &&
+    prevProps.numberOfCardsInMagic === nextProps.numberOfCardsInMagic &&
+    prevProps.totalCardsCollected === nextProps.totalCardsCollected &&
+    prevProps.percentageCollected === nextProps.percentageCollected &&
+    prevProps.totalValue === nextProps.totalValue
+  );
+});

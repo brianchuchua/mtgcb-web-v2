@@ -77,3 +77,22 @@ export interface CollectionCardsData {
 }
 
 export type CollectionCardsResponse = ApiResponse<CollectionCardsData>;
+
+export interface CollectionUpdateRequest {
+  mode: 'set' | 'increment';
+  cards: Array<{
+    cardId: number;
+    quantityReg: number;
+    quantityFoil: number;
+  }>;
+}
+
+export interface CollectionUpdateData {
+  cards: Array<{
+    cardId: number;
+    quantityReg: number;
+    quantityFoil: number;
+  }>;
+}
+
+export type CollectionUpdateResponse = ApiResponse<CollectionUpdateData>;

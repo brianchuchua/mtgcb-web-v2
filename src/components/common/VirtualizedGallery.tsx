@@ -59,16 +59,19 @@ const VirtualizedGallery = <T,>({
   }
 
   // Item content renderer for the Virtuoso component
-  const itemContent = (index: number) => {
-    const item = items[index];
-    return renderItem(item, index);
-  };
+  const itemContent = React.useCallback(
+    (index: number) => {
+      const item = items[index];
+      return renderItem(item, index);
+    },
+    [items, renderItem]
+  );
 
   return (
     <GalleryWrapper columnsPerRow={columnsPerRow} galleryWidth={galleryWidth} horizontalPadding={horizontalPadding}>
       <VirtuosoGrid
         useWindowScroll // Use window scroll instead of creating a scrollable container
-        totalCount={items.length}
+        data={items}
         components={{
           Item: ItemWrapper,
         }}

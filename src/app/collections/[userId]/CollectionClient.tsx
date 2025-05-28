@@ -10,6 +10,7 @@ import { Pagination } from '@/components/pagination';
 import { CardsProps, SetsProps } from '@/features/browse/types';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
+import { useAuth } from '@/hooks/useAuth';
 
 interface CollectionClientProps {
   userId: number;
@@ -17,6 +18,8 @@ interface CollectionClientProps {
 
 export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) => {
   const { view, viewMode, error, paginationProps, setsProps, cardsProps } = useCollectionBrowseController({ userId });
+  const { user } = useAuth();
+  const isOwnCollection = user?.userId === userId;
 
   // Create collection sets map from the sets data
   const collectionSets = useMemo(() => {
@@ -126,8 +129,8 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
       {/* Show cards view for collections */}
       {view === 'cards' && cardsProps && 'items' in cardsProps && (
         <>
-          {viewMode === 'grid' && <CardGrid {...(cardsProps as CardsProps)} />}
-          {viewMode === 'table' && <CardTable {...(cardsProps as CardsProps)} />}
+          {viewMode === 'grid' && <CardGrid {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} />}
+          {viewMode === 'table' && <CardTable {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} />}
         </>
       )}
     </>
