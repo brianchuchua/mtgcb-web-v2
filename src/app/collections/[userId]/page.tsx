@@ -3,9 +3,10 @@ import { CollectionClient } from './CollectionClient';
 export default async function CollectionPage({
   params,
 }: {
-  params: { userId: string };
+  params: Promise<{ userId: string }>;
 }) {
-  const userId = parseInt(params.userId, 10);
+  const { userId: userIdParam } = await params;
+  const userId = parseInt(userIdParam, 10);
   
   if (isNaN(userId)) {
     return <div>Invalid user ID</div>;

@@ -1,11 +1,12 @@
 import SetBrowseClient from './SetBrowseClient';
 
 interface SetBrowsePageProps {
-  params: {
+  params: Promise<{
     setSlug: string;
-  };
+  }>;
 }
 
-export default function SetBrowsePage({ params }: SetBrowsePageProps) {
-  return <SetBrowseClient setSlug={params.setSlug} />;
+export default async function SetBrowsePage({ params }: SetBrowsePageProps) {
+  const { setSlug } = await params;
+  return <SetBrowseClient setSlug={setSlug} />;
 }
