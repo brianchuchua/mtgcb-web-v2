@@ -26,7 +26,9 @@ export function useSort() {
       dispatch(setSortOrder(newOrder));
     } else {
       dispatch(setSortBy(columnId as SortByOption));
-      dispatch(setSortOrder('asc'));
+      // Default to 'desc' for date-based columns, 'asc' for others
+      const defaultOrder = columnId === 'releasedAt' ? 'desc' : 'asc';
+      dispatch(setSortOrder(defaultOrder));
     }
   }, [dispatch, sortBy, sortOrder]);
 

@@ -10,8 +10,10 @@ import {
   selectCardSearchParams,
   selectSetSearchParams,
   selectViewContentType,
+  setCardPagination,
   setCardSearchParams,
   setPagination,
+  setSetPagination,
   setSetSearchParams,
   setViewContentType,
 } from '@/redux/slices/browseSlice';
@@ -57,21 +59,32 @@ export function useBrowseStateSync() {
     const setsUrlState = parseUrlToState(search, 'sets');
 
     // Initialize with localStorage values for page size
-    dispatch(
-      setCardSearchParams({
-        ...cardsUrlState,
-        currentPage: 1,
-        pageSize: cardsPageSize,
-      }),
-    );
+    // Only update fields that are present in the URL, preserving Redux defaults
+    if (Object.keys(cardsUrlState).length > 0) {
+      dispatch(
+        setCardSearchParams({
+          ...cardsUrlState,
+          currentPage: 1,
+          pageSize: cardsPageSize,
+        }),
+      );
+    } else {
+      // Just update pagination from localStorage
+      dispatch(setCardPagination({ currentPage: 1, pageSize: cardsPageSize }));
+    }
 
-    dispatch(
-      setSetSearchParams({
-        ...setsUrlState,
-        currentPage: 1,
-        pageSize: setsPageSize,
-      }),
-    );
+    if (Object.keys(setsUrlState).length > 0) {
+      dispatch(
+        setSetSearchParams({
+          ...setsUrlState,
+          currentPage: 1,
+          pageSize: setsPageSize,
+        }),
+      );
+    } else {
+      // Just update pagination from localStorage, preserve all other defaults
+      dispatch(setSetPagination({ currentPage: 1, pageSize: setsPageSize }));
+    }
 
     prevView.current = initialView;
     hasInit.current = true;

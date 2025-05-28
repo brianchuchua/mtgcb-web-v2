@@ -35,6 +35,8 @@ const initialState: {
     viewMode: 'grid',
     showSubsets: true,
     includeSubsetsInSets: false,
+    sortBy: 'releasedAt',
+    sortOrder: 'desc',
   },
   viewContentType: 'sets', // Default to sets view
 };

@@ -61,8 +61,8 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   costToCompleteData,
 }) => {
   const dispatch = useDispatch();
-  const currentSortBy = useSelector(selectSortBy) || 'name';
-  const currentSortOrder = useSelector(selectSortOrder) || 'asc';
+  const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
+  const currentSortOrder = useSelector(selectSortOrder) || 'desc';
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
   // Create skeleton loading items if needed
