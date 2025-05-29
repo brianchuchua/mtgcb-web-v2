@@ -47,28 +47,103 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         body,
       }),
       async onQueryStarted(arg, { getState, dispatch, queryFulfilled }) {
+        const state = getState() as RootState;
+        const userId = state.auth.user?.userId;
+        
+        if (!userId || arg.mode !== 'set') {
+          // For non-set operations or when no user, just wait for the response
+          try {
+            const { data } = await queryFulfilled;
+            if (data?.success) {
+              if (userId) {
+                dispatch(
+                  mtgcbApi.util.invalidateTags([
+                    'Collection',
+                    { type: 'Cards', id: `user-${userId}` },
+                    { type: 'Sets', id: `user-${userId}` },
+                  ])
+                );
+              } else {
+                dispatch(mtgcbApi.util.invalidateTags(['Collection']));
+              }
+            }
+          } catch {
+            // Error is already handled by RTK Query
+          }
+          return;
+        }
+
+        // Optimistically update the cache for 'set' mode
+        const patchResults: any[] = [];
+        
+        // Update getCards cache entries
+        const cardsCache = mtgcbApi.util.selectInvalidatedBy(state, [
+          { type: 'Cards', id: `user-${userId}` }
+        ]);
+        
+        for (const { endpointName, originalArgs } of cardsCache) {
+          if (endpointName === 'getCards' && originalArgs) {
+            const patchResult = dispatch(
+              mtgcbApi.util.updateQueryData('getCards', originalArgs, (draft) => {
+                if (draft?.data?.cards) {
+                  // Update quantities for matching cards
+                  for (const updateCard of arg.cards) {
+                    const cardIndex = draft.data.cards.findIndex(
+                      (card: any) => card.id === updateCard.cardId
+                    );
+                    if (cardIndex !== -1) {
+                      draft.data.cards[cardIndex].quantityReg = updateCard.quantityReg;
+                      draft.data.cards[cardIndex].quantityFoil = updateCard.quantityFoil;
+                    }
+                  }
+                }
+              })
+            );
+            patchResults.push(patchResult);
+          }
+        }
+
+        // Update getCollectionCards cache entries
+        const collectionCache = mtgcbApi.util.selectInvalidatedBy(state, ['Collection']);
+        
+        for (const { endpointName, originalArgs } of collectionCache) {
+          if (endpointName === 'getCollectionCards' && originalArgs) {
+            const patchResult = dispatch(
+              mtgcbApi.util.updateQueryData('getCollectionCards', originalArgs, (draft) => {
+                if (draft?.data?.cards) {
+                  // Update quantities for matching cards
+                  for (const updateCard of arg.cards) {
+                    const cardIndex = draft.data.cards.findIndex(
+                      (card: any) => card.id === updateCard.cardId
+                    );
+                    if (cardIndex !== -1) {
+                      draft.data.cards[cardIndex].quantityReg = updateCard.quantityReg;
+                      draft.data.cards[cardIndex].quantityFoil = updateCard.quantityFoil;
+                    }
+                  }
+                }
+              })
+            );
+            patchResults.push(patchResult);
+          }
+        }
+
         try {
           const { data } = await queryFulfilled;
+          
           if (data?.success) {
-            const state = getState() as RootState;
-            const userId = state.auth.user?.userId;
-            
-            if (userId) {
-              // Invalidate user-specific cached data
-              dispatch(
-                mtgcbApi.util.invalidateTags([
-                  'Collection',
-                  { type: 'Cards', id: `user-${userId}` },
-                  { type: 'Sets', id: `user-${userId}` },
-                ])
-              );
-            } else {
-              // Fallback: just invalidate collection if no userId
-              dispatch(mtgcbApi.util.invalidateTags(['Collection']));
-            }
+            // Invalidate cache to ensure fresh data is fetched
+            dispatch(
+              mtgcbApi.util.invalidateTags([
+                'Collection',
+                { type: 'Cards', id: `user-${userId}` },
+                { type: 'Sets', id: `user-${userId}` },
+              ])
+            );
           }
-        } catch {
-          // Error is already handled by RTK Query
+        } catch (error) {
+          // On error, revert all optimistic updates
+          patchResults.forEach((patchResult) => patchResult.undo());
         }
       },
     }),

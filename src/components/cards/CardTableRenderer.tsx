@@ -344,16 +344,36 @@ const InlineEditableQuantity: React.FC<{
   const [inputValue, setInputValue] = useState(quantity.toString());
   const [updateCollection] = useUpdateCollectionMutation();
   const { enqueueSnackbar } = useSnackbar();
+  const updatePromiseRef = useRef<{ abort: () => void } | null>(null);
+  const isUserEditingRef = useRef(false);
+  const editingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (editingTimeoutRef.current) {
+        clearTimeout(editingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
-    setLocalQuantity(quantity);
-    setInputValue(quantity.toString());
+    // Only update if user is not actively editing
+    if (!isUserEditingRef.current) {
+      setLocalQuantity(quantity);
+      setInputValue(quantity.toString());
+    }
   }, [quantity]);
 
   const debouncedUpdate = useCallback(
     debounce(async (newQuantity: number) => {
+      // Cancel any pending request
+      if (updatePromiseRef.current) {
+        updatePromiseRef.current.abort();
+      }
+
       try {
-        await updateCollection({
+        const promise = updateCollection({
           mode: 'set',
           cards: [
             {
@@ -362,23 +382,44 @@ const InlineEditableQuantity: React.FC<{
               quantityFoil: quantityType === 'foil' ? newQuantity : otherQuantity,
             },
           ],
-        }).unwrap();
+        });
+
+        // Store the promise so we can abort it later
+        updatePromiseRef.current = promise;
+
+        await promise.unwrap();
 
         const message =
           quantityType === 'regular'
             ? `${cardName} has been set to ${newQuantity}`
             : `${cardName} (Foil) has been set to ${newQuantity}`;
         enqueueSnackbar(message, { variant: 'success', autoHideDuration: 3000 });
-      } catch (error) {
-        enqueueSnackbar(`Failed to update ${cardName} quantity`, { variant: 'error' });
-        setLocalQuantity(quantity); // Reset on error
+      } catch (error: any) {
+        // Don't show error or reset for aborted requests
+        if (error.name !== 'AbortError' && error.message !== 'Aborted') {
+          enqueueSnackbar(`Failed to update ${cardName} quantity`, { variant: 'error' });
+          setLocalQuantity(quantity); // Reset on error
+        }
       }
     }, 400),
-    [updateCollection, cardId, cardName, quantityType, otherQuantity, enqueueSnackbar],
+    [updateCollection, cardId, cardName, quantityType, otherQuantity, enqueueSnackbar, quantity],
   );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
+    
+    // Mark as user editing
+    isUserEditingRef.current = true;
+    
+    // Clear any existing timeout
+    if (editingTimeoutRef.current) {
+      clearTimeout(editingTimeoutRef.current);
+    }
+    
+    // Set timeout to clear editing flag
+    editingTimeoutRef.current = setTimeout(() => {
+      isUserEditingRef.current = false;
+    }, 2000);
     
     // Update the display value
     setInputValue(value);
@@ -408,13 +449,27 @@ const InlineEditableQuantity: React.FC<{
   };
 
   const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-    // Use onClick handler for better selection behavior
-    event.target.select();
+    // Select all text on focus - use currentTarget which is always the input
+    event.currentTarget.select();
   };
 
   const handleIncrement = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     event.currentTarget.blur();
+    
+    // Mark as user editing
+    isUserEditingRef.current = true;
+    
+    // Clear any existing timeout
+    if (editingTimeoutRef.current) {
+      clearTimeout(editingTimeoutRef.current);
+    }
+    
+    // Set timeout to clear editing flag
+    editingTimeoutRef.current = setTimeout(() => {
+      isUserEditingRef.current = false;
+    }, 2000);
+    
     const newQuantity = localQuantity + 1;
     setLocalQuantity(newQuantity);
     setInputValue(newQuantity.toString());
@@ -424,6 +479,20 @@ const InlineEditableQuantity: React.FC<{
   const handleDecrement = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     event.currentTarget.blur();
+    
+    // Mark as user editing
+    isUserEditingRef.current = true;
+    
+    // Clear any existing timeout
+    if (editingTimeoutRef.current) {
+      clearTimeout(editingTimeoutRef.current);
+    }
+    
+    // Set timeout to clear editing flag
+    editingTimeoutRef.current = setTimeout(() => {
+      isUserEditingRef.current = false;
+    }, 2000);
+    
     const newQuantity = Math.max(0, localQuantity - 1);
     setLocalQuantity(newQuantity);
     setInputValue(newQuantity.toString());
@@ -450,7 +519,7 @@ const InlineEditableQuantity: React.FC<{
         onChange={handleInputChange}
         onBlur={handleInputBlur}
         onFocus={handleInputFocus}
-        onClick={(e) => (e.target as HTMLInputElement).select()}
+        onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
         inputProps={{ min: 0 }}
         variant="outlined"
         size="small"

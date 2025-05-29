@@ -4,8 +4,6 @@ I've found over time that maintaining my action items for code in external tools
 
 ## Remaining Major Feature Work Before 1.0
 
-- Grid view card collection updating
-- Table view card collection updating
 - Edit cards page
 - Mass Update Tool
 - Imports and exports
@@ -22,8 +20,7 @@ I've found over time that maintaining my action items for code in external tools
 
 ### Current Action Items
 
-- Implement card collection updating for grid view and table view
-  - UX - Debouncing doesn't feel quite right
+- Implement Edit Cards page, identical to the legacy app, but with the new UI and API
 
 ## Other Action Items
 

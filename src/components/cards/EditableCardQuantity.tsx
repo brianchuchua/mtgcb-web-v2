@@ -110,20 +110,39 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   const [inputValueFoil, setInputValueFoil] = useState(quantityFoil.toString());
   const [updateCollection] = useUpdateCollectionMutation();
   const { enqueueSnackbar } = useSnackbar();
+  const updatePromiseRef = React.useRef<{ abort: () => void } | null>(null);
+  const isUserEditingRef = React.useRef(false);
+  const editingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  
+  // Cleanup on unmount
+  React.useEffect(() => {
+    return () => {
+      if (editingTimeoutRef.current) {
+        clearTimeout(editingTimeoutRef.current);
+      }
+    };
+  }, []);
 
-  // Update local state when props change
+  // Update local state when props change - but only if user is not actively editing
   useEffect(() => {
-    setLocalQuantityReg(quantityReg);
-    setLocalQuantityFoil(quantityFoil);
-    setInputValueReg(quantityReg.toString());
-    setInputValueFoil(quantityFoil.toString());
+    if (!isUserEditingRef.current) {
+      setLocalQuantityReg(quantityReg);
+      setLocalQuantityFoil(quantityFoil);
+      setInputValueReg(quantityReg.toString());
+      setInputValueFoil(quantityFoil.toString());
+    }
   }, [quantityReg, quantityFoil]);
 
   // Create debounced update function
   const debouncedUpdate = useCallback(
     debounce(async (newQuantityReg: number, newQuantityFoil: number, changedType: 'regular' | 'foil') => {
+      // Cancel any pending request
+      if (updatePromiseRef.current) {
+        updatePromiseRef.current.abort();
+      }
+
       try {
-        const result = await updateCollection({
+        const promise = updateCollection({
           mode: 'set',
           cards: [
             {
@@ -132,7 +151,12 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
               quantityFoil: newQuantityFoil,
             },
           ],
-        }).unwrap();
+        });
+
+        // Store the promise so we can abort it later
+        updatePromiseRef.current = promise;
+
+        const result = await promise.unwrap();
 
         if (result.success) {
           const quantity = changedType === 'regular' ? newQuantityReg : newQuantityFoil;
@@ -144,8 +168,11 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         } else {
           enqueueSnackbar(`Failed to update ${cardName}`, { variant: 'error' });
         }
-      } catch (error) {
-        enqueueSnackbar(`Error updating ${cardName}`, { variant: 'error' });
+      } catch (error: any) {
+        // Don't show error for aborted requests
+        if (error.name !== 'AbortError' && error.message !== 'Aborted') {
+          enqueueSnackbar(`Error updating ${cardName}`, { variant: 'error' });
+        }
       }
     }, 400),
     [cardId, cardName, updateCollection, enqueueSnackbar],
@@ -153,6 +180,19 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
 
   const handleQuantityChange = (type: 'regular' | 'foil', value: number) => {
     const newValue = Math.max(0, value);
+
+    // Mark as user editing
+    isUserEditingRef.current = true;
+    
+    // Clear any existing timeout
+    if (editingTimeoutRef.current) {
+      clearTimeout(editingTimeoutRef.current);
+    }
+    
+    // Set timeout to clear editing flag after updates are likely done
+    editingTimeoutRef.current = setTimeout(() => {
+      isUserEditingRef.current = false;
+    }, 2000); // 2 seconds should be enough for debounce + API + cache invalidation
 
     if (type === 'regular') {
       setLocalQuantityReg(newValue);
@@ -235,8 +275,8 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   };
 
   const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-    // Use onClick handler for better selection behavior
-    event.target.select();
+    // Select all text on focus - use currentTarget which is always the input
+    event.currentTarget.select();
   };
 
   return (
@@ -258,9 +298,9 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           type="number"
           value={inputValueReg}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('regular', e)}
-          onBlur={(e) => handleInputBlur('regular', e)}
+          onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('regular', e)}
           onFocus={handleInputFocus}
-          onClick={(e) => (e.target as HTMLInputElement).select()}
+          onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
           inputProps={{ min: 0 }}
           variant="outlined"
           size="small"
@@ -297,9 +337,9 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           type="number"
           value={inputValueFoil}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('foil', e)}
-          onBlur={(e) => handleInputBlur('foil', e)}
+          onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('foil', e)}
           onFocus={handleInputFocus}
-          onClick={(e) => (e.target as HTMLInputElement).select()}
+          onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
           inputProps={{ min: 0 }}
           variant="outlined"
           size="small"
