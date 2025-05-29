@@ -232,6 +232,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                   top: 0,
                   left: 0,
                   borderRadius: getBorderRadius(),
+                  backgroundColor: '#22262c',
                 }}
               />
             )}

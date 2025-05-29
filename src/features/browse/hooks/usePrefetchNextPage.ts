@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { getNextPageParams, usePrefetch } from '@/api/browse/browseApi';
+import { featureFlags } from '@/config/features';
 
 interface UsePrefetchNextPageProps {
   view: string;
@@ -15,6 +16,8 @@ interface UsePrefetchNextPageProps {
 /**
  * Prefetches the next page of results for smoother pagination
  * Calculates next page params based on current view and pagination state
+ * 
+ * Note: Prefetching can be disabled by setting featureFlags.enablePrefetchNextPage to false
  */
 export function usePrefetchNextPage({
   view,
@@ -23,6 +26,10 @@ export function usePrefetchNextPage({
   setApiArgs,
   isLoading,
 }: UsePrefetchNextPageProps) {
+  // Log prefetch status in development
+  if (process.env.NODE_ENV === 'development' && !featureFlags.enablePrefetchNextPage) {
+    console.log('[Prefetch] Next page prefetching is disabled');
+  }
   const isCardsView = view === 'cards';
   const isSetsView = view === 'sets';
   const prefetchEndpoint = isCardsView ? 'getCards' : 'getSets';
@@ -39,6 +46,9 @@ export function usePrefetchNextPage({
 
   // Prefetch next page
   useEffect(() => {
+    // Check if prefetching is enabled
+    if (!featureFlags.enablePrefetchNextPage) return;
+    
     if (!nextPageApiParams || isLoading) return;
 
     const prefetchTimer = setTimeout(() => {

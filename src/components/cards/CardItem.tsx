@@ -213,6 +213,7 @@ const CardItemComponent = ({
               top: 0,
               left: 0,
               borderRadius: getBorderRadius(),
+              backgroundColor: '#22262c',
             }}
           />
         )}
@@ -370,13 +371,12 @@ const CardItem = React.memo(CardItemComponent, (prevProps, nextProps) => {
     prevProps.display?.priceIsVisible === nextProps.display?.priceIsVisible &&
     prevProps.display?.quantityIsVisible === nextProps.display?.quantityIsVisible &&
     // Compare prices if they're visible
-    (!prevProps.display?.priceIsVisible || (
-      prevProps.market === nextProps.market &&
-      prevProps.low === nextProps.low &&
-      prevProps.average === nextProps.average &&
-      prevProps.high === nextProps.high &&
-      prevProps.foil === nextProps.foil
-    ))
+    (!prevProps.display?.priceIsVisible ||
+      (prevProps.market === nextProps.market &&
+        prevProps.low === nextProps.low &&
+        prevProps.average === nextProps.average &&
+        prevProps.high === nextProps.high &&
+        prevProps.foil === nextProps.foil))
   );
 });
 

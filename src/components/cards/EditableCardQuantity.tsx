@@ -106,6 +106,8 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
 }) => {
   const [localQuantityReg, setLocalQuantityReg] = useState(quantityReg);
   const [localQuantityFoil, setLocalQuantityFoil] = useState(quantityFoil);
+  const [inputValueReg, setInputValueReg] = useState(quantityReg.toString());
+  const [inputValueFoil, setInputValueFoil] = useState(quantityFoil.toString());
   const [updateCollection] = useUpdateCollectionMutation();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -113,6 +115,8 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   useEffect(() => {
     setLocalQuantityReg(quantityReg);
     setLocalQuantityFoil(quantityFoil);
+    setInputValueReg(quantityReg.toString());
+    setInputValueFoil(quantityFoil.toString());
   }, [quantityReg, quantityFoil]);
 
   // Create debounced update function
@@ -143,7 +147,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
       } catch (error) {
         enqueueSnackbar(`Error updating ${cardName}`, { variant: 'error' });
       }
-    }, 200),
+    }, 400),
     [cardId, cardName, updateCollection, enqueueSnackbar],
   );
 
@@ -162,31 +166,84 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   const handleIncrement = (type: 'regular' | 'foil', event: React.MouseEvent<HTMLButtonElement>) => {
     event.currentTarget.blur();
     if (type === 'regular') {
-      handleQuantityChange('regular', localQuantityReg + 1);
+      const newValue = localQuantityReg + 1;
+      setInputValueReg(newValue.toString());
+      handleQuantityChange('regular', newValue);
     } else {
-      handleQuantityChange('foil', localQuantityFoil + 1);
+      const newValue = localQuantityFoil + 1;
+      setInputValueFoil(newValue.toString());
+      handleQuantityChange('foil', newValue);
     }
   };
 
   const handleDecrement = (type: 'regular' | 'foil', event: React.MouseEvent<HTMLButtonElement>) => {
     event.currentTarget.blur();
     if (type === 'regular') {
-      handleQuantityChange('regular', localQuantityReg - 1);
+      const newValue = Math.max(0, localQuantityReg - 1);
+      setInputValueReg(newValue.toString());
+      handleQuantityChange('regular', newValue);
     } else {
-      handleQuantityChange('foil', localQuantityFoil - 1);
+      const newValue = Math.max(0, localQuantityFoil - 1);
+      setInputValueFoil(newValue.toString());
+      handleQuantityChange('foil', newValue);
     }
   };
 
   const handleInputChange = (type: 'regular' | 'foil', event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value) || 0;
+    const inputValue = event.target.value;
+
+    // Update the input display value
+    if (type === 'regular') {
+      setInputValueReg(inputValue);
+    } else {
+      setInputValueFoil(inputValue);
+    }
+
+    // Allow empty string without updating the actual quantity
+    if (inputValue === '') {
+      return; // Don't trigger the API call yet
+    }
+
+    const value = parseInt(inputValue) || 0;
     handleQuantityChange(type, value);
+  };
+
+  const handleInputBlur = (type: 'regular' | 'foil', event: React.FocusEvent<HTMLInputElement>) => {
+    const inputValue = type === 'regular' ? inputValueReg : inputValueFoil;
+    
+    // If empty, set to 0
+    if (inputValue === '') {
+      const newValue = 0;
+      if (type === 'regular') {
+        setLocalQuantityReg(newValue);
+        setInputValueReg('0');
+        debouncedUpdate(newValue, localQuantityFoil, 'regular');
+      } else {
+        setLocalQuantityFoil(newValue);
+        setInputValueFoil('0');
+        debouncedUpdate(localQuantityReg, newValue, 'foil');
+      }
+    } else {
+      // Ensure the display value matches the numeric value
+      const numValue = parseInt(inputValue) || 0;
+      if (type === 'regular') {
+        setInputValueReg(numValue.toString());
+      } else {
+        setInputValueFoil(numValue.toString());
+      }
+    }
+  };
+
+  const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    // Use onClick handler for better selection behavior
+    event.target.select();
   };
 
   return (
     <Box display="flex" gap={2} justifyContent="center" sx={{ mt: 0.5 }}>
       <QuantityContainer>
-        <LeftButton 
-          size="small" 
+        <LeftButton
+          size="small"
           onMouseDown={(e) => {
             e.preventDefault();
             handleDecrement('regular', e);
@@ -199,16 +256,19 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         </LeftButton>
         <QuantityInput
           type="number"
-          value={localQuantityReg}
+          value={inputValueReg}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('regular', e)}
+          onBlur={(e) => handleInputBlur('regular', e)}
+          onFocus={handleInputFocus}
+          onClick={(e) => (e.target as HTMLInputElement).select()}
           inputProps={{ min: 0 }}
           variant="outlined"
           size="small"
           label="Regular"
           InputLabelProps={{ shrink: true }}
         />
-        <RightButton 
-          size="small" 
+        <RightButton
+          size="small"
           onMouseDown={(e) => {
             e.preventDefault();
             handleIncrement('regular', e);
@@ -221,8 +281,8 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
       </QuantityContainer>
 
       <QuantityContainer>
-        <LeftButton 
-          size="small" 
+        <LeftButton
+          size="small"
           onMouseDown={(e) => {
             e.preventDefault();
             handleDecrement('foil', e);
@@ -235,16 +295,19 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         </LeftButton>
         <QuantityInput
           type="number"
-          value={localQuantityFoil}
+          value={inputValueFoil}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('foil', e)}
+          onBlur={(e) => handleInputBlur('foil', e)}
+          onFocus={handleInputFocus}
+          onClick={(e) => (e.target as HTMLInputElement).select()}
           inputProps={{ min: 0 }}
           variant="outlined"
           size="small"
           label="Foils"
           InputLabelProps={{ shrink: true }}
         />
-        <RightButton 
-          size="small" 
+        <RightButton
+          size="small"
           onMouseDown={(e) => {
             e.preventDefault();
             handleIncrement('foil', e);

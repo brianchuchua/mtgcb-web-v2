@@ -109,7 +109,11 @@ const SetReleaseDate: React.FC<{ set: Set; isVisible?: boolean }> = ({ set, isVi
   );
 };
 
-const SetIconDisplay: React.FC<{ set: Set; collectionData?: CollectionSetSummary; userId?: number }> = ({ set, collectionData, userId }) => {
+const SetIconDisplay: React.FC<{ set: Set; collectionData?: CollectionSetSummary; userId?: number }> = ({
+  set,
+  collectionData,
+  userId,
+}) => {
   const percentageCollected = collectionData?.percentageCollected || 0;
 
   // Determine rarity based on percentage
@@ -465,8 +469,8 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
 
   if (isSkeleton(set)) {
     return (
-      <SetBoxWrapper sx={{ opacity: 0.7, height: '399px' }}>
-        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: '399px' }}></SetBoxContent>
+      <SetBoxWrapper sx={{ opacity: 0.7, height: '566px' }}>
+        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: '566px' }}></SetBoxContent>
       </SetBoxWrapper>
     );
   }
@@ -474,7 +478,12 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
   return (
     <SetBoxWrapper>
       <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out' }}>
-        <SetNameAndCode set={set} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} userId={userId} />
+        <SetNameAndCode
+          set={set}
+          nameIsVisible={settings.nameIsVisible}
+          codeIsVisible={settings.codeIsVisible}
+          userId={userId}
+        />
         <SetCategoryAndType
           set={set}
           isCategoryVisible={settings.categoryIsVisible}

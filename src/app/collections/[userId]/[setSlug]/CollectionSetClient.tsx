@@ -14,6 +14,7 @@ import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
+import { useAuth } from '@/hooks/useAuth';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import { selectCardSearchParams, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
 import { SetFilter } from '@/types/browse';
@@ -31,6 +32,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
   const setPriceType = useSetPriceType();
+  const { user } = useAuth();
+  const isOwnCollection = user?.userId === userId;
 
   // Get current search parameters to pass to subsets
   const cardSearchParams = useSelector(selectCardSearchParams);
@@ -244,8 +247,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         <ErrorBanner type={browseController.view} />
       ) : (
         <>
-          {isCardGridView && <CardGrid {...cardsProps} />}
-          {isCardTableView && <CardTable {...cardsProps} />}
+          {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} />}
+          {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} />}
         </>
       )}
 

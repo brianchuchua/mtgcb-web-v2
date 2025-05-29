@@ -129,13 +129,6 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
       onSortChange={handleSortChange}
       emptyMessage="No sets found"
       computeItemKey={(index) => displaySets[index]?.id || index}
-      onClick={(itemId: string) => {
-        const set = displaySets.find((s) => s.id === itemId);
-        if (set && !('isLoadingSkeleton' in set)) {
-          onSetClick(set);
-        }
-      }}
-      getItemId={(set) => set.id}
     />
   );
 };

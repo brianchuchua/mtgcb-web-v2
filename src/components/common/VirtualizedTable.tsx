@@ -50,8 +50,6 @@ export interface VirtualizedTableProps<T> {
   emptyMessage?: string;
   computeItemKey?: (index: number) => string | number;
   tableWidth?: number;
-  onClick?: (itemId: string) => void;
-  getItemId?: (item: T) => string;
 }
 
 const VirtualizedTable = <T,>({
@@ -65,8 +63,6 @@ const VirtualizedTable = <T,>({
   emptyMessage = 'No items found',
   computeItemKey,
   tableWidth,
-  onClick,
-  getItemId,
 }: VirtualizedTableProps<T>) => {
   const theme = useTheme();
 
@@ -127,19 +123,8 @@ const VirtualizedTable = <T,>({
   // Custom table row for virtualization
   const CustomTableRow = (props: any) => {
     const { index, item, ...restProps } = props;
-    const handleRowClick = () => {
-      if (onClick && getItemId) {
-        onClick(getItemId(item));
-      }
-    };
 
-    return (
-      <StyledTableRow
-        onClick={onClick && getItemId ? handleRowClick : undefined}
-        style={{ cursor: onClick ? 'pointer' : 'default' }}
-        {...restProps}
-      />
-    );
+    return <StyledTableRow {...restProps} />;
   };
 
   // Table virtualization components
@@ -288,13 +273,9 @@ const VirtualizedTable = <T,>({
 };
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  cursor: 'pointer',
   transition: 'background-color 0.2s ease, opacity 0.2s ease',
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  '&:hover': {
-    backgroundColor: theme.palette.action.selected,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
   },
 }));
 

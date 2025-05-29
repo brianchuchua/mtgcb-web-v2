@@ -45,7 +45,7 @@ const CardTable: React.FC<CardTableProps> = ({
     sortBy,
   );
 
-  const renderCardRow = useCardRowRenderer(priceType, tableSettings, onCardClick);
+  const renderCardRow = useCardRowRenderer(priceType, tableSettings, onCardClick, isOwnCollection);
 
   return (
     <VirtualizedTable
@@ -59,8 +59,6 @@ const CardTable: React.FC<CardTableProps> = ({
       onSortChange={onSort}
       emptyMessage="No cards found"
       computeItemKey={(index) => items[index]?.id || index}
-      onClick={onCardClick}
-      getItemId={(card) => card.id}
     />
   );
 };

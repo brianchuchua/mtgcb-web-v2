@@ -29,8 +29,8 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({
 
   if (isSkeleton(set)) {
     return (
-      <SetBoxWrapper sx={{ opacity: 0.7, height: '399px' }}>
-        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: '399px' }}></SetBoxContent>
+      <SetBoxWrapper sx={{ opacity: 0.7, height: '566px' }}>
+        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: '566px' }}></SetBoxContent>
       </SetBoxWrapper>
     );
   }

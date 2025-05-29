@@ -100,14 +100,15 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
 
   return (
     <>
-      {collectionSummary && (
+      {(collectionSummary || isLoading) && (
         <CollectionHeader
           username={username || ''}
-          uniquePrintingsCollected={collectionSummary.uniquePrintingsCollected || 0}
-          numberOfCardsInMagic={collectionSummary.numberOfCardsInMagic || 0}
-          totalCardsCollected={collectionSummary.totalCardsCollected || 0}
-          percentageCollected={collectionSummary.percentageCollected || 0}
-          totalValue={collectionSummary.totalValue || 0}
+          uniquePrintingsCollected={collectionSummary?.uniquePrintingsCollected || 0}
+          numberOfCardsInMagic={collectionSummary?.numberOfCardsInMagic || 0}
+          totalCardsCollected={collectionSummary?.totalCardsCollected || 0}
+          percentageCollected={collectionSummary?.percentageCollected || 0}
+          totalValue={collectionSummary?.totalValue || 0}
+          isLoading={isLoading && !collectionSummary}
         />
       )}
 

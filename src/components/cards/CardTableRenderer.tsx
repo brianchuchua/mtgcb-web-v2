@@ -1,16 +1,22 @@
 'use client';
 
+import AddIcon from '@mui/icons-material/Add';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Box, TableCell, Tooltip, Typography } from '@mui/material';
+import RemoveIcon from '@mui/icons-material/Remove';
+import { Box, IconButton, TableCell, TextField, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import debounce from 'lodash.debounce';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useEffect, useRef } from 'react';
+import { useSnackbar } from 'notistack';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CardItemProps } from './CardItem';
 import CardPrice from './CardPrice';
+import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import { ResponsiveWidth, TableColumn } from '@/components/common/VirtualizedTable';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
 
 export interface CardTableRendererProps {
@@ -115,6 +121,24 @@ export const useCardTableColumns = (
       sortable: true,
     },
     {
+      id: 'quantityReg',
+      label: 'Regular',
+      width: { default: '100px' },
+      align: 'center',
+      tooltip: <QuantityRegTooltip />,
+      hasInfoIcon: true,
+      sortable: true,
+    },
+    {
+      id: 'quantityFoil',
+      label: 'Foils',
+      width: { default: '100px' },
+      align: 'center',
+      tooltip: <QuantityFoilTooltip />,
+      hasInfoIcon: true,
+      sortable: true,
+    },
+    {
       id: 'releasedAt',
       label: 'Set',
       width: {
@@ -201,24 +225,6 @@ export const useCardTableColumns = (
       hasInfoIcon: true,
       sortable: true,
     },
-    {
-      id: 'quantityReg',
-      label: 'Reg',
-      width: { default: '60px' },
-      align: 'center',
-      tooltip: <QuantityRegTooltip />,
-      hasInfoIcon: true,
-      sortable: true,
-    },
-    {
-      id: 'quantityFoil',
-      label: 'Foil',
-      width: { default: '60px' },
-      align: 'center',
-      tooltip: <QuantityFoilTooltip />,
-      hasInfoIcon: true,
-      sortable: true,
-    },
   ];
 
   // Filter columns based on visibility settings
@@ -243,13 +249,225 @@ export const useCardTableColumns = (
       column.id === 'foil';
 
     if (isPriceColumn) return displaySettings.priceIsVisible;
-    
+
     if (column.id === 'quantityReg' || column.id === 'quantityFoil') {
       return displaySettings.quantityIsVisible ?? false;
     }
 
     return true;
   });
+};
+
+// Table-specific styled components for editable quantity
+const TableQuantityContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '&:focus-within': {
+    '& button': {
+      borderColor: theme.palette.primary.main,
+    },
+  },
+}));
+
+const TableQuantityInput = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-input': {
+    padding: '2px 4px',
+    width: '30px',
+    textAlign: 'center',
+    fontSize: '0.75rem',
+    height: '20px',
+  },
+  '& .MuiOutlinedInput-root': {
+    height: '24px',
+    borderRadius: 0,
+    '& fieldset': {
+      borderLeft: 'none',
+      borderRight: 'none',
+      borderColor: theme.palette.divider,
+      transition: 'border-color 0.2s',
+    },
+    '&:hover fieldset': {
+      borderColor: theme.palette.divider,
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: theme.palette.primary.main,
+      borderWidth: 1,
+    },
+  },
+  '& input[type="number"]::-webkit-inner-spin-button, & input[type="number"]::-webkit-outer-spin-button': {
+    WebkitAppearance: 'none',
+    margin: 0,
+  },
+  '& input[type="number"]': {
+    MozAppearance: 'textfield',
+  },
+}));
+
+const TableQuantityButton = styled(IconButton)(({ theme }) => ({
+  padding: '2px',
+  width: '24px',
+  height: '24px',
+  borderRadius: 0,
+  border: `1px solid ${theme.palette.divider}`,
+  transition: 'border-color 0.2s, background-color 0.2s',
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+    borderColor: theme.palette.divider,
+  },
+  '& .MuiSvgIcon-root': {
+    fontSize: '0.875rem',
+  },
+}));
+
+const TableLeftButton = styled(TableQuantityButton)(({ theme }) => ({
+  borderTopLeftRadius: '4px',
+  borderBottomLeftRadius: '4px',
+  borderRight: 'none',
+}));
+
+const TableRightButton = styled(TableQuantityButton)(({ theme }) => ({
+  borderTopRightRadius: '4px',
+  borderBottomRightRadius: '4px',
+  borderLeft: 'none',
+}));
+
+// Inline editable quantity component for table cells
+const InlineEditableQuantity: React.FC<{
+  cardId: string;
+  cardName: string;
+  quantity: number;
+  quantityType: 'regular' | 'foil';
+  otherQuantity?: number; // The other quantity (foil if editing regular, regular if editing foil)
+}> = ({ cardId, cardName, quantity, quantityType, otherQuantity = 0 }) => {
+  const [localQuantity, setLocalQuantity] = useState(quantity);
+  const [inputValue, setInputValue] = useState(quantity.toString());
+  const [updateCollection] = useUpdateCollectionMutation();
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    setLocalQuantity(quantity);
+    setInputValue(quantity.toString());
+  }, [quantity]);
+
+  const debouncedUpdate = useCallback(
+    debounce(async (newQuantity: number) => {
+      try {
+        await updateCollection({
+          mode: 'set',
+          cards: [
+            {
+              cardId: parseInt(cardId),
+              quantityReg: quantityType === 'regular' ? newQuantity : otherQuantity,
+              quantityFoil: quantityType === 'foil' ? newQuantity : otherQuantity,
+            },
+          ],
+        }).unwrap();
+
+        const message =
+          quantityType === 'regular'
+            ? `${cardName} has been set to ${newQuantity}`
+            : `${cardName} (Foil) has been set to ${newQuantity}`;
+        enqueueSnackbar(message, { variant: 'success', autoHideDuration: 3000 });
+      } catch (error) {
+        enqueueSnackbar(`Failed to update ${cardName} quantity`, { variant: 'error' });
+        setLocalQuantity(quantity); // Reset on error
+      }
+    }, 400),
+    [updateCollection, cardId, cardName, quantityType, otherQuantity, enqueueSnackbar],
+  );
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    
+    // Update the display value
+    setInputValue(value);
+
+    // Allow empty string without updating the actual quantity
+    if (value === '') {
+      return; // Don't trigger the API call yet
+    }
+
+    const numValue = parseInt(value) || 0;
+    const newQuantity = Math.max(0, numValue);
+    setLocalQuantity(newQuantity);
+    debouncedUpdate(newQuantity);
+  };
+
+  const handleInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    // If empty, set to 0
+    if (inputValue === '') {
+      setLocalQuantity(0);
+      setInputValue('0');
+      debouncedUpdate(0);
+    } else {
+      // Ensure the display value matches the numeric value
+      const numValue = parseInt(inputValue) || 0;
+      setInputValue(numValue.toString());
+    }
+  };
+
+  const handleInputFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    // Use onClick handler for better selection behavior
+    event.target.select();
+  };
+
+  const handleIncrement = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    event.currentTarget.blur();
+    const newQuantity = localQuantity + 1;
+    setLocalQuantity(newQuantity);
+    setInputValue(newQuantity.toString());
+    debouncedUpdate(newQuantity);
+  };
+
+  const handleDecrement = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    event.currentTarget.blur();
+    const newQuantity = Math.max(0, localQuantity - 1);
+    setLocalQuantity(newQuantity);
+    setInputValue(newQuantity.toString());
+    debouncedUpdate(newQuantity);
+  };
+
+  return (
+    <TableQuantityContainer>
+      <TableLeftButton
+        size="small"
+        onMouseDown={(e) => {
+          e.preventDefault();
+          handleDecrement(e);
+        }}
+        disabled={localQuantity === 0}
+        tabIndex={-1}
+        disableFocusRipple
+      >
+        <RemoveIcon />
+      </TableLeftButton>
+      <TableQuantityInput
+        type="number"
+        value={inputValue}
+        onChange={handleInputChange}
+        onBlur={handleInputBlur}
+        onFocus={handleInputFocus}
+        onClick={(e) => (e.target as HTMLInputElement).select()}
+        inputProps={{ min: 0 }}
+        variant="outlined"
+        size="small"
+      />
+      <TableRightButton
+        size="small"
+        onMouseDown={(e) => {
+          e.preventDefault();
+          handleIncrement(e);
+        }}
+        tabIndex={-1}
+        disableFocusRipple
+      >
+        <AddIcon />
+      </TableRightButton>
+    </TableQuantityContainer>
+  );
 };
 
 export const useCardPreviewEffect = (cards: CardItemProps[]) => {
@@ -456,6 +674,7 @@ export const useCardRowRenderer = (
   priceType: PriceType,
   displaySettings: CardTableRendererProps['displaySettings'],
   onCardClick?: (cardId: string) => void,
+  isOwnCollection?: boolean,
 ) => {
   const { showCardPreview, hideCardPreview } = useCardPreviewEffect([]);
   const pathname = usePathname();
@@ -486,9 +705,59 @@ export const useCardRowRenderer = (
         onMouseEnter={() => showCardPreview(card)}
         onMouseLeave={hideCardPreview}
       >
-        <ClickableText>{card.name}</ClickableText>
+        <Link
+          href={`/browse/cards/${generateCardSlug(card.name)}/${card.id}`}
+          style={{
+            color: 'inherit',
+            textDecoration: 'none',
+          }}
+          onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
+        >
+          <ClickableText>{card.name}</ClickableText>
+        </Link>
       </TableCell>,
     );
+
+    // Quantity Cells
+    if (displaySettings.quantityIsVisible) {
+      if (isOwnCollection && (card.quantityReg !== undefined || card.quantityFoil !== undefined)) {
+        // Use inline editable quantity components for own collection
+        cells.push(
+          <TableCell key="quantityReg" sx={{ padding: '4px', textAlign: 'center' }}>
+            <InlineEditableQuantity
+              cardId={card.id}
+              cardName={card.name}
+              quantity={card.quantityReg || 0}
+              quantityType="regular"
+              otherQuantity={card.quantityFoil || 0}
+            />
+          </TableCell>,
+        );
+        cells.push(
+          <TableCell key="quantityFoil" sx={{ padding: '4px', textAlign: 'center' }}>
+            <InlineEditableQuantity
+              cardId={card.id}
+              cardName={card.name}
+              quantity={card.quantityFoil || 0}
+              quantityType="foil"
+              otherQuantity={card.quantityReg || 0}
+            />
+          </TableCell>,
+        );
+      } else {
+        // Show read-only quantities for other collections
+        cells.push(
+          <TableCell key="quantityReg" sx={{ textAlign: 'center' }}>
+            {card.quantityReg !== undefined ? card.quantityReg : '-'}
+          </TableCell>,
+        );
+        cells.push(
+          <TableCell key="quantityFoil" sx={{ textAlign: 'center' }}>
+            {card.quantityFoil !== undefined ? card.quantityFoil : '-'}
+          </TableCell>,
+        );
+      }
+    }
 
     // Set Cell
     if (displaySettings.setIsVisible) {
@@ -503,14 +772,12 @@ export const useCardRowRenderer = (
               }}
               onClick={(e) => e.stopPropagation()} // Prevent row click when clicking set link
             >
-              <SetLinkText>
-                {card.setName}
-              </SetLinkText>
+              <SetLinkText>{card.setName}</SetLinkText>
             </Link>
           ) : (
             card.setName || 'Unknown'
           )}
-        </TableCell>
+        </TableCell>,
       );
     }
 
@@ -585,22 +852,13 @@ export const useCardRowRenderer = (
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()} // Prevent row click when clicking price
           >
-            <CardPrice prices={preparePriceData(card) || null} isLoading={false} priceType={priceType} centered={false} />
+            <CardPrice
+              prices={preparePriceData(card) || null}
+              isLoading={false}
+              priceType={priceType}
+              centered={false}
+            />
           </PriceLink>
-        </TableCell>,
-      );
-    }
-
-    // Quantity Cells
-    if (displaySettings.quantityIsVisible) {
-      cells.push(
-        <TableCell key="quantityReg" sx={{ textAlign: 'center' }}>
-          {card.quantityReg !== undefined ? card.quantityReg : '-'}
-        </TableCell>,
-      );
-      cells.push(
-        <TableCell key="quantityFoil" sx={{ textAlign: 'center' }}>
-          {card.quantityFoil !== undefined ? card.quantityFoil : '-'}
         </TableCell>,
       );
     }

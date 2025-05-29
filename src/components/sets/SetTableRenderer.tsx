@@ -3,6 +3,8 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, TableCell, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 import { TableColumn } from '@/components/common/VirtualizedTable';
 import SetIcon from '@/components/sets/SetIcon';
@@ -105,7 +107,14 @@ export const useSetRowRenderer = (
   displaySettings: SetTableRendererProps['displaySettings'],
   onSetClick?: (set: Set) => void,
 ) => {
+  const pathname = usePathname();
+  
   const renderSetRow = (index: number, set: Set) => {
+    // Check if we're in a collection view and extract userId
+    const collectionMatch = pathname?.match(/^\/collections\/(\d+)/);
+    const userId = collectionMatch ? collectionMatch[1] : null;
+    const setUrl = userId ? `/collections/${userId}/${set.slug}` : `/browse/sets/${set.slug}`;
+    
     // Create a collection of cells based on visible columns
     const cells = [];
 
@@ -113,10 +122,19 @@ export const useSetRowRenderer = (
     if (displaySettings.codeIsVisible !== false) {
       cells.push(
         <TableCell key="code" align="center">
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-            {set.code && <SetIcon code={set.code} size="2x" fixedWidth />}
-            {set.code || 'N/A'}
-          </Box>
+          <Link
+            href={setUrl}
+            style={{
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+            onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+              {set.code && <SetIcon code={set.code} size="2x" fixedWidth />}
+              <SetLinkText>{set.code || 'N/A'}</SetLinkText>
+            </Box>
+          </Link>
         </TableCell>,
       );
     }
@@ -124,7 +142,16 @@ export const useSetRowRenderer = (
     // Set Name Cell (always shown)
     cells.push(
       <TableCell key="name" component="th" scope="row">
-        <ClickableText>{set.name}</ClickableText>
+        <Link
+          href={setUrl}
+          style={{
+            color: 'inherit',
+            textDecoration: 'none',
+          }}
+          onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
+        >
+          <ClickableText>{set.name}</ClickableText>
+        </Link>
       </TableCell>,
     );
 
@@ -185,4 +212,12 @@ const ClickableText = styled(Typography)(({ theme }) => ({
   '&:hover': {
     textDecoration: 'underline',
   },
+}));
+
+const SetLinkText = styled(Typography)(({ theme }) => ({
+  '&:hover': {
+    textDecoration: 'underline',
+    color: theme.palette.primary.main,
+  },
+  cursor: 'pointer',
 }));
