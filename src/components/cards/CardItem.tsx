@@ -398,6 +398,9 @@ const StyledCard = styled(Card, {
   borderRadius: setName === 'Limited Edition Alpha' ? '7%' : '5%',
   overflow: 'hidden',
   boxShadow: theme.shadows[3],
+  // Set as a container for container queries
+  containerType: 'inline-size',
+  containerName: 'card',
 
   // Add specific mobile constraints
   [theme.breakpoints.down('sm')]: {

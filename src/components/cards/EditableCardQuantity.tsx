@@ -16,6 +16,10 @@ const QuantityContainer = styled(Box)(({ theme }) => ({
       borderColor: theme.palette.primary.main,
     },
   },
+  // Ensure consistent width when stacked vertically
+  '@container card (max-width: 280px)': {
+    width: '140px',
+  },
 }));
 
 const QuantityInput = styled(TextField)(({ theme }) => ({
@@ -281,7 +285,20 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   };
 
   return (
-    <Box display="flex" gap={1} justifyContent="center" sx={{ mt: 0.5 }}>
+    <Box 
+      display="flex" 
+      gap={1} 
+      justifyContent="center" 
+      sx={{ 
+        mt: 0.5,
+        flexDirection: 'row',
+        // Use container query to stack vertically when card is narrow
+        '@container card (max-width: 280px)': {
+          flexDirection: 'column',
+          alignItems: 'center',
+        },
+      }}
+    >
       <QuantityContainer>
         <LeftButton
           size="small"
