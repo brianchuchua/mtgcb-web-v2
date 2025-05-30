@@ -4,7 +4,6 @@ I've found over time that maintaining my action items for code in external tools
 
 ## Remaining Major Feature Work Before 1.0
 
-- Edit cards page
 - Mass Update Tool
 - Imports and exports
 - Privacy mode

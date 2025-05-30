@@ -353,10 +353,10 @@ const CardMetadata: React.FC<CardMetadataProps> = ({ selectedCard, handleCardCli
         <CardPrice
           prices={{
             normal: {
-              market: parseFloat(selectedCard.card.market) || null,
-              low: parseFloat(selectedCard.card.low) || null,
-              average: parseFloat(selectedCard.card.average) || null,
-              high: parseFloat(selectedCard.card.high) || null,
+              market: selectedCard.card.market ? parseFloat(selectedCard.card.market) : null,
+              low: selectedCard.card.low ? parseFloat(selectedCard.card.low) : null,
+              average: selectedCard.card.average ? parseFloat(selectedCard.card.average) : null,
+              high: selectedCard.card.high ? parseFloat(selectedCard.card.high) : null,
             },
             foil: selectedCard.card.foil
               ? {
