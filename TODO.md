@@ -33,6 +33,8 @@ I've found over time that maintaining my action items for code in external tools
 
 ## UX Action Items
 
+- Consider an easier-to-use card quantity filter, add stat filter works, but users may be used to the easier one (I did this in the legacy new page)
+- Consider moving price type selection to the browsesearchform
 - The pop-up messages are too sticky, feels like mouse movement is involved
 - Header consistency
 - Make set symbols change color on set table and set page too
@@ -46,7 +48,6 @@ I've found over time that maintaining my action items for code in external tools
 - It would be nice if pagination didn't change when changing track subsets with main set or price type
 - See if I can prevent the entire card grid from reloading when the price type is changed
 - Add skeleton loader for collection header to prevent vertical shift when loading (audit set header too)
-- Consider an easier-to-use card quantity filter, add stat filter works, but users may be used to the easier one (I did this in the legacy new page)
 - Audit table field orders and their corresponding visibility filters
 - OpenGraph meta tags for social previews
 - Consider alternate-mobile-filter.png as a design idea (search bar at the top, Filters button that opens a menu with filters)
@@ -76,6 +77,7 @@ I've found over time that maintaining my action items for code in external tools
 
 ## Tech Debt
 
+- Type issues in src\api\collections\collectionsApi.ts
 - Switching from desktop to mobile view unmounts a lot of the app, which resets pages like the edit cards page
 - End-to-end tests for every user action
 - CardBrowseClient is a mess and is using deprecated Grid

@@ -24,7 +24,7 @@ export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCol
   const [setsPerRow] = useLocalStorage<number>('setsPerRow', 0); // Default to 0 (responsive)
   
   // Card gallery settings
-  const [cardsPerRow] = useLocalStorage<number>('cardsPerRow', 4);
+  const [cardsPerRow] = useLocalStorage<number>('cardsPerRow', 0); // Default to 0 (auto/responsive)
   const [cardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
   const [nameIsVisible] = useLocalStorage('cardNameIsVisible', true);
   const [setIsVisible] = useLocalStorage('cardSetIsVisible', true);

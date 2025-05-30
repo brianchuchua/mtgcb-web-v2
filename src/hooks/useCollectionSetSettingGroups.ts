@@ -140,7 +140,7 @@ export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table
     settings: [
       {
         key: 'setsPerRow',
-        label: 'Sets per row',
+        label: 'Sets per row (desktop only)',
         value: setsPerRow,
         setValue: setSetsPerRow,
         type: 'select',

@@ -20,7 +20,8 @@ const QuantityContainer = styled(Box)(({ theme }) => ({
 
 const QuantityInput = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-input': {
-    padding: theme.spacing(1),
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
     width: '50px',
     textAlign: 'center',
     fontSize: '0.875rem',
@@ -65,7 +66,7 @@ const QuantityInput = styled(TextField)(({ theme }) => ({
 
 const QuantityButton = styled(IconButton)(({ theme }) => ({
   padding: theme.spacing(1),
-  width: '40px',
+  width: '35px',
   borderRadius: 0,
   border: `1px solid ${theme.palette.divider}`,
   backgroundColor: theme.palette.background.paper,
@@ -113,7 +114,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   const updatePromiseRef = React.useRef<{ abort: () => void } | null>(null);
   const isUserEditingRef = React.useRef(false);
   const editingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-  
+
   // Cleanup on unmount
   React.useEffect(() => {
     return () => {
@@ -183,12 +184,12 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
 
     // Mark as user editing
     isUserEditingRef.current = true;
-    
+
     // Clear any existing timeout
     if (editingTimeoutRef.current) {
       clearTimeout(editingTimeoutRef.current);
     }
-    
+
     // Set timeout to clear editing flag after updates are likely done
     editingTimeoutRef.current = setTimeout(() => {
       isUserEditingRef.current = false;
@@ -250,7 +251,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
 
   const handleInputBlur = (type: 'regular' | 'foil', event: React.FocusEvent<HTMLInputElement>) => {
     const inputValue = type === 'regular' ? inputValueReg : inputValueFoil;
-    
+
     // If empty, set to 0
     if (inputValue === '') {
       const newValue = 0;
@@ -280,7 +281,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   };
 
   return (
-    <Box display="flex" gap={2} justifyContent="center" sx={{ mt: 0.5 }}>
+    <Box display="flex" gap={1} justifyContent="center" sx={{ mt: 0.5 }}>
       <QuantityContainer>
         <LeftButton
           size="small"

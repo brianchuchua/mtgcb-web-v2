@@ -129,7 +129,7 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
     settings: [
       {
         key: 'setsPerRow',
-        label: 'Sets per row',
+        label: 'Sets per row (desktop only)',
         value: setsPerRow,
         setValue: setSetsPerRow,
         type: 'select',

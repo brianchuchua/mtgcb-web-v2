@@ -64,7 +64,7 @@ const VirtualizedGallery = <T,>({
       const item = items[index];
       return renderItem(item, index);
     },
-    [items, renderItem]
+    [items, renderItem],
   );
 
   return (
@@ -131,25 +131,25 @@ const GalleryWrapper = styled(Box, {
   ...(columnsPerRow === 0 && {
     [theme.breakpoints.up('xl')]: {
       '& .virtualized-gallery-grid': {
+        gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+      },
+    },
+    '@media (min-width: 1750px) and (max-width: 1999px)': {
+      '& .virtualized-gallery-grid': {
         gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
       },
     },
-    [theme.breakpoints.between('lg', 'xl')]: {
+    '@media (min-width: 1300px) and (max-width: 1750px)': {
       '& .virtualized-gallery-grid': {
         gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
       },
     },
-    [theme.breakpoints.between('md', 'lg')]: {
+    '@media (min-width: 1000px) and (max-width: 1300px)': {
       '& .virtualized-gallery-grid': {
         gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
       },
     },
-    '@media (min-width: 700px) and (max-width: 899px)': {
-      '& .virtualized-gallery-grid': {
-        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-      },
-    },
-    '@media (min-width: 600px) and (max-width: 699px)': {
+    '@media (min-width: 600px) and (max-width: 1000px)': {
       '& .virtualized-gallery-grid': {
         gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
       },
