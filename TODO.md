@@ -17,10 +17,11 @@ I've found over time that maintaining my action items for code in external tools
 - Legal disclaimer
 - In-code TODO audit
 - Feature parity audit
+- Audit routes that require authentication
 
 ### Current Action Items
 
-- Implement Edit Cards page, identical to the legacy app, but with the new UI and API
+- When idle: Migrate TODOs from README.md to this file
 
 ## Other Action Items
 
@@ -29,11 +30,12 @@ I've found over time that maintaining my action items for code in external tools
 - Remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
 - canBeFoil = audit my database and implement this in the collection views
 - Support searching by collector number and collector number ranges
-- Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data
+- Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
 
 ## UX Action Items
 
 - The pop-up messages are too sticky, feels like mouse movement is involved
+- Header consistency
 - Make set symbols change color on set table and set page too
 - Add link from child set to parent set
 - Add titles to all pages
@@ -58,6 +60,8 @@ I've found over time that maintaining my action items for code in external tools
 - UX - Make the tab indexes only go to the quantity fields
 - Maybe: Improve rendering of reg and foil quantity when not logged in grid view
 - UX - Why do the pop-ups not dismiss if the screen isn't active?
+- Consider breadcrumbs for collection pages, maybe just the subpages since the main collection page is the root
+- Improve card quantity update messages
 
 ## Bugs
 
@@ -73,12 +77,13 @@ I've found over time that maintaining my action items for code in external tools
 
 ## Tech Debt
 
+- Switching from desktop to mobile view unmounts a lot of the app, which resets pages like the edit cards page
+- End-to-end tests for every user action
 - CardBrowseClient is a mess and is using deprecated Grid
-- Find deprecated uses of PaperProps
+- Find deprecated uses of PaperProps and Grid
 - Tech debt in API: const allMatchingSets = await findSetsByQuery(fastify, whereClause, orderClause, 10000, 0, select); <-- will break if more than 10000 sets
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - Every file needs to follow the code style I established in SetItemRenderer.tsx and browse/page.tsx
-- End-to-end tests for every user action
 - Minor: prefetch leads to page 2 being loaded when a user invalidates the collection tag, it's a prefetch subscription issue in RTK Query, dev team is aware, no current fix, just bad workarounds, page one still loads on visit, so it's fine
 
 ## Future Feature Work
@@ -111,6 +116,7 @@ I've found over time that maintaining my action items for code in external tools
 - Automated database backups
 - Dogfooding and UX testing
 - UX - Must test rendering of input fields on native devices
+- Verify parameter edge cases, minimums and maximums
 
 ## Nice to Have
 

@@ -124,3 +124,45 @@ MTG Collection Builder (MTG CB) is a web application for Magic: The Gathering ca
 ### Type Checking
 
 - `yarn type-check`
+
+## API Documentation
+
+The application uses RTK Query for API management. All API endpoints are defined in the `/src/api` directory.
+
+### Authentication API (`/src/api/auth/authApi.ts`)
+
+- **GET** `auth/me` - Get current user data
+- **POST** `auth/login` - User login
+- **POST** `auth/logout` - User logout
+- **POST** `/api/auth/register` - User registration (local endpoint)
+- **POST** `/api/auth/forgot-password` - Request password reset (local endpoint)
+- **POST** `/api/auth/forgot-username` - Request username reminder (local endpoint)
+- **POST** `/api/auth/reset-password` - Reset password with token (local endpoint)
+- **POST** `/api/auth/validate-password-reset` - Validate password reset token (local endpoint)
+
+### Browse API (`/src/api/browse/browseApi.ts`)
+
+- **POST** `/cards/search` - Search and filter cards (supports pagination, sorting, filtering)
+- **POST** `/sets/search` - Search and filter sets (supports pagination, sorting, filtering)
+- **GET** `/sets/types` - Get available set types with categories
+
+### Cards API (`/src/api/cards/cardsApi.ts`)
+
+- **GET** `/cards/types` - Get available card types
+
+### Collections API (`/src/api/collections/collectionsApi.ts`)
+
+- **POST** `/collection/summary` - Get collection summary statistics ⚠️ **UNUSED** (hook `useGetCollectionSummaryQuery` is only used in the unused `useCollectionData` hook)
+- **POST** `/collection/cards` - Get cards in user's collection ⚠️ **UNUSED** (hook `useGetCollectionCardsQuery` is not used)
+- **POST** `/collection/update` - Update collection (add/remove/modify card quantities)
+  - Supports optimistic updates for better UX
+  - Automatically invalidates related caches
+
+### Sets API (`/src/api/sets/setsApi.ts`)
+
+- **GET** `/sets/cost-to-complete` - Calculate cost to complete sets in collection
+  - Query params: `priceType`, `includeSubsetsInSets`
+
+### User API (`/src/api/user/userApi.ts`)
+
+- **PUT** `/user` - Update user profile (username, email, password)

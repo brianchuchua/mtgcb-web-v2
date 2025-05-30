@@ -20,6 +20,11 @@ export const SearchForms = () => {
   if (!pathname?.startsWith('/browse') && !pathname?.startsWith('/collections')) {
     return null;
   }
+  
+  // Don't render on the edit-cards page
+  if (pathname === '/collections/edit-cards') {
+    return null;
+  }
 
   // Get the appropriate title based on the current route
   const getFormTitle = () => {
