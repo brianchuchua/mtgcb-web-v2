@@ -21,8 +21,9 @@ import {
 import { useRouter } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useGetCardsQuery } from '@/api/browse/browseApi';
+import { useGetCardsQuery, useLazyGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
+import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import CardPrice from '@/components/cards/CardPrice';
 import { useAuth } from '@/hooks/useAuth';
@@ -38,6 +39,7 @@ const EditCardsClient: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [selectedCard, setSelectedCard] = useState<CardOption | null>(null);
+  const [selectedSet, setSelectedSet] = useState<SetOption | null>(null);
   const [quantityRegular, setQuantityRegular] = useState(1);
   const [quantityFoil, setQuantityFoil] = useState(0);
   const [editMode, setEditMode] = useLocalStorage<EditMode>('editCardsMode', 'increment');
@@ -45,6 +47,10 @@ const EditCardsClient: React.FC = () => {
   const priceType = usePriceType();
   const { user } = useAuth();
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const [allCards, setAllCards] = useState<CardModel[]>([]);
+  const [isLoadingAllCards, setIsLoadingAllCards] = useState(false);
+  const [triggerGetCards] = useLazyGetCardsQuery();
 
   const { data: searchResponse, isFetching: isSearching } = useGetCardsQuery(
     {
@@ -55,14 +61,80 @@ const EditCardsClient: React.FC = () => {
       sortDirection: 'desc',
       userId: user?.userId,
       priceType: priceType,
+      ...(selectedSet && selectedSet.value !== 'all' && { setId: parseInt(selectedSet.value) }),
     },
     {
-      skip: searchInput.length < 2,
+      skip: searchInput.length < 2 && (!selectedSet || selectedSet.value === 'all'),
       refetchOnMountOrArgChange: true,
       refetchOnFocus: true,
       refetchOnReconnect: true,
     },
   );
+
+  // Fetch all cards when a set is selected and no search input
+  useEffect(() => {
+    const fetchAllCardsForSet = async () => {
+      if (!selectedSet || selectedSet.value === 'all' || searchInput.length >= 2) {
+        setAllCards([]);
+        return;
+      }
+
+      setIsLoadingAllCards(true);
+      const allCardsList: CardModel[] = [];
+      let offset = 0;
+      const limit = 500;
+
+      try {
+        // First call to get total count
+        const firstResponse = await triggerGetCards({
+          limit,
+          offset,
+          sortBy: 'releasedAt',
+          sortDirection: 'desc',
+          userId: user?.userId,
+          priceType: priceType,
+          setId: parseInt(selectedSet.value),
+        }).unwrap();
+
+        if (firstResponse.data) {
+          allCardsList.push(...firstResponse.data.cards);
+          const totalCount = firstResponse.data.totalCount;
+
+          // Make additional calls if needed
+          while (allCardsList.length < totalCount) {
+            offset += limit;
+            const response = await triggerGetCards({
+              limit,
+              offset,
+              sortBy: 'releasedAt',
+              sortDirection: 'desc',
+              userId: user?.userId,
+              priceType: priceType,
+              setId: parseInt(selectedSet.value),
+            }).unwrap();
+
+            if (response.data) {
+              allCardsList.push(...response.data.cards);
+            }
+          }
+        }
+
+        setAllCards(allCardsList);
+      } catch (error) {
+        console.error('Error fetching all cards for set:', error);
+      } finally {
+        setIsLoadingAllCards(false);
+      }
+    };
+
+    fetchAllCardsForSet();
+  }, [selectedSet, searchInput.length, user?.userId, priceType, triggerGetCards]);
+
+  const { data: setsResponse, isFetching: isLoadingSets } = useGetAllSetsQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
 
   const [updateCollection, { isLoading: isUpdating }] = useUpdateCollectionMutation();
 
@@ -76,8 +148,38 @@ const EditCardsClient: React.FC = () => {
     }
   };
 
+  const setOptions: SetOption[] = useMemo(() => {
+    const allOption: SetOption = { value: 'all', label: 'All Sets', name: 'All Sets', code: '' };
+    
+    if (!setsResponse?.data?.sets) return [allOption];
+
+    const setOptions = setsResponse.data.sets.map((set: any) => ({
+      value: set.id.toString(),
+      label: `${set.name} (${set.code})`,
+      name: set.name,
+      code: set.code,
+    }));
+
+    return [allOption, ...setOptions];
+  }, [setsResponse]);
+
   const cardOptions: CardOption[] = useMemo(() => {
-    if (!searchResponse?.data?.cards || searchInput.length < 2) return [];
+    // When a set is selected and no search input, use allCards
+    if (selectedSet && selectedSet.value !== 'all' && searchInput.length < 2) {
+      return allCards.map((card: CardModel) => ({
+        id: card.id,
+        name: card.name,
+        setName: card.setName,
+        label: `${card.name} [${card.setName}]`,
+        card,
+      }));
+    }
+    
+    // Otherwise use search response
+    if (!searchResponse?.data?.cards) return [];
+    
+    // Require at least 2 characters of search input when not filtering by set
+    if (searchInput.length < 2) return [];
 
     return searchResponse.data.cards.map((card: CardModel) => ({
       id: card.id,
@@ -86,7 +188,7 @@ const EditCardsClient: React.FC = () => {
       label: `${card.name} [${card.setName}]`,
       card,
     }));
-  }, [searchResponse, searchInput]);
+  }, [searchResponse, searchInput, selectedSet, allCards]);
 
   useEffect(() => {
     if (selectedCard?.card.quantityReg !== undefined) {
@@ -107,6 +209,14 @@ const EditCardsClient: React.FC = () => {
 
   const handleCardSelect = (_event: any, value: CardOption | null) => {
     setSelectedCard(value);
+  };
+
+  const handleSetSelect = (_event: any, value: SetOption | null) => {
+    setSelectedSet(value);
+    // Clear the search when changing sets
+    setSearchInput('');
+    setInputValue('');
+    setSelectedCard(null);
   };
 
   const handleCardClick = useCallback(() => {
@@ -165,6 +275,7 @@ const EditCardsClient: React.FC = () => {
       setCurrentQuantities({ regular: 0, foil: 0 });
       setInputValue('');
       setSearchInput('');
+      // Don't reset the selected set, keep it for convenience
 
       // Focus back on search input
       searchInputRef.current?.focus();
@@ -189,9 +300,14 @@ const EditCardsClient: React.FC = () => {
             handleCardSelect={handleCardSelect}
             inputValue={inputValue}
             handleSearchInputChange={handleSearchInputChange}
-            isSearching={isSearching}
+            isSearching={isSearching || isLoadingAllCards}
             searchInputRef={searchInputRef}
             searchInput={searchInput}
+            setOptions={setOptions}
+            selectedSet={selectedSet}
+            handleSetSelect={handleSetSelect}
+            isLoadingSets={isLoadingSets}
+            searchResponse={searchResponse}
           />
         </SearchSection>
 
@@ -231,6 +347,13 @@ interface CardOption {
   card: CardModel;
 }
 
+interface SetOption {
+  value: string;
+  label: string;
+  name: string;
+  code: string;
+}
+
 interface CardSearchAutocompleteProps {
   cardOptions: CardOption[];
   selectedCard: CardOption | null;
@@ -240,6 +363,11 @@ interface CardSearchAutocompleteProps {
   isSearching: boolean;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
   searchInput: string;
+  setOptions: SetOption[];
+  selectedSet: SetOption | null;
+  handleSetSelect: (event: any, value: SetOption | null) => void;
+  isLoadingSets: boolean;
+  searchResponse: any;
 }
 
 const CardSearchAutocomplete: React.FC<CardSearchAutocompleteProps> = ({
@@ -251,46 +379,149 @@ const CardSearchAutocomplete: React.FC<CardSearchAutocompleteProps> = ({
   isSearching,
   searchInputRef,
   searchInput,
+  setOptions,
+  selectedSet,
+  handleSetSelect,
+  isLoadingSets,
+  searchResponse,
 }) => {
   return (
-    <Autocomplete
-      options={cardOptions}
-      getOptionKey={(option) => option.id}
-      getOptionLabel={(option) => option.label}
-      value={selectedCard}
-      onChange={handleCardSelect}
-      inputValue={inputValue}
-      onInputChange={handleSearchInputChange}
-      loading={isSearching}
-      autoFocus
-      fullWidth
-      isOptionEqualToValue={(option, value) => option.id === value.id}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Search cards to add or remove!"
-          placeholder="Ex. Giant Spider"
-          autoFocus
-          inputRef={searchInputRef}
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-                {isSearching ? <CircularProgress color="inherit" size={20} /> : null}
-                {params.InputProps.endAdornment}
-              </>
-            ),
-          }}
-        />
-      )}
-      noOptionsText={
-        searchInput.length < 2 ? 'Start typing to search for a card' : 'No cards found -- try another search'
-      }
-      sx={{
-        maxWidth: { xs: '100%', sm: '100%', md: '50%', lg: '33%' },
-        margin: '0 auto',
-      }}
-    />
+    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', justifyContent: 'center' }}>
+      <Autocomplete
+        options={setOptions}
+        getOptionLabel={(option) => option.code || 'All'}
+        getOptionKey={(option) => option.value}
+        renderOption={(props, option) => {
+          const { key, ...otherProps } = props as any;
+          return (
+            <Box component="li" key={key} {...otherProps}>
+              {option.label}
+            </Box>
+          );
+        }}
+        value={selectedSet || setOptions[0]}
+        onChange={handleSetSelect}
+        loading={isLoadingSets}
+        fullWidth
+        isOptionEqualToValue={(option, value) => option.value === value.value}
+        filterOptions={(options, params) => {
+          const filtered = options.filter((option) => {
+            const searchTerm = params.inputValue.toLowerCase();
+            return option.name.toLowerCase().includes(searchTerm) || 
+                   option.code.toLowerCase().includes(searchTerm);
+          });
+          return filtered;
+        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Set"
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {isLoadingSets ? <CircularProgress color="inherit" size={20} /> : null}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
+          />
+        )}
+        sx={{
+          maxWidth: 120,
+          '& .MuiAutocomplete-input': {
+            minWidth: '40px !important',
+          },
+        }}
+        slotProps={{
+          paper: {
+            sx: {
+              width: 'auto',
+              minWidth: 350,
+            },
+          },
+        }}
+      />
+      <Autocomplete
+        options={cardOptions}
+        getOptionKey={(option) => option.id}
+        getOptionLabel={(option) => option.label}
+        value={selectedCard}
+        onChange={handleCardSelect}
+        inputValue={inputValue}
+        onInputChange={handleSearchInputChange}
+        loading={isSearching}
+        autoFocus
+        fullWidth
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label={selectedSet && selectedSet.value !== 'all' ? `Search in ${selectedSet.name}` : "Search cards to add or remove!"}
+            placeholder="Ex. Giant Spider"
+            autoFocus
+            inputRef={searchInputRef}
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {isSearching ? <CircularProgress color="inherit" size={20} /> : null}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
+          />
+        )}
+        noOptionsText={
+          selectedSet && selectedSet.value !== 'all' && searchInput.length < 1
+            ? `Showing all cards from ${selectedSet.name}`
+            : searchInput.length < 2
+            ? 'Start typing to search for a card'
+            : 'No cards found -- try another search'
+        }
+        ListboxProps={{
+          onScroll: (event: React.UIEvent<HTMLUListElement>) => {
+            const listbox = event.currentTarget;
+            if (listbox.scrollTop + listbox.clientHeight >= listbox.scrollHeight - 10) {
+              // User has scrolled to bottom
+            }
+          },
+        }}
+        renderOption={(props, option, { index }) => {
+          const { key, ...otherProps } = props as any;
+          const isLastItem = index === cardOptions.length - 1;
+          const totalCount = searchResponse?.data?.totalCount || 0;
+          const showLimitMessage = (!selectedSet || selectedSet.value === 'all') && totalCount > 500 && isLastItem && cardOptions.length === 500;
+          
+          return (
+            <React.Fragment key={key}>
+              <Box component="li" {...otherProps}>
+                {option.label}
+              </Box>
+              {showLimitMessage && (
+                <Box
+                  component="li"
+                  sx={{
+                    padding: 2,
+                    textAlign: 'center',
+                    color: 'text.secondary',
+                    fontStyle: 'italic',
+                    borderTop: 1,
+                    borderColor: 'divider',
+                  }}
+                >
+                  Showing first 500 results of {totalCount.toLocaleString()}. Please refine your search for more specific results.
+                </Box>
+              )}
+            </React.Fragment>
+          );
+        }}
+        sx={{
+          flex: 1,
+          maxWidth: { xs: '100%', sm: '100%', md: '500px' },
+        }}
+      />
+    </Box>
   );
 };
 

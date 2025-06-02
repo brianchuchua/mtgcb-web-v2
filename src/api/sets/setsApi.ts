@@ -1,4 +1,4 @@
-import { CostToCompleteParams, CostToCompleteResponse } from './types';
+import { CostToCompleteParams, CostToCompleteResponse, AllSetsResponse } from './types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 
@@ -24,8 +24,15 @@ export const setsApi = mtgcbApi.injectEndpoints({
       },
       keepUnusedDataFor: 300,
     }),
+    getAllSets: builder.query<ApiResponse<AllSetsResponse>, void>({
+      query: () => ({
+        url: '/sets/all',
+        method: 'GET',
+      }),
+      keepUnusedDataFor: 3600, // Cache for 1 hour since sets don't change often
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetCostToCompleteQuery } = setsApi;
+export const { useGetCostToCompleteQuery, useGetAllSetsQuery } = setsApi;

@@ -30,3 +30,7 @@ export interface CostToCompleteParams {
   priceType: 'market' | 'low' | 'average' | 'high';
   includeSubsetsInSets?: boolean;
 }
+
+export interface AllSetsResponse {
+  sets: Set[];
+}

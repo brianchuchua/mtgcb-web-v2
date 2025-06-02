@@ -21,6 +21,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Current Action Items
 
+- change the mass update to have separate add/remove selectors instead of making them do negative numbers
 - Subsets are not rendering quantity editors
 - Do the easier quantity selectors
 - When idle: Migrate TODOs from README.md to this file
@@ -71,6 +72,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - search needs to clear when entering a set page
 - Remove "Showing" from "Showing 1-24 of blah cards" at 1024x768 or smaller
 - (A subset of link) in the header for subsets -- or actually do breadcrumbs
+- Make default number of cards per page a multiple of 5 and 4.
+- Header consistency on pages, make a shared component for text headers
 
 ## Bugs
 
@@ -95,6 +98,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - Every file needs to follow the code style I established in SetItemRenderer.tsx and browse/page.tsx
 - Minor: prefetch leads to page 2 being loaded when a user invalidates the collection tag, it's a prefetch subscription issue in RTK Query, dev team is aware, no current fix, just bad workarounds, page one still loads on visit, so it's fine
+- fetch API being used in SetSelector
 
 ## Future Feature Work
 
