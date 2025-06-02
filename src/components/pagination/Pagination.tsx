@@ -47,6 +47,7 @@ const Pagination: React.FC<PaginationProps> = ({
   settingGroups,
   subsets = [],
   onSubsetSelect,
+  additionalAction,
 }) => {
   const theme = useTheme();
   const [localCurrentPage, setLocalCurrentPage] = useState(currentPage);
@@ -145,13 +146,16 @@ const Pagination: React.FC<PaginationProps> = ({
                   />
 
                   <Box sx={{ mt: 1 }}>
-                    <ViewModeToggle
-                      viewMode={viewMode}
-                      onViewModeChange={onViewModeChange}
-                      isSmallScreen={isSmallScreen}
-                      isLoading={isLoading}
-                      isInitialLoading={isInitialLoading}
-                    />
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <ViewModeToggle
+                        viewMode={viewMode}
+                        onViewModeChange={onViewModeChange}
+                        isSmallScreen={isSmallScreen}
+                        isLoading={isLoading}
+                        isInitialLoading={isInitialLoading}
+                      />
+                      {additionalAction}
+                    </Stack>
                   </Box>
                 </RightControlsGroup>
               </MobileControlsRow>
@@ -159,13 +163,16 @@ const Pagination: React.FC<PaginationProps> = ({
 
             {!isSmallScreen && (
               <ViewToggleContainer>
-                <ViewModeToggle
-                  viewMode={viewMode}
-                  onViewModeChange={onViewModeChange}
-                  isSmallScreen={isSmallScreen}
-                  isLoading={isLoading}
-                  isInitialLoading={isInitialLoading}
-                />
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <ViewModeToggle
+                    viewMode={viewMode}
+                    onViewModeChange={onViewModeChange}
+                    isSmallScreen={isSmallScreen}
+                    isLoading={isLoading}
+                    isInitialLoading={isInitialLoading}
+                  />
+                  {additionalAction}
+                </Stack>
               </ViewToggleContainer>
             )}
 
@@ -216,6 +223,7 @@ export interface PaginationProps {
   hideContentTypeToggle?: boolean;
   subsets?: any[];
   onSubsetSelect?: (subsetId: string) => void;
+  additionalAction?: React.ReactNode;
 }
 
 Pagination.displayName = 'Pagination';
@@ -354,11 +362,15 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
             variant={!isFullyLoaded ? 'outlined' : viewMode === 'grid' ? 'contained' : 'outlined'}
             size="small"
             onClick={handleGridClick}
-            startIcon={<GridViewIcon />}
+            startIcon={!isSmallScreen ? <GridViewIcon /> : undefined}
             disabled={!isFullyLoaded}
-            sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
+            sx={{ 
+              opacity: isFullyLoaded ? 1 : 0.7,
+              minWidth: isSmallScreen ? 'auto' : undefined,
+              px: isSmallScreen ? 1 : undefined,
+            }}
           >
-            Grid
+            {isSmallScreen ? <GridViewIcon /> : 'Grid'}
           </Button>
         </span>
       </Tooltip>
@@ -368,11 +380,15 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
             variant={!isFullyLoaded ? 'outlined' : viewMode === 'table' ? 'contained' : 'outlined'}
             size="small"
             onClick={handleTableClick}
-            startIcon={<TableRowsIcon />}
+            startIcon={!isSmallScreen ? <TableRowsIcon /> : undefined}
             disabled={!isFullyLoaded}
-            sx={{ opacity: isFullyLoaded ? 1 : 0.7 }}
+            sx={{ 
+              opacity: isFullyLoaded ? 1 : 0.7,
+              minWidth: isSmallScreen ? 'auto' : undefined,
+              px: isSmallScreen ? 1 : undefined,
+            }}
           >
-            Table
+            {isSmallScreen ? <TableRowsIcon /> : 'Table'}
           </Button>
         </span>
       </Tooltip>

@@ -1,10 +1,11 @@
 # TODOs
 
-I've found over time that maintaining my action items for code in external tools is overkill and burdensome. Best to keep them in the codebase for now, especially since I'm a team of one.
+I've found over time that maintaining my action items for code in external tools is overkill and burdensome.
+
+Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Remaining Major Feature Work Before 1.0
 
-- Mass Update Tool
 - Imports and exports
 - Privacy mode
 - Cards page
@@ -20,6 +21,8 @@ I've found over time that maintaining my action items for code in external tools
 
 ### Current Action Items
 
+- Subsets are not rendering quantity editors
+- Do the easier quantity selectors
 - When idle: Migrate TODOs from README.md to this file
 
 ## Other Action Items
@@ -62,6 +65,12 @@ I've found over time that maintaining my action items for code in external tools
 - UX - Why do the pop-ups not dismiss if the screen isn't active?
 - Consider breadcrumbs for collection pages, maybe just the subpages since the main collection page is the root
 - Improve card quantity update messages
+- Open Search Options -- should probably scroll to the search options section
+- Shrink card text when scaling down cards via slider
+- Breadcrumbs in collection set view
+- search needs to clear when entering a set page
+- Remove "Showing" from "Showing 1-24 of blah cards" at 1024x768 or smaller
+- (A subset of link) in the header for subsets -- or actually do breadcrumbs
 
 ## Bugs
 
@@ -107,7 +116,7 @@ I've found over time that maintaining my action items for code in external tools
 
 ## Production Checklist
 
-- Integration with Sonarcloud
+- Integration with Sonarcloud (open source the repo)
 - Integration with Sentry
 - Integration with Google Analytics
 - Load testing

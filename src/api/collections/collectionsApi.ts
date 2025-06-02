@@ -5,6 +5,8 @@ import {
   CollectionSummaryResponse,
   CollectionUpdateRequest,
   CollectionUpdateResponse,
+  CollectionMassUpdateRequest,
+  CollectionMassUpdateResponse,
 } from './types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import type { RootState } from '@/redux/store';
@@ -133,6 +135,35 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         }
       },
     }),
+    massUpdateCollection: builder.mutation<CollectionMassUpdateResponse, CollectionMassUpdateRequest>({
+      query: (body) => ({
+        url: '/collection/mass-update',
+        method: 'POST',
+        body,
+      }),
+      async onQueryStarted(arg, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            if (userId) {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  { type: 'Cards', id: `user-${userId}` },
+                  { type: 'Sets', id: `user-${userId}` },
+                ]),
+              );
+            } else {
+              dispatch(mtgcbApi.util.invalidateTags(['Collection']));
+            }
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
+    }),
   }),
 });
 
@@ -141,5 +172,6 @@ export const {
   useGetCollectionCardsQuery,
   useLazyGetCollectionCardsQuery,
   useUpdateCollectionMutation,
+  useMassUpdateCollectionMutation,
 } = collectionsApi;
 export const { endpoints: collectionsEndpoints } = collectionsApi;

@@ -96,3 +96,28 @@ export interface CollectionUpdateData {
 }
 
 export type CollectionUpdateResponse = ApiResponse<CollectionUpdateData>;
+
+export interface CollectionMassUpdateRequest {
+  mode: 'set' | 'increment';
+  setId: number;
+  updates: Array<{
+    rarity: 'common' | 'uncommon' | 'rare' | 'mythic' | 'all';
+    quantityReg: number;
+    quantityFoil: number;
+  }>;
+}
+
+export interface CollectionMassUpdateData {
+  setId: number;
+  setCode: string;
+  setName: string;
+  updatedCards: number;
+  updates: Array<{
+    rarity: string;
+    cardsUpdated: number;
+    quantityReg: number;
+    quantityFoil: number;
+  }>;
+}
+
+export type CollectionMassUpdateResponse = ApiResponse<CollectionMassUpdateData>;

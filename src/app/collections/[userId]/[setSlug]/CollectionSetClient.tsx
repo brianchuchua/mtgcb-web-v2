@@ -2,11 +2,15 @@
 
 import { Box, Typography } from '@mui/material';
 import Link from 'next/link';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
+import { useMassUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
+import MassUpdateButton from '@/components/collections/MassUpdateButton';
+import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
+import MassUpdateConfirmDialog from '@/components/collections/MassUpdateConfirmDialog';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
@@ -20,6 +24,7 @@ import { selectCardSearchParams, selectSets, setSets, setViewContentType } from 
 import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
+import { useSnackbar } from 'notistack';
 
 interface CollectionSetClientProps {
   userId: number;
@@ -34,6 +39,13 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const setPriceType = useSetPriceType();
   const { user } = useAuth();
   const isOwnCollection = user?.userId === userId;
+  const { enqueueSnackbar } = useSnackbar();
+  
+  // Mass Update state
+  const [isMassUpdateOpen, setIsMassUpdateOpen] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [massUpdateFormData, setMassUpdateFormData] = useState<MassUpdateFormData | null>(null);
+  const [massUpdateCollection, { isLoading: isMassUpdateLoading }] = useMassUpdateCollectionMutation();
 
   // Get current search parameters to pass to subsets
   const cardSearchParams = useSelector(selectCardSearchParams);
@@ -126,6 +138,56 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }, 100);
+  }, []);
+
+  // Mass Update handlers
+  const handleMassUpdateToggle = useCallback(() => {
+    setIsMassUpdateOpen(!isMassUpdateOpen);
+  }, [isMassUpdateOpen]);
+
+  const handleMassUpdateSubmit = useCallback((formData: MassUpdateFormData) => {
+    setMassUpdateFormData(formData);
+    setShowConfirmDialog(true);
+  }, []);
+
+  const handleMassUpdateCancel = useCallback(() => {
+    setIsMassUpdateOpen(false);
+  }, []);
+
+  const handleConfirmMassUpdate = useCallback(async () => {
+    if (!massUpdateFormData || !set?.id) return;
+
+    try {
+      const response = await massUpdateCollection({
+        mode: massUpdateFormData.mode,
+        setId: parseInt(set.id),
+        updates: [{
+          rarity: massUpdateFormData.rarity,
+          quantityReg: massUpdateFormData.quantityReg,
+          quantityFoil: massUpdateFormData.quantityFoil,
+        }],
+      }).unwrap();
+
+      if (response.success) {
+        enqueueSnackbar(
+          `Successfully updated ${response.data?.updatedCards || 0} cards in ${set.name}`,
+          { variant: 'success' }
+        );
+        setIsMassUpdateOpen(false);
+        setShowConfirmDialog(false);
+        setMassUpdateFormData(null);
+      }
+    } catch (error: any) {
+      enqueueSnackbar(
+        error?.data?.error?.message || 'Failed to update collection',
+        { variant: 'error' }
+      );
+    }
+  }, [massUpdateFormData, set, massUpdateCollection, enqueueSnackbar]);
+
+  const handleCancelConfirm = useCallback(() => {
+    setShowConfirmDialog(false);
+    setMassUpdateFormData(null);
   }, []);
 
   const isCardGridView = browseController.view === 'cards' && browseController.viewMode === 'grid';
@@ -241,7 +303,26 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         hideContentTypeToggle={true}
         subsets={subsets}
         onSubsetSelect={handleSubsetSelect}
+        additionalAction={
+          isOwnCollection && browseController.view === 'cards' ? (
+            <MassUpdateButton 
+              onClick={handleMassUpdateToggle}
+              isOpen={isMassUpdateOpen}
+              disabled={isMassUpdateLoading}
+            />
+          ) : undefined
+        }
       />
+
+      {/* Mass Update Panel */}
+      {isOwnCollection && browseController.view === 'cards' && (
+        <MassUpdatePanel
+          isOpen={isMassUpdateOpen}
+          onSubmit={handleMassUpdateSubmit}
+          onCancel={handleMassUpdateCancel}
+          isLoading={isMassUpdateLoading}
+        />
+      )}
 
       {browseController.error ? (
         <ErrorBanner type={browseController.view} />
@@ -275,6 +356,18 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             />
           ))}
         </Box>
+      )}
+
+      {/* Mass Update Confirm Dialog */}
+      {massUpdateFormData && (
+        <MassUpdateConfirmDialog
+          open={showConfirmDialog}
+          onConfirm={handleConfirmMassUpdate}
+          onCancel={handleCancelConfirm}
+          formData={massUpdateFormData}
+          setName={set?.name}
+          isLoading={isMassUpdateLoading}
+        />
       )}
     </Box>
   );
