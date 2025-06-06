@@ -151,8 +151,9 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
 
       {isActive && (
         <Box>
-          {/* Collection Header for Subset */}
-          {subsetWithCollectionData && userId && (
+          {/* Header for Subset */}
+          {userId && subsetWithCollectionData ? (
+            // Collection view header with stats
             <Box
               sx={{
                 display: 'flex',
@@ -202,6 +203,40 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
                   </Box>
                 </>
               )}
+            </Box>
+          ) : (
+            // Browse view header (non-collection)
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                mb: 3,
+                mt: 2,
+              }}
+            >
+              <Typography variant="h5" fontWeight="500" sx={{ color: 'primary.main', mb: 1 }}>
+                {subset.name}
+              </Typography>
+              
+              <Typography variant="body1" color="text.secondary">
+                {formatSetCategoryAndType(subset)}
+              </Typography>
+              
+              <Typography variant="body1" color="text.secondary">
+                {subset.releasedAt && formatISODate(subset.releasedAt)}
+              </Typography>
+              
+              {subset.code && (
+                <Box sx={{ my: 1 }}>
+                  <SetIcon code={subset.code} size="3x" fixedWidth />
+                </Box>
+              )}
+              
+              <Typography variant="body1" color="text.secondary">
+                {subset.cardCount ? `${subset.cardCount} cards` : 'N/A'}
+              </Typography>
             </Box>
           )}
 
