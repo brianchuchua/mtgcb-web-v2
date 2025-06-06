@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { useDisplaySettings } from '@/features/browse/hooks/useDisplaySettings';
+import { useCollectionDisplaySettings } from '@/features/collections/hooks/useCollectionDisplaySettings';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -31,9 +32,10 @@ interface UseIndependentBrowseControllerProps {
   setId: string;
   enabled?: boolean;
   searchParams?: any;
+  userId?: number;
 }
 
-export function useIndependentBrowseController({ setId, enabled = true, searchParams = {} }: UseIndependentBrowseControllerProps) {
+export function useIndependentBrowseController({ setId, enabled = true, searchParams = {}, userId }: UseIndependentBrowseControllerProps) {
   const router = useRouter();
   const dispatch = useDispatch();
   
@@ -48,8 +50,10 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
   const sortBy = useSelector(selectSortBy) || 'releasedAt';
   const sortOrder = useSelector(selectSortOrder) || 'asc';
 
-  // Display settings
-  const displaySettings = useDisplaySettings({ view: 'cards', viewMode });
+  // Display settings - use collection settings when userId is provided
+  const browseDisplaySettings = useDisplaySettings({ view: 'cards', viewMode });
+  const collectionDisplaySettings = useCollectionDisplaySettings({ viewMode, view: 'cards' });
+  const displaySettings = userId ? collectionDisplaySettings : browseDisplaySettings;
   const cardSettingGroups = useCardSettingGroups(viewMode);
   const priceType = usePriceType();
 
@@ -65,6 +69,8 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
       setId: {
         OR: [setId], // Force this subset's ID
       },
+      userId: userId,
+      priceType: userId ? priceType : undefined,
       limit: pageSize,
       offset: (currentPage - 1) * pageSize,
       sortBy: sortBy || baseParams.sortBy || 'releasedAt',
@@ -91,14 +97,17 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
         'toughnessNumeric',
         'loyaltyNumeric',
         'releaseDate',
+        'quantityReg',
+        'quantityFoil',
       ] as Array<keyof CardModel>,
     };
-  }, [setId, pageSize, currentPage, sortBy, sortOrder, searchParams]);
+  }, [setId, userId, priceType, pageSize, currentPage, sortBy, sortOrder, searchParams]);
 
   // Fetch data
   const {
     data: cardsSearchResult,
-    isFetching: isLoading,
+    isLoading,
+    isFetching,
     error,
   } = useGetCardsQuery(apiArgs, {
     skip: !enabled,
@@ -116,21 +125,24 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
   const total = cardsSearchResult?.data?.totalCount || 0;
   const totalPages = Math.ceil(total / pageSize) || 1;
 
-  // Create loading skeletons
+  // Create loading skeletons only on initial load
   const displayItems = useMemo(() => {
-    if (!isLoading) return items;
+    // Only show skeletons on initial load, not on refetch
+    if (isLoading && !cardsSearchResult) {
+      return Array(pageSize)
+        .fill(0)
+        .map((_, index) => ({
+          id: `skeleton-${index}`,
+          name: '',
+          setName: '',
+          collectorNumber: '',
+          rarity: '',
+          isLoadingSkeleton: true,
+        }));
+    }
 
-    return Array(pageSize)
-      .fill(0)
-      .map((_, index) => ({
-        id: `skeleton-${index}`,
-        name: '',
-        setName: '',
-        collectorNumber: '',
-        rarity: '',
-        isLoadingSkeleton: true,
-      }));
-  }, [items, isLoading, pageSize]);
+    return items;
+  }, [items, isLoading, cardsSearchResult, pageSize]);
 
   // Event handlers
   const handlePageChange = useCallback((page: number) => {
@@ -188,15 +200,15 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
       onPageChange: handlePageChange,
       onPageSizeChange: handlePageSizeChange,
       onViewModeChange: handleViewModeChange,
-      isLoading,
-      isInitialLoading: false,
+      isLoading: isLoading && !cardsSearchResult,
+      isInitialLoading: isLoading && !cardsSearchResult,
       contentType: 'cards' as const,
       settingGroups: cardSettingGroups,
     },
 
     cardsProps: {
       items: displayItems,
-      loading: isLoading,
+      loading: isLoading && !cardsSearchResult,
       viewMode,
       onSort: handleSort,
       onCardClick: handleCardClick,
@@ -207,6 +219,7 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
       tableSettings: displaySettings.tableSettings,
       cardDisplaySettings: displaySettings.cardDisplaySettings,
       priceType: displaySettings.priceType,
+      userId: userId,
     },
 
     setsProps: {},

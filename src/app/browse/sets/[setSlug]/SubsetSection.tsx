@@ -17,10 +17,12 @@ interface SubsetSectionProps {
   subset: any;
   searchParams: any;
   onRegisterToggle?: (toggleFn: () => void) => void;
+  isOwnCollection?: boolean;
+  userId?: number;
 }
 
 export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function SubsetSection(
-  { subset, searchParams, onRegisterToggle },
+  { subset, searchParams, onRegisterToggle, isOwnCollection = false, userId },
   ref,
 ) {
   const [isActive, setIsActive] = useState(false);
@@ -30,6 +32,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
     setId: subset.id,
     enabled: isActive,
     searchParams: searchParams,
+    userId: userId,
   });
 
   const handleToggleSubset = useCallback(() => {
@@ -135,8 +138,8 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
             <ErrorBanner type={browseController.view} />
           ) : (
             <>
-              {isCardGridView && <CardGrid {...cardsProps} />}
-              {isCardTableView && <CardTable {...cardsProps} />}
+              {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} />}
+              {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} />}
             </>
           )}
 

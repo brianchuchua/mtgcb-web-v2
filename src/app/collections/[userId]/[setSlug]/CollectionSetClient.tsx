@@ -345,6 +345,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               key={subset.id}
               subset={subset}
               searchParams={cardSearchParams}
+              isOwnCollection={isOwnCollection}
+              userId={userId}
               ref={(el) => {
                 if (el) {
                   subsetRefs.current[subset.id] = el;
