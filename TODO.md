@@ -21,7 +21,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Current Action Items
 
-- Do the easier quantity selectors
 - When idle: Migrate TODOs from README.md to this file
 
 ## Other Action Items
@@ -73,6 +72,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - (A subset of link) in the header for subsets -- or actually do breadcrumbs
 - Make default number of cards per page a multiple of 5 and 4.
 - Header consistency on pages, make a shared component for text headers
+- Quantity selectors -- going from custom filter to normal doesn't reset the states as you'd expect
 
 ## Bugs
 

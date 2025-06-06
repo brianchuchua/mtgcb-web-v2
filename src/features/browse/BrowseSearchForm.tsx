@@ -36,6 +36,7 @@ import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ColorSelector from '@/features/browse/ColorSelector';
 import CompletionStatusSelector from '@/features/browse/CompletionStatusSelector';
+import QuantitySelector from '@/features/browse/QuantitySelector';
 import RaritySelector from '@/features/browse/RaritySelector';
 import SetCategorySelector from '@/features/browse/SetCategorySelector';
 import SetSelector from '@/features/browse/SetSelector';
@@ -92,7 +93,7 @@ const BrowseSearchForm = () => {
 
   // Check if this is a collection page (to show collection-specific sort options)
   const isCollectionPage = pathname?.startsWith('/collections/') || false;
-  
+
   // Check if we're on a collection set page specifically (for subset tracking toggle)
   const isCollectionSetPage = pathname?.includes('/collections/') && pathname?.split('/').length > 3;
 
@@ -508,6 +509,7 @@ const BrowseSearchForm = () => {
           />
         </Paper>
       )}
+      <QuantitySelector isCollectionPage={isCollectionPage} />
       <StatSearch />
     </>
   );
