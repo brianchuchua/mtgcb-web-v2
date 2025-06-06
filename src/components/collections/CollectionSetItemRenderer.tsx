@@ -23,6 +23,7 @@ interface CollectionSetItemRendererProps {
   includeSubsetsInSets?: boolean;
   collectionData?: CollectionSetSummary;
   userId?: number;
+  height: number;
 }
 
 // Animation for completed sets - rotating gradient
@@ -36,17 +37,20 @@ const rotateGradientAnimation = keyframes`
 `;
 
 const SetBoxWrapper = styled(Card)(({}) => ({
-  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   border: '1px solid rgba(255, 255, 255, 0.12)',
   transition: 'opacity 0.1s ease-in-out',
+  boxSizing: 'border-box',
 }));
 
 const SetBoxContent = styled(CardContent)(({ theme }) => ({
-  flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
   paddingTop: theme.spacing(1.5),
   paddingBottom: theme.spacing(1.5),
+  boxSizing: 'border-box',
+  overflow: 'hidden',
   '&:last-child': {
     paddingBottom: theme.spacing(1.5),
   },
@@ -264,8 +268,8 @@ const CostToPurchaseSection: React.FC<{
   return (
     <Box
       sx={{
-        mt: 2,
-        pt: 2,
+        mt: 0,
+        pt: 1,
         borderTop: '1px solid rgba(255, 255, 255, 0.12)',
         display: 'flex',
         flexDirection: 'column',
@@ -460,6 +464,7 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
   includeSubsetsInSets = false,
   collectionData,
   userId,
+  height,
 }) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -469,15 +474,15 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
 
   if (isSkeleton(set)) {
     return (
-      <SetBoxWrapper sx={{ opacity: 0.7, height: '566px' }}>
-        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: '566px' }}></SetBoxContent>
+      <SetBoxWrapper sx={{ opacity: 0.7, height: `${height}px` }}>
+        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: `${height}px` }}></SetBoxContent>
       </SetBoxWrapper>
     );
   }
 
   return (
-    <SetBoxWrapper>
-      <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out' }}>
+    <SetBoxWrapper sx={{ height: `${height}px` }}>
+      <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out', height: '100%' }}>
         <SetNameAndCode
           set={set}
           nameIsVisible={settings.nameIsVisible}

@@ -19,6 +19,7 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({
   costToComplete,
   cardCountIncludingSubsets,
   includeSubsetsInSets = false,
+  height,
 }) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -29,15 +30,15 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({
 
   if (isSkeleton(set)) {
     return (
-      <SetBoxWrapper sx={{ opacity: 0.7, height: '566px' }}>
-        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: '566px' }}></SetBoxContent>
+      <SetBoxWrapper sx={{ opacity: 0.7, height: `${height}px` }}>
+        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: `${height}px` }}></SetBoxContent>
       </SetBoxWrapper>
     );
   }
 
   return (
-    <SetBoxWrapper>
-      <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out' }}>
+    <SetBoxWrapper sx={{ height: `${height}px` }}>
+      <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out', height: '100%' }}>
         <SetNameAndCode set={set} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} />
         <SetCategoryAndType
           set={set}
@@ -83,6 +84,7 @@ interface SetItemRendererProps {
   costToComplete?: CostToComplete;
   cardCountIncludingSubsets?: string | null;
   includeSubsetsInSets?: boolean;
+  height: number;
 }
 
 function isSkeleton(value: unknown): value is { isLoadingSkeleton: boolean } {
@@ -90,17 +92,20 @@ function isSkeleton(value: unknown): value is { isLoadingSkeleton: boolean } {
 }
 
 const SetBoxWrapper = styled(Card)(({}) => ({
-  height: '100%',
   display: 'flex',
   flexDirection: 'column',
   border: '1px solid rgba(255, 255, 255, 0.12)',
   transition: 'opacity 0.1s ease-in-out',
+  boxSizing: 'border-box',
 }));
 
 const SetBoxContent = styled(CardContent)(({ theme }) => ({
-  flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
   paddingTop: theme.spacing(1.5),
   paddingBottom: theme.spacing(1.5),
+  boxSizing: 'border-box',
+  overflow: 'hidden',
   // Overriding the default padding for the last child since it's considering all of these as the last child
   '&:last-child': {
     paddingBottom: theme.spacing(1.5),
@@ -258,8 +263,8 @@ const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({
   return (
     <Box
       sx={{
-        mt: 2,
-        pt: 2,
+        mt: 1,
+        pt: 1,
         borderTop: '1px solid rgba(255, 255, 255, 0.12)',
         display: 'flex',
         flexDirection: 'column',

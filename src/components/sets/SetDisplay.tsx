@@ -65,6 +65,15 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   const currentSortOrder = useSelector(selectSortOrder) || 'desc';
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
+  // Calculate fixed height based on display settings
+  const calculateSetItemHeight = () => {
+    if (displaySettings.grid.costsIsVisible) {
+      return 445;
+    } else {
+      return 200;
+    }
+  };
+
   // Create skeleton loading items if needed
   const displaySets = isLoading
     ? Array(pageSize)
@@ -111,9 +120,12 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
         key="browse-set-gallery"
         items={displaySets}
         renderItem={(set, index) => {
-          const targetSet = costToCompleteData && 'sets' in costToCompleteData && Array.isArray(costToCompleteData.sets)
-            ? costToCompleteData.sets.find((s: Set & { costToComplete?: CostToComplete; cardCountIncludingSubsets?: number }) => s.id === set.id)
-            : undefined;
+          const targetSet =
+            costToCompleteData && 'sets' in costToCompleteData && Array.isArray(costToCompleteData.sets)
+              ? costToCompleteData.sets.find(
+                  (s: Set & { costToComplete?: CostToComplete; cardCountIncludingSubsets?: number }) => s.id === set.id,
+                )
+              : undefined;
           const costToComplete = targetSet?.costToComplete;
           const cardCountIncludingSubsets = targetSet?.cardCountIncludingSubsets;
           return (
@@ -123,6 +135,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
               costToComplete={costToComplete}
               includeSubsetsInSets={includeSubsetsInSets}
               cardCountIncludingSubsets={cardCountIncludingSubsets}
+              height={calculateSetItemHeight()}
             />
           );
         }}

@@ -21,8 +21,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Current Action Items
 
-- The main collection set page header should respect a include subsets in set setting like the main page
-- Handle serious virtualize stuttering bug
 - Do the easier quantity selectors
 - When idle: Migrate TODOs from README.md to this file
 
@@ -37,6 +35,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## UX Action Items
 
+- Render "Subset" instead of Set and Subset Group instead of Set where relevant.
 - Consider an easier-to-use card quantity filter, add stat filter works, but users may be used to the easier one (I did this in the legacy new page)
 - Consider moving price type selection to the browsesearchform
 - The pop-up messages are too sticky, feels like mouse movement is involved
@@ -99,6 +98,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Every file needs to follow the code style I established in SetItemRenderer.tsx and browse/page.tsx
 - Minor: prefetch leads to page 2 being loaded when a user invalidates the collection tag, it's a prefetch subscription issue in RTK Query, dev team is aware, no current fix, just bad workarounds, page one still loads on visit, so it's fine
 - fetch API being used in SetSelector
+- Consider removing skeleton loaders from set gallery and experiment with masonry instead of virtuoso
 
 ## Future Feature Work
 

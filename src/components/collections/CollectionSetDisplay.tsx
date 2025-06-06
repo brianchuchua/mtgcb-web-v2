@@ -3,11 +3,11 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CollectionSetItemRenderer } from './CollectionSetItemRenderer';
+import { CollectionSetSummary } from '@/api/collections/types';
 import { useCollectionSetTableRenderers } from '@/components/collections/CollectionSetTableRenderer';
 import VirtualizedGallery from '@/components/common/VirtualizedGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { SetDisplayProps } from '@/components/sets/SetDisplay';
-import { CollectionSetSummary } from '@/api/collections/types';
 import {
   selectIncludeSubsetsInSets,
   selectSortBy,
@@ -41,6 +41,15 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
   const currentSortOrder = useSelector(selectSortOrder) || 'desc';
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
+  // Calculate fixed height based on display settings
+  const calculateCollectionSetItemHeight = () => {
+    if (displaySettings.grid.costsIsVisible) {
+      return 555;
+    } else {
+      return 310;
+    }
+  };
+
   // Create skeleton loading items if needed
   const displaySets = isLoading
     ? Array(pageSize)
@@ -65,7 +74,11 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
     : setItems;
 
   // Get the appropriate renderers for table view with collection-specific columns
-  const { columns, renderRowContent } = useCollectionSetTableRenderers(displaySettings.table, currentSortBy, onSetClick);
+  const { columns, renderRowContent } = useCollectionSetTableRenderers(
+    displaySettings.table,
+    currentSortBy,
+    onSetClick,
+  );
 
   // Handle sort change
   const handleSortChange = (columnId: string) => {
@@ -92,7 +105,7 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
           const collectionSet = collectionData?.collectionSets.get(set.id);
           const costToComplete = collectionSet?.costToComplete;
           const cardCountIncludingSubsets = collectionSet?.cardCountIncludingSubsets;
-          
+
           return (
             <CollectionSetItemRenderer
               set={set}
@@ -102,6 +115,7 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
               cardCountIncludingSubsets={cardCountIncludingSubsets?.toString()}
               collectionData={collectionSet}
               userId={collectionData?.userId}
+              height={calculateCollectionSetItemHeight()}
             />
           );
         }}

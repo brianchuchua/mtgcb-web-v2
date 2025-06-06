@@ -22,12 +22,12 @@ export const useSetDisplaySettings = (viewMode: 'grid' | 'table') => {
 
   if (viewMode === 'grid') {
     return {
-      nameIsVisible: Boolean(nameIsVisible),
-      codeIsVisible: Boolean(codeIsVisible),
-      releaseDateIsVisible: Boolean(releaseDateIsVisible),
-      typeIsVisible: Boolean(typeIsVisible),
-      categoryIsVisible: Boolean(categoryIsVisible),
-      cardCountIsVisible: Boolean(cardCountIsVisible),
+      nameIsVisible: true, // Boolean(nameIsVisible),
+      codeIsVisible: true, // Boolean(codeIsVisible),
+      releaseDateIsVisible: true, // Boolean(releaseDateIsVisible),
+      typeIsVisible: true, // Boolean(typeIsVisible),
+      categoryIsVisible: true, // Boolean(categoryIsVisible),
+      cardCountIsVisible: true, // Boolean(cardCountIsVisible),
       costsIsVisible: Boolean(costsIsVisible),
     };
   }

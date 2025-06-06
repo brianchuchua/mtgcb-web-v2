@@ -58,12 +58,12 @@ export const useCollectionSetDisplaySettings = (viewMode: 'grid' | 'table'): Col
 
   // Grid view settings
   return {
-    nameIsVisible,
-    codeIsVisible,
-    releaseDateIsVisible,
-    typeIsVisible,
-    categoryIsVisible,
-    cardCountIsVisible,
+    nameIsVisible: true, // nameIsVisible,
+    codeIsVisible: true, // codeIsVisible,
+    releaseDateIsVisible: true, // releaseDateIsVisible,
+    typeIsVisible: true, // typeIsVisible,
+    categoryIsVisible: true, // categoryIsVisible,
+    cardCountIsVisible: true, // cardCountIsVisible,
     costsIsVisible,
   };
 };
