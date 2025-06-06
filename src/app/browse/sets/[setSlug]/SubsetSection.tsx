@@ -12,6 +12,9 @@ import { useIndependentBrowseController } from '@/features/browse/useIndependent
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
+import { useGetSetsQuery } from '@/api/browse/browseApi';
+import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
+import { useSetPriceType } from '@/hooks/useSetPriceType';
 
 interface SubsetSectionProps {
   subset: any;
@@ -26,6 +29,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
   ref,
 ) {
   const [isActive, setIsActive] = useState(false);
+  const setPriceType = useSetPriceType();
 
   // Use independent controller that doesn't interfere with main set
   const browseController = useIndependentBrowseController({
@@ -34,6 +38,21 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
     searchParams: searchParams,
     userId: userId,
   });
+
+  // Fetch collection data for the subset when expanded and userId is provided
+  const { data: subsetCollectionData } = useGetSetsQuery(
+    {
+      limit: 1,
+      slug: subset.slug,
+      userId: userId,
+      priceType: setPriceType,
+    },
+    {
+      skip: !isActive || !userId,
+    },
+  );
+
+  const subsetWithCollectionData = subsetCollectionData?.data?.sets?.[0];
 
   const handleToggleSubset = useCallback(() => {
     setIsActive(!isActive);
@@ -132,6 +151,60 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
 
       {isActive && (
         <Box>
+          {/* Collection Header for Subset */}
+          {subsetWithCollectionData && userId && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                mb: 3,
+                mt: 2,
+              }}
+            >
+              <Typography variant="h5" fontWeight="500" sx={{ color: 'primary.main', mb: 1 }}>
+                {subsetWithCollectionData.name}
+              </Typography>
+              
+              {subsetWithCollectionData.code && (
+                <Box sx={{ mb: 2 }}>
+                  <SetIcon code={subsetWithCollectionData.code} size="3x" fixedWidth />
+                </Box>
+              )}
+              
+              {subsetWithCollectionData.uniquePrintingsCollectedInSet !== undefined && (
+                <>
+                  <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+                    {subsetWithCollectionData.uniquePrintingsCollectedInSet}/{subsetWithCollectionData.cardCount || 0}
+                  </Typography>
+
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                    ({subsetWithCollectionData.totalCardsCollectedInSet || 0} total cards collected)
+                  </Typography>
+
+                  <Typography variant="h6" color="text.secondary" sx={{}}>
+                    Set value: $
+                    {(subsetWithCollectionData.totalValue || 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </Typography>
+
+                  <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <CollectionProgressBar
+                      percentage={subsetWithCollectionData.percentageCollected || 0}
+                      height={24}
+                      showLabel={true}
+                      labelFormat="long"
+                      maxWidth="400px"
+                    />
+                  </Box>
+                </>
+              )}
+            </Box>
+          )}
+
           <Pagination {...browseController.paginationProps} hideContentTypeToggle={true} />
 
           {browseController.error ? (

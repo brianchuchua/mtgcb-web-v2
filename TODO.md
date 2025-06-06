@@ -21,7 +21,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Current Action Items
 
-- Subsets should render percentage progress
 - The main collection set page header should respect a include subsets in set setting like the main page
 - Handle serious virtualize stuttering bug
 - Do the easier quantity selectors
