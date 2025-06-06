@@ -21,7 +21,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Current Action Items
 
-- change the mass update to have separate add/remove selectors instead of making them do negative numbers
 - Subsets are not rendering quantity editors
 - Do the easier quantity selectors
 - When idle: Migrate TODOs from README.md to this file

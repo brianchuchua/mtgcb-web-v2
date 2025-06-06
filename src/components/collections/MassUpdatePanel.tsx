@@ -126,6 +126,9 @@ export interface MassUpdateFormData {
   quantityFoil: number;
 }
 
+// UI-only type for the form
+type FormMode = 'set' | 'add' | 'remove';
+
 interface MassUpdatePanelProps {
   isOpen: boolean;
   onSubmit: (data: MassUpdateFormData) => void;
@@ -134,6 +137,7 @@ interface MassUpdatePanelProps {
 }
 
 const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onCancel, isLoading = false }) => {
+  const [uiMode, setUiMode] = useState<FormMode>('set');
   const [formData, setFormData] = useState<MassUpdateFormData>({
     mode: 'set',
     rarity: 'all',
@@ -142,7 +146,15 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
   });
 
   const handleModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, mode: event.target.value as 'set' | 'increment' });
+    const newMode = event.target.value as FormMode;
+    setUiMode(newMode);
+
+    // Reset quantities when switching modes
+    if (newMode === 'add' || newMode === 'remove') {
+      setFormData({ ...formData, mode: 'increment', quantityReg: 1, quantityFoil: 0 });
+    } else {
+      setFormData({ ...formData, mode: 'set', quantityReg: 0, quantityFoil: 0 });
+    }
   };
 
   const handleRarityChange = (event: any) => {
@@ -150,8 +162,8 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
   };
 
   const handleQuantityChange = (field: 'quantityReg' | 'quantityFoil', value: number) => {
-    // In set mode, don't allow negative values
-    if (formData.mode === 'set' && value < 0) {
+    // Always store positive values in the UI
+    if (value < 0) {
       return;
     }
 
@@ -171,28 +183,39 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
 
   const getActionDescription = (): string => {
     const rarityLabel = getRarityLabel(formData.rarity);
-    const { mode, quantityReg, quantityFoil } = formData;
+    const { quantityReg, quantityFoil } = formData;
 
-    if (mode === 'set') {
+    if (uiMode === 'set') {
       return `Set all ${rarityLabel} in this set to ${quantityReg} regular and ${quantityFoil} foil.`;
-    } else {
-      // Handle increment/decrement mode
+    } else if (uiMode === 'add') {
       if (quantityReg === 0 && quantityFoil === 0) {
         return `No changes will be made to ${rarityLabel} in this set.`;
       }
 
       const parts: string[] = [];
-
       if (quantityReg !== 0) {
-        const action = quantityReg > 0 ? 'Add' : 'Remove';
-        parts.push(`${action} ${Math.abs(quantityReg)} regular`);
+        parts.push(`Add ${quantityReg} regular`);
+      }
+      if (quantityFoil !== 0) {
+        const action = parts.length === 0 ? 'Add' : 'add';
+        parts.push(`${action} ${quantityFoil} foil`);
       }
 
+      const combinedAction = parts.join(' and ');
+      return `${combinedAction} for all ${rarityLabel} in this set.`;
+    } else {
+      // Remove mode
+      if (quantityReg === 0 && quantityFoil === 0) {
+        return `No changes will be made to ${rarityLabel} in this set.`;
+      }
+
+      const parts: string[] = [];
+      if (quantityReg !== 0) {
+        parts.push(`Remove ${quantityReg} regular`);
+      }
       if (quantityFoil !== 0) {
-        const action = quantityFoil > 0 ? 'add' : 'remove';
-        // Capitalize if this is the first/only action
-        const finalAction = parts.length === 0 ? action.charAt(0).toUpperCase() + action.slice(1) : action;
-        parts.push(`${finalAction} ${Math.abs(quantityFoil)} foil`);
+        const action = parts.length === 0 ? 'Remove' : 'remove';
+        parts.push(`${action} ${quantityFoil} foil`);
       }
 
       const combinedAction = parts.join(' and ');
@@ -201,14 +224,20 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
   };
 
   const handleSubmit = () => {
-    onSubmit(formData);
+    // Convert UI mode to API format
+    const apiFormData: MassUpdateFormData = {
+      ...formData,
+      mode: uiMode === 'set' ? 'set' : 'increment',
+      // Convert to negative values for remove mode
+      quantityReg: uiMode === 'remove' ? -formData.quantityReg : formData.quantityReg,
+      quantityFoil: uiMode === 'remove' ? -formData.quantityFoil : formData.quantityFoil,
+    };
+    onSubmit(apiFormData);
   };
 
   const isValidForm = () => {
-    if (formData.mode === 'set') {
-      return formData.quantityReg >= 0 && formData.quantityFoil >= 0;
-    }
-    return true;
+    // All modes require non-negative values in the UI
+    return formData.quantityReg >= 0 && formData.quantityFoil >= 0;
   };
 
   return (
@@ -221,9 +250,10 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
         <Stack spacing={1}>
           {/* Mode Selection - Compact */}
           <FormControl component="fieldset" size="small">
-            <RadioGroup row value={formData.mode} onChange={handleModeChange} sx={{ justifyContent: 'center' }}>
-              <FormControlLabel value="set" control={<Radio size="small" />} label="Setting" sx={{ mr: 3 }} />
-              <FormControlLabel value="increment" control={<Radio size="small" />} label="Adding or Removing" />
+            <RadioGroup row value={uiMode} onChange={handleModeChange} sx={{ justifyContent: 'center' }}>
+              <FormControlLabel value="set" control={<Radio size="small" />} label="Setting" sx={{ mr: 2 }} />
+              <FormControlLabel value="add" control={<Radio size="small" />} label="Adding" sx={{ mr: 2 }} />
+              <FormControlLabel value="remove" control={<Radio size="small" />} label="Removing" />
             </RadioGroup>
           </FormControl>
 
@@ -284,12 +314,9 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
                     onMouseDown={(e) => {
                       e.preventDefault();
                       e.currentTarget.blur();
-                      handleQuantityChange(
-                        'quantityReg',
-                        Math.max(formData.mode === 'set' ? 0 : -999, formData.quantityReg - 1),
-                      );
+                      handleQuantityChange('quantityReg', Math.max(0, formData.quantityReg - 1));
                     }}
-                    disabled={isLoading || (formData.mode === 'set' && formData.quantityReg === 0)}
+                    disabled={isLoading || formData.quantityReg === 0}
                     tabIndex={-1}
                     disableFocusRipple
                   >
@@ -300,7 +327,7 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
                     value={formData.quantityReg}
                     onChange={(e) => handleQuantityChange('quantityReg', parseInt(e.target.value) || 0)}
                     inputProps={{
-                      min: formData.mode === 'set' ? 0 : undefined,
+                      min: 0,
                     }}
                     size="small"
                     disabled={isLoading}
@@ -334,12 +361,9 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
                     onMouseDown={(e) => {
                       e.preventDefault();
                       e.currentTarget.blur();
-                      handleQuantityChange(
-                        'quantityFoil',
-                        Math.max(formData.mode === 'set' ? 0 : -999, formData.quantityFoil - 1),
-                      );
+                      handleQuantityChange('quantityFoil', Math.max(0, formData.quantityFoil - 1));
                     }}
-                    disabled={isLoading || (formData.mode === 'set' && formData.quantityFoil === 0)}
+                    disabled={isLoading || formData.quantityFoil === 0}
                     tabIndex={-1}
                     disableFocusRipple
                   >
@@ -350,7 +374,7 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
                     value={formData.quantityFoil}
                     onChange={(e) => handleQuantityChange('quantityFoil', parseInt(e.target.value) || 0)}
                     inputProps={{
-                      min: formData.mode === 'set' ? 0 : undefined,
+                      min: 0,
                     }}
                     size="small"
                     disabled={isLoading}
