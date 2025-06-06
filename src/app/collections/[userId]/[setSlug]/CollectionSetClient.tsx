@@ -20,7 +20,7 @@ import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
-import { selectCardSearchParams, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
+import { selectCardSearchParams, selectIncludeSubsetsInSets, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
 import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
@@ -50,6 +50,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   // Get current search parameters to pass to subsets
   const cardSearchParams = useSelector(selectCardSearchParams);
   const currentSetsFilter = useSelector(selectSets);
+  const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
   const {
     data: setsData,
@@ -60,6 +61,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     slug: setSlug,
     userId: userId,
     priceType: setPriceType,
+    includeSubsetsInSets,
   });
 
   const set = setsData?.data?.sets?.[0];
@@ -270,11 +272,14 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         {set && set.uniquePrintingsCollectedInSet !== undefined && (
           <>
             <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
-              {set.uniquePrintingsCollectedInSet}/{set.cardCount || 0}
+              {set.uniquePrintingsCollectedInSet}/{includeSubsetsInSets && set.cardCountIncludingSubsets 
+                ? set.cardCountIncludingSubsets 
+                : set.cardCount || '0'}
             </Typography>
 
             <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-              ({set.totalCardsCollectedInSet || 0} total cards collected)
+              ({set.totalCardsCollectedInSet || 0} total cards collected
+              {includeSubsetsInSets && set.cardCountIncludingSubsets ? ' including subsets' : ''})
             </Typography>
 
             <Typography variant="h6" color="text.secondary" sx={{}}>

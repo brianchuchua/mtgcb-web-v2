@@ -27,6 +27,11 @@ export interface Set {
   percentageCollected?: number;
   totalValue?: number;
   costToComplete?: CostToComplete;
+  // Collection fields including subsets (when userId is provided and includeSubsetsInSets is true)
+  totalCardsCollectedInSetIncludingSubsets?: number;
+  uniquePrintingsCollectedInSetIncludingSubsets?: number;
+  percentageCollectedIncludingSubsets?: number;
+  totalValueIncludingSubsets?: number;
 }
 
 export interface SetsSearchResult {

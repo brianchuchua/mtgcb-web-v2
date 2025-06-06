@@ -92,6 +92,9 @@ const BrowseSearchForm = () => {
 
   // Check if this is a collection page (to show collection-specific sort options)
   const isCollectionPage = pathname?.startsWith('/collections/') || false;
+  
+  // Check if we're on a collection set page specifically (for subset tracking toggle)
+  const isCollectionSetPage = pathname?.includes('/collections/') && pathname?.split('/').length > 3;
 
   // Get content type from Redux store
   const contentType = useSelector(selectViewContentType);
@@ -459,6 +462,52 @@ const BrowseSearchForm = () => {
           label={<Box sx={{ display: 'flex', alignItems: 'center' }}>Hide duplicate printings</Box>}
         />
       </Paper>
+      {/* Show includeSubsetsInSets toggle only on collection set pages */}
+      {isCollectionSetPage && (
+        <Paper
+          variant="outlined"
+          sx={{
+            borderColor: (theme) => theme.palette.grey[700],
+            mt: 1.5,
+            padding: '8px 8px 8px 1px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <FormControlLabel
+            sx={{ margin: 0 }}
+            control={
+              <Switch
+                checked={reduxIncludeSubsetsInSet}
+                onChange={handleIncludeSubsetsInSetChange}
+                name="includeSubsetsInSets"
+                color="primary"
+                size="small"
+                sx={{ marginRight: '3px' }}
+              />
+            }
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                Track subsets with main set
+                <Tooltip
+                  title={
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          'When enabled, the cost to complete will include subset cards in the calculation. <br /><br />Example: The cost to complete Tempest will include cards from Tempest Prerelease Promos and The List: Tempest.',
+                      }}
+                    />
+                  }
+                  placement="right"
+                >
+                  <InfoOutlinedIcon fontSize="small" sx={{ ml: 0.5, cursor: 'help', color: 'text.secondary' }} />
+                </Tooltip>
+              </Box>
+            }
+          />
+        </Paper>
+      )}
       <StatSearch />
     </>
   );
