@@ -1,8 +1,10 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
 import { mapApiSetsToSetItems } from '@/features/browse/mappers';
+import { selectSelectedGoalId, selectShowGoals } from '@/redux/slices/browseSlice';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import { Set } from '@/types/sets';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
@@ -26,6 +28,8 @@ interface UseSetDataProps {
 export function useSetData({ searchParams, pagination, skip, includeSubsets, skipCostToComplete = false, userId }: UseSetDataProps) {
   const router = useRouter();
   const setPriceType = useSetPriceType();
+  const selectedGoalId = useSelector(selectSelectedGoalId);
+  const showGoals = useSelector(selectShowGoals);
 
   const apiArgs = useMemo(() => {
     const params = buildApiParamsFromSearchParams(searchParams, 'sets');
@@ -55,14 +59,18 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
         userId,
         priceType: setPriceType,
         includeSubsetsInSets: includeSubsets,
+        ...(selectedGoalId && { 
+          goalId: selectedGoalId,
+          ...(showGoals !== 'all' && { showGoals })
+        }),
       };
     }
 
     return baseArgs;
-  }, [searchParams, pagination, userId, setPriceType, includeSubsets]);
+  }, [searchParams, pagination, userId, setPriceType, includeSubsets, selectedGoalId, showGoals]);
 
   const queryConfig = {
-    refetchOnMountOrArgChange: false,
+    refetchOnMountOrArgChange: true,
     refetchOnFocus: false,
     refetchOnReconnect: false,
   };
@@ -118,5 +126,6 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
       percentageCollected: setsSearchResult.data.percentageCollected,
       totalValue: setsSearchResult.data.totalValue,
     } : undefined,
+    goalSummary: setsSearchResult?.data?.goalSummary,
   };
 }

@@ -61,6 +61,7 @@ export interface CardDisplaySettings {
   setIsVisible: boolean;
   priceIsVisible: boolean;
   quantityIsVisible?: boolean;
+  goalProgressIsVisible?: boolean;
 }
 
 /**
@@ -124,6 +125,7 @@ export interface CardData {
     percentageCollected?: number;
     totalValue?: number;
   };
+  goalSummary?: any;
 }
 
 /**
@@ -145,6 +147,7 @@ export interface SetData {
     percentageCollected?: number;
     totalValue?: number;
   };
+  goalSummary?: any;
 }
 
 /**
@@ -183,6 +186,15 @@ export interface CardsProps {
     percentageCollected?: number;
     totalValue?: number;
   };
+  goalSummary?: {
+    goalId: number;
+    goalName: string;
+    totalCards: number;
+    collectedCards: number;
+    percentageCollected: number;
+    totalValue: number;
+    costToComplete: number;
+  };
 }
 
 /**
@@ -207,6 +219,15 @@ export interface SetsProps {
     numberOfCardsInMagic?: number;
     percentageCollected?: number;
     totalValue?: number;
+  };
+  goalSummary?: {
+    goalId: number;
+    goalName: string;
+    totalCards: number;
+    collectedCards: number;
+    percentageCollected: number;
+    totalValue: number;
+    costToComplete: number;
   };
 }
 
@@ -241,6 +262,8 @@ export interface CardPayloadProps {
   displaySettings: DisplaySettings;
   sorting: SortingState;
   initialLoadComplete: boolean;
+  selectedGoalId?: number | null;
+  userId?: number;
 }
 
 /**
@@ -262,4 +285,6 @@ export interface SetPayloadProps {
   sorting: SortingState;
   initialLoadComplete: boolean;
   includeSubsetsInSets: boolean;
+  selectedGoalId?: number | null;
+  userId?: number;
 }

@@ -85,6 +85,10 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
   const username = view === 'sets'
     ? (setsProps && 'username' in setsProps ? setsProps.username : '')
     : (cardsProps && 'username' in cardsProps ? cardsProps.username : '');
+    
+  const goalSummary = view === 'sets'
+    ? (setsProps && 'goalSummary' in setsProps ? setsProps.goalSummary : null)
+    : (cardsProps && 'goalSummary' in cardsProps ? cardsProps.goalSummary : null);
 
   // Show loading state for initial load
   if (isLoading && ((view === 'cards' && (!cardsProps || !('items' in cardsProps))) || 
@@ -103,12 +107,14 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
       {(collectionSummary || isLoading) && (
         <CollectionHeader
           username={username || ''}
+          userId={userId}
           uniquePrintingsCollected={collectionSummary?.uniquePrintingsCollected || 0}
           numberOfCardsInMagic={collectionSummary?.numberOfCardsInMagic || 0}
           totalCardsCollected={collectionSummary?.totalCardsCollected || 0}
           percentageCollected={collectionSummary?.percentageCollected || 0}
           totalValue={collectionSummary?.totalValue || 0}
           isLoading={isLoading && !collectionSummary}
+          goalSummary={goalSummary}
         />
       )}
 

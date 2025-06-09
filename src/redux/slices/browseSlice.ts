@@ -10,6 +10,7 @@ import {
   SetCategoryFilter,
   SetFilter,
   SetTypeFilter,
+  ShowGoalsOption,
   SortByOption,
   SortOrderOption,
   StatFilters,
@@ -300,6 +301,9 @@ export const browseSlice = createSlice({
           viewMode: pagination.viewMode,
         };
       }
+      // Also clear selected goal
+      delete state.cardsSearchParams.selectedGoalId;
+      delete state.setsSearchParams.selectedGoalId;
     },
     resetAllSearches: (state) => {
       // Reset both cards and sets search params but preserve pagination
@@ -340,6 +344,33 @@ export const browseSlice = createSlice({
         state.viewContentType = action.payload;
       }
     },
+    setSelectedGoalId: (state, action: PayloadAction<number | null>) => {
+      // Apply to both card and set search params
+      if (action.payload === null) {
+        delete state.cardsSearchParams.selectedGoalId;
+        delete state.setsSearchParams.selectedGoalId;
+      } else {
+        state.cardsSearchParams.selectedGoalId = action.payload;
+        state.setsSearchParams.selectedGoalId = action.payload;
+      }
+    },
+    clearSelectedGoal: (state) => {
+      delete state.cardsSearchParams.selectedGoalId;
+      delete state.setsSearchParams.selectedGoalId;
+      // Also clear showGoals when clearing goal
+      delete state.cardsSearchParams.showGoals;
+      delete state.setsSearchParams.showGoals;
+    },
+    setShowGoals: (state, action: PayloadAction<ShowGoalsOption>) => {
+      // Apply to both card and set search params
+      if (action.payload === 'all') {
+        delete state.cardsSearchParams.showGoals;
+        delete state.setsSearchParams.showGoals;
+      } else {
+        state.cardsSearchParams.showGoals = action.payload;
+        state.setsSearchParams.showGoals = action.payload;
+      }
+    },
   },
 });
 
@@ -371,6 +402,9 @@ export const {
   resetSearch,
   resetAllSearches,
   setViewContentType,
+  setSelectedGoalId,
+  clearSelectedGoal,
+  setShowGoals,
 } = browseSlice.actions;
 
 // Generic/shared selectors that respect current content type
@@ -433,5 +467,17 @@ export const selectCompletionStatus = (state: RootState) => state.browse.setsSea
 
 // Content type selector
 export const selectViewContentType = (state: RootState) => state.browse.viewContentType;
+
+// Goal selector
+export const selectSelectedGoalId = (state: RootState) => 
+  state.browse.viewContentType === 'cards' 
+    ? state.browse.cardsSearchParams.selectedGoalId 
+    : state.browse.setsSearchParams.selectedGoalId;
+
+// Show goals selector
+export const selectShowGoals = (state: RootState): ShowGoalsOption => 
+  state.browse.viewContentType === 'cards' 
+    ? state.browse.cardsSearchParams.showGoals || 'all'
+    : state.browse.setsSearchParams.showGoals || 'all';
 
 export default browseSlice.reducer;

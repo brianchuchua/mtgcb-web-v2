@@ -1,9 +1,11 @@
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
+import { selectSelectedGoalId, selectShowGoals } from '@/redux/slices/browseSlice';
 import { usePriceType } from '@/hooks/usePriceType';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
@@ -21,6 +23,8 @@ interface UseCardDataProps {
 export function useCardData({ searchParams, pagination, skip, userId }: UseCardDataProps) {
   const router = useRouter();
   const priceType = usePriceType();
+  const selectedGoalId = useSelector(selectSelectedGoalId);
+  const showGoals = useSelector(selectShowGoals);
 
   const apiArgs = useMemo(() => {
     const params = buildApiParamsFromSearchParams(searchParams, 'cards');
@@ -53,19 +57,40 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       selectFields.push('quantityReg', 'quantityFoil');
     }
     
+    // Add goal progress fields when goal is selected
+    if (selectedGoalId && userId) {
+      selectFields.push(
+        'goalTargetQuantityReg',
+        'goalTargetQuantityFoil',
+        'goalTargetQuantityAll',
+        'goalRegMet',
+        'goalFoilMet',
+        'goalAllMet',
+        'goalFullyMet',
+        'goalRegNeeded',
+        'goalFoilNeeded',
+        'goalAllNeeded'
+      );
+    }
+    
     return {
       ...params,
       ...(userId && { userId, priceType }),
+      ...(selectedGoalId && userId && { 
+        goalId: selectedGoalId,
+        showGoalProgress: true,
+        ...(showGoals !== 'all' && { showGoals })
+      }),
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
       sortBy: params.sortBy || 'releasedAt',
       sortDirection: params.sortDirection || ('asc' as const),
       select: selectFields,
     };
-  }, [searchParams, pagination, userId, priceType]);
+  }, [searchParams, pagination, userId, priceType, selectedGoalId, showGoals]);
 
   const queryConfig = {
-    refetchOnMountOrArgChange: false,
+    refetchOnMountOrArgChange: true,
     refetchOnFocus: false,
     refetchOnReconnect: false,
   };
@@ -132,5 +157,6 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       percentageCollected: cardsSearchResult.data.percentageCollected,
       totalValue: cardsSearchResult.data.totalValue,
     } : undefined,
+    goalSummary: cardsSearchResult?.data?.goalSummary,
   };
 }

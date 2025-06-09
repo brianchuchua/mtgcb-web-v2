@@ -43,6 +43,8 @@ import SetSelector from '@/features/browse/SetSelector';
 import SetTypeSelector from '@/features/browse/SetTypeSelector';
 import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
+import GoalSelector from '@/features/browse/GoalSelector';
+import GoalCompletionSelector from '@/features/browse/GoalCompletionSelector';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { usePriceType } from '@/hooks/usePriceType';
 import {
@@ -96,6 +98,19 @@ const BrowseSearchForm = () => {
 
   // Check if we're on a collection set page specifically (for subset tracking toggle)
   const isCollectionSetPage = pathname?.includes('/collections/') && pathname?.split('/').length > 3;
+  
+  // Extract userId from URL for collection pages
+  const getUserIdFromPath = (): number | null => {
+    if (!pathname?.startsWith('/collections/')) return null;
+    const parts = pathname.split('/');
+    if (parts.length >= 3) {
+      const userId = parseInt(parts[2], 10);
+      return isNaN(userId) ? null : userId;
+    }
+    return null;
+  };
+  
+  const userId = getUserIdFromPath();
 
   // Get content type from Redux store
   const contentType = useSelector(selectViewContentType);
@@ -794,6 +809,14 @@ const BrowseSearchForm = () => {
           )}
 
           <Divider />
+          
+          {/* Goal selector for collection pages */}
+          {isCollectionPage && userId && (
+            <>
+              <GoalSelector userId={userId} />
+              <GoalCompletionSelector />
+            </>
+          )}
 
           {/* Render different form fields based on content type */}
           {contentType === 'cards' ? renderCardSearchFields() : renderSetSearchFields()}

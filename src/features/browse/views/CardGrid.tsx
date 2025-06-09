@@ -21,6 +21,7 @@ interface CardGridProps {
     nameIsVisible: boolean;
     setIsVisible: boolean;
     priceIsVisible: boolean;
+    goalProgressIsVisible?: boolean;
   };
   priceType: PriceType;
   isOwnCollection?: boolean;

@@ -1,4 +1,5 @@
 import { CostToComplete } from '@/api/collections/types';
+import { GoalSummary } from '@/api/browse/types';
 
 export interface Set {
   id: string;
@@ -46,4 +47,6 @@ export interface SetsSearchResult {
   numberOfCardsInMagic?: number;
   percentageCollected?: number;
   totalValue?: number;
+  // Goal summary (present when goalId provided)
+  goalSummary?: GoalSummary;
 }

@@ -42,6 +42,27 @@ export interface CardModel {
   // Collection quantities (only present when userId is provided)
   quantityReg?: number;
   quantityFoil?: number;
+  // Goal progress fields (only present when showGoalProgress is true)
+  goalTargetQuantityReg?: number;
+  goalTargetQuantityFoil?: number;
+  goalTargetQuantityAll?: number | null;
+  goalRegMet?: boolean;
+  goalFoilMet?: boolean;
+  goalAllMet?: boolean;
+  goalFullyMet?: boolean;
+  goalRegNeeded?: number;
+  goalFoilNeeded?: number;
+  goalAllNeeded?: number;
+}
+
+export interface GoalSummary {
+  goalId: number;
+  goalName: string;
+  totalCards: number;
+  collectedCards: number;
+  percentageCollected: number;
+  totalValue: number;
+  costToComplete: number;
 }
 
 export interface CardSearchData {
@@ -56,6 +77,8 @@ export interface CardSearchData {
   numberOfCardsInMagic?: number;
   percentageCollected?: number;
   totalValue?: number;
+  // Goal summary (present when goalId provided)
+  goalSummary?: GoalSummary;
 }
 
 export interface CardApiParams {
@@ -86,6 +109,9 @@ export interface CardApiParams {
   sortDirection?: 'asc' | 'desc';
   oneResultPerCardName?: boolean;
   select?: string[];
+  goalId?: number;
+  showGoalProgress?: boolean;
+  showGoals?: 'all' | 'complete' | 'incomplete';
 }
 
 export interface SetApiParams {
@@ -120,4 +146,6 @@ export interface SetApiParams {
     OR?: string[];
     NOT?: string[];
   };
+  goalId?: number;
+  showGoals?: 'all' | 'complete' | 'incomplete';
 }

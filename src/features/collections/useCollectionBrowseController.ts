@@ -42,7 +42,11 @@ export const useCollectionBrowseController = ({
   if ('cardsProps' in customBrowseController && customBrowseController.cardsProps && 'gallerySettings' in customBrowseController.cardsProps) {
     customBrowseController.cardsProps.gallerySettings = collectionDisplaySettings.gallerySettings;
     customBrowseController.cardsProps.tableSettings = collectionDisplaySettings.tableSettings;
-    customBrowseController.cardsProps.cardDisplaySettings = collectionDisplaySettings.cardDisplaySettings;
+    // Merge cardDisplaySettings to preserve goalProgressIsVisible from browse controller
+    customBrowseController.cardsProps.cardDisplaySettings = {
+      ...customBrowseController.cardsProps.cardDisplaySettings,
+      ...collectionDisplaySettings.cardDisplaySettings,
+    };
   }
   
   // Override pagination props to include collection-specific settings

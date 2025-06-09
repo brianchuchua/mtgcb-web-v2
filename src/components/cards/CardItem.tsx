@@ -51,11 +51,23 @@ export interface CardItemProps {
   // Collection quantities
   quantityReg?: number;
   quantityFoil?: number;
+  // Goal progress fields
+  goalTargetQuantityReg?: number;
+  goalTargetQuantityFoil?: number;
+  goalTargetQuantityAll?: number | null;
+  goalRegMet?: boolean;
+  goalFoilMet?: boolean;
+  goalAllMet?: boolean;
+  goalFullyMet?: boolean;
+  goalRegNeeded?: number;
+  goalFoilNeeded?: number;
+  goalAllNeeded?: number;
   display?: {
     nameIsVisible?: boolean;
     setIsVisible?: boolean;
     priceIsVisible?: boolean;
     quantityIsVisible?: boolean;
+    goalProgressIsVisible?: boolean;
   };
   priceType?: PriceType; // Price type to display
   onClick?: () => void;
@@ -84,11 +96,22 @@ const CardItemComponent = ({
   foil,
   quantityReg,
   quantityFoil,
+  goalTargetQuantityReg,
+  goalTargetQuantityFoil,
+  goalTargetQuantityAll,
+  goalRegMet,
+  goalFoilMet,
+  goalAllMet,
+  goalFullyMet,
+  goalRegNeeded,
+  goalFoilNeeded,
+  goalAllNeeded,
   display = {
     nameIsVisible: true,
     setIsVisible: true,
     priceIsVisible: true,
     quantityIsVisible: false,
+    goalProgressIsVisible: false,
   },
   priceType = PriceType.Market,
   onClick,
@@ -100,7 +123,7 @@ const CardItemComponent = ({
   const imageRef = useRef<HTMLImageElement>(null);
   const pathname = usePathname();
 
-  const { nameIsVisible, setIsVisible, priceIsVisible, quantityIsVisible = false } = display;
+  const { nameIsVisible, setIsVisible, priceIsVisible, quantityIsVisible = false, goalProgressIsVisible = false } = display;
 
   // Check if we're in a collection view and extract userId
   const collectionMatch = pathname?.match(/^\/collections\/(\d+)/);
@@ -200,7 +223,39 @@ const CardItemComponent = ({
     >
       <CardImageContainer
         onClick={onClick ? handleCardElementClick : undefined}
-        sx={{ cursor: onClick ? 'pointer' : 'default' }}
+        sx={{ 
+          cursor: onClick ? 'pointer' : 'default',
+          opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
+          transition: 'opacity 0.2s ease-in-out',
+          position: 'relative',
+          '&:hover': {
+            opacity: 1,
+          },
+          // Add diagonal stripes overlay for incomplete goals
+          ...(goalProgressIsVisible && goalFullyMet === false && {
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: `repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 152, 0, 0.1) 10px,
+                rgba(255, 152, 0, 0.1) 20px
+              )`,
+              pointerEvents: 'none',
+              borderRadius: 'inherit',
+              transition: 'opacity 0.2s ease-in-out',
+            },
+            '&:hover::after': {
+              opacity: 0.3,
+            },
+          }),
+        }}
       >
         {!imageLoaded && !imageError && (
           <Skeleton
@@ -237,7 +292,7 @@ const CardItemComponent = ({
         )}
       </CardImageContainer>
 
-      {(nameIsVisible || setIsVisible || priceIsVisible || quantityIsVisible) && (
+      {(nameIsVisible || setIsVisible || priceIsVisible || quantityIsVisible || goalProgressIsVisible) && (
         <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
           {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && isOwnCollection && (
             <Box sx={{ mb: 1 }}>
@@ -247,6 +302,55 @@ const CardItemComponent = ({
                 quantityReg={quantityReg || 0}
                 quantityFoil={quantityFoil || 0}
               />
+            </Box>
+          )}
+
+          {goalProgressIsVisible && (goalTargetQuantityReg || goalTargetQuantityFoil || goalTargetQuantityAll) && (
+            <Box sx={{ mt: -0.5, mb: 0.5 }}>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  display: 'block', 
+                  color: goalFullyMet ? 'success.main' : 'warning.main',
+                  fontWeight: 'medium',
+                  textAlign: 'center'
+                }}
+              >
+                {(() => {
+                  // If goal is fully met
+                  if (goalFullyMet) {
+                    return '(Goal met!)';
+                  }
+                  
+                  // If only regular target exists
+                  if (goalTargetQuantityReg && !goalTargetQuantityFoil && !goalTargetQuantityAll) {
+                    return `(Need ${goalRegNeeded} regular)`;
+                  }
+                  
+                  // If only foil target exists
+                  if (!goalTargetQuantityReg && goalTargetQuantityFoil && !goalTargetQuantityAll) {
+                    return `(Need ${goalFoilNeeded} foil)`;
+                  }
+                  
+                  // If both regular and foil targets exist
+                  if (goalTargetQuantityReg && goalTargetQuantityFoil && !goalTargetQuantityAll) {
+                    const needs = [];
+                    if (goalRegNeeded > 0) needs.push(`${goalRegNeeded} regular`);
+                    if (goalFoilNeeded > 0) needs.push(`${goalFoilNeeded} foil`);
+                    return needs.length > 0 ? `(Need ${needs.join(' and ')})` : '(Goal met!)';
+                  }
+                  
+                  // If "any type" target exists (goalTargetQuantityAll)
+                  if (goalTargetQuantityAll) {
+                    if (goalAllNeeded > 0) {
+                      return `(Need ${goalAllNeeded} regular or foil)`;
+                    }
+                    return '(Goal met!)';
+                  }
+                  
+                  return '';
+                })()}
+              </Typography>
             </Box>
           )}
 
@@ -370,13 +474,26 @@ const CardItem = React.memo(CardItemComponent, (prevProps, nextProps) => {
     prevProps.display?.setIsVisible === nextProps.display?.setIsVisible &&
     prevProps.display?.priceIsVisible === nextProps.display?.priceIsVisible &&
     prevProps.display?.quantityIsVisible === nextProps.display?.quantityIsVisible &&
+    prevProps.display?.goalProgressIsVisible === nextProps.display?.goalProgressIsVisible &&
     // Compare prices if they're visible
     (!prevProps.display?.priceIsVisible ||
       (prevProps.market === nextProps.market &&
         prevProps.low === nextProps.low &&
         prevProps.average === nextProps.average &&
         prevProps.high === nextProps.high &&
-        prevProps.foil === nextProps.foil))
+        prevProps.foil === nextProps.foil)) &&
+    // Compare goal progress if visible
+    (!prevProps.display?.goalProgressIsVisible ||
+      (prevProps.goalTargetQuantityReg === nextProps.goalTargetQuantityReg &&
+        prevProps.goalTargetQuantityFoil === nextProps.goalTargetQuantityFoil &&
+        prevProps.goalTargetQuantityAll === nextProps.goalTargetQuantityAll &&
+        prevProps.goalRegMet === nextProps.goalRegMet &&
+        prevProps.goalFoilMet === nextProps.goalFoilMet &&
+        prevProps.goalAllMet === nextProps.goalAllMet &&
+        prevProps.goalFullyMet === nextProps.goalFullyMet &&
+        prevProps.goalRegNeeded === nextProps.goalRegNeeded &&
+        prevProps.goalFoilNeeded === nextProps.goalFoilNeeded &&
+        prevProps.goalAllNeeded === nextProps.goalAllNeeded))
   );
 });
 

@@ -6,34 +6,55 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Remaining Major Feature Work Before 1.0
 
+- Art cards
+- Custom collection goals
 - Imports and exports
+- Patron support features
 - Privacy mode
 - Cards page
-- Subset data automation and clean-up
+- Subset data automation and clean-up (basically audit subset groups that have cards in them directly)
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
 - Home page (landing page or statistics dashboard)
 - New price updater
-- Tokens
-- Legal disclaimer
+- Legal disclaimer / terms and conditions research / clear estimate labeling
 - In-code TODO audit
 - Feature parity audit
 - Audit routes that require authentication
+- Left <> right set navigation
+- Most valuable card collected, maybe in the set header
+- Handle double-sided, sideways, and flip cards
+- Art Series cards
+- New price updater that updates directly in the new database, separate from the old legacy updater
+- Audit input field lengths for all API calls
 
 ### Current Action Items
 
+- Implement basic custom collection goals
+  - CRUD to start
+  - Add these to Postman
+- Exclude tokens from progress bars when includeSubsetsInSets is true.
+- UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
+  BUG: Set id selection is too sticky when going from a set page to the main page, get reproduction steps
 - When idle: Migrate TODOs from README.md to this file
 
 ## Other Action Items
 
+- Rewrite price updater, had to increase dyno size recently, do a quick refactor and modernization, then scale back down to a smaller dyno
 - Setting to change going mythic to plain green progress bars
 - Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
 - Remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
 - canBeFoil = audit my database and implement this in the collection views
 - Support searching by collector number and collector number ranges
 - Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
+- Missing data detector and clean-up for every card and set field in the database (pureName for example)
 
 ## UX Action Items
 
+- Audit style of info messages and errors
+- Set icons for token subsets
+- Hide duplicate printings -- should show in the card view how many printings are hidden, and maybe a link to show them
+- Hide duplicate printings has an interesting interaction with tokens -- an Elemental token can be a x/x or a 1/1 or what-have-you, but the current logic is to remove duplicates based on a pure card name. This doesn't work for tokens.
+- Evaluate default sort order on a set page, especially subset groups
 - Render "Subset" instead of Set and Subset Group instead of Set where relevant.
 - Consider an easier-to-use card quantity filter, add stat filter works, but users may be used to the easier one (I did this in the legacy new page)
 - Consider moving price type selection to the browsesearchform
@@ -73,6 +94,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Make default number of cards per page a multiple of 5 and 4.
 - Header consistency on pages, make a shared component for text headers
 - Quantity selectors -- going from custom filter to normal doesn't reset the states as you'd expect
+- A cool stats page, icon can be a graph, most valuable card can move there -- can make an expandable region in a set view too.
 
 ## Bugs
 
@@ -135,3 +157,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 ## Nice to Have
 
 - A "money draft" tool to help users during a draft
+
+## Data Decisions
+
+- Tokens count as part of a set if they're promotional in nature

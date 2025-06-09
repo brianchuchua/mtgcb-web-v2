@@ -61,7 +61,7 @@ const EditCardsClient: React.FC = () => {
       sortDirection: 'desc',
       userId: user?.userId,
       priceType: priceType,
-      ...(selectedSet && selectedSet.value !== 'all' && { setId: parseInt(selectedSet.value) }),
+      ...(selectedSet && selectedSet.value !== 'all' && { setId: { OR: [selectedSet.value] } }),
     },
     {
       skip: searchInput.length < 2 && (!selectedSet || selectedSet.value === 'all'),
@@ -93,7 +93,7 @@ const EditCardsClient: React.FC = () => {
           sortDirection: 'desc',
           userId: user?.userId,
           priceType: priceType,
-          setId: parseInt(selectedSet.value),
+          setId: { OR: [selectedSet.value] },
         }).unwrap();
 
         if (firstResponse.data) {
@@ -110,7 +110,7 @@ const EditCardsClient: React.FC = () => {
               sortDirection: 'desc',
               userId: user?.userId,
               priceType: priceType,
-              setId: parseInt(selectedSet.value),
+              setId: { OR: [selectedSet.value] },
             }).unwrap();
 
             if (response.data) {

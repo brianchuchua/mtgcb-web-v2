@@ -42,6 +42,7 @@ import { BrowseControllerResult, CardPayloadProps, SetPayloadProps } from '@/fea
 import {
   selectCardSearchParams,
   selectIncludeSubsetsInSets,
+  selectSelectedGoalId,
   selectSetSearchParams,
   selectViewContentType,
 } from '@/redux/slices/browseSlice';
@@ -56,6 +57,7 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
   const cardSearchParams = useSelector(selectCardSearchParams);
   const setSearchParams = useSelector(selectSetSearchParams);
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
+  const selectedGoalId = useSelector(selectSelectedGoalId);
 
   // Pagination kept in sync with the URL
   const { pagination, handlePageChange, handlePageSizeChange, initialLoadComplete } = usePaginationSync();
@@ -106,6 +108,8 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
         displaySettings,
         sorting,
         initialLoadComplete,
+        selectedGoalId,
+        userId: options?.userId,
       })
     : buildSetPayload({
         currentView: currentView as 'cards' | 'sets',
@@ -119,6 +123,8 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
         sorting,
         initialLoadComplete,
         includeSubsetsInSets,
+        selectedGoalId,
+        userId: options?.userId,
       });
 }
 
@@ -134,6 +140,8 @@ function buildCardPayload({
   displaySettings,
   sorting,
   initialLoadComplete,
+  selectedGoalId,
+  userId,
 }: CardPayloadProps) {
   const isApiLoading = cardData.isLoading;
   const isInitialLoading = !initialLoadComplete && !cardData.items.length && !cardData.error;
@@ -169,10 +177,14 @@ function buildCardPayload({
       sortOrder: sorting.sortOrder,
       gallerySettings: displaySettings.gallerySettings,
       tableSettings: displaySettings.tableSettings,
-      cardDisplaySettings: displaySettings.cardDisplaySettings,
+      cardDisplaySettings: {
+        ...displaySettings.cardDisplaySettings,
+        goalProgressIsVisible: !!selectedGoalId && !!userId,
+      },
       priceType: displaySettings.priceType,
       username: cardData.username,
       collectionSummary: cardData.collectionSummary,
+      goalSummary: cardData.goalSummary,
     },
 
     /* No setsProps while in Card mode */
@@ -239,6 +251,7 @@ function buildSetPayload({
       includeSubsetsInSets,
       username: setData.username,
       collectionSummary: setData.collectionSummary,
+      goalSummary: setData.goalSummary,
     },
   };
 }

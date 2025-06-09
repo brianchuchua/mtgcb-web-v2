@@ -281,6 +281,19 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     separator: ',',
     defaultValue: {},
   },
+  selectedGoalId: {
+    type: 'number',
+    mode: 'both',
+    urlParam: 'goalId',
+    defaultValue: undefined,
+  },
+  showGoals: {
+    type: 'enum',
+    mode: 'both',
+    urlParam: 'showGoals',
+    options: ['all', 'complete', 'incomplete'],
+    defaultValue: 'all',
+  },
 };
 
 export function getParametersForMode(mode: 'cards' | 'sets'): Record<string, ParameterConfig> {

@@ -23,6 +23,7 @@ const schemaToReduxKeyMap: Record<string, string> = {
   setCategories: 'setCategories',
   setTypes: 'setTypes',
   completionStatus: 'completionStatus',
+  selectedGoalId: 'selectedGoalId',
 };
 
 export function parseUrlToState(
@@ -84,6 +85,7 @@ const reduxToSchemaKeyMap: Record<string, string | [string, string]> = {
   setCategories: 'setCategories',
   setTypes: 'setTypes',
   completionStatus: 'completionStatus',
+  selectedGoalId: 'selectedGoalId',
 };
 
 export function convertStateToUrlParams(

@@ -66,6 +66,7 @@ export type SortByOption =
   | 'costToComplete.oneOfEachCard'
   | 'percentageCollected';
 export type SortOrderOption = 'asc' | 'desc';
+export type ShowGoalsOption = 'all' | 'complete' | 'incomplete';
 
 export interface BrowseSearchParams {
   name?: string;
@@ -88,6 +89,8 @@ export interface BrowseSearchParams {
   pageSize?: number;
   viewMode?: 'grid' | 'table';
   completionStatus?: CompletionStatusFilter;
+  selectedGoalId?: number | null;
+  showGoals?: ShowGoalsOption;
 }
 
 export interface BrowsePagination {

@@ -49,6 +49,17 @@ export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
     // Include quantity fields if present
     quantityReg: card.quantityReg,
     quantityFoil: card.quantityFoil,
+    // Include goal progress fields if present
+    goalTargetQuantityReg: card.goalTargetQuantityReg,
+    goalTargetQuantityFoil: card.goalTargetQuantityFoil,
+    goalTargetQuantityAll: card.goalTargetQuantityAll,
+    goalRegMet: card.goalRegMet,
+    goalFoilMet: card.goalFoilMet,
+    goalAllMet: card.goalAllMet,
+    goalFullyMet: card.goalFullyMet,
+    goalRegNeeded: card.goalRegNeeded,
+    goalFoilNeeded: card.goalFoilNeeded,
+    goalAllNeeded: card.goalAllNeeded,
   }));
 };
 
