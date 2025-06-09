@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Paper,
   Box,
   Typography,
   ToggleButton,
@@ -14,12 +13,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useDispatch, useSelector } from 'react-redux';
 import { setStats, selectStats } from '@/redux/slices/browseSlice';
 import { StatFilters } from '@/types/browse';
+import OutlinedBox from '@/components/ui/OutlinedBox';
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  borderColor: theme.palette.grey[700],
-  marginTop: theme.spacing(1.5), // 12px = 1.5 * 8px
-  padding: theme.spacing(1),
-}));
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   flex: 1,
@@ -174,7 +169,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
     filterState: { selected: QuantityOption; hasCustomFilter: boolean }
   ) => (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, gap: 1 }}>
         <Typography variant="body2" color="text.secondary">
           {label}
         </Typography>
@@ -205,8 +200,8 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
   );
 
   return (
-    <StyledPaper variant="outlined">
-      {renderQuantitySelector('Quantity Collected (All)', 'quantityAll', allFilterState)}
+    <OutlinedBox label="Quantity Collected">
+      {renderQuantitySelector('All Cards', 'quantityAll', allFilterState)}
       
       <ExpandableText onClick={() => setExpanded(!expanded)}>
         <Typography variant="body2">
@@ -217,13 +212,13 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
 
       <Collapse in={expanded}>
         <Box sx={{ mt: 2 }}>
-          {renderQuantitySelector('Quantity Collected (Normal)', 'quantityReg', regFilterState)}
+          {renderQuantitySelector('Normal Cards', 'quantityReg', regFilterState)}
         </Box>
         <Box sx={{ mt: 2 }}>
-          {renderQuantitySelector('Quantity Collected (Foil)', 'quantityFoil', foilFilterState)}
+          {renderQuantitySelector('Foil Cards', 'quantityFoil', foilFilterState)}
         </Box>
       </Collapse>
-    </StyledPaper>
+    </OutlinedBox>
   );
 };
 
