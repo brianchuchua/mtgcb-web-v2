@@ -61,12 +61,12 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
 
   return (
     <FormControl fullWidth margin="dense">
-      <InputLabel id="goal-selector-label">View Collection Goal</InputLabel>
+      <InputLabel id="goal-selector-label" shrink>Collection Goal</InputLabel>
       <Select
         labelId="goal-selector-label"
         value={selectedGoalId || ''}
         onChange={handleChange}
-        label="View Collection Goal"
+        label="Collection Goal"
         displayEmpty
         renderValue={(value: number | '') => {
           if (!value) {
@@ -87,7 +87,11 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
                   {goal.name}
                 </Typography>
                 {goal.description && (
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  >
                     {goal.description}
                   </Typography>
                 )}
@@ -105,12 +109,12 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
                     e.preventDefault();
                     e.stopPropagation();
                   }}
-                  sx={{ 
+                  sx={{
                     textDecoration: 'underline',
                     cursor: 'pointer',
                     '&:hover': {
                       textDecoration: 'underline',
-                    }
+                    },
                   }}
                 >
                   Edit

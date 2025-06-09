@@ -1,15 +1,10 @@
 'use client';
 
-import { Box, Paper, ToggleButton, ToggleButtonGroup, Typography, styled } from '@mui/material';
+import { ToggleButton, ToggleButtonGroup, styled } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectSelectedGoalId, selectShowGoals, setShowGoals } from '@/redux/slices/browseSlice';
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  borderColor: theme.palette.grey[700],
-  marginTop: theme.spacing(1.5), // 12px = 1.5 * 8px
-  padding: theme.spacing(1),
-}));
+import OutlinedBox from '@/components/ui/OutlinedBox';
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   flex: 1,
@@ -41,20 +36,15 @@ const GoalCompletionSelector: React.FC = () => {
   }
 
   return (
-    <StyledPaper variant="outlined">
-      <Box>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          Goal Completion Status
-        </Typography>
-        <ToggleButtonGroup value={showGoals} exclusive onChange={handleChange} fullWidth size="small">
-          {SHOW_GOALS_OPTIONS.map((option) => (
-            <StyledToggleButton key={option.value} value={option.value}>
-              {option.label}
-            </StyledToggleButton>
-          ))}
-        </ToggleButtonGroup>
-      </Box>
-    </StyledPaper>
+    <OutlinedBox label="Goal Completion Status">
+      <ToggleButtonGroup value={showGoals} exclusive onChange={handleChange} fullWidth size="small">
+        {SHOW_GOALS_OPTIONS.map((option) => (
+          <StyledToggleButton key={option.value} value={option.value}>
+            {option.label}
+          </StyledToggleButton>
+        ))}
+      </ToggleButtonGroup>
+    </OutlinedBox>
   );
 };
 

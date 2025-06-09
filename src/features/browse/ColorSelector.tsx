@@ -1,11 +1,12 @@
 'use client';
 
-import { IconButton, MenuItem, Paper, Select } from '@mui/material';
+import { IconButton, MenuItem, Select } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectColors, setColors } from '@/redux/slices/browseSlice';
 import { ColorMatchType, MTG_COLORS, MtgColor } from '@/types/browse';
+import OutlinedBox from '@/components/ui/OutlinedBox';
 
 const ColorSelector = () => {
   const dispatch = useDispatch();
@@ -75,7 +76,7 @@ const ColorSelector = () => {
   };
 
   return (
-    <ColorSelectorWrapper variant="outlined">
+    <OutlinedBox label="Colors">
       <ColorSelect>
         {MTG_COLORS.map((color) => (
           <ColorButton
@@ -109,28 +110,20 @@ const ColorSelector = () => {
           <MenuItem value="atMost">{getMatchTypeLabel('atMost')}</MenuItem>
         </Select>
       </ColorTypeSelect>
-    </ColorSelectorWrapper>
+    </OutlinedBox>
   );
 };
-
-const ColorSelectorWrapper = styled(Paper)(({ theme }) => ({
-  '&&': { margin: theme.spacing(0), marginTop: '12px' },
-  paddingTop: theme.spacing(1),
-  borderColor: theme.palette.grey[700],
-}));
 
 const ColorSelect = styled('div')({
   display: 'flex',
   justifyContent: 'center',
   gap: 6,
-  padding: '0 8px',
+  paddingBottom: 8,
 });
 
-const ColorTypeSelect = styled('div')(({ theme }) => ({
-  padding: theme.spacing(1),
-  paddingTop: theme.spacing(1.25),
-  paddingBottom: theme.spacing(1.25),
-}));
+const ColorTypeSelect = styled('div')({
+  paddingTop: 8,
+});
 
 interface ColorButtonProps {
   isSelected: boolean;
