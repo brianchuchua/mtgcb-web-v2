@@ -5,12 +5,14 @@ import {
   FormControl,
   InputLabel,
   LinearProgress,
+  Link,
   MenuItem,
   Select,
   SelectChangeEvent,
   Skeleton,
   Typography,
 } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { Goal } from '@/api/goals/types';
@@ -22,6 +24,7 @@ interface GoalSelectorProps {
 
 const GoalSelector = ({ userId }: GoalSelectorProps) => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const selectedGoalId = useSelector(selectSelectedGoalId);
 
   const { data: goalsResponse, isLoading, error } = useGetUserGoalsQuery(userId);
@@ -33,6 +36,11 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
   const handleChange = (event: SelectChangeEvent<number | ''>) => {
     const value = event.target.value;
     dispatch(setSelectedGoalId(value === '' ? null : Number(value)));
+  };
+
+  const handleEditClick = (goalId: number) => {
+    // Navigate to goals page with the goal ID as a query parameter
+    router.push(`/goals?edit=${goalId}`);
   };
 
   if (isLoading) {
@@ -60,8 +68,8 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
         onChange={handleChange}
         label="View Collection Goal"
         displayEmpty
-        renderValue={(value) => {
-          if (value === '' || value === null) {
+        renderValue={(value: number | '') => {
+          if (!value) {
             return 'Default (all cards)';
           }
           const selectedGoal = activeGoals.find(goal => goal.id === value);
@@ -72,14 +80,42 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
           <em>Default (all cards)</em>
         </MenuItem>
         {activeGoals.map((goal) => (
-          <MenuItem key={goal.id} value={goal.id}>
-            <Box sx={{ width: '100%' }}>
-              <Typography variant="body2">{goal.name}</Typography>
-              {goal.description && (
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                  {goal.description}
+          <MenuItem key={goal.id} value={goal.id} sx={{ p: 0 }}>
+            <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ flex: 1, minWidth: 0, p: 1.5, pr: 0.5 }}>
+                <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {goal.name}
                 </Typography>
-              )}
+                {goal.description && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {goal.description}
+                  </Typography>
+                )}
+              </Box>
+              <Box sx={{ px: 1.5, py: 1.5 }}>
+                <Link
+                  component="button"
+                  variant="caption"
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleEditClick(goal.id);
+                  }}
+                  onMouseDown={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  sx={{ 
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      textDecoration: 'underline',
+                    }
+                  }}
+                >
+                  Edit
+                </Link>
+              </Box>
             </Box>
           </MenuItem>
         ))}

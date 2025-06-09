@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Box, 
   Card, 
@@ -33,9 +33,11 @@ import { GoalDescription } from './GoalDescription';
 interface GoalsListProps {
   goals: Goal[];
   userId: number;
+  initialEditGoalId?: number | null;
+  onEditComplete?: () => void;
 }
 
-export function GoalsList({ goals, userId }: GoalsListProps) {
+export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: GoalsListProps) {
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const [deleteGoal] = useDeleteGoalMutation();
@@ -45,6 +47,17 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
   const [goalToEdit, setGoalToEdit] = useState<Goal | null>(null);
 
   const isOwner = user?.userId === userId;
+
+  // Handle initial edit goal from URL parameter
+  useEffect(() => {
+    if (initialEditGoalId && goals.length > 0) {
+      const goalToEdit = goals.find(g => g.id === initialEditGoalId);
+      if (goalToEdit) {
+        setGoalToEdit(goalToEdit);
+        setEditDialogOpen(true);
+      }
+    }
+  }, [initialEditGoalId, goals]);
 
   const handleDeleteClick = (goal: Goal) => {
     setGoalToDelete(goal);
@@ -78,6 +91,7 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
   const handleEditClose = () => {
     setEditDialogOpen(false);
     setGoalToEdit(null);
+    onEditComplete?.();
   };
 
 

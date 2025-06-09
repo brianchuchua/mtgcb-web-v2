@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, Button, Alert, Paper } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { CreateGoalDialog } from '@/components/goals/CreateGoalDialog';
@@ -10,13 +11,26 @@ import { GoalsList } from '@/components/goals/GoalsList';
 
 export function GoalsClient() {
   const { user, isAuthenticated } = useAuth();
+  const searchParams = useSearchParams();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [goalIdToEdit, setGoalIdToEdit] = useState<number | null>(null);
 
   const { data, isLoading, error } = useGetUserGoalsQuery(user?.userId ?? 0, {
     skip: !user?.userId,
   });
 
   const goals = data?.data?.goals || [];
+
+  // Check for edit query parameter on mount
+  useEffect(() => {
+    const editParam = searchParams.get('edit');
+    if (editParam) {
+      const goalId = parseInt(editParam, 10);
+      if (!isNaN(goalId) && goals.some(g => g.id === goalId)) {
+        setGoalIdToEdit(goalId);
+      }
+    }
+  }, [searchParams, goals]);
 
   const handleCreateClick = () => {
     setCreateDialogOpen(true);
@@ -78,7 +92,12 @@ export function GoalsClient() {
       )}
 
       {goals.length > 0 && (
-        <GoalsList goals={goals} userId={user?.userId || 0} />
+        <GoalsList 
+          goals={goals} 
+          userId={user?.userId || 0} 
+          initialEditGoalId={goalIdToEdit}
+          onEditComplete={() => setGoalIdToEdit(null)}
+        />
       )}
 
       <CreateGoalDialog
