@@ -244,15 +244,15 @@ const CardItemComponent = ({
                 45deg,
                 transparent,
                 transparent 10px,
-                rgba(255, 152, 0, 0.1) 10px,
-                rgba(255, 152, 0, 0.1) 20px
+                rgba(255, 152, 0, 0.2) 10px,
+                rgba(255, 152, 0, 0.2) 20px
               )`,
               pointerEvents: 'none',
               borderRadius: 'inherit',
               transition: 'opacity 0.2s ease-in-out',
             },
             '&:hover::after': {
-              opacity: 0.3,
+              opacity: 0,
             },
           }),
         }}
