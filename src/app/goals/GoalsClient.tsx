@@ -10,7 +10,7 @@ import { CreateGoalDialog } from '@/components/goals/CreateGoalDialog';
 import { GoalsList } from '@/components/goals/GoalsList';
 
 export function GoalsClient() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const searchParams = useSearchParams();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [goalIdToEdit, setGoalIdToEdit] = useState<number | null>(null);
@@ -45,6 +45,10 @@ export function GoalsClient() {
   const handleCloseDialog = () => {
     setCreateDialogOpen(false);
   };
+
+  if (isAuthLoading) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return (
