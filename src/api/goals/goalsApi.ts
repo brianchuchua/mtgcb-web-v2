@@ -10,7 +10,19 @@ export const goalsApi = mtgcbApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: ['Goals'],
+      invalidatesTags: (result) => {
+        if (result?.success && result?.data?.userId) {
+          return [
+            'Goals',
+            // Invalidate browse caches since new goal affects browse results
+            { type: 'Cards', id: `user-${result.data.userId}` },
+            { type: 'Sets', id: `user-${result.data.userId}` },
+            'Cards',
+            'Sets',
+          ];
+        }
+        return ['Goals'];
+      },
     }),
     getUserGoals: builder.query<ApiResponse<GetGoalsResponse>, number>({
       query: (userId) => `goals/${userId}`,
@@ -34,6 +46,11 @@ export const goalsApi = mtgcbApi.injectEndpoints({
         { type: 'Goals', id: `USER-${userId}` },
         { type: 'Goals', id: goalId },
         'Goals',
+        // Invalidate browse caches since goal deletion affects browse results
+        { type: 'Cards', id: `user-${userId}` },
+        { type: 'Sets', id: `user-${userId}` },
+        'Cards',
+        'Sets',
       ],
     }),
     updateGoal: builder.mutation<ApiResponse<Goal>, { userId: number; goalId: number; body: UpdateGoalRequest }>({
@@ -46,6 +63,11 @@ export const goalsApi = mtgcbApi.injectEndpoints({
         { type: 'Goals', id: `USER-${userId}` },
         { type: 'Goals', id: goalId },
         'Goals',
+        // Invalidate browse caches since goal changes affect browse results
+        { type: 'Cards', id: `user-${userId}` },
+        { type: 'Sets', id: `user-${userId}` },
+        'Cards',
+        'Sets',
       ],
     }),
   }),

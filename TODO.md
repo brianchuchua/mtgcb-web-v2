@@ -36,6 +36,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
   BUG: Set id selection is too sticky when going from a set page to the main page, get reproduction steps
 - When idle: Migrate TODOs from README.md to this file
+- Probably need to support hide duplicate printings in the set view too
 
 ## Other Action Items
 
