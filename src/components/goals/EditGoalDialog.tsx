@@ -139,7 +139,7 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
         // Don't send targetQuantityAll at all
       }
 
-      const result = await updateGoal({
+      await updateGoal({
         userId,
         goalId: goal.id,
         body: request,

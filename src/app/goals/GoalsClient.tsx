@@ -1,17 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Box, Typography, Button, Alert, Paper } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import { useSearchParams } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { Alert, Box, Button, Paper, Typography } from '@mui/material';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { CreateGoalDialog } from '@/components/goals/CreateGoalDialog';
 import { GoalsList } from '@/components/goals/GoalsList';
+import { useAuth } from '@/hooks/useAuth';
 
 export function GoalsClient() {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [goalIdToEdit, setGoalIdToEdit] = useState<number | null>(null);
 
@@ -25,18 +26,25 @@ export function GoalsClient() {
   useEffect(() => {
     const editParam = searchParams.get('edit');
     const createParam = searchParams.get('create');
-    
+
     if (editParam) {
       const goalId = parseInt(editParam, 10);
-      if (!isNaN(goalId) && goals.some(g => g.id === goalId)) {
+      if (!isNaN(goalId) && goals.some((g) => g.id === goalId)) {
         setGoalIdToEdit(goalId);
+        // Remove the edit parameter from URL immediately
+        const params = new URLSearchParams(searchParams);
+        params.delete('edit');
+        router.replace(`/goals${params.toString() ? `?${params.toString()}` : ''}`);
       }
     }
-    
+
     if (createParam === 'true') {
       setCreateDialogOpen(true);
+      const params = new URLSearchParams(searchParams);
+      params.delete('create');
+      router.replace(`/goals${params.toString() ? `?${params.toString()}` : ''}`);
     }
-  }, [searchParams, goals]);
+  }, [searchParams, goals, router]);
 
   const handleCreateClick = () => {
     setCreateDialogOpen(true);
@@ -53,9 +61,7 @@ export function GoalsClient() {
   if (!isAuthenticated) {
     return (
       <Box p={3}>
-        <Alert severity="info">
-          Please log in to view and manage your collection goals.
-        </Alert>
+        <Alert severity="info">Please log in to view and manage your collection goals.</Alert>
       </Box>
     );
   }
@@ -66,12 +72,7 @@ export function GoalsClient() {
         <Typography variant="h4" component="h1">
           Collection Goals
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleCreateClick}
-        >
+        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleCreateClick}>
           Create Goal
         </Button>
       </Box>
@@ -90,30 +91,24 @@ export function GoalsClient() {
           <Typography variant="body2" color="text.secondary" paragraph>
             Create your first collection goal to start tracking your progress.
           </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleCreateClick}
-          >
+          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleCreateClick}>
             Create Your First Goal
           </Button>
         </Paper>
       )}
 
       {goals.length > 0 && (
-        <GoalsList 
-          goals={goals} 
-          userId={user?.userId || 0} 
+        <GoalsList
+          goals={goals}
+          userId={user?.userId || 0}
           initialEditGoalId={goalIdToEdit}
-          onEditComplete={() => setGoalIdToEdit(null)}
+          onEditComplete={() => {
+            setGoalIdToEdit(null);
+          }}
         />
       )}
 
-      <CreateGoalDialog
-        open={createDialogOpen}
-        onClose={handleCloseDialog}
-      />
+      <CreateGoalDialog open={createDialogOpen} onClose={handleCloseDialog} />
     </Box>
   );
 }
