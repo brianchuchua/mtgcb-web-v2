@@ -47,6 +47,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Support searching by collector number and collector number ranges
 - Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
 - Missing data detector and clean-up for every card and set field in the database (pureName for example)
+- Probably a bug: When using hide duplicate printings, we should definitely show the card the user owns, not just whatever one corresponds to the sort order
 
 ## UX Action Items
 

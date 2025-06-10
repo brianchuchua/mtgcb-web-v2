@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { Goal } from '@/api/goals/types';
 import { selectSelectedGoalId, setSelectedGoalId } from '@/redux/slices/browseSlice';
+import { useAuth } from '@/hooks/useAuth';
 
 interface GoalSelectorProps {
   userId: number;
@@ -28,6 +29,8 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const selectedGoalId = useSelector(selectSelectedGoalId);
+  const { user, isAuthenticated } = useAuth();
+  const isOwnCollection = isAuthenticated && user?.userId === userId;
 
   const { data: goalsResponse, isLoading, error } = useGetUserGoalsQuery(userId);
   const goals = goalsResponse?.data?.goals || [];
@@ -104,53 +107,57 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
                   </Typography>
                 )}
               </Box>
-              <Box sx={{ px: 1.5, py: 1.5 }}>
-                <Link
-                  component="button"
-                  variant="caption"
-                  onClick={(e: React.MouseEvent) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleEditClick(goal.id);
-                  }}
-                  onMouseDown={(e: React.MouseEvent) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  sx={{
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    '&:hover': {
+              {isOwnCollection && (
+                <Box sx={{ px: 1.5, py: 1.5 }}>
+                  <Link
+                    component="button"
+                    variant="caption"
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleEditClick(goal.id);
+                    }}
+                    onMouseDown={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    sx={{
                       textDecoration: 'underline',
-                    },
-                  }}
-                >
-                  Edit
-                </Link>
-              </Box>
+                      cursor: 'pointer',
+                      '&:hover': {
+                        textDecoration: 'underline',
+                      },
+                    }}
+                  >
+                    Edit
+                  </Link>
+                </Box>
+              )}
             </Box>
           </MenuItem>
         ))}
-        <Divider />
-        <MenuItem
-          value="create-new-goal"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            router.push('/goals?create=true');
-          }}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          sx={{ p: 1.5 }}
-          disableRipple
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AddIcon fontSize="small" />
-            <Typography variant="body2">Create new goal</Typography>
-          </Box>
-        </MenuItem>
+        {isOwnCollection && <Divider />}
+        {isOwnCollection && (
+          <MenuItem
+            value="create-new-goal"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              router.push('/goals?create=true');
+            }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            sx={{ p: 1.5 }}
+            disableRipple
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <AddIcon fontSize="small" />
+              <Typography variant="body2">Create new goal</Typography>
+            </Box>
+          </MenuItem>
+        )}
       </Select>
     </FormControl>
   );
