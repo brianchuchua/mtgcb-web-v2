@@ -2,6 +2,7 @@
 
 import {
   Box,
+  Divider,
   FormControl,
   InputLabel,
   LinearProgress,
@@ -12,6 +13,7 @@ import {
   Skeleton,
   Typography,
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
@@ -33,8 +35,14 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
   // Filter to only show active goals
   const activeGoals = goals.filter((goal) => goal.isActive);
 
-  const handleChange = (event: SelectChangeEvent<number | ''>) => {
+  const handleChange = (event: SelectChangeEvent<number | '' | 'create-new-goal'>) => {
     const value = event.target.value;
+    
+    // Ignore the create new goal option
+    if (value === 'create-new-goal') {
+      return;
+    }
+    
     dispatch(setSelectedGoalId(value === '' ? null : Number(value)));
   };
 
@@ -68,8 +76,8 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
         onChange={handleChange}
         label="Collection Goal"
         displayEmpty
-        renderValue={(value: number | '') => {
-          if (!value) {
+        renderValue={(value: number | '' | 'create-new-goal') => {
+          if (!value || value === 'create-new-goal') {
             return 'Default (all cards)';
           }
           const selectedGoal = activeGoals.find(goal => goal.id === value);
@@ -123,6 +131,26 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
             </Box>
           </MenuItem>
         ))}
+        <Divider />
+        <MenuItem
+          value="create-new-goal"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            router.push('/goals?create=true');
+          }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          sx={{ p: 1.5 }}
+          disableRipple
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <AddIcon fontSize="small" />
+            <Typography variant="body2">Create new goal</Typography>
+          </Box>
+        </MenuItem>
       </Select>
     </FormControl>
   );

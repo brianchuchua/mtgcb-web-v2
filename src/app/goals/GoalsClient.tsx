@@ -21,14 +21,20 @@ export function GoalsClient() {
 
   const goals = data?.data?.goals || [];
 
-  // Check for edit query parameter on mount
+  // Check for edit or create query parameters on mount
   useEffect(() => {
     const editParam = searchParams.get('edit');
+    const createParam = searchParams.get('create');
+    
     if (editParam) {
       const goalId = parseInt(editParam, 10);
       if (!isNaN(goalId) && goals.some(g => g.id === goalId)) {
         setGoalIdToEdit(goalId);
       }
+    }
+    
+    if (createParam === 'true') {
+      setCreateDialogOpen(true);
     }
   }, [searchParams, goals]);
 
