@@ -43,8 +43,8 @@ export interface UpdateGoalRequest {
     sort?: string;
     order?: 'asc' | 'desc';
   };
-  targetQuantityReg?: number;
-  targetQuantityFoil?: number;
-  targetQuantityAll?: number;
+  targetQuantityReg?: number | null;
+  targetQuantityFoil?: number | null;
+  targetQuantityAll?: number | null;
   isActive?: boolean;
 }

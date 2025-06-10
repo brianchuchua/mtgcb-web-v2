@@ -1,25 +1,29 @@
-import { useState, useEffect, useCallback } from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Box,
-  Typography,
   Alert,
-  Divider,
+  Box,
+  Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
   FormControlLabel,
+  IconButton,
   Switch,
+  TextField,
+  Typography,
+  styled,
 } from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
+import { useCallback, useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { GoalSearchForm } from './GoalSearchForm';
+import { CardApiParams } from '@/api/browse/types';
 import { useUpdateGoalMutation } from '@/api/goals/goalsApi';
 import { Goal, UpdateGoalRequest } from '@/api/goals/types';
-import { CardApiParams } from '@/api/browse/types';
-import { GoalSearchForm } from './GoalSearchForm';
 
 interface EditGoalDialogProps {
   open: boolean;
@@ -41,14 +45,27 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
   const { enqueueSnackbar } = useSnackbar();
   const [updateGoal, { isLoading }] = useUpdateGoalMutation();
   const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>('separate');
-  const [searchConditions, setSearchConditions] = useState<Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>>({});
+  const [isChangingMode, setIsChangingMode] = useState(false);
+  const [searchConditions, setSearchConditions] = useState<
+    Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>
+  >({});
 
   // Memoize the onChange handler to prevent infinite loops
-  const handleSearchConditionsChange = useCallback((conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>) => {
-    setSearchConditions(conditions);
-  }, []);
+  const handleSearchConditionsChange = useCallback(
+    (conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>) => {
+      setSearchConditions(conditions);
+    },
+    [],
+  );
 
-  const { control, handleSubmit, reset, formState: { errors }, setValue } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    setValue,
+    getValues,
+  } = useForm<FormValues>({
     defaultValues: {
       name: '',
       description: '',
@@ -57,6 +74,8 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
       targetQuantityAll: undefined,
       isActive: true,
     },
+    mode: 'onChange',
+    reValidateMode: 'onChange',
   });
 
   // Parse search conditions from goal
@@ -99,7 +118,7 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
         order: goal.searchCriteria.order,
       };
 
-      const request: UpdateGoalRequest = {
+      const request: any = {
         name: data.name,
         description: data.description || undefined,
         searchCriteria,
@@ -108,17 +127,24 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
 
       if (quantityMode === 'all') {
         request.targetQuantityAll = data.targetQuantityAll;
+        // Don't send the separate fields at all
       } else {
-        if (data.targetQuantityReg) request.targetQuantityReg = data.targetQuantityReg;
-        if (data.targetQuantityFoil) request.targetQuantityFoil = data.targetQuantityFoil;
+        // For separate mode, only send non-zero values
+        if (data.targetQuantityReg && data.targetQuantityReg > 0) {
+          request.targetQuantityReg = data.targetQuantityReg;
+        }
+        if (data.targetQuantityFoil && data.targetQuantityFoil > 0) {
+          request.targetQuantityFoil = data.targetQuantityFoil;
+        }
+        // Don't send targetQuantityAll at all
       }
 
-      const result = await updateGoal({ 
-        userId, 
-        goalId: goal.id, 
-        body: request 
+      const result = await updateGoal({
+        userId,
+        goalId: goal.id,
+        body: request,
       }).unwrap();
-      
+
       enqueueSnackbar('Goal updated successfully!', { variant: 'success' });
       handleClose();
     } catch (error: any) {
@@ -127,16 +153,16 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
-      maxWidth="md" 
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="md"
       fullWidth
       PaperProps={{
         elevation: 0,
         sx: {
           backgroundColor: 'rgb(34, 38, 44)',
-        }
+        },
       }}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -179,10 +205,7 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
               name="isActive"
               control={control}
               render={({ field }) => (
-                <FormControlLabel
-                  control={<Switch {...field} checked={field.value} />}
-                  label="Active"
-                />
+                <FormControlLabel control={<Switch {...field} checked={field.value} />} label="Active" />
               )}
             />
 
@@ -195,101 +218,298 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
               <Typography variant="body2" color="text.secondary" paragraph>
                 Define which cards this goal applies to. Leave fields empty to include all cards.
               </Typography>
-              
-              <GoalSearchForm
-                searchConditions={searchConditions}
-                onChange={handleSearchConditionsChange}
-              />
+
+              <GoalSearchForm searchConditions={searchConditions} onChange={handleSearchConditionsChange} />
             </Box>
 
             <Divider />
 
             <Box>
               <Typography variant="h6" gutterBottom>
-                Target Quantities
+                Goal Quantities
               </Typography>
               <Box sx={{ mb: 2 }}>
                 <Chip
                   label="Separate Regular/Foil"
-                  onClick={() => setQuantityMode('separate')}
+                  onClick={() => {
+                    setIsChangingMode(true);
+                    setQuantityMode('separate');
+                    // Clear the 'all' field when switching to separate mode
+                    setValue('targetQuantityAll', undefined);
+                    setTimeout(() => setIsChangingMode(false), 100);
+                  }}
                   color={quantityMode === 'separate' ? 'primary' : 'default'}
                   sx={{ mr: 1 }}
                 />
                 <Chip
                   label="Any Type"
-                  onClick={() => setQuantityMode('all')}
+                  onClick={() => {
+                    setIsChangingMode(true);
+                    setQuantityMode('all');
+                    // Clear the separate fields when switching to 'all' mode
+                    setValue('targetQuantityReg', undefined);
+                    setValue('targetQuantityFoil', undefined);
+                    setTimeout(() => setIsChangingMode(false), 100);
+                  }}
                   color={quantityMode === 'all' ? 'primary' : 'default'}
                 />
               </Box>
 
               {quantityMode === 'separate' ? (
-                <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
                   <Controller
                     name="targetQuantityReg"
                     control={control}
-                    rules={{ 
-                      min: { value: 1, message: 'Must be at least 1' },
-                      validate: (value, formValues) => 
-                        value || formValues.targetQuantityFoil ? true : 'At least one quantity is required'
+                    rules={{
+                      validate: (value) => {
+                        // Skip validation when changing modes
+                        if (isChangingMode) return true;
+                        // Only validate if in separate mode
+                        if (quantityMode !== 'separate') return true;
+                        // Allow 0 or undefined, but at least one field must have a value
+                        if (value !== undefined && value !== null && value < 0) return 'Cannot be negative';
+                        const foilValue = getValues('targetQuantityFoil');
+                        // If both are 0 or undefined/null, that's invalid
+                        const regValue = value || 0;
+                        const foilVal = foilValue || 0;
+                        if (regValue === 0 && foilVal === 0) {
+                          return 'At least one quantity is required';
+                        }
+                        return true;
+                      },
                     }}
-                    render={({ field: { onChange, value, ...field } }) => (
-                      <TextField
-                        {...field}
-                        value={value ?? ''}
-                        label="Regular Cards"
-                        type="number"
-                        fullWidth
-                        error={!!errors.targetQuantityReg}
-                        helperText={errors.targetQuantityReg?.message}
-                        onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                      />
+                    render={({ field: { onChange, value } }) => (
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                          Regular Cards
+                        </Typography>
+                        <QuantityContainer>
+                          <QuantityLeftButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              const currentVal = value || 0;
+                              const newValue = Math.max(0, currentVal - 1);
+                              // Set to 0 instead of undefined
+                              onChange(newValue);
+                            }}
+                            disabled={!value || value === 0}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <RemoveIcon />
+                          </QuantityLeftButton>
+                          <QuantityInput
+                            type="number"
+                            value={value === 0 ? '' : (value ?? '')}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === '') {
+                                onChange(0);
+                              } else {
+                                const num = parseInt(val);
+                                onChange(isNaN(num) ? 0 : num);
+                              }
+                            }}
+                            onFocus={(e) => e.target.select()}
+                            inputProps={{ min: 0 }}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.targetQuantityReg}
+                          />
+                          <QuantityRightButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange((value || 0) + 1);
+                            }}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <AddIcon />
+                          </QuantityRightButton>
+                        </QuantityContainer>
+                        {errors.targetQuantityReg && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
+                          >
+                            {errors.targetQuantityReg.message}
+                          </Typography>
+                        )}
+                      </Box>
                     )}
                   />
                   <Controller
                     name="targetQuantityFoil"
                     control={control}
-                    rules={{ min: { value: 1, message: 'Must be at least 1' } }}
-                    render={({ field: { onChange, value, ...field } }) => (
-                      <TextField
-                        {...field}
-                        value={value ?? ''}
-                        label="Foil Cards"
-                        type="number"
-                        fullWidth
-                        error={!!errors.targetQuantityFoil}
-                        helperText={errors.targetQuantityFoil?.message}
-                        onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                      />
+                    rules={{
+                      validate: (value) => {
+                        // Allow undefined/empty
+                        if (value === undefined || value === '') return true;
+                        if (value < 0) return 'Cannot be negative';
+                        return true;
+                      },
+                    }}
+                    render={({ field: { onChange, value } }) => (
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                          Foil Cards
+                        </Typography>
+                        <QuantityContainer>
+                          <QuantityLeftButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              const currentVal = value || 0;
+                              const newValue = Math.max(0, currentVal - 1);
+                              // Set to 0 instead of undefined
+                              onChange(newValue);
+                            }}
+                            disabled={!value || value === 0}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <RemoveIcon />
+                          </QuantityLeftButton>
+                          <QuantityInput
+                            type="number"
+                            value={value === 0 ? '' : (value ?? '')}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === '') {
+                                onChange(0);
+                              } else {
+                                const num = parseInt(val);
+                                onChange(isNaN(num) ? 0 : num);
+                              }
+                            }}
+                            onFocus={(e) => e.target.select()}
+                            inputProps={{ min: 0 }}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.targetQuantityFoil}
+                          />
+                          <QuantityRightButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange((value || 0) + 1);
+                            }}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <AddIcon />
+                          </QuantityRightButton>
+                        </QuantityContainer>
+                        {errors.targetQuantityFoil && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
+                          >
+                            {errors.targetQuantityFoil.message}
+                          </Typography>
+                        )}
+                      </Box>
                     )}
                   />
                 </Box>
               ) : (
-                <Controller
-                  name="targetQuantityAll"
-                  control={control}
-                  rules={{ 
-                    required: 'Quantity is required',
-                    min: { value: 1, message: 'Must be at least 1' }
-                  }}
-                  render={({ field: { onChange, value, ...field } }) => (
-                    <TextField
-                      {...field}
-                      value={value ?? ''}
-                      label="Any Type (Regular or Foil)"
-                      type="number"
-                      fullWidth
-                      error={!!errors.targetQuantityAll}
-                      helperText={errors.targetQuantityAll?.message}
-                      onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                    />
-                  )}
-                />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Controller
+                    name="targetQuantityAll"
+                    control={control}
+                    rules={{
+                      validate: (value) => {
+                        // Only validate if in 'all' mode
+                        if (quantityMode !== 'all') return true;
+                        if (value === undefined || value === null || value === '') {
+                          return 'Quantity is required';
+                        }
+                        if (value < 1) return 'Must be at least 1';
+                        return true;
+                      },
+                    }}
+                    render={({ field: { onChange, value } }) => (
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                          Any Type (Regular or Foil)
+                        </Typography>
+                        <QuantityContainer>
+                          <QuantityLeftButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              const currentVal = value || 0;
+                              const newValue = Math.max(0, currentVal - 1);
+                              // Explicitly set to undefined when reaching 0
+                              if (newValue === 0) {
+                                onChange(undefined);
+                              } else {
+                                onChange(newValue);
+                              }
+                            }}
+                            disabled={!value || value === 0}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <RemoveIcon />
+                          </QuantityLeftButton>
+                          <QuantityInput
+                            type="number"
+                            value={value === 0 ? '' : (value ?? '')}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === '') {
+                                onChange(0);
+                              } else {
+                                const num = parseInt(val);
+                                onChange(isNaN(num) ? 0 : num);
+                              }
+                            }}
+                            onFocus={(e) => e.target.select()}
+                            inputProps={{ min: 0 }}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.targetQuantityAll}
+                          />
+                          <QuantityRightButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange((value || 0) + 1);
+                            }}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <AddIcon />
+                          </QuantityRightButton>
+                        </QuantityContainer>
+                        {errors.targetQuantityAll && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
+                          >
+                            {errors.targetQuantityAll.message}
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
+                  />
+                </Box>
               )}
             </Box>
 
-            <Alert severity="info">
-              Goals are public and can be viewed by anyone visiting your collection.
-            </Alert>
+            <Alert severity="info">Goals are public and can be viewed by anyone visiting your collection.</Alert>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -302,3 +522,81 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
     </Dialog>
   );
 }
+
+// Styled components for quantity picker
+const QuantityContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  '&:focus-within': {
+    '& button': {
+      borderColor: theme.palette.primary.main,
+    },
+  },
+}));
+
+const QuantityInput = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-input': {
+    padding: '6px 12px',
+    textAlign: 'center',
+    fontSize: '0.875rem',
+    height: '28px',
+    boxSizing: 'border-box',
+  },
+  '& .MuiOutlinedInput-root': {
+    height: '40px',
+    borderRadius: 0,
+    '& fieldset': {
+      borderLeft: 'none',
+      borderRight: 'none',
+      borderColor: theme.palette.divider,
+      transition: 'border-color 0.2s',
+    },
+    '&:hover fieldset': {
+      borderColor: theme.palette.divider,
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: theme.palette.primary.main,
+      borderWidth: 1,
+    },
+  },
+  '& input[type="number"]::-webkit-inner-spin-button, & input[type="number"]::-webkit-outer-spin-button': {
+    WebkitAppearance: 'none',
+    margin: 0,
+  },
+  '& input[type="number"]': {
+    MozAppearance: 'textfield',
+  },
+  width: '80px',
+}));
+
+const QuantityButton = styled(IconButton)(({ theme }) => ({
+  padding: '8px',
+  height: '40px',
+  width: '40px',
+  borderRadius: 0,
+  border: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  transition: 'all 0.2s',
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+    borderColor: theme.palette.divider,
+  },
+  '&.Mui-disabled': {
+    borderColor: theme.palette.divider,
+  },
+  '& .MuiSvgIcon-root': {
+    fontSize: '1.2rem',
+  },
+}));
+
+const QuantityLeftButton = styled(QuantityButton)(({ theme }) => ({
+  borderTopLeftRadius: theme.shape.borderRadius,
+  borderBottomLeftRadius: theme.shape.borderRadius,
+  borderRight: 'none',
+}));
+
+const QuantityRightButton = styled(QuantityButton)(({ theme }) => ({
+  borderTopRightRadius: theme.shape.borderRadius,
+  borderBottomRightRadius: theme.shape.borderRadius,
+  borderLeft: 'none',
+}));

@@ -1,23 +1,27 @@
-import { useState, useCallback } from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  Box,
-  Typography,
   Alert,
-  Divider,
+  Box,
+  Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  IconButton,
+  TextField,
+  Typography,
+  styled,
 } from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
 import { useSnackbar } from 'notistack';
+import { useCallback, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { GoalSearchForm } from './GoalSearchForm';
+import { CardApiParams } from '@/api/browse/types';
 import { useCreateGoalMutation } from '@/api/goals/goalsApi';
 import { CreateGoalRequest } from '@/api/goals/types';
-import { CardApiParams } from '@/api/browse/types';
-import { GoalSearchForm } from './GoalSearchForm';
 
 interface CreateGoalDialogProps {
   open: boolean;
@@ -36,14 +40,24 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [createGoal, { isLoading }] = useCreateGoalMutation();
   const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>('separate');
-  const [searchConditions, setSearchConditions] = useState<Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>>({});
+  const [searchConditions, setSearchConditions] = useState<
+    Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>
+  >({});
 
   // Memoize the onChange handler to prevent infinite loops
-  const handleSearchConditionsChange = useCallback((conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>) => {
-    setSearchConditions(conditions);
-  }, []);
+  const handleSearchConditionsChange = useCallback(
+    (conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>) => {
+      setSearchConditions(conditions);
+    },
+    [],
+  );
 
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>({
     defaultValues: {
       name: '',
       description: '',
@@ -82,7 +96,7 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
       }
 
       const result = await createGoal(request).unwrap();
-      
+
       enqueueSnackbar('Goal created successfully!', { variant: 'success' });
       handleClose();
     } catch (error: any) {
@@ -91,16 +105,16 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
-      maxWidth="md" 
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="md"
       fullWidth
       PaperProps={{
         elevation: 0,
         sx: {
           backgroundColor: 'rgb(34, 38, 44)',
-        }
+        },
       }}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -148,18 +162,15 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
               <Typography variant="body2" color="text.secondary" paragraph>
                 Define which cards this goal applies to. Leave fields empty to include all cards.
               </Typography>
-              
-              <GoalSearchForm
-                searchConditions={searchConditions}
-                onChange={handleSearchConditionsChange}
-              />
+
+              <GoalSearchForm searchConditions={searchConditions} onChange={handleSearchConditionsChange} />
             </Box>
 
             <Divider />
 
             <Box>
               <Typography variant="h6" gutterBottom>
-                Target Quantities
+                Goal Quantities
               </Typography>
               <Box sx={{ mb: 2 }}>
                 <Chip
@@ -176,73 +187,196 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
               </Box>
 
               {quantityMode === 'separate' ? (
-                <Box sx={{ display: 'flex', gap: 2 }}>
+                <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
                   <Controller
                     name="targetQuantityReg"
                     control={control}
-                    rules={{ 
+                    rules={{
                       min: { value: 1, message: 'Must be at least 1' },
-                      validate: (value, formValues) => 
-                        value || formValues.targetQuantityFoil ? true : 'At least one quantity is required'
+                      validate: (value, formValues) =>
+                        value || formValues.targetQuantityFoil ? true : 'At least one quantity is required',
                     }}
-                    render={({ field: { onChange, value, ...field } }) => (
-                      <TextField
-                        {...field}
-                        value={value ?? ''}
-                        label="Regular Cards"
-                        type="number"
-                        fullWidth
-                        error={!!errors.targetQuantityReg}
-                        helperText={errors.targetQuantityReg?.message}
-                        onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                      />
+                    render={({ field: { onChange, value } }) => (
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                          Regular Cards
+                        </Typography>
+                        <QuantityContainer>
+                          <QuantityLeftButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange(Math.max(0, (value || 0) - 1) || undefined);
+                            }}
+                            disabled={!value || value === 0}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <RemoveIcon />
+                          </QuantityLeftButton>
+                          <QuantityInput
+                            type="number"
+                            value={value ?? ''}
+                            onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                            onFocus={(e) => e.target.select()}
+                            inputProps={{ min: 0 }}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.targetQuantityReg}
+                          />
+                          <QuantityRightButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange((value || 0) + 1);
+                            }}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <AddIcon />
+                          </QuantityRightButton>
+                        </QuantityContainer>
+                        {errors.targetQuantityReg && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
+                          >
+                            {errors.targetQuantityReg.message}
+                          </Typography>
+                        )}
+                      </Box>
                     )}
                   />
                   <Controller
                     name="targetQuantityFoil"
                     control={control}
                     rules={{ min: { value: 1, message: 'Must be at least 1' } }}
-                    render={({ field: { onChange, value, ...field } }) => (
-                      <TextField
-                        {...field}
-                        value={value ?? ''}
-                        label="Foil Cards"
-                        type="number"
-                        fullWidth
-                        error={!!errors.targetQuantityFoil}
-                        helperText={errors.targetQuantityFoil?.message}
-                        onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                      />
+                    render={({ field: { onChange, value } }) => (
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                          Foil Cards
+                        </Typography>
+                        <QuantityContainer>
+                          <QuantityLeftButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange(Math.max(0, (value || 0) - 1) || undefined);
+                            }}
+                            disabled={!value || value === 0}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <RemoveIcon />
+                          </QuantityLeftButton>
+                          <QuantityInput
+                            type="number"
+                            value={value ?? ''}
+                            onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                            onFocus={(e) => e.target.select()}
+                            inputProps={{ min: 0 }}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.targetQuantityFoil}
+                          />
+                          <QuantityRightButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange((value || 0) + 1);
+                            }}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <AddIcon />
+                          </QuantityRightButton>
+                        </QuantityContainer>
+                        {errors.targetQuantityFoil && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
+                          >
+                            {errors.targetQuantityFoil.message}
+                          </Typography>
+                        )}
+                      </Box>
                     )}
                   />
                 </Box>
               ) : (
-                <Controller
-                  name="targetQuantityAll"
-                  control={control}
-                  rules={{ 
-                    required: 'Quantity is required',
-                    min: { value: 1, message: 'Must be at least 1' }
-                  }}
-                  render={({ field: { onChange, value, ...field } }) => (
-                    <TextField
-                      {...field}
-                      value={value ?? ''}
-                      label="Any Type (Regular or Foil)"
-                      type="number"
-                      fullWidth
-                      error={!!errors.targetQuantityAll}
-                      helperText={errors.targetQuantityAll?.message}
-                      onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                    />
-                  )}
-                />
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Controller
+                    name="targetQuantityAll"
+                    control={control}
+                    rules={{
+                      required: 'Quantity is required',
+                      min: { value: 1, message: 'Must be at least 1' },
+                    }}
+                    render={({ field: { onChange, value } }) => (
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                          Any Type (Regular or Foil)
+                        </Typography>
+                        <QuantityContainer>
+                          <QuantityLeftButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange(Math.max(0, (value || 0) - 1) || undefined);
+                            }}
+                            disabled={!value || value === 0}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <RemoveIcon />
+                          </QuantityLeftButton>
+                          <QuantityInput
+                            type="number"
+                            value={value ?? ''}
+                            onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                            onFocus={(e) => e.target.select()}
+                            inputProps={{ min: 0 }}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.targetQuantityAll}
+                          />
+                          <QuantityRightButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange((value || 0) + 1);
+                            }}
+                            tabIndex={-1}
+                            disableFocusRipple
+                          >
+                            <AddIcon />
+                          </QuantityRightButton>
+                        </QuantityContainer>
+                        {errors.targetQuantityAll && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
+                          >
+                            {errors.targetQuantityAll.message}
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
+                  />
+                </Box>
               )}
             </Box>
 
-            <Alert severity="info">
-              Goals are public and can be viewed by anyone visiting your collection.
-            </Alert>
+            <Alert severity="info">Goals are public and can be viewed by anyone visiting your collection.</Alert>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -255,3 +389,81 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
     </Dialog>
   );
 }
+
+// Styled components for quantity picker
+const QuantityContainer = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  '&:focus-within': {
+    '& button': {
+      borderColor: theme.palette.primary.main,
+    },
+  },
+}));
+
+const QuantityInput = styled(TextField)(({ theme }) => ({
+  '& .MuiOutlinedInput-input': {
+    padding: '6px 12px',
+    textAlign: 'center',
+    fontSize: '0.875rem',
+    height: '28px',
+    boxSizing: 'border-box',
+  },
+  '& .MuiOutlinedInput-root': {
+    height: '40px',
+    borderRadius: 0,
+    '& fieldset': {
+      borderLeft: 'none',
+      borderRight: 'none',
+      borderColor: theme.palette.divider,
+      transition: 'border-color 0.2s',
+    },
+    '&:hover fieldset': {
+      borderColor: theme.palette.divider,
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: theme.palette.primary.main,
+      borderWidth: 1,
+    },
+  },
+  '& input[type="number"]::-webkit-inner-spin-button, & input[type="number"]::-webkit-outer-spin-button': {
+    WebkitAppearance: 'none',
+    margin: 0,
+  },
+  '& input[type="number"]': {
+    MozAppearance: 'textfield',
+  },
+  width: '80px',
+}));
+
+const QuantityButton = styled(IconButton)(({ theme }) => ({
+  padding: '8px',
+  height: '40px',
+  width: '40px',
+  borderRadius: 0,
+  border: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  transition: 'all 0.2s',
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+    borderColor: theme.palette.divider,
+  },
+  '&.Mui-disabled': {
+    borderColor: theme.palette.divider,
+  },
+  '& .MuiSvgIcon-root': {
+    fontSize: '1.2rem',
+  },
+}));
+
+const QuantityLeftButton = styled(QuantityButton)(({ theme }) => ({
+  borderTopLeftRadius: theme.shape.borderRadius,
+  borderBottomLeftRadius: theme.shape.borderRadius,
+  borderRight: 'none',
+}));
+
+const QuantityRightButton = styled(QuantityButton)(({ theme }) => ({
+  borderTopRightRadius: theme.shape.borderRadius,
+  borderBottomRightRadius: theme.shape.borderRadius,
+  borderLeft: 'none',
+}));
