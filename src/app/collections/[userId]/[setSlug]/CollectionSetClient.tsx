@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { useMassUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
+import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import MassUpdateButton from '@/components/collections/MassUpdateButton';
 import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
@@ -124,6 +125,12 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       ? browseController.setsProps.collectionSummary
       : browseController.cardsProps && 'collectionSummary' in browseController.cardsProps
         ? browseController.cardsProps.collectionSummary
+        : null;
+  const goalSummary =
+    browseController.setsProps && 'goalSummary' in browseController.setsProps
+      ? browseController.setsProps.goalSummary
+      : browseController.cardsProps && 'goalSummary' in browseController.cardsProps
+        ? browseController.cardsProps.goalSummary
         : null;
 
   const handleSubsetSelect = useCallback((subsetId: string) => {
