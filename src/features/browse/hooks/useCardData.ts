@@ -90,7 +90,6 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
   }, [searchParams, pagination, userId, priceType, selectedGoalId, showGoals]);
 
   const queryConfig = {
-    refetchOnMountOrArgChange: true,
     refetchOnFocus: false,
     refetchOnReconnect: false,
   };

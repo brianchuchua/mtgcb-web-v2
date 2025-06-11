@@ -70,7 +70,6 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
   }, [searchParams, pagination, userId, setPriceType, includeSubsets, selectedGoalId, showGoals]);
 
   const queryConfig = {
-    refetchOnMountOrArgChange: true,
     refetchOnFocus: false,
     refetchOnReconnect: false,
   };
