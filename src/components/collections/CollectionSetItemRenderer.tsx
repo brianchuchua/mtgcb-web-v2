@@ -8,6 +8,7 @@ import { CostToComplete } from '@/api/sets/types';
 import SetIcon from '@/components/sets/SetIcon';
 import { SetCategoryAndType, SetItemSettings } from '@/components/sets/SetItemRenderer';
 import TCGPlayerMassImportButton from '@/components/tcgplayer/TCGPlayerMassImportButton';
+import TCGPlayerGoalMassImportButton from '@/components/tcgplayer/TCGPlayerGoalMassImportButton';
 import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { Set } from '@/types/sets';
 import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder';
@@ -23,6 +24,7 @@ interface CollectionSetItemRendererProps {
   includeSubsetsInSets?: boolean;
   collectionData?: CollectionSetSummary;
   userId?: number;
+  goalId?: number;
   height: number;
 }
 
@@ -262,7 +264,8 @@ const CostToPurchaseSection: React.FC<{
   includeSubsetsInSets?: boolean;
   set?: Set;
   userId?: number;
-}> = ({ costToComplete, isVisible = true, setId, includeSubsetsInSets = false, set, userId }) => {
+  goalId?: number;
+}> = ({ costToComplete, isVisible = true, setId, includeSubsetsInSets = false, set, userId, goalId }) => {
   if (!isVisible) return null;
 
   return (
@@ -288,6 +291,7 @@ const CostToPurchaseSection: React.FC<{
           countType="all"
           includeSubsetsInSets={includeSubsetsInSets}
           userId={userId}
+          goalId={goalId}
         />
 
         <CostToCompleteRow
@@ -297,6 +301,7 @@ const CostToPurchaseSection: React.FC<{
           countType="mythic"
           includeSubsetsInSets={includeSubsetsInSets}
           userId={userId}
+          goalId={goalId}
         />
 
         <CostToCompleteRow
@@ -306,6 +311,7 @@ const CostToPurchaseSection: React.FC<{
           countType="rare"
           includeSubsetsInSets={includeSubsetsInSets}
           userId={userId}
+          goalId={goalId}
         />
 
         <CostToCompleteRow
@@ -315,6 +321,7 @@ const CostToPurchaseSection: React.FC<{
           countType="uncommon"
           includeSubsetsInSets={includeSubsetsInSets}
           userId={userId}
+          goalId={goalId}
         />
 
         <CostToCompleteRow
@@ -324,6 +331,7 @@ const CostToPurchaseSection: React.FC<{
           countType="common"
           includeSubsetsInSets={includeSubsetsInSets}
           userId={userId}
+          goalId={goalId}
         />
 
         {set?.isDraftable && (
@@ -334,6 +342,7 @@ const CostToPurchaseSection: React.FC<{
             countType="draftcube"
             includeSubsetsInSets={includeSubsetsInSets}
             userId={userId}
+            goalId={goalId}
             singleButton
           />
         )}
@@ -361,6 +370,22 @@ const CostToPurchaseSection: React.FC<{
             </Button>
           </Box>
         )}
+
+        {goalId && userId && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              mt: 1.5,
+            }}
+          >
+            <TCGPlayerGoalMassImportButton
+              setId={setId}
+              userId={userId}
+              goalId={goalId}
+            />
+          </Box>
+        )}
       </Box>
     </Box>
   );
@@ -374,6 +399,7 @@ interface CostToCompleteRowProps {
   includeSubsetsInSets?: boolean;
   singleButton?: boolean;
   userId?: number;
+  goalId?: number;
 }
 
 const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({
@@ -384,6 +410,7 @@ const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({
   includeSubsetsInSets = false,
   singleButton = false,
   userId,
+  goalId,
 }) => {
   return (
     <Box
@@ -425,6 +452,7 @@ const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({
             countType={countType}
             includeSubsetsInSets={includeSubsetsInSets}
             userId={userId}
+            goalId={goalId}
             sx={{ width: '100%', textTransform: 'none' }}
           >
             Buy draft cube
@@ -437,6 +465,7 @@ const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({
               countType={countType}
               includeSubsetsInSets={includeSubsetsInSets}
               userId={userId}
+              goalId={goalId}
             >
               Buy 1x
             </TCGPlayerMassImportButton>
@@ -446,6 +475,7 @@ const CostToCompleteRow: React.FC<CostToCompleteRowProps> = ({
               countType={countType}
               includeSubsetsInSets={includeSubsetsInSets}
               userId={userId}
+              goalId={goalId}
             >
               Buy 4x
             </TCGPlayerMassImportButton>
@@ -464,6 +494,7 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
   includeSubsetsInSets = false,
   collectionData,
   userId,
+  goalId,
   height,
 }) => {
   const [isVisible, setIsVisible] = React.useState(false);
@@ -516,6 +547,7 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
             set={set}
             includeSubsetsInSets={includeSubsetsInSets}
             userId={userId}
+            goalId={goalId}
           />
         )}
       </SetBoxContent>

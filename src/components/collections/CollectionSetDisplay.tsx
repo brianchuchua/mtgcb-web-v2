@@ -24,6 +24,7 @@ export interface CollectionSetDisplayProps extends Omit<SetDisplayProps, 'setIte
     userId: number;
     collectionSets: Map<string, CollectionSetSummary>;
   } | null;
+  goalId?: number;
 }
 
 const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
@@ -35,6 +36,7 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
   displaySettings,
   costToCompleteData,
   collectionData,
+  goalId,
 }) => {
   const dispatch = useDispatch();
   const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
@@ -115,6 +117,7 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
               cardCountIncludingSubsets={cardCountIncludingSubsets?.toString()}
               collectionData={collectionSet}
               userId={collectionData?.userId}
+              goalId={goalId}
               height={calculateCollectionSetItemHeight()}
             />
           );

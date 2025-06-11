@@ -60,6 +60,7 @@ export interface CollectionCardsParams {
   userId: number;
   setId: number;
   includeSubsetsInSets: boolean;
+  goalId?: number;
 }
 
 export interface CollectionCard {

@@ -50,6 +50,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Missing data detector and clean-up for every card and set field in the database (pureName for example)
 - Probably a bug: When using hide duplicate printings, we should definitely show the card the user owns, not just whatever one corresponds to the sort order
 - Showing 2501-3000 of 92769 cards goes to two lines on desktop
+- Performance pass, some API calls have gotten a little worse I think
 
 ## UX Action Items
 

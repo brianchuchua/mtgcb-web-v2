@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react';
 import { useFetchCardsForMassImport } from './useFetchCardsForMassImport';
 import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
+import { usePriceType } from '@/hooks/usePriceType';
 import { getFormTarget } from '@/utils/browser/detectSafari';
 import { formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
 
@@ -16,6 +17,7 @@ interface TCGPlayerMassImportButtonProps extends Omit<ButtonProps, 'onClick'> {
   children?: React.ReactNode;
   includeSubsetsInSets?: boolean;
   userId?: number; // Optional - when provided, only missing cards will be included
+  goalId?: number; // Optional - when provided with userId, only cards needed for the goal will be included
 }
 
 const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
@@ -25,11 +27,13 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
   children,
   includeSubsetsInSets = false,
   userId,
+  goalId,
   ...buttonProps
 }) => {
   const { submitToTCGPlayer } = useTCGPlayer();
   const { enqueueSnackbar } = useSnackbar();
   const [localIsLoading, setLocalIsLoading] = useState(false);
+  const priceType = usePriceType();
 
   const {
     fetchCards,
@@ -41,6 +45,8 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
     includeSubsetsInSets,
     userId,
     count,
+    goalId,
+    priceType: priceType.toLowerCase() as 'market' | 'low' | 'average' | 'high',
   });
 
   const handleClick = useCallback(async () => {
@@ -88,6 +94,7 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
     submitToTCGPlayer,
     includeSubsetsInSets,
     userId,
+    goalId,
     enqueueSnackbar,
   ]);
 

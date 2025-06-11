@@ -2,8 +2,6 @@
 
 import { useCallback, useState } from 'react';
 import { useLazyGetCardsQuery, useLazyGetSetsQuery } from '@/api/browse/browseApi';
-import { useLazyGetCollectionCardsQuery } from '@/api/collections/collectionsApi';
-import { CollectionCard } from '@/api/collections/types';
 import { CardWithQuantity } from '@/utils/tcgplayer/formatMassImportString';
 
 export type CountType = 'all' | 'mythic' | 'rare' | 'uncommon' | 'common' | 'draftcube';
@@ -14,6 +12,8 @@ interface UseFetchCardsForMassImportProps {
   includeSubsetsInSets?: boolean;
   userId?: number;
   count?: number;
+  goalId?: number;
+  priceType?: 'market' | 'low' | 'average' | 'high';
 }
 
 export const useFetchCardsForMassImport = ({
@@ -22,13 +22,14 @@ export const useFetchCardsForMassImport = ({
   includeSubsetsInSets = false,
   userId,
   count = 1,
+  goalId,
+  priceType = 'market',
 }: UseFetchCardsForMassImportProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Use lazy query hooks from RTK Query
   const [getSets, { isLoading: isLoadingSets, error: setsError }] = useLazyGetSetsQuery();
   const [getCards, { isLoading: isLoadingCards, error: cardsError }] = useLazyGetCardsQuery();
-  const [getCollectionCards, { isLoading: isLoadingCollection, error: collectionError }] = useLazyGetCollectionCardsQuery();
 
   const fetchCards = useCallback(async () => {
     setIsProcessing(true);
@@ -52,92 +53,93 @@ export const useFetchCardsForMassImport = ({
         }
       }
 
-      // Now fetch cards with all the relevant setIds
-      const cardsResult = await getCards(
-        {
-          select: ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode'],
-          limit: 500,
-          setId: {
-            OR: allSetIds,
-          },
-        },
-        true, // Force refetch
-      );
+      // Fetch all cards with pagination support
+      let allCards: any[] = [];
+      let offset = 0;
+      const limit = 500;
+      let hasMore = true;
 
-      if (!cardsResult.data?.data?.cards) {
-        return [];
-      }
-
-      // Filter by rarity if needed
-      let filteredByRarity = cardsResult.data.data.cards;
-      if (countType !== 'all' && countType !== 'draftcube') {
-        filteredByRarity = cardsResult.data.data.cards.filter(
-          (card) => card.rarity && card.rarity.toLowerCase() === countType.toLowerCase(),
-        );
-      }
-
-      // If userId is provided, fetch collection data and filter out owned cards
-      if (userId) {
-        const collectionResult = await getCollectionCards(
+      while (hasMore) {
+        const cardsResult = await getCards(
           {
-            userId: userId,
-            setId: Number(setId),
-            includeSubsetsInSets: includeSubsetsInSets && countType !== 'draftcube',
+            select: userId 
+              ? ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode', 'quantityReg', 'quantityFoil']
+              : ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode'],
+            limit,
+            offset,
+            setId: {
+              OR: allSetIds,
+            },
+            // Add rarity filter for non-all and non-draftcube types
+            ...(countType !== 'all' && countType !== 'draftcube' && {
+              rarity: countType,
+            }),
+            // Add userId, goalId, and priceType if provided
+            ...(userId && { userId }),
+            ...(userId && goalId && { goalId }),
+            ...(userId && { priceType }),
           },
           true, // Force refetch
         );
 
-        if (collectionResult?.data?.data?.cards) {
-          const collectionCards = collectionResult.data.data.cards;
-          
-          // Create a map of owned cards by cardId with quantities
-          const ownedCardsMap = new Map<number, CollectionCard>();
-          collectionCards.forEach(card => {
-            ownedCardsMap.set(card.cardId, card);
-          });
-
-          // Map cards to include needed quantities
-          const cardsWithNeededQuantities: CardWithQuantity[] = [];
-          
-          filteredByRarity.forEach(card => {
-            const ownedCard = ownedCardsMap.get(Number(card.id));
-            // Count both regular and foil cards
-            const ownedQuantity = (ownedCard?.quantityReg || 0) + (ownedCard?.quantityFoil || 0);
-            
-            let targetQuantity = count; // Use the count parameter (1 for Buy 1x, 4 for Buy 4x)
-            
-            // For draft cube, determine target quantity based on rarity
-            if (countType === 'draftcube') {
-              const rarity = card.rarity?.toLowerCase();
-              targetQuantity = (rarity === 'common' || rarity === 'uncommon') ? 4 : 1;
-            }
-            
-            const neededQuantity = targetQuantity - ownedQuantity;
-            
-            // Only include cards where we need more copies
-            if (neededQuantity > 0) {
-              cardsWithNeededQuantities.push({
-                ...card,
-                neededQuantity: neededQuantity,
-              });
-            }
-          });
-          
-          return cardsWithNeededQuantities;
+        if (!cardsResult.data?.data?.cards) {
+          break;
         }
+
+        allCards = [...allCards, ...cardsResult.data.data.cards];
+        
+        // Check if there are more cards to fetch
+        const totalCount = cardsResult.data.data.totalCount || 0;
+        offset += limit;
+        hasMore = offset < totalCount;
       }
 
-      return filteredByRarity;
+      if (allCards.length === 0) {
+        return [];
+      }
+
+      // If userId is provided, filter out cards based on ownership
+      if (userId) {
+        // Map cards to include needed quantities
+        const cardsWithNeededQuantities: CardWithQuantity[] = [];
+        
+        allCards.forEach(card => {
+          // Count both regular and foil cards
+          const ownedQuantity = (card.quantityReg || 0) + (card.quantityFoil || 0);
+          
+          let targetQuantity = count; // Use the count parameter (1 for Buy 1x, 4 for Buy 4x)
+          
+          // For draft cube, determine target quantity based on rarity
+          if (countType === 'draftcube') {
+            const rarity = card.rarity?.toLowerCase();
+            targetQuantity = (rarity === 'common' || rarity === 'uncommon') ? 4 : 1;
+          }
+          
+          const neededQuantity = targetQuantity - ownedQuantity;
+          
+          // Only include cards where we need more copies
+          if (neededQuantity > 0) {
+            cardsWithNeededQuantities.push({
+              ...card,
+              neededQuantity: neededQuantity,
+            });
+          }
+        });
+        
+        return cardsWithNeededQuantities;
+      }
+
+      return allCards;
     } catch (error) {
       return [];
     } finally {
       setIsProcessing(false);
     }
-  }, [setId, countType, includeSubsetsInSets, userId, count, getSets, getCards, getCollectionCards]);
+  }, [setId, countType, includeSubsetsInSets, userId, count, goalId, priceType, getSets, getCards]);
 
   return {
     fetchCards,
-    isLoading: isLoadingSets || isLoadingCards || isLoadingCollection || isProcessing,
-    isError: !!setsError || !!cardsError || !!collectionError,
+    isLoading: isLoadingSets || isLoadingCards || isProcessing,
+    isError: !!setsError || !!cardsError,
   };
 };

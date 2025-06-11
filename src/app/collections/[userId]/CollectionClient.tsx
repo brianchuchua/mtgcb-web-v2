@@ -2,6 +2,7 @@
 
 import { Box, CircularProgress } from '@mui/material';
 import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisplay';
@@ -11,6 +12,7 @@ import { CardsProps, SetsProps } from '@/features/browse/types';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
+import { selectSelectedGoalId } from '@/redux/slices/browseSlice';
 
 interface CollectionClientProps {
   userId: number;
@@ -20,6 +22,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
   const { view, viewMode, error, paginationProps, setsProps, cardsProps } = useCollectionBrowseController({ userId });
   const { user } = useAuth();
   const isOwnCollection = user?.userId === userId;
+  const selectedGoalId = useSelector(selectSelectedGoalId);
 
   // Create collection sets map from the sets data
   const collectionSets = useMemo(() => {
@@ -130,6 +133,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
             userId,
             collectionSets,
           }}
+          goalId={selectedGoalId || undefined}
         />
       )}
 
