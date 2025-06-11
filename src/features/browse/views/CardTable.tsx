@@ -26,6 +26,9 @@ interface CardTableProps {
     loyaltyIsVisible: boolean;
     priceIsVisible: boolean;
   };
+  cardDisplaySettings?: {
+    goalProgressIsVisible?: boolean;
+  };
   isOwnCollection?: boolean;
 }
 
@@ -38,14 +41,21 @@ const CardTable: React.FC<CardTableProps> = ({
   onCardClick,
   priceType,
   tableSettings,
+  cardDisplaySettings,
   isOwnCollection = false,
 }) => {
+  // Merge table settings with card display settings
+  const mergedDisplaySettings = {
+    ...tableSettings,
+    ...cardDisplaySettings,
+  };
+
   const tableColumns = useCardTableColumns(
-    { priceType, displaySettings: tableSettings },
+    { priceType, displaySettings: mergedDisplaySettings },
     sortBy,
   );
 
-  const renderCardRow = useCardRowRenderer(priceType, tableSettings, onCardClick, isOwnCollection);
+  const renderCardRow = useCardRowRenderer(priceType, mergedDisplaySettings, onCardClick, isOwnCollection);
 
   return (
     <VirtualizedTable
