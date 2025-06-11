@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import React from 'react';
 import { CollectionProgressBar } from './CollectionProgressBar';
+import TCGPlayerGoalMassImportButton from '@/components/tcgplayer/TCGPlayerGoalMassImportButton';
 
 interface CollectionHeaderProps {
   username: string;
@@ -22,6 +23,8 @@ interface CollectionHeaderProps {
     totalValue: number;
     costToComplete: number;
   };
+  view?: 'cards' | 'sets';
+  selectedGoalId?: number | null;
 }
 
 const HeaderContainer = styled(Box)(({ theme }) => ({
@@ -43,6 +46,8 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
   totalValue,
   isLoading = false,
   goalSummary,
+  view,
+  selectedGoalId,
 }) => {
   if (isLoading) {
     return (
@@ -109,6 +114,16 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
           })}
         </Typography>
 
+        {userId && selectedGoalId && (
+          <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center' }}>
+            <TCGPlayerGoalMassImportButton
+              setId="all"
+              userId={userId}
+              goalId={selectedGoalId}
+            />
+          </Box>
+        )}
+
         <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <CollectionProgressBar
             percentage={goalSummary.percentageCollected}
@@ -168,6 +183,8 @@ export const CollectionHeader = React.memo(CollectionHeaderComponent, (prevProps
     prevProps.percentageCollected === nextProps.percentageCollected &&
     prevProps.totalValue === nextProps.totalValue &&
     prevProps.isLoading === nextProps.isLoading &&
-    JSON.stringify(prevProps.goalSummary) === JSON.stringify(nextProps.goalSummary)
+    JSON.stringify(prevProps.goalSummary) === JSON.stringify(nextProps.goalSummary) &&
+    prevProps.view === nextProps.view &&
+    prevProps.selectedGoalId === nextProps.selectedGoalId
   );
 });

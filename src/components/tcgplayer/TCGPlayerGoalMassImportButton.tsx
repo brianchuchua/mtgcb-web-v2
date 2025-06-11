@@ -11,7 +11,7 @@ import { formatMassImportString } from '@/utils/tcgplayer/formatMassImportString
 import { CardWithQuantity } from '@/utils/tcgplayer/formatMassImportString';
 
 interface TCGPlayerGoalMassImportButtonProps extends Omit<ButtonProps, 'onClick'> {
-  setId: string;
+  setId: string | 'all';
   userId: number;
   goalId: number;
   children?: React.ReactNode;
@@ -64,9 +64,11 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
             ],
             limit,
             offset,
-            setId: {
-              OR: [setId],
-            },
+            ...(setId !== 'all' && {
+              setId: {
+                OR: [setId],
+              },
+            }),
             userId,
             goalId,
             showGoalProgress: true,
@@ -80,7 +82,7 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
         }
 
         allCards = [...allCards, ...cardsResult.data.data.cards];
-        
+
         // Check if there are more cards to fetch
         const totalCount = cardsResult.data.data.totalCount || 0;
         offset += limit;
@@ -88,14 +90,16 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
       }
 
       if (allCards.length === 0) {
-        enqueueSnackbar('No cards found in this set.', { variant: 'error' });
+        enqueueSnackbar(setId === 'all' ? 'No cards found for this goal.' : 'No cards found in this set.', {
+          variant: 'error',
+        });
         return;
       }
 
       // Filter cards that need to be purchased for the goal
       const cardsNeededForGoal: CardWithQuantity[] = [];
-      
-      allCards.forEach(card => {
+
+      allCards.forEach((card) => {
         // Skip cards that are fully met for the goal
         if (card.goalFullyMet) {
           return;
@@ -110,10 +114,10 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
         const regNeeded = card.goalRegNeeded || 0;
         const foilNeeded = card.goalFoilNeeded || 0;
         const allNeeded = card.goalAllNeeded || 0;
-        
+
         // Use goalAllNeeded if specified, otherwise sum regular and foil
-        const totalNeeded = allNeeded > 0 ? allNeeded : (regNeeded + foilNeeded);
-        
+        const totalNeeded = allNeeded > 0 ? allNeeded : regNeeded + foilNeeded;
+
         if (totalNeeded > 0) {
           cardsNeededForGoal.push({
             ...card,
@@ -123,7 +127,12 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
       });
 
       if (cardsNeededForGoal.length === 0) {
-        enqueueSnackbar('You already have all the cards needed for this goal in this set!', { variant: 'info' });
+        enqueueSnackbar(
+          setId === 'all'
+            ? 'You already have all the cards needed for this goal!'
+            : 'You already have all the cards needed for this goal in this set!',
+          { variant: 'info' },
+        );
         return;
       }
 
@@ -136,16 +145,7 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
     } finally {
       setIsLoading(false);
     }
-  }, [
-    setId,
-    userId,
-    goalId,
-    isLoading,
-    priceType,
-    getCards,
-    submitToTCGPlayer,
-    enqueueSnackbar,
-  ]);
+  }, [setId, userId, goalId, isLoading, priceType, getCards, submitToTCGPlayer, enqueueSnackbar]);
 
   return (
     <Button
@@ -160,7 +160,7 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
       }}
       {...buttonProps}
     >
-      {children || 'Buy missing cards for goal'}
+      {children || 'Buy missing cards for this goal'}
     </Button>
   );
 };

@@ -117,7 +117,9 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
           percentageCollected={collectionSummary?.percentageCollected || 0}
           totalValue={collectionSummary?.totalValue || 0}
           isLoading={isLoading && !collectionSummary}
-          goalSummary={goalSummary}
+          goalSummary={goalSummary || undefined}
+          view={view}
+          selectedGoalId={selectedGoalId}
         />
       )}
 
