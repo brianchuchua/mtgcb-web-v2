@@ -797,13 +797,15 @@ export const useCardRowRenderer = (
           <TableCell key="quantityReg" sx={{ padding: '4px', textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}>
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
-                <InlineEditableQuantity
-                  cardId={card.id}
-                  cardName={card.name}
-                  quantity={card.quantityReg || 0}
-                  quantityType="regular"
-                  otherQuantity={card.quantityFoil || 0}
-                />
+                <Box sx={{ mt: '5px' }}>
+                  <InlineEditableQuantity
+                    cardId={card.id}
+                    cardName={card.name}
+                    quantity={card.quantityReg || 0}
+                    quantityType="regular"
+                    otherQuantity={card.quantityFoil || 0}
+                  />
+                </Box>
                 <Typography 
                   variant="caption" 
                   sx={{ 
@@ -834,13 +836,15 @@ export const useCardRowRenderer = (
           <TableCell key="quantityFoil" sx={{ padding: '4px', textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}>
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
-                <InlineEditableQuantity
-                  cardId={card.id}
-                  cardName={card.name}
-                  quantity={card.quantityFoil || 0}
-                  quantityType="foil"
-                  otherQuantity={card.quantityReg || 0}
-                />
+                <Box sx={{ mt: '5px' }}>
+                  <InlineEditableQuantity
+                    cardId={card.id}
+                    cardName={card.name}
+                    quantity={card.quantityFoil || 0}
+                    quantityType="foil"
+                    otherQuantity={card.quantityReg || 0}
+                  />
+                </Box>
                 <Typography 
                   variant="caption" 
                   sx={{ 
@@ -881,7 +885,7 @@ export const useCardRowRenderer = (
           <TableCell key="quantityReg" sx={{ textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}>
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
-                <Box>{card.quantityReg !== undefined ? card.quantityReg : '-'}</Box>
+                <Box sx={{ mt: '5px' }}>{card.quantityReg !== undefined ? card.quantityReg : '-'}</Box>
                 <Typography 
                   variant="caption" 
                   sx={{ 
@@ -904,7 +908,7 @@ export const useCardRowRenderer = (
           <TableCell key="quantityFoil" sx={{ textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}>
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
-                <Box>{card.quantityFoil !== undefined ? card.quantityFoil : '-'}</Box>
+                <Box sx={{ mt: '5px' }}>{card.quantityFoil !== undefined ? card.quantityFoil : '-'}</Box>
                 <Typography 
                   variant="caption" 
                   sx={{ 

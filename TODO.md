@@ -100,6 +100,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Quantity selectors -- going from custom filter to normal doesn't reset the states as you'd expect
 - A cool stats page, icon can be a graph, most valuable card can move there -- can make an expandable region in a set view too.
 - When any prices are missing, add an info icon explaining it's an underestimate
+- Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
 
 ## Bugs
 
