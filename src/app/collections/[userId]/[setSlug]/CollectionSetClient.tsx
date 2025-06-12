@@ -21,7 +21,7 @@ import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
-import { selectCardSearchParams, selectIncludeSubsetsInSets, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
+import { selectCardSearchParams, selectIncludeSubsetsInSets, selectSelectedGoalId, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
 import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
@@ -52,6 +52,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const cardSearchParams = useSelector(selectCardSearchParams);
   const currentSetsFilter = useSelector(selectSets);
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
+  const selectedGoalId = useSelector(selectSelectedGoalId);
 
   const {
     data: setsData,
@@ -63,6 +64,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     userId: userId,
     priceType: setPriceType,
     includeSubsetsInSets,
+    goalId: selectedGoalId || undefined,
   });
 
   const set = setsData?.data?.sets?.[0];
@@ -71,6 +73,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     {
       parentSetId: set?.id,
       limit: 100,
+      userId: userId,
+      goalId: selectedGoalId || undefined,
     },
     {
       skip: !set?.id,
@@ -232,83 +236,114 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   return (
     <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-        }}
-      >
-        <Typography
-          variant="h4"
-          fontWeight="500"
+      {/* Show CollectionHeader when viewing with a goal selected */}
+      {selectedGoalId && collectionSummary && set && (
+        <CollectionHeader
+          username={username || ''}
+          userId={userId}
+          uniquePrintingsCollected={collectionSummary.uniquePrintingsCollected || 0}
+          numberOfCardsInMagic={collectionSummary.numberOfCardsInMagic || 0}
+          totalCardsCollected={collectionSummary.totalCardsCollected || 0}
+          percentageCollected={collectionSummary.percentageCollected || 0}
+          totalValue={collectionSummary.totalValue || 0}
+          isLoading={false}
+          goalSummary={goalSummary || undefined}
+          view="cards"
+          selectedGoalId={selectedGoalId}
+          setInfo={{
+            name: set.name,
+            code: set.code,
+            id: set.id,
+            uniquePrintingsCollectedInSet: set.uniquePrintingsCollectedInSet || 0,
+            cardCount: set.cardCount || '0',
+            totalCardsCollectedInSet: set.totalCardsCollectedInSet || 0,
+            totalValue: set.totalValue || 0,
+            percentageCollected: set.percentageCollected || 0,
+            costToComplete: set.costToComplete?.oneOfEachCard || 0,
+          }}
+        />
+      )}
+      
+      {/* Show regular set header when NOT viewing with a goal */}
+      {!selectedGoalId && (
+        <Box
           sx={{
-            color: (theme) => theme.palette.primary.main,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            maxWidth: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center',
           }}
         >
-          {setName}
-        </Typography>
-
-        {username && (
-          <Typography variant="body1" color="text.secondary" sx={{ m: 0.5 }}>
-            (Part of{' '}
-            <Link
-              href={`/collections/${userId}?contentType=sets`}
-              style={{
-                color: 'inherit',
-                textDecoration: 'underline',
-              }}
-            >
-              {username}'s collection
-            </Link>
-            )
+          <Typography
+            variant="h4"
+            fontWeight="500"
+            sx={{
+              color: (theme) => theme.palette.primary.main,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: '100%',
+            }}
+          >
+            {setName}
           </Typography>
-        )}
 
-        {set?.code && (
-          <Box>
-            <SetIcon code={set.code} size="5x" fixedWidth />
-          </Box>
-        )}
-
-        {set && set.uniquePrintingsCollectedInSet !== undefined && (
-          <>
-            <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
-              {set.uniquePrintingsCollectedInSet}/{includeSubsetsInSets && set.cardCountIncludingSubsets 
-                ? set.cardCountIncludingSubsets 
-                : set.cardCount || '0'}
+          {username && (
+            <Typography variant="body1" color="text.secondary" sx={{ m: 0.5 }}>
+              (Part of{' '}
+              <Link
+                href={`/collections/${userId}?contentType=sets`}
+                style={{
+                  color: 'inherit',
+                  textDecoration: 'underline',
+                }}
+              >
+                {username}'s collection
+              </Link>
+              )
             </Typography>
+          )}
 
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-              ({set.totalCardsCollectedInSet || 0} total cards collected
-              {includeSubsetsInSets && set.cardCountIncludingSubsets ? ' including subsets' : ''})
-            </Typography>
-
-            <Typography variant="h6" color="text.secondary" sx={{}}>
-              Set value: $
-              {(set.totalValue || 0).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </Typography>
-
-            <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <CollectionProgressBar
-                percentage={set.percentageCollected || 0}
-                height={24}
-                showLabel={true}
-                labelFormat="long"
-                maxWidth="400px"
-              />
+          {set?.code && (
+            <Box>
+              <SetIcon code={set.code} size="5x" fixedWidth />
             </Box>
-          </>
-        )}
-      </Box>
+          )}
+
+          {set && set.uniquePrintingsCollectedInSet !== undefined && (
+            <>
+              <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+                {set.uniquePrintingsCollectedInSet}/{includeSubsetsInSets && set.cardCountIncludingSubsets 
+                  ? set.cardCountIncludingSubsets 
+                  : set.cardCount || '0'}
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                ({set.totalCardsCollectedInSet || 0} total cards collected
+                {includeSubsetsInSets && set.cardCountIncludingSubsets ? ' including subsets' : ''})
+              </Typography>
+
+              <Typography variant="h6" color="text.secondary" sx={{}}>
+                Set value: $
+                {(set.totalValue || 0).toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </Typography>
+
+              <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <CollectionProgressBar
+                  percentage={set.percentageCollected || 0}
+                  height={24}
+                  showLabel={true}
+                  labelFormat="long"
+                  maxWidth="400px"
+                />
+              </Box>
+            </>
+          )}
+        </Box>
+      )}
 
       <Pagination
         {...browseController.paginationProps}

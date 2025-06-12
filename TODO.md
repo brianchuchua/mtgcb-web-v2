@@ -103,6 +103,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues
 - Add a note to Cost to complete that it's based on the cheapest printing of a card, which may differ from the one being shown.
+- Inconsistent h1 styles (set page, goal vs non-goal context)
 
 ## Bugs
 
