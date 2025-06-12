@@ -23,6 +23,7 @@ import {
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
+import Link from 'next/link';
 import { Goal } from '@/api/goals/types';
 import { useDeleteGoalMutation } from '@/api/goals/goalsApi';
 import { useAuth } from '@/hooks/useAuth';
@@ -101,16 +102,18 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
         {goals.map((goal) => (
           <Grid item xs={12} md={6} lg={4} key={goal.id}>
             <Card>
-              <CardContent>
+              <CardContent sx={{ '&:last-child': { pb: 2 } }}>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
                   <Typography variant="h6" component="h2" sx={{ flex: 1 }}>
                     {goal.name}
                   </Typography>
                   <Stack direction="row" spacing={0.5}>
-                    <Tooltip title="View details">
-                      <IconButton size="small">
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
+                    <Tooltip title="View this goal">
+                      <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}`} passHref legacyBehavior>
+                        <IconButton size="small" component="a">
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Link>
                     </Tooltip>
                     {isOwner && (
                       <>
@@ -164,9 +167,23 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                       label={goal.isActive ? 'Active' : 'Inactive'}
                       color={goal.isActive ? 'success' : 'default'}
                     />
-                    <Typography variant="caption" color="text.secondary">
-                      Created {formatDate(goal.createdAt)}
-                    </Typography>
+                    {goal.updatedAt && goal.updatedAt !== goal.createdAt ? (
+                      <Tooltip title={`Created ${formatDate(goal.createdAt)}`} placement="top">
+                        <Typography 
+                          variant="caption" 
+                          color="text.secondary"
+                          sx={{ 
+                            cursor: 'help'
+                          }}
+                        >
+                          Edited {formatDate(goal.updatedAt)}
+                        </Typography>
+                      </Tooltip>
+                    ) : (
+                      <Typography variant="caption" color="text.secondary">
+                        Created {formatDate(goal.createdAt)}
+                      </Typography>
+                    )}
                   </Box>
                 </Stack>
               </CardContent>

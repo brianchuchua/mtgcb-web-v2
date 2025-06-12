@@ -10,15 +10,32 @@ interface GoalDescriptionProps extends Omit<TypographyProps, 'children'> {
 
 export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionProps) {
   // Extract set IDs from the search criteria
-  const setIds = useMemo(() => {
+  const { includedSetIds, excludedSetIds } = useMemo(() => {
     const conditions = goal.searchCriteria.conditions;
-    if (conditions.setId?.OR) {
-      return conditions.setId.OR;
+    const included = conditions.setId?.OR || [];
+    const excluded: string[] = [];
+    
+    if (conditions.setId?.AND) {
+      conditions.setId.AND.forEach((condition: string) => {
+        if (condition.startsWith('!=')) {
+          excluded.push(condition.substring(2));
+        }
+      });
     }
-    return undefined;
+    
+    return { 
+      includedSetIds: included.length > 0 ? included : undefined,
+      excludedSetIds: excluded.length > 0 ? excluded : undefined
+    };
   }, [goal.searchCriteria.conditions]);
 
-  const { setNames } = useSetNames(setIds);
+  // Get names for both included and excluded sets
+  const allSetIds = useMemo(() => {
+    const ids = [...(includedSetIds || []), ...(excludedSetIds || [])];
+    return ids.length > 0 ? ids : undefined;
+  }, [includedSetIds, excludedSetIds]);
+  
+  const { setNames } = useSetNames(allSetIds);
 
   const description = useMemo(() => {
     const criteriaText = formatSearchCriteria(goal.searchCriteria);
@@ -39,8 +56,9 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
 
     // Replace "from specific sets" with actual set names
     let finalText = `${quantityText} ${criteriaText}`;
-    if (setIds && setIds.length > 0 && Object.keys(setNames).length > 0) {
-      const setNamesList = setIds
+    
+    if (includedSetIds && includedSetIds.length > 0 && Object.keys(setNames).length > 0) {
+      const setNamesList = includedSetIds
         .map((id: string) => setNames[id])
         .filter(Boolean)
         .join(', ');
@@ -49,9 +67,23 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
         finalText = finalText.replace('from specific sets', `from ${setNamesList}`);
       }
     }
+    
+    // Replace "excluding X sets" with actual excluded set names
+    if (excludedSetIds && excludedSetIds.length > 0 && Object.keys(setNames).length > 0) {
+      const excludedSetNamesList = excludedSetIds
+        .map((id: string) => setNames[id])
+        .filter(Boolean)
+        .join(', ');
+      
+      if (excludedSetNamesList) {
+        const excludedCount = excludedSetIds.length;
+        const pattern = `excluding ${excludedCount} set${excludedCount > 1 ? 's' : ''}`;
+        finalText = finalText.replace(pattern, `excluding ${excludedSetNamesList}`);
+      }
+    }
 
     return finalText;
-  }, [goal, setNames, setIds]);
+  }, [goal, setNames, includedSetIds, excludedSetIds]);
 
   return (
     <Typography {...typographyProps}>

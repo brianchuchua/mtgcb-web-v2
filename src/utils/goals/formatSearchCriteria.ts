@@ -80,6 +80,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription):
   const rarityPart: string[] = [];
   if (conditions.rarityNumeric) {
     const rarities: string[] = [];
+    const excludedRarities: string[] = [];
     
     if (conditions.rarityNumeric.OR) {
       conditions.rarityNumeric.OR.forEach((r: string) => {
@@ -91,8 +92,22 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription):
       });
     }
     
+    if (conditions.rarityNumeric.AND) {
+      conditions.rarityNumeric.AND.forEach((r: string) => {
+        const match = r.match(/^!=(\d+)$/);
+        if (match) {
+          const rarityName = RARITY_NAMES[match[1]];
+          if (rarityName) excludedRarities.push(rarityName);
+        }
+      });
+    }
+    
     if (rarities.length > 0) {
       rarityPart.push(rarities.join('/'));
+    }
+    
+    if (excludedRarities.length > 0) {
+      rarityPart.push(`non-${excludedRarities.join('/non-')}`);
     }
   }
 
@@ -111,6 +126,21 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription):
     if (conditions.setId.OR && conditions.setId.OR.length > 0) {
       attributeParts.push(`from specific sets`);
     }
+    
+    if (conditions.setId.AND && conditions.setId.AND.length > 0) {
+      // Count excluded sets
+      const excludedCount = conditions.setId.AND.filter((s: string) => s.startsWith('!=')).length;
+      if (excludedCount > 0) {
+        attributeParts.push(`excluding ${excludedCount} set${excludedCount > 1 ? 's' : ''}`);
+      }
+    }
+  }
+  
+  // One result per card name (hide duplicate printings)
+  if (conditions.oneResultPerCardName) {
+    attributeParts.push(`(one printing of each card)`);
+  } else {
+    attributeParts.push(`(every printing of each card)`);
   }
 
   // Stats
@@ -131,30 +161,95 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription):
     statConditions.push(...toughnessConditions);
   }
   
+  if (conditions.loyaltyNumeric?.AND) {
+    const loyaltyConditions = conditions.loyaltyNumeric.AND.map((c: string) => `Loyalty ${c}`);
+    statConditions.push(...loyaltyConditions);
+  }
+  
+  // Price filters
+  if (conditions.market?.AND) {
+    const marketConditions = conditions.market.AND.map((c: string) => {
+      const match = c.match(/^([<>=!]+)(.+)$/);
+      if (match) {
+        return `Market Price ${match[1]} $${match[2]}`;
+      }
+      return `Market Price ${c}`;
+    });
+    statConditions.push(...marketConditions);
+  }
+  
+  if (conditions.low?.AND) {
+    const lowConditions = conditions.low.AND.map((c: string) => {
+      const match = c.match(/^([<>=!]+)(.+)$/);
+      if (match) {
+        return `Low Price ${match[1]} $${match[2]}`;
+      }
+      return `Low Price ${c}`;
+    });
+    statConditions.push(...lowConditions);
+  }
+  
+  if (conditions.average?.AND) {
+    const avgConditions = conditions.average.AND.map((c: string) => {
+      const match = c.match(/^([<>=!]+)(.+)$/);
+      if (match) {
+        return `Average Price ${match[1]} $${match[2]}`;
+      }
+      return `Average Price ${c}`;
+    });
+    statConditions.push(...avgConditions);
+  }
+  
+  if (conditions.high?.AND) {
+    const highConditions = conditions.high.AND.map((c: string) => {
+      const match = c.match(/^([<>=!]+)(.+)$/);
+      if (match) {
+        return `High Price ${match[1]} $${match[2]}`;
+      }
+      return `High Price ${c}`;
+    });
+    statConditions.push(...highConditions);
+  }
+  
+  if (conditions.foil?.AND) {
+    const foilConditions = conditions.foil.AND.map((c: string) => {
+      const match = c.match(/^([<>=!]+)(.+)$/);
+      if (match) {
+        return `Foil Price ${match[1]} $${match[2]}`;
+      }
+      return `Foil Price ${c}`;
+    });
+    statConditions.push(...foilConditions);
+  }
+  
   if (statConditions.length > 0) {
     attributeParts.push(`(${statConditions.join(', ')})`);
   }
 
   // Build the final description
-  // Start with card name if specified
-  if (conditions.name) {
-    return `card named "${conditions.name}"`;
-  }
-
-  // Otherwise, compose: [color] [rarity] [type] [attributes]
   const mainParts: string[] = [];
   
-  // Add color + rarity + type as one unit
-  const cardDescParts: string[] = [];
-  if (colorPart.length > 0) cardDescParts.push(...colorPart);
-  if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
-  if (typeParts.length > 0) cardDescParts.push(...typeParts);
-  
-  if (cardDescParts.length > 0) {
-    mainParts.push(cardDescParts.join(' '));
+  // Start with card name if specified
+  if (conditions.name) {
+    // If we have a name and types, format it specially
+    if (typeParts.length > 0) {
+      mainParts.push(`${typeParts.join(' ')} named "${conditions.name}"`);
+    } else {
+      mainParts.push(`card named "${conditions.name}"`);
+    }
+  } else {
+    // Otherwise, compose: [color] [rarity] [type]
+    const cardDescParts: string[] = [];
+    if (colorPart.length > 0) cardDescParts.push(...colorPart);
+    if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
+    if (typeParts.length > 0) cardDescParts.push(...typeParts);
+    
+    if (cardDescParts.length > 0) {
+      mainParts.push(cardDescParts.join(' '));
+    }
   }
   
-  // Add other attributes
+  // Add other attributes (these apply whether or not we have a name)
   if (attributeParts.length > 0) {
     mainParts.push(...attributeParts);
   }

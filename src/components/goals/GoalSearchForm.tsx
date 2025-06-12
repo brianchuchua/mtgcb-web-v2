@@ -13,6 +13,8 @@ import {
   MenuItem,
   IconButton,
   Select,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import { Search as SearchIcon, InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
 import { CardApiParams } from '@/api/browse/types';
@@ -86,7 +88,7 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
   const [name, setName] = useState(searchConditions.name || '');
   const [oracleText, setOracleText] = useState(searchConditions.oracleText || '');
   const [artist, setArtist] = useState(searchConditions.artist || '');
-  const [oneResultPerCardName, setOneResultPerCardName] = useState(searchConditions.oneResultPerCardName || false);
+  const [oneResultPerCardName, setOneResultPerCardName] = useState(searchConditions.oneResultPerCardName ?? true);
   
   // Color state
   const [colorState, setColorState] = useState<ColorState>(() => {
@@ -568,29 +570,59 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
         setSelectedOptionsRemotely={setSelectedSets}
       />
 
-      {/* One Result Per Card Name */}
-      <Paper
-        variant="outlined"
-        sx={{
-          borderColor: (theme) => theme.palette.grey[700],
-          padding: '8px 8px 8px 1px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <FormControlLabel
-          sx={{ margin: 0 }}
-          control={
-            <Switch
-              checked={oneResultPerCardName}
-              onChange={(e) => setOneResultPerCardName(e.target.checked)}
-              size="small"
-              sx={{ marginRight: '3px' }}
-            />
-          }
-          label="Hide duplicate printings"
-        />
+      {/* Printing Options */}
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+          <Typography variant="subtitle2">
+            Card Printings
+          </Typography>
+          <Tooltip 
+            title={
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  This setting controls how multiple printings of the same card are counted.
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                  Example: Giant Spider
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Giant Spider has been printed in over 20 different sets (Alpha, Beta, 4th Edition, etc.).
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 0.5 }}>
+                  • <strong>One printing:</strong> Having any version of Giant Spider counts as 1 towards your goal
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>Every printing:</strong> Each different set's Giant Spider counts separately
+                </Typography>
+              </Box>
+            }
+            placement="left"
+            arrow
+          >
+            <IconButton size="small" sx={{ padding: 0.5 }}>
+              <InfoOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        
+        <ToggleButtonGroup
+          value={oneResultPerCardName ? 'one' : 'every'}
+          exclusive
+          onChange={(_, value) => {
+            if (value !== null) {
+              setOneResultPerCardName(value === 'one');
+            }
+          }}
+          fullWidth
+          size="small"
+        >
+          <ToggleButton value="one">
+            One printing of each unique card
+          </ToggleButton>
+          <ToggleButton value="every">
+            Every printing of each unique card
+          </ToggleButton>
+        </ToggleButtonGroup>
       </Paper>
 
       {/* Stat Conditions */}
