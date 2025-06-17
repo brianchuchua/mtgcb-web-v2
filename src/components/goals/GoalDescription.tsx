@@ -43,19 +43,31 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
     // Determine quantity text
     let quantityText = '';
     if (goal.targetQuantityAll) {
-      quantityText = `${goal.targetQuantityAll}x of`;
+      quantityText = `${goal.targetQuantityAll}x`;
     } else if (goal.targetQuantityReg && goal.targetQuantityFoil) {
-      quantityText = `${goal.targetQuantityReg}x regular and ${goal.targetQuantityFoil}x foil of`;
+      quantityText = `${goal.targetQuantityReg}x regular and ${goal.targetQuantityFoil}x foil`;
     } else if (goal.targetQuantityReg) {
-      quantityText = `${goal.targetQuantityReg}x regular of`;
+      quantityText = `${goal.targetQuantityReg}x regular`;
     } else if (goal.targetQuantityFoil) {
-      quantityText = `${goal.targetQuantityFoil}x foil of`;
+      quantityText = `${goal.targetQuantityFoil}x foil`;
     } else {
-      quantityText = '1x of';
+      quantityText = '1x';
     }
 
-    // Replace "from specific sets" with actual set names
-    let finalText = `${quantityText} ${criteriaText}`;
+    // Build the final text, handling special cases
+    let finalText = '';
+    
+    // Check if we need to add "of" or other prepositions
+    if (criteriaText.startsWith('every card') || criteriaText.startsWith('card named')) {
+      // Don't add "of" for these cases
+      finalText = `${quantityText} ${criteriaText}`;
+    } else if (criteriaText.includes('specific sets')) {
+      // For sets, we'll add "from" when we do the replacement
+      finalText = `${quantityText} from ${criteriaText}`;
+    } else {
+      // For other cases, use "of"
+      finalText = `${quantityText} of ${criteriaText}`;
+    }
     
     if (includedSetIds && includedSetIds.length > 0 && Object.keys(setNames).length > 0) {
       const setNamesList = includedSetIds
@@ -64,7 +76,8 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
         .join(', ');
       
       if (setNamesList) {
-        finalText = finalText.replace('from specific sets', `from ${setNamesList}`);
+        // Replace "specific sets" with the actual set names
+        finalText = finalText.replace('specific sets', setNamesList);
       }
     }
     

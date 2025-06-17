@@ -124,7 +124,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription):
   // Sets
   if (conditions.setId) {
     if (conditions.setId.OR && conditions.setId.OR.length > 0) {
-      attributeParts.push(`from specific sets`);
+      attributeParts.push(`specific sets`);
     }
     
     if (conditions.setId.AND && conditions.setId.AND.length > 0) {

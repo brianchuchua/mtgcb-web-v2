@@ -99,7 +99,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Remove "Showing" from "Showing 1-24 of blah cards" at 1024x768 or smaller
 - (A subset of link) in the header for subsets -- or actually do breadcrumbs
 - Make default number of cards per page a multiple of 5 and 4.
-- Header consistency on pages, make a shared component for text headers
+- Header consistency on pages, make a shared component for text headers -- centered vs not, Goals vs Add/Remove Cards for example.
+- Money value consistency -- success and warning colors
 - Quantity selectors -- going from custom filter to normal doesn't reset the states as you'd expect
 - A cool stats page, icon can be a graph, most valuable card can move there -- can make an expandable region in a set view too.
 - When any prices are missing, add an info icon explaining it's an underestimate

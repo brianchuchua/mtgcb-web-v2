@@ -106,27 +106,20 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
                   <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                     {!goal.isActive && (
-                      <Chip
-                        size="small"
-                        icon={<RadioButtonUncheckedIcon />}
-                        label="Inactive"
-                        color="default"
-                      />
+                      <Tooltip title="(Inactive goals won't show in the list of goals while viewing your collection.)">
+                        <Chip size="small" icon={<RadioButtonUncheckedIcon />} label="Inactive" color="default" />
+                      </Tooltip>
                     )}
-                    <Link 
-                      href={`/collections/${userId}?contentType=cards&goalId=${goal.id}`} 
-                      passHref 
-                      legacyBehavior
-                    >
-                      <Typography 
-                        variant="h6" 
+                    <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}`} passHref legacyBehavior>
+                      <Typography
+                        variant="h6"
                         component="a"
-                        sx={{ 
+                        sx={{
                           textDecoration: 'none',
-                          color: 'inherit',
+                          color: goal.isActive ? 'inherit' : 'text.secondary',
                           '&:hover': {
-                            textDecoration: 'underline'
-                          }
+                            textDecoration: 'underline',
+                          },
                         }}
                       >
                         {goal.name}
@@ -222,11 +215,7 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                                   <Typography variant="caption" color="text.secondary">
                                     Edited
                                   </Typography>
-                                  <Typography 
-                                    variant="body2" 
-                                    color="text.secondary"
-                                    sx={{ cursor: 'help' }}
-                                  >
+                                  <Typography variant="body2" color="text.secondary" sx={{ cursor: 'help' }}>
                                     {formatDate(goal.updatedAt)}
                                   </Typography>
                                 </Box>

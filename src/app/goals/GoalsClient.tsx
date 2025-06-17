@@ -27,7 +27,7 @@ export function GoalsClient() {
     },
     {
       skip: !user?.userId,
-    }
+    },
   );
 
   const goals = data?.data?.goals || [];
@@ -79,7 +79,7 @@ export function GoalsClient() {
   return (
     <Box p={3}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
+        <Typography variant="h4" component="h1" color="primary">
           Collection Goals
         </Typography>
         <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleCreateClick}>
