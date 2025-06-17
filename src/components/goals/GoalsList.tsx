@@ -1,36 +1,36 @@
-import { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Card, 
-  CardContent, 
-  Typography, 
-  IconButton, 
-  Chip, 
-  Stack,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Grid,
-} from '@mui/material';
-import { 
+import {
+  CheckCircle as CheckCircleIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
-  Visibility as VisibilityIcon,
-  CheckCircle as CheckCircleIcon,
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
+  Visibility as VisibilityIcon,
 } from '@mui/icons-material';
-import { useSnackbar } from 'notistack';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import Link from 'next/link';
-import { Goal } from '@/api/goals/types';
-import { useDeleteGoalMutation } from '@/api/goals/goalsApi';
-import { useAuth } from '@/hooks/useAuth';
-import { formatDate } from '@/utils/dateUtils';
+import { useSnackbar } from 'notistack';
+import { useEffect, useState } from 'react';
 import { EditGoalDialog } from './EditGoalDialog';
 import { GoalDescription } from './GoalDescription';
+import { useDeleteGoalMutation } from '@/api/goals/goalsApi';
+import { Goal } from '@/api/goals/types';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
+import { useAuth } from '@/hooks/useAuth';
+import { formatDate } from '@/utils/dateUtils';
 
 interface GoalsListProps {
   goals: Goal[];
@@ -53,7 +53,7 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
   // Handle initial edit goal from URL parameter
   useEffect(() => {
     if (initialEditGoalId && goals.length > 0) {
-      const goalToEdit = goals.find(g => g.id === initialEditGoalId);
+      const goalToEdit = goals.find((g) => g.id === initialEditGoalId);
       if (goalToEdit) {
         setGoalToEdit(goalToEdit);
         setEditDialogOpen(true);
@@ -96,7 +96,6 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
     onEditComplete?.();
   };
 
-
   return (
     <>
       <Grid container spacing={2}>
@@ -105,33 +104,52 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardContent sx={{ '&:last-child': { pb: 2 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
-                  <Typography variant="h6" component="h2" sx={{ flex: 1 }}>
-                    {goal.name}
-                  </Typography>
+                  <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {!goal.isActive && (
+                      <Chip
+                        size="small"
+                        icon={<RadioButtonUncheckedIcon />}
+                        label="Inactive"
+                        color="default"
+                      />
+                    )}
+                    <Link 
+                      href={`/collections/${userId}?contentType=cards&goalId=${goal.id}`} 
+                      passHref 
+                      legacyBehavior
+                    >
+                      <Typography 
+                        variant="h6" 
+                        component="a"
+                        sx={{ 
+                          textDecoration: 'none',
+                          color: 'inherit',
+                          '&:hover': {
+                            textDecoration: 'underline'
+                          }
+                        }}
+                      >
+                        {goal.name}
+                      </Typography>
+                    </Link>
+                  </Box>
                   <Stack direction="row" spacing={0.5}>
-                    <Tooltip title="View this goal">
-                      <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}`} passHref legacyBehavior>
+                    <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}`} passHref legacyBehavior>
+                      <Tooltip title="View goal">
                         <IconButton size="small" component="a">
                           <VisibilityIcon fontSize="small" />
                         </IconButton>
-                      </Link>
-                    </Tooltip>
+                      </Tooltip>
+                    </Link>
                     {isOwner && (
                       <>
                         <Tooltip title="Edit goal">
-                          <IconButton 
-                            size="small"
-                            onClick={() => handleEditClick(goal)}
-                          >
+                          <IconButton size="small" onClick={() => handleEditClick(goal)}>
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Delete goal">
-                          <IconButton 
-                            size="small" 
-                            color="error"
-                            onClick={() => handleDeleteClick(goal)}
-                          >
+                          <IconButton size="small" color="error" onClick={() => handleDeleteClick(goal)}>
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
@@ -147,14 +165,14 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                 <Stack spacing={1} sx={{ mt: 'auto' }}>
                   <Box>
                     <Typography variant="caption" color="text.secondary">
-                      Collection Goal
+                      Collection Summary
                     </Typography>
-                    <GoalDescription 
+                    <GoalDescription
                       goal={goal}
-                      variant="body2" 
-                      sx={{ 
+                      variant="body2"
+                      sx={{
                         fontStyle: 'italic',
-                        color: 'text.primary',
+                        color: 'text.secondary',
                       }}
                     />
                   </Box>
@@ -170,7 +188,7 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                             {goal.progress.collectedCards} / {goal.progress.totalCards} cards
                           </Typography>
                         </Box>
-                        <CollectionProgressBar 
+                        <CollectionProgressBar
                           percentage={goal.progress.percentageCollected}
                           height={20}
                           showLabel={true}
@@ -181,7 +199,7 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                             <Typography variant="caption" color="text.secondary">
                               Collection Value
                             </Typography>
-                            <Typography variant="body2" color="text.primary" fontWeight="medium">
+                            <Typography variant="body2" color="success" fontWeight="medium">
                               ${goal.progress.totalValue.toFixed(2)}
                             </Typography>
                           </Box>
@@ -189,44 +207,45 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                             <Typography variant="caption" color="text.secondary">
                               Cost to Complete
                             </Typography>
-                            <Typography 
-                              variant="body2" 
-                              color={goal.progress.costToComplete === 0 ? 'success.main' : 'text.primary'}
+                            <Typography
+                              variant="body2"
+                              color={goal.progress.costToComplete === 0 ? 'success.main' : 'warning.main'}
                               fontWeight="medium"
                             >
                               ${goal.progress.costToComplete.toFixed(2)}
                             </Typography>
                           </Box>
+                          <Box sx={{ flex: 1, textAlign: 'right' }}>
+                            {goal.updatedAt && goal.updatedAt !== goal.createdAt ? (
+                              <Tooltip title={`Created ${formatDate(goal.createdAt)}`} placement="top">
+                                <Box>
+                                  <Typography variant="caption" color="text.secondary">
+                                    Edited
+                                  </Typography>
+                                  <Typography 
+                                    variant="body2" 
+                                    color="text.secondary"
+                                    sx={{ cursor: 'help' }}
+                                  >
+                                    {formatDate(goal.updatedAt)}
+                                  </Typography>
+                                </Box>
+                              </Tooltip>
+                            ) : (
+                              <Box>
+                                <Typography variant="caption" color="text.secondary">
+                                  Created
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  {formatDate(goal.createdAt)}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
                         </Stack>
                       </Stack>
                     </Box>
                   )}
-
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Chip
-                      size="small"
-                      icon={goal.isActive ? <CheckCircleIcon /> : <RadioButtonUncheckedIcon />}
-                      label={goal.isActive ? 'Active' : 'Inactive'}
-                      color={goal.isActive ? 'success' : 'default'}
-                    />
-                    {goal.updatedAt && goal.updatedAt !== goal.createdAt ? (
-                      <Tooltip title={`Created ${formatDate(goal.createdAt)}`} placement="top">
-                        <Typography 
-                          variant="caption" 
-                          color="text.secondary"
-                          sx={{ 
-                            cursor: 'help'
-                          }}
-                        >
-                          Edited {formatDate(goal.updatedAt)}
-                        </Typography>
-                      </Tooltip>
-                    ) : (
-                      <Typography variant="caption" color="text.secondary">
-                        Created {formatDate(goal.createdAt)}
-                      </Typography>
-                    )}
-                  </Box>
                 </Stack>
               </CardContent>
             </Card>
@@ -237,9 +256,7 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
       <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
         <DialogTitle>Delete Goal</DialogTitle>
         <DialogContent>
-          <Typography>
-            Are you sure you want to delete "{goalToDelete?.name}"? This action cannot be undone.
-          </Typography>
+          <Typography>Are you sure you want to delete "{goalToDelete?.name}"? This action cannot be undone.</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancelDelete}>Cancel</Button>
@@ -249,12 +266,7 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
         </DialogActions>
       </Dialog>
 
-      <EditGoalDialog
-        open={editDialogOpen}
-        onClose={handleEditClose}
-        goal={goalToEdit}
-        userId={userId}
-      />
+      <EditGoalDialog open={editDialogOpen} onClose={handleEditClose} goal={goalToEdit} userId={userId} />
     </>
   );
 }
