@@ -51,6 +51,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Probably a bug: When using hide duplicate printings, we should definitely show the card the user owns, not just whatever one corresponds to the sort order
 - Showing 2501-3000 of 92769 cards goes to two lines on desktop
 - Performance pass, some API calls have gotten a little worse I think
+- Performance benchmark scripts and documentation
 - Card page: Other Printings should just be the standard pagination with those cards filtered, collection aware, maybe goal aware
 - Shopping lists -- reports based on collection goals
 
@@ -139,6 +140,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Foreign Cards
 - Card Locations
 - Deck Completion
+- Button to report missing card data, notify user is link to scryfall or tcgplayer is missing
 
 ## Patron Requests
 

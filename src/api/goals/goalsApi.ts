@@ -1,6 +1,6 @@
+import { CreateGoalRequest, GetGoalsResponse, Goal, UpdateGoalRequest } from './types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
-import { Goal, CreateGoalRequest, GetGoalsResponse, UpdateGoalRequest } from './types';
 
 export const goalsApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -24,7 +24,10 @@ export const goalsApi = mtgcbApi.injectEndpoints({
         return ['Goals'];
       },
     }),
-    getUserGoals: builder.query<ApiResponse<GetGoalsResponse>, { userId: number; includeProgress?: boolean; priceType?: string }>({
+    getUserGoals: builder.query<
+      ApiResponse<GetGoalsResponse>,
+      { userId: number; includeProgress?: boolean; priceType?: string }
+    >({
       query: ({ userId, includeProgress, priceType }) => ({
         url: `goals/${userId}`,
         params: {
@@ -32,16 +35,11 @@ export const goalsApi = mtgcbApi.injectEndpoints({
           ...(priceType && { priceType }),
         },
       }),
-      providesTags: (result, error, { userId }) => [
-        { type: 'Goals', id: `USER-${userId}` },
-        'Goals',
-      ],
+      providesTags: (result, error, { userId }) => [{ type: 'Goals', id: `user-${userId}` }, 'Goals'],
     }),
     getGoal: builder.query<ApiResponse<Goal>, { userId: number; goalId: number }>({
       query: ({ userId, goalId }) => `goals/${userId}/${goalId}`,
-      providesTags: (result, error, { goalId }) => [
-        { type: 'Goals', id: goalId },
-      ],
+      providesTags: (result, error, { goalId }) => [{ type: 'Goals', id: goalId }],
     }),
     deleteGoal: builder.mutation<ApiResponse<{ message: string }>, { userId: number; goalId: number }>({
       query: ({ userId, goalId }) => ({
@@ -49,7 +47,7 @@ export const goalsApi = mtgcbApi.injectEndpoints({
         method: 'DELETE',
       }),
       invalidatesTags: (result, error, { userId, goalId }) => [
-        { type: 'Goals', id: `USER-${userId}` },
+        { type: 'Goals', id: `user-${userId}` },
         { type: 'Goals', id: goalId },
         'Goals',
         // Invalidate browse caches since goal deletion affects browse results
@@ -66,7 +64,7 @@ export const goalsApi = mtgcbApi.injectEndpoints({
         body,
       }),
       invalidatesTags: (result, error, { userId, goalId }) => [
-        { type: 'Goals', id: `USER-${userId}` },
+        { type: 'Goals', id: `user-${userId}` },
         { type: 'Goals', id: goalId },
         'Goals',
         // Invalidate browse caches since goal changes affect browse results

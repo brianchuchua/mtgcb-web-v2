@@ -1,12 +1,12 @@
 import {
   CollectionCardsParams,
   CollectionCardsResponse,
+  CollectionMassUpdateRequest,
+  CollectionMassUpdateResponse,
   CollectionSummaryParams,
   CollectionSummaryResponse,
   CollectionUpdateRequest,
   CollectionUpdateResponse,
-  CollectionMassUpdateRequest,
-  CollectionMassUpdateResponse,
 } from './types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import type { RootState } from '@/redux/store';
@@ -54,6 +54,8 @@ const collectionsApi = mtgcbApi.injectEndpoints({
                     'Collection',
                     { type: 'Cards', id: `user-${userId}` },
                     { type: 'Sets', id: `user-${userId}` },
+                    { type: 'Goals', id: `user-${userId}` },
+                    'Goals',
                   ]),
                 );
               } else {
@@ -126,6 +128,8 @@ const collectionsApi = mtgcbApi.injectEndpoints({
                 'Collection',
                 { type: 'Cards', id: `user-${userId}` },
                 { type: 'Sets', id: `user-${userId}` },
+                { type: 'Goals', id: `user-${userId}` },
+                'Goals',
               ]),
             );
           }
@@ -153,6 +157,8 @@ const collectionsApi = mtgcbApi.injectEndpoints({
                   'Collection',
                   { type: 'Cards', id: `user-${userId}` },
                   { type: 'Sets', id: `user-${userId}` },
+                  { type: 'Goals', id: `user-${userId}` },
+                  'Goals',
                 ]),
               );
             } else {
