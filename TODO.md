@@ -8,7 +8,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 - Art cards
 - Custom collection goals
-- Imports and exports
+- Imports and exports (allow exporting from a specific set or whole collection)
 - Patron support features
 - Privacy mode
 - Cards page
@@ -51,6 +51,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Probably a bug: When using hide duplicate printings, we should definitely show the card the user owns, not just whatever one corresponds to the sort order
 - Showing 2501-3000 of 92769 cards goes to two lines on desktop
 - Performance pass, some API calls have gotten a little worse I think
+- Card page: Other Printings should just be the standard pagination with those cards filtered, collection aware, maybe goal aware
+- Shopping lists -- reports based on collection goals
 
 ## UX Action Items
 
@@ -130,13 +132,12 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Minor: prefetch leads to page 2 being loaded when a user invalidates the collection tag, it's a prefetch subscription issue in RTK Query, dev team is aware, no current fix, just bad workarounds, page one still loads on visit, so it's fine
 - fetch API being used in SetSelector
 - Consider removing skeleton loaders from set gallery and experiment with masonry instead of virtuoso
+- I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
 
 ## Future Feature Work
 
 - Foreign Cards
 - Card Locations
-- Custom Collection Goals
-  - This can be essentially saved searches. Trickiest part is handling card duplicate settings.
 - Deck Completion
 
 ## Patron Requests

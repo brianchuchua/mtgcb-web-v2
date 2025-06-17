@@ -1,8 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import RemoveIcon from '@mui/icons-material/Remove';
 import {
-  Alert,
   Box,
   Button,
   Chip,
@@ -20,12 +19,14 @@ import {
   styled,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { GoalSearchForm } from './GoalSearchForm';
 import { CardApiParams } from '@/api/browse/types';
 import { useCreateGoalMutation } from '@/api/goals/goalsApi';
 import { CreateGoalRequest } from '@/api/goals/types';
+import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
+import { useSetNames } from '@/utils/goals/useSetNames';
 
 interface CreateGoalDialogProps {
   open: boolean;
@@ -61,6 +62,8 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
     handleSubmit,
     reset,
     formState: { errors },
+    getValues,
+    watch,
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
@@ -380,7 +383,18 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
               )}
             </Box>
 
-            <Alert severity="info">Goals are public and can be viewed by anyone visiting your collection.</Alert>
+            <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Goal Summary
+              </Typography>
+              <GoalPreview
+                searchConditions={searchConditions}
+                quantityMode={quantityMode}
+                targetQuantityReg={watch('targetQuantityReg')}
+                targetQuantityFoil={watch('targetQuantityFoil')}
+                targetQuantityAll={watch('targetQuantityAll')}
+              />
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -471,3 +485,115 @@ const QuantityRightButton = styled(QuantityButton)(({ theme }) => ({
   borderBottomRightRadius: theme.shape.borderRadius,
   borderLeft: 'none',
 }));
+
+function GoalPreview({
+  searchConditions,
+  quantityMode,
+  targetQuantityReg,
+  targetQuantityFoil,
+  targetQuantityAll,
+}: {
+  searchConditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>;
+  quantityMode: 'separate' | 'all';
+  targetQuantityReg?: number;
+  targetQuantityFoil?: number;
+  targetQuantityAll?: number;
+}) {
+  // Extract set IDs from the search conditions
+  const { includedSetIds, excludedSetIds } = useMemo(() => {
+    const included = searchConditions.setId?.OR || [];
+    const excluded: string[] = [];
+
+    if (searchConditions.setId?.AND) {
+      searchConditions.setId.AND.forEach((condition: string) => {
+        if (condition.startsWith('!=')) {
+          excluded.push(condition.substring(2));
+        }
+      });
+    }
+
+    return {
+      includedSetIds: included.length > 0 ? included : undefined,
+      excludedSetIds: excluded.length > 0 ? excluded : undefined,
+    };
+  }, [searchConditions]);
+
+  // Get names for both included and excluded sets
+  const allSetIds = useMemo(() => {
+    const ids = [...(includedSetIds || []), ...(excludedSetIds || [])];
+    return ids.length > 0 ? ids : undefined;
+  }, [includedSetIds, excludedSetIds]);
+
+  const { setNames } = useSetNames(allSetIds);
+
+  const description = useMemo(() => {
+    const criteriaText = formatSearchCriteria({
+      conditions: searchConditions,
+      sort: undefined,
+      order: undefined,
+    });
+
+    // Determine quantity text
+    let quantityText = '';
+    if (quantityMode === 'all' && targetQuantityAll) {
+      quantityText = `${targetQuantityAll}x of`;
+    } else if (quantityMode === 'separate') {
+      if (targetQuantityReg && targetQuantityFoil) {
+        quantityText = `${targetQuantityReg}x regular and ${targetQuantityFoil}x foil of`;
+      } else if (targetQuantityReg) {
+        quantityText = `${targetQuantityReg}x regular of`;
+      } else if (targetQuantityFoil) {
+        quantityText = `${targetQuantityFoil}x foil of`;
+      } else {
+        quantityText = '? of';
+      }
+    } else {
+      quantityText = '? of';
+    }
+
+    // Replace "from specific sets" with actual set names
+    let finalText = `${quantityText} ${criteriaText}`;
+
+    if (includedSetIds && includedSetIds.length > 0 && Object.keys(setNames).length > 0) {
+      const setNamesList = includedSetIds
+        .map((id: string) => setNames[id])
+        .filter(Boolean)
+        .join(', ');
+
+      if (setNamesList) {
+        finalText = finalText.replace('from specific sets', `from ${setNamesList}`);
+      }
+    }
+
+    // Replace "excluding X sets" with actual excluded set names
+    if (excludedSetIds && excludedSetIds.length > 0 && Object.keys(setNames).length > 0) {
+      const excludedSetNamesList = excludedSetIds
+        .map((id: string) => setNames[id])
+        .filter(Boolean)
+        .join(', ');
+
+      if (excludedSetNamesList) {
+        const excludedCount = excludedSetIds.length;
+        const pattern = `excluding ${excludedCount} set${excludedCount > 1 ? 's' : ''}`;
+        finalText = finalText.replace(pattern, `excluding ${excludedSetNamesList}`);
+      }
+    }
+
+    return finalText;
+  }, [
+    searchConditions,
+    quantityMode,
+    targetQuantityReg,
+    targetQuantityFoil,
+    targetQuantityAll,
+    setNames,
+    includedSetIds,
+    excludedSetIds,
+  ]);
+
+  return (
+    <Typography variant="body2" color="text.secondary">
+      {description}
+    </Typography>
+  );
+}
