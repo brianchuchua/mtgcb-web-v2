@@ -24,9 +24,15 @@ export const goalsApi = mtgcbApi.injectEndpoints({
         return ['Goals'];
       },
     }),
-    getUserGoals: builder.query<ApiResponse<GetGoalsResponse>, number>({
-      query: (userId) => `goals/${userId}`,
-      providesTags: (result, error, userId) => [
+    getUserGoals: builder.query<ApiResponse<GetGoalsResponse>, { userId: number; includeProgress?: boolean; priceType?: string }>({
+      query: ({ userId, includeProgress, priceType }) => ({
+        url: `goals/${userId}`,
+        params: {
+          ...(includeProgress !== undefined && { includeProgress }),
+          ...(priceType && { priceType }),
+        },
+      }),
+      providesTags: (result, error, { userId }) => [
         { type: 'Goals', id: `USER-${userId}` },
         'Goals',
       ],

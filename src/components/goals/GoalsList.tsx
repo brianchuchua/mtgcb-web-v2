@@ -30,6 +30,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { formatDate } from '@/utils/dateUtils';
 import { EditGoalDialog } from './EditGoalDialog';
 import { GoalDescription } from './GoalDescription';
+import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 
 interface GoalsListProps {
   goals: Goal[];
@@ -101,8 +102,8 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
       <Grid container spacing={2}>
         {goals.map((goal) => (
           <Grid item xs={12} md={6} lg={4} key={goal.id}>
-            <Card>
-              <CardContent sx={{ '&:last-child': { pb: 2 } }}>
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <CardContent sx={{ '&:last-child': { pb: 2 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
                   <Typography variant="h6" component="h2" sx={{ flex: 1 }}>
                     {goal.name}
@@ -139,13 +140,11 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                   </Stack>
                 </Box>
 
-                {goal.description && (
-                  <Typography variant="body2" color="text.secondary" paragraph>
-                    {goal.description}
-                  </Typography>
-                )}
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  {goal.description || 'No description provided'}
+                </Typography>
 
-                <Stack spacing={1}>
+                <Stack spacing={1} sx={{ mt: 'auto' }}>
                   <Box>
                     <Typography variant="caption" color="text.secondary">
                       Collection Goal
@@ -159,6 +158,49 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                       }}
                     />
                   </Box>
+
+                  {goal.progress && (
+                    <Box>
+                      <Stack spacing={0.5}>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="caption" color="text.secondary">
+                            Progress
+                          </Typography>
+                          <Typography variant="caption" color="text.primary" fontWeight="medium">
+                            {goal.progress.collectedCards} / {goal.progress.totalCards} cards
+                          </Typography>
+                        </Box>
+                        <CollectionProgressBar 
+                          percentage={goal.progress.percentageCollected}
+                          height={20}
+                          showLabel={true}
+                          labelFormat="short"
+                        />
+                        <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Collection Value
+                            </Typography>
+                            <Typography variant="body2" color="text.primary" fontWeight="medium">
+                              ${goal.progress.totalValue.toFixed(2)}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Cost to Complete
+                            </Typography>
+                            <Typography 
+                              variant="body2" 
+                              color={goal.progress.costToComplete === 0 ? 'success.main' : 'text.primary'}
+                              fontWeight="medium"
+                            >
+                              ${goal.progress.costToComplete.toFixed(2)}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  )}
 
                   <Box display="flex" justifyContent="space-between" alignItems="center">
                     <Chip

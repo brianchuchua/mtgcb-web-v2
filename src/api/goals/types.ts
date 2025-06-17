@@ -1,5 +1,13 @@
 import { CardApiParams } from '@/api/browse/types';
 
+export interface GoalProgress {
+  totalCards: number;
+  collectedCards: number;
+  percentageCollected: number;
+  totalValue: number;
+  costToComplete: number;
+}
+
 export interface Goal {
   id: number;
   userId: number;
@@ -16,6 +24,7 @@ export interface Goal {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  progress?: GoalProgress;
 }
 
 export interface CreateGoalRequest {

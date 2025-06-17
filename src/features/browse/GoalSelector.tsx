@@ -32,7 +32,7 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
   const { user, isAuthenticated } = useAuth();
   const isOwnCollection = isAuthenticated && user?.userId === userId;
 
-  const { data: goalsResponse, isLoading, error } = useGetUserGoalsQuery(userId);
+  const { data: goalsResponse, isLoading, error } = useGetUserGoalsQuery({ userId, includeProgress: false });
   const goals = goalsResponse?.data?.goals || [];
 
   // Filter to only show active goals

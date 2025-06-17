@@ -8,6 +8,8 @@ import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { CreateGoalDialog } from '@/components/goals/CreateGoalDialog';
 import { GoalsList } from '@/components/goals/GoalsList';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { PriceType } from '@/types/pricing';
 
 export function GoalsClient() {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
@@ -15,10 +17,18 @@ export function GoalsClient() {
   const router = useRouter();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [goalIdToEdit, setGoalIdToEdit] = useState<number | null>(null);
+  const [displayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
 
-  const { data, isLoading, error } = useGetUserGoalsQuery(user?.userId ?? 0, {
-    skip: !user?.userId,
-  });
+  const { data, isLoading, error } = useGetUserGoalsQuery(
+    {
+      userId: user?.userId ?? 0,
+      includeProgress: true,
+      priceType: displayPriceType.toLowerCase(),
+    },
+    {
+      skip: !user?.userId,
+    }
+  );
 
   const goals = data?.data?.goals || [];
 
