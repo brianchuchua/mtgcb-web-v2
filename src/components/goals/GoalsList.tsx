@@ -158,7 +158,7 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                 <Stack spacing={1} sx={{ mt: 'auto' }}>
                   <Box>
                     <Typography variant="caption" color="text.secondary">
-                      Collection Summary
+                      Goal Summary
                     </Typography>
                     <GoalDescription
                       goal={goal}

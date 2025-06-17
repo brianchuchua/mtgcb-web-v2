@@ -1,25 +1,27 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { InfoOutlined as InfoOutlinedIcon, Search as SearchIcon } from '@mui/icons-material';
 import {
   Box,
-  TextField,
-  InputAdornment,
-  FormControlLabel,
-  Switch,
-  Paper,
   Chip,
-  Stack,
-  Typography,
-  Tooltip,
-  MenuItem,
+  FormControlLabel,
   IconButton,
+  InputAdornment,
+  MenuItem,
+  Paper,
   Select,
+  Stack,
+  Switch,
+  TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
+  Typography,
 } from '@mui/material';
-import { Search as SearchIcon, InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CardApiParams } from '@/api/browse/types';
-import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
 import { useGetCardTypesQuery } from '@/api/cards/cardsApi';
+import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
+import OutlinedBox from '@/components/ui/OutlinedBox';
+import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
 import { ColorMatchType, MTG_COLORS } from '@/types/browse';
 
 interface GoalSearchFormProps {
@@ -83,13 +85,13 @@ const STAT_OPERATORS = [
 export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormProps) {
   // Initialize state from searchConditions
   const [isInitialized, setIsInitialized] = useState(false);
-  
+
   // Local states for all search fields
   const [name, setName] = useState(searchConditions.name || '');
   const [oracleText, setOracleText] = useState(searchConditions.oracleText || '');
   const [artist, setArtist] = useState(searchConditions.artist || '');
   const [oneResultPerCardName, setOneResultPerCardName] = useState(searchConditions.oneResultPerCardName ?? true);
-  
+
   // Color state
   const [colorState, setColorState] = useState<ColorState>(() => {
     if (searchConditions.colors_array?.exactly?.length === 0) {
@@ -118,6 +120,9 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
   // Stat conditions
   const [statConditions, setStatConditions] = useState<StatCondition[]>([]);
 
+  // Card filter state
+  const [cardFilter, setCardFilter] = useState<CardFilter>({ include: [], exclude: [] });
+
   // Fetch data for dropdowns
   const { data: cardTypesData } = useGetCardTypesQuery();
 
@@ -125,9 +130,9 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
   const toAutocompleteOptions = (
     options: SimpleOption[],
     category: string,
-    excludeList: string[] = []
+    excludeList: string[] = [],
   ): AutocompleteOption[] => {
-    return options.map(opt => ({
+    return options.map((opt) => ({
       category,
       label: opt.label,
       value: opt.value,
@@ -138,8 +143,8 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
   // Fetch sets data
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL}/sets/all`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.success && data.data && data.data.sets) {
           // Sort sets by releasedAt in descending order (newest first)
           const sortedSets = [...data.data.sets].sort((a: any, b: any) => {
@@ -154,7 +159,7 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
           setSetOptions(options);
         }
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching sets:', error);
       });
   }, []);
@@ -163,21 +168,21 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
   useEffect(() => {
     if (!isInitialized && searchConditions.type && typeOptions.length > 0) {
       const selected: AutocompleteOption[] = [];
-      
+
       searchConditions.type.AND?.forEach((type: string) => {
-        const option = typeOptions.find(opt => opt.value === type);
+        const option = typeOptions.find((opt) => opt.value === type);
         if (option) {
           selected.push({ ...option, exclude: false });
         }
       });
-      
+
       searchConditions.type.NOT?.forEach((type: string) => {
-        const option = typeOptions.find(opt => opt.value === type);
+        const option = typeOptions.find((opt) => opt.value === type);
         if (option) {
           selected.push({ ...option, exclude: true });
         }
       });
-      
+
       setSelectedTypes(selected);
     }
   }, [isInitialized, searchConditions.type, typeOptions]);
@@ -187,27 +192,27 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
     if (!isInitialized && searchConditions.rarityNumeric) {
       const selected: AutocompleteOption[] = [];
       const rarityAutocompleteOptions = toAutocompleteOptions(RARITY_OPTIONS, 'Rarities');
-      
+
       searchConditions.rarityNumeric.OR?.forEach((r: string) => {
         if (r.startsWith('=')) {
           const value = r.substring(1);
-          const option = rarityAutocompleteOptions.find(opt => opt.value === value);
+          const option = rarityAutocompleteOptions.find((opt) => opt.value === value);
           if (option) {
             selected.push({ ...option, exclude: false });
           }
         }
       });
-      
+
       searchConditions.rarityNumeric.AND?.forEach((r: string) => {
         if (r.startsWith('!=')) {
           const value = r.substring(2);
-          const option = rarityAutocompleteOptions.find(opt => opt.value === value);
+          const option = rarityAutocompleteOptions.find((opt) => opt.value === value);
           if (option) {
             selected.push({ ...option, exclude: true });
           }
         }
       });
-      
+
       setSelectedRarities(selected);
     }
   }, [isInitialized, searchConditions.rarityNumeric]);
@@ -216,24 +221,24 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
   useEffect(() => {
     if (!isInitialized && searchConditions.setId && setOptions.length > 0) {
       const selected: AutocompleteOption[] = [];
-      
+
       searchConditions.setId.OR?.forEach((id: string) => {
-        const option = setOptions.find(opt => opt.value === id);
+        const option = setOptions.find((opt) => opt.value === id);
         if (option) {
           selected.push({ ...option, exclude: false });
         }
       });
-      
+
       searchConditions.setId.AND?.forEach((id: string) => {
         if (id.startsWith('!=')) {
           const value = id.substring(2);
-          const option = setOptions.find(opt => opt.value === value);
+          const option = setOptions.find((opt) => opt.value === value);
           if (option) {
             selected.push({ ...option, exclude: true });
           }
         }
       });
-      
+
       setSelectedSets(selected);
     }
   }, [isInitialized, searchConditions.setId, setOptions]);
@@ -243,7 +248,7 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
     if (!isInitialized) {
       const conditions: StatCondition[] = [];
       Object.entries(searchConditions).forEach(([key, value]) => {
-        const statAttr = STAT_ATTRIBUTES.find(attr => attr.value === key);
+        const statAttr = STAT_ATTRIBUTES.find((attr) => attr.value === key);
         if (statAttr && value && typeof value === 'object' && 'AND' in value) {
           value.AND?.forEach((condition: string) => {
             const operatorMatch = condition.match(/^(>=|>|=|<=|<|!=)(.+)$/);
@@ -260,6 +265,26 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
       setStatConditions(conditions);
     }
   }, [isInitialized, searchConditions]);
+
+  // Parse initial card ID conditions (only once)
+  useEffect(() => {
+    if (!isInitialized && searchConditions.id) {
+      const include: string[] = [];
+      const exclude: string[] = [];
+
+      searchConditions.id.OR?.forEach((id: string) => {
+        include.push(id);
+      });
+
+      searchConditions.id.AND?.forEach((id: string) => {
+        if (id.startsWith('!=')) {
+          exclude.push(id.substring(2));
+        }
+      });
+
+      setCardFilter({ include, exclude });
+    }
+  }, [isInitialized, searchConditions.id]);
 
   // Build conditions object
   const buildConditions = useCallback(() => {
@@ -281,62 +306,84 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
     }
 
     // Types
-    const typeInclude = selectedTypes.filter(t => !t.exclude);
-    const typeExclude = selectedTypes.filter(t => t.exclude);
+    const typeInclude = selectedTypes.filter((t) => !t.exclude);
+    const typeExclude = selectedTypes.filter((t) => t.exclude);
     if (typeInclude.length > 0 || typeExclude.length > 0) {
       conditions.type = {};
       if (typeInclude.length > 0) {
-        conditions.type.AND = typeInclude.map(t => t.value);
+        conditions.type.AND = typeInclude.map((t) => t.value);
       }
       if (typeExclude.length > 0) {
-        conditions.type.NOT = typeExclude.map(t => t.value);
+        conditions.type.NOT = typeExclude.map((t) => t.value);
       }
     }
 
     // Rarities
-    const rarityInclude = selectedRarities.filter(r => !r.exclude);
-    const rarityExclude = selectedRarities.filter(r => r.exclude);
+    const rarityInclude = selectedRarities.filter((r) => !r.exclude);
+    const rarityExclude = selectedRarities.filter((r) => r.exclude);
     if (rarityInclude.length > 0 || rarityExclude.length > 0) {
       conditions.rarityNumeric = {};
       if (rarityInclude.length > 0) {
-        conditions.rarityNumeric.OR = rarityInclude.map(r => `=${r.value}`);
+        conditions.rarityNumeric.OR = rarityInclude.map((r) => `=${r.value}`);
       }
       if (rarityExclude.length > 0) {
-        conditions.rarityNumeric.AND = rarityExclude.map(r => `!=${r.value}`);
+        conditions.rarityNumeric.AND = rarityExclude.map((r) => `!=${r.value}`);
       }
     }
 
     // Sets
-    const setInclude = selectedSets.filter(s => !s.exclude);
-    const setExclude = selectedSets.filter(s => s.exclude);
+    const setInclude = selectedSets.filter((s) => !s.exclude);
+    const setExclude = selectedSets.filter((s) => s.exclude);
     if (setInclude.length > 0 || setExclude.length > 0) {
       conditions.setId = {};
       if (setInclude.length > 0) {
-        conditions.setId.OR = setInclude.map(s => s.value);
+        conditions.setId.OR = setInclude.map((s) => s.value);
       }
       if (setExclude.length > 0) {
-        conditions.setId.AND = setExclude.map(s => `!=${s.value}`);
+        conditions.setId.AND = setExclude.map((s) => `!=${s.value}`);
       }
     }
 
     // Stats
     const statsByAttribute: Record<string, string[]> = {};
-    statConditions.forEach(stat => {
-      if (stat.value) {  // Only include if value is not empty
+    statConditions.forEach((stat) => {
+      if (stat.value) {
+        // Only include if value is not empty
         if (!statsByAttribute[stat.attribute]) {
           statsByAttribute[stat.attribute] = [];
         }
         statsByAttribute[stat.attribute].push(`${stat.operator}${stat.value}`);
       }
     });
-    
+
     Object.entries(statsByAttribute).forEach(([attribute, conditionValues]) => {
       conditions[attribute] = { AND: conditionValues };
     });
 
+    // Card IDs
+    if (cardFilter.include.length > 0 || cardFilter.exclude.length > 0) {
+      conditions.id = {};
+      if (cardFilter.include.length > 0) {
+        conditions.id.OR = cardFilter.include;
+      }
+      if (cardFilter.exclude.length > 0) {
+        conditions.id.AND = cardFilter.exclude.map((id) => `!=${id}`);
+      }
+    }
+
     return conditions;
-  }, [name, oracleText, artist, oneResultPerCardName, colorState, selectedTypes, 
-      selectedRarities, selectedSets, statConditions]);
+  }, [
+    name,
+    oracleText,
+    artist,
+    oneResultPerCardName,
+    colorState,
+    selectedTypes,
+    selectedRarities,
+    selectedSets,
+    statConditions,
+    cardFilter,
+  ]);
 
   // Mark as initialized once all data is loaded
   useEffect(() => {
@@ -370,7 +417,7 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
       ];
       // Remove duplicates and create options
       const uniqueTypes = [...new Set(allTypes)];
-      const options = uniqueTypes.map(type => ({
+      const options = uniqueTypes.map((type) => ({
         category: 'Types',
         label: type,
         value: `"${type}"`,
@@ -382,17 +429,15 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
 
   const handleColorToggle = (color: string) => {
     if (color === 'C') {
-      setColorState(prev => ({
+      setColorState((prev) => ({
         ...prev,
         includeColorless: !prev.includeColorless,
         colors: !prev.includeColorless ? [] : prev.colors,
       }));
     } else {
-      setColorState(prev => ({
+      setColorState((prev) => ({
         ...prev,
-        colors: prev.colors.includes(color)
-          ? prev.colors.filter(c => c !== color)
-          : [...prev.colors, color],
+        colors: prev.colors.includes(color) ? prev.colors.filter((c) => c !== color) : [...prev.colors, color],
         includeColorless: false,
       }));
     }
@@ -466,17 +511,9 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
       />
 
       {/* Color Selector */}
-      <Paper 
-        variant="outlined" 
-        sx={{ 
-          margin: 0,
-          marginTop: '12px',
-          pt: 1,
-          borderColor: (theme) => theme.palette.grey[700],
-        }}
-      >
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: '6px', px: 1 }}>
-          {MTG_COLORS.map(color => (
+      <OutlinedBox label="Colors">
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: '6px', pb: 1 }}>
+          {MTG_COLORS.map((color) => (
             <IconButton
               key={color}
               size="small"
@@ -526,8 +563,8 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
             <i className="ms ms-c ms-cost ms-2x" />
           </IconButton>
         </Box>
-        
-        <Box sx={{ p: 1, pt: 1.25, pb: 1.25 }}>
+
+        <Box sx={{ pt: 1 }}>
           <Select
             fullWidth
             size="small"
@@ -544,7 +581,7 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
             <MenuItem value="atMost">At Most These Colors</MenuItem>
           </Select>
         </Box>
-      </Paper>
+      </OutlinedBox>
 
       {/* Type Selector */}
       <AutocompleteWithNegation
@@ -570,13 +607,19 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
         setSelectedOptionsRemotely={setSelectedSets}
       />
 
+      {/* Card Selector */}
+      <CardSelector
+        value={cardFilter}
+        onChange={setCardFilter}
+        label="Specific Cards (to include or exclude)"
+        placeholder="Search for cards to include or exclude"
+      />
+
       {/* Printing Options */}
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="subtitle2">
-            Card Printings
-          </Typography>
-          <Tooltip 
+          <Typography variant="subtitle2">Card Printings</Typography>
+          <Tooltip
             title={
               <Box>
                 <Typography variant="body2" sx={{ mb: 1 }}>
@@ -589,10 +632,15 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
                   Giant Spider has been printed in over 20 different sets (Alpha, Beta, 4th Edition, etc.).
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 0.5 }}>
-                  • <strong>One printing:</strong> Having any version of Giant Spider counts as 1 towards your goal
+                  • <strong>One printing:</strong> Having any version of Giant Spider counts as 1 towards your goal --
+                  you only need one copy of any Giant Spider.
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  • <strong>Every printing:</strong> Each different set's Giant Spider counts separately -- you'll need
+                  a copy of each printing of Giant Spider.
                 </Typography>
                 <Typography variant="body2">
-                  • <strong>Every printing:</strong> Each different set's Giant Spider counts separately
+                  <em>(Note: Specific cards you include or exclude will always override this setting.)</em>
                 </Typography>
               </Box>
             }
@@ -604,7 +652,7 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
             </IconButton>
           </Tooltip>
         </Box>
-        
+
         <ToggleButtonGroup
           value={oneResultPerCardName ? 'one' : 'every'}
           exclusive
@@ -616,29 +664,18 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
           fullWidth
           size="small"
         >
-          <ToggleButton value="one">
-            One printing of each unique card
-          </ToggleButton>
-          <ToggleButton value="every">
-            Every printing of each unique card
-          </ToggleButton>
+          <ToggleButton value="one">One printing of each unique card</ToggleButton>
+          <ToggleButton value="every">Every printing of each unique card</ToggleButton>
         </ToggleButtonGroup>
       </Paper>
 
       {/* Stat Conditions */}
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="subtitle2">
-            Stat Filters
-          </Typography>
-          <Chip
-            label="Add Filter"
-            size="small"
-            onClick={handleAddStatCondition}
-            color="primary"
-          />
+          <Typography variant="subtitle2">Stat Filters</Typography>
+          <Chip label="Add Filter" size="small" onClick={handleAddStatCondition} color="primary" />
         </Box>
-        
+
         {statConditions.map((condition, index) => (
           <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'center' }}>
             <TextField
@@ -648,13 +685,13 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
               onChange={(e) => handleStatConditionChange(index, 'attribute', e.target.value)}
               sx={{ minWidth: 150 }}
             >
-              {STAT_ATTRIBUTES.map(attr => (
+              {STAT_ATTRIBUTES.map((attr) => (
                 <MenuItem key={attr.value} value={attr.value}>
                   {attr.label}
                 </MenuItem>
               ))}
             </TextField>
-            
+
             <TextField
               select
               size="small"
@@ -662,13 +699,13 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
               onChange={(e) => handleStatConditionChange(index, 'operator', e.target.value)}
               sx={{ minWidth: 70 }}
             >
-              {STAT_OPERATORS.map(op => (
+              {STAT_OPERATORS.map((op) => (
                 <MenuItem key={op.value} value={op.value}>
                   {op.label}
                 </MenuItem>
               ))}
             </TextField>
-            
+
             <TextField
               size="small"
               value={condition.value}
@@ -676,16 +713,11 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
               placeholder="Value"
               sx={{ flex: 1 }}
             />
-            
-            <Chip
-              label="Remove"
-              size="small"
-              onDelete={() => handleRemoveStatCondition(index)}
-              color="error"
-            />
+
+            <Chip label="Remove" size="small" onDelete={() => handleRemoveStatCondition(index)} color="error" />
           </Box>
         ))}
-        
+
         {statConditions.length === 0 && (
           <Typography variant="body2" color="text.secondary">
             No stat filters applied

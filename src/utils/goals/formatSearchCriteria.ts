@@ -29,6 +29,11 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription):
   const typeParts: string[] = [];
   const colorPart: string[] = [];
   const attributeParts: string[] = [];
+  
+  // Check if we only have specific card IDs (and maybe oneResultPerCardName)
+  const hasOnlyCardIds = conditions.id && Object.keys(conditions).filter(
+    key => key !== 'id' && key !== 'oneResultPerCardName'
+  ).length === 0;
 
   // Types - collect them separately for better formatting
   if (conditions.type) {
@@ -136,11 +141,31 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription):
     }
   }
   
-  // One result per card name (hide duplicate printings)
-  if (conditions.oneResultPerCardName) {
-    attributeParts.push(`(one printing of each card)`);
-  } else {
-    attributeParts.push(`(every printing of each card)`);
+  // Specific cards
+  if (conditions.id) {
+    const includedCards = conditions.id.OR?.length || 0;
+    const excludedCards = conditions.id.AND?.filter((id: string) => id.startsWith('!=')).length || 0;
+    
+    const cardParts: string[] = [];
+    if (includedCards > 0) {
+      cardParts.push(`including ${includedCards} specific card${includedCards > 1 ? 's' : ''}`);
+    }
+    if (excludedCards > 0) {
+      cardParts.push(`excluding ${excludedCards} specific card${excludedCards > 1 ? 's' : ''}`);
+    }
+    
+    if (cardParts.length > 0) {
+      attributeParts.push(`(${cardParts.join(' and ')})`);
+    }
+  }
+  
+  // One result per card name (hide duplicate printings) - but not if we only have card IDs
+  if (!hasOnlyCardIds) {
+    if (conditions.oneResultPerCardName) {
+      attributeParts.push(`(one printing of each card)`);
+    } else {
+      attributeParts.push(`(every printing of each card)`);
+    }
   }
 
   // Stats
@@ -254,6 +279,20 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription):
     mainParts.push(...attributeParts);
   }
 
+  // Special case: if only specific cards are selected (no other criteria except maybe oneResultPerCardName)
+  if (hasOnlyCardIds) {
+    const includedCards = conditions.id.OR?.length || 0;
+    const excludedCards = conditions.id.AND?.filter((id: string) => id.startsWith('!=')).length || 0;
+    
+    if (includedCards > 0 && excludedCards === 0) {
+      return `${includedCards} specific card${includedCards > 1 ? 's' : ''}`;
+    } else if (includedCards === 0 && excludedCards > 0) {
+      return `every card except ${excludedCards} specific card${excludedCards > 1 ? 's' : ''}`;
+    } else if (includedCards > 0 && excludedCards > 0) {
+      return `${includedCards} specific card${includedCards > 1 ? 's' : ''} (excluding ${excludedCards} other${excludedCards > 1 ? 's' : ''})`;
+    }
+  }
+  
   // If no criteria specified
   if (mainParts.length === 0) {
     return 'every card';
