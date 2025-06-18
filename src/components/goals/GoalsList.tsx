@@ -151,25 +151,27 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                   </Stack>
                 </Box>
 
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  {goal.description || 'No description provided'}
-                </Typography>
+                {goal.description && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    {goal.description}
+                  </Typography>
+                )}
+
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="caption" color="text.secondary">
+                    Goal Summary
+                  </Typography>
+                  <GoalDescription
+                    goal={goal}
+                    variant="body2"
+                    sx={{
+                      fontStyle: 'italic',
+                      color: 'text.secondary',
+                    }}
+                  />
+                </Box>
 
                 <Stack spacing={1} sx={{ mt: 'auto' }}>
-                  <Box>
-                    <Typography variant="caption" color="text.secondary">
-                      Goal Summary
-                    </Typography>
-                    <GoalDescription
-                      goal={goal}
-                      variant="body2"
-                      sx={{
-                        fontStyle: 'italic',
-                        color: 'text.secondary',
-                      }}
-                    />
-                  </Box>
-
                   {goal.progress && (
                     <Box>
                       <Stack spacing={0.5}>

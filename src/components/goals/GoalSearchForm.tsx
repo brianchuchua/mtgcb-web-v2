@@ -83,6 +83,7 @@ const STAT_OPERATORS = [
 ];
 
 export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormProps) {
+  
   // Initialize state from searchConditions
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -384,6 +385,13 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
     statConditions,
     cardFilter,
   ]);
+
+  // Update oneResultPerCardName when searchConditions changes
+  useEffect(() => {
+    if (searchConditions.oneResultPerCardName !== undefined) {
+      setOneResultPerCardName(searchConditions.oneResultPerCardName);
+    }
+  }, [searchConditions.oneResultPerCardName]);
 
   // Mark as initialized once all data is loaded
   useEffect(() => {

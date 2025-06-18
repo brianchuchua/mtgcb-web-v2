@@ -17,7 +17,7 @@ import {
   styled,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { GoalSearchForm } from './GoalSearchForm';
 import { CardApiParams } from '@/api/browse/types';
@@ -45,7 +45,7 @@ interface FormValues {
 export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [updateGoal, { isLoading }] = useUpdateGoalMutation();
-  const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>('separate');
+  const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>('all');
   const [isChangingMode, setIsChangingMode] = useState(false);
   const [searchConditions, setSearchConditions] = useState<
     Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>
@@ -83,6 +83,7 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
   // Parse search conditions from goal
   useEffect(() => {
     if (goal) {
+      
       // Set form values
       setValue('name', goal.name);
       setValue('description', goal.description || '');
@@ -99,14 +100,19 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
       }
 
       // Set search conditions
-      setSearchConditions(goal.searchCriteria.conditions);
+      // API default: undefined means false (every printing)
+      const conditions = {
+        ...goal.searchCriteria.conditions,
+        oneResultPerCardName: goal.searchCriteria.conditions.oneResultPerCardName ?? false
+      };
+      setSearchConditions(conditions);
     }
   }, [goal, setValue]);
 
   const handleClose = () => {
     reset();
     setSearchConditions({});
-    setQuantityMode('separate');
+    setQuantityMode('all');
     onClose();
   };
 
@@ -221,7 +227,7 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
                 Define which cards this goal applies to. Leave fields empty to include all cards.
               </Typography>
 
-              <GoalSearchForm searchConditions={searchConditions} onChange={handleSearchConditionsChange} />
+              {goal && <GoalSearchForm searchConditions={searchConditions} onChange={handleSearchConditionsChange} />}
             </Box>
 
             <Divider />
@@ -231,18 +237,6 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
                 Goal Quantities
               </Typography>
               <Box sx={{ mb: 2 }}>
-                <Chip
-                  label="Separate Regular/Foil"
-                  onClick={() => {
-                    setIsChangingMode(true);
-                    setQuantityMode('separate');
-                    // Clear the 'all' field when switching to separate mode
-                    setValue('targetQuantityAll', undefined);
-                    setTimeout(() => setIsChangingMode(false), 100);
-                  }}
-                  color={quantityMode === 'separate' ? 'primary' : 'default'}
-                  sx={{ mr: 1 }}
-                />
                 <Chip
                   label="Any Type"
                   onClick={() => {
@@ -254,6 +248,18 @@ export function EditGoalDialog({ open, onClose, goal, userId }: EditGoalDialogPr
                     setTimeout(() => setIsChangingMode(false), 100);
                   }}
                   color={quantityMode === 'all' ? 'primary' : 'default'}
+                  sx={{ mr: 1 }}
+                />
+                <Chip
+                  label="Separate Regular/Foil"
+                  onClick={() => {
+                    setIsChangingMode(true);
+                    setQuantityMode('separate');
+                    // Clear the 'all' field when switching to separate mode
+                    setValue('targetQuantityAll', undefined);
+                    setTimeout(() => setIsChangingMode(false), 100);
+                  }}
+                  color={quantityMode === 'separate' ? 'primary' : 'default'}
                 />
               </Box>
 

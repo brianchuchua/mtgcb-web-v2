@@ -44,7 +44,7 @@ interface FormValues {
 export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [createGoal, { isLoading }] = useCreateGoalMutation();
-  const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>('separate');
+  const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>('all');
   const [searchConditions, setSearchConditions] = useState<
     Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>
   >({});
@@ -77,7 +77,7 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
   const handleClose = () => {
     reset();
     setSearchConditions({});
-    setQuantityMode('separate');
+    setQuantityMode('all');
     onClose();
   };
 
@@ -181,15 +181,15 @@ export function CreateGoalDialog({ open, onClose }: CreateGoalDialogProps) {
               </Typography>
               <Box sx={{ mb: 2 }}>
                 <Chip
-                  label="Separate Regular/Foil"
-                  onClick={() => setQuantityMode('separate')}
-                  color={quantityMode === 'separate' ? 'primary' : 'default'}
-                  sx={{ mr: 1 }}
-                />
-                <Chip
                   label="Any Type"
                   onClick={() => setQuantityMode('all')}
                   color={quantityMode === 'all' ? 'primary' : 'default'}
+                  sx={{ mr: 1 }}
+                />
+                <Chip
+                  label="Separate Regular/Foil"
+                  onClick={() => setQuantityMode('separate')}
+                  color={quantityMode === 'separate' ? 'primary' : 'default'}
                 />
               </Box>
 
