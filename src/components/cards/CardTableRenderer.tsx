@@ -810,13 +810,23 @@ export const useCardRowRenderer = (
                   variant="caption" 
                   sx={{ 
                     display: 'block', 
-                    color: card.goalTargetQuantityReg ? (card.goalRegMet ? 'success.main' : 'warning.main') : 'transparent',
+                    color: (card.goalTargetQuantityReg || (card.goalTargetQuantityAll && !card.goalTargetQuantityFoil)) ? 
+                      ((card.goalTargetQuantityReg && card.goalRegMet) || (card.goalTargetQuantityAll && card.goalAllMet) ? 'success.main' : 'warning.main') : 
+                      'transparent',
                     fontWeight: 'medium',
                     mt: 0.5,
                     minHeight: '16px'
                   }}
                 >
-                  {card.goalTargetQuantityReg ? (card.goalRegMet ? 'Goal met!' : `Need ${card.goalRegNeeded || 0}`) : '\u00A0'}
+                  {(() => {
+                    if (card.goalTargetQuantityReg) {
+                      return card.goalRegMet ? 'Goal met!' : `Need ${card.goalRegNeeded || 0}`;
+                    }
+                    if (card.goalTargetQuantityAll && !card.goalTargetQuantityReg && !card.goalTargetQuantityFoil) {
+                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0} (either)`;
+                    }
+                    return '\u00A0';
+                  })()}
                 </Typography>
               </Box>
             ) : (
@@ -862,7 +872,7 @@ export const useCardRowRenderer = (
                       return card.goalFoilMet ? 'Goal met!' : `Need ${card.goalFoilNeeded || 0}`;
                     }
                     if (card.goalTargetQuantityAll && !card.goalTargetQuantityReg && !card.goalTargetQuantityFoil) {
-                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0}`;
+                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0} (either)`;
                     }
                     return '\u00A0'; // Non-breaking space to maintain height
                   })()}
@@ -890,13 +900,23 @@ export const useCardRowRenderer = (
                   variant="caption" 
                   sx={{ 
                     display: 'block', 
-                    color: card.goalTargetQuantityReg ? (card.goalRegMet ? 'success.main' : 'warning.main') : 'transparent',
+                    color: (card.goalTargetQuantityReg || (card.goalTargetQuantityAll && !card.goalTargetQuantityFoil)) ? 
+                      ((card.goalTargetQuantityReg && card.goalRegMet) || (card.goalTargetQuantityAll && card.goalAllMet) ? 'success.main' : 'warning.main') : 
+                      'transparent',
                     fontWeight: 'medium',
                     mt: 0.5,
                     minHeight: '16px'
                   }}
                 >
-                  {card.goalTargetQuantityReg ? (card.goalRegMet ? 'Goal met!' : `Need ${card.goalRegNeeded || 0}`) : '\u00A0'}
+                  {(() => {
+                    if (card.goalTargetQuantityReg) {
+                      return card.goalRegMet ? 'Goal met!' : `Need ${card.goalRegNeeded || 0}`;
+                    }
+                    if (card.goalTargetQuantityAll && !card.goalTargetQuantityReg && !card.goalTargetQuantityFoil) {
+                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0} (either)`;
+                    }
+                    return '\u00A0';
+                  })()}
                 </Typography>
               </Box>
             ) : (
@@ -926,7 +946,7 @@ export const useCardRowRenderer = (
                       return card.goalFoilMet ? 'Goal met!' : `Need ${card.goalFoilNeeded || 0}`;
                     }
                     if (card.goalTargetQuantityAll && !card.goalTargetQuantityReg && !card.goalTargetQuantityFoil) {
-                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0}`;
+                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0} (either)`;
                     }
                     return '\u00A0'; // Non-breaking space to maintain height
                   })()}

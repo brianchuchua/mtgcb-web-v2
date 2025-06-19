@@ -58,9 +58,11 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Performance benchmark scripts and documentation
 - Card page: Other Printings should just be the standard pagination with those cards filtered, collection aware, maybe goal aware
 - Shopping lists -- reports based on collection goals
+- TCGPlayer supports adding a collector number after the set code -- needed for things like secret lair that have duplicate names
 
 ## UX Action Items
 
+- Link to collection needs to be consistent. Underlined or not, which parts, etc.
 - Improve height of skeleton loader for collectionheader
 - Header and breadcrumb and form and alignment consistency
 - Clicking "Manath's Collection Goal" needs to clear the selection of collection goal
