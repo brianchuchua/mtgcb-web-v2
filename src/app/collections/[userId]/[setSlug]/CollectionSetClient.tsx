@@ -352,7 +352,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         subsets={subsets}
         onSubsetSelect={handleSubsetSelect}
         additionalAction={
-          isOwnCollection && browseController.view === 'cards' ? (
+          isOwnCollection && browseController.view === 'cards' && !selectedGoalId ? (
             <MassUpdateButton 
               onClick={handleMassUpdateToggle}
               isOpen={isMassUpdateOpen}
@@ -363,7 +363,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       />
 
       {/* Mass Update Panel */}
-      {isOwnCollection && browseController.view === 'cards' && (
+      {isOwnCollection && browseController.view === 'cards' && !selectedGoalId && (
         <MassUpdatePanel
           isOpen={isMassUpdateOpen}
           onSubmit={handleMassUpdateSubmit}
