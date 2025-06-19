@@ -47,7 +47,7 @@ export function GoalsClient() {
     <Box p={3}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4" component="h1" color="primary">
-          Collection Goals
+          Goals
         </Typography>
         <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleCreateClick}>
           Create Goal
@@ -74,12 +74,7 @@ export function GoalsClient() {
         </Paper>
       )}
 
-      {goals.length > 0 && (
-        <GoalsList
-          goals={goals}
-          userId={user?.userId || 0}
-        />
-      )}
+      {goals.length > 0 && <GoalsList goals={goals} userId={user?.userId || 0} />}
     </Box>
   );
 }

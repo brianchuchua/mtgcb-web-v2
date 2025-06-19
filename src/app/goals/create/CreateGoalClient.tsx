@@ -56,7 +56,7 @@ export function CreateGoalClient() {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h4" component="h1" color="primary">
-          Create Collection Goal
+          Create Goal
         </Typography>
       </Box>
 

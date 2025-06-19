@@ -60,6 +60,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## UX Action Items
 
+- Header and breadcrumb and form and alignment consistency
 - Clicking "Manath's Collection Goal" needs to clear the selection of collection goal
 - Position of created date when hovering edited date on goals page is weird
 - Audit style of info messages and errors
@@ -107,7 +108,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Header consistency on pages, make a shared component for text headers -- centered vs not, Goals vs Add/Remove Cards for example.
 - Money value consistency -- success and warning colors
 - Quantity selectors -- going from custom filter to normal doesn't reset the states as you'd expect
-- A cool stats page, icon can be a graph, most valuable card can move there -- can make an expandable region in a set view too.
+- A cool stats page, icon can be a graph, most valuable card can move there -- can make an expandable region in a set view too. How much of each color selected, etc. Check what MTG Arena and other tools do. Some easy wins. Most common creature type, most valuable card, etc.
 - When any prices are missing, add an info icon explaining it's an underestimate
 - Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues

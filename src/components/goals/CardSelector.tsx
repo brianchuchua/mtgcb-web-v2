@@ -215,7 +215,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
           <TextField
             {...params}
             label={label}
-            placeholder={placeholder}
+            placeholder={allSelectedCards.size === 0 ? placeholder : ''}
             InputProps={{
               ...params.InputProps,
               startAdornment: (
@@ -259,7 +259,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
       />
 
       {Array.from(allSelectedCards.entries()).length > 0 && (
-        <Stack direction="row" flexWrap="wrap" gap={1} mt={1}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
           {Array.from(allSelectedCards.entries()).map(([cardId, { type }]) => {
             const cardInfo = cardInfoCache.get(cardId);
             const isExclude = type === 'exclude';
@@ -320,14 +320,14 @@ const CardSelector: React.FC<CardSelectorProps> = ({
                     <img
                       src={getCardImageUrl(cardInfo.id)}
                       alt={cardInfo.name}
-                      style={{ width: '100%', height: 'auto', borderRadius: '5%' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                     />
                   </CardPreview>
                 )}
               </Box>
             );
           })}
-        </Stack>
+        </Box>
       )}
     </Box>
   );
@@ -345,10 +345,18 @@ const CardChip = styled(Chip)(({ theme }) => ({
   '& .MuiChip-label': {
     paddingLeft: theme.spacing(0.5),
     paddingRight: theme.spacing(1),
+    maxWidth: '100%',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   '& .MuiChip-icon': {
     marginLeft: theme.spacing(0.5),
     marginRight: 0,
+  },
+  maxWidth: '100%',
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: 'calc(100vw - 80px)', // Account for padding/margins on mobile
   },
 }));
 
@@ -357,12 +365,13 @@ const CardPreview = styled(Box)(({ theme }) => ({
   bottom: '100%',
   left: '50%',
   transform: 'translateX(-50%) translateY(-8px)',
-  width: 200,
+  width: 299,
+  height: 'calc(299px * 1.393)',
   zIndex: theme.zIndex.tooltip,
   backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: '5%',
   boxShadow: theme.shadows[8],
-  padding: theme.spacing(0.5),
+  overflow: 'hidden',
   pointerEvents: 'none',
 }));
 

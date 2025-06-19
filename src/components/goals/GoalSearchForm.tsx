@@ -386,6 +386,19 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
     cardFilter,
   ]);
 
+  // Update color state when searchConditions changes
+  useEffect(() => {
+    if (searchConditions.colors_array?.exactly?.length === 0) {
+      setColorState({ colors: [], matchType: 'exactly', includeColorless: true });
+    } else if (searchConditions.colors_array?.exactly) {
+      setColorState({ colors: searchConditions.colors_array.exactly, matchType: 'exactly', includeColorless: false });
+    } else if (searchConditions.colors_array?.atLeast) {
+      setColorState({ colors: searchConditions.colors_array.atLeast, matchType: 'atLeast', includeColorless: false });
+    } else if (searchConditions.colors_array?.atMost) {
+      setColorState({ colors: searchConditions.colors_array.atMost, matchType: 'atMost', includeColorless: false });
+    }
+  }, [searchConditions.colors_array]);
+
   // Update oneResultPerCardName when searchConditions changes
   useEffect(() => {
     if (searchConditions.oneResultPerCardName !== undefined) {
