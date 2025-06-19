@@ -1,4 +1,4 @@
-import { CreateGoalRequest, GetGoalsResponse, Goal, UpdateGoalRequest } from './types';
+import { CreateGoalRequest, GetGoalsResponse, Goal, UpdateGoalRequest, GetGoalsParams } from './types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 
@@ -24,15 +24,14 @@ export const goalsApi = mtgcbApi.injectEndpoints({
         return ['Goals'];
       },
     }),
-    getUserGoals: builder.query<
-      ApiResponse<GetGoalsResponse>,
-      { userId: number; includeProgress?: boolean; priceType?: string }
-    >({
-      query: ({ userId, includeProgress, priceType }) => ({
+    getUserGoals: builder.query<ApiResponse<GetGoalsResponse>, GetGoalsParams>({
+      query: ({ userId, includeProgress, priceType, limit = 9, offset = 0 }) => ({
         url: `goals/${userId}`,
         params: {
           ...(includeProgress !== undefined && { includeProgress }),
           ...(priceType && { priceType }),
+          limit,
+          offset,
         },
       }),
       providesTags: (result, error, { userId }) => [{ type: 'Goals', id: `user-${userId}` }, 'Goals'],

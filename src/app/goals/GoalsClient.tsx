@@ -5,7 +5,9 @@ import { Alert, Box, Button, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { GoalsList } from '@/components/goals/GoalsList';
+import Pagination, { PaginationProps } from '@/components/pagination/Pagination';
 import { useAuth } from '@/hooks/useAuth';
+import { useGoalsPagination } from '@/hooks/goals/useGoalsPagination';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { PriceType } from '@/types/pricing';
 
@@ -13,19 +15,40 @@ export function GoalsClient() {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const [displayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
+  const { currentPage, pageSize, onPageChange, onPageSizeChange } = useGoalsPagination();
 
-  const { data, isLoading, error } = useGetUserGoalsQuery(
-    {
-      userId: user?.userId ?? 0,
-      includeProgress: true,
-      priceType: displayPriceType.toLowerCase(),
-    },
-    {
-      skip: !user?.userId,
-    },
-  );
+  const queryArgs = {
+    userId: user?.userId ?? 0,
+    includeProgress: true,
+    priceType: displayPriceType.toLowerCase(),
+    limit: pageSize,
+    offset: (currentPage - 1) * pageSize,
+  };
+
+  const { data, isLoading, error } = useGetUserGoalsQuery(queryArgs, {
+    skip: !user?.userId,
+  });
 
   const goals = data?.data?.goals || [];
+  const totalCount = data?.data?.totalCount || 0;
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const paginationProps: PaginationProps = {
+    contentType: 'cards', // Goals use card-like display
+    currentPage,
+    pageSize,
+    pageSizeOptions: [1, 2, 3, 4, 5, 6, 7, 8, 9], // Limit to 1-9 for goals
+    totalPages,
+    totalItems: totalCount,
+    onPageChange,
+    onPageSizeChange,
+    viewMode: 'grid', // Goals only support grid view
+    onViewModeChange: () => {}, // No-op since goals only have grid view
+    isLoading,
+    hideContentTypeToggle: true, // Hide the cards/sets toggle
+    hideViewModeToggle: true, // Hide the grid/table toggle
+    customItemName: 'goals', // Show 'goals' instead of 'cards'
+  };
 
   const handleCreateClick = () => {
     router.push('/goals/create');
@@ -74,7 +97,13 @@ export function GoalsClient() {
         </Paper>
       )}
 
-      {goals.length > 0 && <GoalsList goals={goals} userId={user?.userId || 0} />}
+      {totalCount > 0 && (
+        <>
+          <Pagination {...paginationProps} />
+          <GoalsList goals={goals} userId={user?.userId || 0} />
+          <Pagination {...paginationProps} position="bottom" />
+        </>
+      )}
     </Box>
   );
 }

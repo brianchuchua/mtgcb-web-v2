@@ -40,8 +40,19 @@ export interface CreateGoalRequest {
   targetQuantityAll?: number;
 }
 
+export interface GetGoalsParams {
+  userId: number;
+  includeProgress?: boolean;
+  priceType?: string;
+  limit?: number;
+  offset?: number;
+}
+
 export interface GetGoalsResponse {
   goals: Goal[];
+  totalCount: number;
+  limit: number;
+  offset: number;
 }
 
 export interface UpdateGoalRequest {

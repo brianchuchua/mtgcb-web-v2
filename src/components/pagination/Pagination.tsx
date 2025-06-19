@@ -48,6 +48,8 @@ const Pagination: React.FC<PaginationProps> = ({
   subsets = [],
   onSubsetSelect,
   additionalAction,
+  hideViewModeToggle = false,
+  customItemName,
 }) => {
   const theme = useTheme();
   const [localCurrentPage, setLocalCurrentPage] = useState(currentPage);
@@ -92,6 +94,7 @@ const Pagination: React.FC<PaginationProps> = ({
                 totalItems={totalItems}
                 contentType={contentType}
                 isSmallScreen={false}
+                customItemName={customItemName}
               />
             )}
           </LeftSection>
@@ -128,6 +131,7 @@ const Pagination: React.FC<PaginationProps> = ({
                         totalItems={totalItems}
                         contentType={contentType}
                         isSmallScreen={true}
+                        customItemName={customItemName}
                       />
                     )}
                   </MobileInfoRow>
@@ -143,34 +147,41 @@ const Pagination: React.FC<PaginationProps> = ({
                     customSettingGroups={settingGroups}
                     subsets={subsets}
                     onSubsetSelect={onSubsetSelect}
+                    customItemName={customItemName}
                   />
 
-                  <Box sx={{ mt: 1 }}>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <ViewModeToggle
-                        viewMode={viewMode}
-                        onViewModeChange={onViewModeChange}
-                        isSmallScreen={isSmallScreen}
-                        isLoading={isLoading}
-                        isInitialLoading={isInitialLoading}
-                      />
-                      {additionalAction}
-                    </Stack>
-                  </Box>
+                  {(!hideViewModeToggle || additionalAction) && (
+                    <Box sx={{ mt: 1 }}>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        {!hideViewModeToggle && (
+                          <ViewModeToggle
+                            viewMode={viewMode}
+                            onViewModeChange={onViewModeChange}
+                            isSmallScreen={isSmallScreen}
+                            isLoading={isLoading}
+                            isInitialLoading={isInitialLoading}
+                          />
+                        )}
+                        {additionalAction}
+                      </Stack>
+                    </Box>
+                  )}
                 </RightControlsGroup>
               </MobileControlsRow>
             )}
 
-            {!isSmallScreen && (
+            {!isSmallScreen && (!hideViewModeToggle || additionalAction) && (
               <ViewToggleContainer>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <ViewModeToggle
-                    viewMode={viewMode}
-                    onViewModeChange={onViewModeChange}
-                    isSmallScreen={isSmallScreen}
-                    isLoading={isLoading}
-                    isInitialLoading={isInitialLoading}
-                  />
+                  {!hideViewModeToggle && (
+                    <ViewModeToggle
+                      viewMode={viewMode}
+                      onViewModeChange={onViewModeChange}
+                      isSmallScreen={isSmallScreen}
+                      isLoading={isLoading}
+                      isInitialLoading={isInitialLoading}
+                    />
+                  )}
                   {additionalAction}
                 </Stack>
               </ViewToggleContainer>
@@ -193,6 +204,7 @@ const Pagination: React.FC<PaginationProps> = ({
               customSettingGroups={settingGroups}
               subsets={subsets}
               onSubsetSelect={onSubsetSelect}
+              customItemName={customItemName}
             />
           </RightSection>
         </TopPaginationLayout>
@@ -224,6 +236,8 @@ export interface PaginationProps {
   subsets?: any[];
   onSubsetSelect?: (subsetId: string) => void;
   additionalAction?: React.ReactNode;
+  hideViewModeToggle?: boolean;
+  customItemName?: string;
 }
 
 Pagination.displayName = 'Pagination';
@@ -234,6 +248,7 @@ interface ItemRangeDisplayProps {
   totalItems: number;
   contentType: 'cards' | 'sets';
   isSmallScreen: boolean;
+  customItemName?: string;
 }
 
 const ItemRangeDisplay: React.FC<ItemRangeDisplayProps> = ({
@@ -242,6 +257,7 @@ const ItemRangeDisplay: React.FC<ItemRangeDisplayProps> = ({
   totalItems,
   contentType,
   isSmallScreen,
+  customItemName,
 }) => {
   if (isSmallScreen) {
     return (
@@ -253,7 +269,7 @@ const ItemRangeDisplay: React.FC<ItemRangeDisplayProps> = ({
           whiteSpace: 'nowrap',
         }}
       >
-        {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
+        {startItem}-{endItem} of {totalItems} {customItemName || (contentType === 'cards' ? 'cards' : 'sets')}
       </Typography>
     );
   }
@@ -261,7 +277,7 @@ const ItemRangeDisplay: React.FC<ItemRangeDisplayProps> = ({
   return (
     <ItemRangeInfo>
       <Typography variant="body1" color="text.secondary">
-        Showing {startItem}-{endItem} of {totalItems} {contentType === 'cards' ? 'cards' : 'sets'}
+        Showing {startItem}-{endItem} of {totalItems} {customItemName || (contentType === 'cards' ? 'cards' : 'sets')}
       </Typography>
     </ItemRangeInfo>
   );
@@ -407,6 +423,7 @@ interface PageSizeControlProps {
   customSettingGroups?: CardSettingGroup[];
   subsets?: any[];
   onSubsetSelect?: (subsetId: string) => void;
+  customItemName?: string;
 }
 
 const PageSizeControl: React.FC<PageSizeControlProps> = ({
@@ -418,6 +435,7 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
   customSettingGroups,
   subsets = [],
   onSubsetSelect,
+  customItemName,
 }) => {
   const cardSettingGroups = customSettingGroups || useCardSettingGroups(viewMode);
   const isSmallScreen = useMediaQuery('(max-width:899px)');
@@ -434,13 +452,13 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
   return (
     <PageSizeSelector>
       <FormControl size="small" variant="outlined" sx={{ minWidth: 70 }}>
-        <InputLabel id={labelId}>{contentType === 'cards' ? 'Cards' : 'Sets'}</InputLabel>
+        <InputLabel id={labelId}>{customItemName ? customItemName.charAt(0).toUpperCase() + customItemName.slice(1) : (contentType === 'cards' ? 'Cards' : 'Sets')}</InputLabel>
         <Select
           labelId={labelId}
           value={pageSize}
           onChange={handlePageSizeChange}
           renderValue={(value) => <>{value}</>}
-          label={`${contentType === 'cards' ? 'Cards' : 'Sets'}`}
+          label={customItemName ? customItemName.charAt(0).toUpperCase() + customItemName.slice(1) : (contentType === 'cards' ? 'Cards' : 'Sets')}
           sx={{ minWidth: 70 }}
         >
           {pageSizeOptions.map((option) => (
