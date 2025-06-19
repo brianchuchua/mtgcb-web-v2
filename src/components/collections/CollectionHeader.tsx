@@ -156,19 +156,23 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
         </Typography>
 
         <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
-          Current value: $
-          {goalSummary.totalValue.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
+          Current value:{' '}
+          <Box component="span" sx={{ color: 'success.main' }}>
+            ${goalSummary.totalValue.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </Box>
         </Typography>
 
-        <Typography variant="h6" sx={{ mb: 0, color: 'warning.main' }}>
-          Cost to complete: $
-          {goalSummary.costToComplete.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+          Cost to complete:{' '}
+          <Box component="span" sx={{ color: 'warning.main' }}>
+            ${goalSummary.costToComplete.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </Box>
         </Typography>
 
         {userId && selectedGoalId && (
@@ -206,11 +210,13 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
       </Typography>
 
       <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
-        Collection value: $
-        {totalValue.toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}
+        Collection value:{' '}
+        <Box component="span" sx={{ color: 'success.main' }}>
+          ${totalValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}
+        </Box>
       </Typography>
 
       <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

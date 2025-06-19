@@ -61,6 +61,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## UX Action Items
 
+- Improve height of skeleton loader for collectionheader
 - Header and breadcrumb and form and alignment consistency
 - Clicking "Manath's Collection Goal" needs to clear the selection of collection goal
 - Position of created date when hovering edited date on goals page is weird
@@ -158,6 +159,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 ## Maybes
 
 - Showing number of cards in excess of a goal
+- Showing goal criteria in the collection header
 
 ## Things To Check On
 
