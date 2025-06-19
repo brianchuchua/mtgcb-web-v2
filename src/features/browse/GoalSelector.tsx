@@ -50,8 +50,8 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
   };
 
   const handleEditClick = (goalId: number) => {
-    // Navigate to goals page with the goal ID as a query parameter
-    router.push(`/goals?edit=${goalId}`);
+    // Navigate to goal edit page
+    router.push(`/goals/edit/${goalId}`);
   };
 
   if (isLoading) {
@@ -143,7 +143,7 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              router.push('/goals?create=true');
+              router.push('/goals/create');
             }}
             onMouseDown={(e) => {
               e.preventDefault();

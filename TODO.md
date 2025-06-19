@@ -60,6 +60,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## UX Action Items
 
+- Clicking "Manath's Collection Goal" needs to clear the selection of collection goal
+- Position of created date when hovering edited date on goals page is weird
 - Audit style of info messages and errors
 - Set icons for token subsets
 - Hide duplicate printings -- should show in the card view how many printings are hidden, and maybe a link to show them
