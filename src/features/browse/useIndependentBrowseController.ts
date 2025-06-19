@@ -23,7 +23,7 @@ import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePriceType } from '@/hooks/usePriceType';
-import { selectSortBy, selectSortOrder, setSortBy, setSortOrder } from '@/redux/slices/browseSlice';
+import { selectSortBy, selectSortOrder, setSortBy, setSortOrder, selectShowGoals } from '@/redux/slices/browseSlice';
 import { SortByOption } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
@@ -33,9 +33,10 @@ interface UseIndependentBrowseControllerProps {
   enabled?: boolean;
   searchParams?: any;
   userId?: number;
+  goalId?: number;
 }
 
-export function useIndependentBrowseController({ setId, enabled = true, searchParams = {}, userId }: UseIndependentBrowseControllerProps) {
+export function useIndependentBrowseController({ setId, enabled = true, searchParams = {}, userId, goalId }: UseIndependentBrowseControllerProps) {
   const router = useRouter();
   const dispatch = useDispatch();
   
@@ -49,6 +50,7 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
   // Use Redux sort state for global synchronization
   const sortBy = useSelector(selectSortBy) || 'releasedAt';
   const sortOrder = useSelector(selectSortOrder) || 'asc';
+  const showGoals = useSelector(selectShowGoals);
 
   // Display settings - use collection settings when userId is provided
   const browseDisplaySettings = useDisplaySettings({ view: 'cards', viewMode });
@@ -61,6 +63,52 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
   const apiArgs = useMemo(() => {
     // Start with search parameters from the main search form
     const baseParams = buildApiParamsFromSearchParams(searchParams, 'cards');
+    
+    // Build select fields
+    const selectFields: Array<keyof CardModel> = [
+      'name',
+      'setId',
+      'setName',
+      'tcgplayerId',
+      'market',
+      'low',
+      'average',
+      'high',
+      'foil',
+      'collectorNumber',
+      'mtgcbCollectorNumber',
+      'rarity',
+      'rarityNumeric',
+      'type',
+      'artist',
+      'manaCost',
+      'convertedManaCost',
+      'powerNumeric',
+      'toughnessNumeric',
+      'loyaltyNumeric',
+      'releaseDate',
+    ];
+    
+    // Add quantity fields when userId is present
+    if (userId) {
+      selectFields.push('quantityReg', 'quantityFoil');
+    }
+    
+    // Add goal progress fields when goal is selected
+    if (goalId && userId) {
+      selectFields.push(
+        'goalTargetQuantityReg',
+        'goalTargetQuantityFoil',
+        'goalTargetQuantityAll',
+        'goalRegMet',
+        'goalFoilMet',
+        'goalAllMet',
+        'goalFullyMet',
+        'goalRegNeeded',
+        'goalFoilNeeded',
+        'goalAllNeeded'
+      );
+    }
     
     // Combine with subset-specific parameters
     return {
@@ -75,33 +123,15 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
       offset: (currentPage - 1) * pageSize,
       sortBy: sortBy || baseParams.sortBy || 'releasedAt',
       sortDirection: sortOrder || baseParams.sortDirection || 'asc',
-      select: [
-        'name',
-        'setId',
-        'setName',
-        'tcgplayerId',
-        'market',
-        'low',
-        'average',
-        'high',
-        'foil',
-        'collectorNumber',
-        'mtgcbCollectorNumber',
-        'rarity',
-        'rarityNumeric',
-        'type',
-        'artist',
-        'manaCost',
-        'convertedManaCost',
-        'powerNumeric',
-        'toughnessNumeric',
-        'loyaltyNumeric',
-        'releaseDate',
-        'quantityReg',
-        'quantityFoil',
-      ] as Array<keyof CardModel>,
+      select: selectFields,
+      // Add goal-specific parameters when goal is selected
+      ...(goalId && userId && { 
+        goalId: goalId,
+        showGoalProgress: true,
+        ...(showGoals !== 'all' && { showGoals }),
+      }),
     };
-  }, [setId, userId, priceType, pageSize, currentPage, sortBy, sortOrder, searchParams]);
+  }, [setId, userId, goalId, priceType, pageSize, currentPage, sortBy, sortOrder, searchParams, showGoals]);
 
   // Fetch data
   const {
@@ -217,7 +247,10 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
       sortOrder,
       gallerySettings: displaySettings.gallerySettings,
       tableSettings: displaySettings.tableSettings,
-      cardDisplaySettings: displaySettings.cardDisplaySettings,
+      cardDisplaySettings: {
+        ...displaySettings.cardDisplaySettings,
+        goalProgressIsVisible: !!goalId && !!userId,
+      },
       priceType: displaySettings.priceType,
       userId: userId,
     },

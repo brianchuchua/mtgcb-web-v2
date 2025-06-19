@@ -22,10 +22,11 @@ interface SubsetSectionProps {
   onRegisterToggle?: (toggleFn: () => void) => void;
   isOwnCollection?: boolean;
   userId?: number;
+  goalId?: number;
 }
 
 export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function SubsetSection(
-  { subset, searchParams, onRegisterToggle, isOwnCollection = false, userId },
+  { subset, searchParams, onRegisterToggle, isOwnCollection = false, userId, goalId },
   ref,
 ) {
   const [isActive, setIsActive] = useState(false);
@@ -37,6 +38,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
     enabled: isActive,
     searchParams: searchParams,
     userId: userId,
+    goalId: goalId,
   });
 
   // Fetch collection data for the subset when expanded and userId is provided
@@ -46,6 +48,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
       slug: subset.slug,
       userId: userId,
       priceType: setPriceType,
+      goalId: goalId,
     },
     {
       skip: !isActive || !userId,
