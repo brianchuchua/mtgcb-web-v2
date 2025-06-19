@@ -22,9 +22,9 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSnackbar } from 'notistack';
-import { useEffect, useState } from 'react';
-import { EditGoalDialog } from './EditGoalDialog';
+import { useState } from 'react';
 import { GoalDescription } from './GoalDescription';
 import { useDeleteGoalMutation } from '@/api/goals/goalsApi';
 import { Goal } from '@/api/goals/types';
@@ -35,31 +35,17 @@ import { formatDate } from '@/utils/dateUtils';
 interface GoalsListProps {
   goals: Goal[];
   userId: number;
-  initialEditGoalId?: number | null;
-  onEditComplete?: () => void;
 }
 
-export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: GoalsListProps) {
+export function GoalsList({ goals, userId }: GoalsListProps) {
   const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
   const [deleteGoal] = useDeleteGoalMutation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [goalToDelete, setGoalToDelete] = useState<Goal | null>(null);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [goalToEdit, setGoalToEdit] = useState<Goal | null>(null);
 
   const isOwner = user?.userId === userId;
-
-  // Handle initial edit goal from URL parameter
-  useEffect(() => {
-    if (initialEditGoalId && goals.length > 0) {
-      const goalToEdit = goals.find((g) => g.id === initialEditGoalId);
-      if (goalToEdit) {
-        setGoalToEdit(goalToEdit);
-        setEditDialogOpen(true);
-      }
-    }
-  }, [initialEditGoalId, goals]);
 
   const handleDeleteClick = (goal: Goal) => {
     setGoalToDelete(goal);
@@ -86,14 +72,7 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
   };
 
   const handleEditClick = (goal: Goal) => {
-    setGoalToEdit(goal);
-    setEditDialogOpen(true);
-  };
-
-  const handleEditClose = () => {
-    setEditDialogOpen(false);
-    setGoalToEdit(null);
-    onEditComplete?.();
+    router.push(`/goals/edit/${goal.id}`);
   };
 
   return (
@@ -256,8 +235,6 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
           </Button>
         </DialogActions>
       </Dialog>
-
-      <EditGoalDialog open={editDialogOpen} onClose={handleEditClose} goal={goalToEdit} userId={userId} />
     </>
   );
 }

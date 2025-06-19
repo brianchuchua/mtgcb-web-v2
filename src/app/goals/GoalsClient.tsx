@@ -2,10 +2,8 @@
 
 import { Add as AddIcon } from '@mui/icons-material';
 import { Alert, Box, Button, Paper, Typography } from '@mui/material';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
-import { CreateGoalDialog } from '@/components/goals/CreateGoalDialog';
 import { GoalsList } from '@/components/goals/GoalsList';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -13,10 +11,7 @@ import { PriceType } from '@/types/pricing';
 
 export function GoalsClient() {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [goalIdToEdit, setGoalIdToEdit] = useState<number | null>(null);
   const [displayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
 
   const { data, isLoading, error } = useGetUserGoalsQuery(
@@ -32,36 +27,8 @@ export function GoalsClient() {
 
   const goals = data?.data?.goals || [];
 
-  // Check for edit or create query parameters on mount
-  useEffect(() => {
-    const editParam = searchParams.get('edit');
-    const createParam = searchParams.get('create');
-
-    if (editParam) {
-      const goalId = parseInt(editParam, 10);
-      if (!isNaN(goalId) && goals.some((g) => g.id === goalId)) {
-        setGoalIdToEdit(goalId);
-        // Remove the edit parameter from URL immediately
-        const params = new URLSearchParams(searchParams);
-        params.delete('edit');
-        router.replace(`/goals${params.toString() ? `?${params.toString()}` : ''}`);
-      }
-    }
-
-    if (createParam === 'true') {
-      setCreateDialogOpen(true);
-      const params = new URLSearchParams(searchParams);
-      params.delete('create');
-      router.replace(`/goals${params.toString() ? `?${params.toString()}` : ''}`);
-    }
-  }, [searchParams, goals, router]);
-
   const handleCreateClick = () => {
-    setCreateDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setCreateDialogOpen(false);
+    router.push('/goals/create');
   };
 
   if (isAuthLoading) {
@@ -111,14 +78,8 @@ export function GoalsClient() {
         <GoalsList
           goals={goals}
           userId={user?.userId || 0}
-          initialEditGoalId={goalIdToEdit}
-          onEditComplete={() => {
-            setGoalIdToEdit(null);
-          }}
         />
       )}
-
-      <CreateGoalDialog open={createDialogOpen} onClose={handleCloseDialog} />
     </Box>
   );
 }
