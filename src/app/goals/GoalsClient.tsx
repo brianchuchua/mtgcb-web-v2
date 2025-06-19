@@ -48,6 +48,8 @@ export function GoalsClient() {
     hideContentTypeToggle: true, // Hide the cards/sets toggle
     hideViewModeToggle: true, // Hide the grid/table toggle
     customItemName: 'goals', // Show 'goals' instead of 'cards'
+    hideSearchButton: true, // Hide the 'Open search options' button
+    hideSettingsPanel: true, // Hide the gear icon
   };
 
   const handleCreateClick = () => {
@@ -100,7 +102,9 @@ export function GoalsClient() {
       {totalCount > 0 && (
         <>
           <Pagination {...paginationProps} />
-          <GoalsList goals={goals} userId={user?.userId || 0} />
+          <Box sx={{ mt: { xs: 2, sm: 0 } }}>
+            <GoalsList goals={goals} userId={user?.userId || 0} />
+          </Box>
           <Pagination {...paginationProps} position="bottom" />
         </>
       )}
