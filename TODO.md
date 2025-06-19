@@ -148,6 +148,10 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 - Search with scryfall syntax
 
+## Maybes
+
+- Showing number of cards in excess of a goal
+
 ## Things To Check On
 
 - UX: Verify that every search tool trims whitespace

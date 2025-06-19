@@ -74,6 +74,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       parentSetId: set?.id,
       limit: 100,
       userId: userId,
+      priceType: setPriceType,
       goalId: selectedGoalId || undefined,
     },
     {

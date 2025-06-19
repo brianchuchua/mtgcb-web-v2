@@ -187,7 +187,7 @@ export function GoalsList({ goals, userId, initialEditGoalId, onEditComplete }: 
                           percentage={goal.progress.percentageCollected}
                           height={20}
                           showLabel={true}
-                          labelFormat="short"
+                          labelFormat="long"
                         />
                         <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
                           <Box>
