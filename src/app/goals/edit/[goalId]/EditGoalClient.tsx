@@ -102,7 +102,7 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h4" component="h1" color="primary">
-          Edit Goal
+          Editing {goal.name}
         </Typography>
       </Box>
 

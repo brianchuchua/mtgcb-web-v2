@@ -41,7 +41,9 @@ interface FormValues {
 export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [updateGoal, { isLoading }] = useUpdateGoalMutation();
-  const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>('all');
+  const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>(
+    goal?.targetQuantityAll ? 'all' : 'separate'
+  );
   const [isChangingMode, setIsChangingMode] = useState(false);
   const [searchConditions, setSearchConditions] = useState<
     Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>
@@ -96,6 +98,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
       setSearchConditions(conditions);
     }
   }, [goal, setValue]);
+
 
   const onSubmit = async (data: FormValues) => {
     if (!goal) return;
