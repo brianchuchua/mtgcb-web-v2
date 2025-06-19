@@ -8,6 +8,7 @@ import {
   Iso as IsoIcon,
   ImportContacts as LibraryIcon,
   ListAlt as ListAltIcon,
+  Style as StyleIcon,
   Timeline as TimelineIcon,
 } from '@mui/icons-material';
 import { AutoStories as BinderIcon } from '@mui/icons-material';
@@ -165,6 +166,19 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                       <BinderIcon />
                     </ListItemIcon>
                     <ListItemText primary="Locations (In Development)" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton disabled sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <StyleIcon
+                        sx={{
+                          transform: 'scaleY(-1)',
+                          transformOrigin: 'center',
+                        }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText primary="Decks (In Development)" />
                   </ListItemButton>
                 </ListItem>
               </List>
