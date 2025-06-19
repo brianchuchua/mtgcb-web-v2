@@ -1,6 +1,13 @@
-import { InfoOutlined as InfoOutlinedIcon, Search as SearchIcon } from '@mui/icons-material';
+import { 
+  InfoOutlined as InfoOutlinedIcon, 
+  Search as SearchIcon,
+  FilterList as FilterListIcon,
+  Add as AddIcon,
+  Remove as RemoveIcon
+} from '@mui/icons-material';
 import {
   Box,
+  Button,
   Chip,
   FormControlLabel,
   IconButton,
@@ -79,7 +86,7 @@ const STAT_OPERATORS = [
   { value: '=', label: '=' },
   { value: '<=', label: '<=' },
   { value: '<', label: '<' },
-  { value: '!=', label: '!=' },
+  { value: '!=', label: '≠' },
 ];
 
 export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormProps) {
@@ -691,60 +698,88 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
       </Paper>
 
       {/* Stat Conditions */}
-      <Paper variant="outlined" sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="subtitle2">Stat Filters</Typography>
-          <Chip label="Add Filter" size="small" onClick={handleAddStatCondition} color="primary" />
-        </Box>
+      {statConditions.length === 0 ? (
+        <Button 
+          variant="outlined" 
+          startIcon={<FilterListIcon />} 
+          onClick={handleAddStatCondition} 
+          fullWidth 
+          sx={{ mt: 1 }}
+        >
+          Add Stat Filters
+        </Button>
+      ) : (
+        <Stack spacing={1.5}>
+          {statConditions.map((condition, index) => (
+            <Box key={index} sx={{ display: 'flex', gap: '7px', width: '100%' }}>
+              <Select
+                size="small"
+                value={condition.attribute}
+                onChange={(e) => handleStatConditionChange(index, 'attribute', e.target.value)}
+                sx={{ width: '45%', minWidth: '45%' }}
+              >
+                {STAT_ATTRIBUTES.map((attr) => (
+                  <MenuItem key={attr.value} value={attr.value}>
+                    {attr.label}
+                  </MenuItem>
+                ))}
+              </Select>
 
-        {statConditions.map((condition, index) => (
-          <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'center' }}>
-            <TextField
-              select
-              size="small"
-              value={condition.attribute}
-              onChange={(e) => handleStatConditionChange(index, 'attribute', e.target.value)}
-              sx={{ minWidth: 150 }}
+              <Select
+                size="small"
+                value={condition.operator}
+                onChange={(e) => handleStatConditionChange(index, 'operator', e.target.value)}
+                sx={{ width: '25%', minWidth: '25%' }}
+              >
+                {STAT_OPERATORS.map((op) => (
+                  <MenuItem key={op.value} value={op.value}>
+                    {op.label}
+                  </MenuItem>
+                ))}
+              </Select>
+
+              <TextField
+                size="small"
+                type="number"
+                inputProps={{
+                  min: '0',
+                  step: condition.attribute.includes('Price') || condition.attribute === 'market' || 
+                        condition.attribute === 'low' || condition.attribute === 'average' || 
+                        condition.attribute === 'high' || condition.attribute === 'foil' ? 'any' : '1'
+                }}
+                placeholder={
+                  condition.attribute.includes('Price') || condition.attribute === 'market' || 
+                  condition.attribute === 'low' || condition.attribute === 'average' || 
+                  condition.attribute === 'high' || condition.attribute === 'foil' ? '0.00' : '0'
+                }
+                value={condition.value}
+                onChange={(e) => handleStatConditionChange(index, 'value', e.target.value)}
+                sx={{ width: '25%', minWidth: '25%' }}
+              />
+            </Box>
+          ))}
+
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                fontStyle: 'italic',
+                marginRight: 'auto',
+                fontSize: '0.875rem',
+              }}
             >
-              {STAT_ATTRIBUTES.map((attr) => (
-                <MenuItem key={attr.value} value={attr.value}>
-                  {attr.label}
-                </MenuItem>
-              ))}
-            </TextField>
-
-            <TextField
-              select
-              size="small"
-              value={condition.operator}
-              onChange={(e) => handleStatConditionChange(index, 'operator', e.target.value)}
-              sx={{ minWidth: 70 }}
-            >
-              {STAT_OPERATORS.map((op) => (
-                <MenuItem key={op.value} value={op.value}>
-                  {op.label}
-                </MenuItem>
-              ))}
-            </TextField>
-
-            <TextField
-              size="small"
-              value={condition.value}
-              onChange={(e) => handleStatConditionChange(index, 'value', e.target.value)}
-              placeholder="Value"
-              sx={{ flex: 1 }}
-            />
-
-            <Chip label="Remove" size="small" onDelete={() => handleRemoveStatCondition(index)} color="error" />
+              Add or remove stat filters:
+            </Typography>
+            <IconButton size="small" onClick={() => handleRemoveStatCondition(statConditions.length - 1)}>
+              <RemoveIcon />
+            </IconButton>
+            <IconButton size="small" onClick={handleAddStatCondition}>
+              <AddIcon />
+            </IconButton>
           </Box>
-        ))}
-
-        {statConditions.length === 0 && (
-          <Typography variant="body2" color="text.secondary">
-            No stat filters applied
-          </Typography>
-        )}
-      </Paper>
+        </Stack>
+      )}
     </Box>
   );
 }

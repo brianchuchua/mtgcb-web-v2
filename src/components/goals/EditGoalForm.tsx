@@ -200,7 +200,14 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
           <Typography variant="h6" gutterBottom>
             Goal Quantities
           </Typography>
-          <Box sx={{ mb: 2 }}>
+          <Box 
+            sx={{ 
+              mb: 2,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1
+            }}
+          >
             <Chip
               label="Any Type"
               onClick={() => {
@@ -211,7 +218,6 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                 setTimeout(() => setIsChangingMode(false), 100);
               }}
               color={quantityMode === 'all' ? 'primary' : 'default'}
-              sx={{ mr: 1 }}
             />
             <Chip
               label="Separate Regular/Foil"
@@ -226,7 +232,15 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
           </Box>
 
           {quantityMode === 'separate' ? (
-            <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: 3, 
+                justifyContent: 'center',
+                alignItems: { xs: 'center', sm: 'flex-start' }
+              }}
+            >
               <Controller
                 name="targetQuantityReg"
                 control={control}

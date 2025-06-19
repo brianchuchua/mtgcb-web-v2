@@ -147,12 +147,18 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
           <Typography variant="h6" gutterBottom>
             Goal Quantities
           </Typography>
-          <Box sx={{ mb: 2 }}>
+          <Box 
+            sx={{ 
+              mb: 2,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 1
+            }}
+          >
             <Chip
               label="Any Type"
               onClick={() => setQuantityMode('all')}
               color={quantityMode === 'all' ? 'primary' : 'default'}
-              sx={{ mr: 1 }}
             />
             <Chip
               label="Separate Regular/Foil"
@@ -162,7 +168,15 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
           </Box>
 
           {quantityMode === 'separate' ? (
-            <Box sx={{ display: 'flex', gap: 3, justifyContent: 'center' }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: 3, 
+                justifyContent: 'center',
+                alignItems: { xs: 'center', sm: 'flex-start' }
+              }}
+            >
               <Controller
                 name="targetQuantityReg"
                 control={control}
