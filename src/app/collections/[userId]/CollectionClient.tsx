@@ -12,7 +12,7 @@ import { CardsProps, SetsProps } from '@/features/browse/types';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
-import { selectSelectedGoalId } from '@/redux/slices/browseSlice';
+import { selectSelectedGoalId, selectIncludeSubsetsInSets } from '@/redux/slices/browseSlice';
 
 interface CollectionClientProps {
   userId: number;
@@ -23,6 +23,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
   const { user } = useAuth();
   const isOwnCollection = user?.userId === userId;
   const selectedGoalId = useSelector(selectSelectedGoalId);
+  const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
   // Create collection sets map from the sets data
   const collectionSets = useMemo(() => {
@@ -120,6 +121,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
           goalSummary={goalSummary || undefined}
           view={view}
           selectedGoalId={selectedGoalId}
+          includeSubsetsInSets={includeSubsetsInSets}
         />
       )}
 

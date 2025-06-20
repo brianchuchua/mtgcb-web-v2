@@ -383,6 +383,7 @@ const CostToPurchaseSection: React.FC<{
               setId={setId}
               userId={userId}
               goalId={goalId}
+              includeSubsetsInSets={includeSubsetsInSets}
             />
           </Box>
         )}

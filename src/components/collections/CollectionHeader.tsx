@@ -26,6 +26,7 @@ interface CollectionHeaderProps {
   };
   view?: 'cards' | 'sets';
   selectedGoalId?: number | null;
+  includeSubsetsInSets?: boolean;
   // Set-specific props for when viewing a set page
   setInfo?: {
     name: string;
@@ -60,6 +61,7 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
   goalSummary,
   view,
   selectedGoalId,
+  includeSubsetsInSets = false,
   setInfo,
 }) => {
   if (isLoading) {
@@ -177,7 +179,7 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
 
         {userId && selectedGoalId && (
           <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center' }}>
-            <TCGPlayerGoalMassImportButton setId="all" userId={userId} goalId={selectedGoalId} />
+            <TCGPlayerGoalMassImportButton setId="all" userId={userId} goalId={selectedGoalId} includeSubsetsInSets={includeSubsetsInSets} />
           </Box>
         )}
 
@@ -245,6 +247,7 @@ export const CollectionHeader = React.memo(CollectionHeaderComponent, (prevProps
     JSON.stringify(prevProps.goalSummary) === JSON.stringify(nextProps.goalSummary) &&
     prevProps.view === nextProps.view &&
     prevProps.selectedGoalId === nextProps.selectedGoalId &&
+    prevProps.includeSubsetsInSets === nextProps.includeSubsetsInSets &&
     JSON.stringify(prevProps.setInfo) === JSON.stringify(nextProps.setInfo)
   );
 });

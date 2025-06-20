@@ -122,6 +122,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Bugs
 
+- Bug: Link to subset from name at bottom of set page always links to browse equivalent, even in collection view
 - Severe: Scrolling far down during the virtualization of the set grid view by clicking halfway through scrollbar while viewing 500 sets, jumping up and down in a loop -- maybe need to render further down or something?
 - Moderate: Draft cube calculation when track subsets with sets in on is wrong, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir -- it's incorrectly counting non main set cards as missing just in terms of the value
 - Moderate+ Bug: Collector number sort is broken in collector table view, probably not using the numeric version of collector number

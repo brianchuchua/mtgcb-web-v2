@@ -3,7 +3,7 @@
 import { Button, ButtonProps } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
-import { useLazyGetCardsQuery } from '@/api/browse/browseApi';
+import { useLazyGetCardsQuery, useLazyGetSetsQuery } from '@/api/browse/browseApi';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
 import { usePriceType } from '@/hooks/usePriceType';
 import { getFormTarget } from '@/utils/browser/detectSafari';
@@ -14,6 +14,7 @@ interface TCGPlayerGoalMassImportButtonProps extends Omit<ButtonProps, 'onClick'
   setId: string | 'all';
   userId: number;
   goalId: number;
+  includeSubsetsInSets?: boolean;
   children?: React.ReactNode;
 }
 
@@ -21,6 +22,7 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
   setId,
   userId,
   goalId,
+  includeSubsetsInSets = false,
   children,
   ...buttonProps
 }) => {
@@ -29,12 +31,31 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
   const [isLoading, setIsLoading] = useState(false);
   const priceType = usePriceType();
   const [getCards] = useLazyGetCardsQuery();
+  const [getSets] = useLazyGetSetsQuery();
 
   const handleClick = useCallback(async () => {
     if (isLoading) return;
 
     try {
       setIsLoading(true);
+
+      // If we need to include subsets and have a specific setId, fetch child sets first
+      let allSetIds: string[] | undefined;
+      if (includeSubsetsInSets && setId !== 'all') {
+        allSetIds = [setId];
+        
+        const setsResult = await getSets(
+          {
+            parentSetId: setId,
+          },
+          true, // Force refetch
+        );
+
+        if (setsResult?.data?.data?.sets && setsResult?.data?.data?.sets?.length > 0) {
+          const subsetIds = setsResult.data.data.sets.map((set) => set.id);
+          allSetIds = [setId, ...subsetIds];
+        }
+      }
 
       // Fetch all cards with goal data
       let allCards: any[] = [];
@@ -66,7 +87,7 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
             offset,
             ...(setId !== 'all' && {
               setId: {
-                OR: [setId],
+                OR: allSetIds || [setId],
               },
             }),
             userId,
@@ -145,7 +166,7 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
     } finally {
       setIsLoading(false);
     }
-  }, [setId, userId, goalId, isLoading, priceType, getCards, submitToTCGPlayer, enqueueSnackbar]);
+  }, [setId, userId, goalId, includeSubsetsInSets, isLoading, priceType, getCards, getSets, submitToTCGPlayer, enqueueSnackbar]);
 
   return (
     <Button
