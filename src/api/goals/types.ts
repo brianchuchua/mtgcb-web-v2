@@ -25,6 +25,7 @@ export interface Goal {
   createdAt: string;
   updatedAt: string;
   progress?: GoalProgress;
+  onePrintingPerPureName: boolean;
 }
 
 export interface CreateGoalRequest {
@@ -38,6 +39,7 @@ export interface CreateGoalRequest {
   targetQuantityReg?: number;
   targetQuantityFoil?: number;
   targetQuantityAll?: number;
+  onePrintingPerPureName?: boolean;
 }
 
 export interface GetGoalsParams {
@@ -67,4 +69,5 @@ export interface UpdateGoalRequest {
   targetQuantityFoil?: number | null;
   targetQuantityAll?: number | null;
   isActive?: boolean;
+  onePrintingPerPureName?: boolean;
 }

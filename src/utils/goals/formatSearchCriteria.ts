@@ -23,16 +23,16 @@ const MTG_COLOR_NAMES: Record<string, string> = {
   'G': 'Green',
 };
 
-export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription): string {
+export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, onePrintingPerPureName?: boolean): string {
   const { conditions } = searchCriteria;
   const parts: string[] = [];
   const typeParts: string[] = [];
   const colorPart: string[] = [];
   const attributeParts: string[] = [];
   
-  // Check if we only have specific card IDs (and maybe oneResultPerCardName)
+  // Check if we only have specific card IDs
   const hasOnlyCardIds = conditions.id && Object.keys(conditions).filter(
-    key => key !== 'id' && key !== 'oneResultPerCardName'
+    key => key !== 'id'
   ).length === 0;
 
   // Types - collect them separately for better formatting
@@ -160,8 +160,8 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription):
   }
   
   // One result per card name (hide duplicate printings) - but not if we only have card IDs
-  if (!hasOnlyCardIds) {
-    if (conditions.oneResultPerCardName) {
+  if (!hasOnlyCardIds && onePrintingPerPureName !== undefined) {
+    if (onePrintingPerPureName) {
       attributeParts.push(`(one printing of each card)`);
     } else {
       attributeParts.push(`(every printing of each card)`);

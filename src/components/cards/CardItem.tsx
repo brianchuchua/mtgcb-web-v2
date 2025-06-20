@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import CardPrice from './CardPrice';
 import { EditableCardQuantity } from './EditableCardQuantity';
+import { GoalStatusDisplay } from './GoalStatusDisplay';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
@@ -62,6 +63,15 @@ export interface CardItemProps {
   goalRegNeeded?: number;
   goalFoilNeeded?: number;
   goalAllNeeded?: number;
+  // Cross-set goal tracking fields
+  goalMetByOtherSets?: boolean;
+  goalContributingVersions?: {
+    cardId: string;
+    setId: string;
+    setName?: string;
+    quantityReg: number;
+    quantityFoil: number;
+  }[];
   display?: {
     nameIsVisible?: boolean;
     setIsVisible?: boolean;
@@ -106,6 +116,8 @@ const CardItemComponent = ({
   goalRegNeeded,
   goalFoilNeeded,
   goalAllNeeded,
+  goalMetByOtherSets,
+  goalContributingVersions,
   display = {
     nameIsVisible: true,
     setIsVisible: true,
@@ -123,7 +135,13 @@ const CardItemComponent = ({
   const imageRef = useRef<HTMLImageElement>(null);
   const pathname = usePathname();
 
-  const { nameIsVisible, setIsVisible, priceIsVisible, quantityIsVisible = false, goalProgressIsVisible = false } = display;
+  const {
+    nameIsVisible,
+    setIsVisible,
+    priceIsVisible,
+    quantityIsVisible = false,
+    goalProgressIsVisible = false,
+  } = display;
 
   // Check if we're in a collection view and extract userId
   const collectionMatch = pathname?.match(/^\/collections\/(\d+)/);
@@ -223,7 +241,7 @@ const CardItemComponent = ({
     >
       <CardImageContainer
         onClick={onClick ? handleCardElementClick : undefined}
-        sx={{ 
+        sx={{
           cursor: onClick ? 'pointer' : 'default',
           opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
           transition: 'opacity 0.2s ease-in-out',
@@ -232,29 +250,30 @@ const CardItemComponent = ({
             opacity: 1,
           },
           // Add diagonal stripes overlay for incomplete goals
-          ...(goalProgressIsVisible && goalFullyMet === false && {
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: `repeating-linear-gradient(
+          ...(goalProgressIsVisible &&
+            goalFullyMet === false && {
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `repeating-linear-gradient(
                 45deg,
                 transparent,
                 transparent 10px,
                 rgba(255, 152, 0, 0.2) 10px,
                 rgba(255, 152, 0, 0.2) 20px
               )`,
-              pointerEvents: 'none',
-              borderRadius: 'inherit',
-              transition: 'opacity 0.2s ease-in-out',
-            },
-            '&:hover::after': {
-              opacity: 0,
-            },
-          }),
+                pointerEvents: 'none',
+                borderRadius: 'inherit',
+                transition: 'opacity 0.2s ease-in-out',
+              },
+              '&:hover::after': {
+                opacity: 0,
+              },
+            }),
         }}
       >
         {!imageLoaded && !imageError && (
@@ -306,51 +325,24 @@ const CardItemComponent = ({
           )}
 
           {goalProgressIsVisible && (goalTargetQuantityReg || goalTargetQuantityFoil || goalTargetQuantityAll) && (
-            <Box sx={{ mt: -0.5, mb: 0.5 }}>
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  display: 'block', 
-                  color: goalFullyMet ? 'success.main' : 'warning.main',
-                  fontWeight: 'medium',
-                  textAlign: 'center'
-                }}
-              >
-                {(() => {
-                  // If goal is fully met
-                  if (goalFullyMet) {
-                    return '(Goal met!)';
-                  }
-                  
-                  // If only regular target exists
-                  if (goalTargetQuantityReg && !goalTargetQuantityFoil && !goalTargetQuantityAll) {
-                    return `(Need ${goalRegNeeded} regular)`;
-                  }
-                  
-                  // If only foil target exists
-                  if (!goalTargetQuantityReg && goalTargetQuantityFoil && !goalTargetQuantityAll) {
-                    return `(Need ${goalFoilNeeded} foil)`;
-                  }
-                  
-                  // If both regular and foil targets exist
-                  if (goalTargetQuantityReg && goalTargetQuantityFoil && !goalTargetQuantityAll) {
-                    const needs = [];
-                    if (goalRegNeeded > 0) needs.push(`${goalRegNeeded} regular`);
-                    if (goalFoilNeeded > 0) needs.push(`${goalFoilNeeded} foil`);
-                    return needs.length > 0 ? `(Need ${needs.join(' and ')})` : '(Goal met!)';
-                  }
-                  
-                  // If "any type" target exists (goalTargetQuantityAll)
-                  if (goalTargetQuantityAll) {
-                    if (goalAllNeeded > 0) {
-                      return `(Need ${goalAllNeeded} regular or foil)`;
-                    }
-                    return '(Goal met!)';
-                  }
-                  
-                  return '';
-                })()}
-              </Typography>
+            <Box sx={{ mt: -0.5, mb: 0.5, display: 'flex', justifyContent: 'center' }}>
+              <GoalStatusDisplay
+                card={
+                  {
+                    id,
+                    name,
+                    goalTargetQuantityReg,
+                    goalTargetQuantityFoil,
+                    goalTargetQuantityAll,
+                    goalRegNeeded,
+                    goalFoilNeeded,
+                    goalAllNeeded,
+                    goalFullyMet,
+                    goalMetByOtherSets,
+                    goalContributingVersions,
+                  } as any
+                }
+              />
             </Box>
           )}
 

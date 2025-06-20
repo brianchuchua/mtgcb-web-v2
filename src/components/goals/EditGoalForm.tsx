@@ -48,6 +48,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
   const [searchConditions, setSearchConditions] = useState<
     Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>
   >({});
+  const [onePrintingPerPureName, setOnePrintingPerPureName] = useState(true);
 
   const handleSearchConditionsChange = useCallback(
     (conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>) => {
@@ -91,11 +92,8 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
         setQuantityMode('separate');
       }
 
-      const conditions = {
-        ...goal.searchCriteria.conditions,
-        oneResultPerCardName: goal.searchCriteria.conditions.oneResultPerCardName ?? false
-      };
-      setSearchConditions(conditions);
+      setSearchConditions(goal.searchCriteria.conditions);
+      setOnePrintingPerPureName(goal.onePrintingPerPureName ?? true);
     }
   }, [goal, setValue]);
 
@@ -115,6 +113,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
         description: data.description || undefined,
         searchCriteria,
         isActive: data.isActive,
+        onePrintingPerPureName,
       };
 
       if (quantityMode === 'all') {
@@ -194,7 +193,12 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
             Define which cards this goal applies to. Leave fields empty to include all cards.
           </Typography>
 
-          <GoalSearchForm searchConditions={searchConditions} onChange={handleSearchConditionsChange} />
+          <GoalSearchForm 
+            searchConditions={searchConditions} 
+            onChange={handleSearchConditionsChange}
+            onePrintingPerPureName={onePrintingPerPureName}
+            onOnePrintingPerPureNameChange={setOnePrintingPerPureName}
+          />
         </Box>
 
         <Divider />
@@ -497,6 +501,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
             targetQuantityReg={watch('targetQuantityReg')}
             targetQuantityFoil={watch('targetQuantityFoil')}
             targetQuantityAll={watch('targetQuantityAll')}
+            onePrintingPerPureName={onePrintingPerPureName}
           />
         </Box>
 
@@ -595,12 +600,14 @@ function GoalPreview({
   targetQuantityReg,
   targetQuantityFoil,
   targetQuantityAll,
+  onePrintingPerPureName,
 }: {
   searchConditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>;
   quantityMode: 'separate' | 'all';
   targetQuantityReg?: number;
   targetQuantityFoil?: number;
   targetQuantityAll?: number;
+  onePrintingPerPureName: boolean;
 }) {
   const { includedSetIds, excludedSetIds } = useMemo(() => {
     const included = searchConditions.setId?.OR || [];
@@ -632,7 +639,7 @@ function GoalPreview({
       conditions: searchConditions,
       sort: undefined,
       order: undefined,
-    });
+    }, onePrintingPerPureName);
 
     let quantityText = '';
     if (quantityMode === 'all' && targetQuantityAll) {
@@ -687,6 +694,7 @@ function GoalPreview({
     setNames,
     includedSetIds,
     excludedSetIds,
+    onePrintingPerPureName,
   ]);
 
   return (

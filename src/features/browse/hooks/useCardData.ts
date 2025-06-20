@@ -69,7 +69,11 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
         'goalFullyMet',
         'goalRegNeeded',
         'goalFoilNeeded',
-        'goalAllNeeded'
+        'goalAllNeeded',
+        // Cross-set goal tracking fields
+        'goalMetByOtherSets',
+        'goalContributingSetIds',
+        'goalContributingVersions'
       );
     }
     

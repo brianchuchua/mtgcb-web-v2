@@ -12,6 +12,7 @@ import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CardItemProps } from './CardItem';
 import CardPrice from './CardPrice';
+import { GoalStatusTableCell } from './GoalStatusTableCell';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import { ResponsiveWidth, TableColumn } from '@/components/common/VirtualizedTable';
 import { PriceType } from '@/types/pricing';
@@ -806,28 +807,7 @@ export const useCardRowRenderer = (
                     otherQuantity={card.quantityFoil || 0}
                   />
                 </Box>
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    display: 'block', 
-                    color: (card.goalTargetQuantityReg || (card.goalTargetQuantityAll && !card.goalTargetQuantityFoil)) ? 
-                      ((card.goalTargetQuantityReg && card.goalRegMet) || (card.goalTargetQuantityAll && card.goalAllMet) ? 'success.main' : 'warning.main') : 
-                      'transparent',
-                    fontWeight: 'medium',
-                    mt: 0.5,
-                    minHeight: '16px'
-                  }}
-                >
-                  {(() => {
-                    if (card.goalTargetQuantityReg) {
-                      return card.goalRegMet ? 'Goal met!' : `Need ${card.goalRegNeeded || 0}`;
-                    }
-                    if (card.goalTargetQuantityAll && !card.goalTargetQuantityReg && !card.goalTargetQuantityFoil) {
-                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0} (either)`;
-                    }
-                    return '\u00A0';
-                  })()}
-                </Typography>
+                <GoalStatusTableCell card={card as any} goalType="regular" />
               </Box>
             ) : (
               <InlineEditableQuantity
@@ -855,28 +835,7 @@ export const useCardRowRenderer = (
                     otherQuantity={card.quantityReg || 0}
                   />
                 </Box>
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    display: 'block', 
-                    color: (card.goalTargetQuantityFoil || (card.goalTargetQuantityAll && !card.goalTargetQuantityReg)) ? 
-                      ((card.goalTargetQuantityFoil && card.goalFoilMet) || (card.goalTargetQuantityAll && card.goalAllMet) ? 'success.main' : 'warning.main') : 
-                      'transparent',
-                    fontWeight: 'medium',
-                    mt: 0.5,
-                    minHeight: '16px'
-                  }}
-                >
-                  {(() => {
-                    if (card.goalTargetQuantityFoil) {
-                      return card.goalFoilMet ? 'Goal met!' : `Need ${card.goalFoilNeeded || 0}`;
-                    }
-                    if (card.goalTargetQuantityAll && !card.goalTargetQuantityReg && !card.goalTargetQuantityFoil) {
-                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0} (either)`;
-                    }
-                    return '\u00A0'; // Non-breaking space to maintain height
-                  })()}
-                </Typography>
+                <GoalStatusTableCell card={card as any} goalType="foil" />
               </Box>
             ) : (
               <InlineEditableQuantity
@@ -896,28 +855,7 @@ export const useCardRowRenderer = (
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
                 <Box sx={{ mt: '5px' }}>{card.quantityReg !== undefined ? card.quantityReg : '-'}</Box>
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    display: 'block', 
-                    color: (card.goalTargetQuantityReg || (card.goalTargetQuantityAll && !card.goalTargetQuantityFoil)) ? 
-                      ((card.goalTargetQuantityReg && card.goalRegMet) || (card.goalTargetQuantityAll && card.goalAllMet) ? 'success.main' : 'warning.main') : 
-                      'transparent',
-                    fontWeight: 'medium',
-                    mt: 0.5,
-                    minHeight: '16px'
-                  }}
-                >
-                  {(() => {
-                    if (card.goalTargetQuantityReg) {
-                      return card.goalRegMet ? 'Goal met!' : `Need ${card.goalRegNeeded || 0}`;
-                    }
-                    if (card.goalTargetQuantityAll && !card.goalTargetQuantityReg && !card.goalTargetQuantityFoil) {
-                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0} (either)`;
-                    }
-                    return '\u00A0';
-                  })()}
-                </Typography>
+                <GoalStatusTableCell card={card as any} goalType="regular" />
               </Box>
             ) : (
               card.quantityReg !== undefined ? card.quantityReg : '-'
@@ -929,28 +867,7 @@ export const useCardRowRenderer = (
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
                 <Box sx={{ mt: '5px' }}>{card.quantityFoil !== undefined ? card.quantityFoil : '-'}</Box>
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    display: 'block', 
-                    color: (card.goalTargetQuantityFoil || (card.goalTargetQuantityAll && !card.goalTargetQuantityReg)) ? 
-                      ((card.goalTargetQuantityFoil && card.goalFoilMet) || (card.goalTargetQuantityAll && card.goalAllMet) ? 'success.main' : 'warning.main') : 
-                      'transparent',
-                    fontWeight: 'medium',
-                    mt: 0.5,
-                    minHeight: '16px'
-                  }}
-                >
-                  {(() => {
-                    if (card.goalTargetQuantityFoil) {
-                      return card.goalFoilMet ? 'Goal met!' : `Need ${card.goalFoilNeeded || 0}`;
-                    }
-                    if (card.goalTargetQuantityAll && !card.goalTargetQuantityReg && !card.goalTargetQuantityFoil) {
-                      return card.goalAllMet ? 'Goal met!' : `Need ${card.goalAllNeeded || 0} (either)`;
-                    }
-                    return '\u00A0'; // Non-breaking space to maintain height
-                  })()}
-                </Typography>
+                <GoalStatusTableCell card={card as any} goalType="foil" />
               </Box>
             ) : (
               card.quantityFoil !== undefined ? card.quantityFoil : '-'

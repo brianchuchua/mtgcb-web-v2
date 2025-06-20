@@ -34,6 +34,8 @@ import { ColorMatchType, MTG_COLORS } from '@/types/browse';
 interface GoalSearchFormProps {
   searchConditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>;
   onChange: (conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>) => void;
+  onePrintingPerPureName: boolean;
+  onOnePrintingPerPureNameChange: (value: boolean) => void;
 }
 
 interface SimpleOption {
@@ -89,7 +91,7 @@ const STAT_OPERATORS = [
   { value: '!=', label: '≠' },
 ];
 
-export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormProps) {
+export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureName, onOnePrintingPerPureNameChange }: GoalSearchFormProps) {
   
   // Initialize state from searchConditions
   const [isInitialized, setIsInitialized] = useState(false);
@@ -98,7 +100,6 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
   const [name, setName] = useState(searchConditions.name || '');
   const [oracleText, setOracleText] = useState(searchConditions.oracleText || '');
   const [artist, setArtist] = useState(searchConditions.artist || '');
-  const [oneResultPerCardName, setOneResultPerCardName] = useState(searchConditions.oneResultPerCardName ?? true);
 
   // Color state
   const [colorState, setColorState] = useState<ColorState>(() => {
@@ -302,7 +303,6 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
     if (name) conditions.name = name;
     if (oracleText) conditions.oracleText = oracleText;
     if (artist) conditions.artist = artist;
-    if (oneResultPerCardName) conditions.oneResultPerCardName = oneResultPerCardName;
 
     // Colors
     if (colorState.includeColorless) {
@@ -384,7 +384,6 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
     name,
     oracleText,
     artist,
-    oneResultPerCardName,
     colorState,
     selectedTypes,
     selectedRarities,
@@ -406,12 +405,6 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
     }
   }, [searchConditions.colors_array]);
 
-  // Update oneResultPerCardName when searchConditions changes
-  useEffect(() => {
-    if (searchConditions.oneResultPerCardName !== undefined) {
-      setOneResultPerCardName(searchConditions.oneResultPerCardName);
-    }
-  }, [searchConditions.oneResultPerCardName]);
 
   // Mark as initialized once all data is loaded
   useEffect(() => {
@@ -682,11 +675,11 @@ export function GoalSearchForm({ searchConditions, onChange }: GoalSearchFormPro
         </Box>
 
         <ToggleButtonGroup
-          value={oneResultPerCardName ? 'one' : 'every'}
+          value={onePrintingPerPureName ? 'one' : 'every'}
           exclusive
           onChange={(_, value) => {
             if (value !== null) {
-              setOneResultPerCardName(value === 'one');
+              onOnePrintingPerPureNameChange(value === 'one');
             }
           }}
           fullWidth

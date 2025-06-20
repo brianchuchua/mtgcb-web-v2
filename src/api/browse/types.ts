@@ -53,6 +53,16 @@ export interface CardModel {
   goalRegNeeded?: number;
   goalFoilNeeded?: number;
   goalAllNeeded?: number;
+  // Cross-set goal tracking fields
+  goalMetByOtherSets?: boolean;
+  goalContributingSetIds?: string[];
+  goalContributingVersions?: {
+    cardId: string;
+    setId: string;
+    setName?: string;
+    quantityReg: number;
+    quantityFoil: number;
+  }[];
 }
 
 export interface GoalSummary {

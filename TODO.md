@@ -132,6 +132,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Make sure 99% doesn't round to 100% in progress bars and collection progress (see Duel Decks: Anthology and Gatecrash)
 - See if still present: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - See if still present: paginating too far in the future in the url bug may be back
+- Matching cards by their pure name for collection goals doesn't work well with tokens, because they have the same name but are physically distinct in terms of type lines and power and toughness and color identity
 
 ## Tech Debt
 
@@ -141,6 +142,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - CardBrowseClient is a mess and is using deprecated Grid
 - Find deprecated uses of PaperProps and Grid
 - Tech debt in API: const allMatchingSets = await findSetsByQuery(fastify, whereClause, orderClause, 10000, 0, select); <-- will break if more than 10000 sets
+- I see a limit of 100000 in the API too
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - Every file needs to follow the code style I established in SetItemRenderer.tsx and browse/page.tsx
 - Minor: prefetch leads to page 2 being loaded when a user invalidates the collection tag, it's a prefetch subscription issue in RTK Query, dev team is aware, no current fix, just bad workarounds, page one still loads on visit, so it's fine

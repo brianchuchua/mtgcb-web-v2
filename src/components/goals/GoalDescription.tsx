@@ -38,7 +38,7 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
   const { setNames } = useSetNames(allSetIds);
 
   const description = useMemo(() => {
-    const criteriaText = formatSearchCriteria(goal.searchCriteria);
+    const criteriaText = formatSearchCriteria(goal.searchCriteria, goal.onePrintingPerPureName);
     
     // Determine quantity text
     let quantityText = '';
