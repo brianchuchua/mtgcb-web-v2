@@ -80,6 +80,7 @@ export const {
   useCreateGoalMutation,
   useGetUserGoalsQuery,
   useGetGoalQuery,
+  useLazyGetGoalQuery,
   useDeleteGoalMutation,
   useUpdateGoalMutation,
 } = goalsApi;

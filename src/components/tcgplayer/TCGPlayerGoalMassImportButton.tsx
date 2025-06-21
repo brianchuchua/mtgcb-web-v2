@@ -4,6 +4,7 @@ import { Button, ButtonProps } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useCallback, useState } from 'react';
 import { useLazyGetCardsQuery, useLazyGetSetsQuery } from '@/api/browse/browseApi';
+import { useLazyGetGoalQuery } from '@/api/goals/goalsApi';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
 import { usePriceType } from '@/hooks/usePriceType';
 import { getFormTarget } from '@/utils/browser/detectSafari';
@@ -32,12 +33,23 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
   const priceType = usePriceType();
   const [getCards] = useLazyGetCardsQuery();
   const [getSets] = useLazyGetSetsQuery();
+  const [getGoal] = useLazyGetGoalQuery();
 
   const handleClick = useCallback(async () => {
     if (isLoading) return;
 
     try {
       setIsLoading(true);
+
+      // First, fetch the goal to check if onePrintingPerPureName is true
+      const goalResult = await getGoal({ userId, goalId });
+      if (!goalResult?.data?.data) {
+        enqueueSnackbar('Failed to fetch goal information.', { variant: 'error' });
+        return;
+      }
+
+      const goal = goalResult.data.data;
+      const useOneResultPerCardName = goal.onePrintingPerPureName === true;
 
       // If we need to include subsets and have a specific setId, fetch child sets first
       let allSetIds: string[] | undefined;
@@ -94,6 +106,7 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
             goalId,
             showGoalProgress: true,
             priceType: priceType.toLowerCase() as 'market' | 'low' | 'average' | 'high',
+            ...(useOneResultPerCardName && { oneResultPerCardName: true }),
           },
           true, // Force refetch
         );
@@ -166,7 +179,7 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
     } finally {
       setIsLoading(false);
     }
-  }, [setId, userId, goalId, includeSubsetsInSets, isLoading, priceType, getCards, getSets, submitToTCGPlayer, enqueueSnackbar]);
+  }, [setId, userId, goalId, includeSubsetsInSets, isLoading, priceType, getCards, getSets, getGoal, submitToTCGPlayer, enqueueSnackbar]);
 
   return (
     <Button
