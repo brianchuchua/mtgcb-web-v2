@@ -125,7 +125,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
   // Get image URL using the same pattern as CardItem component
   const getImageUrl = () => {
     if (!cardId) return null;
-    return `https://mtgcb-images.s3.amazonaws.com/cards/images/normal/${cardId}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`;
+    return `https://r2.mtgcollectionbuilder.com/cards/images/normal/${cardId}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`;
   };
 
   const imageUrl = getImageUrl();
