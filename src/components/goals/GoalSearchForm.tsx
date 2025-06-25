@@ -405,6 +405,19 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
     }
   }, [searchConditions.colors_array]);
 
+  // Update basic text fields when searchConditions changes
+  useEffect(() => {
+    if (searchConditions.name !== undefined) {
+      setName(searchConditions.name || '');
+    }
+    if (searchConditions.oracleText !== undefined) {
+      setOracleText(searchConditions.oracleText || '');
+    }
+    if (searchConditions.artist !== undefined) {
+      setArtist(searchConditions.artist || '');
+    }
+  }, [searchConditions.name, searchConditions.oracleText, searchConditions.artist]);
+
 
   // Mark as initialized once all data is loaded
   useEffect(() => {

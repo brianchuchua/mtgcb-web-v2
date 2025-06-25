@@ -4,7 +4,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Alert, Box, CircularProgress, IconButton, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
+import { useGetGoalQuery } from '@/api/goals/goalsApi';
 import { Goal } from '@/api/goals/types';
 import { EditGoalForm } from '@/components/goals/EditGoalForm';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
@@ -20,10 +20,10 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
   const [goal, setGoal] = useState<Goal | null>(null);
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
-  const { data, isLoading, error } = useGetUserGoalsQuery(
+  const { data, isLoading, error } = useGetGoalQuery(
     {
       userId: user?.userId || 0,
-      includeProgress: false,
+      goalId,
     },
     {
       skip: !user?.userId,
@@ -43,16 +43,12 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
   }, [shouldRedirect, router, goalId]);
 
   useEffect(() => {
-    if (data?.data?.goals) {
-      const foundGoal = data.data.goals.find((g) => g.id === goalId);
-      if (foundGoal) {
-        setGoal(foundGoal);
-      } else {
-        // Goal not found, redirect to goals page
-        router.push('/goals');
-      }
+    if (data?.data) {
+      setGoal(data.data);
+    } else if (data && !data.success) {
+      router.push('/goals');
     }
-  }, [data, goalId, router]);
+  }, [data, router]);
 
   const handleClose = () => {
     router.push('/goals');
