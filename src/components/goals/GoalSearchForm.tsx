@@ -95,6 +95,7 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
   
   // Initialize state from searchConditions
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isColorInitialized, setIsColorInitialized] = useState(false);
 
   // Local states for all search fields
   const [name, setName] = useState(searchConditions.name || '');
@@ -392,18 +393,21 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
     cardFilter,
   ]);
 
-  // Update color state when searchConditions changes
+  // Initialize color state when searchConditions change (only once)
   useEffect(() => {
-    if (searchConditions.colors_array?.exactly?.length === 0) {
-      setColorState({ colors: [], matchType: 'exactly', includeColorless: true });
-    } else if (searchConditions.colors_array?.exactly) {
-      setColorState({ colors: searchConditions.colors_array.exactly, matchType: 'exactly', includeColorless: false });
-    } else if (searchConditions.colors_array?.atLeast) {
-      setColorState({ colors: searchConditions.colors_array.atLeast, matchType: 'atLeast', includeColorless: false });
-    } else if (searchConditions.colors_array?.atMost) {
-      setColorState({ colors: searchConditions.colors_array.atMost, matchType: 'atMost', includeColorless: false });
+    if (!isColorInitialized && searchConditions.colors_array) {
+      if (searchConditions.colors_array?.exactly?.length === 0) {
+        setColorState({ colors: [], matchType: 'exactly', includeColorless: true });
+      } else if (searchConditions.colors_array?.exactly) {
+        setColorState({ colors: searchConditions.colors_array.exactly, matchType: 'exactly', includeColorless: false });
+      } else if (searchConditions.colors_array?.atLeast) {
+        setColorState({ colors: searchConditions.colors_array.atLeast, matchType: 'atLeast', includeColorless: false });
+      } else if (searchConditions.colors_array?.atMost) {
+        setColorState({ colors: searchConditions.colors_array.atMost, matchType: 'atMost', includeColorless: false });
+      }
+      setIsColorInitialized(true);
     }
-  }, [searchConditions.colors_array]);
+  }, [searchConditions.colors_array, isColorInitialized]);
 
   // Update basic text fields when searchConditions changes
   useEffect(() => {
