@@ -54,8 +54,12 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
     router.push('/goals');
   };
 
-  const handleSuccess = () => {
-    router.push('/goals');
+  const handleSuccess = (goal: Goal) => {
+    if (user?.userId) {
+      router.push(`/collections/${user.userId}?contentType=cards&goalId=${goal.id}`);
+    } else {
+      router.push('/goals');
+    }
   };
 
   if (isAuthLoading || isLoading) {

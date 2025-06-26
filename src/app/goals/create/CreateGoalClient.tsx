@@ -4,21 +4,26 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Box, CircularProgress, IconButton, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { Goal } from '@/api/goals/types';
 import { CreateGoalForm } from '@/components/goals/CreateGoalForm';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useAuth } from '@/hooks/useAuth';
 
 export function CreateGoalClient() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
   const handleClose = () => {
     router.push('/goals');
   };
 
-  const handleSuccess = () => {
-    router.push('/goals');
+  const handleSuccess = (goal: Goal) => {
+    if (user?.userId) {
+      router.push(`/collections/${user.userId}?contentType=cards&goalId=${goal.id}`);
+    } else {
+      router.push('/goals');
+    }
   };
 
   useEffect(() => {

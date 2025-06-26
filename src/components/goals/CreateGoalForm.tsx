@@ -16,13 +16,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { GoalSearchForm } from './GoalSearchForm';
 import { CardApiParams } from '@/api/browse/types';
 import { useCreateGoalMutation } from '@/api/goals/goalsApi';
-import { CreateGoalRequest } from '@/api/goals/types';
+import { CreateGoalRequest, Goal } from '@/api/goals/types';
 import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
 import { useSetNames } from '@/utils/goals/useSetNames';
 
 interface CreateGoalFormProps {
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (goal: Goal) => void;
 }
 
 interface FormValues {
@@ -86,10 +86,12 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
         if (data.targetQuantityFoil) request.targetQuantityFoil = data.targetQuantityFoil;
       }
 
-      await createGoal(request).unwrap();
+      const response = await createGoal(request).unwrap();
 
       enqueueSnackbar('Goal created successfully!', { variant: 'success' });
-      onSuccess();
+      if (response.data) {
+        onSuccess(response.data);
+      }
     } catch (error: any) {
       enqueueSnackbar(error?.data?.error?.message || 'Failed to create goal', { variant: 'error' });
     }

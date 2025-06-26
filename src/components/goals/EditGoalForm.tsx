@@ -26,7 +26,7 @@ interface EditGoalFormProps {
   goal: Goal;
   userId: number;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (goal: Goal) => void;
 }
 
 interface FormValues {
@@ -134,7 +134,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
       }).unwrap();
 
       enqueueSnackbar('Goal updated successfully!', { variant: 'success' });
-      onSuccess();
+      onSuccess(goal);
     } catch (error: any) {
       enqueueSnackbar(error?.data?.error?.message || 'Failed to update goal', { variant: 'error' });
     }
