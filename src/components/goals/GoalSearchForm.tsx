@@ -1,9 +1,9 @@
-import { 
-  InfoOutlined as InfoOutlinedIcon, 
-  Search as SearchIcon,
-  FilterList as FilterListIcon,
+import {
   Add as AddIcon,
-  Remove as RemoveIcon
+  FilterList as FilterListIcon,
+  InfoOutlined as InfoOutlinedIcon,
+  Remove as RemoveIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
 import {
   Box,
@@ -27,8 +27,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CardApiParams } from '@/api/browse/types';
 import { useGetCardTypesQuery } from '@/api/cards/cardsApi';
 import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
-import OutlinedBox from '@/components/ui/OutlinedBox';
 import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
+import OutlinedBox from '@/components/ui/OutlinedBox';
 import { ColorMatchType, MTG_COLORS } from '@/types/browse';
 
 interface GoalSearchFormProps {
@@ -91,8 +91,12 @@ const STAT_OPERATORS = [
   { value: '!=', label: '≠' },
 ];
 
-export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureName, onOnePrintingPerPureNameChange }: GoalSearchFormProps) {
-  
+export function GoalSearchForm({
+  searchConditions,
+  onChange,
+  onePrintingPerPureName,
+  onOnePrintingPerPureNameChange,
+}: GoalSearchFormProps) {
   // Initialize state from searchConditions
   const [isInitialized, setIsInitialized] = useState(false);
   const [isColorInitialized, setIsColorInitialized] = useState(false);
@@ -119,6 +123,7 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
   // Type state - using AutocompleteOption for AutocompleteWithNegation
   const [typeOptions, setTypeOptions] = useState<AutocompleteOption[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<AutocompleteOption[]>([]);
+
 
   // Rarity state
   const [selectedRarities, setSelectedRarities] = useState<AutocompleteOption[]>([]);
@@ -381,17 +386,7 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
     }
 
     return conditions;
-  }, [
-    name,
-    oracleText,
-    artist,
-    colorState,
-    selectedTypes,
-    selectedRarities,
-    selectedSets,
-    statConditions,
-    cardFilter,
-  ]);
+  }, [name, oracleText, artist, colorState, selectedTypes, selectedRarities, selectedSets, statConditions, cardFilter]);
 
   // Initialize color state when searchConditions change (only once)
   useEffect(() => {
@@ -421,7 +416,6 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
       setArtist(searchConditions.artist || '');
     }
   }, [searchConditions.name, searchConditions.oracleText, searchConditions.artist]);
-
 
   // Mark as initialized once all data is loaded
   useEffect(() => {
@@ -467,17 +461,23 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
 
   const handleColorToggle = (color: string) => {
     if (color === 'C') {
-      setColorState((prev) => ({
-        ...prev,
-        includeColorless: !prev.includeColorless,
-        colors: !prev.includeColorless ? [] : prev.colors,
-      }));
+      setColorState((prev) => {
+        const newState = {
+          ...prev,
+          includeColorless: !prev.includeColorless,
+          colors: !prev.includeColorless ? [] : prev.colors,
+        };
+        return newState;
+      });
     } else {
-      setColorState((prev) => ({
-        ...prev,
-        colors: prev.colors.includes(color) ? prev.colors.filter((c) => c !== color) : [...prev.colors, color],
-        includeColorless: false,
-      }));
+      setColorState((prev) => {
+        const newState = {
+          ...prev,
+          colors: prev.colors.includes(color) ? prev.colors.filter((c) => c !== color) : [...prev.colors, color],
+          includeColorless: false,
+        };
+        return newState;
+      });
     }
   };
 
@@ -556,7 +556,6 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
               key={color}
               size="small"
               onClick={() => handleColorToggle(color)}
-              disabled={colorState.includeColorless}
               sx={{
                 padding: 0,
                 borderRadius: '50%',
@@ -709,11 +708,11 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
 
       {/* Stat Conditions */}
       {statConditions.length === 0 ? (
-        <Button 
-          variant="outlined" 
-          startIcon={<FilterListIcon />} 
-          onClick={handleAddStatCondition} 
-          fullWidth 
+        <Button
+          variant="outlined"
+          startIcon={<FilterListIcon />}
+          onClick={handleAddStatCondition}
+          fullWidth
           sx={{ mt: 1 }}
         >
           Add Stat Filters
@@ -753,14 +752,25 @@ export function GoalSearchForm({ searchConditions, onChange, onePrintingPerPureN
                 type="number"
                 inputProps={{
                   min: '0',
-                  step: condition.attribute.includes('Price') || condition.attribute === 'market' || 
-                        condition.attribute === 'low' || condition.attribute === 'average' || 
-                        condition.attribute === 'high' || condition.attribute === 'foil' ? 'any' : '1'
+                  step:
+                    condition.attribute.includes('Price') ||
+                    condition.attribute === 'market' ||
+                    condition.attribute === 'low' ||
+                    condition.attribute === 'average' ||
+                    condition.attribute === 'high' ||
+                    condition.attribute === 'foil'
+                      ? 'any'
+                      : '1',
                 }}
                 placeholder={
-                  condition.attribute.includes('Price') || condition.attribute === 'market' || 
-                  condition.attribute === 'low' || condition.attribute === 'average' || 
-                  condition.attribute === 'high' || condition.attribute === 'foil' ? '0.00' : '0'
+                  condition.attribute.includes('Price') ||
+                  condition.attribute === 'market' ||
+                  condition.attribute === 'low' ||
+                  condition.attribute === 'average' ||
+                  condition.attribute === 'high' ||
+                  condition.attribute === 'foil'
+                    ? '0.00'
+                    : '0'
                 }
                 value={condition.value}
                 onChange={(e) => handleStatConditionChange(index, 'value', e.target.value)}
