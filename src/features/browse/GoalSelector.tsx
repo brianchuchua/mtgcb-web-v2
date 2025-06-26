@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { Goal } from '@/api/goals/types';
-import { selectSelectedGoalId, setSelectedGoalId } from '@/redux/slices/browseSlice';
+import { selectSelectedGoalId, setSelectedGoalId, setOneResultPerCardName } from '@/redux/slices/browseSlice';
 import { useAuth } from '@/hooks/useAuth';
 
 interface GoalSelectorProps {
@@ -46,7 +46,15 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
       return;
     }
     
-    dispatch(setSelectedGoalId(value === '' ? null : Number(value)));
+    const goalId = value === '' ? null : Number(value);
+    dispatch(setSelectedGoalId(goalId));
+    
+    // Only set oneResultPerCardName when a goal is selected
+    if (goalId !== null) {
+      const selectedGoal = activeGoals.find(goal => goal.id === goalId);
+      dispatch(setOneResultPerCardName(selectedGoal?.onePrintingPerPureName || false));
+    }
+    // When no goal is selected, leave oneResultPerCardName unchanged
   };
 
   const handleEditClick = (goalId: number) => {

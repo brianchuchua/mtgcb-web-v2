@@ -89,7 +89,7 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                         <Chip size="small" icon={<RadioButtonUncheckedIcon />} label="Inactive" color="default" />
                       </Tooltip>
                     )}
-                    <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}`} passHref legacyBehavior>
+                    <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
                       <Typography
                         variant="h6"
                         component="a"
@@ -106,7 +106,7 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                     </Link>
                   </Box>
                   <Stack direction="row" spacing={0.5}>
-                    <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}`} passHref legacyBehavior>
+                    <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
                       <Tooltip title="View goal">
                         <IconButton size="small" component="a">
                           <VisibilityIcon fontSize="small" />

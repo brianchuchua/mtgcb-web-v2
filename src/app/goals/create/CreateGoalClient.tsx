@@ -20,7 +20,7 @@ export function CreateGoalClient() {
 
   const handleSuccess = (goal: Goal) => {
     if (user?.userId) {
-      router.push(`/collections/${user.userId}?contentType=cards&goalId=${goal.id}`);
+      router.push(`/collections/${user.userId}?contentType=cards&goalId=${goal.id}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`);
     } else {
       router.push('/goals');
     }
