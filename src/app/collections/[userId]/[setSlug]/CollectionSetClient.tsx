@@ -256,10 +256,12 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
           goalSummary={goalSummary || undefined}
           view="cards"
           selectedGoalId={selectedGoalId}
+          includeSubsetsInSets={includeSubsetsInSets}
           setInfo={{
             name: set.name,
             code: set.code || '',
             id: set.id,
+            slug: setSlug,
             uniquePrintingsCollectedInSet: set.uniquePrintingsCollectedInSet || 0,
             cardCount: set.cardCount || '0',
             totalCardsCollectedInSet: set.totalCardsCollectedInSet || 0,

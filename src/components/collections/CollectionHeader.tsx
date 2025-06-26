@@ -32,6 +32,7 @@ interface CollectionHeaderProps {
     name: string;
     code: string;
     id: string;
+    slug: string;
     uniquePrintingsCollectedInSet: number;
     cardCount: string | number;
     totalCardsCollectedInSet: number;
@@ -83,8 +84,42 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
     return (
       <HeaderContainer>
         <Typography variant="h4" sx={{ mb: 0.5, color: 'primary.main' }}>
-          {setInfo.name}
+          {goalSummary.goalName}
         </Typography>
+
+        <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 0.5 }}>
+          <Link href={`/collections/${userId}?contentType=cards&goalId=${selectedGoalId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Box
+              component="span"
+              sx={{
+                cursor: 'pointer',
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              {username}'s Collection Goal
+            </Box>
+          </Link>
+          {' from set:'}
+        </Typography>
+
+        <Link href={`/collections/${userId}/${setInfo.slug}`} style={{ textDecoration: 'none' }}>
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              mb: 0.5, 
+              color: 'primary.main',
+              cursor: 'pointer',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            }}
+          >
+            {setInfo.name}
+          </Typography>
+        </Link>
 
         {setInfo.code && (
           <Box>
@@ -95,19 +130,36 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
           {setInfo.uniquePrintingsCollectedInSet}/{setInfo.cardCount}
         </Typography>
 
-        <Typography variant="h6" sx={{ mb: 0, color: 'warning.main' }}>
-          Cost to complete: $
-          {setInfo.costToComplete.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+          Current value:{' '}
+          <Box component="span" sx={{ color: 'success.main' }}>
+            ${setInfo.totalValue.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </Box>
         </Typography>
 
-        {/* {userId && selectedGoalId && (
-          <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center' }}>
-            <TCGPlayerGoalMassImportButton setId={setInfo.id} userId={userId} goalId={selectedGoalId} />
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+          Cost to complete:{' '}
+          <Box component="span" sx={{ color: 'warning.main' }}>
+            ${setInfo.costToComplete.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </Box>
-        )} */}
+        </Typography>
+
+        {userId && selectedGoalId && (
+          <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center' }}>
+            <TCGPlayerGoalMassImportButton 
+              setId={setInfo.id} 
+              userId={userId} 
+              goalId={selectedGoalId} 
+              includeSubsetsInSets={includeSubsetsInSets}
+            />
+          </Box>
+        )}
 
         <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <CollectionProgressBar
