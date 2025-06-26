@@ -75,10 +75,11 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         const cardsCache = mtgcbApi.util.selectInvalidatedBy(state, [{ type: 'Cards', id: `user-${userId}` }]);
 
         // TODO: Type issue mess. Not even sure if this is necessary anymore, need to test.
-        for (const { endpointName, originalArgs } of cardsCache) {
+        for (const cacheEntry of cardsCache as any[]) {
+          const { endpointName, originalArgs } = cacheEntry;
           if (endpointName === 'getCards' && originalArgs) {
-            const patchResult = dispatch(
-              mtgcbApi.util.updateQueryData('getCards', originalArgs, (draft) => {
+            const patchResult = (dispatch as any)(
+              (mtgcbApi.util as any).updateQueryData('getCards', originalArgs, (draft: any) => {
                 if (draft?.data?.cards) {
                   // Update quantities for matching cards
                   for (const updateCard of arg.cards) {
@@ -98,10 +99,11 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         // Update getCollectionCards cache entries
         const collectionCache = mtgcbApi.util.selectInvalidatedBy(state, ['Collection']);
 
-        for (const { endpointName, originalArgs } of collectionCache) {
+        for (const cacheEntry of collectionCache as any[]) {
+          const { endpointName, originalArgs } = cacheEntry;
           if (endpointName === 'getCollectionCards' && originalArgs) {
-            const patchResult = dispatch(
-              mtgcbApi.util.updateQueryData('getCollectionCards', originalArgs, (draft) => {
+            const patchResult = (dispatch as any)(
+              (mtgcbApi.util as any).updateQueryData('getCollectionCards', originalArgs, (draft: any) => {
                 if (draft?.data?.cards) {
                   // Update quantities for matching cards
                   for (const updateCard of arg.cards) {

@@ -258,7 +258,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
           selectedGoalId={selectedGoalId}
           setInfo={{
             name: set.name,
-            code: set.code,
+            code: set.code || '',
             id: set.id,
             uniquePrintingsCollectedInSet: set.uniquePrintingsCollectedInSet || 0,
             cardCount: set.cardCount || '0',

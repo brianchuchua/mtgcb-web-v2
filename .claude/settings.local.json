@@ -4,7 +4,8 @@
       "Bash(yarn type-check)",
       "Bash(mkdir:*)",
       "Bash(grep:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

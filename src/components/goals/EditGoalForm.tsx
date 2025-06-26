@@ -280,7 +280,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                           const newValue = Math.max(0, currentVal - 1);
                           onChange(newValue);
                         }}
-                        disabled={!value || value === 0}
+                        disabled={!value || Number(value) === 0}
                         tabIndex={-1}
                         disableFocusRipple
                       >
@@ -288,7 +288,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                       </QuantityLeftButton>
                       <QuantityInput
                         type="number"
-                        value={value === 0 ? '' : (value ?? '')}
+                        value={Number(value) === 0 ? '' : (value ?? '')}
                         onChange={(e) => {
                           const val = e.target.value;
                           if (val === '') {
@@ -333,9 +333,10 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                 name="targetQuantityFoil"
                 control={control}
                 rules={{
-                  validate: (value) => {
-                    if (value === undefined || value === '') return true;
-                    if (value < 0) return 'Cannot be negative';
+                  validate: (value: any) => {
+                    if (!value && value !== 0) return true;
+                    const numValue = Number(value);
+                    if (isNaN(numValue) || numValue < 0) return 'Cannot be negative';
                     return true;
                   },
                 }}
@@ -354,7 +355,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                           const newValue = Math.max(0, currentVal - 1);
                           onChange(newValue);
                         }}
-                        disabled={!value || value === 0}
+                        disabled={!value || Number(value) === 0}
                         tabIndex={-1}
                         disableFocusRipple
                       >
@@ -362,7 +363,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                       </QuantityLeftButton>
                       <QuantityInput
                         type="number"
-                        value={value === 0 ? '' : (value ?? '')}
+                        value={Number(value) === 0 ? '' : (value ?? '')}
                         onChange={(e) => {
                           const val = e.target.value;
                           if (val === '') {
@@ -410,12 +411,13 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                 name="targetQuantityAll"
                 control={control}
                 rules={{
-                  validate: (value) => {
+                  validate: (value: any) => {
                     if (quantityMode !== 'all') return true;
-                    if (value === undefined || value === null || value === '') {
+                    if (!value && value !== 0) {
                       return 'Quantity is required';
                     }
-                    if (value < 1) return 'Must be at least 1';
+                    const numValue = Number(value);
+                    if (isNaN(numValue) || numValue < 1) return 'Must be at least 1';
                     return true;
                   },
                 }}
@@ -438,7 +440,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                             onChange(newValue);
                           }
                         }}
-                        disabled={!value || value === 0}
+                        disabled={!value || Number(value) === 0}
                         tabIndex={-1}
                         disableFocusRipple
                       >
@@ -446,7 +448,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                       </QuantityLeftButton>
                       <QuantityInput
                         type="number"
-                        value={value === 0 ? '' : (value ?? '')}
+                        value={Number(value) === 0 ? '' : (value ?? '')}
                         onChange={(e) => {
                           const val = e.target.value;
                           if (val === '') {
