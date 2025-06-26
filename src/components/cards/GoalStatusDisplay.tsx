@@ -96,7 +96,7 @@ export function GoalStatusDisplay({ card }: GoalStatusDisplayProps) {
     return (
       <Box sx={{ p: 1 }}>
         <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-          {isGoalMet ? 'Goal met by cards from:' : 'Progress from other sets:'}
+          Contributions from other sets:
         </Typography>
         {versionsToShow.map((version, index) => (
           <Box key={`${version.cardId}-${index}`} sx={{ mb: 0.5 }}>

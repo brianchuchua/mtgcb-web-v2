@@ -45,32 +45,31 @@ export function GoalStatusTableCell({ card, goalType }: GoalStatusTableCellProps
     if (goalType === 'regular' && goalTargetQuantityReg) {
       return goalRegMet ? 'Goal met!' : `Need ${goalRegNeeded || 0}`;
     }
-    
+
     if (goalType === 'foil' && goalTargetQuantityFoil) {
       return goalFoilMet ? 'Goal met!' : `Need ${goalFoilNeeded || 0}`;
     }
-    
+
     if (goalType === 'all' && goalTargetQuantityAll && !goalTargetQuantityReg && !goalTargetQuantityFoil) {
       return goalAllMet ? 'Goal met!' : `Need ${goalAllNeeded || 0} (either)`;
     }
-    
+
     return '\u00A0'; // Non-breaking space to maintain height
   };
 
   const message = getGoalMessage();
-  const isGoalMet = (goalType === 'regular' && goalRegMet) || 
-                    (goalType === 'foil' && goalFoilMet) || 
-                    (goalType === 'all' && goalAllMet);
-  
+  const isGoalMet =
+    (goalType === 'regular' && goalRegMet) ||
+    (goalType === 'foil' && goalFoilMet) ||
+    (goalType === 'all' && goalAllMet);
+
   // Filter out self-contributions (same card ID)
-  const otherContributingVersions = goalContributingVersions?.filter(
-    (version) => version.cardId !== card.id
-  ) || [];
-  
+  const otherContributingVersions = goalContributingVersions?.filter((version) => version.cardId !== card.id) || [];
+
   // Show asterisk logic:
   // - For both "Goal met!" and "Need X": show when there are contributing versions from OTHER cards
   const showAsterisk = otherContributingVersions.length > 0;
-    
+
   const hasContributingVersions = showAsterisk;
   const showMessage = message !== '\u00A0';
 
@@ -78,19 +77,18 @@ export function GoalStatusTableCell({ card, goalType }: GoalStatusTableCellProps
   const renderTooltipContent = () => {
     // Always use filtered list to exclude self-contributions
     const versionsToShow = otherContributingVersions;
-    
+
     if (!versionsToShow || versionsToShow.length === 0) return null;
 
     return (
       <Box sx={{ p: 1 }}>
         <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-          {isGoalMet ? 'Goal met by cards from:' : 'Progress from other sets:'}
+          Contributions from other sets:
         </Typography>
         {versionsToShow.map((version, index) => (
           <Box key={`${version.cardId}-${index}`} sx={{ mb: 0.5 }}>
             <Typography variant="body2">
-              {version.setName || `Set ${version.setId}`}:
-              {version.quantityReg > 0 && ` ${version.quantityReg} regular`}
+              {version.setName || `Set ${version.setId}`}:{version.quantityReg > 0 && ` ${version.quantityReg} regular`}
               {version.quantityReg > 0 && version.quantityFoil > 0 && ','}
               {version.quantityFoil > 0 && ` ${version.quantityFoil} foil`}
             </Typography>
@@ -103,9 +101,9 @@ export function GoalStatusTableCell({ card, goalType }: GoalStatusTableCellProps
   // If there are contributing versions, wrap in tooltip
   if (hasContributingVersions && showMessage) {
     return (
-      <Tooltip 
-        title={renderTooltipContent()} 
-        placement="top" 
+      <Tooltip
+        title={renderTooltipContent()}
+        placement="top"
         arrow
         enterDelay={300}
         componentsProps={{

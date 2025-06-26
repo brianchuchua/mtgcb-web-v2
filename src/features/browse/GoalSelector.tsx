@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { Goal } from '@/api/goals/types';
-import { selectSelectedGoalId, setSelectedGoalId, setOneResultPerCardName } from '@/redux/slices/browseSlice';
+import { selectSelectedGoalId, setSelectedGoalId, setOneResultPerCardName, resetSearch } from '@/redux/slices/browseSlice';
 import { useAuth } from '@/hooks/useAuth';
 
 interface GoalSelectorProps {
@@ -47,6 +47,11 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
     }
     
     const goalId = value === '' ? null : Number(value);
+    
+    // Reset all search filters but preserve the goal selection
+    dispatch(resetSearch({ preserveGoal: true }));
+    
+    // Set the new goal ID
     dispatch(setSelectedGoalId(goalId));
     
     // Only set oneResultPerCardName when a goal is selected

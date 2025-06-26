@@ -17,6 +17,11 @@ import {
   TypeFilter,
 } from '@/types/browse';
 
+// Type for resetSearch options
+interface ResetSearchOptions {
+  preserveGoal?: boolean;
+}
+
 // Initialize with default pagination values for both card and set views
 const initialState: {
   cardsSearchParams: BrowseSearchParams;
@@ -273,7 +278,9 @@ export const browseSlice = createSlice({
         viewMode: action.payload.viewMode !== undefined ? action.payload.viewMode : pagination.viewMode,
       };
     },
-    resetSearch: (state) => {
+    resetSearch: (state, action: PayloadAction<ResetSearchOptions | undefined>) => {
+      const preserveGoal = action.payload?.preserveGoal || false;
+      
       // Reset the current view type's search params but preserve pagination
       const pagination =
         state.viewContentType === 'cards'
@@ -288,12 +295,23 @@ export const browseSlice = createSlice({
               viewMode: state.setsSearchParams.viewMode || 'grid',
             };
 
+      // Store current values that might need to be preserved
+      const currentGoalId = state.viewContentType === 'cards' 
+        ? state.cardsSearchParams.selectedGoalId 
+        : state.setsSearchParams.selectedGoalId;
+      const currentSortBy = state.setsSearchParams.sortBy;
+      const currentSortOrder = state.setsSearchParams.sortOrder;
+
       if (state.viewContentType === 'cards') {
         state.cardsSearchParams = {
           currentPage: pagination.currentPage,
           pageSize: pagination.pageSize,
           viewMode: pagination.viewMode,
         };
+        // Preserve goal if requested
+        if (preserveGoal && currentGoalId !== undefined) {
+          state.cardsSearchParams.selectedGoalId = currentGoalId;
+        }
       } else {
         state.setsSearchParams = {
           currentPage: pagination.currentPage,
@@ -302,13 +320,20 @@ export const browseSlice = createSlice({
           // Restore default values for sets
           showSubsets: true,
           includeSubsetsInSets: false,
-          sortBy: 'releasedAt',
-          sortOrder: 'desc',
+          sortBy: preserveGoal && currentSortBy ? currentSortBy : 'releasedAt',
+          sortOrder: preserveGoal && currentSortOrder ? currentSortOrder : 'desc',
         };
+        // Preserve goal if requested
+        if (preserveGoal && currentGoalId !== undefined) {
+          state.setsSearchParams.selectedGoalId = currentGoalId;
+        }
       }
-      // Also clear selected goal
-      delete state.cardsSearchParams.selectedGoalId;
-      delete state.setsSearchParams.selectedGoalId;
+      
+      // Only clear selected goal if not preserving it
+      if (!preserveGoal) {
+        delete state.cardsSearchParams.selectedGoalId;
+        delete state.setsSearchParams.selectedGoalId;
+      }
     },
     resetAllSearches: (state) => {
       // Reset both cards and sets search params but preserve pagination
