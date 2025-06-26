@@ -299,6 +299,11 @@ export const browseSlice = createSlice({
           currentPage: pagination.currentPage,
           pageSize: pagination.pageSize,
           viewMode: pagination.viewMode,
+          // Restore default values for sets
+          showSubsets: true,
+          includeSubsetsInSets: false,
+          sortBy: 'releasedAt',
+          sortOrder: 'desc',
         };
       }
       // Also clear selected goal
@@ -329,6 +334,11 @@ export const browseSlice = createSlice({
         currentPage: setsPagination.currentPage,
         pageSize: setsPagination.pageSize,
         viewMode: setsPagination.viewMode,
+        // Restore default values for sets
+        showSubsets: true,
+        includeSubsetsInSets: false,
+        sortBy: 'releasedAt',
+        sortOrder: 'desc',
       };
     },
     setViewContentType: (state, action: PayloadAction<'cards' | 'sets'>) => {

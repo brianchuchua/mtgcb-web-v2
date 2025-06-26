@@ -7,6 +7,7 @@ import { useCardsPageSize } from '@/hooks/useCardsPageSize';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useSetsPageSize } from '@/hooks/useSetsPageSize';
 import {
+  resetAllSearches,
   selectCardSearchParams,
   selectSetSearchParams,
   selectViewContentType,
@@ -42,6 +43,7 @@ export function useBrowseStateSync() {
   const hasInit = useRef(false);
   const prevView = useRef(viewType);
   const lastUrlPushed = useRef<string | undefined>(undefined);
+  const prevSearchParamsString = useRef<string>('');
 
   // TODO: Consider using named functions for useEffects for readability
   // TODO: Still not happy with the readability of this code
@@ -58,32 +60,45 @@ export function useBrowseStateSync() {
     const cardsUrlState = parseUrlToState(search, 'cards');
     const setsUrlState = parseUrlToState(search, 'sets');
 
-    // Initialize with localStorage values for page size
-    // Only update fields that are present in the URL, preserving Redux defaults
-    if (Object.keys(cardsUrlState).length > 0) {
-      dispatch(
-        setCardSearchParams({
-          ...cardsUrlState,
-          currentPage: 1,
-          pageSize: cardsPageSize,
-        }),
-      );
-    } else {
-      // Just update pagination from localStorage
-      dispatch(setCardPagination({ currentPage: 1, pageSize: cardsPageSize }));
-    }
+    // Check if we have any search parameters in the URL (excluding contentType)
+    const hasSearchParams = Array.from(search.entries()).some(
+      ([key]) => key !== 'contentType'
+    );
 
-    if (Object.keys(setsUrlState).length > 0) {
-      dispatch(
-        setSetSearchParams({
-          ...setsUrlState,
-          currentPage: 1,
-          pageSize: setsPageSize,
-        }),
-      );
+    if (!hasSearchParams) {
+      // No search params in URL - reset to defaults
+      dispatch(resetAllSearches());
+      // Then update pagination from localStorage
+      dispatch(setCardPagination({ pageSize: cardsPageSize }));
+      dispatch(setSetPagination({ pageSize: setsPageSize }));
     } else {
-      // Just update pagination from localStorage, preserve all other defaults
-      dispatch(setSetPagination({ currentPage: 1, pageSize: setsPageSize }));
+      // Initialize with localStorage values for page size
+      // Only update fields that are present in the URL, preserving Redux defaults
+      if (Object.keys(cardsUrlState).length > 0) {
+        dispatch(
+          setCardSearchParams({
+            ...cardsUrlState,
+            currentPage: 1,
+            pageSize: cardsPageSize,
+          }),
+        );
+      } else {
+        // Just update pagination from localStorage
+        dispatch(setCardPagination({ currentPage: 1, pageSize: cardsPageSize }));
+      }
+
+      if (Object.keys(setsUrlState).length > 0) {
+        dispatch(
+          setSetSearchParams({
+            ...setsUrlState,
+            currentPage: 1,
+            pageSize: setsPageSize,
+          }),
+        );
+      } else {
+        // Just update pagination from localStorage, preserve all other defaults
+        dispatch(setSetPagination({ currentPage: 1, pageSize: setsPageSize }));
+      }
     }
 
     prevView.current = initialView;
@@ -92,6 +107,57 @@ export function useBrowseStateSync() {
     // Mark that we've already loaded from localStorage during initialization
     hasLoadedFromLocalStorage.current = true;
   }, [dispatch, search, cardsPageSize, setsPageSize]);
+
+  /** ------------------------------------------------------------------
+   *  Handle URL changes after initialization
+   * ------------------------------------------------------------------ */
+  useEffect(() => {
+    if (!hasInit.current) return;
+
+    const currentSearchString = search.toString();
+    
+    // Skip if URL hasn't changed
+    if (currentSearchString === prevSearchParamsString.current) return;
+
+    // Check if search params have been cleared (URL has no params or only contentType)
+    const hasSearchParams = Array.from(search.entries()).some(
+      ([key]) => key !== 'contentType'
+    );
+
+    if (!hasSearchParams) {
+      // No search params in URL - reset to defaults
+      dispatch(resetAllSearches());
+      // Update pagination from localStorage
+      dispatch(setCardPagination({ pageSize: cardsPageSize }));
+      dispatch(setSetPagination({ pageSize: setsPageSize }));
+    } else {
+      // Parse the new URL state and update Redux
+      const cardsUrlState = parseUrlToState(search, 'cards');
+      const setsUrlState = parseUrlToState(search, 'sets');
+
+      // Update cards state if there are card-specific params
+      if (Object.keys(cardsUrlState).length > 0) {
+        dispatch(
+          setCardSearchParams({
+            ...cardsUrlState,
+            pageSize: cardsPageSize,
+          }),
+        );
+      }
+
+      // Update sets state if there are set-specific params
+      if (Object.keys(setsUrlState).length > 0) {
+        dispatch(
+          setSetSearchParams({
+            ...setsUrlState,
+            pageSize: setsPageSize,
+          }),
+        );
+      }
+    }
+
+    prevSearchParamsString.current = currentSearchString;
+  }, [search, dispatch, cardsPageSize, setsPageSize]);
 
   /** ------------------------------------------------------------------
    *  When the *view type* changes, rewrite the URL
