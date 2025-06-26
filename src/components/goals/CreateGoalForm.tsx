@@ -60,7 +60,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
       description: '',
       targetQuantityReg: undefined,
       targetQuantityFoil: undefined,
-      targetQuantityAll: undefined,
+      targetQuantityAll: 1,
     },
   });
 
