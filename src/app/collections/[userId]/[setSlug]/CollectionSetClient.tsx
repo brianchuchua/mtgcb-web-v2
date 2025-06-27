@@ -2,6 +2,7 @@
 
 import { Box, Typography } from '@mui/material';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +28,7 @@ import {
   selectIncludeSubsetsInSets,
   selectSelectedGoalId,
   selectSets,
+  setSelectedGoalId,
   setSets,
   setViewContentType,
 } from '@/redux/slices/browseSlice';
@@ -41,6 +43,7 @@ interface CollectionSetClientProps {
 
 export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId, setSlug }) => {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
   const browseController = useCollectionBrowseController({ userId });
   const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
@@ -88,6 +91,17 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       skip: !set?.id,
     },
   );
+
+  // Sync goalId from URL params to Redux
+  useEffect(() => {
+    const goalIdParam = searchParams?.get('goalId');
+    if (goalIdParam) {
+      const goalId = parseInt(goalIdParam);
+      if (!isNaN(goalId)) {
+        dispatch(setSelectedGoalId(goalId));
+      }
+    }
+  }, [searchParams, dispatch]);
 
   useEffect(() => {
     dispatch(setViewContentType('cards'));
@@ -386,8 +400,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         <ErrorBanner type={browseController.view} />
       ) : (
         <>
-          {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} />}
-          {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} />}
+          {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
+          {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
         </>
       )}
 

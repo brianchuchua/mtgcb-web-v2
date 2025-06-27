@@ -5,6 +5,7 @@ import React from 'react';
 import { CollectionProgressBar } from './CollectionProgressBar';
 import SetIcon from '@/components/sets/SetIcon';
 import TCGPlayerGoalMassImportButton from '@/components/tcgplayer/TCGPlayerGoalMassImportButton';
+import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 interface CollectionHeaderProps {
   username: string;
@@ -105,7 +106,7 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
           {' from set:'}
         </Typography>
 
-        <Link href={`/collections/${userId}/${setInfo.slug}`} style={{ textDecoration: 'none' }}>
+        <Link href={userId ? getCollectionSetUrl(userId, setInfo.slug) : '#'} style={{ textDecoration: 'none' }}>
           <Typography 
             variant="h5" 
             sx={{ 

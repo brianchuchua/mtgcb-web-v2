@@ -8,6 +8,7 @@ import { selectSelectedGoalId, selectShowGoals } from '@/redux/slices/browseSlic
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import { Set } from '@/types/sets';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
+import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 interface UseSetDataProps {
   searchParams: any;
@@ -101,12 +102,12 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
   const handleSetClick = useCallback(
     (set: Set) => {
       if (userId) {
-        router.push(`/collections/${userId}/${set.slug}`);
+        router.push(getCollectionSetUrl(userId, set.slug, selectedGoalId));
       } else {
         router.push(`/browse?includeSets=${set.id}`);
       }
     },
-    [router, userId],
+    [router, userId, selectedGoalId],
   );
 
   return {

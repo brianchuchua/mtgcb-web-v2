@@ -19,6 +19,7 @@ import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
+import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 export interface CardTableRendererProps {
   priceType: PriceType;
@@ -746,6 +747,7 @@ export const useCardRowRenderer = (
   displaySettings: CardTableRendererProps['displaySettings'],
   onCardClick?: (cardId: string) => void,
   isOwnCollection?: boolean,
+  goalId?: string,
 ) => {
   const { showCardPreview, hideCardPreview } = useCardPreviewEffect([]);
   const pathname = usePathname();
@@ -883,7 +885,7 @@ export const useCardRowRenderer = (
         <TableCell key="set">
           {card.setName && card.setSlug ? (
             <Link
-              href={userId ? `/collections/${userId}/${card.setSlug}` : `/browse/sets/${card.setSlug}`}
+              href={userId ? getCollectionSetUrl(userId, card.setSlug, goalId) : `/browse/sets/${card.setSlug}`}
               style={{
                 color: 'inherit',
                 textDecoration: 'none',

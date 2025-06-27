@@ -42,16 +42,18 @@ export function GoalStatusTableCell({ card, goalType }: GoalStatusTableCellProps
 
   // Determine the goal status message
   const getGoalMessage = () => {
+    // Special case: If only targetQuantityAll exists (no reg/foil targets)
+    // Show the "all" message on both regular and foil columns
+    if (goalTargetQuantityAll && !goalTargetQuantityReg && !goalTargetQuantityFoil) {
+      return goalAllMet ? 'Goal met!' : `Need ${goalAllNeeded || 0} (either)`;
+    }
+
     if (goalType === 'regular' && goalTargetQuantityReg) {
       return goalRegMet ? 'Goal met!' : `Need ${goalRegNeeded || 0}`;
     }
 
     if (goalType === 'foil' && goalTargetQuantityFoil) {
       return goalFoilMet ? 'Goal met!' : `Need ${goalFoilNeeded || 0}`;
-    }
-
-    if (goalType === 'all' && goalTargetQuantityAll && !goalTargetQuantityReg && !goalTargetQuantityFoil) {
-      return goalAllMet ? 'Goal met!' : `Need ${goalAllNeeded || 0} (either)`;
     }
 
     return '\u00A0'; // Non-breaking space to maintain height
@@ -61,7 +63,9 @@ export function GoalStatusTableCell({ card, goalType }: GoalStatusTableCellProps
   const isGoalMet =
     (goalType === 'regular' && goalRegMet) ||
     (goalType === 'foil' && goalFoilMet) ||
-    (goalType === 'all' && goalAllMet);
+    (goalType === 'all' && goalAllMet) ||
+    // Special case for "all" goals shown in both regular and foil columns
+    (goalTargetQuantityAll && !goalTargetQuantityReg && !goalTargetQuantityFoil && goalAllMet);
 
   // Filter out self-contributions (same card ID)
   const otherContributingVersions = goalContributingVersions?.filter((version) => version.cardId !== card.id) || [];

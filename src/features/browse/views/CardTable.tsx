@@ -30,6 +30,7 @@ interface CardTableProps {
     goalProgressIsVisible?: boolean;
   };
   isOwnCollection?: boolean;
+  goalId?: string;
 }
 
 const CardTable: React.FC<CardTableProps> = ({
@@ -43,6 +44,7 @@ const CardTable: React.FC<CardTableProps> = ({
   tableSettings,
   cardDisplaySettings,
   isOwnCollection = false,
+  goalId,
 }) => {
   // Merge table settings with card display settings
   const mergedDisplaySettings = {
@@ -55,7 +57,7 @@ const CardTable: React.FC<CardTableProps> = ({
     sortBy,
   );
 
-  const renderCardRow = useCardRowRenderer(priceType, mergedDisplaySettings, onCardClick, isOwnCollection);
+  const renderCardRow = useCardRowRenderer(priceType, mergedDisplaySettings, onCardClick, isOwnCollection, goalId);
 
   return (
     <VirtualizedTable

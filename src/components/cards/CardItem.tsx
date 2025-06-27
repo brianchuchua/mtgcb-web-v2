@@ -10,6 +10,7 @@ import { EditableCardQuantity } from './EditableCardQuantity';
 import { GoalStatusDisplay } from './GoalStatusDisplay';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 export interface CardItemProps {
   id: string;
@@ -82,6 +83,7 @@ export interface CardItemProps {
   priceType?: PriceType; // Price type to display
   onClick?: () => void;
   isOwnCollection?: boolean;
+  goalId?: string;
 }
 
 /**
@@ -129,6 +131,7 @@ const CardItemComponent = ({
   onClick,
   isLoadingSkeleton = false,
   isOwnCollection = false,
+  goalId,
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -383,7 +386,7 @@ const CardItemComponent = ({
             >
               {setName && setSlug ? (
                 <Link
-                  href={userId ? `/collections/${userId}/${setSlug}` : `/browse/sets/${setSlug}`}
+                  href={userId ? getCollectionSetUrl(userId, setSlug, goalId) : `/browse/sets/${setSlug}`}
                   style={{
                     color: 'inherit',
                     textDecoration: 'none',

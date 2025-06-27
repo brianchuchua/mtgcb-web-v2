@@ -25,6 +25,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
+
   // Create collection sets map from the sets data
   const collectionSets = useMemo(() => {
     if (!setsProps || !('setItems' in setsProps) || !setsProps.setItems) {
@@ -144,8 +145,8 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
       {/* Show cards view for collections */}
       {view === 'cards' && cardsProps && 'items' in cardsProps && (
         <>
-          {viewMode === 'grid' && <CardGrid {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} />}
-          {viewMode === 'table' && <CardTable {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} />}
+          {viewMode === 'grid' && <CardGrid {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
+          {viewMode === 'table' && <CardTable {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
         </>
       )}
     </>

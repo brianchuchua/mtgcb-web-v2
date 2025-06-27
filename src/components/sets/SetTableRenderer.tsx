@@ -4,12 +4,13 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, TableCell, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React from 'react';
 import { TableColumn } from '@/components/common/VirtualizedTable';
 import SetIcon from '@/components/sets/SetIcon';
 import { Set } from '@/types/sets';
 import { formatISODate } from '@/utils/dateUtils';
+import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 export interface SetTableRendererProps {
   displaySettings: {
@@ -108,12 +109,16 @@ export const useSetRowRenderer = (
   onSetClick?: (set: Set) => void,
 ) => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   
   const renderSetRow = (index: number, set: Set) => {
     // Check if we're in a collection view and extract userId
     const collectionMatch = pathname?.match(/^\/collections\/(\d+)/);
     const userId = collectionMatch ? collectionMatch[1] : null;
-    const setUrl = userId ? `/collections/${userId}/${set.slug}` : `/browse/sets/${set.slug}`;
+    const goalId = searchParams?.get('goalId') ? parseInt(searchParams.get('goalId')!) : undefined;
+    const setUrl = userId 
+      ? getCollectionSetUrl(userId, set.slug, goalId)
+      : `/browse/sets/${set.slug}`;
     
     // Create a collection of cells based on visible columns
     const cells = [];

@@ -15,6 +15,7 @@ export interface CardItemRendererProps {
   priceType?: PriceType;
   onClick?: (cardId: string, cardName?: string) => void;
   isOwnCollection?: boolean;
+  goalId?: string;
 }
 
 const CardItemRenderer = ({
@@ -27,6 +28,7 @@ const CardItemRenderer = ({
   priceType = PriceType.Market,
   onClick,
   isOwnCollection = false,
+  goalId,
 }: CardItemRendererProps) => {
   const handleCardClick = () => {
     if (onClick) {
@@ -41,6 +43,7 @@ const CardItemRenderer = ({
       display={settings} 
       priceType={priceType}
       isOwnCollection={isOwnCollection}
+      goalId={goalId}
     />
   );
 };

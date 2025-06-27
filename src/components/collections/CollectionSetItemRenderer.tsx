@@ -13,6 +13,7 @@ import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { Set } from '@/types/sets';
 import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder';
 import capitalize from '@/utils/capitalize';
+import { getCollectionSetUrl } from '@/utils/collectionUrls';
 import { formatISODate } from '@/utils/dateUtils';
 import { formatPrice } from '@/utils/formatters';
 
@@ -81,13 +82,16 @@ type SetNameProps = {
   nameIsVisible?: boolean;
   codeIsVisible?: boolean;
   userId?: number;
+  goalId?: number;
 };
 
-const SetNameAndCode: React.FC<SetNameProps> = ({ set, nameIsVisible = true, codeIsVisible = true, userId }) => {
+const SetNameAndCode: React.FC<SetNameProps> = ({ set, nameIsVisible = true, codeIsVisible = true, userId, goalId }) => {
   if (!nameIsVisible) return null;
 
   const displayName = codeIsVisible ? `${set.name} (${set.code})` : set.name;
-  const href = userId ? `/collections/${userId}/${set.slug}` : `/browse/sets/${set.slug}`;
+  const href = userId 
+    ? getCollectionSetUrl(userId, set.slug, goalId) 
+    : `/browse/sets/${set.slug}`;
 
   return (
     <Link
@@ -115,10 +119,11 @@ const SetReleaseDate: React.FC<{ set: Set; isVisible?: boolean }> = ({ set, isVi
   );
 };
 
-const SetIconDisplay: React.FC<{ set: Set; collectionData?: CollectionSetSummary; userId?: number }> = ({
+const SetIconDisplay: React.FC<{ set: Set; collectionData?: CollectionSetSummary; userId?: number; goalId?: number }> = ({
   set,
   collectionData,
   userId,
+  goalId,
 }) => {
   const percentageCollected = collectionData?.percentageCollected || 0;
 
@@ -136,7 +141,7 @@ const SetIconDisplay: React.FC<{ set: Set; collectionData?: CollectionSetSummary
     <Box sx={{ textAlign: 'center', m: 0.5 }}>
       {set.code && (
         <Link
-          href={userId ? `/collections/${userId}/${set.slug}` : `/browse/sets/${set.slug}`}
+          href={userId ? getCollectionSetUrl(userId, set.slug, goalId) : `/browse/sets/${set.slug}`}
           style={{
             textDecoration: 'none',
             color: 'inherit',
@@ -520,6 +525,7 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
           nameIsVisible={settings.nameIsVisible}
           codeIsVisible={settings.codeIsVisible}
           userId={userId}
+          goalId={goalId}
         />
         <SetCategoryAndType
           set={set}
@@ -527,7 +533,7 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
           isTypeVisible={settings.typeIsVisible}
         />
         <SetReleaseDate set={set} isVisible={settings.releaseDateIsVisible} />
-        <SetIconDisplay set={set} collectionData={collectionData} userId={userId} />
+        <SetIconDisplay set={set} collectionData={collectionData} userId={userId} goalId={goalId} />
         <CollectionCardCount
           set={set}
           collectionData={collectionData}
