@@ -23,6 +23,7 @@ import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
+import { useViewModeToggle } from '@/hooks/useViewModeToggle';
 import {
   selectCardSearchParams,
   selectIncludeSubsetsInSets,
@@ -51,6 +52,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const { user } = useAuth();
   const isOwnCollection = user?.userId === userId;
   const { enqueueSnackbar } = useSnackbar();
+  const { handleViewModeChange } = useViewModeToggle();
 
   // Mass Update state
   const [isMassUpdateOpen, setIsMassUpdateOpen] = useState(false);
@@ -104,7 +106,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   }, [searchParams, dispatch]);
 
   useEffect(() => {
-    dispatch(setViewContentType('cards'));
+    handleViewModeChange('cards');
 
     if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
       const set = setsData.data.sets[0];

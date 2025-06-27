@@ -47,6 +47,7 @@ import GoalSelector from '@/features/browse/GoalSelector';
 import GoalCompletionSelector from '@/features/browse/GoalCompletionSelector';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { usePriceType } from '@/hooks/usePriceType';
+import { useViewModeToggle } from '@/hooks/useViewModeToggle';
 import {
   resetSearch,
   selectArtist,
@@ -338,16 +339,19 @@ const BrowseSearchForm = () => {
     setMobileOpen(false);
   };
 
+  // Get the view mode toggle handler from the custom hook
+  const { handleViewModeChange } = useViewModeToggle();
+
   // Direct click handlers for the toggle buttons
   const handleCardsClick = () => {
     if (contentType !== 'cards') {
-      dispatch(setViewContentType('cards'));
+      handleViewModeChange('cards');
     }
   };
 
   const handleSetsClick = () => {
     if (contentType !== 'sets') {
-      dispatch(setViewContentType('sets'));
+      handleViewModeChange('sets');
     }
   };
 
