@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
   selectSortBy, 
   selectSortOrder, 
+  selectViewContentType,
   setSortBy, 
   setSortOrder 
 } from '@/redux/slices/browseSlice';
@@ -14,8 +15,9 @@ import { SortByOption } from '@/types/browse';
  */
 export function useSort() {
   const dispatch = useDispatch();
+  const viewType = useSelector(selectViewContentType);
   const sortBy = useSelector(selectSortBy) || 'releasedAt';
-  const sortOrder = useSelector(selectSortOrder) || 'asc';
+  const sortOrder = useSelector(selectSortOrder) || (viewType === 'cards' ? 'asc' : 'desc');
 
   const handleSort = useCallback((columnId: string) => {
     if (!columnId) return;
@@ -26,11 +28,18 @@ export function useSort() {
       dispatch(setSortOrder(newOrder));
     } else {
       dispatch(setSortBy(columnId as SortByOption));
-      // Default to 'desc' for date-based columns, 'asc' for others
-      const defaultOrder = columnId === 'releasedAt' ? 'desc' : 'asc';
+      // Default sort order depends on view type and column
+      let defaultOrder: 'asc' | 'desc';
+      if (viewType === 'cards') {
+        // For cards, default to asc for all columns
+        defaultOrder = 'asc';
+      } else {
+        // For sets, default to desc for date columns, asc for others
+        defaultOrder = columnId === 'releasedAt' ? 'desc' : 'asc';
+      }
       dispatch(setSortOrder(defaultOrder));
     }
-  }, [dispatch, sortBy, sortOrder]);
+  }, [dispatch, sortBy, sortOrder, viewType]);
 
   return {
     sortBy,

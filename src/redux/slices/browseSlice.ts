@@ -33,6 +33,8 @@ const initialState: {
     currentPage: 1,
     pageSize: 24,
     viewMode: 'grid',
+    sortBy: 'releasedAt',
+    sortOrder: 'asc', // Cards default to ascending (oldest first)
   },
   setsSearchParams: {
     // Default pagination for sets
@@ -307,6 +309,9 @@ export const browseSlice = createSlice({
           currentPage: pagination.currentPage,
           pageSize: pagination.pageSize,
           viewMode: pagination.viewMode,
+          // Restore default values for cards
+          sortBy: preserveGoal && state.cardsSearchParams.sortBy ? state.cardsSearchParams.sortBy : 'releasedAt',
+          sortOrder: preserveGoal && state.cardsSearchParams.sortOrder ? state.cardsSearchParams.sortOrder : 'asc',
         };
         // Preserve goal if requested
         if (preserveGoal && currentGoalId !== undefined) {
@@ -353,6 +358,9 @@ export const browseSlice = createSlice({
         currentPage: cardsPagination.currentPage,
         pageSize: cardsPagination.pageSize,
         viewMode: cardsPagination.viewMode,
+        // Restore default values for cards
+        sortBy: 'releasedAt',
+        sortOrder: 'asc',
       };
 
       state.setsSearchParams = {

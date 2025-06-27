@@ -99,10 +99,10 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     defaultValue: 24,
   },
 
-  sortBy: {
+  cardsSortBy: {
     type: 'enum',
-    mode: 'both',
-    urlParam: 'sortBy',
+    mode: 'cards',
+    urlParam: 'cardsSortBy',
     options: [
       'name',
       'releasedAt',
@@ -118,6 +118,23 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       'average',
       'high',
       'foil',
+    ],
+    defaultValue: 'releasedAt',
+  },
+  cardsSortOrder: {
+    type: 'enum',
+    mode: 'cards',
+    urlParam: 'cardsSortOrder',
+    options: ['asc', 'desc'],
+    defaultValue: 'asc',
+  },
+  setsSortBy: {
+    type: 'enum',
+    mode: 'sets',
+    urlParam: 'setsSortBy',
+    options: [
+      'name',
+      'releasedAt',
       'code',
       'cardCount',
       'setType',
@@ -127,12 +144,12 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     ],
     defaultValue: 'releasedAt',
   },
-  sortOrder: {
+  setsSortOrder: {
     type: 'enum',
-    mode: 'both',
-    urlParam: 'sortOrder',
+    mode: 'sets',
+    urlParam: 'setsSortOrder',
     options: ['asc', 'desc'],
-    defaultValue: 'asc',
+    defaultValue: 'desc',
   },
   cardName: {
     type: 'string',
