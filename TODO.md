@@ -62,6 +62,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## UX Action Items
 
+- When Open Search Options is clicked, it should scroll to the search options section
 - Link to collection needs to be consistent. Underlined or not, which parts, etc.
 - Improve height of skeleton loader for collectionheader
 - Header and breadcrumb and form and alignment consistency
@@ -149,6 +150,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - fetch API being used in SetSelector
 - Consider removing skeleton loaders from set gallery and experiment with masonry instead of virtuoso
 - I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
+- Audit consistency of naming of fields returned by API for totalCount and values.
 
 ## Future Feature Work
 
@@ -156,6 +158,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Card Locations
 - Deck Completion
 - Button to report missing card data, notify user is link to scryfall or tcgplayer is missing
+- Sharing and duplicating collection goals
 
 ## Patron Requests
 
