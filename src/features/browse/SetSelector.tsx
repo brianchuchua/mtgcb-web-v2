@@ -1,47 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import AutocompleteWithNegation, { Option } from '@/components/ui/AutocompleteWithNegation';
 import { selectSets, setSets } from '@/redux/slices/browseSlice';
-
-interface Set {
-  id: number;
-  name: string;
-  code: string;
-  category: string;
-  releasedAt: string;
-}
 
 const SetSelector = () => {
   const dispatch = useDispatch();
   const selectedSets = useSelector(selectSets);
-  const [allSets, setAllSets] = useState<Set[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSets = async () => {
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL}/sets/all`);
-        const data = await response.json();
-
-        if (data.success && data.data.sets) {
-          // Sort sets by releasedAt in descending order (newest first)
-          const sortedSets = [...data.data.sets].sort((a, b) => {
-            return new Date(b.releasedAt).getTime() - new Date(a.releasedAt).getTime();
-          });
-          setAllSets(sortedSets);
-        }
-
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching sets:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchSets();
-  }, []);
+  
+  // Use RTK Query hook instead of direct fetch to benefit from caching
+  const { data: setsResponse, isLoading } = useGetAllSetsQuery();
+  
+  // Sort sets by releasedAt in descending order (newest first)
+  const allSets = useMemo(() => {
+    if (!setsResponse?.data?.sets) return [];
+    
+    return [...setsResponse.data.sets].sort((a, b) => {
+      return new Date(b.releasedAt).getTime() - new Date(a.releasedAt).getTime();
+    });
+  }, [setsResponse]);
 
   // Convert sets to options for the autocomplete
   const mappedSets: Option[] = allSets.map((set) => ({
@@ -86,7 +65,7 @@ const SetSelector = () => {
     dispatch(setSets(setFilter));
   };
 
-  if (loading) {
+  if (isLoading) {
     return <div style={{ paddingLeft: '9px' }}>Loading sets...</div>;
   }
 

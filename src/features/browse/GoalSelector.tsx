@@ -48,18 +48,21 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
     
     const goalId = value === '' ? null : Number(value);
     
-    // Reset all search filters but preserve the goal selection
-    dispatch(resetSearch({ preserveGoal: true }));
-    
-    // Set the new goal ID
-    dispatch(setSelectedGoalId(goalId));
-    
-    // Only set oneResultPerCardName when a goal is selected
-    if (goalId !== null) {
-      const selectedGoal = activeGoals.find(goal => goal.id === goalId);
-      dispatch(setOneResultPerCardName(selectedGoal?.onePrintingPerPureName || false));
+    // Only reset search if the goal is actually changing
+    if (goalId !== selectedGoalId) {
+      // Reset all search filters but preserve the goal selection
+      dispatch(resetSearch({ preserveGoal: true }));
+      
+      // Set the new goal ID
+      dispatch(setSelectedGoalId(goalId));
+      
+      // Only set oneResultPerCardName when a goal is selected
+      if (goalId !== null) {
+        const selectedGoal = activeGoals.find(goal => goal.id === goalId);
+        dispatch(setOneResultPerCardName(selectedGoal?.onePrintingPerPureName || false));
+      }
+      // When no goal is selected, leave oneResultPerCardName unchanged
     }
-    // When no goal is selected, leave oneResultPerCardName unchanged
   };
 
   const handleEditClick = (goalId: number) => {

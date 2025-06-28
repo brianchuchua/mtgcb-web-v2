@@ -26,6 +26,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CardApiParams } from '@/api/browse/types';
 import { useGetCardTypesQuery } from '@/api/cards/cardsApi';
+import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
 import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
 import OutlinedBox from '@/components/ui/OutlinedBox';
@@ -155,29 +156,25 @@ export function GoalSearchForm({
     }));
   };
 
-  // Fetch sets data
+  // Use RTK Query hook for sets data
+  const { data: setsResponse } = useGetAllSetsQuery();
+  
+  // Process sets data when it arrives
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL}/sets/all`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.data && data.data.sets) {
-          // Sort sets by releasedAt in descending order (newest first)
-          const sortedSets = [...data.data.sets].sort((a: any, b: any) => {
-            return new Date(b.releasedAt).getTime() - new Date(a.releasedAt).getTime();
-          });
-          const options = sortedSets.map((set: any) => ({
-            category: 'Sets',
-            label: `${set.name} (${set.code})`,
-            value: set.id.toString(),
-            exclude: false,
-          }));
-          setSetOptions(options);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching sets:', error);
+    if (setsResponse?.data?.sets) {
+      // Sort sets by releasedAt in descending order (newest first)
+      const sortedSets = [...setsResponse.data.sets].sort((a: any, b: any) => {
+        return new Date(b.releasedAt).getTime() - new Date(a.releasedAt).getTime();
       });
-  }, []);
+      const options = sortedSets.map((set: any) => ({
+        category: 'Sets',
+        label: `${set.name} (${set.code})`,
+        value: set.id.toString(),
+        exclude: false,
+      }));
+      setSetOptions(options);
+    }
+  }, [setsResponse]);
 
   // Initialize selected types when typeOptions are loaded
   useEffect(() => {

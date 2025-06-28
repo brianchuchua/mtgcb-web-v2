@@ -96,10 +96,12 @@ export function convertStateToUrlParams(
 ): URLSearchParams {
   const params = new URLSearchParams();
 
-  params.set('contentType', currentMode);
+  // Note: contentType is now handled by useBrowseStateSync to avoid adding it on collection set pages
   Object.entries(state).forEach(([reduxKey, value]) => {
     if (value === undefined || value === null) return;
     if (reduxKey === 'viewMode') return;
+    // Skip viewContentType as it's handled separately by useBrowseStateSync
+    if (reduxKey === 'viewContentType') return;
 
     const mappedKey = reduxToSchemaKeyMap[reduxKey] || reduxKey;
 

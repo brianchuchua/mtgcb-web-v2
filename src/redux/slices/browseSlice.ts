@@ -256,8 +256,17 @@ export const browseSlice = createSlice({
         viewMode: state.cardsSearchParams.viewMode || 'grid',
       };
 
+      // Filter out undefined values from the payload to avoid overriding existing values
+      const cleanPayload = Object.entries(action.payload).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as any);
+      
       state.cardsSearchParams = {
-        ...action.payload,
+        ...state.cardsSearchParams, // Preserve existing state
+        ...cleanPayload, // Only override with defined values
         // Keep current pagination unless explicitly overridden
         currentPage: action.payload.currentPage !== undefined ? action.payload.currentPage : pagination.currentPage,
         pageSize: action.payload.pageSize !== undefined ? action.payload.pageSize : pagination.pageSize,
@@ -272,8 +281,17 @@ export const browseSlice = createSlice({
         viewMode: state.setsSearchParams.viewMode || 'grid',
       };
 
+      // Filter out undefined values from the payload to avoid overriding existing values
+      const cleanPayload = Object.entries(action.payload).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as any);
+      
       state.setsSearchParams = {
-        ...action.payload,
+        ...state.setsSearchParams, // Preserve existing state
+        ...cleanPayload, // Only override with defined values
         // Keep current pagination unless explicitly overridden
         currentPage: action.payload.currentPage !== undefined ? action.payload.currentPage : pagination.currentPage,
         pageSize: action.payload.pageSize !== undefined ? action.payload.pageSize : pagination.pageSize,

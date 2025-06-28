@@ -3,10 +3,11 @@ import { BrowseControllerResult } from '@/features/browse/types';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { useCollectionDisplaySettings } from '@/features/collections/hooks/useCollectionDisplaySettings';
 import { useViewMode } from '@/features/browse/hooks';
-import { selectViewContentType } from '@/redux/slices/browseSlice';
+import { selectViewContentType, selectSets, selectSelectedGoalId } from '@/redux/slices/browseSlice';
 
 interface UseCollectionBrowseControllerProps {
   userId: number;
+  isSetSpecificPage?: boolean; // True when on /collections/[userId]/[setSlug]
 }
 
 export interface CollectionBrowseController extends BrowseControllerResult {
@@ -15,16 +16,32 @@ export interface CollectionBrowseController extends BrowseControllerResult {
 
 export const useCollectionBrowseController = ({
   userId,
+  isSetSpecificPage = false,
 }: UseCollectionBrowseControllerProps): CollectionBrowseController => {
-  const currentView = useSelector(selectViewContentType) ?? 'sets';
+  const reduxView = useSelector(selectViewContentType);
+  // On set-specific pages, always use 'cards' view
+  const currentView = isSetSpecificPage ? 'cards' : (reduxView ?? 'sets');
+  const selectedGoalId = useSelector(selectSelectedGoalId);
   const { viewMode } = useViewMode(currentView);
+  
+  // Check if we're waiting for goalId from URL
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const hasGoalInUrl = searchParams?.get('goalId') !== null;
+  const goalIdFromUrl = searchParams?.get('goalId') ? parseInt(searchParams.get('goalId')!) : null;
+  const isWaitingForGoalSync = hasGoalInUrl && goalIdFromUrl !== selectedGoalId;
+  
   
   // Use collection-specific display settings
   const collectionDisplaySettings = useCollectionDisplaySettings({ viewMode, view: currentView });
   
   const browseController = useBrowseController({ 
     skipCostToComplete: true,
-    userId 
+    userId,
+    // Only wait for set filter on set-specific pages when viewing cards
+    waitForSetFilter: isSetSpecificPage && currentView === 'cards',
+    // Skip until goalId is synced from URL
+    skipCardsUntilReady: isWaitingForGoalSync && currentView === 'cards',
+    waitForInitialLoad: isWaitingForGoalSync
   });
 
   // Override the display settings with collection-specific ones

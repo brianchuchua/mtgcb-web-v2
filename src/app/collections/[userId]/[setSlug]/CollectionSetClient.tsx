@@ -22,8 +22,8 @@ import { CardsProps } from '@/features/browse/types/browseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
+import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
-import { useViewModeToggle } from '@/hooks/useViewModeToggle';
 import {
   selectCardSearchParams,
   selectIncludeSubsetsInSets,
@@ -45,14 +45,17 @@ interface CollectionSetClientProps {
 export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId, setSlug }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
-  const browseController = useCollectionBrowseController({ userId });
+  
+  // Sync goalId from URL to Redux on mount
+  useInitialUrlSync({ syncView: false, syncGoalId: true });
+  
+  const browseController = useCollectionBrowseController({ userId, isSetSpecificPage: true });
   const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
   const setPriceType = useSetPriceType();
   const { user } = useAuth();
   const isOwnCollection = user?.userId === userId;
   const { enqueueSnackbar } = useSnackbar();
-  const { handleViewModeChange } = useViewModeToggle();
 
   // Mass Update state
   const [isMassUpdateOpen, setIsMassUpdateOpen] = useState(false);
@@ -65,6 +68,12 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const currentSetsFilter = useSelector(selectSets);
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
   const selectedGoalId = useSelector(selectSelectedGoalId);
+  
+  // Check if we're waiting for goalId to sync from URL
+  const goalIdParam = searchParams?.get('goalId');
+  const hasGoalInUrl = goalIdParam !== null;
+  const goalIdFromUrl = goalIdParam ? parseInt(goalIdParam) : null;
+  const isWaitingForGoalSync = hasGoalInUrl && !isNaN(goalIdFromUrl!) && goalIdFromUrl !== selectedGoalId;
 
   const {
     data: setsData,
@@ -77,6 +86,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     priceType: setPriceType,
     includeSubsetsInSets,
     goalId: selectedGoalId || undefined,
+  }, {
+    skip: isWaitingForGoalSync,
   });
 
   const set = setsData?.data?.sets?.[0];
@@ -90,24 +101,15 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       goalId: selectedGoalId || undefined,
     },
     {
-      skip: !set?.id,
+      skip: !set?.id || isWaitingForGoalSync,
     },
   );
 
-  // Sync goalId from URL params to Redux
-  useEffect(() => {
-    const goalIdParam = searchParams?.get('goalId');
-    if (goalIdParam) {
-      const goalId = parseInt(goalIdParam);
-      if (!isNaN(goalId)) {
-        dispatch(setSelectedGoalId(goalId));
-      }
-    }
-  }, [searchParams, dispatch]);
 
   useEffect(() => {
-    handleViewModeChange('cards');
-
+    // Always set view to cards for this page
+    dispatch(setViewContentType('cards'));
+    
     if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
       const set = setsData.data.sets[0];
 
@@ -316,7 +318,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             <Typography variant="body1" color="text.secondary" sx={{ m: 0.5 }}>
               (Part of{' '}
               <Link
-                href={`/collections/${userId}?contentType=sets`}
+                href={`/collections/${userId}`}
                 style={{
                   color: 'inherit',
                   textDecoration: 'underline',

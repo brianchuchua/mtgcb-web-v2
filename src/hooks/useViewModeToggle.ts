@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
+import { useGetGoalQuery } from '@/api/goals/goalsApi';
 import { setViewContentType, setOneResultPerCardName, selectSelectedGoalId } from '@/redux/slices/browseSlice';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -10,24 +10,22 @@ export const useViewModeToggle = () => {
   const userId = user?.userId;
   const selectedGoalId = useSelector(selectSelectedGoalId);
   
-  const { data: goalsResponse } = useGetUserGoalsQuery(
-    { userId: userId || 0, includeProgress: false },
+  // Only fetch the specific goal if we have a selectedGoalId
+  const { data: goalResponse } = useGetGoalQuery(
+    { userId: userId || 0, goalId: selectedGoalId || 0 },
     { skip: !userId || !selectedGoalId }
   );
   
-  const goals = goalsResponse?.data?.goals || [];
+  const selectedGoal = goalResponse?.data;
 
   const handleViewModeChange = useCallback((newMode: 'cards' | 'sets') => {
     dispatch(setViewContentType(newMode));
     
     // When switching to cards view, check if we need to set oneResultPerCardName based on selected goal
-    if (newMode === 'cards' && selectedGoalId !== null && goals.length > 0) {
-      const selectedGoal = goals.find(goal => goal.id === selectedGoalId);
-      if (selectedGoal?.onePrintingPerPureName) {
-        dispatch(setOneResultPerCardName(true));
-      }
+    if (newMode === 'cards' && selectedGoal?.onePrintingPerPureName) {
+      dispatch(setOneResultPerCardName(true));
     }
-  }, [dispatch, selectedGoalId, goals]);
+  }, [dispatch, selectedGoal]);
 
   return { handleViewModeChange };
 };

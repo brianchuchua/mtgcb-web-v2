@@ -31,6 +31,7 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
   const setPriceType = useSetPriceType();
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const showGoals = useSelector(selectShowGoals);
+  
 
   const apiArgs = useMemo(() => {
     const params = buildApiParamsFromSearchParams(searchParams, 'sets');
@@ -39,7 +40,7 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
       sortBy: params.sortBy || 'releasedAt',
-      sortDirection: params.sortDirection || ('asc' as const),
+      sortDirection: params.sortDirection || ('desc' as const),
       select: [
         'name',
         'slug',
@@ -52,10 +53,11 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
         'sealedProductUrl',
       ],
     };
+    
 
     // Add collection parameters if userId is provided
     if (userId) {
-      return {
+      const result = {
         ...baseArgs,
         userId,
         priceType: setPriceType,
@@ -65,6 +67,8 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
           ...(showGoals !== 'all' && { showGoals })
         }),
       };
+      
+      return result;
     }
 
     return baseArgs;

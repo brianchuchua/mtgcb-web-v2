@@ -44,20 +44,32 @@ import {
   selectIncludeSubsetsInSets,
   selectSelectedGoalId,
   selectSetSearchParams,
+  selectSets,
   selectViewContentType,
 } from '@/redux/slices/browseSlice';
 
 interface UseBrowseControllerOptions {
   skipCostToComplete?: boolean;
   userId?: number;
+  forceView?: 'cards' | 'sets';
+  skipCardsUntilReady?: boolean;
+  waitForSetFilter?: boolean; // New option to wait for set filter
+  waitForInitialLoad?: boolean; // Wait for URL sync to complete
 }
 
 export function useBrowseController(options?: UseBrowseControllerOptions): BrowseControllerResult {
-  const currentView = useSelector(selectViewContentType) ?? 'cards'; // "cards" | "sets"
+  const viewFromRedux = useSelector(selectViewContentType) ?? 'cards';
+  const currentView = options?.forceView ?? viewFromRedux; // Use forced view if provided
   const cardSearchParams = useSelector(selectCardSearchParams);
   const setSearchParams = useSelector(selectSetSearchParams);
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
   const selectedGoalId = useSelector(selectSelectedGoalId);
+  const currentSetsFilter = useSelector(selectSets);
+  
+  // Determine if we should skip cards query
+  const shouldSkipCards = currentView !== 'cards' || 
+    (options?.skipCardsUntilReady ?? false) ||
+    (options?.waitForSetFilter && (!currentSetsFilter?.include || currentSetsFilter.include.length === 0));
 
   // Pagination kept in sync with the URL
   const { pagination, handlePageChange, handlePageSizeChange, initialLoadComplete } = usePaginationSync();
@@ -69,14 +81,19 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
   const cardData = useCardData({
     searchParams: cardSearchParams,
     pagination,
-    skip: currentView !== 'cards',
+    skip: shouldSkipCards,
     userId: options?.userId,
   });
+
+  // Skip sets query until localStorage is ready to prevent double API calls
+  const shouldSkipSets = currentView !== 'sets' || 
+    !initialLoadComplete ||
+    (options?.waitForInitialLoad && !initialLoadComplete);
 
   const setData = useSetData({
     searchParams: setSearchParams,
     pagination,
-    skip: currentView !== 'sets',
+    skip: shouldSkipSets,
     includeSubsets: includeSubsetsInSets,
     skipCostToComplete: options?.skipCostToComplete,
     userId: options?.userId,

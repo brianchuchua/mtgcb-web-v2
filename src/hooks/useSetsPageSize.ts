@@ -6,8 +6,8 @@ const DEFAULT_PAGE_SIZE = 24;
  * Hook for managing the page size for set browsing
  * Includes fallback to default value when localStorage is unavailable
  */
-export function useSetsPageSize(): [number, (pageSize: number) => void] {
-  const [setsPageSize, setSetsPageSize] = useLocalStorage<number>('setsPageSize', DEFAULT_PAGE_SIZE);
+export function useSetsPageSize(): [number, (pageSize: number) => void, boolean] {
+  const [setsPageSize, setSetsPageSize, isReady] = useLocalStorage<number>('setsPageSize', DEFAULT_PAGE_SIZE);
 
   // Ensure we always have a valid page size
   const validPageSize =
@@ -31,5 +31,5 @@ export function useSetsPageSize(): [number, (pageSize: number) => void] {
     }
   };
 
-  return [validPageSize, setValidPageSize];
+  return [validPageSize, setValidPageSize, isReady];
 }

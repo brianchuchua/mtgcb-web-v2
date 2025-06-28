@@ -7,6 +7,7 @@ import { ReactNode } from 'react';
 import Dashboard from '@/components/layout/Dashboard';
 import SnackbarProvider from '@/components/providers/NotistackProvider';
 import ReCaptchaProvider from '@/components/providers/ReCaptchaProvider';
+import { DisplaySettingsProvider } from '@/contexts/DisplaySettingsContext';
 import { TCGPlayerProvider } from '@/context/TCGPlayerContext';
 import StoreProvider from '@/redux/StoreProvider';
 import darkTheme from '@/styles/darkTheme';
@@ -39,13 +40,15 @@ export default function RootLayout({
           <ThemeProvider theme={darkTheme}>
             <CssBaseline enableColorScheme />
             <StoreProvider>
-              <ReCaptchaProvider>
-                <SnackbarProvider>
-                  <TCGPlayerProvider>
-                    <Dashboard>{children}</Dashboard>
-                  </TCGPlayerProvider>
-                </SnackbarProvider>
-              </ReCaptchaProvider>
+              <DisplaySettingsProvider>
+                <ReCaptchaProvider>
+                  <SnackbarProvider>
+                    <TCGPlayerProvider>
+                      <Dashboard>{children}</Dashboard>
+                    </TCGPlayerProvider>
+                  </SnackbarProvider>
+                </ReCaptchaProvider>
+              </DisplaySettingsProvider>
             </StoreProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>

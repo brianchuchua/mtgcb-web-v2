@@ -11,7 +11,6 @@ import SetIcon from '@/components/sets/SetIcon';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
-import { useViewModeToggle } from '@/hooks/useViewModeToggle';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import { selectCardSearchParams, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
 import { SetFilter } from '@/types/browse';
@@ -24,10 +23,15 @@ interface SetBrowseClientProps {
 
 export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   const dispatch = useDispatch();
-  const browseController = useBrowseController();
+  
+  // Use browse controller with proper configuration
+  const browseController = useBrowseController({
+    forceView: 'cards',
+    waitForSetFilter: true
+  });
+  
   const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
-  const { handleViewModeChange } = useViewModeToggle();
 
   // Get current search parameters to pass to subsets
   const cardSearchParams = useSelector(selectCardSearchParams);
@@ -54,9 +58,11 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
     },
   );
 
+  // Set the filter and view when set data loads
   useEffect(() => {
-    handleViewModeChange('cards');
-
+    // Always set view to cards for this page
+    dispatch(setViewContentType('cards'));
+    
     if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
       const set = setsData.data.sets[0];
 
@@ -67,7 +73,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
 
       dispatch(setSets(setFilter));
     }
-  }, [dispatch, setsData, isSuccess, setSlug]);
+  }, [dispatch, setsData, isSuccess]);
 
   // Re-apply set filter if it gets cleared (e.g., by reset search)
   useEffect(() => {

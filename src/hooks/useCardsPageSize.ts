@@ -6,8 +6,8 @@ const DEFAULT_PAGE_SIZE = 24;
  * Hook for managing the page size for card browsing
  * Includes fallback to default value when localStorage is unavailable
  */
-export function useCardsPageSize(): [number, (pageSize: number) => void] {
-  const [cardsPageSize, setCardsPageSize] = useLocalStorage<number>('cardsPageSize', DEFAULT_PAGE_SIZE);
+export function useCardsPageSize(): [number, (pageSize: number) => void, boolean] {
+  const [cardsPageSize, setCardsPageSize, isReady] = useLocalStorage<number>('cardsPageSize', DEFAULT_PAGE_SIZE);
 
   // Ensure we always have a valid page size
   const validPageSize =
@@ -31,5 +31,5 @@ export function useCardsPageSize(): [number, (pageSize: number) => void] {
     }
   };
 
-  return [validPageSize, setValidPageSize];
+  return [validPageSize, setValidPageSize, isReady];
 }

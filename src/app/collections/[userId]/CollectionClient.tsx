@@ -19,6 +19,8 @@ interface CollectionClientProps {
 }
 
 export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) => {
+  // Note: URL sync is handled by useBrowseStateSync via usePaginationSync in useBrowseController
+  
   const { view, viewMode, error, paginationProps, setsProps, cardsProps } = useCollectionBrowseController({ userId });
   const { user } = useAuth();
   const isOwnCollection = user?.userId === userId;

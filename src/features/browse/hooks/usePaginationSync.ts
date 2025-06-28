@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useBrowseStateSync } from '@/hooks/useBrowseStateSync';
 import { useCardsPageSize } from '@/hooks/useCardsPageSize';
@@ -10,12 +10,20 @@ import { selectViewContentType } from '@/redux/slices/browseSlice';
  * Wraps useBrowseStateSync to provide a consistent interface
  */
 export function usePaginationSync() {
-  const { pagination, updatePagination } = useBrowseStateSync();
+  const { pagination, updatePagination, isReady } = useBrowseStateSync();
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const viewType = useSelector(selectViewContentType);
 
-  const [, setCardsPageSize] = useCardsPageSize();
-  const [, setSetsPageSize] = useSetsPageSize();
+  const [, setCardsPageSize, ] = useCardsPageSize();
+  const [, setSetsPageSize, ] = useSetsPageSize();
+  
+  // Set initialLoadComplete to true once localStorage is ready
+  useEffect(() => {
+    if (isReady && !initialLoadComplete) {
+      setInitialLoadComplete(true);
+    }
+  }, [isReady, initialLoadComplete]);
+  
 
   const handlePageChange = useCallback(
     (page: number) => {
