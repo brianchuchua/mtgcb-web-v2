@@ -8,13 +8,12 @@ import { GoalsList } from '@/components/goals/GoalsList';
 import Pagination, { PaginationProps } from '@/components/pagination/Pagination';
 import { useAuth } from '@/hooks/useAuth';
 import { useGoalsPagination } from '@/hooks/goals/useGoalsPagination';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { PriceType } from '@/types/pricing';
+import { usePriceType } from '@/contexts/DisplaySettingsContext';
 
 export function GoalsClient() {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
-  const [displayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
+  const [displayPriceType] = usePriceType();
   const { currentPage, pageSize, onPageChange, onPageSizeChange } = useGoalsPagination();
 
   const queryArgs = {

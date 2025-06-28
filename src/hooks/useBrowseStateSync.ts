@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { convertStateToUrlParams, parseUrlToState } from '@/features/browse/schema/urlStateAdapters';
 import { useCardsPageSize } from '@/hooks/useCardsPageSize';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useSetsPageSize } from '@/hooks/useSetsPageSize';
+import { usePreferredCardViewMode, usePreferredSetViewMode } from '@/contexts/DisplaySettingsContext';
 import {
   resetAllSearches,
   selectCardSearchParams,
@@ -30,8 +30,8 @@ export function useBrowseStateSync() {
   const cardState = useSelector(selectCardSearchParams);
   const setState = useSelector(selectSetSearchParams);
 
-  const [cardView, , ] = useLocalStorage<'grid' | 'table'>('preferredCardViewMode', 'grid');
-  const [setView, , ] = useLocalStorage<'grid' | 'table'>('preferredSetViewMode', 'grid');
+  const [cardView] = usePreferredCardViewMode();
+  const [setView] = usePreferredSetViewMode();
   const viewMode = viewType === 'cards' ? cardView : setView;
 
   const [cardsPageSize, , cardsPageSizeReady] = useCardsPageSize();

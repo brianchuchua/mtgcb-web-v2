@@ -7,6 +7,15 @@ interface DisplaySettings {
   // Price settings
   priceType: PriceType;
   
+  // View preferences
+  preferredViewMode: 'grid' | 'table';
+  preferredCardViewMode: 'grid' | 'table';
+  preferredSetViewMode: 'grid' | 'table';
+  
+  // Page sizes
+  cardsPageSize: number;
+  setsPageSize: number;
+  
   // Layout settings
   cardsPerRow: number;
   cardSizeMargin: number;
@@ -87,6 +96,15 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   // Price settings
   priceType: PriceType.Market,
   
+  // View preferences
+  preferredViewMode: 'grid',
+  preferredCardViewMode: 'grid',
+  preferredSetViewMode: 'grid',
+  
+  // Page sizes
+  cardsPageSize: 24,
+  setsPageSize: 24,
+  
   // Layout settings
   cardsPerRow: 5,
   cardSizeMargin: 0.75,
@@ -161,12 +179,17 @@ const STORAGE_KEY = 'mtgcb-display-settings';
 const DisplaySettingsContext = createContext<DisplaySettingsContextType | undefined>(undefined);
 
 export function DisplaySettingsProvider({ children }: { children: React.ReactNode }) {
-  // Initialize all settings at once from localStorage
+  // Check if we're on the client
+  const isClient = typeof window !== 'undefined';
+  
+  // Initialize settings - on server use defaults, on client read from localStorage
   const [settings, setSettings] = useState<DisplaySettings>(() => {
-    if (typeof window === 'undefined') {
+    if (!isClient) {
+      // Server side - always use defaults
       return DEFAULT_SETTINGS;
     }
-
+    
+    // Client side - try to read from localStorage
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -177,21 +200,16 @@ export function DisplaySettingsProvider({ children }: { children: React.ReactNod
     } catch (error) {
       console.warn('Error loading display settings:', error);
     }
-
+    
     return DEFAULT_SETTINGS;
   });
+
 
   // Save to localStorage whenever settings change
   const saveSettings = useCallback((newSettings: DisplaySettings) => {
     if (typeof window !== 'undefined') {
       try {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings));
-        // Dispatch event for other components/tabs
-        window.dispatchEvent(new StorageEvent('storage', {
-          key: STORAGE_KEY,
-          newValue: JSON.stringify(newSettings),
-          storageArea: window.localStorage
-        }));
       } catch (error) {
         console.warn('Error saving display settings:', error);
       }
@@ -347,4 +365,29 @@ export function useCollectionSetSettings() {
     tableCostToCompleteIsVisible: settings.tableCollectionCostToCompleteIsVisible,
     tableValueIsVisible: settings.tableCollectionValueIsVisible,
   };
+}
+
+export function usePreferredViewMode(): ['grid' | 'table', (value: 'grid' | 'table') => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.preferredViewMode, (value) => updateSetting('preferredViewMode', value)];
+}
+
+export function useCardsPageSize(): [number, (value: number) => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.cardsPageSize, (value) => updateSetting('cardsPageSize', value)];
+}
+
+export function useSetsPageSize(): [number, (value: number) => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.setsPageSize, (value) => updateSetting('setsPageSize', value)];
+}
+
+export function usePreferredCardViewMode(): ['grid' | 'table', (value: 'grid' | 'table') => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.preferredCardViewMode, (value) => updateSetting('preferredCardViewMode', value)];
+}
+
+export function usePreferredSetViewMode(): ['grid' | 'table', (value: 'grid' | 'table') => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.preferredSetViewMode, (value) => updateSetting('preferredSetViewMode', value)];
 }

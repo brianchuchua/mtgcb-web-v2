@@ -1,7 +1,6 @@
 'use client';
 
 import { useCardSettingGroups } from './useCardSettingGroups';
-import { useLocalStorage } from './useLocalStorage';
 import { useSetSettingGroups } from './useSetSettingGroups';
 import { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 

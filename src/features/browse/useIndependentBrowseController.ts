@@ -21,7 +21,7 @@ import { useDisplaySettings } from '@/features/browse/hooks/useDisplaySettings';
 import { useCollectionDisplaySettings } from '@/features/collections/hooks/useCollectionDisplaySettings';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { usePreferredCardViewMode } from '@/contexts/DisplaySettingsContext';
 import { usePriceType } from '@/hooks/usePriceType';
 import { selectSortBy, selectSortOrder, setSortBy, setSortOrder, selectShowGoals } from '@/redux/slices/browseSlice';
 import { SortByOption } from '@/types/browse';
@@ -45,7 +45,7 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
   const [pageSize, setPageSize] = useState(24);
   
   // Local state for view mode
-  const [viewMode, setViewMode] = useLocalStorage<'grid' | 'table'>('cardViewMode', 'grid');
+  const [viewMode, setViewMode] = usePreferredCardViewMode();
   
   // Use Redux sort state for global synchronization
   const sortBy = useSelector(selectSortBy) || 'releasedAt';

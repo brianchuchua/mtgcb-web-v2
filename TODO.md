@@ -62,6 +62,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## UX Action Items
 
+- Goals should have a computation loading state
+- Not liking set box heights
 - When Open Search Options is clicked, it should scroll to the search options section
 - Link to collection needs to be consistent. Underlined or not, which parts, etc.
 - Improve height of skeleton loader for collectionheader
@@ -182,6 +184,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Integration with Google Analytics
 - Load testing
 - Performance testing / index audit
+- Add an index for set slug probably
 - SQL injection audit
 - Security audit -- confirm I cannot edit a JWT to change the userId
 - Automated database backups

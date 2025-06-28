@@ -1,19 +1,13 @@
-import { useCallback, useEffect } from 'react';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useCallback } from 'react';
+import { usePreferredCardViewMode, usePreferredSetViewMode } from '@/contexts/DisplaySettingsContext';
 
 /**
  * Manages view mode (grid/table) for cards and sets
- * Persists preferences in local storage
+ * Now uses the centralized DisplaySettingsContext
  */
 export function useViewMode(view: string) {
-  const [preferredCardViewMode, setPreferredCardViewMode] = useLocalStorage<'grid' | 'table'>(
-    'preferredCardViewMode',
-    'grid',
-  );
-  const [preferredSetViewMode, setPreferredSetViewMode] = useLocalStorage<'grid' | 'table'>(
-    'preferredSetViewMode',
-    'grid',
-  );
+  const [preferredCardViewMode, setPreferredCardViewMode] = usePreferredCardViewMode();
+  const [preferredSetViewMode, setPreferredSetViewMode] = usePreferredSetViewMode();
 
   const viewMode = view === 'cards' ? preferredCardViewMode : preferredSetViewMode;
 

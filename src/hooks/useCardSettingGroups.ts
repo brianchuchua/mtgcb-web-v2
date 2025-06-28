@@ -5,9 +5,9 @@ import {
   useCardDisplaySettings,
   useLayoutSettings,
   useTableCardSettings,
-  usePriceType
+  usePriceType,
+  usePreferredViewMode
 } from '@/contexts/DisplaySettingsContext';
-import { useLocalStorage } from './useLocalStorage';
 import { CardSelectSetting, CardSettingGroup, CardSliderSetting } from '@/components/cards/CardSettingsPanel';
 import { PriceType } from '@/types/pricing';
 
@@ -17,9 +17,9 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
   const layoutSettings = useLayoutSettings();
   const tableCardSettings = useTableCardSettings();
   const [priceType, setPriceType] = usePriceType();
+  const [preferredViewMode] = usePreferredViewMode();
 
-  const [localStorageViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
-  const viewMode = explicitViewMode || localStorageViewMode;
+  const viewMode = explicitViewMode || preferredViewMode;
 
   const handleSetPriceType = (value: number): void => {
     setPriceType(value as unknown as PriceType);

@@ -1,56 +1,31 @@
 'use client';
 
-import { useLocalStorage } from './useLocalStorage';
+import { 
+  useDisplaySettings,
+  useSetDisplaySettings,
+  useTableSetSettings,
+  useLayoutSettings,
+  useCollectionSetSettings,
+  usePriceType,
+  usePreferredViewMode
+} from '@/contexts/DisplaySettingsContext';
 import { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 import { PriceType } from '@/types/pricing';
 
 export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
-  // Set Gallery visibility settings (reuse existing ones)
-  const [nameIsVisible, setNameIsVisible] = useLocalStorage('setNameIsVisible', true);
-  const [codeIsVisible, setCodeIsVisible] = useLocalStorage('setCodeIsVisible', true);
-  const [releaseDateIsVisible, setReleaseDateIsVisible] = useLocalStorage('setReleaseDateIsVisible', true);
-  const [typeIsVisible, setTypeIsVisible] = useLocalStorage('setTypeIsVisible', true);
-  const [categoryIsVisible, setCategoryIsVisible] = useLocalStorage('setCategoryIsVisible', true);
-  const [cardCountIsVisible, setCardCountIsVisible] = useLocalStorage('setCardCountIsVisible', true);
-  const [costsIsVisible, setCostsIsVisible] = useLocalStorage('setCostsIsVisible', true);
-
-  // Collection-specific table column visibility settings
-  const [tableCodeIsVisible, setTableCodeIsVisible] = useLocalStorage('tableSetCodeIsVisible', true);
-  const [tableCardCountIsVisible, setTableCardCountIsVisible] = useLocalStorage('tableSetCardCountIsVisible', true);
-  const [tableReleaseDateIsVisible, setTableReleaseDateIsVisible] = useLocalStorage(
-    'tableSetReleaseDateIsVisible',
-    true,
-  );
-  const [tableTypeIsVisible, setTableTypeIsVisible] = useLocalStorage('tableSetTypeIsVisible', true);
-  const [tableCategoryIsVisible, setTableCategoryIsVisible] = useLocalStorage('tableSetCategoryIsVisible', false);
-  const [tableIsDraftableIsVisible, setTableIsDraftableIsVisible] = useLocalStorage(
-    'tableSetIsDraftableIsVisible',
-    false,
-  );
-
-  // New collection-specific columns
-  const [tableCompletionIsVisible, setTableCompletionIsVisible] = useLocalStorage(
-    'tableCollectionCompletionIsVisible',
-    true,
-  );
-  const [tableCostToCompleteIsVisible, setTableCostToCompleteIsVisible] = useLocalStorage(
-    'tableCollectionCostToCompleteIsVisible',
-    true,
-  );
-  const [tableValueIsVisible, setTableValueIsVisible] = useLocalStorage('tableCollectionValueIsVisible', true);
-
-  // Layout settings
-  const [setsPerRow, setSetsPerRow] = useLocalStorage('setsPerRow', 0); // Default to 0 (responsive)
-
-  // Shared price display setting - uses the same key as card settings
-  const [displayPriceType, setDisplayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
+  const { updateSetting } = useDisplaySettings();
+  const setDisplaySettings = useSetDisplaySettings();
+  const tableSetSettings = useTableSetSettings();
+  const layoutSettings = useLayoutSettings();
+  const collectionSetSettings = useCollectionSetSettings();
+  const [priceType, setPriceType] = usePriceType();
+  const [preferredViewMode] = usePreferredViewMode();
 
   const handleSetPriceType = (value: number): void => {
-    setDisplayPriceType(value as unknown as PriceType);
+    setPriceType(value as unknown as PriceType);
   };
 
-  const [localStorageViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
-  const viewMode = explicitViewMode || localStorageViewMode;
+  const viewMode = explicitViewMode || preferredViewMode;
 
   // Base settings groups that are always available
   const settingGroups: CardSettingGroup[] = [
@@ -62,7 +37,7 @@ export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table
         {
           key: 'priceType',
           label: '',
-          value: displayPriceType as unknown as number,
+          value: priceType as unknown as number,
           setValue: handleSetPriceType,
           type: 'select',
           options: [
@@ -81,53 +56,53 @@ export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table
     label: 'Set Fields',
     type: 'toggle',
     settings: [
-      // {
-      //   key: 'name',
-      //   label: 'Name',
-      //   isVisible: nameIsVisible,
-      //   setVisibility: setNameIsVisible,
-      //   type: 'toggle',
-      // },
-      // {
-      //   key: 'code',
-      //   label: 'Code',
-      //   isVisible: codeIsVisible,
-      //   setVisibility: setCodeIsVisible,
-      //   type: 'toggle',
-      // },
-      // {
-      //   key: 'releaseDate',
-      //   label: 'Release Date',
-      //   isVisible: releaseDateIsVisible,
-      //   setVisibility: setReleaseDateIsVisible,
-      //   type: 'toggle',
-      // },
-      // {
-      //   key: 'category',
-      //   label: 'Category',
-      //   isVisible: categoryIsVisible,
-      //   setVisibility: setCategoryIsVisible,
-      //   type: 'toggle',
-      // },
-      // {
-      //   key: 'type',
-      //   label: 'Type',
-      //   isVisible: typeIsVisible,
-      //   setVisibility: setTypeIsVisible,
-      //   type: 'toggle',
-      // },
-      // {
-      //   key: 'cardCount',
-      //   label: 'Cards In Set',
-      //   isVisible: cardCountIsVisible,
-      //   setVisibility: setCardCountIsVisible,
-      //   type: 'toggle',
-      // },
+      {
+        key: 'name',
+        label: 'Name',
+        isVisible: setDisplaySettings.nameIsVisible,
+        setVisibility: (value: boolean) => updateSetting('setNameIsVisible', value),
+        type: 'toggle',
+      },
+      {
+        key: 'code',
+        label: 'Code',
+        isVisible: setDisplaySettings.codeIsVisible,
+        setVisibility: (value: boolean) => updateSetting('setCodeIsVisible', value),
+        type: 'toggle',
+      },
+      {
+        key: 'releaseDate',
+        label: 'Release Date',
+        isVisible: setDisplaySettings.releaseDateIsVisible,
+        setVisibility: (value: boolean) => updateSetting('setReleaseDateIsVisible', value),
+        type: 'toggle',
+      },
+      {
+        key: 'category',
+        label: 'Category',
+        isVisible: setDisplaySettings.categoryIsVisible,
+        setVisibility: (value: boolean) => updateSetting('setCategoryIsVisible', value),
+        type: 'toggle',
+      },
+      {
+        key: 'type',
+        label: 'Type',
+        isVisible: setDisplaySettings.typeIsVisible,
+        setVisibility: (value: boolean) => updateSetting('setTypeIsVisible', value),
+        type: 'toggle',
+      },
+      {
+        key: 'cardCount',
+        label: 'Cards In Set',
+        isVisible: setDisplaySettings.cardCountIsVisible,
+        setVisibility: (value: boolean) => updateSetting('setCardCountIsVisible', value),
+        type: 'toggle',
+      },
       {
         key: 'costs',
         label: 'Costs to Purchase',
-        isVisible: costsIsVisible,
-        setVisibility: setCostsIsVisible,
+        isVisible: setDisplaySettings.priceIsVisible,
+        setVisibility: (value: boolean) => updateSetting('setPriceIsVisible', value),
         type: 'toggle',
       },
     ],
@@ -141,8 +116,8 @@ export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table
       {
         key: 'setsPerRow',
         label: 'Sets per row (desktop only)',
-        value: setsPerRow,
-        setValue: setSetsPerRow,
+        value: layoutSettings.setsPerRow,
+        setValue: layoutSettings.setSetsPerRow,
         type: 'select',
         options: [
           { value: 0, label: 'Auto' },
@@ -165,64 +140,64 @@ export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table
       {
         key: 'tableCode',
         label: 'Code',
-        isVisible: tableCodeIsVisible,
-        setVisibility: setTableCodeIsVisible,
+        isVisible: tableSetSettings.codeIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableSetCodeIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableCardCount',
         label: 'Cards In Set',
-        isVisible: tableCardCountIsVisible,
-        setVisibility: setTableCardCountIsVisible,
+        isVisible: tableSetSettings.cardCountIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableSetCardCountIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableCompletion',
         label: 'Completion',
-        isVisible: tableCompletionIsVisible,
-        setVisibility: setTableCompletionIsVisible,
+        isVisible: collectionSetSettings.tableCompletionIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableCollectionCompletionIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableValue',
         label: 'Value',
-        isVisible: tableValueIsVisible,
-        setVisibility: setTableValueIsVisible,
+        isVisible: collectionSetSettings.tableValueIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableCollectionValueIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableCostToComplete',
         label: '$ to Complete',
-        isVisible: tableCostToCompleteIsVisible,
-        setVisibility: setTableCostToCompleteIsVisible,
+        isVisible: collectionSetSettings.tableCostToCompleteIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableCollectionCostToCompleteIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableReleaseDate',
         label: 'Release Date',
-        isVisible: tableReleaseDateIsVisible,
-        setVisibility: setTableReleaseDateIsVisible,
+        isVisible: tableSetSettings.releaseDateIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableSetReleaseDateIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableType',
         label: 'Type',
-        isVisible: tableTypeIsVisible,
-        setVisibility: setTableTypeIsVisible,
+        isVisible: tableSetSettings.typeIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableSetTypeIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableCategory',
         label: 'Category',
-        isVisible: tableCategoryIsVisible,
-        setVisibility: setTableCategoryIsVisible,
+        isVisible: tableSetSettings.categoryIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableSetCategoryIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableIsDraftable',
         label: 'Draftable',
-        isVisible: tableIsDraftableIsVisible,
-        setVisibility: setTableIsDraftableIsVisible,
+        isVisible: tableSetSettings.isDraftableIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableSetIsDraftableIsVisible', value),
         type: 'toggle',
       },
     ],
