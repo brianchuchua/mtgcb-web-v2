@@ -69,7 +69,7 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
   // Determine if we should skip cards query
   const shouldSkipCards = currentView !== 'cards' || 
     (options?.skipCardsUntilReady ?? false) ||
-    (options?.waitForSetFilter && (!currentSetsFilter?.include || currentSetsFilter.include.length === 0));
+    (options?.waitForSetFilter === true && (!currentSetsFilter?.include || currentSetsFilter.include.length === 0));
 
   // Pagination kept in sync with the URL
   const { pagination, handlePageChange, handlePageSizeChange, initialLoadComplete } = usePaginationSync();
@@ -88,7 +88,7 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
   // Skip sets query until localStorage is ready to prevent double API calls
   const shouldSkipSets = currentView !== 'sets' || 
     !initialLoadComplete ||
-    (options?.waitForInitialLoad && !initialLoadComplete);
+    (options?.waitForInitialLoad === true && !initialLoadComplete);
 
   const setData = useSetData({
     searchParams: setSearchParams,

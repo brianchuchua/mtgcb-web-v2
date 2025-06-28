@@ -7,6 +7,11 @@ interface DisplaySettings {
   // Price settings
   priceType: PriceType;
   
+  // Layout settings
+  cardsPerRow: number;
+  cardSizeMargin: number;
+  setsPerRow: number;
+  
   // Card display settings
   cardNameIsVisible: boolean;
   cardSetIconIsVisible: boolean;
@@ -21,21 +26,54 @@ interface DisplaySettings {
   cardOwnedFoilIsVisible: boolean;
   cardGoalProgressIsVisible: boolean;
   
-  // Set display settings
+  // Set display settings (grid view)
+  setNameIsVisible: boolean;
+  setCodeIsVisible: boolean;
   setReleaseDateIsVisible: boolean;
+  setTypeIsVisible: boolean;
+  setCategoryIsVisible: boolean;
+  setCardCountIsVisible: boolean;
   setPriceIsVisible: boolean;
   setPercentCollectedIsVisible: boolean;
   setCardsCollectedIsVisible: boolean;
   setIconIsVisible: boolean;
   
-  // Table-specific settings
+  // Table-specific card settings
   cardNumberIsVisible: boolean;
   convertedManaCostIsVisible: boolean;
   powerToughnessIsVisible: boolean;
+  tableMtgcbNumberIsVisible: boolean;
+  tableLoyaltyIsVisible: boolean;
+  tableCollectorNumberIsVisible: boolean;
+  tableRarityIsVisible: boolean;
+  tableTypeIsVisible: boolean;
+  tableArtistIsVisible: boolean;
+  tableManaCostIsVisible: boolean;
+  tablePowerIsVisible: boolean;
+  tableToughnessIsVisible: boolean;
+  tableSetIsVisible: boolean;
+  tablePriceIsVisible: boolean;
+  
+  // Table-specific set settings
+  tableSetCodeIsVisible: boolean;
+  tableSetCardCountIsVisible: boolean;
+  tableSetReleaseDateIsVisible: boolean;
+  tableSetTypeIsVisible: boolean;
+  tableSetCategoryIsVisible: boolean;
+  tableSetIsDraftableIsVisible: boolean;
   
   // Collection-specific settings
   quantityIsVisible: boolean;
   lastModifiedIsVisible: boolean;
+  tableQuantityIsVisible: boolean;
+  
+  // Collection set-specific settings
+  completionIsVisible: boolean;
+  costToCompleteIsVisible: boolean;
+  valueIsVisible: boolean;
+  tableCollectionCompletionIsVisible: boolean;
+  tableCollectionCostToCompleteIsVisible: boolean;
+  tableCollectionValueIsVisible: boolean;
 }
 
 interface DisplaySettingsContextType {
@@ -48,6 +86,11 @@ interface DisplaySettingsContextType {
 const DEFAULT_SETTINGS: DisplaySettings = {
   // Price settings
   priceType: PriceType.Market,
+  
+  // Layout settings
+  cardsPerRow: 5,
+  cardSizeMargin: 0.75,
+  setsPerRow: 5,
   
   // Card display settings
   cardNameIsVisible: true,
@@ -63,21 +106,54 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   cardOwnedFoilIsVisible: true,
   cardGoalProgressIsVisible: false,
   
-  // Set display settings
+  // Set display settings (grid view)
+  setNameIsVisible: true,
+  setCodeIsVisible: false,
   setReleaseDateIsVisible: true,
+  setTypeIsVisible: false,
+  setCategoryIsVisible: false,
+  setCardCountIsVisible: true,
   setPriceIsVisible: true,
   setPercentCollectedIsVisible: true,
   setCardsCollectedIsVisible: true,
   setIconIsVisible: true,
   
-  // Table-specific settings
+  // Table-specific card settings
   cardNumberIsVisible: true,
   convertedManaCostIsVisible: false,
   powerToughnessIsVisible: true,
+  tableMtgcbNumberIsVisible: false,
+  tableLoyaltyIsVisible: false,
+  tableCollectorNumberIsVisible: true,
+  tableRarityIsVisible: false,
+  tableTypeIsVisible: false,
+  tableArtistIsVisible: false,
+  tableManaCostIsVisible: false,
+  tablePowerIsVisible: false,
+  tableToughnessIsVisible: false,
+  tableSetIsVisible: true,
+  tablePriceIsVisible: true,
+  
+  // Table-specific set settings
+  tableSetCodeIsVisible: false,
+  tableSetCardCountIsVisible: true,
+  tableSetReleaseDateIsVisible: true,
+  tableSetTypeIsVisible: true,
+  tableSetCategoryIsVisible: false,
+  tableSetIsDraftableIsVisible: false,
   
   // Collection-specific settings
   quantityIsVisible: true,
   lastModifiedIsVisible: false,
+  tableQuantityIsVisible: true,
+  
+  // Collection set-specific settings
+  completionIsVisible: true,
+  costToCompleteIsVisible: true,
+  valueIsVisible: true,
+  tableCollectionCompletionIsVisible: true,
+  tableCollectionCostToCompleteIsVisible: true,
+  tableCollectionValueIsVisible: true,
 };
 
 const STORAGE_KEY = 'mtgcb-display-settings';
@@ -195,10 +271,80 @@ export function useCardDisplaySettings() {
 export function useSetDisplaySettings() {
   const { settings } = useDisplaySettings();
   return {
+    nameIsVisible: settings.setNameIsVisible,
+    codeIsVisible: settings.setCodeIsVisible,
     releaseDateIsVisible: settings.setReleaseDateIsVisible,
+    typeIsVisible: settings.setTypeIsVisible,
+    categoryIsVisible: settings.setCategoryIsVisible,
+    cardCountIsVisible: settings.setCardCountIsVisible,
     priceIsVisible: settings.setPriceIsVisible,
     percentCollectedIsVisible: settings.setPercentCollectedIsVisible,
     cardsCollectedIsVisible: settings.setCardsCollectedIsVisible,
     iconIsVisible: settings.setIconIsVisible,
+  };
+}
+
+export function useLayoutSettings() {
+  const { settings, updateSetting } = useDisplaySettings();
+  return {
+    cardsPerRow: settings.cardsPerRow,
+    cardSizeMargin: settings.cardSizeMargin,
+    setsPerRow: settings.setsPerRow,
+    setCardsPerRow: (value: number) => updateSetting('cardsPerRow', value),
+    setCardSizeMargin: (value: number) => updateSetting('cardSizeMargin', value),
+    setSetsPerRow: (value: number) => updateSetting('setsPerRow', value),
+  };
+}
+
+export function useTableCardSettings() {
+  const { settings } = useDisplaySettings();
+  return {
+    cardNumberIsVisible: settings.cardNumberIsVisible,
+    convertedManaCostIsVisible: settings.convertedManaCostIsVisible,
+    powerToughnessIsVisible: settings.powerToughnessIsVisible,
+    mtgcbNumberIsVisible: settings.tableMtgcbNumberIsVisible,
+    loyaltyIsVisible: settings.tableLoyaltyIsVisible,
+    collectorNumberIsVisible: settings.tableCollectorNumberIsVisible,
+    rarityIsVisible: settings.tableRarityIsVisible,
+    typeIsVisible: settings.tableTypeIsVisible,
+    artistIsVisible: settings.tableArtistIsVisible,
+    manaCostIsVisible: settings.tableManaCostIsVisible,
+    powerIsVisible: settings.tablePowerIsVisible,
+    toughnessIsVisible: settings.tableToughnessIsVisible,
+    setIsVisible: settings.tableSetIsVisible,
+    priceIsVisible: settings.tablePriceIsVisible,
+  };
+}
+
+export function useTableSetSettings() {
+  const { settings } = useDisplaySettings();
+  return {
+    codeIsVisible: settings.tableSetCodeIsVisible,
+    cardCountIsVisible: settings.tableSetCardCountIsVisible,
+    releaseDateIsVisible: settings.tableSetReleaseDateIsVisible,
+    typeIsVisible: settings.tableSetTypeIsVisible,
+    categoryIsVisible: settings.tableSetCategoryIsVisible,
+    isDraftableIsVisible: settings.tableSetIsDraftableIsVisible,
+  };
+}
+
+export function useCollectionSettings() {
+  const { settings } = useDisplaySettings();
+  return {
+    quantityIsVisible: settings.quantityIsVisible,
+    lastModifiedIsVisible: settings.lastModifiedIsVisible,
+    tableQuantityIsVisible: settings.tableQuantityIsVisible,
+  };
+}
+
+export function useCollectionSetSettings() {
+  const { settings } = useDisplaySettings();
+  return {
+    completionIsVisible: settings.completionIsVisible,
+    costToCompleteIsVisible: settings.costToCompleteIsVisible,
+    valueIsVisible: settings.valueIsVisible,
+    tableCompletionIsVisible: settings.tableCollectionCompletionIsVisible,
+    tableCostToCompleteIsVisible: settings.tableCollectionCostToCompleteIsVisible,
+    tableValueIsVisible: settings.tableCollectionValueIsVisible,
   };
 }

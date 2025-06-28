@@ -1,44 +1,29 @@
 'use client';
 
+import { 
+  useDisplaySettings,
+  useCardDisplaySettings,
+  useLayoutSettings,
+  useTableCardSettings,
+  usePriceType
+} from '@/contexts/DisplaySettingsContext';
 import { useLocalStorage } from './useLocalStorage';
 import { CardSelectSetting, CardSettingGroup, CardSliderSetting } from '@/components/cards/CardSettingsPanel';
 import { PriceType } from '@/types/pricing';
 
 export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
-  // Card Gallery visibility settings
-  const [nameIsVisible, setNameIsVisible] = useLocalStorage('cardNameIsVisible', true);
-  const [setIsVisible, setSetIsVisible] = useLocalStorage('cardSetIsVisible', true);
-  const [priceIsVisible, setPriceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
-
-  // Card Table column visibility settings
-  const [tableSetIsVisible, setTableSetIsVisible] = useLocalStorage('tableSetIsVisible', true);
-  const [tableCollectorNumberIsVisible, setTableCollectorNumberIsVisible] = useLocalStorage(
-    'tableCollectorNumberIsVisible',
-    true,
-  );
-  const [tableMtgcbNumberIsVisible, setTableMtgcbNumberIsVisible] = useLocalStorage('tableMtgcbNumberIsVisible', false);
-  const [tableRarityIsVisible, setTableRarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
-  const [tableManaCostIsVisible, setTableManaCostIsVisible] = useLocalStorage('tableManaCostIsVisible', false);
-  const [tablePowerIsVisible, setTablePowerIsVisible] = useLocalStorage('tablePowerIsVisible', false);
-  const [tableToughnessIsVisible, setTableToughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', false);
-  const [tableLoyaltyIsVisible, setTableLoyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', false);
-  const [tablePriceIsVisible, setTablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
-  const [tableTypeIsVisible, setTableTypeIsVisible] = useLocalStorage('tableTypeIsVisible', false);
-  const [tableArtistIsVisible, setTableArtistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
-
-  // Layout settings
-  const [cardsPerRow, setCardsPerRow] = useLocalStorage('cardsPerRow', 0); // Default to 0 (auto/responsive)
-  const [cardSizeMargin, setCardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
-
-  // Price display setting
-  const [displayPriceType, setDisplayPriceType] = useLocalStorage<PriceType>('displayPriceType', PriceType.Market);
-
-  const handleSetPriceType = (value: number): void => {
-    setDisplayPriceType(value as unknown as PriceType);
-  };
+  const { updateSetting } = useDisplaySettings();
+  const cardDisplaySettings = useCardDisplaySettings();
+  const layoutSettings = useLayoutSettings();
+  const tableCardSettings = useTableCardSettings();
+  const [priceType, setPriceType] = usePriceType();
 
   const [localStorageViewMode] = useLocalStorage<'grid' | 'table'>('preferredViewMode', 'grid');
   const viewMode = explicitViewMode || localStorageViewMode;
+
+  const handleSetPriceType = (value: number): void => {
+    setPriceType(value as unknown as PriceType);
+  };
 
   // Base settings groups that are always available
   const settingGroups: CardSettingGroup[] = [
@@ -50,7 +35,7 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
         {
           key: 'priceType',
           label: '', // Removed the redundant label
-          value: displayPriceType as unknown as number,
+          value: priceType as unknown as number,
           setValue: handleSetPriceType,
           type: 'select',
           options: [
@@ -72,22 +57,22 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
       {
         key: 'name',
         label: 'Name',
-        isVisible: nameIsVisible,
-        setVisibility: setNameIsVisible,
+        isVisible: cardDisplaySettings.nameIsVisible,
+        setVisibility: (value: boolean) => updateSetting('cardNameIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'set',
         label: 'Set',
-        isVisible: setIsVisible,
-        setVisibility: setSetIsVisible,
+        isVisible: cardDisplaySettings.setIconIsVisible,
+        setVisibility: (value: boolean) => updateSetting('cardSetIconIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'price',
         label: 'Price',
-        isVisible: priceIsVisible,
-        setVisibility: setPriceIsVisible,
+        isVisible: cardDisplaySettings.priceIsVisible,
+        setVisibility: (value: boolean) => updateSetting('cardPriceIsVisible', value),
         type: 'toggle',
       },
     ],
@@ -101,8 +86,8 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
       {
         key: 'cardsPerRow',
         label: 'Cards per row (desktop only)',
-        value: cardsPerRow,
-        setValue: setCardsPerRow,
+        value: layoutSettings.cardsPerRow,
+        setValue: layoutSettings.setCardsPerRow,
         type: 'select',
         options: [
           { value: 0, label: 'Auto' },
@@ -125,8 +110,8 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
       {
         key: 'cardSizeMargin',
         label: 'Shrink cards (desktop only)',
-        value: cardSizeMargin,
-        setValue: setCardSizeMargin,
+        value: layoutSettings.cardSizeMargin,
+        setValue: layoutSettings.setCardSizeMargin,
         min: 0,
         max: 40,
         step: 1,
@@ -143,78 +128,78 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
       {
         key: 'tableSet',
         label: 'Set',
-        isVisible: tableSetIsVisible,
-        setVisibility: setTableSetIsVisible,
+        isVisible: tableCardSettings.setIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableSetIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableCollectorNumber',
         label: 'Collector #',
-        isVisible: tableCollectorNumberIsVisible,
-        setVisibility: setTableCollectorNumberIsVisible,
+        isVisible: tableCardSettings.collectorNumberIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableCollectorNumberIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableMtgcbNumber',
         label: 'MTG CB #',
-        isVisible: tableMtgcbNumberIsVisible,
-        setVisibility: setTableMtgcbNumberIsVisible,
+        isVisible: tableCardSettings.mtgcbNumberIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableMtgcbNumberIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableRarity',
         label: 'Rarity',
-        isVisible: tableRarityIsVisible,
-        setVisibility: setTableRarityIsVisible,
+        isVisible: tableCardSettings.rarityIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableRarityIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableType',
         label: 'Type',
-        isVisible: tableTypeIsVisible,
-        setVisibility: setTableTypeIsVisible,
+        isVisible: tableCardSettings.typeIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableTypeIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableArtist',
         label: 'Artist',
-        isVisible: tableArtistIsVisible,
-        setVisibility: setTableArtistIsVisible,
+        isVisible: tableCardSettings.artistIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableArtistIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableManaCost',
         label: 'Mana Cost',
-        isVisible: tableManaCostIsVisible,
-        setVisibility: setTableManaCostIsVisible,
+        isVisible: tableCardSettings.manaCostIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableManaCostIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tablePower',
         label: 'Power',
-        isVisible: tablePowerIsVisible,
-        setVisibility: setTablePowerIsVisible,
+        isVisible: tableCardSettings.powerIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tablePowerIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableToughness',
         label: 'Toughness',
-        isVisible: tableToughnessIsVisible,
-        setVisibility: setTableToughnessIsVisible,
+        isVisible: tableCardSettings.toughnessIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableToughnessIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tableLoyalty',
         label: 'Loyalty',
-        isVisible: tableLoyaltyIsVisible,
-        setVisibility: setTableLoyaltyIsVisible,
+        isVisible: tableCardSettings.loyaltyIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableLoyaltyIsVisible', value),
         type: 'toggle',
       },
       {
         key: 'tablePrice',
         label: 'Price',
-        isVisible: tablePriceIsVisible,
-        setVisibility: setTablePriceIsVisible,
+        isVisible: tableCardSettings.priceIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tablePriceIsVisible', value),
         type: 'toggle',
       },
     ],

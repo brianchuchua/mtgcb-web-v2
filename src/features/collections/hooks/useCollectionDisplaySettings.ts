@@ -1,9 +1,16 @@
 import { useMemo } from 'react';
+import { 
+  useCardDisplaySettings, 
+  useLayoutSettings, 
+  useTableCardSettings,
+  useSetDisplaySettings as useSetDisplaySettingsFromContext,
+  useTableSetSettings,
+  useCollectionSettings,
+  useCollectionSetSettings,
+  usePriceType 
+} from '@/contexts/DisplaySettingsContext';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { useCollectionSetSettingGroups } from '@/hooks/useCollectionSetSettingGroups';
-import { useCollectionSetDisplaySettings } from '@/hooks/useCollectionSetDisplaySettings';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { usePriceType } from '@/hooks/usePriceType';
 
 interface UseCollectionDisplaySettingsProps {
   viewMode: 'grid' | 'table';
@@ -15,117 +22,94 @@ interface UseCollectionDisplaySettingsProps {
  * Includes set gallery and table settings, and card display settings
  */
 export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCollectionDisplaySettingsProps) {
+  // Settings from centralized context
+  const cardDisplaySettings = useCardDisplaySettings();
+  const layoutSettings = useLayoutSettings();
+  const tableCardSettings = useTableCardSettings();
+  const setDisplaySettings = useSetDisplaySettingsFromContext();
+  const tableSetSettings = useTableSetSettings();
+  const collectionSettings = useCollectionSettings();
+  const collectionSetSettings = useCollectionSetSettings();
+  const [currentPriceType] = usePriceType();
+  
   // Settings for display components
-  const setDisplaySettings = useCollectionSetDisplaySettings(viewMode);
   const setSettingGroups = useCollectionSetSettingGroups(viewMode);
   const cardSettingGroups = useCardSettingGroups(viewMode);
-  const currentPriceType = usePriceType();
-
-  const [setsPerRow] = useLocalStorage<number>('setsPerRow', 0); // Default to 0 (responsive)
   
-  // Card gallery settings
-  const [cardsPerRow] = useLocalStorage<number>('cardsPerRow', 0); // Default to 0 (auto/responsive)
-  const [cardSizeMargin] = useLocalStorage('cardSizeMargin', 0);
-  const [nameIsVisible] = useLocalStorage('cardNameIsVisible', true);
-  const [setIsVisible] = useLocalStorage('cardSetIsVisible', true);
-  const [priceIsVisible] = useLocalStorage('cardPriceIsVisible', true);
-  const [quantityIsVisible] = useLocalStorage('cardQuantityIsVisible', true); // Default to true for collections
-
-  // Card table settings
-  const [tableSetIsVisible] = useLocalStorage('tableSetIsVisible', true);
-  const [collectorNumberIsVisible] = useLocalStorage('tableCollectorNumberIsVisible', true);
-  const [mtgcbNumberIsVisible] = useLocalStorage('tableMtgcbNumberIsVisible', false);
-  const [rarityIsVisible] = useLocalStorage('tableRarityIsVisible', true);
-  const [typeIsVisible] = useLocalStorage('tableTypeIsVisible', false);
-  const [artistIsVisible] = useLocalStorage('tableArtistIsVisible', false);
-  const [manaCostIsVisible] = useLocalStorage('tableManaCostIsVisible', true);
-  const [powerIsVisible] = useLocalStorage('tablePowerIsVisible', false);
-  const [toughnessIsVisible] = useLocalStorage('tableToughnessIsVisible', false);
-  const [loyaltyIsVisible] = useLocalStorage('tableLoyaltyIsVisible', false);
-  const [tablePriceIsVisible] = useLocalStorage('tablePriceIsVisible', true);
-  const [tableQuantityIsVisible] = useLocalStorage('tableQuantityIsVisible', true); // Default to true for collections
-
   // Formatted set display settings
   const formattedSetDisplaySettings = useMemo(
     () => ({
       grid: {
-        nameIsVisible: Boolean(setDisplaySettings.nameIsVisible),
-        codeIsVisible: Boolean(setDisplaySettings.codeIsVisible),
-        releaseDateIsVisible: Boolean(setDisplaySettings.releaseDateIsVisible),
-        typeIsVisible: Boolean(setDisplaySettings.typeIsVisible),
-        categoryIsVisible: Boolean(setDisplaySettings.categoryIsVisible),
-        cardCountIsVisible: Boolean(setDisplaySettings.cardCountIsVisible),
-        costsIsVisible: Boolean(setDisplaySettings.costsIsVisible),
-        setsPerRow: setsPerRow,
+        nameIsVisible: setDisplaySettings.nameIsVisible,
+        codeIsVisible: setDisplaySettings.codeIsVisible,
+        releaseDateIsVisible: setDisplaySettings.releaseDateIsVisible,
+        typeIsVisible: setDisplaySettings.typeIsVisible,
+        categoryIsVisible: setDisplaySettings.categoryIsVisible,
+        cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
+        costsIsVisible: setDisplaySettings.priceIsVisible,
+        setsPerRow: layoutSettings.setsPerRow,
       },
       table: {
-        codeIsVisible: Boolean(setDisplaySettings.codeIsVisible),
-        cardCountIsVisible: Boolean(setDisplaySettings.cardCountIsVisible),
-        releaseDateIsVisible: Boolean(setDisplaySettings.releaseDateIsVisible),
-        typeIsVisible: Boolean(setDisplaySettings.typeIsVisible),
-        categoryIsVisible: Boolean(setDisplaySettings.categoryIsVisible),
-        isDraftableIsVisible: Boolean(setDisplaySettings.isDraftableIsVisible),
-        completionIsVisible: Boolean(setDisplaySettings.completionIsVisible),
-        costToCompleteIsVisible: Boolean(setDisplaySettings.costToCompleteIsVisible),
-        valueIsVisible: Boolean(setDisplaySettings.valueIsVisible),
+        codeIsVisible: tableSetSettings.codeIsVisible,
+        cardCountIsVisible: tableSetSettings.cardCountIsVisible,
+        releaseDateIsVisible: tableSetSettings.releaseDateIsVisible,
+        typeIsVisible: tableSetSettings.typeIsVisible,
+        categoryIsVisible: tableSetSettings.categoryIsVisible,
+        isDraftableIsVisible: tableSetSettings.isDraftableIsVisible,
+        completionIsVisible: collectionSetSettings.tableCompletionIsVisible,
+        costToCompleteIsVisible: collectionSetSettings.tableCostToCompleteIsVisible,
+        valueIsVisible: collectionSetSettings.tableValueIsVisible,
       },
     }),
-    [setDisplaySettings, setsPerRow],
+    [setDisplaySettings, tableSetSettings, collectionSetSettings, layoutSettings.setsPerRow],
   );
 
   // Gallery settings
   const gallerySettings = useMemo(
     () => ({
-      cardsPerRow,
-      cardSizeMargin,
-      nameIsVisible,
-      setIsVisible,
-      priceIsVisible,
+      cardsPerRow: layoutSettings.cardsPerRow,
+      cardSizeMargin: layoutSettings.cardSizeMargin,
+      nameIsVisible: cardDisplaySettings.nameIsVisible,
+      setIsVisible: cardDisplaySettings.setIconIsVisible,
+      priceIsVisible: cardDisplaySettings.priceIsVisible,
     }),
-    [cardsPerRow, cardSizeMargin, nameIsVisible, setIsVisible, priceIsVisible],
+    [
+      layoutSettings.cardsPerRow, 
+      layoutSettings.cardSizeMargin, 
+      cardDisplaySettings.nameIsVisible, 
+      cardDisplaySettings.setIconIsVisible, 
+      cardDisplaySettings.priceIsVisible
+    ],
   );
 
   // Table settings
   const tableSettings = useMemo(
     () => ({
-      setIsVisible: tableSetIsVisible,
-      collectorNumberIsVisible,
-      mtgcbNumberIsVisible,
-      rarityIsVisible,
-      typeIsVisible,
-      artistIsVisible,
-      manaCostIsVisible,
-      powerIsVisible,
-      toughnessIsVisible,
-      loyaltyIsVisible,
-      priceIsVisible: tablePriceIsVisible,
-      quantityIsVisible: tableQuantityIsVisible,
+      setIsVisible: tableCardSettings.setIsVisible,
+      collectorNumberIsVisible: tableCardSettings.collectorNumberIsVisible,
+      mtgcbNumberIsVisible: tableCardSettings.mtgcbNumberIsVisible,
+      rarityIsVisible: tableCardSettings.rarityIsVisible,
+      typeIsVisible: tableCardSettings.typeIsVisible,
+      artistIsVisible: tableCardSettings.artistIsVisible,
+      manaCostIsVisible: tableCardSettings.manaCostIsVisible,
+      powerIsVisible: tableCardSettings.powerIsVisible,
+      toughnessIsVisible: tableCardSettings.toughnessIsVisible,
+      loyaltyIsVisible: tableCardSettings.loyaltyIsVisible,
+      priceIsVisible: tableCardSettings.priceIsVisible,
+      quantityIsVisible: collectionSettings.tableQuantityIsVisible,
     }),
-    [
-      tableSetIsVisible,
-      collectorNumberIsVisible,
-      mtgcbNumberIsVisible,
-      rarityIsVisible,
-      typeIsVisible,
-      artistIsVisible,
-      manaCostIsVisible,
-      powerIsVisible,
-      toughnessIsVisible,
-      loyaltyIsVisible,
-      tablePriceIsVisible,
-      tableQuantityIsVisible,
-    ],
+    [tableCardSettings, collectionSettings.tableQuantityIsVisible],
   );
 
   // Card display settings (includes quantity for collections)
-  const cardDisplaySettings = useMemo(
+  const cardDisplaySettingsFormatted = useMemo(
     () => ({
-      nameIsVisible,
-      setIsVisible,
-      priceIsVisible,
-      quantityIsVisible,
+      nameIsVisible: cardDisplaySettings.nameIsVisible,
+      setIsVisible: cardDisplaySettings.setIconIsVisible,
+      priceIsVisible: cardDisplaySettings.priceIsVisible,
+      quantityIsVisible: collectionSettings.quantityIsVisible,
     }),
-    [nameIsVisible, setIsVisible, priceIsVisible, quantityIsVisible],
+    [cardDisplaySettings, collectionSettings.quantityIsVisible],
   );
 
   return {
@@ -133,7 +117,7 @@ export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCol
     setDisplaySettings: formattedSetDisplaySettings,
     gallerySettings,
     tableSettings,
-    cardDisplaySettings,
+    cardDisplaySettings: cardDisplaySettingsFormatted,
     priceType: currentPriceType,
   };
 }

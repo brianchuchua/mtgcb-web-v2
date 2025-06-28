@@ -1,6 +1,10 @@
 'use client';
 
-import { useLocalStorage } from './useLocalStorage';
+import { 
+  useSetDisplaySettings as useSetDisplaySettingsFromContext,
+  useTableSetSettings,
+  useCollectionSetSettings
+} from '@/contexts/DisplaySettingsContext';
 
 interface CollectionSetDisplaySettings {
   // Grid visibility settings (reusing existing keys)
@@ -20,50 +24,32 @@ interface CollectionSetDisplaySettings {
 }
 
 export const useCollectionSetDisplaySettings = (viewMode: 'grid' | 'table'): CollectionSetDisplaySettings => {
-  // Grid visibility settings
-  const [nameIsVisible] = useLocalStorage('setNameIsVisible', true);
-  const [codeIsVisible] = useLocalStorage('setCodeIsVisible', true);
-  const [releaseDateIsVisible] = useLocalStorage('setReleaseDateIsVisible', true);
-  const [typeIsVisible] = useLocalStorage('setTypeIsVisible', true);
-  const [categoryIsVisible] = useLocalStorage('setCategoryIsVisible', true);
-  const [cardCountIsVisible] = useLocalStorage('setCardCountIsVisible', true);
-  const [costsIsVisible] = useLocalStorage('setCostsIsVisible', true);
-
-  // Table column visibility settings
-  const [tableCodeIsVisible] = useLocalStorage('tableSetCodeIsVisible', true);
-  const [tableCardCountIsVisible] = useLocalStorage('tableSetCardCountIsVisible', true);
-  const [tableReleaseDateIsVisible] = useLocalStorage('tableSetReleaseDateIsVisible', true);
-  const [tableTypeIsVisible] = useLocalStorage('tableSetTypeIsVisible', true);
-  const [tableCategoryIsVisible] = useLocalStorage('tableSetCategoryIsVisible', false);
-  const [tableIsDraftableIsVisible] = useLocalStorage('tableSetIsDraftableIsVisible', false);
-  
-  // Collection-specific table columns
-  const [tableCompletionIsVisible] = useLocalStorage('tableCollectionCompletionIsVisible', true);
-  const [tableCostToCompleteIsVisible] = useLocalStorage('tableCollectionCostToCompleteIsVisible', true);
-  const [tableValueIsVisible] = useLocalStorage('tableCollectionValueIsVisible', true);
+  const setDisplaySettings = useSetDisplaySettingsFromContext();
+  const tableSetSettings = useTableSetSettings();
+  const collectionSetSettings = useCollectionSetSettings();
 
   if (viewMode === 'table') {
     return {
-      codeIsVisible: tableCodeIsVisible,
-      cardCountIsVisible: tableCardCountIsVisible,
-      releaseDateIsVisible: tableReleaseDateIsVisible,
-      typeIsVisible: tableTypeIsVisible,
-      categoryIsVisible: tableCategoryIsVisible,
-      isDraftableIsVisible: tableIsDraftableIsVisible,
-      completionIsVisible: tableCompletionIsVisible,
-      costToCompleteIsVisible: tableCostToCompleteIsVisible,
-      valueIsVisible: tableValueIsVisible,
+      codeIsVisible: tableSetSettings.codeIsVisible,
+      cardCountIsVisible: tableSetSettings.cardCountIsVisible,
+      releaseDateIsVisible: tableSetSettings.releaseDateIsVisible,
+      typeIsVisible: tableSetSettings.typeIsVisible,
+      categoryIsVisible: tableSetSettings.categoryIsVisible,
+      isDraftableIsVisible: tableSetSettings.isDraftableIsVisible,
+      completionIsVisible: collectionSetSettings.tableCompletionIsVisible,
+      costToCompleteIsVisible: collectionSetSettings.tableCostToCompleteIsVisible,
+      valueIsVisible: collectionSetSettings.tableValueIsVisible,
     };
   }
 
   // Grid view settings
   return {
-    nameIsVisible: true, // nameIsVisible,
-    codeIsVisible: true, // codeIsVisible,
-    releaseDateIsVisible: true, // releaseDateIsVisible,
-    typeIsVisible: true, // typeIsVisible,
-    categoryIsVisible: true, // categoryIsVisible,
-    cardCountIsVisible: true, // cardCountIsVisible,
-    costsIsVisible,
+    nameIsVisible: setDisplaySettings.nameIsVisible,
+    codeIsVisible: setDisplaySettings.codeIsVisible,
+    releaseDateIsVisible: setDisplaySettings.releaseDateIsVisible,
+    typeIsVisible: setDisplaySettings.typeIsVisible,
+    categoryIsVisible: setDisplaySettings.categoryIsVisible,
+    cardCountIsVisible: setDisplaySettings.cardCountIsVisible,
+    costsIsVisible: setDisplaySettings.priceIsVisible,
   };
 };

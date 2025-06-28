@@ -18,7 +18,9 @@ const SetSelector = () => {
     if (!setsResponse?.data?.sets) return [];
     
     return [...setsResponse.data.sets].sort((a, b) => {
-      return new Date(b.releasedAt).getTime() - new Date(a.releasedAt).getTime();
+      const dateA = a.releasedAt ? new Date(a.releasedAt).getTime() : 0;
+      const dateB = b.releasedAt ? new Date(b.releasedAt).getTime() : 0;
+      return dateB - dateA;
     });
   }, [setsResponse]);
 
