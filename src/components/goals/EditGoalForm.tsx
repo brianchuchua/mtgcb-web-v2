@@ -552,7 +552,7 @@ const QuantityInput = styled(TextField)(({ theme }) => ({
       borderColor: theme.palette.divider,
       transition: 'border-color 0.2s',
     },
-    '&:hover fieldset': {
+    '&:hover:not(.Mui-error) fieldset': {
       borderColor: theme.palette.divider,
     },
     '&.Mui-focused fieldset': {
