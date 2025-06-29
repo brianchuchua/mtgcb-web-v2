@@ -139,6 +139,77 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
       }
     }
   }
+
+  // Set Categories
+  if (conditions.setCategory) {
+    const setCategoryParts: string[] = [];
+    const categoryNames: Record<string, string> = {
+      'normal': 'normal',
+      'sealed': 'sealed',
+      'special': 'special'
+    };
+    
+    if (typeof conditions.setCategory === 'string') {
+      const categoryName = categoryNames[conditions.setCategory] || conditions.setCategory;
+      setCategoryParts.push(`from ${categoryName} category`);
+    } else if (Array.isArray(conditions.setCategory)) {
+      const names = conditions.setCategory.map((c: string) => categoryNames[c] || c);
+      if (names.length === 1) {
+        setCategoryParts.push(`from ${names[0]} category`);
+      } else {
+        setCategoryParts.push(`from ${names.join('/')} categories`);
+      }
+    } else if (conditions.setCategory.OR && conditions.setCategory.OR.length > 0) {
+      const names = conditions.setCategory.OR.map((c: string) => categoryNames[c] || c);
+      if (names.length === 1) {
+        setCategoryParts.push(`from ${names[0]} category`);
+      } else {
+        setCategoryParts.push(`from ${names.join('/')} categories`);
+      }
+    } else if (conditions.setCategory.NOT && conditions.setCategory.NOT.length > 0) {
+      const names = conditions.setCategory.NOT.map((c: string) => categoryNames[c] || c);
+      if (names.length === 1) {
+        setCategoryParts.push(`not from ${names[0]} category`);
+      } else {
+        setCategoryParts.push(`not from ${names.join('/')} categories`);
+      }
+    }
+    
+    if (setCategoryParts.length > 0) {
+      attributeParts.push(...setCategoryParts);
+    }
+  }
+
+  // Set Types
+  if (conditions.setType) {
+    const setTypeParts: string[] = [];
+    
+    if (typeof conditions.setType === 'string') {
+      setTypeParts.push(`from ${conditions.setType} sets`);
+    } else if (Array.isArray(conditions.setType)) {
+      if (conditions.setType.length === 1) {
+        setTypeParts.push(`from ${conditions.setType[0]} sets`);
+      } else {
+        setTypeParts.push(`from ${conditions.setType.join('/')} sets`);
+      }
+    } else if (conditions.setType.OR && conditions.setType.OR.length > 0) {
+      if (conditions.setType.OR.length === 1) {
+        setTypeParts.push(`from ${conditions.setType.OR[0]} sets`);
+      } else {
+        setTypeParts.push(`from ${conditions.setType.OR.join('/')} sets`);
+      }
+    } else if (conditions.setType.NOT && conditions.setType.NOT.length > 0) {
+      if (conditions.setType.NOT.length === 1) {
+        setTypeParts.push(`not from ${conditions.setType.NOT[0]} sets`);
+      } else {
+        setTypeParts.push(`not from ${conditions.setType.NOT.join('/')} sets`);
+      }
+    }
+    
+    if (setTypeParts.length > 0) {
+      attributeParts.push(...setTypeParts);
+    }
+  }
   
   // Specific cards
   if (conditions.id) {

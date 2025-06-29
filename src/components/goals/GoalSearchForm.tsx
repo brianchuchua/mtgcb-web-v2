@@ -25,6 +25,7 @@ import {
 } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CardApiParams } from '@/api/browse/types';
+import { useGetSetTypesQuery } from '@/api/browse/browseApi';
 import { useGetCardTypesQuery } from '@/api/cards/cardsApi';
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
@@ -69,6 +70,12 @@ const RARITY_OPTIONS: SimpleOption[] = [
   { value: '4', label: 'Rare' },
   { value: '5', label: 'Mythic' },
   { value: '6', label: 'Special' },
+];
+
+const SET_CATEGORY_OPTIONS: SimpleOption[] = [
+  { value: 'normal', label: 'Normal' },
+  { value: 'sealed', label: 'Sealed' },
+  { value: 'special', label: 'Special' },
 ];
 
 const STAT_ATTRIBUTES = [
@@ -122,7 +129,7 @@ export function GoalSearchForm({
   });
 
   // Type state - using AutocompleteOption for AutocompleteWithNegation
-  const [typeOptions, setTypeOptions] = useState<AutocompleteOption[]>([]);
+  const [cardTypeOptions, setCardTypeOptions] = useState<AutocompleteOption[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<AutocompleteOption[]>([]);
 
 
@@ -133,6 +140,11 @@ export function GoalSearchForm({
   const [setOptions, setSetOptions] = useState<AutocompleteOption[]>([]);
   const [selectedSets, setSelectedSets] = useState<AutocompleteOption[]>([]);
 
+  // Set type and category state
+  const [setTypeOptions, setSetTypeOptions] = useState<AutocompleteOption[]>([]);
+  const [selectedSetTypes, setSelectedSetTypes] = useState<AutocompleteOption[]>([]);
+  const [selectedSetCategories, setSelectedSetCategories] = useState<AutocompleteOption[]>([]);
+
   // Stat conditions
   const [statConditions, setStatConditions] = useState<StatCondition[]>([]);
 
@@ -141,6 +153,7 @@ export function GoalSearchForm({
 
   // Fetch data for dropdowns
   const { data: cardTypesData } = useGetCardTypesQuery();
+  const { data: setTypesData } = useGetSetTypesQuery();
 
   // Helper to convert simple options to autocomplete options
   const toAutocompleteOptions = (
@@ -176,20 +189,33 @@ export function GoalSearchForm({
     }
   }, [setsResponse]);
 
-  // Initialize selected types when typeOptions are loaded
+  // Process set types data when it arrives
   useEffect(() => {
-    if (!isInitialized && searchConditions.type && typeOptions.length > 0) {
+    if (setTypesData?.data) {
+      const options = setTypesData.data.map((type) => ({
+        category: 'Set Types',
+        label: type.label,
+        value: type.value,
+        exclude: false,
+      }));
+      setSetTypeOptions(options);
+    }
+  }, [setTypesData]);
+
+  // Initialize selected types when cardTypeOptions are loaded
+  useEffect(() => {
+    if (!isInitialized && searchConditions.type && cardTypeOptions.length > 0) {
       const selected: AutocompleteOption[] = [];
 
       searchConditions.type.AND?.forEach((type: string) => {
-        const option = typeOptions.find((opt) => opt.value === type);
+        const option = cardTypeOptions.find((opt) => opt.value === type);
         if (option) {
           selected.push({ ...option, exclude: false });
         }
       });
 
       searchConditions.type.NOT?.forEach((type: string) => {
-        const option = typeOptions.find((opt) => opt.value === type);
+        const option = cardTypeOptions.find((opt) => opt.value === type);
         if (option) {
           selected.push({ ...option, exclude: true });
         }
@@ -197,7 +223,7 @@ export function GoalSearchForm({
 
       setSelectedTypes(selected);
     }
-  }, [isInitialized, searchConditions.type, typeOptions]);
+  }, [isInitialized, searchConditions.type, cardTypeOptions]);
 
   // Parse initial rarity conditions (only once)
   useEffect(() => {
@@ -254,6 +280,83 @@ export function GoalSearchForm({
       setSelectedSets(selected);
     }
   }, [isInitialized, searchConditions.setId, setOptions]);
+
+  // Parse initial set type conditions (only once when set types are loaded)
+  useEffect(() => {
+    if (!isInitialized && searchConditions.setType && setTypeOptions.length > 0) {
+      const selected: AutocompleteOption[] = [];
+
+      // Handle string, array, or complex conditions
+      if (typeof searchConditions.setType === 'string') {
+        const option = setTypeOptions.find((opt) => opt.value === searchConditions.setType);
+        if (option) {
+          selected.push({ ...option, exclude: false });
+        }
+      } else if (Array.isArray(searchConditions.setType)) {
+        searchConditions.setType.forEach((type: string) => {
+          const option = setTypeOptions.find((opt) => opt.value === type);
+          if (option) {
+            selected.push({ ...option, exclude: false });
+          }
+        });
+      } else if (searchConditions.setType?.OR) {
+        searchConditions.setType.OR.forEach((type: string) => {
+          const option = setTypeOptions.find((opt) => opt.value === type);
+          if (option) {
+            selected.push({ ...option, exclude: false });
+          }
+        });
+      } else if (searchConditions.setType?.NOT) {
+        searchConditions.setType.NOT.forEach((type: string) => {
+          const option = setTypeOptions.find((opt) => opt.value === type);
+          if (option) {
+            selected.push({ ...option, exclude: true });
+          }
+        });
+      }
+
+      setSelectedSetTypes(selected);
+    }
+  }, [isInitialized, searchConditions.setType, setTypeOptions]);
+
+  // Parse initial set category conditions (only once)
+  useEffect(() => {
+    if (!isInitialized && searchConditions.setCategory) {
+      const selected: AutocompleteOption[] = [];
+      const categoryAutocompleteOptions = toAutocompleteOptions(SET_CATEGORY_OPTIONS, 'Set Categories');
+
+      // Handle string, array, or complex conditions
+      if (typeof searchConditions.setCategory === 'string') {
+        const option = categoryAutocompleteOptions.find((opt) => opt.value === searchConditions.setCategory);
+        if (option) {
+          selected.push({ ...option, exclude: false });
+        }
+      } else if (Array.isArray(searchConditions.setCategory)) {
+        searchConditions.setCategory.forEach((category: string) => {
+          const option = categoryAutocompleteOptions.find((opt) => opt.value === category);
+          if (option) {
+            selected.push({ ...option, exclude: false });
+          }
+        });
+      } else if (searchConditions.setCategory?.OR) {
+        searchConditions.setCategory.OR.forEach((category: string) => {
+          const option = categoryAutocompleteOptions.find((opt) => opt.value === category);
+          if (option) {
+            selected.push({ ...option, exclude: false });
+          }
+        });
+      } else if (searchConditions.setCategory?.NOT) {
+        searchConditions.setCategory.NOT.forEach((category: string) => {
+          const option = categoryAutocompleteOptions.find((opt) => opt.value === category);
+          if (option) {
+            selected.push({ ...option, exclude: true });
+          }
+        });
+      }
+
+      setSelectedSetCategories(selected);
+    }
+  }, [isInitialized, searchConditions.setCategory]);
 
   // Parse initial stat conditions (only once)
   useEffect(() => {
@@ -355,6 +458,58 @@ export function GoalSearchForm({
       }
     }
 
+    // Set Types
+    const setTypeInclude = selectedSetTypes.filter((t) => !t.exclude);
+    const setTypeExclude = selectedSetTypes.filter((t) => t.exclude);
+    if (setTypeInclude.length > 0 || setTypeExclude.length > 0) {
+      if (setTypeInclude.length > 0 && setTypeExclude.length === 0) {
+        // Simple case: only includes
+        if (setTypeInclude.length === 1) {
+          conditions.setType = setTypeInclude[0].value;
+        } else {
+          conditions.setType = { OR: setTypeInclude.map((t) => t.value) };
+        }
+      } else if (setTypeExclude.length > 0 && setTypeInclude.length === 0) {
+        // Only excludes
+        conditions.setType = { NOT: setTypeExclude.map((t) => t.value) };
+      } else {
+        // Both includes and excludes
+        conditions.setType = {};
+        if (setTypeInclude.length > 0) {
+          conditions.setType.OR = setTypeInclude.map((t) => t.value);
+        }
+        if (setTypeExclude.length > 0) {
+          conditions.setType.NOT = setTypeExclude.map((t) => t.value);
+        }
+      }
+    }
+
+    // Set Categories
+    const setCategoryInclude = selectedSetCategories.filter((c) => !c.exclude);
+    const setCategoryExclude = selectedSetCategories.filter((c) => c.exclude);
+    if (setCategoryInclude.length > 0 || setCategoryExclude.length > 0) {
+      if (setCategoryInclude.length > 0 && setCategoryExclude.length === 0) {
+        // Simple case: only includes
+        if (setCategoryInclude.length === 1) {
+          conditions.setCategory = setCategoryInclude[0].value;
+        } else {
+          conditions.setCategory = { OR: setCategoryInclude.map((c) => c.value) };
+        }
+      } else if (setCategoryExclude.length > 0 && setCategoryInclude.length === 0) {
+        // Only excludes
+        conditions.setCategory = { NOT: setCategoryExclude.map((c) => c.value) };
+      } else {
+        // Both includes and excludes
+        conditions.setCategory = {};
+        if (setCategoryInclude.length > 0) {
+          conditions.setCategory.OR = setCategoryInclude.map((c) => c.value);
+        }
+        if (setCategoryExclude.length > 0) {
+          conditions.setCategory.NOT = setCategoryExclude.map((c) => c.value);
+        }
+      }
+    }
+
     // Stats
     const statsByAttribute: Record<string, string[]> = {};
     statConditions.forEach((stat) => {
@@ -383,7 +538,7 @@ export function GoalSearchForm({
     }
 
     return conditions;
-  }, [name, oracleText, artist, colorState, selectedTypes, selectedRarities, selectedSets, statConditions, cardFilter]);
+  }, [name, oracleText, artist, colorState, selectedTypes, selectedRarities, selectedSets, selectedSetTypes, selectedSetCategories, statConditions, cardFilter]);
 
   // Initialize color state when searchConditions change (only once)
   useEffect(() => {
@@ -416,10 +571,10 @@ export function GoalSearchForm({
 
   // Mark as initialized once all data is loaded
   useEffect(() => {
-    if (typeOptions.length > 0 && setOptions.length > 0 && !isInitialized) {
+    if (cardTypeOptions.length > 0 && setOptions.length > 0 && setTypeOptions.length > 0 && !isInitialized) {
       setIsInitialized(true);
     }
-  }, [typeOptions.length, setOptions.length, isInitialized]);
+  }, [cardTypeOptions.length, setOptions.length, setTypeOptions.length, isInitialized]);
 
   // Update parent whenever conditions change (but skip during initialization)
   useEffect(() => {
@@ -452,7 +607,7 @@ export function GoalSearchForm({
         value: `"${type}"`,
         exclude: false,
       }));
-      setTypeOptions(options);
+      setCardTypeOptions(options);
     }
   }, [cardTypesData]);
 
@@ -620,7 +775,7 @@ export function GoalSearchForm({
       {/* Type Selector */}
       <AutocompleteWithNegation
         label="Card Types"
-        options={typeOptions}
+        options={cardTypeOptions}
         selectedOptions={selectedTypes}
         setSelectedOptionsRemotely={setSelectedTypes}
       />
@@ -639,6 +794,22 @@ export function GoalSearchForm({
         options={setOptions}
         selectedOptions={selectedSets}
         setSelectedOptionsRemotely={setSelectedSets}
+      />
+
+      {/* Set Category Selector */}
+      <AutocompleteWithNegation
+        label="Set Categories"
+        options={toAutocompleteOptions(SET_CATEGORY_OPTIONS, 'Set Categories')}
+        selectedOptions={selectedSetCategories}
+        setSelectedOptionsRemotely={setSelectedSetCategories}
+      />
+
+      {/* Set Type Selector */}
+      <AutocompleteWithNegation
+        label="Set Types"
+        options={setTypeOptions}
+        selectedOptions={selectedSetTypes}
+        setSelectedOptionsRemotely={setSelectedSetTypes}
       />
 
       {/* Card Selector */}

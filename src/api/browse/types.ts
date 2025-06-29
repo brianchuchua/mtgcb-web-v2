@@ -112,6 +112,14 @@ export interface CardApiParams {
     OR?: string[];
     AND?: string[];
   };
+  setType?: string | string[] | {
+    OR?: string[];
+    NOT?: string[];
+  };
+  setCategory?: string | string[] | {
+    OR?: string[];
+    NOT?: string[];
+  };
   [key: string]: any; // Allow for dynamic stat filters
   limit?: number;
   offset?: number;
@@ -128,18 +136,14 @@ export interface SetApiParams {
   name?: string;
   slug?: string;
   code?: string;
-  setType?:
-    | string
-    | {
-        OR?: string[];
-        NOT?: string[];
-      };
-  category?:
-    | string
-    | {
-        OR?: string[];
-        NOT?: string[];
-      };
+  setType?: string | string[] | {
+    OR?: string[];
+    NOT?: string[];
+  };
+  category?: string | string[] | {
+    OR?: string[];
+    NOT?: string[];
+  };
   parentSetId?: string | null;
   releasedAt?: string;
   isDraftable?: boolean;

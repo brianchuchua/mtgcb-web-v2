@@ -89,30 +89,51 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                         <Chip size="small" icon={<RadioButtonUncheckedIcon />} label="Inactive" color="default" />
                       </Tooltip>
                     )}
-                    <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
+                    {goal.isActive ? (
+                      <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
+                        <Typography
+                          variant="h6"
+                          component="a"
+                          sx={{
+                            textDecoration: 'none',
+                            color: 'inherit',
+                            '&:hover': {
+                              textDecoration: 'underline',
+                            },
+                          }}
+                        >
+                          {goal.name}
+                        </Typography>
+                      </Link>
+                    ) : (
                       <Typography
                         variant="h6"
-                        component="a"
                         sx={{
-                          textDecoration: 'none',
-                          color: goal.isActive ? 'inherit' : 'text.secondary',
-                          '&:hover': {
-                            textDecoration: 'underline',
-                          },
+                          color: 'text.secondary',
                         }}
                       >
                         {goal.name}
                       </Typography>
-                    </Link>
+                    )}
                   </Box>
                   <Stack direction="row" spacing={0.5}>
-                    <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
-                      <Tooltip title="View goal">
-                        <IconButton size="small" component="a">
-                          <VisibilityIcon fontSize="small" />
-                        </IconButton>
+                    {goal.isActive ? (
+                      <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
+                        <Tooltip title="View goal">
+                          <IconButton size="small" component="a">
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Link>
+                    ) : (
+                      <Tooltip title="View goal (Inactive)">
+                        <span>
+                          <IconButton size="small" disabled>
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
+                        </span>
                       </Tooltip>
-                    </Link>
+                    )}
                     {isOwner && (
                       <>
                         <Tooltip title="Edit goal">

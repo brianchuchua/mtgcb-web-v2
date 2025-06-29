@@ -192,6 +192,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Dogfooding and UX testing
 - UX - Must test rendering of input fields on native devices
 - Verify parameter edge cases, minimums and maximums
+- Audit field length limits
 
 ## Nice to Have
 
