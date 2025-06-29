@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import {
+  Alert,
   Box,
   Button,
   Chip,
@@ -52,7 +53,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitted },
     watch,
     getValues,
   } = useForm<FormValues>({
@@ -446,6 +447,29 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
             onePrintingPerPureName={onePrintingPerPureName}
           />
         </Box>
+
+        {isSubmitted && Object.keys(errors).length > 0 && (
+          <Alert severity="error">
+            <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 1 }}>
+              Please fix the following errors:
+            </Typography>
+            {errors.name && (
+              <Typography variant="body2">• Goal name: {errors.name.message}</Typography>
+            )}
+            {errors.description && (
+              <Typography variant="body2">• Description: {errors.description.message}</Typography>
+            )}
+            {errors.targetQuantityReg && (
+              <Typography variant="body2">• Regular quantity: {errors.targetQuantityReg.message}</Typography>
+            )}
+            {errors.targetQuantityFoil && (
+              <Typography variant="body2">• Foil quantity: {errors.targetQuantityFoil.message}</Typography>
+            )}
+            {errors.targetQuantityAll && (
+              <Typography variant="body2">• Quantity: {errors.targetQuantityAll.message}</Typography>
+            )}
+          </Alert>
+        )}
 
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
           <Button onClick={onClose}>Cancel</Button>
