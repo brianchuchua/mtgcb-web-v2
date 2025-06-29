@@ -283,6 +283,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         disabled={!value || Number(value) === 0}
                         tabIndex={-1}
                         disableFocusRipple
+                        error={!!errors.targetQuantityReg}
                       >
                         <RemoveIcon />
                       </QuantityLeftButton>
@@ -313,6 +314,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         }}
                         tabIndex={-1}
                         disableFocusRipple
+                        error={!!errors.targetQuantityReg}
                       >
                         <AddIcon />
                       </QuantityRightButton>
@@ -358,6 +360,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         disabled={!value || Number(value) === 0}
                         tabIndex={-1}
                         disableFocusRipple
+                        error={!!errors.targetQuantityFoil}
                       >
                         <RemoveIcon />
                       </QuantityLeftButton>
@@ -388,6 +391,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         }}
                         tabIndex={-1}
                         disableFocusRipple
+                        error={!!errors.targetQuantityFoil}
                       >
                         <AddIcon />
                       </QuantityRightButton>
@@ -443,6 +447,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         disabled={!value || Number(value) === 0}
                         tabIndex={-1}
                         disableFocusRipple
+                        error={!!errors.targetQuantityAll}
                       >
                         <RemoveIcon />
                       </QuantityLeftButton>
@@ -473,6 +478,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         }}
                         tabIndex={-1}
                         disableFocusRipple
+                        error={!!errors.targetQuantityAll}
                       >
                         <AddIcon />
                       </QuantityRightButton>
@@ -564,20 +570,22 @@ const QuantityInput = styled(TextField)(({ theme }) => ({
   width: '80px',
 }));
 
-const QuantityButton = styled(IconButton)(({ theme }) => ({
+const QuantityButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== 'error',
+})<{ error?: boolean }>(({ theme, error }) => ({
   padding: '8px',
   height: '40px',
   width: '40px',
   borderRadius: 0,
-  border: `1px solid ${theme.palette.divider}`,
+  border: `1px solid ${error ? theme.palette.error.main : theme.palette.divider}`,
   backgroundColor: theme.palette.background.paper,
   transition: 'all 0.2s',
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
-    borderColor: theme.palette.divider,
+    borderColor: error ? theme.palette.error.main : theme.palette.divider,
   },
   '&.Mui-disabled': {
-    borderColor: theme.palette.divider,
+    borderColor: error ? theme.palette.error.main : theme.palette.divider,
   },
   '& .MuiSvgIcon-root': {
     fontSize: '1.2rem',
