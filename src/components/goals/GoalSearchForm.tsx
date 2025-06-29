@@ -64,11 +64,11 @@ interface StatCondition {
 }
 
 const RARITY_OPTIONS: SimpleOption[] = [
-  { value: '1', label: 'Common' },
-  { value: '2', label: 'Uncommon' },
-  { value: '3', label: 'Rare' },
-  { value: '4', label: 'Mythic' },
-  { value: '5', label: 'Special' },
+  { value: '2', label: 'Common' },
+  { value: '3', label: 'Uncommon' },
+  { value: '4', label: 'Rare' },
+  { value: '5', label: 'Mythic' },
+  { value: '6', label: 'Special' },
 ];
 
 const STAT_ATTRIBUTES = [

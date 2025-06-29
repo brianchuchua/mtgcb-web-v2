@@ -7,12 +7,11 @@ interface SearchCriteriaDescription {
 }
 
 const RARITY_NAMES: Record<string, string> = {
-  '1': 'Common',
-  '2': 'Uncommon', 
-  '3': 'Rare',
-  '4': 'Mythic',
-  '5': 'Special',
-  '6': 'Special', // Sometimes Special is 6
+  '2': 'Common',
+  '3': 'Uncommon', 
+  '4': 'Rare',
+  '5': 'Mythic',
+  '6': 'Special',
 };
 
 const MTG_COLOR_NAMES: Record<string, string> = {
