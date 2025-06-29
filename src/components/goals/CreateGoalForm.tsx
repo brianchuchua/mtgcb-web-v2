@@ -54,6 +54,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
     handleSubmit,
     formState: { errors },
     watch,
+    getValues,
   } = useForm<FormValues>({
     defaultValues: {
       name: '',
@@ -190,9 +191,17 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                 name="targetQuantityReg"
                 control={control}
                 rules={{
-                  min: { value: 1, message: 'Must be at least 1' },
-                  validate: (value, formValues) =>
-                    value || formValues.targetQuantityFoil ? true : 'At least one quantity is required',
+                  validate: (value) => {
+                    if (quantityMode !== 'separate') return true;
+                    if (value !== undefined && value !== null && value < 0) return 'Cannot be negative';
+                    const foilValue = getValues('targetQuantityFoil');
+                    const regValue = value || 0;
+                    const foilVal = foilValue || 0;
+                    if (regValue === 0 && foilVal === 0) {
+                      return 'At least one quantity is required';
+                    }
+                    return true;
+                  },
                 }}
                 render={({ field: { onChange, value } }) => (
                   <Box>
@@ -205,7 +214,9 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         onMouseDown={(e) => {
                           e.preventDefault();
                           e.currentTarget.blur();
-                          onChange(Math.max(0, (value || 0) - 1) || undefined);
+                          const currentVal = value || 0;
+                          const newValue = Math.max(0, currentVal - 1);
+                          onChange(newValue);
                         }}
                         disabled={!value || value === 0}
                         tabIndex={-1}
@@ -216,8 +227,16 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                       </QuantityLeftButton>
                       <QuantityInput
                         type="number"
-                        value={value ?? ''}
-                        onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                        value={Number(value) === 0 ? '' : (value ?? '')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            onChange(0);
+                          } else {
+                            const num = parseInt(val);
+                            onChange(isNaN(num) ? 0 : num);
+                          }
+                        }}
                         onFocus={(e) => e.target.select()}
                         inputProps={{ min: 0 }}
                         variant="outlined"
@@ -253,7 +272,14 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
               <Controller
                 name="targetQuantityFoil"
                 control={control}
-                rules={{ min: { value: 1, message: 'Must be at least 1' } }}
+                rules={{
+                  validate: (value: any) => {
+                    if (!value && value !== 0) return true;
+                    const numValue = Number(value);
+                    if (isNaN(numValue) || numValue < 0) return 'Cannot be negative';
+                    return true;
+                  },
+                }}
                 render={({ field: { onChange, value } }) => (
                   <Box>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
@@ -265,7 +291,9 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         onMouseDown={(e) => {
                           e.preventDefault();
                           e.currentTarget.blur();
-                          onChange(Math.max(0, (value || 0) - 1) || undefined);
+                          const currentVal = value || 0;
+                          const newValue = Math.max(0, currentVal - 1);
+                          onChange(newValue);
                         }}
                         disabled={!value || value === 0}
                         tabIndex={-1}
@@ -276,8 +304,16 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                       </QuantityLeftButton>
                       <QuantityInput
                         type="number"
-                        value={value ?? ''}
-                        onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                        value={Number(value) === 0 ? '' : (value ?? '')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            onChange(0);
+                          } else {
+                            const num = parseInt(val);
+                            onChange(isNaN(num) ? 0 : num);
+                          }
+                        }}
                         onFocus={(e) => e.target.select()}
                         inputProps={{ min: 0 }}
                         variant="outlined"
@@ -317,8 +353,15 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                 name="targetQuantityAll"
                 control={control}
                 rules={{
-                  required: 'Quantity is required',
-                  min: { value: 1, message: 'Must be at least 1' },
+                  validate: (value: any) => {
+                    if (quantityMode !== 'all') return true;
+                    if (!value && value !== 0) {
+                      return 'Quantity is required';
+                    }
+                    const numValue = Number(value);
+                    if (isNaN(numValue) || numValue < 1) return 'Must be at least 1';
+                    return true;
+                  },
                 }}
                 render={({ field: { onChange, value } }) => (
                   <Box>
@@ -331,7 +374,9 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         onMouseDown={(e) => {
                           e.preventDefault();
                           e.currentTarget.blur();
-                          onChange(Math.max(0, (value || 0) - 1) || undefined);
+                          const currentVal = value || 0;
+                          const newValue = Math.max(0, currentVal - 1);
+                          onChange(newValue);
                         }}
                         disabled={!value || value === 0}
                         tabIndex={-1}
@@ -342,8 +387,16 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                       </QuantityLeftButton>
                       <QuantityInput
                         type="number"
-                        value={value ?? ''}
-                        onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                        value={Number(value) === 0 ? '' : (value ?? '')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '') {
+                            onChange(0);
+                          } else {
+                            const num = parseInt(val);
+                            onChange(isNaN(num) ? 0 : num);
+                          }
+                        }}
                         onFocus={(e) => e.target.select()}
                         inputProps={{ min: 0 }}
                         variant="outlined"
