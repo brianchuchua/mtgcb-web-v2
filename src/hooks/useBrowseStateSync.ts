@@ -16,6 +16,7 @@ import {
   setPagination,
   setSetPagination,
   setSetSearchParams,
+  setSets,
   setViewContentType,
 } from '@/redux/slices/browseSlice';
 import { BrowsePagination } from '@/types/browse';
@@ -97,6 +98,13 @@ export function useBrowseStateSync() {
         // Just update pagination from localStorage
         dispatch(setCardPagination({ currentPage: 1, pageSize: cardsPageSize }));
       }
+      
+      // Clear sets filter if not in URL (prevents persistence from set-specific pages)
+      const hasIncludeSets = search.has('includeSets');
+      const hasExcludeSets = search.has('excludeSets');
+      if (!hasIncludeSets && !hasExcludeSets && !cardsUrlState.sets) {
+        dispatch(setSets({ include: [], exclude: [] }));
+      }
 
       if (Object.keys(setsUrlState).length > 0) {
         dispatch(
@@ -154,6 +162,13 @@ export function useBrowseStateSync() {
             pageSize: cardsPageSize,
           }),
         );
+      }
+      
+      // Clear sets filter if not in URL (prevents persistence from set-specific pages)
+      const hasIncludeSets = search.has('includeSets');
+      const hasExcludeSets = search.has('excludeSets');
+      if (!hasIncludeSets && !hasExcludeSets && !cardsUrlState.sets) {
+        dispatch(setSets({ include: [], exclude: [] }));
       }
 
       // Update sets state if there are set-specific params
