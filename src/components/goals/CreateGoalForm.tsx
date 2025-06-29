@@ -113,6 +113,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
               fullWidth
               error={!!errors.name}
               helperText={errors.name?.message}
+              autoFocus
             />
           )}
         />
