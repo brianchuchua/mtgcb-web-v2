@@ -49,6 +49,7 @@ export interface SetDisplayProps {
         sets: Array<Set & { costToComplete?: CostToComplete; cardCountIncludingSubsets?: number }>;
       };
   includeSubsetsInSets?: boolean;
+  'data-testid'?: string;
 }
 
 const SetDisplay: React.FC<SetDisplayProps> = ({
@@ -59,6 +60,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   pageSize,
   displaySettings,
   costToCompleteData,
+  'data-testid': dataTestId,
 }) => {
   const dispatch = useDispatch();
   const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
@@ -119,6 +121,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
       <VirtualizedGallery
         key="browse-set-gallery"
         items={displaySets}
+        data-testid={dataTestId}
         renderItem={(set, index) => {
           const targetSet =
             costToCompleteData && 'sets' in costToCompleteData && Array.isArray(costToCompleteData.sets)

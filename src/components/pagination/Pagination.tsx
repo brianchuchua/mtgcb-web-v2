@@ -85,7 +85,7 @@ const Pagination: React.FC<PaginationProps> = ({
   }, []);
 
   return (
-    <PaginationContainer>
+    <PaginationContainer data-testid={`pagination-${position}`}>
       {!isOnBottom ? (
         <TopPaginationLayout>
           <LeftSection>
@@ -270,6 +270,7 @@ const ItemRangeDisplay: React.FC<ItemRangeDisplayProps> = ({
       <Typography
         variant="body2"
         color="text.secondary"
+        data-testid="page-info"
         sx={{
           fontSize: '0.825rem',
           whiteSpace: 'nowrap',
@@ -281,7 +282,7 @@ const ItemRangeDisplay: React.FC<ItemRangeDisplayProps> = ({
   }
 
   return (
-    <ItemRangeInfo>
+    <ItemRangeInfo data-testid="page-info">
       <Typography variant="body1" color="text.secondary">
         Showing {startItem}-{endItem} of {totalItems} {customItemName || (contentType === 'cards' ? 'cards' : 'sets')}
       </Typography>
@@ -386,6 +387,7 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
             onClick={handleGridClick}
             startIcon={!isSmallScreen ? <GridViewIcon /> : undefined}
             disabled={!isFullyLoaded}
+            data-testid="view-mode-toggle-grid"
             sx={{ 
               opacity: isFullyLoaded ? 1 : 0.7,
               minWidth: isSmallScreen ? 'auto' : undefined,
@@ -404,6 +406,7 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
             onClick={handleTableClick}
             startIcon={!isSmallScreen ? <TableRowsIcon /> : undefined}
             disabled={!isFullyLoaded}
+            data-testid="view-mode-toggle-table"
             sx={{ 
               opacity: isFullyLoaded ? 1 : 0.7,
               minWidth: isSmallScreen ? 'auto' : undefined,
@@ -549,7 +552,13 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
     <PaginationControls>
       <Tooltip title="First page">
         <span>
-          <IconButton onClick={handleFirstPage} disabled={page === 1 || isLoading} size="small" color="primary">
+          <IconButton 
+            onClick={handleFirstPage} 
+            disabled={page === 1 || isLoading} 
+            size="small" 
+            color="primary"
+            data-testid="pagination-first"
+          >
             <FirstPageIcon />
           </IconButton>
         </span>
@@ -557,7 +566,13 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
 
       <Tooltip title="Previous page">
         <span>
-          <IconButton onClick={handlePreviousPage} disabled={page === 1 || isLoading} size="small" color="primary">
+          <IconButton 
+            onClick={handlePreviousPage} 
+            disabled={page === 1 || isLoading} 
+            size="small" 
+            color="primary"
+            data-testid="pagination-prev"
+          >
             <ChevronLeftIcon />
           </IconButton>
         </span>
@@ -582,7 +597,13 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
 
       <Tooltip title="Next page">
         <span>
-          <IconButton onClick={handleNextPage} disabled={page === totalPages || isLoading} size="small" color="primary">
+          <IconButton 
+            onClick={handleNextPage} 
+            disabled={page === totalPages || isLoading} 
+            size="small" 
+            color="primary"
+            data-testid="pagination-next"
+          >
             <ChevronRightIcon />
           </IconButton>
         </span>
@@ -590,7 +611,13 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
 
       <Tooltip title="Last page">
         <span>
-          <IconButton onClick={handleLastPage} disabled={page === totalPages || isLoading} size="small" color="primary">
+          <IconButton 
+            onClick={handleLastPage} 
+            disabled={page === totalPages || isLoading} 
+            size="small" 
+            color="primary"
+            data-testid="pagination-last"
+          >
             <LastPageIcon />
           </IconButton>
         </span>

@@ -31,8 +31,8 @@ export default function BrowseClient() {
         <>
           {isCardGridView && <CardGrid {...cardsProps} />}
           {isCardTableView && <CardTable {...cardsProps} />}
-          {isSetGridView && <SetDisplay {...setsProps} viewMode="grid" />}
-          {isSetTableView && <SetDisplay {...setsProps} viewMode="table" />}
+          {isSetGridView && <SetDisplay {...setsProps} viewMode="grid" data-testid="sets-grid" />}
+          {isSetTableView && <SetDisplay {...setsProps} viewMode="table" data-testid="sets-table" />}
         </>
       )}
 

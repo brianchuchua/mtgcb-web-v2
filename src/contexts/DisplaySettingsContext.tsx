@@ -108,7 +108,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   // Layout settings
   cardsPerRow: 5,
   cardSizeMargin: 0.75,
-  setsPerRow: 5,
+  setsPerRow: 0, // 0 means auto
   
   // Card display settings
   cardNameIsVisible: true,
@@ -126,10 +126,10 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   
   // Set display settings (grid view)
   setNameIsVisible: true,
-  setCodeIsVisible: false,
+  setCodeIsVisible: true,
   setReleaseDateIsVisible: true,
-  setTypeIsVisible: false,
-  setCategoryIsVisible: false,
+  setTypeIsVisible: true,
+  setCategoryIsVisible: true,
   setCardCountIsVisible: true,
   setPriceIsVisible: true,
   setPercentCollectedIsVisible: true,
@@ -153,11 +153,11 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   tablePriceIsVisible: true,
   
   // Table-specific set settings
-  tableSetCodeIsVisible: false,
+  tableSetCodeIsVisible: true,
   tableSetCardCountIsVisible: true,
   tableSetReleaseDateIsVisible: true,
   tableSetTypeIsVisible: true,
-  tableSetCategoryIsVisible: false,
+  tableSetCategoryIsVisible: true,
   tableSetIsDraftableIsVisible: false,
   
   // Collection-specific settings

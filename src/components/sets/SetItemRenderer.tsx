@@ -37,7 +37,7 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({
   }
 
   return (
-    <SetBoxWrapper sx={{ height: `${height}px` }}>
+    <SetBoxWrapper sx={{ height: `${height}px` }} data-testid="set-item">
       <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out', height: '100%' }}>
         <SetNameAndCode set={set} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} />
         <SetCategoryAndType
@@ -132,7 +132,7 @@ export const SetNameAndCode: React.FC<SetNameProps> = ({ set, nameIsVisible = tr
       }}
       onClick={(e) => e.stopPropagation()} // Prevent card click when clicking set name
     >
-      <SetNameTypography variant="body1" fontWeight="500">
+      <SetNameTypography variant="body1" fontWeight="500" data-testid="set-name">
         {displayName}
       </SetNameTypography>
     </Link>
@@ -185,7 +185,7 @@ const SetReleaseDate: React.FC<SetReleaseDateProps> = ({ set, isVisible = true }
   if (!isVisible) return null;
 
   return (
-    <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+    <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center' }} data-testid="set-release-date">
       {formatISODate(set.releasedAt)}
     </Typography>
   );
@@ -203,7 +203,9 @@ const SetIconDisplay: React.FC<{ set: Set }> = ({ set }) => {
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <SetIcon code={set.code} size="5x" fixedWidth />
+          <Box data-testid="set-icon">
+            <SetIcon code={set.code} size="5x" fixedWidth />
+          </Box>
         </Link>
       )}
     </Box>
@@ -227,7 +229,7 @@ const SetCardCount: React.FC<SetCardCountProps> = ({
   const cardCount = includeSubsetsInSets ? cardCountIncludingSubsets : set.cardCount;
 
   return (
-    <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 0.5 }}>
+    <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 0.5 }} data-testid="set-card-count">
       {cardCount ? `${cardCount} cards` : 'N/A'}
     </Typography>
   );

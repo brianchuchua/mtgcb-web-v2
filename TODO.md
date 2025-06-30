@@ -39,9 +39,11 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Probably need to support hide duplicate printings in the set view too
 - Full end-to-end test suite, generate test cases, then automate
 - Testing: Purchasing buttons with different settings
+- I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
 
 ## Other Action Items
 
+- numberOfCardsInMagic in API coming back isn't always right, see http://local.mtgcb.com:3000/collections/1337/surprise-slivers?goalId=16&includeSets=1056
 - Rewrite price updater, had to increase dyno size recently, do a quick refactor and modernization, then scale back down to a smaller dyno
 - Setting to change going mythic to plain green progress bars
 - Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too

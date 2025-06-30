@@ -47,6 +47,8 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
         value={localCardName}
         onChange={handleCardNameChange}
         placeholder="Search by card name"
+        inputTestId="card-name-field"
+        iconTestId="card-name-search-icon"
       />
       <OracleTextField value={localOracleText} onChange={handleOracleChange} />
       <SearchField label="Artist" value={localArtist} onChange={handleArtistChange} placeholder="Search by artist name" />

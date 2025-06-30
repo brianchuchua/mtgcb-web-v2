@@ -8,6 +8,8 @@ interface SearchFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder: string;
   startAdornment?: React.ReactNode;
+  inputTestId?: string;
+  iconTestId?: string;
 }
 
 const SearchField: React.FC<SearchFieldProps> = ({
@@ -16,7 +18,15 @@ const SearchField: React.FC<SearchFieldProps> = ({
   onChange,
   placeholder,
   startAdornment = <SearchIcon color="disabled" />,
+  inputTestId,
+  iconTestId,
 }) => {
+  const adornmentWithTestId = iconTestId ? (
+    <SearchIcon color="disabled" data-testid={iconTestId} />
+  ) : (
+    startAdornment
+  );
+
   return (
     <TextField
       fullWidth
@@ -25,9 +35,10 @@ const SearchField: React.FC<SearchFieldProps> = ({
       onChange={onChange}
       placeholder={placeholder}
       margin="dense"
+      data-testid={inputTestId}
       slotProps={{
         input: {
-          startAdornment: <InputAdornment position="start">{startAdornment}</InputAdornment>,
+          startAdornment: <InputAdornment position="start">{adornmentWithTestId}</InputAdornment>,
         },
       }}
     />

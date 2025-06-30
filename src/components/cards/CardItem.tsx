@@ -241,6 +241,7 @@ const CardItemComponent = ({
         borderRadius: getBorderRadius(),
       }}
       setName={setName}
+      data-testid="card-item"
     >
       <CardImageContainer
         onClick={onClick ? handleCardElementClick : undefined}
@@ -355,6 +356,7 @@ const CardItemComponent = ({
               noWrap
               title={name}
               onClick={onClick ? handleCardElementClick : undefined}
+              data-testid="card-name"
               sx={{
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',

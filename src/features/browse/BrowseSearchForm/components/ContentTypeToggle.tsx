@@ -19,6 +19,7 @@ const ContentTypeToggle: React.FC<ContentTypeToggleProps> = ({ contentType, onCa
           onClick={onCardsClick}
           startIcon={<StyleIcon sx={{ transform: 'scaleY(-1)' }} />}
           fullWidth
+          data-testid="content-type-toggle-cards"
         >
           View Cards
         </Button>
@@ -28,6 +29,7 @@ const ContentTypeToggle: React.FC<ContentTypeToggleProps> = ({ contentType, onCa
           onClick={onSetsClick}
           startIcon={<ViewModuleIcon />}
           fullWidth
+          data-testid="content-type-toggle-sets"
         >
           View Sets
         </Button>

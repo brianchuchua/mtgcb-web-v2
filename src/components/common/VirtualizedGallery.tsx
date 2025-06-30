@@ -14,6 +14,7 @@ export interface VirtualizedGalleryProps<T> {
   horizontalPadding?: number;
   emptyMessage?: string;
   computeItemKey?: (index: number) => string | number;
+  'data-testid'?: string;
 }
 
 const VirtualizedGallery = <T,>({
@@ -25,6 +26,7 @@ const VirtualizedGallery = <T,>({
   horizontalPadding = 0,
   emptyMessage = 'No items found',
   computeItemKey,
+  'data-testid': dataTestId,
 }: VirtualizedGalleryProps<T>) => {
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -68,7 +70,12 @@ const VirtualizedGallery = <T,>({
   );
 
   return (
-    <GalleryWrapper columnsPerRow={columnsPerRow} galleryWidth={galleryWidth} horizontalPadding={horizontalPadding}>
+    <GalleryWrapper 
+      columnsPerRow={columnsPerRow} 
+      galleryWidth={galleryWidth} 
+      horizontalPadding={horizontalPadding}
+      data-testid={dataTestId}
+    >
       <VirtuosoGrid
         useWindowScroll // Use window scroll instead of creating a scrollable container
         data={items}

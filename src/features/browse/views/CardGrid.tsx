@@ -64,6 +64,7 @@ const CardGridComponent: React.FC<CardGridProps> = ({
       horizontalPadding={gallerySettings.cardSizeMargin}
       emptyMessage="No cards found"
       computeItemKey={(index) => items[index]?.id || index}
+      data-testid="cards-grid"
     />
   );
 };
