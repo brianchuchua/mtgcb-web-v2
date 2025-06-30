@@ -8,7 +8,8 @@ import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
 import { usePriceType } from '@/hooks/usePriceType';
 import { getFormTarget } from '@/utils/browser/detectSafari';
-import { formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
+import { formatMassImportString, CardWithQuantity } from '@/utils/tcgplayer/formatMassImportString';
+import TCGPlayerMassImportChunksDialog from './TCGPlayerMassImportChunksDialog';
 
 interface TCGPlayerMassImportButtonProps extends Omit<ButtonProps, 'onClick'> {
   setId: string;
@@ -33,6 +34,8 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
   const { submitToTCGPlayer } = useTCGPlayer();
   const { enqueueSnackbar } = useSnackbar();
   const [localIsLoading, setLocalIsLoading] = useState(false);
+  const [showChunksDialog, setShowChunksDialog] = useState(false);
+  const [cardsForChunking, setCardsForChunking] = useState<CardWithQuantity[]>([]);
   const priceType = usePriceType();
 
   const {
@@ -75,10 +78,25 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
       }
 
       const isDraftCube = countType === 'draftcube';
-      const importString = formatMassImportString(cards, count, isDraftCube);
+      
+      // Convert cards to CardWithQuantity format for consistency
+      const cardsWithQuantity: CardWithQuantity[] = cards.map(card => ({
+        ...card,
+        neededQuantity: isDraftCube 
+          ? (card.rarity?.toLowerCase() === 'common' || card.rarity?.toLowerCase() === 'uncommon' ? 4 : 1)
+          : count
+      }));
 
-      const formTarget = getFormTarget();
-      submitToTCGPlayer(importString, formTarget);
+      // Check if we need to chunk the cards
+      if (cardsWithQuantity.length > 1000) {
+        setCardsForChunking(cardsWithQuantity);
+        setShowChunksDialog(true);
+      } else {
+        // Submit immediately for 1000 or fewer cards
+        const importString = formatMassImportString(cards, count, isDraftCube);
+        const formTarget = getFormTarget();
+        submitToTCGPlayer(importString, formTarget);
+      }
     } catch (error) {
       enqueueSnackbar('There was an error preparing your card list. Please try again.', { variant: 'error' });
     } finally {
@@ -101,22 +119,30 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
   const isLoading = isHookLoading || localIsLoading;
 
   return (
-    <Button
-      variant="outlined"
-      size="small"
-      disabled={isLoading}
-      onClick={handleClick}
-      sx={{
-        fontSize: '0.7rem',
-        py: 0.2,
-        minWidth: 'auto',
-        textTransform: 'capitalize',
-        ...buttonProps.sx,
-      }}
-      {...buttonProps}
-    >
-      {children || `Buy ${count}x`}
-    </Button>
+    <>
+      <Button
+        variant="outlined"
+        size="small"
+        disabled={isLoading}
+        onClick={handleClick}
+        sx={{
+          fontSize: '0.7rem',
+          py: 0.2,
+          minWidth: 'auto',
+          textTransform: 'capitalize',
+          ...buttonProps.sx,
+        }}
+        {...buttonProps}
+      >
+        {children || `Buy ${count}x`}
+      </Button>
+      
+      <TCGPlayerMassImportChunksDialog
+        open={showChunksDialog}
+        onClose={() => setShowChunksDialog(false)}
+        cards={cardsForChunking}
+      />
+    </>
   );
 };
 

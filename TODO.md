@@ -29,6 +29,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Current Action Items
 
+- verify default visibility for set boxes and card box fields
 - Can be foil cannot be foil
   - integrate with quantity updating, warnings next to existing bad data
   - integrate with custom collection goals
