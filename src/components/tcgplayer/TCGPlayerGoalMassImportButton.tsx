@@ -10,6 +10,7 @@ import { usePriceType } from '@/hooks/usePriceType';
 import { getFormTarget } from '@/utils/browser/detectSafari';
 import { formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
 import { CardWithQuantity } from '@/utils/tcgplayer/formatMassImportString';
+import TCGPlayerMassImportChunksDialog from './TCGPlayerMassImportChunksDialog';
 
 interface TCGPlayerGoalMassImportButtonProps extends Omit<ButtonProps, 'onClick'> {
   setId: string | 'all';
@@ -30,6 +31,8 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
   const { submitToTCGPlayer } = useTCGPlayer();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
+  const [showChunksDialog, setShowChunksDialog] = useState(false);
+  const [cardsForChunking, setCardsForChunking] = useState<CardWithQuantity[]>([]);
   const priceType = usePriceType();
   const [getCards] = useLazyGetCardsQuery();
   const [getSets] = useLazyGetSetsQuery();
@@ -170,10 +173,16 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
         return;
       }
 
-      // Format the mass import string
-      const importString = formatMassImportString(cardsNeededForGoal, 1, false);
-      const formTarget = getFormTarget();
-      submitToTCGPlayer(importString, formTarget);
+      // Check if we need to chunk the cards
+      if (cardsNeededForGoal.length > 1000) {
+        setCardsForChunking(cardsNeededForGoal);
+        setShowChunksDialog(true);
+      } else {
+        // Submit immediately for 1000 or fewer cards
+        const importString = formatMassImportString(cardsNeededForGoal, 1, false);
+        const formTarget = getFormTarget();
+        submitToTCGPlayer(importString, formTarget);
+      }
     } catch (error) {
       enqueueSnackbar('There was an error preparing your card list. Please try again.', { variant: 'error' });
     } finally {
@@ -182,20 +191,28 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
   }, [setId, userId, goalId, includeSubsetsInSets, isLoading, priceType, getCards, getSets, getGoal, submitToTCGPlayer, enqueueSnackbar]);
 
   return (
-    <Button
-      variant="outlined"
-      disabled={isLoading}
-      onClick={handleClick}
-      size="small"
-      sx={{
-        textTransform: 'none',
-        py: 0.5,
-        ...buttonProps.sx,
-      }}
-      {...buttonProps}
-    >
-      {children || 'Buy missing cards for this goal'}
-    </Button>
+    <>
+      <Button
+        variant="outlined"
+        disabled={isLoading}
+        onClick={handleClick}
+        size="small"
+        sx={{
+          textTransform: 'none',
+          py: 0.5,
+          ...buttonProps.sx,
+        }}
+        {...buttonProps}
+      >
+        {children || 'Buy missing cards for this goal'}
+      </Button>
+      
+      <TCGPlayerMassImportChunksDialog
+        open={showChunksDialog}
+        onClose={() => setShowChunksDialog(false)}
+        cards={cardsForChunking}
+      />
+    </>
   );
 };
 

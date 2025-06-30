@@ -7,7 +7,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 ## Remaining Major Feature Work Before 1.0
 
 - Art cards
-- Custom collection goals
 - Imports and exports (allow exporting from a specific set or whole collection)
 - Patron support features
 - Privacy mode
@@ -30,17 +29,15 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Current Action Items
 
-- Implement basic custom collection goals
-  - CRUD to start
-  - Add these to Postman
 - Can be foil cannot be foil
   - integrate with quantity updating, warnings next to existing bad data
   - integrate with custom collection goals
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
-  BUG: Set id selection is too sticky when going from a set page to the main page, get reproduction steps
 - When idle: Migrate TODOs from README.md to this file
 - Probably need to support hide duplicate printings in the set view too
+- Full end-to-end test suite, generate test cases, then automate
+- Testing: Purchasing buttons with different settings
 
 ## Other Action Items
 
@@ -59,10 +56,12 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Card page: Other Printings should just be the standard pagination with those cards filtered, collection aware, maybe goal aware
 - Shopping lists -- reports based on collection goals
 - TCGPlayer supports adding a collector number after the set code -- needed for things like secret lair that have duplicate names
+- Allow selection of default collection goal
 
 ## UX Action Items
 
-- Goals should have a computation loading state
+- Audit subsets with collection goals -- data and appearance.
+- Goals should have a computation loading state, especially in the header
 - Not liking set box heights
 - When Open Search Options is clicked, it should scroll to the search options section
 - Link to collection needs to be consistent. Underlined or not, which parts, etc.
@@ -122,6 +121,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Add a note to Cost to complete that it's based on the cheapest printing of a card, which may differ from the one being shown.
 - Inconsistent h1 styles (set page, goal vs non-goal context)
 - error state of quantity selectors not affecting button properly in goal editing or creation form
+- improve loading states, http://local.mtgcb.com:3000/collections/1337?goalId=14&oneResultPerCardName=true&contentType=cards and switch to "all except alpha" goal -- the transition is jarring
 
 ## Bugs
 
@@ -144,8 +144,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - End-to-end tests for every user action
 - CardBrowseClient is a mess and is using deprecated Grid
 - Find deprecated uses of PaperProps and Grid
-- Tech debt in API: const allMatchingSets = await findSetsByQuery(fastify, whereClause, orderClause, 10000, 0, select); <-- will break if more than 10000 sets
-- I see a limit of 100000 in the API too
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - Every file needs to follow the code style I established in SetItemRenderer.tsx and browse/page.tsx
 - Minor: prefetch leads to page 2 being loaded when a user invalidates the collection tag, it's a prefetch subscription issue in RTK Query, dev team is aware, no current fix, just bad workarounds, page one still loads on visit, so it's fine
@@ -153,6 +151,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Consider removing skeleton loaders from set gallery and experiment with masonry instead of virtuoso
 - I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
 - Audit consistency of naming of fields returned by API for totalCount and values.
+- Need a full postman library of my API calls, these should live with api docs
 
 ## Future Feature Work
 
