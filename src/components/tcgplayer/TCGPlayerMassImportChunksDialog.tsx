@@ -88,8 +88,8 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
       <StyledDialogContent>
         <InfoBox>
           <Typography variant="body2" color="textSecondary" paragraph>
-            TCGPlayer's mass entry feature has a limit of approximately 1000-2000 cards per entry. To prevent crashes,
-            we've split your {totalCards} cards into {totalChunks} separate entries.
+            TCGPlayer's mass entry feature has issues dealing with over 1000 cards at once. To prevent crashes, we've
+            split your {totalCards} cards into {totalChunks} separate entries.
           </Typography>
           <Typography variant="body2" color="textSecondary">
             Click each button below to open a new TCGPlayer tab with that batch of cards. You can submit multiple

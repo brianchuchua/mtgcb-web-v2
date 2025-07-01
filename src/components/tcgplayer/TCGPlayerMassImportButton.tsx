@@ -10,6 +10,7 @@ import { usePriceType } from '@/hooks/usePriceType';
 import { getFormTarget } from '@/utils/browser/detectSafari';
 import { formatMassImportString, CardWithQuantity } from '@/utils/tcgplayer/formatMassImportString';
 import TCGPlayerMassImportChunksDialog from './TCGPlayerMassImportChunksDialog';
+import { useLazyGetGoalQuery } from '@/api/goals/goalsApi';
 
 interface TCGPlayerMassImportButtonProps extends Omit<ButtonProps, 'onClick'> {
   setId: string;
@@ -37,6 +38,7 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
   const [showChunksDialog, setShowChunksDialog] = useState(false);
   const [cardsForChunking, setCardsForChunking] = useState<CardWithQuantity[]>([]);
   const priceType = usePriceType();
+  const [getGoal] = useLazyGetGoalQuery();
 
   const {
     fetchCards,
@@ -58,7 +60,16 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
     try {
       setLocalIsLoading(true);
 
-      const cards = await fetchCards();
+      // Fetch goal data if goalId is provided to check onePrintingPerPureName
+      let oneResultPerCardName = false;
+      if (userId && goalId) {
+        const goalResult = await getGoal({ userId, goalId });
+        if (goalResult.data?.data?.onePrintingPerPureName) {
+          oneResultPerCardName = true;
+        }
+      }
+
+      const cards = await fetchCards(oneResultPerCardName);
 
       if (!cards || cards.length === 0) {
         // Show a softer message when user has collection context (already owns all cards)
@@ -114,6 +125,7 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
     userId,
     goalId,
     enqueueSnackbar,
+    getGoal,
   ]);
 
   const isLoading = isHookLoading || localIsLoading;

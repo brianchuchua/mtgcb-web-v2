@@ -6,8 +6,11 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Remaining Major Feature Work Before 1.0
 
+- Proper flavor name support
+- Left <> right set navigation
 - Art cards
 - Imports and exports (allow exporting from a specific set or whole collection)
+  - Request from Patron: Delver Lens or one that is csv all fields
 - Patron support features
 - Privacy mode
 - Cards page
@@ -19,7 +22,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - In-code TODO audit
 - Feature parity audit
 - Audit routes that require authentication
-- Left <> right set navigation
 - Most valuable card collected, maybe in the set header
 - Handle double-sided, sideways, and flip cards
 - Art Series cards

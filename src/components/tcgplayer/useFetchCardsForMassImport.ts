@@ -31,7 +31,7 @@ export const useFetchCardsForMassImport = ({
   const [getSets, { isLoading: isLoadingSets, error: setsError }] = useLazyGetSetsQuery();
   const [getCards, { isLoading: isLoadingCards, error: cardsError }] = useLazyGetCardsQuery();
 
-  const fetchCards = useCallback(async () => {
+  const fetchCards = useCallback(async (oneResultPerCardName = false) => {
     setIsProcessing(true);
 
     try {
@@ -78,6 +78,8 @@ export const useFetchCardsForMassImport = ({
             ...(userId && { userId }),
             ...(userId && goalId && { goalId }),
             ...(userId && { priceType }),
+            // Add oneResultPerCardName if requested
+            ...(oneResultPerCardName && { oneResultPerCardName: true }),
           },
           true, // Force refetch
         );
