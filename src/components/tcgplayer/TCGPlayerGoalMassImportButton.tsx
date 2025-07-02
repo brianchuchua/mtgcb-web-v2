@@ -11,6 +11,9 @@ import { getFormTarget } from '@/utils/browser/detectSafari';
 import { formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
 import { CardWithQuantity } from '@/utils/tcgplayer/formatMassImportString';
 import TCGPlayerMassImportChunksDialog from './TCGPlayerMassImportChunksDialog';
+import TCGPlayerSplitByFinishDialog from './TCGPlayerSplitByFinishDialog';
+import TCGPlayerSplitByFinishChunksDialog from './TCGPlayerSplitByFinishChunksDialog';
+import TCGPlayerFoilOnlyDialog from './TCGPlayerFoilOnlyDialog';
 
 interface TCGPlayerGoalMassImportButtonProps extends Omit<ButtonProps, 'onClick'> {
   setId: string | 'all';
@@ -33,6 +36,12 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
   const [isLoading, setIsLoading] = useState(false);
   const [showChunksDialog, setShowChunksDialog] = useState(false);
   const [cardsForChunking, setCardsForChunking] = useState<CardWithQuantity[]>([]);
+  const [showSplitByFinishDialog, setShowSplitByFinishDialog] = useState(false);
+  const [showSplitByFinishChunksDialog, setShowSplitByFinishChunksDialog] = useState(false);
+  const [regularCardsForSplit, setRegularCardsForSplit] = useState<CardWithQuantity[]>([]);
+  const [foilCardsForSplit, setFoilCardsForSplit] = useState<CardWithQuantity[]>([]);
+  const [showFoilOnlyDialog, setShowFoilOnlyDialog] = useState(false);
+  const [isFoilOnlyImport, setIsFoilOnlyImport] = useState(false);
   const priceType = usePriceType();
   const [getCards] = useLazyGetCardsQuery();
   const [getSets] = useLazyGetSetsQuery();
@@ -135,6 +144,10 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
 
       // Filter cards that need to be purchased for the goal
       const cardsNeededForGoal: CardWithQuantity[] = [];
+      const regularCardsNeeded: CardWithQuantity[] = [];
+      const foilCardsNeeded: CardWithQuantity[] = [];
+      let hasRegularNeeds = false;
+      let hasFoilNeeds = false;
 
       allCards.forEach((card) => {
         // Skip cards that are fully met for the goal
@@ -143,8 +156,6 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
         }
 
         // Calculate the total needed quantity
-        // TCGPlayer mass import doesn't distinguish between regular and foil,
-        // so we need to sum up the needs
         // Goals can specify either:
         // 1. Specific regular/foil needs (goalRegNeeded + goalFoilNeeded)
         // 2. Any type needs (goalAllNeeded)
@@ -152,18 +163,45 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
         const foilNeeded = card.goalFoilNeeded || 0;
         const allNeeded = card.goalAllNeeded || 0;
 
-        // Use goalAllNeeded if specified, otherwise sum regular and foil
-        const totalNeeded = allNeeded > 0 ? allNeeded : regNeeded + foilNeeded;
-
-        if (totalNeeded > 0) {
+        // If goal specifies "any" type needs, we'll treat them as regular for simplicity
+        if (allNeeded > 0) {
           cardsNeededForGoal.push({
             ...card,
-            neededQuantity: totalNeeded,
+            neededQuantity: allNeeded,
           });
+        } else {
+          // Goal specifies specific regular/foil needs
+          if (regNeeded > 0) {
+            hasRegularNeeds = true;
+            regularCardsNeeded.push({
+              ...card,
+              neededQuantity: regNeeded,
+            });
+          }
+          if (foilNeeded > 0) {
+            hasFoilNeeds = true;
+            foilCardsNeeded.push({
+              ...card,
+              neededQuantity: foilNeeded,
+            });
+          }
         }
       });
 
-      if (cardsNeededForGoal.length === 0) {
+      // If we have both regular and foil needs, we need to split them
+      const needsSplitByFinish = hasRegularNeeds && hasFoilNeeds;
+      const isFoilOnly = hasFoilNeeds && !hasRegularNeeds;
+      
+      // Combine all cards if we're not splitting by finish
+      if (!needsSplitByFinish) {
+        cardsNeededForGoal.push(...regularCardsNeeded, ...foilCardsNeeded);
+      }
+
+      const totalCardsNeeded = needsSplitByFinish 
+        ? regularCardsNeeded.length + foilCardsNeeded.length 
+        : cardsNeededForGoal.length;
+
+      if (totalCardsNeeded === 0) {
         enqueueSnackbar(
           setId === 'all'
             ? 'You already have all the cards needed for this goal!'
@@ -173,15 +211,41 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
         return;
       }
 
-      // Check if we need to chunk the cards
-      if (cardsNeededForGoal.length > 1000) {
-        setCardsForChunking(cardsNeededForGoal);
-        setShowChunksDialog(true);
+      // Determine which dialog to show based on the needs
+      if (needsSplitByFinish) {
+        // Need to split by finish
+        setRegularCardsForSplit(regularCardsNeeded);
+        setFoilCardsForSplit(foilCardsNeeded);
+        
+        // Check if either regular or foil cards exceed 1000
+        if (regularCardsNeeded.length > 1000 || foilCardsNeeded.length > 1000) {
+          setShowSplitByFinishChunksDialog(true);
+        } else {
+          setShowSplitByFinishDialog(true);
+        }
+      } else if (isFoilOnly) {
+        // Foil-only import
+        setIsFoilOnlyImport(true);
+        if (cardsNeededForGoal.length > 1000) {
+          // For large foil-only orders, use chunks dialog but mark as foil-only
+          setCardsForChunking(cardsNeededForGoal);
+          setShowChunksDialog(true);
+        } else {
+          // For small foil-only orders, show the foil reminder dialog
+          setFoilCardsForSplit(cardsNeededForGoal);
+          setShowFoilOnlyDialog(true);
+        }
       } else {
-        // Submit immediately for 1000 or fewer cards
-        const importString = formatMassImportString(cardsNeededForGoal, 1, false);
-        const formTarget = getFormTarget();
-        submitToTCGPlayer(importString, formTarget);
+        // Regular cards only or "any" type cards
+        if (cardsNeededForGoal.length > 1000) {
+          setCardsForChunking(cardsNeededForGoal);
+          setShowChunksDialog(true);
+        } else {
+          // Submit immediately for 1000 or fewer cards
+          const importString = formatMassImportString(cardsNeededForGoal, 1, false);
+          const formTarget = getFormTarget();
+          submitToTCGPlayer(importString, formTarget);
+        }
       }
     } catch (error) {
       enqueueSnackbar('There was an error preparing your card list. Please try again.', { variant: 'error' });
@@ -209,8 +273,32 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
       
       <TCGPlayerMassImportChunksDialog
         open={showChunksDialog}
-        onClose={() => setShowChunksDialog(false)}
+        onClose={() => {
+          setShowChunksDialog(false);
+          setIsFoilOnlyImport(false);
+        }}
         cards={cardsForChunking}
+        isFoilOnly={isFoilOnlyImport}
+      />
+      
+      <TCGPlayerSplitByFinishDialog
+        open={showSplitByFinishDialog}
+        onClose={() => setShowSplitByFinishDialog(false)}
+        regularCards={regularCardsForSplit}
+        foilCards={foilCardsForSplit}
+      />
+      
+      <TCGPlayerSplitByFinishChunksDialog
+        open={showSplitByFinishChunksDialog}
+        onClose={() => setShowSplitByFinishChunksDialog(false)}
+        regularCards={regularCardsForSplit}
+        foilCards={foilCardsForSplit}
+      />
+      
+      <TCGPlayerFoilOnlyDialog
+        open={showFoilOnlyDialog}
+        onClose={() => setShowFoilOnlyDialog(false)}
+        foilCards={foilCardsForSplit}
       />
     </>
   );

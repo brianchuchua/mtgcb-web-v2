@@ -12,6 +12,7 @@ interface TCGPlayerMassImportChunksDialogProps {
   onClose: () => void;
   cards: CardWithQuantity[];
   chunkSize?: number;
+  isFoilOnly?: boolean;
 }
 
 const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
@@ -37,6 +38,7 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
   onClose,
   cards,
   chunkSize = 1000,
+  isFoilOnly = false,
 }) => {
   const { submitToTCGPlayer } = useTCGPlayer();
   const [submittedChunks, setSubmittedChunks] = useState<Set<number>>(new Set());
@@ -95,6 +97,12 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
             Click each button below to open a new TCGPlayer tab with that batch of cards. You can submit multiple
             batches by clicking multiple buttons.
           </Typography>
+          {isFoilOnly && (
+            <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
+              <strong>Important:</strong> These are foil cards. After importing each batch, under "Item Options" 
+              in TCGPlayer, choose "Foil" for the printing.
+            </Typography>
+          )}
         </InfoBox>
 
         <Typography variant="subtitle2" color="textSecondary" gutterBottom>
@@ -148,6 +156,21 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
         >
           {submittedChunks.size > 0 && `${submittedChunks.size} of ${totalChunks} batches submitted`}
         </Typography>
+        
+        {isFoilOnly && (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{
+              display: 'block',
+              textAlign: 'center',
+              mt: 2,
+              fontStyle: 'italic',
+            }}
+          >
+            Don't forget: Under "Item Options" in TCGPlayer, choose "Foil" for the printing.
+          </Typography>
+        )}
       </StyledDialogContent>
 
       <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
