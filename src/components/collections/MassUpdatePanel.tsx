@@ -144,6 +144,20 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
     quantityReg: 0,
     quantityFoil: 0,
   });
+  
+  // Reset form when panel is closed
+  React.useEffect(() => {
+    if (!isOpen) {
+      // Reset to default values
+      setUiMode('set');
+      setFormData({
+        mode: 'set',
+        rarity: 'all',
+        quantityReg: 0,
+        quantityFoil: 0,
+      });
+    }
+  }, [isOpen]);
 
   const handleModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newMode = event.target.value as FormMode;
