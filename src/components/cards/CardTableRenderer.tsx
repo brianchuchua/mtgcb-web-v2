@@ -297,6 +297,21 @@ const TableQuantityInput = styled(TextField)(({ theme }) => ({
       borderColor: theme.palette.primary.main,
       borderWidth: 1,
     },
+    '&.Mui-disabled fieldset': {
+      borderColor: theme.palette.divider,
+    },
+    '&.Mui-error fieldset': {
+      borderColor: theme.palette.error.main,
+    },
+    '&.Mui-error:hover fieldset': {
+      borderColor: theme.palette.error.main,
+    },
+    '&.Mui-error.Mui-focused fieldset': {
+      borderColor: theme.palette.error.main,
+    },
+    '&.Mui-error.Mui-disabled fieldset': {
+      borderColor: theme.palette.error.main,
+    },
   },
   '& input[type="number"]::-webkit-inner-spin-button, & input[type="number"]::-webkit-outer-spin-button': {
     WebkitAppearance: 'none',
@@ -307,16 +322,21 @@ const TableQuantityInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const TableQuantityButton = styled(IconButton)(({ theme }) => ({
+const TableQuantityButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== '$error',
+})<{ $error?: boolean }>(({ theme, $error }) => ({
   padding: '2px',
   width: '24px',
   height: '24px',
   borderRadius: 0,
-  border: `1px solid ${theme.palette.divider}`,
+  border: `1px solid ${$error ? theme.palette.error.main : theme.palette.divider}`,
   transition: 'border-color 0.2s, background-color 0.2s',
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
-    borderColor: theme.palette.divider,
+    borderColor: $error ? theme.palette.error.main : theme.palette.divider,
+  },
+  '&.Mui-disabled': {
+    borderColor: $error ? theme.palette.error.main : theme.palette.divider,
   },
   '& .MuiSvgIcon-root': {
     fontSize: '0.875rem',
@@ -342,7 +362,9 @@ const InlineEditableQuantity: React.FC<{
   quantity: number;
   quantityType: 'regular' | 'foil';
   otherQuantity?: number; // The other quantity (foil if editing regular, regular if editing foil)
-}> = ({ cardId, cardName, quantity, quantityType, otherQuantity = 0 }) => {
+  canBeFoil?: boolean;
+  canBeNonFoil?: boolean;
+}> = ({ cardId, cardName, quantity, quantityType, otherQuantity = 0, canBeFoil = true, canBeNonFoil = true }) => {
   const [localQuantity, setLocalQuantity] = useState(quantity);
   const [inputValue, setInputValue] = useState(quantity.toString());
   const [updateCollection] = useUpdateCollectionMutation();
@@ -350,6 +372,12 @@ const InlineEditableQuantity: React.FC<{
   const updatePromiseRef = useRef<{ abort: () => void } | null>(null);
   const isUserEditingRef = useRef(false);
   const editingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Determine if this quantity selector should be disabled
+  const isDisabled = quantityType === 'regular' ? !canBeNonFoil : !canBeFoil;
+  
+  // Determine if this selector has an error (disabled but non-zero quantity)
+  const hasError = isDisabled && localQuantity > 0;
   
   // Cleanup on unmount
   useEffect(() => {
@@ -502,43 +530,63 @@ const InlineEditableQuantity: React.FC<{
     debouncedUpdate(newQuantity);
   };
 
+  // Determine tooltip message
+  const tooltipMessage = isDisabled
+    ? hasError
+      ? `This card doesn't come in ${quantityType === 'regular' ? 'non-foil' : 'foil'}. You can only reduce the quantity.`
+      : `This card doesn't come in ${quantityType === 'regular' ? 'non-foil' : 'foil'}.`
+    : '';
+
   return (
-    <TableQuantityContainer>
-      <TableLeftButton
-        size="small"
-        onMouseDown={(e) => {
-          e.preventDefault();
-          handleDecrement(e);
-        }}
-        disabled={localQuantity === 0}
-        tabIndex={-1}
-        disableFocusRipple
-      >
-        <RemoveIcon />
-      </TableLeftButton>
-      <TableQuantityInput
-        type="number"
-        value={inputValue}
-        onChange={handleInputChange}
-        onBlur={handleInputBlur}
-        onFocus={handleInputFocus}
-        onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
-        inputProps={{ min: 0 }}
-        variant="outlined"
-        size="small"
-      />
-      <TableRightButton
-        size="small"
-        onMouseDown={(e) => {
-          e.preventDefault();
-          handleIncrement(e);
-        }}
-        tabIndex={-1}
-        disableFocusRipple
-      >
-        <AddIcon />
-      </TableRightButton>
-    </TableQuantityContainer>
+    <Tooltip
+      title={tooltipMessage}
+      placement="top"
+      disableHoverListener={!isDisabled}
+      disableFocusListener={!isDisabled}
+      disableTouchListener={!isDisabled}
+    >
+      <TableQuantityContainer>
+        <TableLeftButton
+          size="small"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleDecrement(e);
+          }}
+          disabled={localQuantity === 0}
+          tabIndex={-1}
+          disableFocusRipple
+          $error={hasError}
+        >
+          <RemoveIcon />
+        </TableLeftButton>
+        <TableQuantityInput
+          type="number"
+          value={inputValue}
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          onFocus={handleInputFocus}
+          onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
+          inputProps={{ min: 0 }}
+          variant="outlined"
+          size="small"
+          disabled={isDisabled}
+          error={hasError}
+        />
+        <TableRightButton
+          size="small"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleIncrement(e);
+          }}
+          tabIndex={-1}
+          disableFocusRipple
+          disabled={isDisabled}
+          $error={hasError}
+        >
+          <AddIcon />
+        </TableRightButton>
+      </TableQuantityContainer>
+    </Tooltip>
   );
 };
 
@@ -807,6 +855,8 @@ export const useCardRowRenderer = (
                     quantity={card.quantityReg || 0}
                     quantityType="regular"
                     otherQuantity={card.quantityFoil || 0}
+                    canBeFoil={card.canBeFoil}
+                    canBeNonFoil={card.canBeNonFoil}
                   />
                 </Box>
                 <GoalStatusTableCell card={card as any} goalType="regular" />
@@ -818,6 +868,8 @@ export const useCardRowRenderer = (
                 quantity={card.quantityReg || 0}
                 quantityType="regular"
                 otherQuantity={card.quantityFoil || 0}
+                canBeFoil={card.canBeFoil}
+                canBeNonFoil={card.canBeNonFoil}
               />
             )}
           </TableCell>,
@@ -835,6 +887,8 @@ export const useCardRowRenderer = (
                     quantity={card.quantityFoil || 0}
                     quantityType="foil"
                     otherQuantity={card.quantityReg || 0}
+                    canBeFoil={card.canBeFoil}
+                    canBeNonFoil={card.canBeNonFoil}
                   />
                 </Box>
                 <GoalStatusTableCell card={card as any} goalType="foil" />
@@ -846,6 +900,8 @@ export const useCardRowRenderer = (
                 quantity={card.quantityFoil || 0}
                 quantityType="foil"
                 otherQuantity={card.quantityReg || 0}
+                canBeFoil={card.canBeFoil}
+                canBeNonFoil={card.canBeNonFoil}
               />
             )}
           </TableCell>,

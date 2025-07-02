@@ -2,7 +2,7 @@
 
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { Box, IconButton, TextField, Typography, styled } from '@mui/material';
+import { Box, IconButton, TextField, Tooltip, Typography, styled } from '@mui/material';
 import debounce from 'lodash.debounce';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -58,6 +58,21 @@ const QuantityInput = styled(TextField)(({ theme }) => ({
       borderColor: theme.palette.primary.main,
       borderWidth: 1,
     },
+    '&.Mui-disabled fieldset': {
+      borderColor: theme.palette.divider,
+    },
+    '&.Mui-error fieldset': {
+      borderColor: theme.palette.error.main,
+    },
+    '&.Mui-error:hover fieldset': {
+      borderColor: theme.palette.error.main,
+    },
+    '&.Mui-error.Mui-focused fieldset': {
+      borderColor: theme.palette.error.main,
+    },
+    '&.Mui-error.Mui-disabled fieldset': {
+      borderColor: theme.palette.error.main,
+    },
   },
   '& input[type="number"]::-webkit-inner-spin-button, & input[type="number"]::-webkit-outer-spin-button': {
     WebkitAppearance: 'none',
@@ -68,16 +83,21 @@ const QuantityInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const QuantityButton = styled(IconButton)(({ theme }) => ({
+const QuantityButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== '$error',
+})<{ $error?: boolean }>(({ theme, $error }) => ({
   padding: theme.spacing(1),
   width: '35px',
   borderRadius: 0,
-  border: `1px solid ${theme.palette.divider}`,
+  border: `1px solid ${$error ? theme.palette.error.main : theme.palette.divider}`,
   backgroundColor: theme.palette.background.paper,
   transition: 'border-color 0.2s, background-color 0.2s',
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
-    borderColor: theme.palette.divider,
+    borderColor: $error ? theme.palette.error.main : theme.palette.divider,
+  },
+  '&.Mui-disabled': {
+    borderColor: $error ? theme.palette.error.main : theme.palette.divider,
   },
   '& .MuiSvgIcon-root': {
     fontSize: '1.1rem',
@@ -101,6 +121,8 @@ interface EditableCardQuantityProps {
   cardName: string;
   quantityReg: number;
   quantityFoil: number;
+  canBeNonFoil?: boolean;
+  canBeFoil?: boolean;
 }
 
 export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
@@ -108,6 +130,8 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   cardName,
   quantityReg,
   quantityFoil,
+  canBeNonFoil = true,
+  canBeFoil = true,
 }) => {
   const [localQuantityReg, setLocalQuantityReg] = useState(quantityReg);
   const [localQuantityFoil, setLocalQuantityFoil] = useState(quantityFoil);
@@ -284,6 +308,10 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
     event.currentTarget.select();
   };
 
+  // Determine error states
+  const regularHasError = !canBeNonFoil && localQuantityReg > 0;
+  const foilHasError = !canBeFoil && localQuantityFoil > 0;
+
   return (
     <Box 
       display="flex" 
@@ -299,17 +327,25 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         },
       }}
     >
-      <QuantityContainer>
-        <LeftButton
-          size="small"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleDecrement('regular', e);
-          }}
-          disabled={localQuantityReg === 0}
-          tabIndex={-1}
-          disableFocusRipple
-        >
+      <Tooltip 
+        title={!canBeNonFoil ? (regularHasError ? "This card doesn't come in non-foil. You can only reduce the quantity." : "This card doesn't come in non-foil.") : ""}
+        placement="top"
+        disableHoverListener={canBeNonFoil}
+        disableFocusListener={canBeNonFoil}
+        disableTouchListener={canBeNonFoil}
+      >
+        <QuantityContainer>
+          <LeftButton
+            size="small"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleDecrement('regular', e);
+            }}
+            disabled={localQuantityReg === 0}
+            tabIndex={-1}
+            disableFocusRipple
+            $error={regularHasError}
+          >
           <RemoveIcon />
         </LeftButton>
         <QuantityInput
@@ -324,6 +360,8 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           size="small"
           label="Regular"
           InputLabelProps={{ shrink: true }}
+          disabled={!canBeNonFoil}
+          error={regularHasError}
         />
         <RightButton
           size="small"
@@ -333,22 +371,33 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           }}
           tabIndex={-1}
           disableFocusRipple
+          disabled={!canBeNonFoil}
+          $error={regularHasError}
         >
           <AddIcon />
-        </RightButton>
-      </QuantityContainer>
+          </RightButton>
+        </QuantityContainer>
+      </Tooltip>
 
-      <QuantityContainer>
-        <LeftButton
-          size="small"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleDecrement('foil', e);
-          }}
-          disabled={localQuantityFoil === 0}
-          tabIndex={-1}
-          disableFocusRipple
-        >
+      <Tooltip 
+        title={!canBeFoil ? (foilHasError ? "This card doesn't come in foil. You can only reduce the quantity." : "This card doesn't come in foil.") : ""}
+        placement="top"
+        disableHoverListener={canBeFoil}
+        disableFocusListener={canBeFoil}
+        disableTouchListener={canBeFoil}
+      >
+        <QuantityContainer>
+          <LeftButton
+            size="small"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleDecrement('foil', e);
+            }}
+            disabled={localQuantityFoil === 0}
+            tabIndex={-1}
+            disableFocusRipple
+            $error={foilHasError}
+          >
           <RemoveIcon />
         </LeftButton>
         <QuantityInput
@@ -363,6 +412,8 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           size="small"
           label="Foils"
           InputLabelProps={{ shrink: true }}
+          disabled={!canBeFoil}
+          error={foilHasError}
         />
         <RightButton
           size="small"
@@ -372,10 +423,13 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           }}
           tabIndex={-1}
           disableFocusRipple
+          disabled={!canBeFoil}
+          $error={foilHasError}
         >
           <AddIcon />
-        </RightButton>
-      </QuantityContainer>
+          </RightButton>
+        </QuantityContainer>
+      </Tooltip>
     </Box>
   );
 };

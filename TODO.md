@@ -34,6 +34,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - verify default visibility for set boxes and card box fields
 - Can be foil cannot be foil
   - integrate with quantity updating, warnings next to existing bad data
+  - clean up data, scryfall gets all of the rainbow foil stuff wrong, I manually split those, need to patch and prevent bad future data
   - integrate with custom collection goals
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
@@ -45,8 +46,9 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Other Action Items
 
+- support better rendering of which variants of cards exist in searches when limiting one copy per card name, maybe
+- Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
 - numberOfCardsInMagic in API coming back isn't always right, see http://local.mtgcb.com:3000/collections/1337/surprise-slivers?goalId=16&includeSets=1056
-- Rewrite price updater, had to increase dyno size recently, do a quick refactor and modernization, then scale back down to a smaller dyno
 - Setting to change going mythic to plain green progress bars
 - Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
 - Remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
@@ -184,7 +186,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Production Checklist
 
-- Integration with Sonarcloud (open source the repo)
+- Integration with Sonarcloud (open source the repo, make development easy for new devs)
 - Integration with Sentry
 - Integration with Google Analytics
 - Load testing
@@ -197,6 +199,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - UX - Must test rendering of input fields on native devices
 - Verify parameter edge cases, minimums and maximums
 - Audit field length limits
+- Adequate feature testing
 
 ## Nice to Have
 

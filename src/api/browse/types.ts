@@ -39,6 +39,8 @@ export interface CardModel {
     } | null;
   };
   releaseDate: string | null;
+  canBeFoil?: boolean;
+  canBeNonFoil?: boolean;
   // Collection quantities (only present when userId is provided)
   quantityReg?: number;
   quantityFoil?: number;

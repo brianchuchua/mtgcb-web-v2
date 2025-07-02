@@ -63,6 +63,9 @@ export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
     // Cross-set goal tracking fields
     goalMetByOtherSets: card.goalMetByOtherSets,
     goalContributingVersions: card.goalContributingVersions,
+    // Card capabilities
+    canBeFoil: card.canBeFoil,
+    canBeNonFoil: card.canBeNonFoil,
   }));
 };
 

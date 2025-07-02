@@ -63,8 +63,8 @@ export const useFetchCardsForMassImport = ({
         const cardsResult = await getCards(
           {
             select: userId 
-              ? ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode', 'quantityReg', 'quantityFoil']
-              : ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode'],
+              ? ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode', 'quantityReg', 'quantityFoil', 'canBeFoil', 'canBeNonFoil']
+              : ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode', 'canBeFoil', 'canBeNonFoil'],
             limit,
             offset,
             setId: {

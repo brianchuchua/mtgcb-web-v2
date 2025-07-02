@@ -14,6 +14,7 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
   Typography,
   debounce,
   styled,
@@ -328,6 +329,8 @@ const EditCardsClient: React.FC = () => {
                 setEditMode={setEditMode}
                 handleSave={handleSave}
                 isUpdating={isUpdating}
+                canBeNonFoil={selectedCard.card.canBeNonFoil}
+                canBeFoil={selectedCard.card.canBeFoil}
               />
             </QuantityEditorSection>
           </>
@@ -616,6 +619,8 @@ interface QuantityEditorProps {
   setEditMode: (mode: EditMode) => void;
   handleSave: () => void;
   isUpdating: boolean;
+  canBeNonFoil?: boolean;
+  canBeFoil?: boolean;
 }
 
 const QuantityEditor: React.FC<QuantityEditorProps> = ({
@@ -628,7 +633,44 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
   setEditMode,
   handleSave,
   isUpdating,
+  canBeNonFoil = true,
+  canBeFoil = true,
 }) => {
+  // Determine error states based on edit mode
+  const regularHasError = !canBeNonFoil && (
+    (editMode === 'set' && quantityRegular > 0) ||
+    (editMode === 'increment' && quantityRegular > 0) ||
+    (editMode === 'decrement' && currentQuantities.regular > 0)
+  );
+  
+  const foilHasError = !canBeFoil && (
+    (editMode === 'set' && quantityFoil > 0) ||
+    (editMode === 'increment' && quantityFoil > 0) ||
+    (editMode === 'decrement' && currentQuantities.foil > 0)
+  );
+
+  // Get contextual tooltip messages
+  const getTooltipMessage = (type: 'regular' | 'foil', hasError: boolean) => {
+    const cardType = type === 'regular' ? 'non-foil' : 'foil';
+    
+    if (type === 'regular' ? !canBeNonFoil : !canBeFoil) {
+      if (!hasError) {
+        return `This card doesn't come in ${cardType}.`;
+      }
+      
+      switch (editMode) {
+        case 'set':
+          return `This card doesn't come in ${cardType}. You can only set to 0.`;
+        case 'increment':
+          return `This card doesn't come in ${cardType}. You cannot add any.`;
+        case 'decrement':
+          return `This card doesn't come in ${cardType}. You can only remove existing cards.`;
+      }
+    }
+    
+    return '';
+  };
+
   const getQuantityLabel = (type: 'Regular' | 'Foils', current: number, input: number) => {
     if (editMode === 'increment') {
       const newValue = current + input;
@@ -660,48 +702,61 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, textAlign: 'center' }}>
             {getQuantityLabel('Regular', currentQuantities.regular, quantityRegular)}
           </Typography>
-          <QuantityContainer>
-            <QuantityLeftButton
-              size="small"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.currentTarget.blur();
-                setQuantityRegular(Math.max(0, quantityRegular - 1));
-              }}
-              disabled={quantityRegular === 0}
-              tabIndex={-1}
-              disableFocusRipple
-            >
-              <RemoveIcon />
-            </QuantityLeftButton>
-            <QuantityInput
-              type="number"
-              value={quantityRegular}
-              onChange={(e) => setQuantityRegular(Math.max(0, parseInt(e.target.value) || 0))}
-              inputProps={{ min: 0 }}
-              autoFocus
-              onFocus={(e) => e.target.select()}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleSave();
-                }
-              }}
-              variant="outlined"
-              size="small"
-            />
-            <QuantityRightButton
-              size="small"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.currentTarget.blur();
-                setQuantityRegular(quantityRegular + 1);
-              }}
-              tabIndex={-1}
-              disableFocusRipple
-            >
-              <AddIcon />
-            </QuantityRightButton>
-          </QuantityContainer>
+          <Tooltip
+            title={getTooltipMessage('regular', regularHasError)}
+            placement="top"
+            disableHoverListener={!getTooltipMessage('regular', regularHasError)}
+            disableFocusListener={!getTooltipMessage('regular', regularHasError)}
+            disableTouchListener={!getTooltipMessage('regular', regularHasError)}
+          >
+            <QuantityContainer>
+              <QuantityLeftButton
+                size="small"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.blur();
+                  setQuantityRegular(Math.max(0, quantityRegular - 1));
+                }}
+                disabled={quantityRegular === 0 || (editMode === 'increment' && !canBeNonFoil)}
+                tabIndex={-1}
+                disableFocusRipple
+                $error={regularHasError}
+              >
+                <RemoveIcon />
+              </QuantityLeftButton>
+              <QuantityInput
+                type="number"
+                value={quantityRegular}
+                onChange={(e) => setQuantityRegular(Math.max(0, parseInt(e.target.value) || 0))}
+                inputProps={{ min: 0 }}
+                autoFocus
+                onFocus={(e) => e.target.select()}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSave();
+                  }
+                }}
+                variant="outlined"
+                size="small"
+                disabled={!canBeNonFoil && editMode !== 'decrement'}
+                error={regularHasError}
+              />
+              <QuantityRightButton
+                size="small"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.blur();
+                  setQuantityRegular(quantityRegular + 1);
+                }}
+                tabIndex={-1}
+                disableFocusRipple
+                disabled={!canBeNonFoil && editMode !== 'decrement'}
+                $error={regularHasError}
+              >
+                <AddIcon />
+              </QuantityRightButton>
+            </QuantityContainer>
+          </Tooltip>
         </Box>
       </Grid>
       <Grid item xs={6}>
@@ -709,47 +764,60 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, textAlign: 'center' }}>
             {getQuantityLabel('Foils', currentQuantities.foil, quantityFoil)}
           </Typography>
-          <QuantityContainer>
-            <QuantityLeftButton
-              size="small"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.currentTarget.blur();
-                setQuantityFoil(Math.max(0, quantityFoil - 1));
-              }}
-              disabled={quantityFoil === 0}
-              tabIndex={-1}
-              disableFocusRipple
-            >
-              <RemoveIcon />
-            </QuantityLeftButton>
-            <QuantityInput
-              type="number"
-              value={quantityFoil}
-              onChange={(e) => setQuantityFoil(Math.max(0, parseInt(e.target.value) || 0))}
-              inputProps={{ min: 0 }}
-              onFocus={(e) => e.target.select()}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleSave();
-                }
-              }}
-              variant="outlined"
-              size="small"
-            />
-            <QuantityRightButton
-              size="small"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                e.currentTarget.blur();
-                setQuantityFoil(quantityFoil + 1);
-              }}
-              tabIndex={-1}
-              disableFocusRipple
-            >
-              <AddIcon />
-            </QuantityRightButton>
-          </QuantityContainer>
+          <Tooltip
+            title={getTooltipMessage('foil', foilHasError)}
+            placement="top"
+            disableHoverListener={!getTooltipMessage('foil', foilHasError)}
+            disableFocusListener={!getTooltipMessage('foil', foilHasError)}
+            disableTouchListener={!getTooltipMessage('foil', foilHasError)}
+          >
+            <QuantityContainer>
+              <QuantityLeftButton
+                size="small"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.blur();
+                  setQuantityFoil(Math.max(0, quantityFoil - 1));
+                }}
+                disabled={quantityFoil === 0 || (editMode === 'increment' && !canBeFoil)}
+                tabIndex={-1}
+                disableFocusRipple
+                $error={foilHasError}
+              >
+                <RemoveIcon />
+              </QuantityLeftButton>
+              <QuantityInput
+                type="number"
+                value={quantityFoil}
+                onChange={(e) => setQuantityFoil(Math.max(0, parseInt(e.target.value) || 0))}
+                inputProps={{ min: 0 }}
+                onFocus={(e) => e.target.select()}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSave();
+                  }
+                }}
+                variant="outlined"
+                size="small"
+                disabled={!canBeFoil && editMode !== 'decrement'}
+                error={foilHasError}
+              />
+              <QuantityRightButton
+                size="small"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.blur();
+                  setQuantityFoil(quantityFoil + 1);
+                }}
+                tabIndex={-1}
+                disableFocusRipple
+                disabled={!canBeFoil && editMode !== 'decrement'}
+                $error={foilHasError}
+              >
+                <AddIcon />
+              </QuantityRightButton>
+            </QuantityContainer>
+          </Tooltip>
         </Box>
       </Grid>
       <Grid item xs={12}>
@@ -899,6 +967,21 @@ const QuantityInput = styled(TextField)(({ theme }) => ({
       borderColor: theme.palette.primary.main,
       borderWidth: 1,
     },
+    '&.Mui-disabled fieldset': {
+      borderColor: theme.palette.divider,
+    },
+    '&.Mui-error fieldset': {
+      borderColor: theme.palette.error.main,
+    },
+    '&.Mui-error:hover fieldset': {
+      borderColor: theme.palette.error.main,
+    },
+    '&.Mui-error.Mui-focused fieldset': {
+      borderColor: theme.palette.error.main,
+    },
+    '&.Mui-error.Mui-disabled fieldset': {
+      borderColor: theme.palette.error.main,
+    },
   },
   '& input[type="number"]::-webkit-inner-spin-button, & input[type="number"]::-webkit-outer-spin-button': {
     WebkitAppearance: 'none',
@@ -910,20 +993,22 @@ const QuantityInput = styled(TextField)(({ theme }) => ({
   width: '100px',
 }));
 
-const QuantityButton = styled(IconButton)(({ theme }) => ({
+const QuantityButton = styled(IconButton, {
+  shouldForwardProp: (prop) => prop !== '$error',
+})<{ $error?: boolean }>(({ theme, $error }) => ({
   padding: '8px',
   height: '40px',
   width: '40px',
   borderRadius: 0,
-  border: `1px solid ${theme.palette.divider}`,
+  border: `1px solid ${$error ? theme.palette.error.main : theme.palette.divider}`,
   transition: 'all 0.2s',
   backgroundColor: theme.palette.background.paper,
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
-    borderColor: theme.palette.divider,
+    borderColor: $error ? theme.palette.error.main : theme.palette.divider,
   },
   '&.Mui-disabled': {
-    borderColor: theme.palette.divider,
+    borderColor: $error ? theme.palette.error.main : theme.palette.divider,
   },
   '& .MuiSvgIcon-root': {
     fontSize: '1.25rem',

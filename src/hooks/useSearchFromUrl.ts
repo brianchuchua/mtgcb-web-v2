@@ -42,6 +42,8 @@ export const useSearchFromUrl = () => {
         'mtgcbCollectorNumber',
         'rarity',
         'rarityNumeric',
+        'canBeFoil',
+        'canBeNonFoil',
       ],
       limit: pageSize,
       offset: (currentPage - 1) * pageSize,

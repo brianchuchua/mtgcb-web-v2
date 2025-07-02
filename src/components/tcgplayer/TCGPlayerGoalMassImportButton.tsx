@@ -106,6 +106,8 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
               'goalFoilNeeded',
               'goalAllNeeded',
               'goalFullyMet',
+              'canBeFoil',
+              'canBeNonFoil',
             ],
             limit,
             offset,

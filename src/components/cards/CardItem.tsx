@@ -53,6 +53,9 @@ export interface CardItemProps {
   // Collection quantities
   quantityReg?: number;
   quantityFoil?: number;
+  // Card capabilities
+  canBeFoil?: boolean;
+  canBeNonFoil?: boolean;
   // Goal progress fields
   goalTargetQuantityReg?: number;
   goalTargetQuantityFoil?: number;
@@ -108,6 +111,8 @@ const CardItemComponent = ({
   foil,
   quantityReg,
   quantityFoil,
+  canBeFoil,
+  canBeNonFoil,
   goalTargetQuantityReg,
   goalTargetQuantityFoil,
   goalTargetQuantityAll,
@@ -324,6 +329,8 @@ const CardItemComponent = ({
                 cardName={name}
                 quantityReg={quantityReg || 0}
                 quantityFoil={quantityFoil || 0}
+                canBeFoil={canBeFoil}
+                canBeNonFoil={canBeNonFoil}
               />
             </Box>
           )}

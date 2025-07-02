@@ -87,6 +87,8 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
       'toughnessNumeric',
       'loyaltyNumeric',
       'releaseDate',
+      'canBeFoil',
+      'canBeNonFoil',
     ];
     
     // Add quantity fields when userId is present

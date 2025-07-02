@@ -50,6 +50,8 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       'toughnessNumeric',
       'loyaltyNumeric',
       'releaseDate',
+      'canBeFoil',
+      'canBeNonFoil',
     ];
     
     // Add quantity fields when userId is present
