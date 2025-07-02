@@ -411,6 +411,24 @@ const MassUpdatePanel: React.FC<MassUpdatePanelProps> = ({ isOpen, onSubmit, onC
               {getActionDescription()}
             </Typography>
           </Box>
+          
+          {/* Warning about foil restrictions */}
+          {((uiMode === 'set' && (formData.quantityReg > 0 || formData.quantityFoil > 0)) ||
+            (uiMode === 'add' && (formData.quantityReg > 0 || formData.quantityFoil > 0))) && (
+            <Box
+              sx={{
+                mt: 1,
+                p: 1,
+                borderRadius: 1,
+                border: (theme) => `1px solid ${theme.palette.info.main}`,
+                backgroundColor: (theme) => theme.palette.info.light + '10',
+              }}
+            >
+              <Typography variant="caption" color="info.main" sx={{ display: 'block', textAlign: 'center' }}>
+                Note: Cards that don't exist in the selected version (foil/non-foil) will be skipped.
+              </Typography>
+            </Box>
+          )}
 
           {/* Action buttons */}
           <Stack direction="row" spacing={1} justifyContent="center">

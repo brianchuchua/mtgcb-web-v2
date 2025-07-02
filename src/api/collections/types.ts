@@ -118,7 +118,15 @@ export interface CollectionMassUpdateData {
     cardsUpdated: number;
     quantityReg: number;
     quantityFoil: number;
+    skippedDueToConstraints?: {
+      cannotBeFoil: number;
+      cannotBeNonFoil: number;
+    };
   }>;
+  totalSkipped?: {
+    cannotBeFoil: number;
+    cannotBeNonFoil: number;
+  };
 }
 
 export type CollectionMassUpdateResponse = ApiResponse<CollectionMassUpdateData>;

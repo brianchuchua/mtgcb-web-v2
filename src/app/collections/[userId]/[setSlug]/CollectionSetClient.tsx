@@ -210,9 +210,56 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       }).unwrap();
 
       if (response.success) {
-        enqueueSnackbar(`Successfully updated ${response.data?.updatedCards || 0} cards in ${set.name}`, {
-          variant: 'success',
-        });
+        const updatedCount = response.data?.updatedCards || 0;
+        const totalSkipped = response.data?.totalSkipped;
+        
+        // Special case: No cards could be updated
+        if (updatedCount === 0 && totalSkipped && (totalSkipped.cannotBeFoil > 0 || totalSkipped.cannotBeNonFoil > 0)) {
+          const skippedCount = totalSkipped.cannotBeFoil + totalSkipped.cannotBeNonFoil;
+          let message = `0 cards updated. All ${skippedCount} card${skippedCount !== 1 ? 's have' : ' has'} foil restrictions. `;
+          
+          // Add specific details
+          if (totalSkipped.cannotBeFoil > 0 && totalSkipped.cannotBeNonFoil > 0) {
+            message += `${totalSkipped.cannotBeFoil} card${totalSkipped.cannotBeFoil !== 1 ? 's' : ''} cannot be foil and ${totalSkipped.cannotBeNonFoil} card${totalSkipped.cannotBeNonFoil !== 1 ? 's' : ''} cannot be non-foil.`;
+          } else if (totalSkipped.cannotBeFoil > 0) {
+            message += `These card${totalSkipped.cannotBeFoil !== 1 ? 's don\'t' : ' doesn\'t'} exist in foil.`;
+          } else if (totalSkipped.cannotBeNonFoil > 0) {
+            message += `These card${totalSkipped.cannotBeNonFoil !== 1 ? 's don\'t' : ' doesn\'t'} exist in non-foil.`;
+          }
+          
+          enqueueSnackbar(message, { 
+            variant: 'warning',
+            autoHideDuration: 6000 // Display for 6 seconds
+          });
+        } else {
+          // Normal case: Some or all cards were updated
+          let message = `Successfully updated ${updatedCount} cards in ${set.name}`;
+          
+          // Add information about skipped cards if any
+          if (totalSkipped && (totalSkipped.cannotBeFoil > 0 || totalSkipped.cannotBeNonFoil > 0)) {
+            const skippedCount = totalSkipped.cannotBeFoil + totalSkipped.cannotBeNonFoil;
+            message += `. ${skippedCount} card${skippedCount !== 1 ? 's were' : ' was'} skipped: `;
+            
+            // Add specific details
+            if (totalSkipped.cannotBeFoil > 0 && totalSkipped.cannotBeNonFoil > 0) {
+              message += `${totalSkipped.cannotBeFoil} cannot be foil, ${totalSkipped.cannotBeNonFoil} cannot be non-foil.`;
+            } else if (totalSkipped.cannotBeFoil > 0) {
+              message += `${totalSkipped.cannotBeFoil} cannot be foil.`;
+            } else if (totalSkipped.cannotBeNonFoil > 0) {
+              message += `${totalSkipped.cannotBeNonFoil} cannot be non-foil.`;
+            }
+            
+            enqueueSnackbar(message, {
+              variant: 'warning',
+              autoHideDuration: 6000 // Display for 6 seconds
+            });
+          } else {
+            enqueueSnackbar(message, {
+              variant: 'success',
+            });
+          }
+        }
+        
         setIsMassUpdateOpen(false);
         setShowConfirmDialog(false);
         setMassUpdateFormData(null);
