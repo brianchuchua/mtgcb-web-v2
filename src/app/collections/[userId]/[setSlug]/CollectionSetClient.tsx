@@ -330,9 +330,9 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             uniquePrintingsCollectedInSet: set.uniquePrintingsCollectedInSet || 0,
             cardCount: set.cardCount || '0',
             totalCardsCollectedInSet: set.totalCardsCollectedInSet || 0,
-            totalValue: set.totalValue || 0,
+            totalValue: set.costToComplete?.totalValue || 0,
             percentageCollected: set.percentageCollected || 0,
-            costToComplete: set.costToComplete?.oneOfEachCard || 0,
+            costToComplete: set.costToComplete?.goal || 0,
           }}
         />
       )}
