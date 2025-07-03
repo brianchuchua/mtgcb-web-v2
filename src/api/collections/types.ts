@@ -19,6 +19,7 @@ export interface CostToComplete {
   fourOfEachCommon: number;
   draftCube: number;
   totalValue: number;
+  goal?: number;
 }
 
 export interface CollectionSetSummary {
