@@ -12,6 +12,7 @@ import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
+import InfoBanner from '@/features/browse/views/InfoBanner';
 import { selectCardSearchParams, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
 import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
@@ -23,13 +24,13 @@ interface SetBrowseClientProps {
 
 export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   const dispatch = useDispatch();
-  
+
   // Use browse controller with proper configuration
   const browseController = useBrowseController({
     forceView: 'cards',
-    waitForSetFilter: true
+    waitForSetFilter: true,
   });
-  
+
   const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
 
@@ -62,7 +63,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   useEffect(() => {
     // Always set view to cards for this page
     dispatch(setViewContentType('cards'));
-    
+
     if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
       const set = setsData.data.sets[0];
 
@@ -145,7 +146,10 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
             { label: 'Set not found' },
           ]}
         />
-        <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}>Set not found</Box>
+        <InfoBanner
+          title="Set not found or no cards found in it matching your criteria"
+          message="The requested set might not exist, or there are no cards that match your current filter settings."
+        />
       </Box>
     );
   }

@@ -20,6 +20,7 @@ import SetIcon from '@/components/sets/SetIcon';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
+import InfoBanner from '@/features/browse/views/InfoBanner';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
 import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
@@ -290,7 +291,10 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   if (!set && !isSetLoading) {
     return (
       <Box>
-        <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}>Set not found</Box>
+        <InfoBanner 
+          title="Set not found or no cards found in it matching your criteria" 
+          message="The requested set might not exist, or there are no cards that match your current filter settings."
+        />
       </Box>
     );
   }
