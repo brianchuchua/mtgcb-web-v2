@@ -17,6 +17,7 @@ export interface VirtualizedGalleryProps<T> {
   'data-testid'?: string;
 }
 
+// This is dead code right now, but kept in case https://github.com/petyosi/react-virtuoso/issues/1220 returns
 const VirtualizedGallery = <T,>({
   items,
   renderItem,
@@ -70,9 +71,9 @@ const VirtualizedGallery = <T,>({
   );
 
   return (
-    <GalleryWrapper 
-      columnsPerRow={columnsPerRow} 
-      galleryWidth={galleryWidth} 
+    <GalleryWrapper
+      columnsPerRow={columnsPerRow}
+      galleryWidth={galleryWidth}
       horizontalPadding={horizontalPadding}
       data-testid={dataTestId}
     >

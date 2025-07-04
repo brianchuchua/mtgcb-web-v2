@@ -40,6 +40,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Full end-to-end test suite, generate test cases, then automate
 - Testing: Purchasing buttons with different settings
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
+- Preload stuff on pagination hover?
 
 ## Other Action Items
 

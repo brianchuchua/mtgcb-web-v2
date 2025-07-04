@@ -27,67 +27,34 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({
     setIsVisible(true);
   }, []);
 
-  // For skeletons, render the same structure but with invisible content
-  const isSkeletonItem = isSkeleton(set);
-  const displaySet = isSkeletonItem ? {
-    ...set,
-    name: 'Placeholder Set Name',
-    code: 'XXX',
-    category: 'core',
-    setType: 'expansion',
-    releasedAt: '2024-01-01',
-    cardCount: '250',
-    isDraftable: true,
-  } as unknown as Set : set;
-  
-  // Mock cost data for skeletons when costs are visible
-  const mockCostData: CostToComplete | undefined = isSkeletonItem && settings.costsIsVisible ? {
-    oneOfEachCard: 150,
-    oneOfEachMythic: 50,
-    oneOfEachRare: 80,
-    oneOfEachUncommon: 15,
-    oneOfEachCommon: 5,
-    fourOfEachCard: 600,
-    fourOfEachMythic: 200,
-    fourOfEachRare: 320,
-    fourOfEachUncommon: 60,
-    fourOfEachCommon: 20,
-    draftCube: 400,
-    totalValue: 1000,
-  } : undefined;
-  
-  const displayCostToComplete = mockCostData || costToComplete;
 
   return (
-    <SetBoxWrapper data-testid="set-item" sx={{ 
-      opacity: isSkeletonItem ? 0.3 : 1,
-      pointerEvents: isSkeletonItem ? 'none' : 'auto',
-    }}>
+    <SetBoxWrapper data-testid="set-item">
       <SetBoxContent sx={{ 
-        opacity: isSkeletonItem ? 0 : (isVisible ? 1 : 0), 
-        transition: isSkeletonItem ? 'none' : 'opacity 0.7s ease-in-out' 
+        opacity: isVisible ? 1 : 0, 
+        transition: 'opacity 0.7s ease-in-out' 
       }}>
-        <SetNameAndCode set={displaySet} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} />
+        <SetNameAndCode set={set} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} />
         <SetCategoryAndType
-          set={displaySet}
+          set={set}
           isCategoryVisible={settings.categoryIsVisible}
           isTypeVisible={settings.typeIsVisible}
         />
-        <SetReleaseDate set={displaySet} isVisible={settings.releaseDateIsVisible} />
-        <SetIconDisplay set={displaySet} />
+        <SetReleaseDate set={set} isVisible={settings.releaseDateIsVisible} />
+        <SetIconDisplay set={set} />
         <SetCardCount
-          set={displaySet}
+          set={set}
           isVisible={settings.cardCountIsVisible}
           includeSubsetsInSets={includeSubsetsInSets}
-          cardCountIncludingSubsets={isSkeletonItem ? '250' : cardCountIncludingSubsets}
+          cardCountIncludingSubsets={cardCountIncludingSubsets}
         />
 
-        {displayCostToComplete && (
+        {costToComplete && (
           <CostToPurchaseSection
-            costToComplete={displayCostToComplete || costToComplete}
+            costToComplete={costToComplete}
             isVisible={settings.costsIsVisible}
-            setId={displaySet.id}
-            set={displaySet}
+            setId={set.id}
+            set={set}
             includeSubsetsInSets={includeSubsetsInSets}
           />
         )}
@@ -112,10 +79,6 @@ interface SetItemRendererProps {
   costToComplete?: CostToComplete;
   cardCountIncludingSubsets?: string | null;
   includeSubsetsInSets?: boolean;
-}
-
-function isSkeleton(value: unknown): value is { isLoadingSkeleton: boolean } {
-  return typeof value === 'object' && value !== null && 'isLoadingSkeleton' in value;
 }
 
 const SetBoxWrapper = styled(Card)(({}) => ({

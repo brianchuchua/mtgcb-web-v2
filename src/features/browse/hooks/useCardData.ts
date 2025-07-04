@@ -117,21 +117,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
 
   const total = cardsSearchResult?.data?.totalCount || 0;
 
-  const displayItems = useMemo(() => {
-    // Only show skeletons on initial load, not on refetch
-    if (isLoading && !cardsSearchResult) return Array(pagination.pageSize)
-      .fill(0)
-      .map((_, index) => ({
-        id: `skeleton-${index}`,
-        name: '',
-        setName: '',
-        collectorNumber: '',
-        rarity: '',
-        isLoadingSkeleton: true,
-      }));
-    
-    return items;
-  }, [items, isLoading, pagination.pageSize, cardsSearchResult]);
+  const displayItems = items;
 
   const handleCardClick = useCallback(
     (cardId: string, cardName?: string) => {

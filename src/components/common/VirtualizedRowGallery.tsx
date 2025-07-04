@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
@@ -128,21 +128,33 @@ const VirtualizedRowGallery = <T,>({
       horizontalPadding={horizontalPadding}
       data-testid={dataTestId}
     >
-      <Virtuoso
-        useWindowScroll
-        data={rows}
-        itemContent={rowContent}
-        increaseViewportBy={600}
-        computeItemKey={(index) => rows[index].id}
-        // Remove the default item wrapper styles that might interfere
-        components={{
-          Item: ({ children, ...props }) => (
-            <div {...props} style={{ ...props.style, paddingBottom: 0 }}>
-              {children}
-            </div>
-          ),
-        }}
-      />
+      {isLoading && items.length === 0 ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+          <CircularProgress />
+        </Box>
+      ) : rows.length === 0 ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+          <Typography variant="body1" color="text.secondary">
+            {emptyMessage}
+          </Typography>
+        </Box>
+      ) : (
+        <Virtuoso
+          useWindowScroll
+          data={rows}
+          itemContent={rowContent}
+          increaseViewportBy={600}
+          computeItemKey={(index) => rows[index].id}
+          // Remove the default item wrapper styles that might interfere
+          components={{
+            Item: ({ children, ...props }) => (
+              <div {...props} style={{ ...props.style, paddingBottom: 0 }}>
+                {children}
+              </div>
+            ),
+          }}
+        />
+      )}
     </GalleryWrapper>
   );
 };

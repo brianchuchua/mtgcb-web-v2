@@ -74,10 +74,6 @@ const SetNameTypography = styled(Typography)(({ theme }) => ({
   },
 }));
 
-function isSkeleton(value: unknown): value is { isLoadingSkeleton: boolean } {
-  return typeof value === 'object' && value !== null && 'isLoadingSkeleton' in value;
-}
-
 // Collection-aware SetNameAndCode component
 type SetNameProps = {
   set: Set;
@@ -514,69 +510,47 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
     setIsVisible(true);
   }, []);
 
-  // For skeletons, render the same structure but with invisible content
-  const isSkeletonItem = isSkeleton(set);
-  const displaySet = isSkeletonItem
-    ? ({
-        ...set,
-        name: 'Placeholder Set Name',
-        code: 'XXX',
-        category: 'core',
-        setType: 'expansion',
-        releasedAt: '2024-01-01',
-        cardCount: '250',
-        isDraftable: true,
-      } as unknown as Set)
-    : set;
-
-  // Use the collection data as-is (parent provides mock data for skeletons)
-  const displayCollectionData = collectionData;
 
   return (
-    <SetBoxWrapper
-      sx={{
-        opacity: isSkeletonItem ? 0.3 : 1,
-        pointerEvents: isSkeletonItem ? 'none' : 'auto',
-      }}
-    >
+    <SetBoxWrapper>
       <SetBoxContent
         sx={{
-          opacity: isSkeletonItem ? 0 : isVisible ? 1 : 0,
-          transition: isSkeletonItem ? 'none' : 'opacity 0.7s ease-in-out',
+          opacity: isVisible ? 1 : 0,
+          transition: 'opacity 0.7s ease-in-out',
         }}
       >
         <SetNameAndCode
-          set={displaySet}
+          set={set}
           nameIsVisible={settings.nameIsVisible}
           codeIsVisible={settings.codeIsVisible}
           userId={userId}
           goalId={goalId}
         />
         <SetCategoryAndType
-          set={displaySet}
+          set={set}
           isCategoryVisible={settings.categoryIsVisible}
           isTypeVisible={settings.typeIsVisible}
         />
-        <SetReleaseDate set={displaySet} isVisible={settings.releaseDateIsVisible} />
-        <SetIconDisplay set={displaySet} collectionData={displayCollectionData} userId={userId} goalId={goalId} />
+        <SetReleaseDate set={set} isVisible={settings.releaseDateIsVisible} />
+        <SetIconDisplay set={set} collectionData={collectionData} userId={userId} goalId={goalId} />
         <CollectionCardCount
-          set={displaySet}
-          collectionData={displayCollectionData}
+          set={set}
+          collectionData={collectionData}
           isVisible={settings.cardCountIsVisible}
           includeSubsetsInSets={includeSubsetsInSets}
-          cardCountIncludingSubsets={isSkeletonItem ? '250' : cardCountIncludingSubsets}
+          cardCountIncludingSubsets={cardCountIncludingSubsets}
         />
 
-        {displayCollectionData && (
-          <CollectionInfoSection collectionData={displayCollectionData} includeSubsetsInSets={includeSubsetsInSets} />
+        {collectionData && (
+          <CollectionInfoSection collectionData={collectionData} includeSubsetsInSets={includeSubsetsInSets} />
         )}
 
         {costToComplete && (
           <CostToPurchaseSection
             costToComplete={costToComplete}
             isVisible={settings.costsIsVisible}
-            setId={displaySet.id}
-            set={displaySet}
+            setId={set.id}
+            set={set}
             includeSubsetsInSets={includeSubsetsInSets}
             userId={userId}
             goalId={goalId}

@@ -18,7 +18,6 @@ export interface CardItemProps {
   setCode?: string;
   setName?: string;
   setSlug?: string;
-  isLoadingSkeleton?: boolean;
   tcgplayerId?: number | string;
   collectorNumber?: string;
   mtgcbCollectorNumber?: string;
@@ -134,7 +133,6 @@ const CardItemComponent = ({
   },
   priceType = PriceType.Market,
   onClick,
-  isLoadingSkeleton = false,
   isOwnCollection = false,
   goalId,
 }: CardItemProps) => {
@@ -155,34 +153,8 @@ const CardItemComponent = ({
   const collectionMatch = pathname?.match(/^\/collections\/(\d+)/);
   const userId = collectionMatch ? collectionMatch[1] : null;
 
-  // For skeleton loading, render the same structure with placeholder data
-  const isSkeletonItem = isLoadingSkeleton;
-  
-  // Create placeholder data for skeleton
-  const displayName = isSkeletonItem ? 'Placeholder Card Name' : name;
-  const displaySetName = isSkeletonItem ? 'Placeholder Set' : setName;
-  const displaySetCode = isSkeletonItem ? 'XXX' : setCode;
-  const displayCollectorNumber = isSkeletonItem ? '123' : collectorNumber;
-  const displayQuantityReg = isSkeletonItem ? 2 : quantityReg;
-  const displayQuantityFoil = isSkeletonItem ? 1 : quantityFoil;
-
   // Create structured price data from the raw API values if not already provided
-  const mockPriceData = isSkeletonItem ? {
-    normal: {
-      market: 12.50,
-      low: 10.00,
-      average: 11.25,
-      high: 15.00,
-    },
-    foil: {
-      market: 25.00,
-      low: null,
-      average: null,
-      high: null,
-    },
-  } : null;
-  
-  const priceData = mockPriceData || prices || {
+  const priceData = prices || {
     normal: {
       market: market ? parseFloat(market) : null,
       low: low ? parseFloat(low) : null,
@@ -227,14 +199,13 @@ const CardItemComponent = ({
   };
 
   return (
-    <Box sx={{ opacity: isSkeletonItem ? 0.3 : 1 }}>
-      <StyledCard
-        sx={{
-          borderRadius: getBorderRadius(),
-        }}
-        setName={setName}
-        data-testid="card-item"
-      >
+    <StyledCard
+      sx={{
+        borderRadius: getBorderRadius(),
+      }}
+      setName={setName}
+      data-testid="card-item"
+    >
         <CardImageContainer
           onClick={onClick ? handleCardElementClick : undefined}
           sx={{
@@ -287,43 +258,40 @@ const CardItemComponent = ({
             }}
           />
         )}
-        <Box sx={{ opacity: isSkeletonItem ? 0 : 1 }}>
-          {!imageError ? (
-            <CardImage
-              ref={imageRef}
-              src={getImageUrl()}
-              loading="lazy"
-              alt={displayName}
-              title={displayName}
-              setName={setName}
-              onLoad={() => setImageLoaded(true)}
-              onError={() => setImageError(true)}
-              style={{ opacity: imageLoaded && !isSkeletonItem ? 1 : 0 }}
-            />
-          ) : (
-            <MissingImageFallback setName={setName}>
-              <Typography variant="subtitle2">{displayName}</Typography>
-              <Typography variant="caption">Image not available</Typography>
-            </MissingImageFallback>
-          )}
-        </Box>
+        {!imageError ? (
+          <CardImage
+            ref={imageRef}
+            src={getImageUrl()}
+            loading="lazy"
+            alt={name}
+            title={name}
+            setName={setName}
+            onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
+            style={{ opacity: imageLoaded ? 1 : 0 }}
+          />
+        ) : (
+          <MissingImageFallback setName={setName}>
+            <Typography variant="subtitle2">{name}</Typography>
+            <Typography variant="caption">Image not available</Typography>
+          </MissingImageFallback>
+        )}
       </CardImageContainer>
 
       {(nameIsVisible || setIsVisible || priceIsVisible || quantityIsVisible || goalProgressIsVisible) && (
         <CardContent sx={{ p: 1, '&:last-child': { pb: 1 }, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-          <Box sx={{ opacity: isSkeletonItem ? 0 : 1 }}>
-            {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && isOwnCollection && (
-              <Box sx={{ mb: 1 }}>
-                <EditableCardQuantity
-                  cardId={parseInt(id)}
-                  cardName={name}
-                  quantityReg={displayQuantityReg || 0}
-                  quantityFoil={displayQuantityFoil || 0}
-                  canBeFoil={canBeFoil}
-                  canBeNonFoil={canBeNonFoil}
-                />
-              </Box>
-            )}
+          {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && isOwnCollection && (
+            <Box sx={{ mb: 1 }}>
+              <EditableCardQuantity
+                cardId={parseInt(id)}
+                cardName={name}
+                quantityReg={quantityReg || 0}
+                quantityFoil={quantityFoil || 0}
+                canBeFoil={canBeFoil}
+                canBeNonFoil={canBeNonFoil}
+              />
+            </Box>
+          )}
 
           {goalProgressIsVisible && (goalTargetQuantityReg || goalTargetQuantityFoil || goalTargetQuantityAll) && (
             <Box sx={{ mt: -0.5, mb: 0.5, display: 'flex', justifyContent: 'center' }}>
@@ -365,7 +333,7 @@ const CardItemComponent = ({
                 },
               }}
             >
-              {displayName}
+              {name}
             </Typography>
           )}
 
@@ -402,13 +370,13 @@ const CardItemComponent = ({
                       cursor: 'pointer',
                     }}
                   >
-                    {displaySetName}
+                    {setName}
                   </Box>
                 </Link>
               ) : (
-                displaySetName || 'Unknown Set'
+                setName || 'Unknown Set'
               )}{' '}
-              #{displayCollectorNumber || '??'}
+              #{collectorNumber || '??'}
             </Typography>
           )}
 
@@ -429,7 +397,7 @@ const CardItemComponent = ({
                 color: (theme) => theme.palette.primary.main,
               }}
             >
-              <CardPrice prices={priceData} isLoading={isLoadingSkeleton} priceType={priceType} />
+              <CardPrice prices={priceData} isLoading={false} priceType={priceType} />
             </Box>
           )}
 
@@ -437,21 +405,19 @@ const CardItemComponent = ({
             <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center', gap: 1 }}>
               {quantityReg !== undefined && (
                 <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                  {displayQuantityReg}x Regular
+                  {quantityReg}x Regular
                 </Typography>
               )}
               {quantityFoil !== undefined && (
                 <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                  {displayQuantityFoil}x Foil
+                  {quantityFoil}x Foil
                 </Typography>
               )}
             </Box>
           )}
-          </Box>
         </CardContent>
       )}
     </StyledCard>
-    </Box>
   );
 };
 
@@ -464,7 +430,6 @@ const CardItem = React.memo(CardItemComponent, (prevProps, nextProps) => {
     prevProps.quantityFoil === nextProps.quantityFoil &&
     prevProps.isOwnCollection === nextProps.isOwnCollection &&
     prevProps.priceType === nextProps.priceType &&
-    prevProps.isLoadingSkeleton === nextProps.isLoadingSkeleton &&
     // Deep compare display settings
     prevProps.display?.nameIsVisible === nextProps.display?.nameIsVisible &&
     prevProps.display?.setIsVisible === nextProps.display?.setIsVisible &&

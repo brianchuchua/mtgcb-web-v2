@@ -68,28 +68,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
 
-  // Create skeleton loading items if needed
-  const displaySets = isLoading
-    ? Array(pageSize)
-        .fill(0)
-        .map(
-          (_, index) =>
-            ({
-              id: `skeleton-${index}`,
-              name: '',
-              slug: '',
-              code: '',
-              scryfallId: '', // Adding required Set fields for type compatibility
-              tcgplayerId: null,
-              setType: '',
-              category: '',
-              releasedAt: null,
-              cardCount: 0,
-              isDraftable: false,
-              isLoadingSkeleton: true,
-            }) as unknown as Set,
-        )
-    : setItems;
+  const displaySets = setItems;
 
   // Get the appropriate renderers for table view
   const { columns, renderRowContent } = useSetTableRenderers(displaySettings.table, currentSortBy, onSetClick);
