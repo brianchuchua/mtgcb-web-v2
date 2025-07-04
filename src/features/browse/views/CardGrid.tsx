@@ -2,7 +2,7 @@
 
 import React, { useCallback } from 'react';
 import CardItemRenderer from '@/components/cards/CardItemRenderer';
-import VirtualizedGallery from '@/components/common/VirtualizedGallery';
+import VirtualizedRowGallery from '@/components/common/VirtualizedRowGallery';
 import { PriceType } from '@/types/pricing';
 
 interface CardGridProps {
@@ -54,7 +54,7 @@ const CardGridComponent: React.FC<CardGridProps> = ({
   );
   
   return (
-    <VirtualizedGallery
+    <VirtualizedRowGallery
       key="browse-card-gallery"
       items={items}
       renderItem={renderItem}

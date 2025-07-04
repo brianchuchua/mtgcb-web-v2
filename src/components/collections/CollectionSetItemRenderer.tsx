@@ -1,14 +1,15 @@
 'use client';
 
 import { Box, Button, Card, CardContent, CircularProgress, Typography, keyframes, styled } from '@mui/material';
+import { isDraft } from '@reduxjs/toolkit';
 import Link from 'next/link';
 import React from 'react';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { CostToComplete } from '@/api/sets/types';
 import SetIcon from '@/components/sets/SetIcon';
 import { SetCategoryAndType, SetItemSettings } from '@/components/sets/SetItemRenderer';
-import TCGPlayerMassImportButton from '@/components/tcgplayer/TCGPlayerMassImportButton';
 import TCGPlayerGoalMassImportButton from '@/components/tcgplayer/TCGPlayerGoalMassImportButton';
+import TCGPlayerMassImportButton from '@/components/tcgplayer/TCGPlayerMassImportButton';
 import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { Set } from '@/types/sets';
 import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder';
@@ -26,7 +27,6 @@ interface CollectionSetItemRendererProps {
   collectionData?: CollectionSetSummary;
   userId?: number;
   goalId?: number;
-  height: number;
 }
 
 // Animation for completed sets - rotating gradient
@@ -45,6 +45,7 @@ const SetBoxWrapper = styled(Card)(({}) => ({
   border: '1px solid rgba(255, 255, 255, 0.12)',
   transition: 'opacity 0.1s ease-in-out',
   boxSizing: 'border-box',
+  height: '100%', // Fill the available height from the grid cell
 }));
 
 const SetBoxContent = styled(CardContent)(({ theme }) => ({
@@ -54,6 +55,7 @@ const SetBoxContent = styled(CardContent)(({ theme }) => ({
   paddingBottom: theme.spacing(1.5),
   boxSizing: 'border-box',
   overflow: 'hidden',
+  flexGrow: 1, // Allow content to expand
   '&:last-child': {
     paddingBottom: theme.spacing(1.5),
   },
@@ -85,13 +87,17 @@ type SetNameProps = {
   goalId?: number;
 };
 
-const SetNameAndCode: React.FC<SetNameProps> = ({ set, nameIsVisible = true, codeIsVisible = true, userId, goalId }) => {
+const SetNameAndCode: React.FC<SetNameProps> = ({
+  set,
+  nameIsVisible = true,
+  codeIsVisible = true,
+  userId,
+  goalId,
+}) => {
   if (!nameIsVisible) return null;
 
   const displayName = codeIsVisible ? `${set.name} (${set.code})` : set.name;
-  const href = userId 
-    ? getCollectionSetUrl(userId, set.slug, goalId) 
-    : `/browse/sets/${set.slug}`;
+  const href = userId ? getCollectionSetUrl(userId, set.slug, goalId) : `/browse/sets/${set.slug}`;
 
   return (
     <Link
@@ -119,12 +125,12 @@ const SetReleaseDate: React.FC<{ set: Set; isVisible?: boolean }> = ({ set, isVi
   );
 };
 
-const SetIconDisplay: React.FC<{ set: Set; collectionData?: CollectionSetSummary; userId?: number; goalId?: number }> = ({
-  set,
-  collectionData,
-  userId,
-  goalId,
-}) => {
+const SetIconDisplay: React.FC<{
+  set: Set;
+  collectionData?: CollectionSetSummary;
+  userId?: number;
+  goalId?: number;
+}> = ({ set, collectionData, userId, goalId }) => {
   const percentageCollected = collectionData?.percentageCollected || 0;
 
   // Determine rarity based on percentage
@@ -501,7 +507,6 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
   collectionData,
   userId,
   goalId,
-  height,
 }) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -509,49 +514,69 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
     setIsVisible(true);
   }, []);
 
-  if (isSkeleton(set)) {
-    return (
-      <SetBoxWrapper sx={{ opacity: 0.7, height: `${height}px` }}>
-        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: `${height}px` }}></SetBoxContent>
-      </SetBoxWrapper>
-    );
-  }
+  // For skeletons, render the same structure but with invisible content
+  const isSkeletonItem = isSkeleton(set);
+  const displaySet = isSkeletonItem
+    ? ({
+        ...set,
+        name: 'Placeholder Set Name',
+        code: 'XXX',
+        category: 'core',
+        setType: 'expansion',
+        releasedAt: '2024-01-01',
+        cardCount: '250',
+        isDraftable: true,
+      } as unknown as Set)
+    : set;
+
+  // Use the collection data as-is (parent provides mock data for skeletons)
+  const displayCollectionData = collectionData;
 
   return (
-    <SetBoxWrapper sx={{ height: `${height}px` }}>
-      <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out', height: '100%' }}>
+    <SetBoxWrapper
+      sx={{
+        opacity: isSkeletonItem ? 0.3 : 1,
+        pointerEvents: isSkeletonItem ? 'none' : 'auto',
+      }}
+    >
+      <SetBoxContent
+        sx={{
+          opacity: isSkeletonItem ? 0 : isVisible ? 1 : 0,
+          transition: isSkeletonItem ? 'none' : 'opacity 0.7s ease-in-out',
+        }}
+      >
         <SetNameAndCode
-          set={set}
+          set={displaySet}
           nameIsVisible={settings.nameIsVisible}
           codeIsVisible={settings.codeIsVisible}
           userId={userId}
           goalId={goalId}
         />
         <SetCategoryAndType
-          set={set}
+          set={displaySet}
           isCategoryVisible={settings.categoryIsVisible}
           isTypeVisible={settings.typeIsVisible}
         />
-        <SetReleaseDate set={set} isVisible={settings.releaseDateIsVisible} />
-        <SetIconDisplay set={set} collectionData={collectionData} userId={userId} goalId={goalId} />
+        <SetReleaseDate set={displaySet} isVisible={settings.releaseDateIsVisible} />
+        <SetIconDisplay set={displaySet} collectionData={displayCollectionData} userId={userId} goalId={goalId} />
         <CollectionCardCount
-          set={set}
-          collectionData={collectionData}
+          set={displaySet}
+          collectionData={displayCollectionData}
           isVisible={settings.cardCountIsVisible}
           includeSubsetsInSets={includeSubsetsInSets}
-          cardCountIncludingSubsets={cardCountIncludingSubsets}
+          cardCountIncludingSubsets={isSkeletonItem ? '250' : cardCountIncludingSubsets}
         />
 
-        {collectionData && (
-          <CollectionInfoSection collectionData={collectionData} includeSubsetsInSets={includeSubsetsInSets} />
+        {displayCollectionData && (
+          <CollectionInfoSection collectionData={displayCollectionData} includeSubsetsInSets={includeSubsetsInSets} />
         )}
 
         {costToComplete && (
           <CostToPurchaseSection
             costToComplete={costToComplete}
             isVisible={settings.costsIsVisible}
-            setId={set.id}
-            set={set}
+            setId={displaySet.id}
+            set={displaySet}
             includeSubsetsInSets={includeSubsetsInSets}
             userId={userId}
             goalId={goalId}

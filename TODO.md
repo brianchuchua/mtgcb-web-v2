@@ -31,11 +31,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Current Action Items
 
+- Card Locations
 - verify default visibility for set boxes and card box fields
-- Can be foil cannot be foil
-  - integrate with quantity updating, warnings next to existing bad data
-  - clean up data, scryfall gets all of the rainbow foil stuff wrong, I manually split those, need to patch and prevent bad future data
-  - integrate with custom collection goals
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
 - When idle: Migrate TODOs from README.md to this file

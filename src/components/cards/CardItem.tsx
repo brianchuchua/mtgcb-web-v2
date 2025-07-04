@@ -155,48 +155,34 @@ const CardItemComponent = ({
   const collectionMatch = pathname?.match(/^\/collections\/(\d+)/);
   const userId = collectionMatch ? collectionMatch[1] : null;
 
-  // If this is a loading skeleton, render an invisible placeholder
-  if (isLoadingSkeleton) {
-    return (
-      <StyledCard
-        sx={{
-          opacity: 0.0, // Intentional while I experiment with skeleton loaders
-        }}
-      >
-        <CardImageContainer>
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height="100%"
-            animation={false}
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              borderRadius: '5%',
-            }}
-          />
-        </CardImageContainer>
-
-        <CardContent
-          sx={{
-            p: 1,
-            '&:last-child': { pb: 1 },
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Skeleton variant="text" width="80%" height={28} animation="wave" />
-          <Skeleton variant="text" width="60%" height={20} animation="wave" />
-          <Skeleton variant="text" width="50%" height={20} animation="wave" />
-        </CardContent>
-      </StyledCard>
-    );
-  }
+  // For skeleton loading, render the same structure with placeholder data
+  const isSkeletonItem = isLoadingSkeleton;
+  
+  // Create placeholder data for skeleton
+  const displayName = isSkeletonItem ? 'Placeholder Card Name' : name;
+  const displaySetName = isSkeletonItem ? 'Placeholder Set' : setName;
+  const displaySetCode = isSkeletonItem ? 'XXX' : setCode;
+  const displayCollectorNumber = isSkeletonItem ? '123' : collectorNumber;
+  const displayQuantityReg = isSkeletonItem ? 2 : quantityReg;
+  const displayQuantityFoil = isSkeletonItem ? 1 : quantityFoil;
 
   // Create structured price data from the raw API values if not already provided
-  const priceData = prices || {
+  const mockPriceData = isSkeletonItem ? {
+    normal: {
+      market: 12.50,
+      low: 10.00,
+      average: 11.25,
+      high: 15.00,
+    },
+    foil: {
+      market: 25.00,
+      low: null,
+      average: null,
+      high: null,
+    },
+  } : null;
+  
+  const priceData = mockPriceData || prices || {
     normal: {
       market: market ? parseFloat(market) : null,
       low: low ? parseFloat(low) : null,
@@ -241,50 +227,51 @@ const CardItemComponent = ({
   };
 
   return (
-    <StyledCard
-      sx={{
-        borderRadius: getBorderRadius(),
-      }}
-      setName={setName}
-      data-testid="card-item"
-    >
-      <CardImageContainer
-        onClick={onClick ? handleCardElementClick : undefined}
+    <Box sx={{ opacity: isSkeletonItem ? 0.3 : 1 }}>
+      <StyledCard
         sx={{
-          cursor: onClick ? 'pointer' : 'default',
-          opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
-          transition: 'opacity 0.2s ease-in-out',
-          position: 'relative',
-          '&:hover': {
-            opacity: 1,
-          },
-          // Add diagonal stripes overlay for incomplete goals
-          ...(goalProgressIsVisible &&
-            goalFullyMet === false && {
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundImage: `repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(255, 152, 0, 0.2) 10px,
-                rgba(255, 152, 0, 0.2) 20px
-              )`,
-                pointerEvents: 'none',
-                borderRadius: 'inherit',
-                transition: 'opacity 0.2s ease-in-out',
-              },
-              '&:hover::after': {
-                opacity: 0,
-              },
-            }),
+          borderRadius: getBorderRadius(),
         }}
+        setName={setName}
+        data-testid="card-item"
       >
+        <CardImageContainer
+          onClick={onClick ? handleCardElementClick : undefined}
+          sx={{
+            cursor: onClick ? 'pointer' : 'default',
+            opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
+            transition: 'opacity 0.2s ease-in-out',
+            position: 'relative',
+            '&:hover': {
+              opacity: 1,
+            },
+            // Add diagonal stripes overlay for incomplete goals
+            ...(goalProgressIsVisible &&
+              goalFullyMet === false && {
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundImage: `repeating-linear-gradient(
+                  45deg,
+                  transparent,
+                  transparent 10px,
+                  rgba(255, 152, 0, 0.2) 10px,
+                  rgba(255, 152, 0, 0.2) 20px
+                )`,
+                  pointerEvents: 'none',
+                  borderRadius: 'inherit',
+                  transition: 'opacity 0.2s ease-in-out',
+                },
+                '&:hover::after': {
+                  opacity: 0,
+                },
+              }),
+          }}
+        >
         {!imageLoaded && !imageError && (
           <Skeleton
             variant="rectangular"
@@ -300,40 +287,43 @@ const CardItemComponent = ({
             }}
           />
         )}
-        {!imageError ? (
-          <CardImage
-            ref={imageRef}
-            src={getImageUrl()}
-            loading="lazy"
-            alt={name}
-            title={name}
-            setName={setName}
-            onLoad={() => setImageLoaded(true)}
-            onError={() => setImageError(true)}
-            style={{ opacity: imageLoaded ? 1 : 0 }}
-          />
-        ) : (
-          <MissingImageFallback setName={setName}>
-            <Typography variant="subtitle2">{name}</Typography>
-            <Typography variant="caption">Image not available</Typography>
-          </MissingImageFallback>
-        )}
+        <Box sx={{ opacity: isSkeletonItem ? 0 : 1 }}>
+          {!imageError ? (
+            <CardImage
+              ref={imageRef}
+              src={getImageUrl()}
+              loading="lazy"
+              alt={displayName}
+              title={displayName}
+              setName={setName}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageError(true)}
+              style={{ opacity: imageLoaded && !isSkeletonItem ? 1 : 0 }}
+            />
+          ) : (
+            <MissingImageFallback setName={setName}>
+              <Typography variant="subtitle2">{displayName}</Typography>
+              <Typography variant="caption">Image not available</Typography>
+            </MissingImageFallback>
+          )}
+        </Box>
       </CardImageContainer>
 
       {(nameIsVisible || setIsVisible || priceIsVisible || quantityIsVisible || goalProgressIsVisible) && (
-        <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
-          {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && isOwnCollection && (
-            <Box sx={{ mb: 1 }}>
-              <EditableCardQuantity
-                cardId={parseInt(id)}
-                cardName={name}
-                quantityReg={quantityReg || 0}
-                quantityFoil={quantityFoil || 0}
-                canBeFoil={canBeFoil}
-                canBeNonFoil={canBeNonFoil}
-              />
-            </Box>
-          )}
+        <CardContent sx={{ p: 1, '&:last-child': { pb: 1 }, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+          <Box sx={{ opacity: isSkeletonItem ? 0 : 1 }}>
+            {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && isOwnCollection && (
+              <Box sx={{ mb: 1 }}>
+                <EditableCardQuantity
+                  cardId={parseInt(id)}
+                  cardName={name}
+                  quantityReg={displayQuantityReg || 0}
+                  quantityFoil={displayQuantityFoil || 0}
+                  canBeFoil={canBeFoil}
+                  canBeNonFoil={canBeNonFoil}
+                />
+              </Box>
+            )}
 
           {goalProgressIsVisible && (goalTargetQuantityReg || goalTargetQuantityFoil || goalTargetQuantityAll) && (
             <Box sx={{ mt: -0.5, mb: 0.5, display: 'flex', justifyContent: 'center' }}>
@@ -375,7 +365,7 @@ const CardItemComponent = ({
                 },
               }}
             >
-              {name}
+              {displayName}
             </Typography>
           )}
 
@@ -412,13 +402,13 @@ const CardItemComponent = ({
                       cursor: 'pointer',
                     }}
                   >
-                    {setName}
+                    {displaySetName}
                   </Box>
                 </Link>
               ) : (
-                setName || 'Unknown Set'
+                displaySetName || 'Unknown Set'
               )}{' '}
-              #{collectorNumber || '??'}
+              #{displayCollectorNumber || '??'}
             </Typography>
           )}
 
@@ -447,19 +437,21 @@ const CardItemComponent = ({
             <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center', gap: 1 }}>
               {quantityReg !== undefined && (
                 <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                  {quantityReg}x Regular
+                  {displayQuantityReg}x Regular
                 </Typography>
               )}
               {quantityFoil !== undefined && (
                 <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                  {quantityFoil}x Foil
+                  {displayQuantityFoil}x Foil
                 </Typography>
               )}
             </Box>
           )}
+          </Box>
         </CardContent>
       )}
     </StyledCard>
+    </Box>
   );
 };
 

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import SetItemRenderer from './SetItemRenderer';
 import { useSetTableRenderers } from './SetTableRenderer';
 import { CostToComplete } from '@/api/sets/types';
-import VirtualizedGallery from '@/components/common/VirtualizedGallery';
+import VirtualizedRowGallery from '@/components/common/VirtualizedRowGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import {
   selectIncludeSubsetsInSets,
@@ -67,14 +67,6 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   const currentSortOrder = useSelector(selectSortOrder) || 'desc';
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
-  // Calculate fixed height based on display settings
-  const calculateSetItemHeight = () => {
-    if (displaySettings.grid.costsIsVisible) {
-      return 445;
-    } else {
-      return 200;
-    }
-  };
 
   // Create skeleton loading items if needed
   const displaySets = isLoading
@@ -118,7 +110,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
 
   if (viewMode === 'grid') {
     return (
-      <VirtualizedGallery
+      <VirtualizedRowGallery
         key="browse-set-gallery"
         items={displaySets}
         data-testid={dataTestId}
@@ -138,7 +130,6 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
               costToComplete={costToComplete}
               includeSubsetsInSets={includeSubsetsInSets}
               cardCountIncludingSubsets={cardCountIncludingSubsets}
-              height={calculateSetItemHeight()}
             />
           );
         }}

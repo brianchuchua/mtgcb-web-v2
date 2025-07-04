@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CollectionSetItemRenderer } from './CollectionSetItemRenderer';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { useCollectionSetTableRenderers } from '@/components/collections/CollectionSetTableRenderer';
-import VirtualizedGallery from '@/components/common/VirtualizedGallery';
+import VirtualizedRowGallery from '@/components/common/VirtualizedRowGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { SetDisplayProps } from '@/components/sets/SetDisplay';
 import {
@@ -43,14 +43,6 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
   const currentSortOrder = useSelector(selectSortOrder) || 'desc';
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
-  // Calculate fixed height based on display settings
-  const calculateCollectionSetItemHeight = () => {
-    if (displaySettings.grid.costsIsVisible) {
-      return 555;
-    } else {
-      return 310;
-    }
-  };
 
   // Create skeleton loading items if needed
   const displaySets = isLoading
@@ -100,11 +92,49 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
 
   if (viewMode === 'grid') {
     return (
-      <VirtualizedGallery
+      <VirtualizedRowGallery
         key="browse-collection-set-gallery"
         items={displaySets}
         renderItem={(set) => {
-          const collectionSet = collectionData?.collectionSets.get(set.id);
+          const isSkeletonItem = (set as any).isLoadingSkeleton;
+          
+          // For skeletons, create mock collection data
+          const mockCollectionData = isSkeletonItem ? {
+            id: set.id,
+            setId: set.id,
+            name: set.name || 'Placeholder Set',
+            slug: set.slug || 'placeholder',
+            code: set.code || 'XXX',
+            setType: set.setType || 'expansion',
+            cardCount: 250,
+            category: set.category || 'core',
+            releasedAt: set.releasedAt || '2024-01-01',
+            sealedProductUrl: set.sealedProductUrl || '',
+            isDraftable: set.isDraftable || false,
+            subsetGroupId: null,
+            isSubsetGroup: false,
+            parentSetId: null,
+            uniquePrintingsCollectedInSet: 100,
+            totalCardsCollectedInSet: 150,
+            percentageCollected: 40,
+            cardCountIncludingSubsets: 300,
+            costToComplete: {
+              oneOfEachCard: 150,
+              oneOfEachMythic: 50,
+              oneOfEachRare: 80,
+              oneOfEachUncommon: 15,
+              oneOfEachCommon: 5,
+              fourOfEachCard: 600,
+              fourOfEachMythic: 200,
+              fourOfEachRare: 320,
+              fourOfEachUncommon: 60,
+              fourOfEachCommon: 20,
+              draftCube: 400,
+              totalValue: 1000,
+            },
+          } as CollectionSetSummary : undefined;
+          
+          const collectionSet = isSkeletonItem ? mockCollectionData : collectionData?.collectionSets.get(set.id);
           const costToComplete = collectionSet?.costToComplete;
           const cardCountIncludingSubsets = collectionSet?.cardCountIncludingSubsets;
 
@@ -118,7 +148,6 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
               collectionData={collectionSet}
               userId={collectionData?.userId}
               goalId={goalId}
-              height={calculateCollectionSetItemHeight()}
             />
           );
         }}

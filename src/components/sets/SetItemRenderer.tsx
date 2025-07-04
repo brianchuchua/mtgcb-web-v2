@@ -19,7 +19,6 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({
   costToComplete,
   cardCountIncludingSubsets,
   includeSubsetsInSets = false,
-  height,
 }) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -28,38 +27,67 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({
     setIsVisible(true);
   }, []);
 
-  if (isSkeleton(set)) {
-    return (
-      <SetBoxWrapper sx={{ opacity: 0.7, height: `${height}px` }}>
-        <SetBoxContent sx={{ display: 'flex', flexDirection: 'column', height: `${height}px` }}></SetBoxContent>
-      </SetBoxWrapper>
-    );
-  }
+  // For skeletons, render the same structure but with invisible content
+  const isSkeletonItem = isSkeleton(set);
+  const displaySet = isSkeletonItem ? {
+    ...set,
+    name: 'Placeholder Set Name',
+    code: 'XXX',
+    category: 'core',
+    setType: 'expansion',
+    releasedAt: '2024-01-01',
+    cardCount: '250',
+    isDraftable: true,
+  } as unknown as Set : set;
+  
+  // Mock cost data for skeletons when costs are visible
+  const mockCostData: CostToComplete | undefined = isSkeletonItem && settings.costsIsVisible ? {
+    oneOfEachCard: 150,
+    oneOfEachMythic: 50,
+    oneOfEachRare: 80,
+    oneOfEachUncommon: 15,
+    oneOfEachCommon: 5,
+    fourOfEachCard: 600,
+    fourOfEachMythic: 200,
+    fourOfEachRare: 320,
+    fourOfEachUncommon: 60,
+    fourOfEachCommon: 20,
+    draftCube: 400,
+    totalValue: 1000,
+  } : undefined;
+  
+  const displayCostToComplete = mockCostData || costToComplete;
 
   return (
-    <SetBoxWrapper sx={{ height: `${height}px` }} data-testid="set-item">
-      <SetBoxContent sx={{ opacity: isVisible ? 1 : 0, transition: 'opacity 0.7s ease-in-out', height: '100%' }}>
-        <SetNameAndCode set={set} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} />
+    <SetBoxWrapper data-testid="set-item" sx={{ 
+      opacity: isSkeletonItem ? 0.3 : 1,
+      pointerEvents: isSkeletonItem ? 'none' : 'auto',
+    }}>
+      <SetBoxContent sx={{ 
+        opacity: isSkeletonItem ? 0 : (isVisible ? 1 : 0), 
+        transition: isSkeletonItem ? 'none' : 'opacity 0.7s ease-in-out' 
+      }}>
+        <SetNameAndCode set={displaySet} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} />
         <SetCategoryAndType
-          set={set}
+          set={displaySet}
           isCategoryVisible={settings.categoryIsVisible}
           isTypeVisible={settings.typeIsVisible}
         />
-        <SetReleaseDate set={set} isVisible={settings.releaseDateIsVisible} />
-        <SetIconDisplay set={set} />
+        <SetReleaseDate set={displaySet} isVisible={settings.releaseDateIsVisible} />
+        <SetIconDisplay set={displaySet} />
         <SetCardCount
-          set={set}
+          set={displaySet}
           isVisible={settings.cardCountIsVisible}
           includeSubsetsInSets={includeSubsetsInSets}
-          cardCountIncludingSubsets={cardCountIncludingSubsets}
+          cardCountIncludingSubsets={isSkeletonItem ? '250' : cardCountIncludingSubsets}
         />
 
-        {costToComplete && (
+        {displayCostToComplete && (
           <CostToPurchaseSection
-            costToComplete={costToComplete}
+            costToComplete={displayCostToComplete || costToComplete}
             isVisible={settings.costsIsVisible}
-            setId={set.id}
-            set={set}
+            setId={displaySet.id}
+            set={displaySet}
             includeSubsetsInSets={includeSubsetsInSets}
           />
         )}
@@ -84,7 +112,6 @@ interface SetItemRendererProps {
   costToComplete?: CostToComplete;
   cardCountIncludingSubsets?: string | null;
   includeSubsetsInSets?: boolean;
-  height: number;
 }
 
 function isSkeleton(value: unknown): value is { isLoadingSkeleton: boolean } {
@@ -97,6 +124,7 @@ const SetBoxWrapper = styled(Card)(({}) => ({
   border: '1px solid rgba(255, 255, 255, 0.12)',
   transition: 'opacity 0.1s ease-in-out',
   boxSizing: 'border-box',
+  height: '100%', // Fill the available height from the grid cell
 }));
 
 const SetBoxContent = styled(CardContent)(({ theme }) => ({
@@ -106,6 +134,7 @@ const SetBoxContent = styled(CardContent)(({ theme }) => ({
   paddingBottom: theme.spacing(1.5),
   boxSizing: 'border-box',
   overflow: 'hidden',
+  flexGrow: 1, // Allow content to expand
   // Overriding the default padding for the last child since it's considering all of these as the last child
   '&:last-child': {
     paddingBottom: theme.spacing(1.5),
