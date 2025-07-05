@@ -28,6 +28,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - New price updater that updates directly in the new database, separate from the old legacy updater
 - Audit input field lengths for all API calls
 - Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages
+- Brainstorm patron cosmetic perks
 
 ### Current Action Items
 

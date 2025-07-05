@@ -8,7 +8,16 @@ import {
   CollectionUpdateRequest,
   CollectionUpdateResponse,
 } from './types';
+import {
+  AssociateCardLocationRequest,
+  UpdateCardLocationRequest,
+  RemoveCardLocationRequest,
+  CardLocationAssociation,
+  CardLocationsResponse,
+  LocationCardsResponse,
+} from './collectionLocationsTypes';
 import { mtgcbApi } from '@/api/mtgcbApi';
+import { ApiResponse } from '@/api/types/apiTypes';
 import type { RootState } from '@/redux/store';
 
 const collectionsApi = mtgcbApi.injectEndpoints({
@@ -172,6 +181,62 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         }
       },
     }),
+    
+    // Collection-Location endpoints
+    associateCardLocation: builder.mutation<ApiResponse<CardLocationAssociation>, AssociateCardLocationRequest>({
+      query: (body) => ({
+        url: '/collection/locations',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        'Collection',
+        'Location',
+        { type: 'Cards', id: arg.cardId },
+      ],
+    }),
+    
+    updateCardLocation: builder.mutation<ApiResponse<CardLocationAssociation>, UpdateCardLocationRequest>({
+      query: (body) => ({
+        url: '/collection/locations',
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        'Collection',
+        'Location',
+        { type: 'Cards', id: arg.cardId },
+      ],
+    }),
+    
+    removeCardLocation: builder.mutation<ApiResponse<{ success: true }>, RemoveCardLocationRequest>({
+      query: (body) => ({
+        url: '/collection/locations',
+        method: 'DELETE',
+        body,
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        'Collection',
+        'Location',
+        { type: 'Cards', id: arg.cardId },
+      ],
+    }),
+    
+    getCardLocations: builder.query<ApiResponse<CardLocationsResponse>, number>({
+      query: (cardId) => `/collection/cards/${cardId}/locations`,
+      providesTags: (_result, _error, cardId) => [{ type: 'Cards', id: cardId }],
+    }),
+    
+    getLocationCards: builder.query<ApiResponse<LocationCardsResponse>, { locationId: number; sortBy?: string; sortOrder?: string }>({
+      query: ({ locationId, sortBy, sortOrder }) => ({
+        url: `/locations/${locationId}/cards`,
+        params: {
+          ...(sortBy && { sortBy }),
+          ...(sortOrder && { sortOrder }),
+        },
+      }),
+      providesTags: (_result, _error, { locationId }) => [{ type: 'Location', id: locationId }],
+    }),
   }),
 });
 
@@ -181,5 +246,11 @@ export const {
   useLazyGetCollectionCardsQuery,
   useUpdateCollectionMutation,
   useMassUpdateCollectionMutation,
+  useAssociateCardLocationMutation,
+  useUpdateCardLocationMutation,
+  useRemoveCardLocationMutation,
+  useGetCardLocationsQuery,
+  useLazyGetCardLocationsQuery,
+  useGetLocationCardsQuery,
 } = collectionsApi;
 export const { endpoints: collectionsEndpoints } = collectionsApi;
