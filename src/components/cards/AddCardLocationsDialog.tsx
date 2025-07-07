@@ -63,7 +63,7 @@ export default function AddCardLocationsDialog({
   const [associateCardLocation] = useAssociateCardLocationMutation();
   const [updateCardLocation] = useUpdateCardLocationMutation();
 
-  const locations = locationsResponse?.data || [];
+  const locations = locationsResponse?.data?.locations || [];
   const cardLocations = cardLocationsResponse?.data?.locations || [];
 
   // Check if selected location already has this card

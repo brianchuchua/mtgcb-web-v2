@@ -2,19 +2,30 @@ import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 import type {
   Location,
+  LocationWithCount,
+  LocationsResponse,
   CreateLocationRequest,
   UpdateLocationRequest,
   DeleteLocationResponse,
 } from './types';
 
+interface GetLocationsParams {
+  includeCardCount?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
 export const locationsApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
-    getLocations: builder.query<ApiResponse<Location[]>, void>({
-      query: () => '/locations',
+    getLocations: builder.query<ApiResponse<LocationsResponse>, GetLocationsParams | void>({
+      query: (params) => ({
+        url: '/locations',
+        params: params || {},
+      }),
       providesTags: (result) =>
-        result?.data
+        result?.data?.locations
           ? [
-              ...result.data.map(({ id }) => ({ type: 'Location' as const, id })),
+              ...result.data.locations.map(({ id }) => ({ type: 'Location' as const, id })),
               { type: 'Location', id: 'LIST' },
             ]
           : [{ type: 'Location', id: 'LIST' }],

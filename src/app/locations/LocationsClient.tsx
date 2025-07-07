@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -20,7 +19,11 @@ export default function LocationsClient() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { currentPage, pageSize, onPageChange, onPageSizeChange } = useLocationsPagination();
   
-  const { data: locationsResponse, isLoading, error } = useGetLocationsQuery(undefined, {
+  const { data: locationsResponse, isLoading, error } = useGetLocationsQuery({
+    includeCardCount: true,
+    limit: pageSize,
+    offset: (currentPage - 1) * pageSize,
+  }, {
     skip: !isAuthenticated || isAuthLoading,
   });
 
@@ -51,17 +54,9 @@ export default function LocationsClient() {
     );
   }
 
-  const locations = locationsResponse?.data || [];
-  
-  // Calculate pagination
-  const totalLocations = locations.length;
+  const locations = locationsResponse?.data?.locations || [];
+  const totalLocations = locationsResponse?.data?.totalCount || 0;
   const totalPages = Math.ceil(totalLocations / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedLocations = useMemo(
-    () => locations.slice(startIndex, endIndex),
-    [locations, startIndex, endIndex]
-  );
 
   return (
     <Box p={0}>
@@ -115,7 +110,7 @@ export default function LocationsClient() {
                 hideSettingsPanel
           />
           <Box sx={{ mt: { xs: 2, sm: 0 } }}>
-            <LocationsList locations={paginatedLocations} />
+            <LocationsList locations={locations} />
           </Box>
           <Pagination
                 currentPage={currentPage}

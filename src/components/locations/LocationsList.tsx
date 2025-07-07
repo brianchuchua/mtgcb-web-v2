@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -12,17 +11,18 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Location } from '@/api/locations/types';
+import { Location, LocationWithCount } from '@/api/locations/types';
 import { useDeleteLocationMutation } from '@/api/locations/locationsApi';
 import { useSnackbar } from 'notistack';
 import { formatDate } from '@/utils/dateUtils';
 
 interface LocationsListProps {
-  locations: Location[];
+  locations: (Location | LocationWithCount)[];
 }
 
 export default function LocationsList({ locations }: LocationsListProps) {
@@ -65,56 +65,65 @@ export default function LocationsList({ locations }: LocationsListProps) {
         {locations.map((location) => (
           <Grid item xs={12} md={6} lg={4} key={location.id}>
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h6" component="h2" gutterBottom>
-                  {location.name}
-                </Typography>
+              <CardContent sx={{ '&:last-child': { pb: 2 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
+                  <Typography variant="h6" component="h2" sx={{ flex: 1 }}>
+                    {location.name}
+                  </Typography>
+                  <Stack direction="row" spacing={0.5}>
+                    <Tooltip title="Edit location">
+                      <IconButton size="small" onClick={() => handleEditClick(location.id)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete location">
+                      <IconButton size="small" color="error" onClick={() => handleDeleteClick(location)}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Stack>
+                </Box>
+                
                 {location.description && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {location.description}
                   </Typography>
                 )}
-                <Box sx={{ mt: 'auto', pt: 2 }}>
-                  {location.updatedAt && location.updatedAt !== location.createdAt ? (
-                    <Tooltip title={`Created ${formatDate(location.createdAt)}`} placement="top">
+                
+                <Box sx={{ mt: 'auto', pt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                  <Box>
+                    {'totalCards' in location && (
+                      <Typography variant="body2" color="text.secondary">
+                        {location.totalCards} {location.totalCards === 1 ? 'card' : 'cards'}
+                      </Typography>
+                    )}
+                  </Box>
+                  
+                  <Box sx={{ textAlign: 'right' }}>
+                    {location.updatedAt && location.updatedAt !== location.createdAt ? (
+                      <Tooltip title={`Created ${formatDate(location.createdAt)}`} placement="top">
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            Edited
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ cursor: 'help' }}>
+                            {formatDate(location.updatedAt)}
+                          </Typography>
+                        </Box>
+                      </Tooltip>
+                    ) : (
                       <Box>
                         <Typography variant="caption" color="text.secondary">
-                          Edited
+                          Created
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ cursor: 'help' }}>
-                          {formatDate(location.updatedAt)}
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDate(location.createdAt)}
                         </Typography>
                       </Box>
-                    </Tooltip>
-                  ) : (
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">
-                        Created
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {formatDate(location.createdAt)}
-                      </Typography>
-                    </Box>
-                  )}
+                    )}
+                  </Box>
                 </Box>
               </CardContent>
-              <CardActions>
-                <IconButton
-                  size="small"
-                  onClick={() => handleEditClick(location.id)}
-                  aria-label="edit location"
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => handleDeleteClick(location)}
-                  aria-label="delete location"
-                  color="error"
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </CardActions>
             </Card>
           </Grid>
         ))}

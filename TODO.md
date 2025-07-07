@@ -6,6 +6,11 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Remaining Major Feature Work Before 1.0
 
+- User migration -- what if they try a password reset from the new site before logging in? Make sure that works with the migration system.
+- Deck completion
+  - cards should show which decks they are in
+  - Deck building needs to support choosing specific cards so their locations can be labeled
+- Data issues section to show cards that need quantities fixed
 - Proper flavor name support
 - Left <> right set navigation
 - Art cards
@@ -16,7 +21,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Cards page
 - Subset data automation and clean-up (basically audit subset groups that have cards in them directly)
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
-- Home page (landing page or statistics dashboard)
+- Home page (landing page or statistics dashboard depending on login state, perhaps most valuable card can live here)
 - New price updater
 - Legal disclaimer / terms and conditions research / clear estimate labeling
 - In-code TODO audit
@@ -45,13 +50,14 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Other Action Items
 
+- card notes field for card page
 - support better rendering of which variants of cards exist in searches when limiting one copy per card name, maybe
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
 - numberOfCardsInMagic in API coming back isn't always right, see http://local.mtgcb.com:3000/collections/1337/surprise-slivers?goalId=16&includeSets=1056
 - Setting to change going mythic to plain green progress bars
 - Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
 - Remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
-- canBeFoil = audit my database and implement this in the collection views
+- audit all api calls, how they're used, and their payloads, then revise and document
 - Support searching by collector number and collector number ranges
 - Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
 - Missing data detector and clean-up for every card and set field in the database (pureName for example)
@@ -162,8 +168,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 ## Future Feature Work
 
 - Foreign Cards
-- Card Locations
-- Deck Completion
 - Button to report missing card data, notify user is link to scryfall or tcgplayer is missing
 - Sharing and duplicating collection goals
 - Sealed product support
@@ -171,6 +175,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 ## Patron Requests
 
 - Search with scryfall syntax
+- "In terms of import/export, I've got a ton of decks in Moxfield. I'd love the ability to import a deck from Moxfield and then add the name of the Moxfield deck to a location field to help indicate within MTG Collection Builder that a specific card is in a specific Commander deck. Not sure if that's what you were asking with regard to importers and exporters, but it's something that would make my life easier....." "Exactly! This one would be just to import for the location, not to add to the collection. Of course, it would be an added bonus if there were some sort of error handling in case I chose a card variant in Moxfield that I have 0 of in my collection which would notify me so I could change the variant within Moxfield."
 
 ## Maybes
 
@@ -199,6 +204,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Verify parameter edge cases, minimums and maximums
 - Audit field length limits
 - Adequate feature testing
+- Terms and conditions, research
+- Data cleanup for tcgplayer names and codes and tcgplayer ids
 
 ## Nice to Have
 
