@@ -311,6 +311,12 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     options: ['all', 'complete', 'incomplete'],
     defaultValue: 'all',
   },
+  selectedLocationId: {
+    type: 'number',
+    mode: 'cards',
+    urlParam: 'locationId',
+    defaultValue: undefined,
+  },
 };
 
 export function getParametersForMode(mode: 'cards' | 'sets'): Record<string, ParameterConfig> {
