@@ -156,7 +156,7 @@ const BrowseSearchForm: React.FC = () => {
             <>
               <GoalSelector userId={userId} />
               <GoalCompletionSelector />
-              <LocationSelector userId={userId} />
+              {contentType === 'cards' && <LocationSelector userId={userId} />}
             </>
           )}
 
