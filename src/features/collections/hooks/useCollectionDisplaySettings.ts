@@ -108,6 +108,7 @@ export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCol
       setIsVisible: cardDisplaySettings.setIconIsVisible,
       priceIsVisible: cardDisplaySettings.priceIsVisible,
       quantityIsVisible: collectionSettings.quantityIsVisible,
+      locationsIsVisible: cardDisplaySettings.locationsIsVisible,
     }),
     [cardDisplaySettings, collectionSettings.quantityIsVisible],
   );

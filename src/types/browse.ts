@@ -91,6 +91,7 @@ export interface BrowseSearchParams {
   completionStatus?: CompletionStatusFilter;
   selectedGoalId?: number | null;
   showGoals?: ShowGoalsOption;
+  selectedLocationId?: number | null;
 }
 
 export interface BrowsePagination {

@@ -1,5 +1,6 @@
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
+import { RootState } from '@/redux/rootReducer';
 import type {
   Location,
   LocationWithCount,
@@ -51,10 +52,26 @@ export const locationsApi = mtgcbApi.injectEndpoints({
         method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: (_result, _error, { id }) => [
-        { type: 'Location', id },
-        { type: 'Location', id: 'LIST' },
-      ],
+      async onQueryStarted({ id }, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            const tags: any[] = [
+              { type: 'Location', id },
+              { type: 'Location', id: 'LIST' },
+            ];
+            // Also invalidate cards cache to update location names
+            if (userId) {
+              tags.push({ type: 'Cards', id: `user-${userId}` });
+            }
+            dispatch(mtgcbApi.util.invalidateTags(tags));
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
     }),
 
     deleteLocation: builder.mutation<ApiResponse<DeleteLocationResponse>, number>({
@@ -62,10 +79,26 @@ export const locationsApi = mtgcbApi.injectEndpoints({
         url: `/locations/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (_result, _error, id) => [
-        { type: 'Location', id },
-        { type: 'Location', id: 'LIST' },
-      ],
+      async onQueryStarted(id, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            const tags: any[] = [
+              { type: 'Location', id },
+              { type: 'Location', id: 'LIST' },
+            ];
+            // Also invalidate cards cache to remove deleted location from cards
+            if (userId) {
+              tags.push({ type: 'Cards', id: `user-${userId}` });
+            }
+            dispatch(mtgcbApi.util.invalidateTags(tags));
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
     }),
   }),
 });

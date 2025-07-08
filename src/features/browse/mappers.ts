@@ -66,6 +66,8 @@ export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
     // Card capabilities
     canBeFoil: card.canBeFoil,
     canBeNonFoil: card.canBeNonFoil,
+    // Location data
+    locations: card.locations,
   }));
 };
 

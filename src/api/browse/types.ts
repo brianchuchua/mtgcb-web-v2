@@ -65,6 +65,14 @@ export interface CardModel {
     quantityReg: number;
     quantityFoil: number;
   }[];
+  // Location fields (only present when includeLocations is true)
+  locations?: {
+    locationId: number;
+    locationName: string;
+    description: string | null;
+    quantityReg: number;
+    quantityFoil: number;
+  }[];
 }
 
 export interface GoalSummary {
@@ -129,9 +137,13 @@ export interface CardApiParams {
   sortDirection?: 'asc' | 'desc';
   oneResultPerCardName?: boolean;
   select?: string[];
+  userId?: number;
+  priceType?: 'market' | 'low' | 'average' | 'high';
   goalId?: number;
   showGoalProgress?: boolean;
   showGoals?: 'all' | 'complete' | 'incomplete';
+  locationId?: number;
+  includeLocations?: boolean;
 }
 
 export interface SetApiParams {

@@ -75,6 +75,13 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
         setVisibility: (value: boolean) => updateSetting('cardPriceIsVisible', value),
         type: 'toggle',
       },
+      {
+        key: 'locations',
+        label: 'Locations',
+        isVisible: cardDisplaySettings.locationsIsVisible,
+        setVisibility: (value: boolean) => updateSetting('cardLocationsIsVisible', value),
+        type: 'toggle',
+      },
     ],
   };
 

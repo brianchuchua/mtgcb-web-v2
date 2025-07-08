@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import GoalCompletionSelector from '@/features/browse/GoalCompletionSelector';
 import GoalSelector from '@/features/browse/GoalSelector';
+import LocationSelector from '@/features/browse/LocationSelector';
 import { useViewModeToggle } from '@/hooks/useViewModeToggle';
 import {
   resetSearch,
@@ -155,6 +156,7 @@ const BrowseSearchForm: React.FC = () => {
             <>
               <GoalSelector userId={userId} />
               <GoalCompletionSelector />
+              <LocationSelector userId={userId} />
             </>
           )}
 

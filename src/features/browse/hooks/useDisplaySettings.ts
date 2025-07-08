@@ -72,6 +72,7 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
       nameIsVisible: cardDisplaySettings.nameIsVisible,
       setIsVisible: cardDisplaySettings.setIconIsVisible,
       priceIsVisible: cardDisplaySettings.priceIsVisible,
+      locationsIsVisible: cardDisplaySettings.locationsIsVisible,
     }),
     [cardDisplaySettings],
   );

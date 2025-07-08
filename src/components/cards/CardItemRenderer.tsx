@@ -11,6 +11,7 @@ export interface CardItemRendererProps {
     setIsVisible?: boolean;
     priceIsVisible?: boolean;
     goalProgressIsVisible?: boolean;
+    locationsIsVisible?: boolean;
   };
   priceType?: PriceType;
   onClick?: (cardId: string, cardName?: string) => void;

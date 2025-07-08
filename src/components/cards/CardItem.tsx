@@ -78,12 +78,21 @@ export interface CardItemProps {
     quantityReg: number;
     quantityFoil: number;
   }[];
+  // Location fields
+  locations?: {
+    locationId: number;
+    locationName: string;
+    description: string | null;
+    quantityReg: number;
+    quantityFoil: number;
+  }[];
   display?: {
     nameIsVisible?: boolean;
     setIsVisible?: boolean;
     priceIsVisible?: boolean;
     quantityIsVisible?: boolean;
     goalProgressIsVisible?: boolean;
+    locationsIsVisible?: boolean;
   };
   priceType?: PriceType; // Price type to display
   onClick?: () => void;
@@ -127,12 +136,14 @@ const CardItemComponent = ({
   goalAllNeeded,
   goalMetByOtherSets,
   goalContributingVersions,
+  locations,
   display = {
     nameIsVisible: true,
     setIsVisible: true,
     priceIsVisible: true,
     quantityIsVisible: false,
     goalProgressIsVisible: false,
+    locationsIsVisible: true,
   },
   priceType = PriceType.Market,
   onClick,
@@ -166,6 +177,7 @@ const CardItemComponent = ({
     priceIsVisible,
     quantityIsVisible = false,
     goalProgressIsVisible = false,
+    locationsIsVisible = true,
   } = display;
 
   // Check if we're in a collection view and extract userId
@@ -451,8 +463,15 @@ const CardItemComponent = ({
             </Box>
           )}
           
-          {quantityIsVisible && isOwnCollection && (
-            <CardLocationPills cardId={parseInt(id)} cardName={name} setName={setName} />
+          {quantityIsVisible && isOwnCollection && locationsIsVisible && (
+            <CardLocationPills 
+              cardId={parseInt(id)} 
+              cardName={name} 
+              setName={setName} 
+              totalQuantityReg={quantityReg || 0}
+              totalQuantityFoil={quantityFoil || 0}
+              locations={locations}
+            />
           )}
 
           {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && !isOwnCollection && (

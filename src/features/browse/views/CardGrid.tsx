@@ -22,6 +22,7 @@ interface CardGridProps {
     setIsVisible: boolean;
     priceIsVisible: boolean;
     goalProgressIsVisible?: boolean;
+    locationsIsVisible?: boolean;
   };
   priceType: PriceType;
   isOwnCollection?: boolean;
@@ -63,7 +64,13 @@ const CardGridComponent: React.FC<CardGridProps> = ({
       galleryWidth={100}
       horizontalPadding={gallerySettings.cardSizeMargin}
       emptyMessage="No cards found"
-      computeItemKey={(index) => items[index]?.id || index}
+      computeItemKey={(index) => {
+        const item = items[index];
+        if (!item) return index;
+        // Include locations in the key so items re-render when locations change
+        const locationsKey = item.locations ? JSON.stringify(item.locations) : '';
+        return `${item.id}-${locationsKey}`;
+      }}
       data-testid="cards-grid"
     />
   );

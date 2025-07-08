@@ -189,11 +189,35 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: (_result, _error, arg) => [
-        'Collection',
-        'Location',
-        { type: 'Cards', id: arg.cardId },
-      ],
+      async onQueryStarted(arg, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            if (userId) {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  'Location',
+                  { type: 'Cards', id: arg.cardId },
+                  { type: 'Cards', id: `user-${userId}` },
+                ]),
+              );
+            } else {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  'Location',
+                  { type: 'Cards', id: arg.cardId },
+                ]),
+              );
+            }
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
     }),
     
     updateCardLocation: builder.mutation<ApiResponse<CardLocationAssociation>, UpdateCardLocationRequest>({
@@ -202,11 +226,35 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         method: 'PATCH',
         body,
       }),
-      invalidatesTags: (_result, _error, arg) => [
-        'Collection',
-        'Location',
-        { type: 'Cards', id: arg.cardId },
-      ],
+      async onQueryStarted(arg, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            if (userId) {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  'Location',
+                  { type: 'Cards', id: arg.cardId },
+                  { type: 'Cards', id: `user-${userId}` },
+                ]),
+              );
+            } else {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  'Location',
+                  { type: 'Cards', id: arg.cardId },
+                ]),
+              );
+            }
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
     }),
     
     removeCardLocation: builder.mutation<ApiResponse<{ success: true }>, RemoveCardLocationRequest>({
@@ -215,11 +263,35 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         method: 'DELETE',
         body,
       }),
-      invalidatesTags: (_result, _error, arg) => [
-        'Collection',
-        'Location',
-        { type: 'Cards', id: arg.cardId },
-      ],
+      async onQueryStarted(arg, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            if (userId) {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  'Location',
+                  { type: 'Cards', id: arg.cardId },
+                  { type: 'Cards', id: `user-${userId}` },
+                ]),
+              );
+            } else {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  'Location',
+                  { type: 'Cards', id: arg.cardId },
+                ]),
+              );
+            }
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
     }),
     
     getCardLocations: builder.query<ApiResponse<CardLocationsResponse>, number>({

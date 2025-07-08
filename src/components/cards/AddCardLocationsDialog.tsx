@@ -66,6 +66,10 @@ export default function AddCardLocationsDialog({
   const locations = locationsResponse?.data?.locations || [];
   const cardLocations = cardLocationsResponse?.data?.locations || [];
 
+  // Calculate totals already assigned
+  const totalAssignedReg = cardLocations.reduce((sum, loc) => sum + loc.quantityReg, 0);
+  const totalAssignedFoil = cardLocations.reduce((sum, loc) => sum + loc.quantityFoil, 0);
+
   // Check if selected location already has this card
   const existingLocation = cardLocations.find((loc) => loc.locationId === selectedLocationId);
 
@@ -80,6 +84,19 @@ export default function AddCardLocationsDialog({
       setIsUpdating(false);
     }
   }, [existingLocation]);
+
+  // Calculate available quantities (owned - already assigned to other locations)
+  const currentLocationReg = existingLocation?.quantityReg || 0;
+  const currentLocationFoil = existingLocation?.quantityFoil || 0;
+  const availableReg = totalQuantityReg - totalAssignedReg + currentLocationReg;
+  const availableFoil = totalQuantityFoil - totalAssignedFoil + currentLocationFoil;
+
+  // Validate quantities don't exceed available
+  const regQtyNum = parseInt(quantityReg) || 0;
+  const foilQtyNum = parseInt(quantityFoil) || 0;
+  const regExceedsAvailable = regQtyNum > availableReg;
+  const foilExceedsAvailable = foilQtyNum > availableFoil;
+  const hasValidationError = regExceedsAvailable || foilExceedsAvailable;
 
   const handleSave = async () => {
     if (!selectedLocationId) {
@@ -97,6 +114,11 @@ export default function AddCardLocationsDialog({
 
     if (regQty < 0 || foilQty < 0) {
       enqueueSnackbar('Quantities cannot be negative', { variant: 'error' });
+      return;
+    }
+
+    if (regExceedsAvailable || foilExceedsAvailable) {
+      enqueueSnackbar('Quantities cannot exceed available amounts', { variant: 'error' });
       return;
     }
 
@@ -134,10 +156,6 @@ export default function AddCardLocationsDialog({
   };
 
   const isLoading = locationsLoading || cardLocationsLoading;
-
-  // Calculate totals already assigned
-  const totalAssignedReg = cardLocations.reduce((sum, loc) => sum + loc.quantityReg, 0);
-  const totalAssignedFoil = cardLocations.reduce((sum, loc) => sum + loc.quantityFoil, 0);
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ elevation: 0 }}>
@@ -190,6 +208,8 @@ export default function AddCardLocationsDialog({
                     value={quantityReg}
                     onChange={(e) => setQuantityReg(e.target.value)}
                     inputProps={{ min: 0 }}
+                    error={regExceedsAvailable}
+                    helperText={regExceedsAvailable ? `Maximum available: ${availableReg}` : ''}
                   />
                   <TextField
                     fullWidth
@@ -198,6 +218,8 @@ export default function AddCardLocationsDialog({
                     value={quantityFoil}
                     onChange={(e) => setQuantityFoil(e.target.value)}
                     inputProps={{ min: 0 }}
+                    error={foilExceedsAvailable}
+                    helperText={foilExceedsAvailable ? `Maximum available: ${availableFoil}` : ''}
                   />
                 </Stack>
 
@@ -216,6 +238,10 @@ export default function AddCardLocationsDialog({
                   <br />
                   <Typography variant="caption" color="text.secondary">
                     Already assigned: {totalAssignedReg} regular, {totalAssignedFoil} foil
+                  </Typography>
+                  <br />
+                  <Typography variant="caption" color="text.secondary">
+                    Available to assign: {availableReg} regular, {availableFoil} foil
                   </Typography>
                 </Box>
 
@@ -238,7 +264,7 @@ export default function AddCardLocationsDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSave} variant="contained" disabled={!selectedLocationId || isLoading}>
+        <Button onClick={handleSave} variant="contained" disabled={!selectedLocationId || isLoading || hasValidationError}>
           {isUpdating ? 'Update' : 'Add'}
         </Button>
       </DialogActions>

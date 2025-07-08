@@ -34,6 +34,7 @@ interface DisplaySettings {
   cardOwnedIsVisible: boolean;
   cardOwnedFoilIsVisible: boolean;
   cardGoalProgressIsVisible: boolean;
+  cardLocationsIsVisible: boolean;
   
   // Set display settings (grid view)
   setNameIsVisible: boolean;
@@ -123,6 +124,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   cardOwnedIsVisible: true,
   cardOwnedFoilIsVisible: true,
   cardGoalProgressIsVisible: false,
+  cardLocationsIsVisible: true,
   
   // Set display settings (grid view)
   setNameIsVisible: true,
@@ -283,6 +285,7 @@ export function useCardDisplaySettings() {
     ownedIsVisible: settings.cardOwnedIsVisible,
     ownedFoilIsVisible: settings.cardOwnedFoilIsVisible,
     goalProgressIsVisible: settings.cardGoalProgressIsVisible,
+    locationsIsVisible: settings.cardLocationsIsVisible,
   };
 }
 

@@ -20,6 +20,7 @@ import {
 // Type for resetSearch options
 interface ResetSearchOptions {
   preserveGoal?: boolean;
+  preserveLocation?: boolean;
 }
 
 // Initialize with default pagination values for both card and set views
@@ -300,6 +301,7 @@ export const browseSlice = createSlice({
     },
     resetSearch: (state, action: PayloadAction<ResetSearchOptions | undefined>) => {
       const preserveGoal = action.payload?.preserveGoal || false;
+      const preserveLocation = action.payload?.preserveLocation || false;
       
       // Reset the current view type's search params but preserve pagination
       const pagination =
@@ -319,6 +321,9 @@ export const browseSlice = createSlice({
       const currentGoalId = state.viewContentType === 'cards' 
         ? state.cardsSearchParams.selectedGoalId 
         : state.setsSearchParams.selectedGoalId;
+      const currentLocationId = state.viewContentType === 'cards' 
+        ? state.cardsSearchParams.selectedLocationId 
+        : state.setsSearchParams.selectedLocationId;
       const currentSortBy = state.setsSearchParams.sortBy;
       const currentSortOrder = state.setsSearchParams.sortOrder;
 
@@ -335,6 +340,10 @@ export const browseSlice = createSlice({
         if (preserveGoal && currentGoalId !== undefined) {
           state.cardsSearchParams.selectedGoalId = currentGoalId;
         }
+        // Preserve location if requested
+        if (preserveLocation && currentLocationId !== undefined) {
+          state.cardsSearchParams.selectedLocationId = currentLocationId;
+        }
       } else {
         state.setsSearchParams = {
           currentPage: pagination.currentPage,
@@ -350,12 +359,22 @@ export const browseSlice = createSlice({
         if (preserveGoal && currentGoalId !== undefined) {
           state.setsSearchParams.selectedGoalId = currentGoalId;
         }
+        // Preserve location if requested
+        if (preserveLocation && currentLocationId !== undefined) {
+          state.setsSearchParams.selectedLocationId = currentLocationId;
+        }
       }
       
       // Only clear selected goal if not preserving it
       if (!preserveGoal) {
         delete state.cardsSearchParams.selectedGoalId;
         delete state.setsSearchParams.selectedGoalId;
+      }
+      
+      // Only clear selected location if not preserving it
+      if (!preserveLocation) {
+        delete state.cardsSearchParams.selectedLocationId;
+        delete state.setsSearchParams.selectedLocationId;
       }
     },
     resetAllSearches: (state) => {
@@ -432,6 +451,20 @@ export const browseSlice = createSlice({
         state.setsSearchParams.showGoals = action.payload;
       }
     },
+    setSelectedLocationId: (state, action: PayloadAction<number | null>) => {
+      // Apply to both card and set search params
+      if (action.payload === null) {
+        delete state.cardsSearchParams.selectedLocationId;
+        delete state.setsSearchParams.selectedLocationId;
+      } else {
+        state.cardsSearchParams.selectedLocationId = action.payload;
+        state.setsSearchParams.selectedLocationId = action.payload;
+      }
+    },
+    clearSelectedLocation: (state) => {
+      delete state.cardsSearchParams.selectedLocationId;
+      delete state.setsSearchParams.selectedLocationId;
+    },
   },
 });
 
@@ -466,6 +499,8 @@ export const {
   setSelectedGoalId,
   clearSelectedGoal,
   setShowGoals,
+  setSelectedLocationId,
+  clearSelectedLocation,
 } = browseSlice.actions;
 
 // Generic/shared selectors that respect current content type
@@ -540,5 +575,11 @@ export const selectShowGoals = (state: RootState): ShowGoalsOption =>
   state.browse.viewContentType === 'cards' 
     ? state.browse.cardsSearchParams.showGoals || 'all'
     : state.browse.setsSearchParams.showGoals || 'all';
+
+// Location selector
+export const selectSelectedLocationId = (state: RootState) => 
+  state.browse.viewContentType === 'cards' 
+    ? state.browse.cardsSearchParams.selectedLocationId 
+    : state.browse.setsSearchParams.selectedLocationId;
 
 export default browseSlice.reducer;
