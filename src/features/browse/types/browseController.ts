@@ -51,6 +51,7 @@ export interface TableSettings {
   loyaltyIsVisible: boolean;
   priceIsVisible: boolean;
   quantityIsVisible?: boolean;
+  locationsIsVisible?: boolean;
 }
 
 /**
@@ -62,6 +63,7 @@ export interface CardDisplaySettings {
   priceIsVisible: boolean;
   quantityIsVisible?: boolean;
   goalProgressIsVisible?: boolean;
+  locationsIsVisible?: boolean;
 }
 
 /**

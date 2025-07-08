@@ -525,6 +525,7 @@ const CardItem = React.memo(CardItemComponent, (prevProps, nextProps) => {
     prevProps.display?.priceIsVisible === nextProps.display?.priceIsVisible &&
     prevProps.display?.quantityIsVisible === nextProps.display?.quantityIsVisible &&
     prevProps.display?.goalProgressIsVisible === nextProps.display?.goalProgressIsVisible &&
+    prevProps.display?.locationsIsVisible === nextProps.display?.locationsIsVisible &&
     // Compare prices if they're visible
     (!prevProps.display?.priceIsVisible ||
       (prevProps.market === nextProps.market &&

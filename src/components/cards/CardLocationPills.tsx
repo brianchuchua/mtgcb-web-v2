@@ -261,11 +261,11 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
             label={
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <span>{location.locationName}</span>
-                <Typography variant="caption" component="span" sx={{ opacity: 0.8 }}>
+                <span style={{ opacity: 0.7, fontSize: '0.875em' }}>
                   {location.quantityReg > 0 && `${location.quantityReg}R`}
                   {location.quantityReg > 0 && location.quantityFoil > 0 && '/'}
                   {location.quantityFoil > 0 && `${location.quantityFoil}F`}
-                </Typography>
+                </span>
               </Box>
             }
             size="small"

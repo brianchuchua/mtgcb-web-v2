@@ -97,8 +97,9 @@ export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCol
       loyaltyIsVisible: tableCardSettings.loyaltyIsVisible,
       priceIsVisible: tableCardSettings.priceIsVisible,
       quantityIsVisible: collectionSettings.tableQuantityIsVisible,
+      locationsIsVisible: collectionSettings.tableLocationsIsVisible,
     }),
-    [tableCardSettings, collectionSettings.tableQuantityIsVisible],
+    [tableCardSettings, collectionSettings.tableQuantityIsVisible, collectionSettings.tableLocationsIsVisible],
   );
 
   // Card display settings (includes quantity for collections)

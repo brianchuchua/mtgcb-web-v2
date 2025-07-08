@@ -11,6 +11,7 @@ import { usePathname } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CardItemProps } from './CardItem';
+import { CardLocationTableCell } from './CardLocationTableCell';
 import CardPrice from './CardPrice';
 import { GoalStatusTableCell } from './GoalStatusTableCell';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
@@ -37,6 +38,7 @@ export interface CardTableRendererProps {
     priceIsVisible?: boolean;
     quantityIsVisible?: boolean;
     goalProgressIsVisible?: boolean;
+    locationsIsVisible?: boolean;
   };
 }
 
@@ -140,6 +142,17 @@ export const useCardTableColumns = (
       tooltip: <QuantityFoilTooltip />,
       hasInfoIcon: true,
       sortable: true,
+    },
+    {
+      id: 'locations',
+      label: 'Locations',
+      width: {
+        xs: '150px',
+        sm: '200px',
+        md: '250px',
+        default: '250px',
+      },
+      sortable: false,
     },
     {
       id: 'releasedAt',
@@ -257,6 +270,10 @@ export const useCardTableColumns = (
       return displaySettings.quantityIsVisible ?? false;
     }
 
+    if (column.id === 'locations') {
+      return displaySettings.locationsIsVisible ?? false;
+    }
+
     return true;
   });
 };
@@ -372,13 +389,13 @@ const InlineEditableQuantity: React.FC<{
   const updatePromiseRef = useRef<{ abort: () => void } | null>(null);
   const isUserEditingRef = useRef(false);
   const editingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Determine if this quantity selector should be disabled
   const isDisabled = quantityType === 'regular' ? !canBeNonFoil : !canBeFoil;
-  
+
   // Determine if this selector has an error (disabled but non-zero quantity)
   const hasError = isDisabled && localQuantity > 0;
-  
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -438,20 +455,20 @@ const InlineEditableQuantity: React.FC<{
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    
+
     // Mark as user editing
     isUserEditingRef.current = true;
-    
+
     // Clear any existing timeout
     if (editingTimeoutRef.current) {
       clearTimeout(editingTimeoutRef.current);
     }
-    
+
     // Set timeout to clear editing flag
     editingTimeoutRef.current = setTimeout(() => {
       isUserEditingRef.current = false;
     }, 2000);
-    
+
     // Update the display value
     setInputValue(value);
 
@@ -487,20 +504,20 @@ const InlineEditableQuantity: React.FC<{
   const handleIncrement = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     event.currentTarget.blur();
-    
+
     // Mark as user editing
     isUserEditingRef.current = true;
-    
+
     // Clear any existing timeout
     if (editingTimeoutRef.current) {
       clearTimeout(editingTimeoutRef.current);
     }
-    
+
     // Set timeout to clear editing flag
     editingTimeoutRef.current = setTimeout(() => {
       isUserEditingRef.current = false;
     }, 2000);
-    
+
     const newQuantity = localQuantity + 1;
     setLocalQuantity(newQuantity);
     setInputValue(newQuantity.toString());
@@ -510,20 +527,20 @@ const InlineEditableQuantity: React.FC<{
   const handleDecrement = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     event.currentTarget.blur();
-    
+
     // Mark as user editing
     isUserEditingRef.current = true;
-    
+
     // Clear any existing timeout
     if (editingTimeoutRef.current) {
       clearTimeout(editingTimeoutRef.current);
     }
-    
+
     // Set timeout to clear editing flag
     editingTimeoutRef.current = setTimeout(() => {
       isUserEditingRef.current = false;
     }, 2000);
-    
+
     const newQuantity = Math.max(0, localQuantity - 1);
     setLocalQuantity(newQuantity);
     setInputValue(newQuantity.toString());
@@ -845,7 +862,14 @@ export const useCardRowRenderer = (
         // Use inline editable quantity components for own collection
         // Regular quantity cell
         cells.push(
-          <TableCell key="quantityReg" sx={{ padding: '4px', textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}>
+          <TableCell
+            key="quantityReg"
+            sx={{
+              padding: '4px',
+              textAlign: 'center',
+              verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle',
+            }}
+          >
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
                 <Box sx={{ mt: '5px' }}>
@@ -874,10 +898,17 @@ export const useCardRowRenderer = (
             )}
           </TableCell>,
         );
-        
+
         // Foil quantity cell
         cells.push(
-          <TableCell key="quantityFoil" sx={{ padding: '4px', textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}>
+          <TableCell
+            key="quantityFoil"
+            sx={{
+              padding: '4px',
+              textAlign: 'center',
+              verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle',
+            }}
+          >
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
                 <Box sx={{ mt: '5px' }}>
@@ -909,30 +940,57 @@ export const useCardRowRenderer = (
       } else {
         // Show read-only quantities for other collections
         cells.push(
-          <TableCell key="quantityReg" sx={{ textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}>
+          <TableCell
+            key="quantityReg"
+            sx={{ textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}
+          >
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
                 <Box sx={{ mt: '5px' }}>{card.quantityReg !== undefined ? card.quantityReg : '-'}</Box>
                 <GoalStatusTableCell card={card as any} goalType="regular" />
               </Box>
+            ) : card.quantityReg !== undefined ? (
+              card.quantityReg
             ) : (
-              card.quantityReg !== undefined ? card.quantityReg : '-'
+              '-'
             )}
           </TableCell>,
         );
         cells.push(
-          <TableCell key="quantityFoil" sx={{ textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}>
+          <TableCell
+            key="quantityFoil"
+            sx={{ textAlign: 'center', verticalAlign: displaySettings.goalProgressIsVisible ? 'top' : 'middle' }}
+          >
             {displaySettings.goalProgressIsVisible ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '48px' }}>
                 <Box sx={{ mt: '5px' }}>{card.quantityFoil !== undefined ? card.quantityFoil : '-'}</Box>
                 <GoalStatusTableCell card={card as any} goalType="foil" />
               </Box>
+            ) : card.quantityFoil !== undefined ? (
+              card.quantityFoil
             ) : (
-              card.quantityFoil !== undefined ? card.quantityFoil : '-'
+              '-'
             )}
           </TableCell>,
         );
       }
+    }
+
+    // Locations Cell
+    if (displaySettings.locationsIsVisible && isOwnCollection) {
+      cells.push(
+        <CardLocationTableCell
+          key="locations"
+          cardId={card.id}
+          cardName={card.name}
+          setName={card.setName}
+          totalQuantityReg={card.quantityReg || 0}
+          totalQuantityFoil={card.quantityFoil || 0}
+          canBeFoil={card.canBeFoil}
+          canBeNonFoil={card.canBeNonFoil}
+          locations={card.locations}
+        />,
+      );
     }
 
     // Set Cell

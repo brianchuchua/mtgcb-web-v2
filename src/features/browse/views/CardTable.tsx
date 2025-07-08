@@ -25,9 +25,11 @@ interface CardTableProps {
     toughnessIsVisible: boolean;
     loyaltyIsVisible: boolean;
     priceIsVisible: boolean;
+    locationsIsVisible?: boolean;
   };
   cardDisplaySettings?: {
     goalProgressIsVisible?: boolean;
+    locationsIsVisible?: boolean;
   };
   isOwnCollection?: boolean;
   goalId?: string;
@@ -47,9 +49,11 @@ const CardTable: React.FC<CardTableProps> = ({
   goalId,
 }) => {
   // Merge table settings with card display settings
+  // For locations, prioritize tableSettings over cardDisplaySettings
   const mergedDisplaySettings = {
     ...tableSettings,
     ...cardDisplaySettings,
+    locationsIsVisible: tableSettings.locationsIsVisible ?? cardDisplaySettings?.locationsIsVisible,
   };
 
   const tableColumns = useCardTableColumns(

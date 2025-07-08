@@ -5,6 +5,7 @@ import {
   useCardDisplaySettings,
   useLayoutSettings,
   useTableCardSettings,
+  useCollectionSettings,
   usePriceType,
   usePreferredViewMode
 } from '@/contexts/DisplaySettingsContext';
@@ -16,6 +17,7 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
   const cardDisplaySettings = useCardDisplaySettings();
   const layoutSettings = useLayoutSettings();
   const tableCardSettings = useTableCardSettings();
+  const collectionSettings = useCollectionSettings();
   const [priceType, setPriceType] = usePriceType();
   const [preferredViewMode] = usePreferredViewMode();
 
@@ -207,6 +209,13 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
         label: 'Price',
         isVisible: tableCardSettings.priceIsVisible,
         setVisibility: (value: boolean) => updateSetting('tablePriceIsVisible', value),
+        type: 'toggle',
+      },
+      {
+        key: 'tableLocations',
+        label: 'Locations',
+        isVisible: collectionSettings.tableLocationsIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableLocationsIsVisible', value),
         type: 'toggle',
       },
     ],

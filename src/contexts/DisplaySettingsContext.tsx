@@ -76,6 +76,7 @@ interface DisplaySettings {
   quantityIsVisible: boolean;
   lastModifiedIsVisible: boolean;
   tableQuantityIsVisible: boolean;
+  tableLocationsIsVisible: boolean;
   
   // Collection set-specific settings
   completionIsVisible: boolean;
@@ -166,6 +167,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   quantityIsVisible: true,
   lastModifiedIsVisible: false,
   tableQuantityIsVisible: true,
+  tableLocationsIsVisible: true,
   
   // Collection set-specific settings
   completionIsVisible: true,
@@ -355,6 +357,7 @@ export function useCollectionSettings() {
     quantityIsVisible: settings.quantityIsVisible,
     lastModifiedIsVisible: settings.lastModifiedIsVisible,
     tableQuantityIsVisible: settings.tableQuantityIsVisible,
+    tableLocationsIsVisible: settings.tableLocationsIsVisible,
   };
 }
 

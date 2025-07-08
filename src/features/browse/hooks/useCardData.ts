@@ -9,7 +9,7 @@ import { selectSelectedGoalId, selectShowGoals, selectSelectedLocationId } from 
 import { usePriceType } from '@/hooks/usePriceType';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
-import { useCardDisplaySettings } from '@/contexts/DisplaySettingsContext';
+import { useCardDisplaySettings, useCollectionSettings } from '@/contexts/DisplaySettingsContext';
 
 interface UseCardDataProps {
   searchParams: any;
@@ -28,6 +28,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
   const showGoals = useSelector(selectShowGoals);
   const selectedLocationId = useSelector(selectSelectedLocationId);
   const cardDisplaySettings = useCardDisplaySettings();
+  const collectionSettings = useCollectionSettings();
 
   const apiArgs = useMemo(() => {
     const params = buildApiParamsFromSearchParams(searchParams, 'cards');
@@ -60,7 +61,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     // Add quantity fields when userId is present
     if (userId) {
       selectFields.push('quantityReg', 'quantityFoil');
-      if (cardDisplaySettings.locationsIsVisible) {
+      if (cardDisplaySettings.locationsIsVisible || collectionSettings.tableLocationsIsVisible) {
         selectFields.push('locations');
       }
     }
@@ -90,7 +91,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       ...(userId && { 
         userId, 
         priceType,
-        includeLocations: cardDisplaySettings.locationsIsVisible
+        includeLocations: cardDisplaySettings.locationsIsVisible || collectionSettings.tableLocationsIsVisible
       }),
       ...(selectedGoalId && userId && { 
         goalId: selectedGoalId,
@@ -106,7 +107,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       sortDirection: params.sortDirection || ('asc' as const),
       select: selectFields,
     };
-  }, [searchParams, pagination, userId, priceType, selectedGoalId, showGoals, selectedLocationId, cardDisplaySettings.locationsIsVisible]);
+  }, [searchParams, pagination, userId, priceType, selectedGoalId, showGoals, selectedLocationId, cardDisplaySettings.locationsIsVisible, collectionSettings.tableLocationsIsVisible]);
 
   const queryConfig = {
     refetchOnFocus: false,
