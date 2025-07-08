@@ -209,14 +209,16 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
     return null;
   }
 
-  // Transform locations to CardLocation type - this will re-run when propLocations changes
-  const locations: CardLocation[] = propLocations.map(loc => ({
-    locationId: loc.locationId,
-    locationName: loc.locationName,
-    description: loc.description,
-    quantityReg: loc.quantityReg,
-    quantityFoil: loc.quantityFoil
-  }));
+  // Transform locations to CardLocation type and sort alphabetically - this will re-run when propLocations changes
+  const locations: CardLocation[] = propLocations
+    .map(loc => ({
+      locationId: loc.locationId,
+      locationName: loc.locationName,
+      description: loc.description,
+      quantityReg: loc.quantityReg,
+      quantityFoil: loc.quantityFoil
+    }))
+    .sort((a, b) => a.locationName.localeCompare(b.locationName));
 
   const handleRemoveClick = (location: CardLocation, event: React.MouseEvent) => {
     event.stopPropagation();
