@@ -470,6 +470,8 @@ const CardItemComponent = ({
               setName={setName} 
               totalQuantityReg={quantityReg || 0}
               totalQuantityFoil={quantityFoil || 0}
+              canBeFoil={canBeFoil}
+              canBeNonFoil={canBeNonFoil}
               locations={locations}
             />
           )}
@@ -500,6 +502,8 @@ const CardItemComponent = ({
           setName={setName}
           totalQuantityReg={quantityReg || 0}
           totalQuantityFoil={quantityFoil || 0}
+          canBeFoil={canBeFoil}
+          canBeNonFoil={canBeNonFoil}
         />
       )}
     </StyledCard>

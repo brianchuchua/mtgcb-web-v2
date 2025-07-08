@@ -151,6 +151,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Tech Debt
 
+- All quantity selectors should be using the same component, QuantitySelector.tsx
 - Type issues in src\api\collections\collectionsApi.ts
 - Switching from desktop to mobile view unmounts a lot of the app, which resets pages like the edit cards page
 - End-to-end tests for every user action

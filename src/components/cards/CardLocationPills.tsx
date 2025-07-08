@@ -9,7 +9,6 @@ import {
   DialogTitle,
   IconButton,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -20,6 +19,7 @@ import {
   useRemoveCardLocationMutation,
   useUpdateCardLocationMutation,
 } from '@/api/collections/collectionsApi';
+import { DualQuantitySelector } from '@/components/shared/QuantitySelector';
 
 const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -39,6 +39,8 @@ interface CardLocationPillsProps {
   setName?: string;
   totalQuantityReg: number;
   totalQuantityFoil: number;
+  canBeFoil?: boolean;
+  canBeNonFoil?: boolean;
   locations?: {
     locationId: number;
     locationName: string;
@@ -57,19 +59,21 @@ interface EditLocationDialogProps {
   setName?: string;
   totalQuantityReg: number;
   totalQuantityFoil: number;
+  canBeFoil?: boolean;
+  canBeNonFoil?: boolean;
   allLocations: CardLocation[];
 }
 
-function EditLocationDialog({ open, onClose, location, cardId, cardName, setName, totalQuantityReg, totalQuantityFoil, allLocations }: EditLocationDialogProps) {
+function EditLocationDialog({ open, onClose, location, cardId, cardName, setName, totalQuantityReg, totalQuantityFoil, canBeFoil = true, canBeNonFoil = true, allLocations }: EditLocationDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
-  const [quantityReg, setQuantityReg] = useState(location.quantityReg.toString());
-  const [quantityFoil, setQuantityFoil] = useState(location.quantityFoil.toString());
+  const [quantityReg, setQuantityReg] = useState(location.quantityReg);
+  const [quantityFoil, setQuantityFoil] = useState(location.quantityFoil);
   const [updateCardLocation, { isLoading }] = useUpdateCardLocationMutation();
 
   // Update state when location prop changes
   useEffect(() => {
-    setQuantityReg(location.quantityReg.toString());
-    setQuantityFoil(location.quantityFoil.toString());
+    setQuantityReg(location.quantityReg);
+    setQuantityFoil(location.quantityFoil);
   }, [location.quantityReg, location.quantityFoil]);
 
   // Calculate totals already assigned across ALL locations
@@ -93,24 +97,28 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
   const maxAssignableFoil = totalQuantityFoil - totalAssignedOthersFoil;
 
   // Validate quantities don't exceed maximum assignable
-  const regQtyNum = parseInt(quantityReg) || 0;
-  const foilQtyNum = parseInt(quantityFoil) || 0;
-  const regExceedsAvailable = regQtyNum > maxAssignableReg;
-  const foilExceedsAvailable = foilQtyNum > maxAssignableFoil;
-  const hasValidationError = regExceedsAvailable || foilExceedsAvailable;
+  const regExceedsAvailable = quantityReg > maxAssignableReg;
+  const foilExceedsAvailable = quantityFoil > maxAssignableFoil;
+  const hasValidationError = regExceedsAvailable || foilExceedsAvailable || (!canBeNonFoil && quantityReg > 0) || (!canBeFoil && quantityFoil > 0);
 
   const handleSave = async () => {
-    const regQty = parseInt(quantityReg) || 0;
-    const foilQty = parseInt(quantityFoil) || 0;
-
-    if (regQty < 0 || foilQty < 0) {
+    if (quantityReg < 0 || quantityFoil < 0) {
       enqueueSnackbar('Quantities cannot be negative', { variant: 'error' });
       return;
     }
 
-
     if (regExceedsAvailable || foilExceedsAvailable) {
       enqueueSnackbar('Quantities cannot exceed available amounts', { variant: 'error' });
+      return;
+    }
+
+    if (!canBeNonFoil && quantityReg > 0) {
+      enqueueSnackbar('This card cannot be non-foil', { variant: 'error' });
+      return;
+    }
+
+    if (!canBeFoil && quantityFoil > 0) {
+      enqueueSnackbar('This card cannot be foil', { variant: 'error' });
       return;
     }
 
@@ -118,8 +126,8 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
       await updateCardLocation({
         cardId,
         locationId: location.locationId,
-        quantityReg: regQty,
-        quantityFoil: foilQty,
+        quantityReg: quantityReg,
+        quantityFoil: quantityFoil,
       }).unwrap();
       enqueueSnackbar('Location quantities updated', { variant: 'success' });
       onClose();
@@ -145,25 +153,21 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
           <Typography variant="body2" color="text.secondary">
             at {location.locationName}
           </Typography>
-          <TextField
-            fullWidth
-            type="number"
-            label="Regular Quantity"
-            value={quantityReg}
-            onChange={(e) => setQuantityReg(e.target.value)}
-            inputProps={{ min: 0 }}
-            error={regExceedsAvailable}
-            helperText={regExceedsAvailable ? `Maximum available: ${maxAssignableReg}` : ''}
-          />
-          <TextField
-            fullWidth
-            type="number"
-            label="Foil Quantity"
-            value={quantityFoil}
-            onChange={(e) => setQuantityFoil(e.target.value)}
-            inputProps={{ min: 0 }}
-            error={foilExceedsAvailable}
-            helperText={foilExceedsAvailable ? `Maximum available: ${maxAssignableFoil}` : ''}
+          <DualQuantitySelector
+            regularValue={quantityReg}
+            foilValue={quantityFoil}
+            onRegularChange={setQuantityReg}
+            onFoilChange={setQuantityFoil}
+            canBeNonFoil={canBeNonFoil}
+            canBeFoil={canBeFoil}
+            maxRegular={maxAssignableReg}
+            maxFoil={maxAssignableFoil}
+            regularError={regExceedsAvailable}
+            foilError={foilExceedsAvailable}
+            regularHelperText={regExceedsAvailable ? `Maximum available: ${maxAssignableReg}` : undefined}
+            foilHelperText={foilExceedsAvailable ? `Maximum available: ${maxAssignableFoil}` : undefined}
+            size="medium"
+            orientation="horizontal"
           />
           <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
             Note: Tracking quantities with card locations is optional.
@@ -193,7 +197,7 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
   );
 }
 
-export default function CardLocationPills({ cardId, cardName, setName, totalQuantityReg, totalQuantityFoil, locations: propLocations }: CardLocationPillsProps) {
+export default function CardLocationPills({ cardId, cardName, setName, totalQuantityReg, totalQuantityFoil, canBeFoil = true, canBeNonFoil = true, locations: propLocations }: CardLocationPillsProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [editingLocation, setEditingLocation] = useState<CardLocation | null>(null);
   const [deletingLocation, setDeletingLocation] = useState<CardLocation | null>(null);
@@ -293,6 +297,8 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
           setName={setName}
           totalQuantityReg={totalQuantityReg}
           totalQuantityFoil={totalQuantityFoil}
+          canBeFoil={canBeFoil}
+          canBeNonFoil={canBeNonFoil}
           allLocations={locations}
         />
       )}

@@ -12,7 +12,6 @@ import {
   MenuItem,
   Select,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
@@ -24,6 +23,7 @@ import {
   useUpdateCardLocationMutation,
 } from '@/api/collections/collectionsApi';
 import { useGetLocationsQuery } from '@/api/locations/locationsApi';
+import { DualQuantitySelector } from '@/components/shared/QuantitySelector';
 
 interface AddCardLocationsDialogProps {
   open: boolean;
@@ -33,6 +33,8 @@ interface AddCardLocationsDialogProps {
   setName?: string;
   totalQuantityReg: number;
   totalQuantityFoil: number;
+  canBeFoil?: boolean;
+  canBeNonFoil?: boolean;
 }
 
 export default function AddCardLocationsDialog({
@@ -43,11 +45,13 @@ export default function AddCardLocationsDialog({
   setName,
   totalQuantityReg,
   totalQuantityFoil,
+  canBeFoil = true,
+  canBeNonFoil = true,
 }: AddCardLocationsDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [selectedLocationId, setSelectedLocationId] = useState<number | ''>('');
-  const [quantityReg, setQuantityReg] = useState<string>('0');
-  const [quantityFoil, setQuantityFoil] = useState<string>('0');
+  const [quantityReg, setQuantityReg] = useState<number>(0);
+  const [quantityFoil, setQuantityFoil] = useState<number>(0);
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Fetch user's locations
@@ -75,12 +79,12 @@ export default function AddCardLocationsDialog({
 
   useEffect(() => {
     if (existingLocation) {
-      setQuantityReg(existingLocation.quantityReg.toString());
-      setQuantityFoil(existingLocation.quantityFoil.toString());
+      setQuantityReg(existingLocation.quantityReg);
+      setQuantityFoil(existingLocation.quantityFoil);
       setIsUpdating(true);
     } else {
-      setQuantityReg('0');
-      setQuantityFoil('0');
+      setQuantityReg(0);
+      setQuantityFoil(0);
       setIsUpdating(false);
     }
   }, [existingLocation]);
@@ -92,11 +96,9 @@ export default function AddCardLocationsDialog({
   const availableFoil = totalQuantityFoil - totalAssignedFoil + currentLocationFoil;
 
   // Validate quantities don't exceed available
-  const regQtyNum = parseInt(quantityReg) || 0;
-  const foilQtyNum = parseInt(quantityFoil) || 0;
-  const regExceedsAvailable = regQtyNum > availableReg;
-  const foilExceedsAvailable = foilQtyNum > availableFoil;
-  const hasValidationError = regExceedsAvailable || foilExceedsAvailable;
+  const regExceedsAvailable = quantityReg > availableReg;
+  const foilExceedsAvailable = quantityFoil > availableFoil;
+  const hasValidationError = regExceedsAvailable || foilExceedsAvailable || (!canBeNonFoil && quantityReg > 0) || (!canBeFoil && quantityFoil > 0);
 
   const handleSave = async () => {
     if (!selectedLocationId) {
@@ -104,11 +106,7 @@ export default function AddCardLocationsDialog({
       return;
     }
 
-    const regQty = parseInt(quantityReg) || 0;
-    const foilQty = parseInt(quantityFoil) || 0;
-
-
-    if (regQty < 0 || foilQty < 0) {
+    if (quantityReg < 0 || quantityFoil < 0) {
       enqueueSnackbar('Quantities cannot be negative', { variant: 'error' });
       return;
     }
@@ -118,21 +116,31 @@ export default function AddCardLocationsDialog({
       return;
     }
 
+    if (!canBeNonFoil && quantityReg > 0) {
+      enqueueSnackbar('This card cannot be non-foil', { variant: 'error' });
+      return;
+    }
+
+    if (!canBeFoil && quantityFoil > 0) {
+      enqueueSnackbar('This card cannot be foil', { variant: 'error' });
+      return;
+    }
+
     try {
       if (isUpdating) {
         await updateCardLocation({
           cardId,
           locationId: selectedLocationId as number,
-          quantityReg: regQty,
-          quantityFoil: foilQty,
+          quantityReg: quantityReg,
+          quantityFoil: quantityFoil,
         }).unwrap();
         enqueueSnackbar('Location quantities updated successfully', { variant: 'success' });
       } else {
         await associateCardLocation({
           cardId,
           locationId: selectedLocationId as number,
-          quantityReg: regQty,
-          quantityFoil: foilQty,
+          quantityReg: quantityReg,
+          quantityFoil: quantityFoil,
         }).unwrap();
         enqueueSnackbar('Card added to location successfully', { variant: 'success' });
       }
@@ -145,8 +153,8 @@ export default function AddCardLocationsDialog({
 
   const handleClose = () => {
     setSelectedLocationId('');
-    setQuantityReg('0');
-    setQuantityFoil('0');
+    setQuantityReg(0);
+    setQuantityFoil(0);
     setIsUpdating(false);
     onClose();
   };
@@ -196,28 +204,22 @@ export default function AddCardLocationsDialog({
                   </Select>
                 </FormControl>
 
-                <Stack direction="row" spacing={2}>
-                  <TextField
-                    fullWidth
-                    type="number"
-                    label="Regular Quantity"
-                    value={quantityReg}
-                    onChange={(e) => setQuantityReg(e.target.value)}
-                    inputProps={{ min: 0 }}
-                    error={regExceedsAvailable}
-                    helperText={regExceedsAvailable ? `Maximum available: ${availableReg}` : ''}
-                  />
-                  <TextField
-                    fullWidth
-                    type="number"
-                    label="Foil Quantity"
-                    value={quantityFoil}
-                    onChange={(e) => setQuantityFoil(e.target.value)}
-                    inputProps={{ min: 0 }}
-                    error={foilExceedsAvailable}
-                    helperText={foilExceedsAvailable ? `Maximum available: ${availableFoil}` : ''}
-                  />
-                </Stack>
+                <DualQuantitySelector
+                  regularValue={quantityReg}
+                  foilValue={quantityFoil}
+                  onRegularChange={setQuantityReg}
+                  onFoilChange={setQuantityFoil}
+                  canBeNonFoil={canBeNonFoil}
+                  canBeFoil={canBeFoil}
+                  maxRegular={availableReg}
+                  maxFoil={availableFoil}
+                  regularError={regExceedsAvailable}
+                  foilError={foilExceedsAvailable}
+                  regularHelperText={regExceedsAvailable ? `Maximum available: ${availableReg}` : undefined}
+                  foilHelperText={foilExceedsAvailable ? `Maximum available: ${availableFoil}` : undefined}
+                  size="medium"
+                  orientation="horizontal"
+                />
 
                 <Box>
                   <Typography
