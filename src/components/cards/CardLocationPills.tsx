@@ -108,10 +108,6 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
       return;
     }
 
-    if (regQty === 0 && foilQty === 0) {
-      enqueueSnackbar('At least one quantity must be greater than 0', { variant: 'error' });
-      return;
-    }
 
     if (regExceedsAvailable || foilExceedsAvailable) {
       enqueueSnackbar('Quantities cannot exceed available amounts', { variant: 'error' });

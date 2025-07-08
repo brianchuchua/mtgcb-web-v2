@@ -107,10 +107,6 @@ export default function AddCardLocationsDialog({
     const regQty = parseInt(quantityReg) || 0;
     const foilQty = parseInt(quantityFoil) || 0;
 
-    if (regQty === 0 && foilQty === 0) {
-      enqueueSnackbar('Please enter at least one quantity', { variant: 'error' });
-      return;
-    }
 
     if (regQty < 0 || foilQty < 0) {
       enqueueSnackbar('Quantities cannot be negative', { variant: 'error' });
