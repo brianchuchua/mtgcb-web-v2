@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -16,10 +17,12 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Location, LocationWithCount } from '@/api/locations/types';
 import { useDeleteLocationMutation } from '@/api/locations/locationsApi';
 import { useSnackbar } from 'notistack';
 import { formatDate } from '@/utils/dateUtils';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LocationsListProps {
   locations: (Location | LocationWithCount)[];
@@ -27,10 +30,13 @@ interface LocationsListProps {
 
 export default function LocationsList({ locations }: LocationsListProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const [deleteLocation] = useDeleteLocationMutation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [locationToDelete, setLocationToDelete] = useState<Location | null>(null);
+  
+  const userId = user?.userId;
 
   const handleEditClick = (locationId: number) => {
     router.push(`/locations/edit/${locationId}`);
@@ -67,10 +73,39 @@ export default function LocationsList({ locations }: LocationsListProps) {
             <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               <CardContent sx={{ '&:last-child': { pb: 2 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
-                  <Typography variant="h6" component="h2" sx={{ flex: 1 }}>
-                    {location.name}
-                  </Typography>
+                  <Box sx={{ flex: 1 }}>
+                    {userId ? (
+                      <Link href={`/collections/${userId}?contentType=cards&locationId=${location.id}`} passHref legacyBehavior>
+                        <Typography
+                          variant="h6"
+                          component="a"
+                          sx={{
+                            textDecoration: 'none',
+                            color: 'inherit',
+                            '&:hover': {
+                              textDecoration: 'underline',
+                            },
+                          }}
+                        >
+                          {location.name}
+                        </Typography>
+                      </Link>
+                    ) : (
+                      <Typography variant="h6" component="h2">
+                        {location.name}
+                      </Typography>
+                    )}
+                  </Box>
                   <Stack direction="row" spacing={0.5}>
+                    {userId && (
+                      <Link href={`/collections/${userId}?contentType=cards&locationId=${location.id}`} passHref legacyBehavior>
+                        <Tooltip title="View location">
+                          <IconButton size="small" component="a">
+                            <VisibilityIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Link>
+                    )}
                     <Tooltip title="Edit location">
                       <IconButton size="small" onClick={() => handleEditClick(location.id)}>
                         <EditIcon fontSize="small" />
