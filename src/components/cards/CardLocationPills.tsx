@@ -1,7 +1,10 @@
 import CloseIcon from '@mui/icons-material/Close';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Box,
   Button,
+  Card,
+  CardContent,
   Chip,
   Dialog,
   DialogActions,
@@ -9,6 +12,7 @@ import {
   DialogTitle,
   IconButton,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -140,53 +144,117 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ elevation: 0 }}>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ elevation: 0 }}>
       <DialogTitle>Edit Location Quantities</DialogTitle>
       <DialogContent>
-        <Stack spacing={2} sx={{ mt: 1 }}>
-          <Typography variant="body2" color="text.secondary">
-            {cardName}
-            {setName && (
-              <Typography component="span" variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                {' '}— {setName}
-              </Typography>
-            )}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            at {location.locationName}
-          </Typography>
-          <DualQuantitySelector
-            regularValue={quantityReg}
-            foilValue={quantityFoil}
-            onRegularChange={setQuantityReg}
-            onFoilChange={setQuantityFoil}
-            canBeNonFoil={canBeNonFoil}
-            canBeFoil={canBeFoil}
-            maxRegular={maxAssignableReg}
-            maxFoil={maxAssignableFoil}
-            regularError={regExceedsAvailable}
-            foilError={foilExceedsAvailable}
-            regularHelperText={regExceedsAvailable ? `Maximum available: ${maxAssignableReg}` : undefined}
-            foilHelperText={foilExceedsAvailable ? `Maximum available: ${maxAssignableFoil}` : undefined}
-            size="medium"
-            orientation="horizontal"
-          />
-          <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-            Note: Tracking quantities with card locations is optional.
-          </Typography>
+        <Stack spacing={2} sx={{ mt: 0 }}>
+          {/* Action and Selectors */}
           <Box>
-            <Typography variant="caption" color="text.secondary">
-              Collection totals: {totalQuantityReg} regular, {totalQuantityFoil} foil
-            </Typography>
-            <br />
-            <Typography variant="caption" color="text.secondary">
-              Already assigned: {totalAssignedReg} regular, {totalAssignedFoil} foil
-            </Typography>
-            <br />
-            <Typography variant="caption" color="text.secondary">
-              Available to assign: {availableReg} regular, {availableFoil} foil
+            <Typography variant="body2" color="text.secondary" gutterBottom>
+              Edit quantities for{' '}
+              <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
+                {cardName}
+                {setName && ` (${setName})`}
+              </Typography>
+              {' '}at{' '}
+              <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
+                {location.locationName}
+              </Typography>
             </Typography>
           </Box>
+
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                Quantities (optional)
+              </Typography>
+              <Tooltip title="You can track card locations without specifying quantities. Leave these fields at 0 if you only want to track which location has the card.">
+                <IconButton size="small" sx={{ ml: 0.5 }}>
+                  <InfoOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <DualQuantitySelector
+              regularValue={quantityReg}
+              foilValue={quantityFoil}
+              onRegularChange={setQuantityReg}
+              onFoilChange={setQuantityFoil}
+              canBeNonFoil={canBeNonFoil}
+              canBeFoil={canBeFoil}
+              maxRegular={maxAssignableReg}
+              maxFoil={maxAssignableFoil}
+              regularError={regExceedsAvailable}
+              foilError={foilExceedsAvailable}
+              regularHelperText={regExceedsAvailable ? `Maximum available: ${maxAssignableReg}` : undefined}
+              foilHelperText={foilExceedsAvailable ? `Maximum available: ${maxAssignableFoil}` : undefined}
+              size="medium"
+              orientation="horizontal"
+            />
+          </Box>
+
+          {/* Collection Status */}
+          <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+            <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+              <Stack spacing={1.5}>
+                {/* Ownership Summary */}
+                <Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                    You own:
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Typography variant="body2">
+                      {totalQuantityReg} regular
+                      {totalQuantityFoil > 0 && `, ${totalQuantityFoil} foil`}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Assignment Status */}
+                <Box>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                    Assigned to locations:
+                  </Typography>
+                  <Typography variant="body2">
+                    {totalAssignedReg} regular
+                    {totalAssignedFoil > 0 && `, ${totalAssignedFoil} foil`}
+                    {totalAssignedReg === 0 && totalAssignedFoil === 0 && ' (none)'}
+                  </Typography>
+                </Box>
+
+                {/* Current Locations */}
+                {allLocations.length > 0 && (
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                      Located in:
+                    </Typography>
+                    <Stack spacing={0.25}>
+                      {allLocations.map((loc) => (
+                        <Typography 
+                          key={loc.locationId} 
+                          variant="body2"
+                          sx={{ fontWeight: loc.locationId === location.locationId ? 600 : 400 }}
+                        >
+                          • {loc.locationName}: {loc.quantityReg} regular
+                          {loc.quantityFoil > 0 && `, ${loc.quantityFoil} foil`}
+                          {loc.locationId === location.locationId && ' (editing)'}
+                        </Typography>
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
+
+                {/* Available to Assign */}
+                {(maxAssignableReg > quantityReg || maxAssignableFoil > quantityFoil) && (
+                  <Box sx={{ pt: 0.5, borderTop: 1, borderColor: 'divider' }}>
+                    <Typography variant="caption" color="success.main" sx={{ fontWeight: 500 }}>
+                      Can assign up to: {maxAssignableReg} regular
+                      {maxAssignableFoil > 0 && `, ${maxAssignableFoil} foil`}
+                    </Typography>
+                  </Box>
+                )}
+              </Stack>
+            </CardContent>
+          </Card>
         </Stack>
       </DialogContent>
       <DialogActions>
