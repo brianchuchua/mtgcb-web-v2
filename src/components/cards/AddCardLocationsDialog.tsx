@@ -1,17 +1,26 @@
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import {
   Alert,
   Box,
   Button,
+  Card,
+  CardContent,
+  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  IconButton,
   InputLabel,
+  LinearProgress,
   MenuItem,
   Select,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
@@ -98,7 +107,11 @@ export default function AddCardLocationsDialog({
   // Validate quantities don't exceed available
   const regExceedsAvailable = quantityReg > availableReg;
   const foilExceedsAvailable = quantityFoil > availableFoil;
-  const hasValidationError = regExceedsAvailable || foilExceedsAvailable || (!canBeNonFoil && quantityReg > 0) || (!canBeFoil && quantityFoil > 0);
+  const hasValidationError =
+    regExceedsAvailable ||
+    foilExceedsAvailable ||
+    (!canBeNonFoil && quantityReg > 0) ||
+    (!canBeFoil && quantityFoil > 0);
 
   const handleSave = async () => {
     if (!selectedLocationId) {
@@ -170,91 +183,130 @@ export default function AddCardLocationsDialog({
             <CircularProgress />
           </Box>
         ) : (
-          <Stack spacing={3} sx={{ mt: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              {cardName}
-              {setName && (
-                <Typography component="span" variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                  {' '}— {setName}
-                </Typography>
-              )}
-            </Typography>
-
+          <Stack spacing={2} sx={{ mt: 0 }}>
             {locations.length === 0 ? (
               <Alert severity="info">No locations found. Please create a location first.</Alert>
             ) : (
               <>
-                <FormControl fullWidth>
-                  <InputLabel>Location</InputLabel>
-                  <Select
-                    value={selectedLocationId}
-                    label="Location"
-                    onChange={(e) => setSelectedLocationId(e.target.value as number | '')}
-                  >
-                    {locations.map((location) => (
-                      <MenuItem key={location.id} value={location.id}>
-                        {location.name}
-                        {location.description && (
-                          <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                            ({location.description})
-                          </Typography>
-                        )}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <DualQuantitySelector
-                  regularValue={quantityReg}
-                  foilValue={quantityFoil}
-                  onRegularChange={setQuantityReg}
-                  onFoilChange={setQuantityFoil}
-                  canBeNonFoil={canBeNonFoil}
-                  canBeFoil={canBeFoil}
-                  maxRegular={availableReg}
-                  maxFoil={availableFoil}
-                  regularError={regExceedsAvailable}
-                  foilError={foilExceedsAvailable}
-                  regularHelperText={regExceedsAvailable ? `Maximum available: ${availableReg}` : undefined}
-                  foilHelperText={foilExceedsAvailable ? `Maximum available: ${availableFoil}` : undefined}
-                  size="medium"
-                  orientation="horizontal"
-                />
-
+                {/* Action and Selectors */}
                 <Box>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ fontStyle: 'italic', mt: 0.5, display: 'block' }}
-                  >
-                    Note: Tracking quantities with card locations is optional.
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Add{' '}
+                    <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
+                      {cardName}
+                      {setName && ` (${setName})`}
+                    </Typography>
+                    {' '}to:
                   </Typography>
-                  <br />
-                  <Typography variant="caption" color="text.secondary">
-                    Collection totals: {totalQuantityReg} regular, {totalQuantityFoil} foil
-                  </Typography>
-                  <br />
-                  <Typography variant="caption" color="text.secondary">
-                    Already assigned: {totalAssignedReg} regular, {totalAssignedFoil} foil
-                  </Typography>
-                  <br />
-                  <Typography variant="caption" color="text.secondary">
-                    Available to assign: {availableReg} regular, {availableFoil} foil
-                  </Typography>
+
+                  <FormControl fullWidth sx={{ mt: 1 }}>
+                    <InputLabel>Select Location</InputLabel>
+                    <Select
+                      value={selectedLocationId}
+                      label="Select Location"
+                      onChange={(e) => setSelectedLocationId(e.target.value as number | '')}
+                    >
+                      {locations.map((location) => (
+                        <MenuItem key={location.id} value={location.id}>
+                          {location.name}
+                          {location.description && (
+                            <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                              ({location.description})
+                            </Typography>
+                          )}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Box>
 
-                {cardLocations.length > 0 && !isUpdating && (
-                  <Alert severity="info" icon={false}>
-                    <Typography variant="body2" gutterBottom>
-                      This card is already in:
+                <Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Quantities (optional)
                     </Typography>
-                    {cardLocations.map((loc) => (
-                      <Typography key={loc.locationId} variant="body2">
-                        • {loc.locationName}: {loc.quantityReg}R / {loc.quantityFoil}F
-                      </Typography>
-                    ))}
-                  </Alert>
-                )}
+                    <Tooltip title="You can track card locations without specifying quantities. Leave these fields at 0 if you only want to track which location has the card.">
+                      <IconButton size="small" sx={{ ml: 0.5 }}>
+                        <InfoOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <DualQuantitySelector
+                    regularValue={quantityReg}
+                    foilValue={quantityFoil}
+                    onRegularChange={setQuantityReg}
+                    onFoilChange={setQuantityFoil}
+                    canBeNonFoil={canBeNonFoil}
+                    canBeFoil={canBeFoil}
+                    maxRegular={availableReg}
+                    maxFoil={availableFoil}
+                    regularError={regExceedsAvailable}
+                    foilError={foilExceedsAvailable}
+                    regularHelperText={regExceedsAvailable ? `Maximum available: ${availableReg}` : undefined}
+                    foilHelperText={foilExceedsAvailable ? `Maximum available: ${availableFoil}` : undefined}
+                    size="medium"
+                    orientation="horizontal"
+                  />
+                </Box>
+
+                {/* Collection Status */}
+                <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+                  <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                    <Stack spacing={1.5}>
+                      {/* Ownership Summary */}
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                          You own:
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                          <Typography variant="body2">
+                            {totalQuantityReg} regular
+                            {totalQuantityFoil > 0 && `, ${totalQuantityFoil} foil`}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      {/* Assignment Status */}
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                          Assigned to locations:
+                        </Typography>
+                        <Typography variant="body2">
+                          {totalAssignedReg} regular
+                          {totalAssignedFoil > 0 && `, ${totalAssignedFoil} foil`}
+                          {totalAssignedReg === 0 && totalAssignedFoil === 0 && ' (none)'}
+                        </Typography>
+                      </Box>
+
+                      {/* Current Locations */}
+                      {cardLocations.length > 0 && (
+                        <Box>
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                            Located in:
+                          </Typography>
+                          <Stack spacing={0.25}>
+                            {cardLocations.map((loc) => (
+                              <Typography key={loc.locationId} variant="body2">
+                                • {loc.locationName}: {loc.quantityReg} regular
+                                {loc.quantityFoil > 0 && `, ${loc.quantityFoil} foil`}
+                              </Typography>
+                            ))}
+                          </Stack>
+                        </Box>
+                      )}
+
+                      {/* Available to Assign */}
+                      {(availableReg > 0 || availableFoil > 0) && (
+                        <Box sx={{ pt: 0.5, borderTop: 1, borderColor: 'divider' }}>
+                          <Typography variant="caption" color="success.main" sx={{ fontWeight: 500 }}>
+                            Can assign up to: {availableReg} regular
+                            {availableFoil > 0 && `, ${availableFoil} foil`}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Stack>
+                  </CardContent>
+                </Card>
               </>
             )}
           </Stack>
@@ -262,7 +314,11 @@ export default function AddCardLocationsDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSave} variant="contained" disabled={!selectedLocationId || isLoading || hasValidationError}>
+        <Button
+          onClick={handleSave}
+          variant="contained"
+          disabled={!selectedLocationId || isLoading || hasValidationError}
+        >
           {isUpdating ? 'Update' : 'Add'}
         </Button>
       </DialogActions>

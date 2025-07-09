@@ -14,6 +14,9 @@ const StyledQuantityBox = styled(Box)(({ theme }) => ({
       borderColor: theme.palette.primary.main,
     },
   },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+  },
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -323,7 +326,24 @@ export const DualQuantitySelector: React.FC<DualQuantitySelectorProps> = ({
   },
 }) => {
   return (
-    <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+    <Box sx={{ 
+      display: 'flex', 
+      gap: 2, 
+      alignItems: 'flex-start',
+      flexDirection: { 
+        xs: 'column', // Stack vertically on mobile
+        sm: orientation === 'vertical' ? 'column' : 'row' // Use orientation prop on larger screens
+      },
+      '& > div': {
+        width: { xs: '100%', sm: 'auto' }, // Full width on mobile
+      },
+      '& .MuiBox-root': {
+        width: { xs: '100%', sm: 'auto' }, // Full width for quantity selector wrapper on mobile
+      },
+      '& > div > div:first-of-type': {
+        width: { xs: '100%', sm: '160px' }, // Full width for StyledQuantityBox on mobile
+      }
+    }}>
       <QuantitySelector
         value={regularValue}
         onChange={onRegularChange}
