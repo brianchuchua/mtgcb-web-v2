@@ -1,31 +1,38 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import AddIcon from '@mui/icons-material/Add';
+import { useRouter } from 'next/navigation';
+import { useGetLocationsQuery } from '@/api/locations/locationsApi';
 import LocationsList from '@/components/locations/LocationsList';
 import Pagination from '@/components/pagination/Pagination';
-import { useGetLocationsQuery } from '@/api/locations/locationsApi';
-import { useAuth } from '@/hooks/useAuth';
 import { useLocationsPagination } from '@/hooks/locations/useLocationsPagination';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LocationsClient() {
   const router = useRouter();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { currentPage, pageSize, onPageChange, onPageSizeChange } = useLocationsPagination();
-  
-  const { data: locationsResponse, isLoading, error } = useGetLocationsQuery({
-    includeCardCount: true,
-    limit: pageSize,
-    offset: (currentPage - 1) * pageSize,
-  }, {
-    skip: !isAuthenticated || isAuthLoading,
-  });
+
+  const {
+    data: locationsResponse,
+    isLoading,
+    error,
+  } = useGetLocationsQuery(
+    {
+      includeCardCount: true,
+      limit: pageSize,
+      offset: (currentPage - 1) * pageSize,
+    },
+    {
+      skip: !isAuthenticated || isAuthLoading,
+    },
+  );
 
   if (isAuthLoading || isLoading) {
     return (
@@ -73,7 +80,7 @@ export default function LocationsClient() {
           Add Location
         </Button>
       </Box>
-      
+
       {locations.length === 0 && !isLoading ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -91,45 +98,47 @@ export default function LocationsClient() {
             Create Your First Location
           </Button>
         </Paper>
-      ) : totalLocations > 0 && (
-        <>
-          <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                pageSize={pageSize}
-                pageSizeOptions={[3, 6, 9, 12, 18, 24]}
-                totalItems={totalLocations}
-                viewMode="grid"
-                onPageChange={onPageChange}
-                onPageSizeChange={onPageSizeChange}
-                onViewModeChange={() => {}}
-                contentType="cards"
-                customItemName="locations"
-                hideViewModeToggle
-                hideSearchButton
-                hideSettingsPanel
-          />
-          <Box sx={{ mt: { xs: 2, sm: 0 } }}>
-            <LocationsList locations={locations} />
-          </Box>
-          <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                pageSize={pageSize}
-                pageSizeOptions={[3, 6, 9, 12, 18, 24]}
-                totalItems={totalLocations}
-                viewMode="grid"
-                onPageChange={onPageChange}
-                onPageSizeChange={onPageSizeChange}
-                onViewModeChange={() => {}}
-                position="bottom"
-                contentType="cards"
-                customItemName="locations"
-                hideViewModeToggle
-                hideSearchButton
-                hideSettingsPanel
-          />
-        </>
+      ) : (
+        totalLocations > 0 && (
+          <>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              pageSizeOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+              totalItems={totalLocations}
+              viewMode="grid"
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+              onViewModeChange={() => {}}
+              contentType="cards"
+              customItemName="locations"
+              hideViewModeToggle
+              hideSearchButton
+              hideSettingsPanel
+            />
+            <Box sx={{ mt: { xs: 2, sm: 0 } }}>
+              <LocationsList locations={locations} />
+            </Box>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              pageSizeOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+              totalItems={totalLocations}
+              viewMode="grid"
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+              onViewModeChange={() => {}}
+              position="bottom"
+              contentType="cards"
+              customItemName="locations"
+              hideViewModeToggle
+              hideSearchButton
+              hideSettingsPanel
+            />
+          </>
+        )
       )}
     </Box>
   );

@@ -57,7 +57,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Setting to change going mythic to plain green progress bars
 - Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
 - Remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
-- audit all api calls, how they're used, and their payloads, then revise and document
+- audit all api calls, how they're used, and their payloads, then revise and document, some locations ones and collections ones may be unused
 - Support searching by collector number and collector number ranges
 - Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
 - Missing data detector and clean-up for every card and set field in the database (pureName for example)
@@ -182,6 +182,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 - Showing number of cards in excess of a goal
 - Showing goal criteria in the collection header
+- Allowing editing of card locations in edit cards page
 
 ## Things To Check On
 
