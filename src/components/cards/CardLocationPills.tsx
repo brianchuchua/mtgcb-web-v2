@@ -15,7 +15,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { useState, useEffect } from 'react';
 import { CardLocation } from '@/api/collections/collectionLocationsTypes';
@@ -24,18 +23,6 @@ import {
   useUpdateCardLocationMutation,
 } from '@/api/collections/collectionsApi';
 import { DualQuantitySelector } from '@/components/shared/QuantitySelector';
-
-const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
-  padding: theme.spacing(2),
-}));
-
-const ConfirmationBox = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius,
-  border: `1px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.action.hover,
-  marginBottom: theme.spacing(2),
-}));
 
 interface CardLocationPillsProps {
   cardId: number;
@@ -396,81 +383,62 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
       <Dialog
         open={Boolean(deletingLocation)}
         onClose={handleCancelRemove}
-        maxWidth="xs"
+        maxWidth="sm"
         fullWidth
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            borderRadius: 2,
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-          },
-        }}
+        PaperProps={{ elevation: 0 }}
       >
-        <DialogTitle
-          sx={{
-            textAlign: 'center',
-            pb: 1,
-            fontSize: '1rem',
-            fontWeight: 500,
-          }}
-        >
-          Remove Card from Location
-        </DialogTitle>
-        
-        <StyledDialogContent>
-          <ConfirmationBox>
-            <Typography
-              variant="body2"
-              color="textSecondary"
-              fontWeight="medium"
-              sx={{ textAlign: 'center', fontStyle: 'italic' }}
-            >
-              Remove {cardName}
-              {setName && (
-                <Typography component="span" variant="body2" color="textSecondary" sx={{ fontStyle: 'italic' }}>
-                  {' '}— {setName}
+        <DialogTitle>Remove Card from Location</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 0 }}>
+            {/* Action */}
+            <Box>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Remove{' '}
+                <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
+                  {cardName}
+                  {setName && ` (${setName})`}
                 </Typography>
-              )}
-              {' '}from {deletingLocation?.locationName}?
-            </Typography>
-          </ConfirmationBox>
-          
-          {deletingLocation && (
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{
-                display: 'block',
-                textAlign: 'center',
-                mb: 1,
-              }}
-            >
-              Currently tracking: {deletingLocation.quantityReg} regular, {deletingLocation.quantityFoil} foil
-            </Typography>
-          )}
-          
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{
-              display: 'block',
-              textAlign: 'center',
-              mt: 1,
-            }}
-          >
-            This action cannot be undone.
-          </Typography>
-        </StyledDialogContent>
-        
-        <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
-          <Button variant="outlined" size="small" onClick={handleCancelRemove} disabled={isDeleting}>
+                {' '}from{' '}
+                <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
+                  {deletingLocation?.locationName}
+                </Typography>
+                ?
+              </Typography>
+            </Box>
+
+            {/* Current Status */}
+            {deletingLocation && (
+              <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+                <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                  <Stack spacing={1}>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                        Currently tracking at this location:
+                      </Typography>
+                      <Typography variant="body2">
+                        {deletingLocation.quantityReg} regular
+                        {deletingLocation.quantityFoil > 0 && `, ${deletingLocation.quantityFoil} foil`}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ pt: 0.5, borderTop: 1, borderColor: 'divider' }}>
+                      <Typography variant="caption" color="warning.main" sx={{ fontWeight: 500 }}>
+                        This action cannot be undone
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelRemove} disabled={isDeleting}>
             Cancel
           </Button>
           <Button
             onClick={handleConfirmRemove}
             variant="contained"
             color="error"
-            size="small"
             disabled={isDeleting}
           >
             {isDeleting ? 'Removing...' : 'Remove'}
