@@ -50,8 +50,8 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
     
     // Only reset search if the goal is actually changing
     if (goalId !== selectedGoalId) {
-      // Reset all search filters but preserve the goal selection
-      dispatch(resetSearch({ preserveGoal: true }));
+      // Reset all search filters but preserve both goal and location selections
+      dispatch(resetSearch({ preserveGoal: true, preserveLocation: true }));
       
       // Set the new goal ID
       dispatch(setSelectedGoalId(goalId));

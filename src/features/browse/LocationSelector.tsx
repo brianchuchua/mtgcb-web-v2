@@ -46,8 +46,8 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
     
     // Only reset search if the location is actually changing
     if (locationId !== selectedLocationId) {
-      // Reset all search filters but preserve the location selection
-      dispatch(resetSearch({ preserveLocation: true }));
+      // Reset all search filters but preserve both goal and location selections
+      dispatch(resetSearch({ preserveGoal: true, preserveLocation: true }));
       
       // Set the new location ID
       dispatch(setSelectedLocationId(locationId));
