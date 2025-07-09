@@ -464,16 +464,18 @@ const CardItemComponent = ({
           )}
           
           {quantityIsVisible && isOwnCollection && locationsIsVisible && (
-            <CardLocationPills 
-              cardId={parseInt(id)} 
-              cardName={name} 
-              setName={setName} 
-              totalQuantityReg={quantityReg || 0}
-              totalQuantityFoil={quantityFoil || 0}
-              canBeFoil={canBeFoil}
-              canBeNonFoil={canBeNonFoil}
-              locations={locations}
-            />
+            <Box sx={{ mt: 1 }}>
+              <CardLocationPills 
+                cardId={parseInt(id)} 
+                cardName={name} 
+                setName={setName} 
+                totalQuantityReg={quantityReg || 0}
+                totalQuantityFoil={quantityFoil || 0}
+                canBeFoil={canBeFoil}
+                canBeNonFoil={canBeNonFoil}
+                locations={locations}
+              />
+            </Box>
           )}
 
           {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && !isOwnCollection && (

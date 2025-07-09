@@ -48,6 +48,8 @@ interface CardLocationPillsProps {
     quantityReg: number;
     quantityFoil: number;
   }[];
+  align?: 'left' | 'center';
+  onAddLocation?: (event: React.MouseEvent) => void;
 }
 
 interface EditLocationDialogProps {
@@ -197,7 +199,7 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
   );
 }
 
-export default function CardLocationPills({ cardId, cardName, setName, totalQuantityReg, totalQuantityFoil, canBeFoil = true, canBeNonFoil = true, locations: propLocations }: CardLocationPillsProps) {
+export default function CardLocationPills({ cardId, cardName, setName, totalQuantityReg, totalQuantityFoil, canBeFoil = true, canBeNonFoil = true, locations: propLocations, align = 'center', onAddLocation }: CardLocationPillsProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [editingLocation, setEditingLocation] = useState<CardLocation | null>(null);
   const [deletingLocation, setDeletingLocation] = useState<CardLocation | null>(null);
@@ -254,7 +256,7 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
 
   return (
     <>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1, justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: align === 'left' ? 'flex-start' : 'center' }}>
         {locations.map((location) => (
           <Chip
             key={location.locationId}
@@ -287,6 +289,23 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
             }}
           />
         ))}
+        {onAddLocation && (
+          <Chip
+            label="+"
+            onClick={onAddLocation}
+            size="small"
+            sx={{
+              cursor: 'pointer',
+              color: 'text.secondary',
+              borderColor: 'divider',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+                borderColor: 'text.secondary',
+              },
+            }}
+            variant="outlined"
+          />
+        )}
       </Box>
 
       {editingLocation && (

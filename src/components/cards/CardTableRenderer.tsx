@@ -153,6 +153,7 @@ export const useCardTableColumns = (
         default: '250px',
       },
       sortable: false,
+      align: 'center' as const,
     },
     {
       id: 'releasedAt',

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Box, IconButton, Menu, MenuItem, TableCell } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Box, Chip, TableCell } from '@mui/material';
 import CardLocationPills from './CardLocationPills';
 import AddCardLocationsDialog from './AddCardLocationsDialog';
 
@@ -31,67 +30,47 @@ export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
   canBeNonFoil = true,
   locations,
 }) => {
-  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleAddLocation = (event: React.MouseEvent) => {
     event.stopPropagation();
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setMenuAnchorEl(null);
-  };
-
-  const handleAddLocation = () => {
-    handleMenuClose();
     setLocationDialogOpen(true);
   };
 
   return (
-    <TableCell sx={{ maxWidth: '300px', position: 'relative' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <CardLocationPills
-            cardId={parseInt(cardId)}
-            cardName={cardName}
-            setName={setName}
-            totalQuantityReg={totalQuantityReg}
-            totalQuantityFoil={totalQuantityFoil}
-            canBeFoil={canBeFoil}
-            canBeNonFoil={canBeNonFoil}
-            locations={locations}
+    <TableCell sx={{ maxWidth: '300px', position: 'relative', verticalAlign: 'middle' }}>
+      {locations && locations.length > 0 ? (
+        <CardLocationPills
+          cardId={parseInt(cardId)}
+          cardName={cardName}
+          setName={setName}
+          totalQuantityReg={totalQuantityReg}
+          totalQuantityFoil={totalQuantityFoil}
+          canBeFoil={canBeFoil}
+          canBeNonFoil={canBeNonFoil}
+          locations={locations}
+          align="center"
+          onAddLocation={handleAddLocation}
+        />
+      ) : (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Chip
+            label="Add Card to Location"
+            onClick={handleAddLocation}
+            size="small"
+            sx={{
+              cursor: 'pointer',
+              color: 'text.secondary',
+              borderColor: 'divider',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+                borderColor: 'text.secondary',
+              },
+            }}
+            variant="outlined"
           />
         </Box>
-        <IconButton
-          size="small"
-          onClick={handleMenuOpen}
-          sx={{
-            padding: 0.5,
-            '&:hover': {
-              backgroundColor: 'action.hover',
-            },
-          }}
-        >
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
-      </Box>
-      
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={handleMenuClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-      >
-        <MenuItem onClick={handleAddLocation}>Add Card to Location</MenuItem>
-      </Menu>
+      )}
 
       {locationDialogOpen && (
         <AddCardLocationsDialog
