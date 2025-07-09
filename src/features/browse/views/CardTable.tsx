@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { useCardRowRenderer, useCardTableColumns } from '@/components/cards/CardTableRenderer';
+import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { PriceType } from '@/types/pricing';
 
 interface CardTableProps {
@@ -51,15 +51,12 @@ const CardTable: React.FC<CardTableProps> = ({
   // Merge table settings with card display settings
   // For locations, prioritize tableSettings over cardDisplaySettings
   const mergedDisplaySettings = {
-    ...tableSettings,
     ...cardDisplaySettings,
+    ...tableSettings,
     locationsIsVisible: tableSettings.locationsIsVisible ?? cardDisplaySettings?.locationsIsVisible,
   };
 
-  const tableColumns = useCardTableColumns(
-    { priceType, displaySettings: mergedDisplaySettings },
-    sortBy,
-  );
+  const tableColumns = useCardTableColumns({ priceType, displaySettings: mergedDisplaySettings }, sortBy);
 
   const renderCardRow = useCardRowRenderer(priceType, mergedDisplaySettings, onCardClick, isOwnCollection, goalId);
 

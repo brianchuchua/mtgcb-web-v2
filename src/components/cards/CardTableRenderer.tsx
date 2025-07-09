@@ -156,7 +156,7 @@ export const useCardTableColumns = (
       align: 'center' as const,
     },
     {
-      id: 'releasedAt',
+      id: 'releasedAt', // This renders as a set name, but sorts by release date
       label: 'Set',
       width: {
         xs: '120px',
@@ -249,7 +249,7 @@ export const useCardTableColumns = (
     if (column.id === 'collectorNumber') return displaySettings.collectorNumberIsVisible;
     if (column.id === 'mtgcbCollectorNumber') return displaySettings.mtgcbNumberIsVisible;
     if (column.id === 'name') return true; // Always show name
-    if (column.id === 'releasedAt') return displaySettings.setIsVisible;
+    if (column.id === 'releasedAt') return displaySettings.setIsVisible; // Set name is always shown, but sorted by release date
     if (column.id === 'rarityNumeric') return displaySettings.rarityIsVisible;
     if (column.id === 'type') return displaySettings.typeIsVisible;
     if (column.id === 'artist') return displaySettings.artistIsVisible;

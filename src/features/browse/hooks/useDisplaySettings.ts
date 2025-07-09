@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
-import { 
-  useCardDisplaySettings, 
-  useLayoutSettings, 
-  useTableCardSettings,
+import {
+  useCardDisplaySettings,
+  useLayoutSettings,
+  usePriceType,
   useSetDisplaySettings as useSetDisplaySettingsFromContext,
+  useTableCardSettings,
   useTableSetSettings,
-  usePriceType 
 } from '@/contexts/DisplaySettingsContext';
 import { useCardSetSettingGroups } from '@/hooks/useCardSetSettingGroups';
 
@@ -26,7 +26,7 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
   const setDisplaySettings = useSetDisplaySettingsFromContext();
   const tableSetSettings = useTableSetSettings();
   const [currentPriceType] = usePriceType();
-  
+
   // Settings for display components
   const settingGroups = useCardSetSettingGroups(view, viewMode);
 
@@ -40,11 +40,11 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
       priceIsVisible: cardDisplaySettings.priceIsVisible,
     }),
     [
-      layoutSettings.cardsPerRow, 
-      layoutSettings.cardSizeMargin, 
-      cardDisplaySettings.nameIsVisible, 
-      cardDisplaySettings.setIconIsVisible, 
-      cardDisplaySettings.priceIsVisible
+      layoutSettings.cardsPerRow,
+      layoutSettings.cardSizeMargin,
+      cardDisplaySettings.nameIsVisible,
+      cardDisplaySettings.setIconIsVisible,
+      cardDisplaySettings.priceIsVisible,
     ],
   );
 
@@ -63,7 +63,19 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
       loyaltyIsVisible: tableCardSettings.loyaltyIsVisible,
       priceIsVisible: tableCardSettings.priceIsVisible,
     }),
-    [tableCardSettings],
+    [
+      tableCardSettings.setIsVisible,
+      tableCardSettings.collectorNumberIsVisible,
+      tableCardSettings.mtgcbNumberIsVisible,
+      tableCardSettings.rarityIsVisible,
+      tableCardSettings.typeIsVisible,
+      tableCardSettings.artistIsVisible,
+      tableCardSettings.manaCostIsVisible,
+      tableCardSettings.powerIsVisible,
+      tableCardSettings.toughnessIsVisible,
+      tableCardSettings.loyaltyIsVisible,
+      tableCardSettings.priceIsVisible,
+    ],
   );
 
   // Card display settings (simplified subset of gallery settings)

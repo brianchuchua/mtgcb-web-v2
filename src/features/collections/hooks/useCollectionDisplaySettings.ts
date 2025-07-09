@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
-import { 
-  useCardDisplaySettings, 
-  useLayoutSettings, 
-  useTableCardSettings,
-  useSetDisplaySettings as useSetDisplaySettingsFromContext,
-  useTableSetSettings,
-  useCollectionSettings,
+import {
+  useCardDisplaySettings,
   useCollectionSetSettings,
-  usePriceType 
+  useCollectionSettings,
+  useLayoutSettings,
+  usePriceType,
+  useSetDisplaySettings as useSetDisplaySettingsFromContext,
+  useTableCardSettings,
+  useTableSetSettings,
 } from '@/contexts/DisplaySettingsContext';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { useCollectionSetSettingGroups } from '@/hooks/useCollectionSetSettingGroups';
@@ -31,11 +31,11 @@ export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCol
   const collectionSettings = useCollectionSettings();
   const collectionSetSettings = useCollectionSetSettings();
   const [currentPriceType] = usePriceType();
-  
+
   // Settings for display components
   const setSettingGroups = useCollectionSetSettingGroups(viewMode);
   const cardSettingGroups = useCardSettingGroups(viewMode);
-  
+
   // Formatted set display settings
   const formattedSetDisplaySettings = useMemo(
     () => ({
@@ -74,15 +74,16 @@ export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCol
       priceIsVisible: cardDisplaySettings.priceIsVisible,
     }),
     [
-      layoutSettings.cardsPerRow, 
-      layoutSettings.cardSizeMargin, 
-      cardDisplaySettings.nameIsVisible, 
-      cardDisplaySettings.setIconIsVisible, 
-      cardDisplaySettings.priceIsVisible
+      layoutSettings.cardsPerRow,
+      layoutSettings.cardSizeMargin,
+      cardDisplaySettings.nameIsVisible,
+      cardDisplaySettings.setIconIsVisible,
+      cardDisplaySettings.priceIsVisible,
     ],
   );
 
   // Table settings
+
   const tableSettings = useMemo(
     () => ({
       setIsVisible: tableCardSettings.setIsVisible,
@@ -99,7 +100,21 @@ export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCol
       quantityIsVisible: collectionSettings.tableQuantityIsVisible,
       locationsIsVisible: collectionSettings.tableLocationsIsVisible,
     }),
-    [tableCardSettings, collectionSettings.tableQuantityIsVisible, collectionSettings.tableLocationsIsVisible],
+    [
+      tableCardSettings.setIsVisible,
+      tableCardSettings.collectorNumberIsVisible,
+      tableCardSettings.mtgcbNumberIsVisible,
+      tableCardSettings.rarityIsVisible,
+      tableCardSettings.typeIsVisible,
+      tableCardSettings.artistIsVisible,
+      tableCardSettings.manaCostIsVisible,
+      tableCardSettings.powerIsVisible,
+      tableCardSettings.toughnessIsVisible,
+      tableCardSettings.loyaltyIsVisible,
+      tableCardSettings.priceIsVisible,
+      collectionSettings.tableQuantityIsVisible,
+      collectionSettings.tableLocationsIsVisible,
+    ],
   );
 
   // Card display settings (includes quantity for collections)
