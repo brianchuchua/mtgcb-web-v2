@@ -1,20 +1,33 @@
 'use client';
 
-import { Add as AddIcon } from '@mui/icons-material';
-import { Alert, Box, Button, Paper, Typography } from '@mui/material';
+import { Add as AddIcon, InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
+import {
+  Alert,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Paper,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { GoalsList } from '@/components/goals/GoalsList';
 import Pagination, { PaginationProps } from '@/components/pagination/Pagination';
-import { useAuth } from '@/hooks/useAuth';
-import { useGoalsPagination } from '@/hooks/goals/useGoalsPagination';
 import { usePriceType } from '@/contexts/DisplaySettingsContext';
+import { useGoalsPagination } from '@/hooks/goals/useGoalsPagination';
+import { useAuth } from '@/hooks/useAuth';
 
 export function GoalsClient() {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const router = useRouter();
   const [displayPriceType] = usePriceType();
   const { currentPage, pageSize, onPageChange, onPageSizeChange } = useGoalsPagination();
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
   const queryArgs = {
     userId: user?.userId ?? 0,
@@ -73,9 +86,14 @@ export function GoalsClient() {
         <Typography variant="h4" component="h1" color="primary">
           Goals
         </Typography>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleCreateClick}>
-          Create Goal
-        </Button>
+        <Box display="flex" alignItems="center" gap={1}>
+          <IconButton onClick={() => setInfoDialogOpen(true)} size="small" sx={{ color: 'text.secondary' }}>
+            <InfoOutlinedIcon />
+          </IconButton>
+          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleCreateClick}>
+            Create Goal
+          </Button>
+        </Box>
       </Box>
 
       {error && (
@@ -107,6 +125,44 @@ export function GoalsClient() {
           <Pagination {...paginationProps} position="bottom" />
         </>
       )}
+
+      <Dialog
+        open={infoDialogOpen}
+        onClose={() => setInfoDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          elevation: 1,
+        }}
+      >
+        <DialogTitle>About Goals</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" paragraph>
+            <strong>What are goals?</strong>
+          </Typography>
+          <Typography variant="body2" paragraph>
+            Goals help you track your progress toward collecting whatever you value the most. It can be something like
+            "collect every red goblin" or "collect every legendary creature cheaper than $10".
+          </Typography>
+          <Typography variant="body2" paragraph>
+            <strong>Key features:</strong>
+          </Typography>
+          <Typography variant="body2" component="ul" sx={{ pl: 2 }}>
+            <li>Create goals based on any search criteria (sets, colors, card types, etc.)</li>
+            <li>Track progress with visual progress bars showing percentage complete</li>
+            <li>See the current value of your goal and cost to complete</li>
+            <li>Choose whether to collect one printing per card or all printings</li>
+            <li>Set separate quantities for regular and foil cards, or a combined target</li>
+            <li>Active goals appear as filters when viewing your collection</li>
+            <li>Goals can be marked as inactive to hide them from collection filters</li>
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInfoDialogOpen(false)} variant="contained">
+            Got it
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

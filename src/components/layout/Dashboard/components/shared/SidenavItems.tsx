@@ -10,6 +10,8 @@ import {
   ListAlt as ListAltIcon,
   Style as StyleIcon,
   Timeline as TimelineIcon,
+  SaveAlt as ImportIcon,
+  Launch as ExportIcon,
 } from '@mui/icons-material';
 import { AutoStories as BinderIcon } from '@mui/icons-material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -130,65 +132,83 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
               </ListItem>
             )}
 
-            {isAuthenticated && user?.userId && (pathname?.startsWith('/collections') || pathname === '/goals' || pathname?.startsWith('/locations')) && (
-              <List component="div" disablePadding>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    component={Link}
-                    href="/collections/edit-cards"
-                    selected={pathname?.startsWith('/collections/edit-cards')}
-                    onClick={handleClick}
-                    sx={{ pl: 4 }}
-                  >
-                    <ListItemIcon>
-                      <IsoIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Add or Remove Cards" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    component={Link}
-                    href="/goals"
-                    selected={pathname === '/goals'}
-                    onClick={handleClick}
-                    sx={{ pl: 4 }}
-                  >
-                    <ListItemIcon>
-                      <BarChartIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Goals" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton
-                    component={Link}
-                    href="/locations"
-                    selected={pathname === '/locations' || pathname?.startsWith('/locations/')}
-                    onClick={handleClick}
-                    sx={{ pl: 4 }}
-                  >
-                    <ListItemIcon>
-                      <BinderIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Locations" />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton disabled sx={{ pl: 4 }}>
-                    <ListItemIcon>
-                      <StyleIcon
-                        sx={{
-                          transform: 'scaleY(-1)',
-                          transformOrigin: 'center',
-                        }}
-                      />
-                    </ListItemIcon>
-                    <ListItemText primary="Decks (In Development)" />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            )}
+            {isAuthenticated &&
+              user?.userId &&
+              (pathname?.startsWith('/collections') || pathname === '/goals' || pathname?.startsWith('/locations')) && (
+                <List component="div" disablePadding>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      component={Link}
+                      href="/collections/edit-cards"
+                      selected={pathname?.startsWith('/collections/edit-cards')}
+                      onClick={handleClick}
+                      sx={{ pl: 4 }}
+                    >
+                      <ListItemIcon>
+                        <IsoIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Add or Remove Cards" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      component={Link}
+                      href="/goals"
+                      selected={pathname === '/goals'}
+                      onClick={handleClick}
+                      sx={{ pl: 4 }}
+                    >
+                      <ListItemIcon>
+                        <BarChartIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Goals" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      component={Link}
+                      href="/locations"
+                      selected={pathname === '/locations' || pathname?.startsWith('/locations/')}
+                      onClick={handleClick}
+                      sx={{ pl: 4 }}
+                    >
+                      <ListItemIcon>
+                        <BinderIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Locations" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton disabled sx={{ pl: 4 }}>
+                      <ListItemIcon>
+                        <StyleIcon
+                          sx={{
+                            transform: 'scaleY(-1)',
+                            transformOrigin: 'center',
+                          }}
+                        />
+                      </ListItemIcon>
+                      <ListItemText primary="Decks (In Development)" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton disabled sx={{ pl: 4 }}>
+                      <ListItemIcon>
+                        <ImportIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Import (In Development)" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton disabled sx={{ pl: 4 }}>
+                      <ListItemIcon>
+                        <ExportIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Export (In Development)" />
+                    </ListItemButton>
+                  </ListItem>
+                </List>
+              )}
 
             <ListItem disablePadding>
               <ListItemButton disabled>

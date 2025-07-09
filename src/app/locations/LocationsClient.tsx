@@ -1,13 +1,20 @@
 'use client';
 
 import AddIcon from '@mui/icons-material/Add';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useGetLocationsQuery } from '@/api/locations/locationsApi';
 import LocationsList from '@/components/locations/LocationsList';
 import Pagination from '@/components/pagination/Pagination';
@@ -18,6 +25,7 @@ export default function LocationsClient() {
   const router = useRouter();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { currentPage, pageSize, onPageChange, onPageSizeChange } = useLocationsPagination();
+  const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
   const {
     data: locationsResponse,
@@ -71,14 +79,19 @@ export default function LocationsClient() {
         <Typography variant="h4" component="h1" color="primary">
           Locations
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => router.push('/locations/create')}
-        >
-          Add Location
-        </Button>
+        <Box display="flex" alignItems="center" gap={1}>
+          <IconButton onClick={() => setInfoDialogOpen(true)} size="small" sx={{ color: 'text.secondary' }}>
+            <InfoOutlinedIcon />
+          </IconButton>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={() => router.push('/locations/create')}
+          >
+            Add Location
+          </Button>
+        </Box>
       </Box>
 
       {locations.length === 0 && !isLoading ? (
@@ -140,6 +153,45 @@ export default function LocationsClient() {
           </>
         )
       )}
+
+      <Dialog
+        open={infoDialogOpen}
+        onClose={() => setInfoDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          elevation: 1,
+        }}
+      >
+        <DialogTitle>About Locations</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" paragraph>
+            <strong>What are locations?</strong>
+          </Typography>
+          <Typography variant="body2" paragraph>
+            Locations help you organize your physical card collection by tracking where cards are stored. Whether you
+            use binders, boxes, or other storage methods, you can create locations to match your organization system.
+          </Typography>
+          <Typography variant="body2" paragraph>
+            <strong>Key points:</strong>
+          </Typography>
+          <Typography variant="body2" component="ul" sx={{ pl: 2 }}>
+            <li>Using locations is completely optional</li>
+            <li>You can track your collection without assigning cards to locations</li>
+            <li>You don't need to assign every card – track only what's useful</li>
+            <li>
+              Tracking quantities in locations is also optional – you can assign cards without specifying exact numbers
+            </li>
+            <li>Cards can be assigned to multiple locations with different quantities</li>
+            <li>Click on a location name to view all cards stored there</li>
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setInfoDialogOpen(false)} variant="contained">
+            Got it
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
