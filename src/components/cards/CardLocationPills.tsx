@@ -16,12 +16,9 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { CardLocation } from '@/api/collections/collectionLocationsTypes';
-import {
-  useRemoveCardLocationMutation,
-  useUpdateCardLocationMutation,
-} from '@/api/collections/collectionsApi';
+import { useRemoveCardLocationMutation, useUpdateCardLocationMutation } from '@/api/collections/collectionsApi';
 import { DualQuantitySelector } from '@/components/shared/QuantitySelector';
 
 interface CardLocationPillsProps {
@@ -57,7 +54,19 @@ interface EditLocationDialogProps {
   allLocations: CardLocation[];
 }
 
-function EditLocationDialog({ open, onClose, location, cardId, cardName, setName, totalQuantityReg, totalQuantityFoil, canBeFoil = true, canBeNonFoil = true, allLocations }: EditLocationDialogProps) {
+function EditLocationDialog({
+  open,
+  onClose,
+  location,
+  cardId,
+  cardName,
+  setName,
+  totalQuantityReg,
+  totalQuantityFoil,
+  canBeFoil = true,
+  canBeNonFoil = true,
+  allLocations,
+}: EditLocationDialogProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [quantityReg, setQuantityReg] = useState(location.quantityReg);
   const [quantityFoil, setQuantityFoil] = useState(location.quantityFoil);
@@ -78,11 +87,13 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
   const availableFoil = totalQuantityFoil - totalAssignedFoil;
 
   // Calculate totals assigned to OTHER locations (excluding current) for validation
-  const totalAssignedOthersReg = allLocations.reduce((sum, loc) => 
-    loc.locationId === location.locationId ? sum : sum + loc.quantityReg, 0
+  const totalAssignedOthersReg = allLocations.reduce(
+    (sum, loc) => (loc.locationId === location.locationId ? sum : sum + loc.quantityReg),
+    0,
   );
-  const totalAssignedOthersFoil = allLocations.reduce((sum, loc) => 
-    loc.locationId === location.locationId ? sum : sum + loc.quantityFoil, 0
+  const totalAssignedOthersFoil = allLocations.reduce(
+    (sum, loc) => (loc.locationId === location.locationId ? sum : sum + loc.quantityFoil),
+    0,
   );
 
   // Calculate maximum that can be assigned to this location
@@ -92,7 +103,11 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
   // Validate quantities don't exceed maximum assignable
   const regExceedsAvailable = quantityReg > maxAssignableReg;
   const foilExceedsAvailable = quantityFoil > maxAssignableFoil;
-  const hasValidationError = regExceedsAvailable || foilExceedsAvailable || (!canBeNonFoil && quantityReg > 0) || (!canBeFoil && quantityFoil > 0);
+  const hasValidationError =
+    regExceedsAvailable ||
+    foilExceedsAvailable ||
+    (!canBeNonFoil && quantityReg > 0) ||
+    (!canBeFoil && quantityFoil > 0);
 
   const handleSave = async () => {
     if (quantityReg < 0 || quantityFoil < 0) {
@@ -142,8 +157,8 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
               <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
                 {cardName}
                 {setName && ` (${setName})`}
-              </Typography>
-              {' '}at{' '}
+              </Typography>{' '}
+              in{' '}
               <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
                 {location.locationName}
               </Typography>
@@ -216,8 +231,8 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
                     </Typography>
                     <Stack spacing={0.25}>
                       {allLocations.map((loc) => (
-                        <Typography 
-                          key={loc.locationId} 
+                        <Typography
+                          key={loc.locationId}
                           variant="body2"
                           sx={{ fontWeight: loc.locationId === location.locationId ? 600 : 400 }}
                         >
@@ -254,7 +269,18 @@ function EditLocationDialog({ open, onClose, location, cardId, cardName, setName
   );
 }
 
-export default function CardLocationPills({ cardId, cardName, setName, totalQuantityReg, totalQuantityFoil, canBeFoil = true, canBeNonFoil = true, locations: propLocations, align = 'center', onAddLocation }: CardLocationPillsProps) {
+export default function CardLocationPills({
+  cardId,
+  cardName,
+  setName,
+  totalQuantityReg,
+  totalQuantityFoil,
+  canBeFoil = true,
+  canBeNonFoil = true,
+  locations: propLocations,
+  align = 'center',
+  onAddLocation,
+}: CardLocationPillsProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [editingLocation, setEditingLocation] = useState<CardLocation | null>(null);
   const [deletingLocation, setDeletingLocation] = useState<CardLocation | null>(null);
@@ -268,12 +294,12 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
 
   // Transform locations to CardLocation type and sort alphabetically - this will re-run when propLocations changes
   const locations: CardLocation[] = propLocations
-    .map(loc => ({
+    .map((loc) => ({
       locationId: loc.locationId,
       locationName: loc.locationName,
       description: loc.description,
       quantityReg: loc.quantityReg,
-      quantityFoil: loc.quantityFoil
+      quantityFoil: loc.quantityFoil,
     }))
     .sort((a, b) => a.locationName.localeCompare(b.locationName));
 
@@ -284,7 +310,7 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
 
   const handleConfirmRemove = async () => {
     if (!deletingLocation) return;
-    
+
     setIsDeleting(true);
     try {
       await removeCardLocation({
@@ -311,7 +337,9 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
 
   return (
     <>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: align === 'left' ? 'flex-start' : 'center' }}>
+      <Box
+        sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: align === 'left' ? 'flex-start' : 'center' }}
+      >
         {locations.map((location) => (
           <Chip
             key={location.locationId}
@@ -367,7 +395,7 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
         <EditLocationDialog
           open={Boolean(editingLocation)}
           onClose={() => setEditingLocation(null)}
-          location={locations.find(loc => loc.locationId === editingLocation.locationId) || editingLocation}
+          location={locations.find((loc) => loc.locationId === editingLocation.locationId) || editingLocation}
           cardId={cardId}
           cardName={cardName}
           setName={setName}
@@ -378,7 +406,7 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
           allLocations={locations}
         />
       )}
-      
+
       {/* Confirmation Dialog */}
       <Dialog
         open={Boolean(deletingLocation)}
@@ -397,8 +425,8 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
                 <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
                   {cardName}
                   {setName && ` (${setName})`}
-                </Typography>
-                {' '}from{' '}
+                </Typography>{' '}
+                from{' '}
                 <Typography component="span" variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
                   {deletingLocation?.locationName}
                 </Typography>
@@ -435,12 +463,7 @@ export default function CardLocationPills({ cardId, cardName, setName, totalQuan
           <Button onClick={handleCancelRemove} disabled={isDeleting}>
             Cancel
           </Button>
-          <Button
-            onClick={handleConfirmRemove}
-            variant="contained"
-            color="error"
-            disabled={isDeleting}
-          >
+          <Button onClick={handleConfirmRemove} variant="contained" color="error" disabled={isDeleting}>
             {isDeleting ? 'Removing...' : 'Remove'}
           </Button>
         </DialogActions>

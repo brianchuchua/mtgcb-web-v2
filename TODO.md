@@ -6,6 +6,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Remaining Major Feature Work Before 1.0
 
+- Card page, for browse and collection contexts, showing other printings needs to be cool
 - User migration -- what if they try a password reset from the new site before logging in? Make sure that works with the migration system.
 - Deck completion
   - cards should show which decks they are in
@@ -34,6 +35,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Audit input field lengths for all API calls
 - Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages
 - Brainstorm patron cosmetic perks
+- canBeFoil/canBeNonFoil -- need to have a page showing all the cards with bad data
 
 ### Current Action Items
 
@@ -47,6 +49,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Testing: Purchasing buttons with different settings
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
 - Preload stuff on pagination hover?
+- mass entry, add collector number
 
 ## Other Action Items
 
