@@ -39,6 +39,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Current Action Items
 
+- Import/Export
+  - Be sure to use MTGJSON as a rosetta stone for data
 - Card Locations
 - verify default visibility for set boxes and card box fields
 - Exclude tokens from progress bars when includeSubsetsInSets is true.

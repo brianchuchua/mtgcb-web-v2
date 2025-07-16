@@ -1,41 +1,56 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import ErrorIcon from '@mui/icons-material/Error';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import WarningIcon from '@mui/icons-material/Warning';
 import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Button,
   Alert,
+  Box,
+  Button,
+  Chip,
   CircularProgress,
-  Stack,
+  Collapse,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  IconButton,
+  Link,
+  Paper,
   Radio,
   RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-  Divider,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Chip,
-  Link,
-  Collapse,
-  IconButton,
+  Typography,
 } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import WarningIcon from '@mui/icons-material/Warning';
-import ErrorIcon from '@mui/icons-material/Error';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { styled } from '@mui/material/styles';
+import React, { useRef, useState } from 'react';
 import { useGetImportFormatsQuery, useImportCollectionMutation } from '@/api/import/importApi';
-import type { ImportResult, ImportError } from '@/api/import/types';
+import type { ImportError, ImportResult } from '@/api/import/types';
+import { Link as NextLink } from '@/components/ui/link';
+
+const InfoBox = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  border: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.action.hover,
+  marginBottom: theme.spacing(2),
+}));
 
 export const ImportClient: React.FC = () => {
   const [selectedFormat, setSelectedFormat] = useState('mtgcb');
@@ -43,8 +58,10 @@ export const ImportClient: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [showErrors, setShowErrors] = useState(true);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [pendingDryRun, setPendingDryRun] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const { data: formats, isLoading: formatsLoading, error: formatsError } = useGetImportFormatsQuery();
   const [importCollection, { isLoading: importing }] = useImportCollectionMutation();
 
@@ -64,8 +81,19 @@ export const ImportClient: React.FC = () => {
     }
   };
 
+  const handleImportClick = (dryRun = false) => {
+    if (dryRun) {
+      handleImport(true);
+    } else {
+      setPendingDryRun(false);
+      setConfirmDialogOpen(true);
+    }
+  };
+
   const handleImport = async (dryRun = false) => {
     if (!selectedFile) return;
+
+    setConfirmDialogOpen(false);
 
     try {
       const csvData = await selectedFile.text();
@@ -111,7 +139,7 @@ export const ImportClient: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const currentFormat = formats?.find(f => f.id === selectedFormat);
+  const currentFormat = formats?.find((f) => f.id === selectedFormat);
 
   if (formatsLoading) {
     return (
@@ -136,15 +164,11 @@ export const ImportClient: React.FC = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         Import Collection
       </Typography>
-      
+
       <Paper sx={{ p: 3, mt: 3 }}>
         <FormControl component="fieldset">
           <FormLabel component="legend">Import Format</FormLabel>
-          <RadioGroup
-            value={selectedFormat}
-            onChange={(e) => setSelectedFormat(e.target.value)}
-            sx={{ mt: 2 }}
-          >
+          <RadioGroup value={selectedFormat} onChange={(e) => setSelectedFormat(e.target.value)} sx={{ mt: 2 }}>
             {formats?.map((format) => (
               <FormControlLabel
                 key={format.id}
@@ -167,7 +191,7 @@ export const ImportClient: React.FC = () => {
         {currentFormat && (
           <>
             <Divider sx={{ my: 3 }} />
-            
+
             <Box>
               <Typography variant="body2" color="text.secondary" paragraph>
                 Required fields for import:
@@ -195,7 +219,7 @@ export const ImportClient: React.FC = () => {
                 onClick={handleDownloadTemplate}
                 sx={{ mb: 3 }}
               >
-                Download Template
+                Download Example
               </Button>
             </Box>
 
@@ -226,7 +250,7 @@ export const ImportClient: React.FC = () => {
                     control={<Radio />}
                     label={
                       <Box>
-                        <Typography variant="body2">Merge</Typography>
+                        <Typography variant="body2">Add</Typography>
                         <Typography variant="caption" color="text.secondary">
                           Add CSV quantities to existing collection
                         </Typography>
@@ -243,7 +267,7 @@ export const ImportClient: React.FC = () => {
                 onChange={handleFileSelect}
                 style={{ display: 'none' }}
               />
-              
+
               <Stack direction="row" spacing={2} alignItems="center">
                 <Button
                   variant="contained"
@@ -252,7 +276,7 @@ export const ImportClient: React.FC = () => {
                 >
                   Select CSV File
                 </Button>
-                
+
                 {selectedFile && (
                   <Typography variant="body2">
                     Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
@@ -262,16 +286,12 @@ export const ImportClient: React.FC = () => {
 
               {selectedFile && !importResult && (
                 <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleImport(true)}
-                    disabled={importing}
-                  >
+                  <Button variant="outlined" onClick={() => handleImportClick(true)} disabled={importing}>
                     Preview (Dry Run)
                   </Button>
                   <Button
                     variant="contained"
-                    onClick={() => handleImport(false)}
+                    onClick={() => handleImportClick(false)}
                     disabled={importing}
                     startIcon={importing ? <CircularProgress size={20} /> : null}
                   >
@@ -282,17 +302,18 @@ export const ImportClient: React.FC = () => {
 
               {importResult && (
                 <Box sx={{ mt: 4 }}>
-                  <Alert 
+                  <Alert
                     severity={
-                      importResult.failedRows === 0 ? 'success' : 
-                      importResult.partialSuccess ? 'warning' : 'error'
+                      importResult.failedRows === 0 ? 'success' : importResult.partialSuccess ? 'warning' : 'error'
                     }
                     sx={{ mb: 3 }}
                   >
                     {importResult.failedRows === 0 ? (
                       <>Successfully imported all {importResult.totalRows} rows</>
                     ) : importResult.partialSuccess ? (
-                      <>Partially successful: {importResult.successfulRows} of {importResult.totalRows} rows imported</>
+                      <>
+                        Partially successful: {importResult.successfulRows} of {importResult.totalRows} rows imported
+                      </>
                     ) : (
                       <>Import failed: All {importResult.totalRows} rows failed</>
                     )}
@@ -354,9 +375,7 @@ export const ImportClient: React.FC = () => {
                   {importResult.errors.length > 0 && (
                     <Box sx={{ mt: 3 }}>
                       <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="h6">
-                          Errors ({importResult.errors.length})
-                        </Typography>
+                        <Typography variant="h6">Errors ({importResult.errors.length})</Typography>
                         <Stack direction="row" spacing={1}>
                           <Button
                             variant="outlined"
@@ -366,15 +385,12 @@ export const ImportClient: React.FC = () => {
                           >
                             Download Errors
                           </Button>
-                          <IconButton
-                            size="small"
-                            onClick={() => setShowErrors(!showErrors)}
-                          >
+                          <IconButton size="small" onClick={() => setShowErrors(!showErrors)}>
                             {showErrors ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                           </IconButton>
                         </Stack>
                       </Box>
-                      
+
                       <Collapse in={showErrors}>
                         <TableContainer component={Paper} variant="outlined" sx={{ mt: 2, maxHeight: 400 }}>
                           <Table size="small" stickyHeader>
@@ -422,6 +438,62 @@ export const ImportClient: React.FC = () => {
           </>
         )}
       </Paper>
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          elevation: 0,
+          sx: {
+            borderRadius: 2,
+            border: (theme) => `1px solid ${theme.palette.divider}`,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            pb: 1,
+            fontSize: '1.25rem',
+            fontWeight: 500,
+          }}
+        >
+          Confirm Import
+        </DialogTitle>
+        <DialogContent>
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            This action cannot be reversed. If you haven't already,{' '}
+            <NextLink href="/export">create an MTG CB export backup</NextLink> of your collection first.
+          </Alert>
+
+          <InfoBox>
+            <Typography variant="body2" gutterBottom>
+              <strong>File:</strong> {selectedFile?.name}
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              <strong>Update Mode:</strong> {updateMode === 'replace' ? 'Replace' : 'Add'}
+            </Typography>
+            <Typography variant="body2">
+              <strong>Action:</strong>{' '}
+              {updateMode === 'replace'
+                ? 'Set card quantities to the exact values in the CSV file'
+                : 'Add the CSV quantities to your existing collection quantities'}
+            </Typography>
+          </InfoBox>
+
+          <DialogContentText>Are you sure you want to proceed with this import?</DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
+          <Button variant="outlined" onClick={() => setConfirmDialogOpen(false)}>
+            Cancel
+          </Button>
+          <Button variant="contained" color="primary" onClick={() => handleImport(false)} autoFocus>
+            Confirm Import
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
