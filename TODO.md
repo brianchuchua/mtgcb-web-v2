@@ -53,6 +53,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Other Action Items
 
+- nuke collection button
+- youtube channel for how to use the site
 - card notes field for card page
 - support better rendering of which variants of cards exist in searches when limiting one copy per card name, maybe
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
@@ -192,9 +194,11 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - UX: Verify that every search tool trims whitespace
 - API: Any chance I run out of ids for collection entries?
 - RTK Query: Compare configuration in legacy app to the new one, especially in terms of caching and invalidation
+- fastify multipart for uploads
 
 ## Production Checklist
 
+- Ping johnny on Discord once card locations are released. :)
 - Integration with Sonarcloud (open source the repo, make development easy for new devs)
 - Integration with Sentry
 - Integration with Google Analytics

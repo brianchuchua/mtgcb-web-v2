@@ -23,6 +23,8 @@ import {
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useGetExportFormatsQuery } from '@/api/export/exportApi';
 
+const MANDATORY_FIELDS = new Set(['id', 'quantity_regular', 'quantity_foil']);
+
 export const ExportClient: React.FC = () => {
   const [selectedFormat, setSelectedFormat] = useState('mtgcb');
   const [exporting, setExporting] = useState(false);
@@ -40,9 +42,17 @@ export const ExportClient: React.FC = () => {
     }
     
     // Add selected fields if using custom field selection
-    if (useCustomFields && selectedFields.size > 0) {
-      selectedFields.forEach(field => {
+    if (useCustomFields) {
+      // Always include mandatory fields
+      MANDATORY_FIELDS.forEach(field => {
         queryParams.append('fields', field);
+      });
+      
+      // Add other selected fields
+      selectedFields.forEach(field => {
+        if (!MANDATORY_FIELDS.has(field)) { // Avoid duplicating mandatory fields
+          queryParams.append('fields', field);
+        }
       });
     }
     
@@ -57,6 +67,9 @@ export const ExportClient: React.FC = () => {
   };
 
   const handleFieldToggle = (fieldName: string) => {
+    // Don't allow toggling mandatory fields
+    if (MANDATORY_FIELDS.has(fieldName)) return;
+    
     const newSelectedFields = new Set(selectedFields);
     if (newSelectedFields.has(fieldName)) {
       newSelectedFields.delete(fieldName);
@@ -182,18 +195,30 @@ export const ExportClient: React.FC = () => {
                         key={field.name}
                         control={
                           <Checkbox
-                            checked={selectedFields.has(field.name)}
+                            checked={MANDATORY_FIELDS.has(field.name) ? true : selectedFields.has(field.name)}
                             onChange={() => handleFieldToggle(field.name)}
+                            disabled={MANDATORY_FIELDS.has(field.name)}
                           />
                         }
-                        label={field.header}
+                        label={
+                          <Box>
+                            <Typography variant="body2">
+                              {field.header}
+                              {MANDATORY_FIELDS.has(field.name) && (
+                                <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                                  (Required)
+                                </Typography>
+                              )}
+                            </Typography>
+                          </Box>
+                        }
                       />
                     ))}
                   </FormGroup>
                   
                   {selectedFields.size === 0 && (
-                    <Alert severity="warning" sx={{ mt: 2 }}>
-                      Please select at least one field to export.
+                    <Alert severity="info" sx={{ mt: 2 }}>
+                      Only the required fields (ID, Quantity Regular, Quantity Foil) will be exported. Select additional fields to include more data.
                     </Alert>
                   )}
                 </Box>
@@ -208,7 +233,7 @@ export const ExportClient: React.FC = () => {
             size="large"
             startIcon={exporting ? <CircularProgress size={20} /> : <FileDownloadIcon />}
             onClick={handleExport}
-            disabled={!selectedFormat || exporting || (useCustomFields && selectedFields.size === 0)}
+            disabled={!selectedFormat || exporting}
           >
             {exporting ? 'Exporting...' : 'Export Collection'}
           </Button>

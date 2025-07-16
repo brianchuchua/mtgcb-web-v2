@@ -134,7 +134,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
 
             {isAuthenticated &&
               user?.userId &&
-              (pathname?.startsWith('/collections') || pathname === '/goals' || pathname?.startsWith('/locations') || pathname === '/export') && (
+              (pathname?.startsWith('/collections') || pathname === '/goals' || pathname?.startsWith('/locations') || pathname === '/export' || pathname === '/import') && (
                 <List component="div" disablePadding>
                   <ListItem disablePadding>
                     <ListItemButton
@@ -192,11 +192,17 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                     </ListItemButton>
                   </ListItem>
                   <ListItem disablePadding>
-                    <ListItemButton disabled sx={{ pl: 4 }}>
+                    <ListItemButton
+                      component={Link}
+                      href="/import"
+                      selected={pathname === '/import'}
+                      onClick={handleClick}
+                      sx={{ pl: 4 }}
+                    >
                       <ListItemIcon>
                         <ImportIcon />
                       </ListItemIcon>
-                      <ListItemText primary="Import (In Development)" />
+                      <ListItemText primary="Import" />
                     </ListItemButton>
                   </ListItem>
                   <ListItem disablePadding>
