@@ -4,6 +4,7 @@ export interface ExportFormat {
   description: string;
   defaultFields: ExportField[];
   availableFields: ExportField[];
+  supported: boolean;
 }
 
 export interface ExportField {
