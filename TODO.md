@@ -185,6 +185,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 - Search with scryfall syntax
 - "In terms of import/export, I've got a ton of decks in Moxfield. I'd love the ability to import a deck from Moxfield and then add the name of the Moxfield deck to a location field to help indicate within MTG Collection Builder that a specific card is in a specific Commander deck. Not sure if that's what you were asking with regard to importers and exporters, but it's something that would make my life easier....." "Exactly! This one would be just to import for the location, not to add to the collection. Of course, it would be an added bonus if there were some sort of error handling in case I chose a card variant in Moxfield that I have 0 of in my collection which would notify me so I could change the variant within Moxfield."
+- Nestable locations
 
 ## Maybes
 

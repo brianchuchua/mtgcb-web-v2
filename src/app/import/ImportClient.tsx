@@ -215,9 +215,9 @@ export const ImportClient: React.FC = () => {
 
               <Button
                 variant="outlined"
+                size="small"
                 startIcon={<FileDownloadIcon />}
                 onClick={handleDownloadTemplate}
-                sx={{ mb: 3 }}
               >
                 Download Example
               </Button>

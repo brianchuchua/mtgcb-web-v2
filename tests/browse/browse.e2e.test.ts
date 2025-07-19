@@ -121,8 +121,15 @@ test.describe('Browse Page', () => {
     // Click next page
     await page.getByTestId('pagination-next').click();
     
-    // Wait for new sets to load
-    await page.waitForLoadState('networkidle');
+    // Wait for the content to actually change
+    await page.waitForFunction(
+      (firstPageFirstSet) => {
+        const currentFirstSet = document.querySelector('[data-testid="set-name"]')?.textContent;
+        return currentFirstSet && currentFirstSet !== firstPageFirstSet;
+      },
+      firstPageSetNames[0], // Pass the first set name from page 1
+      { timeout: 10000 }
+    );
     
     // Get second page set names
     const secondPageSetNames = await page.getByTestId('set-name').allTextContents();
