@@ -309,6 +309,38 @@ const collectionsApi = mtgcbApi.injectEndpoints({
       }),
       providesTags: (_result, _error, { locationId }) => [{ type: 'Location', id: locationId }],
     }),
+    
+    nukeCollection: builder.mutation<ApiResponse<{ userId: number; deletedCount: number; message: string }>, void>({
+      query: () => ({
+        url: '/collection/nuke',
+        method: 'DELETE',
+      }),
+      async onQueryStarted(arg, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            if (userId) {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  { type: 'Cards', id: `user-${userId}` },
+                  { type: 'Sets', id: `user-${userId}` },
+                  { type: 'Goals', id: `user-${userId}` },
+                  'Goals',
+                  'Location',
+                ]),
+              );
+            } else {
+              dispatch(mtgcbApi.util.invalidateTags(['Collection', 'Location']));
+            }
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
+    }),
   }),
 });
 
@@ -324,5 +356,6 @@ export const {
   useGetCardLocationsQuery,
   useLazyGetCardLocationsQuery,
   useGetLocationCardsQuery,
+  useNukeCollectionMutation,
 } = collectionsApi;
 export const { endpoints: collectionsEndpoints } = collectionsApi;

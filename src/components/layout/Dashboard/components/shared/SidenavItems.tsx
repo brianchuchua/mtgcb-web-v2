@@ -12,6 +12,7 @@ import {
   ListAlt as ListAltIcon,
   Style as StyleIcon,
   Timeline as TimelineIcon,
+  DeleteForever as ResetIcon,
 } from '@mui/icons-material';
 import { AutoStories as BinderIcon } from '@mui/icons-material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -255,6 +256,20 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                         <ExportIcon />
                       </ListItemIcon>
                       <ListItemText primary="Export" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      component={Link}
+                      href="/reset-collection"
+                      selected={pathname === '/reset-collection'}
+                      onClick={handleClick}
+                      sx={{ pl: 4 }}
+                    >
+                      <ListItemIcon>
+                        <ResetIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Reset Collection" />
                     </ListItemButton>
                   </ListItem>
                 </List>
