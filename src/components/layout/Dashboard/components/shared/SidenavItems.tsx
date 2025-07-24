@@ -3,15 +3,15 @@
 import {
   BarChart as BarChartIcon,
   Dashboard as DashboardIcon,
+  Launch as ExportIcon,
   Favorite as FavoriteIcon,
   Home as HomeIcon,
+  SaveAlt as ImportIcon,
   Iso as IsoIcon,
   ImportContacts as LibraryIcon,
   ListAlt as ListAltIcon,
   Style as StyleIcon,
   Timeline as TimelineIcon,
-  SaveAlt as ImportIcon,
-  Launch as ExportIcon,
 } from '@mui/icons-material';
 import { AutoStories as BinderIcon } from '@mui/icons-material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -30,7 +30,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SearchForms } from '@/components/layout/Dashboard/components/shared/SearchForms';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
@@ -42,7 +42,7 @@ interface SidenavItemsProps {
 export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
   const pathname = usePathname();
   const { isAuthenticated, user } = useAuth();
-  const [isCollectionMenuOpen] = useState(false); // Kept for future collection menu implementation
+  const [isCollectionMenuOpen, setIsCollectionMenuOpen] = useState(false);
   const [isNavExpanded, setIsNavExpanded] = useState(true);
 
   const toggleNavExpanded = () => {
@@ -54,6 +54,20 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
       onNavigate();
     }
   };
+
+  // Auto-open collection menu when on collection-related pages
+  useEffect(() => {
+    const isOnCollectionPage =
+      pathname?.startsWith('/collections') ||
+      pathname === '/goals' ||
+      pathname?.startsWith('/locations') ||
+      pathname === '/export' ||
+      pathname === '/import';
+
+    if (isOnCollectionPage && isAuthenticated && user?.userId) {
+      setIsCollectionMenuOpen(true);
+    }
+  }, [pathname, isAuthenticated, user?.userId]);
 
   return (
     <SidenavContainer>
@@ -117,25 +131,49 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
             </ListItem>
 
             {isAuthenticated && user?.userId && (
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
-                  href={`/collections/${user.userId}`}
-                  selected={pathname?.startsWith(`/collections/${user.userId}`)}
-                  onClick={handleClick}
-                >
-                  <ListItemIcon>
-                    <LibraryIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Collection" />
-                </ListItemButton>
-              </ListItem>
+              <>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => setIsCollectionMenuOpen(!isCollectionMenuOpen)}
+                    selected={
+                      pathname?.startsWith('/collections') ||
+                      pathname === '/goals' ||
+                      pathname?.startsWith('/locations') ||
+                      pathname === '/export' ||
+                      pathname === '/import'
+                    }
+                  >
+                    <ListItemIcon>
+                      <LibraryIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Collection" />
+                    {isCollectionMenuOpen ? (
+                      <ExpandLessIcon sx={{ mr: '5px' }} />
+                    ) : (
+                      <ExpandMoreIcon sx={{ mr: '5px' }} />
+                    )}
+                  </ListItemButton>
+                </ListItem>
+              </>
             )}
 
-            {isAuthenticated &&
-              user?.userId &&
-              (pathname?.startsWith('/collections') || pathname === '/goals' || pathname?.startsWith('/locations') || pathname === '/export' || pathname === '/import') && (
+            {isAuthenticated && user?.userId && (
+              <Collapse in={isCollectionMenuOpen} timeout="auto">
                 <List component="div" disablePadding>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      component={Link}
+                      href={`/collections/${user.userId}`}
+                      selected={pathname?.startsWith(`/collections/${user.userId}`)}
+                      onClick={handleClick}
+                      sx={{ pl: 4 }}
+                    >
+                      <ListItemIcon>
+                        <DashboardIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="My Collection" />
+                    </ListItemButton>
+                  </ListItem>
                   <ListItem disablePadding>
                     <ListItemButton
                       component={Link}
@@ -220,7 +258,8 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                     </ListItemButton>
                   </ListItem>
                 </List>
-              )}
+              </Collapse>
+            )}
 
             <ListItem disablePadding>
               <ListItemButton disabled>
