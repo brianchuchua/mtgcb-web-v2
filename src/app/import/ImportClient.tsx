@@ -475,11 +475,25 @@ export const ImportClient: React.FC = () => {
             <Typography variant="body2" gutterBottom>
               <strong>Update Mode:</strong> {updateMode === 'replace' ? 'Replace' : 'Add'}
             </Typography>
-            <Typography variant="body2">
+            <Typography variant="body2" gutterBottom>
               <strong>Action:</strong>{' '}
               {updateMode === 'replace'
                 ? 'Set card quantities to the exact values in the CSV file'
                 : 'Add the CSV quantities to your existing collection quantities'}
+            </Typography>
+            <Divider sx={{ my: 1.5 }} />
+            <Typography variant="body2" color="warning.main">
+              {updateMode === 'replace' ? (
+                <>
+                  <strong>Warning:</strong> Replace mode will completely override the quantities for all cards in the CSV
+                  file with the new values. Cards not in the CSV will remain unchanged.
+                </>
+              ) : (
+                <>
+                  <strong>Warning:</strong> Add mode will add the CSV quantities to your existing collection quantities. Cards not in the CSV will
+                  remain unchanged.
+                </>
+              )}
             </Typography>
           </InfoBox>
 
