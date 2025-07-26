@@ -13,6 +13,7 @@ import {
   Style as StyleIcon,
   Timeline as TimelineIcon,
   DeleteForever as ResetIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { AutoStories as BinderIcon } from '@mui/icons-material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -56,14 +57,25 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
     }
   };
 
+  const handleCollectionClick = () => {
+    setIsCollectionMenuOpen(false);
+    handleClick();
+  };
+
+  const handleBrowseClick = () => {
+    setIsCollectionMenuOpen(false);
+    handleClick();
+  };
+
   // Auto-open collection menu when on collection-related pages
   useEffect(() => {
     const isOnCollectionPage =
-      pathname?.startsWith('/collections') ||
+      pathname?.startsWith('/collections/edit-cards') ||
       pathname === '/goals' ||
       pathname?.startsWith('/locations') ||
       pathname === '/export' ||
-      pathname === '/import';
+      pathname === '/import' ||
+      pathname === '/reset-collection';
 
     if (isOnCollectionPage && isAuthenticated && user?.userId) {
       setIsCollectionMenuOpen(true);
@@ -122,7 +134,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                 component={Link}
                 href="/browse"
                 selected={pathname.startsWith('/browse')}
-                onClick={handleClick}
+                onClick={handleBrowseClick}
               >
                 <ListItemIcon>
                   <DashboardIcon />
@@ -135,19 +147,34 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
               <>
                 <ListItem disablePadding>
                   <ListItemButton
-                    onClick={() => setIsCollectionMenuOpen(!isCollectionMenuOpen)}
-                    selected={
-                      pathname?.startsWith('/collections') ||
-                      pathname === '/goals' ||
-                      pathname?.startsWith('/locations') ||
-                      pathname === '/export' ||
-                      pathname === '/import'
-                    }
+                    component={Link}
+                    href={`/collections/${user.userId}`}
+                    selected={pathname?.startsWith(`/collections/${user.userId}`)}
+                    onClick={handleCollectionClick}
                   >
                     <ListItemIcon>
                       <LibraryIcon />
                     </ListItemIcon>
                     <ListItemText primary="Collection" />
+                  </ListItemButton>
+                </ListItem>
+
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={() => setIsCollectionMenuOpen(!isCollectionMenuOpen)}
+                    selected={
+                      pathname?.startsWith('/collections/edit-cards') ||
+                      pathname === '/goals' ||
+                      pathname?.startsWith('/locations') ||
+                      pathname === '/export' ||
+                      pathname === '/import' ||
+                      pathname === '/reset-collection'
+                    }
+                  >
+                    <ListItemIcon>
+                      <SettingsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Manage Collection" />
                     {isCollectionMenuOpen ? (
                       <ExpandLessIcon sx={{ mr: '5px' }} />
                     ) : (
@@ -161,20 +188,6 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
             {isAuthenticated && user?.userId && (
               <Collapse in={isCollectionMenuOpen} timeout="auto">
                 <List component="div" disablePadding>
-                  <ListItem disablePadding>
-                    <ListItemButton
-                      component={Link}
-                      href={`/collections/${user.userId}`}
-                      selected={pathname?.startsWith(`/collections/${user.userId}`)}
-                      onClick={handleClick}
-                      sx={{ pl: 4 }}
-                    >
-                      <ListItemIcon>
-                        <DashboardIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="My Collection" />
-                    </ListItemButton>
-                  </ListItem>
                   <ListItem disablePadding>
                     <ListItemButton
                       component={Link}
