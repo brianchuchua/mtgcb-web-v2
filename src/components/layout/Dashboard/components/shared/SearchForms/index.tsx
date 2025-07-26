@@ -2,7 +2,7 @@
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import TuneIcon from '@mui/icons-material/Tune';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import { Box, Collapse, Divider, IconButton, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -50,7 +50,7 @@ export const SearchForms = () => {
         onClick={toggleExpanded}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <TuneIcon color="primary" sx={{ mr: 1.5 }} />
+          <ManageSearchIcon color="primary" sx={{ mr: 1.5 }} />
           <Typography variant="subtitle1" fontWeight="medium">
             {getFormTitle()}
           </Typography>

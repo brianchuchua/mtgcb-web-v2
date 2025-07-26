@@ -13,7 +13,7 @@ import {
   Style as StyleIcon,
   Timeline as TimelineIcon,
   DeleteForever as ResetIcon,
-  Settings as SettingsIcon,
+  Tune as TuneIcon,
 } from '@mui/icons-material';
 import { AutoStories as BinderIcon } from '@mui/icons-material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -172,7 +172,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                     }
                   >
                     <ListItemIcon>
-                      <SettingsIcon />
+                      <TuneIcon />
                     </ListItemIcon>
                     <ListItemText primary="Manage Collection" />
                     {isCollectionMenuOpen ? (
