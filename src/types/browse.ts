@@ -92,6 +92,7 @@ export interface BrowseSearchParams {
   selectedGoalId?: number | null;
   showGoals?: ShowGoalsOption;
   selectedLocationId?: number | null;
+  includeBadDataOnly?: boolean;
 }
 
 export interface BrowsePagination {

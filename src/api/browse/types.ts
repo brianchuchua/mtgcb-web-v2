@@ -144,6 +144,7 @@ export interface CardApiParams {
   showGoals?: 'all' | 'complete' | 'incomplete';
   locationId?: number;
   includeLocations?: boolean;
+  includeBadDataOnly?: boolean;
 }
 
 export interface SetApiParams {

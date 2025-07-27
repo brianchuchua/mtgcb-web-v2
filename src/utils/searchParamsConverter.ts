@@ -47,6 +47,11 @@ export const buildApiParamsFromSearchParams = (
       apiParams.oneResultPerCardName = searchParams.oneResultPerCardName;
     }
 
+    // Add includeBadDataOnly parameter
+    if (searchParams.includeBadDataOnly) {
+      apiParams.includeBadDataOnly = searchParams.includeBadDataOnly;
+    }
+
     // Add color filtering
     if (searchParams.colors) {
       if (searchParams.colors.includeColorless) {

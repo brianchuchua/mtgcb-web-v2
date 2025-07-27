@@ -7,11 +7,15 @@ import {
   Collapse,
   styled,
   Chip,
+  FormControlLabel,
+  Switch,
+  Tooltip,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useDispatch, useSelector } from 'react-redux';
-import { setStats, selectStats } from '@/redux/slices/browseSlice';
+import { setStats, selectStats, setIncludeBadDataOnly, selectIncludeBadDataOnly } from '@/redux/slices/browseSlice';
 import { StatFilters } from '@/types/browse';
 import OutlinedBox from '@/components/ui/OutlinedBox';
 
@@ -47,6 +51,7 @@ const QUANTITY_OPTIONS: QuantityOption[] = ['all', '0x', '1x', '2x', '3x', '4x',
 const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage }) => {
   const dispatch = useDispatch();
   const statFilters = useSelector(selectStats);
+  const includeBadDataOnly = useSelector(selectIncludeBadDataOnly) ?? false;
   const [expanded, setExpanded] = useState(false);
 
   // Parse current stat filters to determine selected values and custom filters
@@ -159,6 +164,10 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
     dispatch(setStats(newStatFilters));
   };
 
+  const handleIncludeBadDataToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setIncludeBadDataOnly(event.target.checked));
+  };
+
   if (!isCollectionPage) {
     return null;
   }
@@ -216,6 +225,31 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
         </Box>
         <Box sx={{ mt: 2 }}>
           {renderQuantitySelector('Foil Cards', 'quantityFoil', foilFilterState)}
+        </Box>
+        
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={includeBadDataOnly}
+                onChange={handleIncludeBadDataToggle}
+                name="includeBadDataOnly"
+                color="primary"
+                size="small"
+              />
+            }
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography variant="body2">Show Bad Data</Typography>
+                <Tooltip
+                  title="Shows cards that were input that aren't possible to own, like foil printings of cards that don't come in foil"
+                  placement="top"
+                >
+                  <InfoOutlinedIcon sx={{ fontSize: '1rem', color: 'text.secondary', cursor: 'help' }} />
+                </Tooltip>
+              </Box>
+            }
+          />
         </Box>
       </Collapse>
     </OutlinedBox>

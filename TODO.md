@@ -142,6 +142,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Inconsistent h1 styles (set page, goal vs non-goal context)
 - error state of quantity selectors not affecting button properly in goal editing or creation form
 - improve loading states, http://local.mtgcb.com:3000/collections/1337?goalId=14&oneResultPerCardName=true&contentType=cards and switch to "all except alpha" goal -- the transition is jarring
+- improve rendering of quantities of another person's collection, maybe just hide left/right buttons and disable, still need to show bad data indicators
 
 ## Bugs
 

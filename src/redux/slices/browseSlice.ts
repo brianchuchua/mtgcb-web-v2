@@ -180,6 +180,14 @@ export const browseSlice = createSlice({
         state.cardsSearchParams.oneResultPerCardName = action.payload;
       }
     },
+    setIncludeBadDataOnly: (state, action: PayloadAction<boolean>) => {
+      // Cards-specific field
+      if (!action.payload) {
+        delete state.cardsSearchParams.includeBadDataOnly;
+      } else {
+        state.cardsSearchParams.includeBadDataOnly = action.payload;
+      }
+    },
     setSortBy: (state, action: PayloadAction<SortByOption>) => {
       // Apply to current view type
       const searchParams = state.viewContentType === 'cards' ? state.cardsSearchParams : state.setsSearchParams;
@@ -486,6 +494,7 @@ export const {
   setIncludeSubsetsInSet,
   setCompletionStatus,
   setOneResultPerCardName,
+  setIncludeBadDataOnly,
   setSortBy,
   setSortOrder,
   setPagination,
@@ -542,6 +551,7 @@ export const selectRarities = (state: RootState) => state.browse.cardsSearchPara
 export const selectSets = (state: RootState) => state.browse.cardsSearchParams.sets;
 export const selectStats = (state: RootState) => state.browse.cardsSearchParams.stats;
 export const selectOneResultPerCardName = (state: RootState) => state.browse.cardsSearchParams.oneResultPerCardName;
+export const selectIncludeBadDataOnly = (state: RootState) => state.browse.cardsSearchParams.includeBadDataOnly;
 export const selectCardSortBy = (state: RootState) => state.browse.cardsSearchParams.sortBy;
 export const selectCardSortOrder = (state: RootState) => state.browse.cardsSearchParams.sortOrder;
 export const selectCardCurrentPage = (state: RootState) => state.browse.cardsSearchParams.currentPage || 1;
