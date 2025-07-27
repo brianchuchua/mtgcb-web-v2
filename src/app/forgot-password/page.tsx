@@ -93,16 +93,16 @@ export default function ForgotPasswordPage() {
   return (
     <CenteredContainer>
       <ForgotPasswordWrapper>
-        <ForgotPasswordIcon>
+        <ForgotPasswordIcon data-testid="forgot-password-icon">
           <LockOutlined />
         </ForgotPasswordIcon>
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h5" data-testid="forgot-password-title">
           Forgot Password
         </Typography>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }}>
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }} data-testid="forgot-password-description">
           Enter your username and email address and we'll send you instructions to reset your password.
         </Typography>
-        <ForgotPasswordForm noValidate onSubmit={handleSubmit(onSubmit)}>
+        <ForgotPasswordForm noValidate onSubmit={handleSubmit(onSubmit)} data-testid="forgot-password-form">
           <TextField
             {...register('username', { required: 'Username is required' })}
             label="Username"
@@ -118,6 +118,7 @@ export default function ForgotPasswordPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'username-input',
               },
             }}
           />
@@ -142,16 +143,17 @@ export default function ForgotPasswordPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'email-input',
               },
             }}
           />
 
           <Box>
-            <FormHelperText error={Boolean(errors.root)}>{errors.root?.message}</FormHelperText>
+            <FormHelperText error={Boolean(errors.root)} data-testid="form-error">{errors.root?.message}</FormHelperText>
           </Box>
 
           <SubmitButtonWrapper>
-            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting}>
+            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting} data-testid="submit-button">
               Send Reset Instructions
             </Button>
           </SubmitButtonWrapper>
@@ -164,18 +166,18 @@ export default function ForgotPasswordPage() {
               mb: 2,
             }}
           >
-            <Link href="/login" variant="body2">
+            <Link href="/login" variant="body2" data-testid="login-link">
               Back to Login
             </Link>
           </Box>
 
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>
+          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }} data-testid="recaptcha-text">
             This site is protected by reCAPTCHA and the Google{' '}
-            <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+            <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-testid="privacy-link">
               Privacy Policy
             </Link>{' '}
             and{' '}
-            <Link href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">
+            <Link href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" data-testid="terms-link">
               Terms of Service
             </Link>{' '}
             apply.

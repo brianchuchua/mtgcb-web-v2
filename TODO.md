@@ -174,6 +174,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
 - Audit consistency of naming of fields returned by API for totalCount and values.
 - Need a full postman library of my API calls, these should live with api docs
+- Need a fallback if both canBeFoil and canBeNonFoil are false, treat them both as true probably
 
 ## Future Feature Work
 

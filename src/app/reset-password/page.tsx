@@ -121,16 +121,16 @@ export default function ResetPasswordPage() {
   return (
     <CenteredContainer>
       <ResetPasswordWrapper>
-        <ResetPasswordIcon>
+        <ResetPasswordIcon data-testid="reset-password-icon">
           <LockOutlined />
         </ResetPasswordIcon>
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h5" data-testid="reset-password-title">
           Reset Password
         </Typography>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }}>
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }} data-testid="reset-password-description">
           Enter your new password below.
         </Typography>
-        <ResetPasswordForm noValidate onSubmit={handleSubmit(onSubmit)}>
+        <ResetPasswordForm noValidate onSubmit={handleSubmit(onSubmit)} data-testid="reset-password-form">
           <TextField
             {...register('newPassword', {
               required: 'Password is required',
@@ -150,6 +150,7 @@ export default function ResetPasswordPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'new-password-input',
               },
             }}
           />
@@ -170,16 +171,17 @@ export default function ResetPasswordPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'confirm-password-input',
               },
             }}
           />
 
           <Box>
-            <FormHelperText error={Boolean(errors.root)}>{errors.root?.message}</FormHelperText>
+            <FormHelperText error={Boolean(errors.root)} data-testid="form-error">{errors.root?.message}</FormHelperText>
           </Box>
 
           <SubmitButtonWrapper>
-            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting}>
+            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting} data-testid="submit-button">
               Reset Password
             </Button>
           </SubmitButtonWrapper>
@@ -192,7 +194,7 @@ export default function ResetPasswordPage() {
               mb: 2,
             }}
           >
-            <Link href="/login" variant="body2">
+            <Link href="/login" variant="body2" data-testid="login-link">
               Back to Login
             </Link>
           </Box>
@@ -239,16 +241,16 @@ const SubmitButtonWrapper = styled('div')(({ theme }) => ({
 
 const InvalidTokenMessage = ({ message }: { message: string }) => (
   <TokenErrorWrapper>
-    <TokenErrorIcon>
+    <TokenErrorIcon data-testid="invalid-token-icon">
       <ErrorOutline />
     </TokenErrorIcon>
-    <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
+    <Typography component="h1" variant="h5" sx={{ mb: 2 }} data-testid="invalid-token-title">
       Invalid Reset Link
     </Typography>
-    <Typography color="text.secondary" align="center" sx={{ mb: 3 }}>
+    <Typography color="text.secondary" align="center" sx={{ mb: 3 }} data-testid="invalid-token-message">
       {message}
     </Typography>
-    <Button href="/login" variant="contained" color="primary" fullWidth>
+    <Button href="/login" variant="contained" color="primary" fullWidth data-testid="return-to-login-button">
       Return to Login
     </Button>
   </TokenErrorWrapper>

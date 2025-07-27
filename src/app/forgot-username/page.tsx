@@ -91,16 +91,16 @@ export default function ForgotUsernamePage() {
   return (
     <CenteredContainer>
       <ForgotUsernameWrapper>
-        <ForgotUsernameIcon>
+        <ForgotUsernameIcon data-testid="forgot-username-icon">
           <PersonOutline />
         </ForgotUsernameIcon>
-        <Typography component="h1" variant="h5">
+        <Typography component="h1" variant="h5" data-testid="forgot-username-title">
           Forgot Username
         </Typography>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }}>
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }} data-testid="forgot-username-description">
           Enter your email address and we'll send you your username.
         </Typography>
-        <ForgotUsernameForm noValidate onSubmit={handleSubmit(onSubmit)}>
+        <ForgotUsernameForm noValidate onSubmit={handleSubmit(onSubmit)} data-testid="forgot-username-form">
           <TextField
             {...register('email', {
               required: 'Email is required',
@@ -122,16 +122,17 @@ export default function ForgotUsernamePage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                'data-testid': 'email-input',
               },
             }}
           />
 
           <Box>
-            <FormHelperText error={Boolean(errors.root)}>{errors.root?.message}</FormHelperText>
+            <FormHelperText error={Boolean(errors.root)} data-testid="form-error">{errors.root?.message}</FormHelperText>
           </Box>
 
           <SubmitButtonWrapper>
-            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting}>
+            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting} data-testid="submit-button">
               Recover Username
             </Button>
           </SubmitButtonWrapper>
@@ -144,18 +145,18 @@ export default function ForgotUsernamePage() {
               mb: 2,
             }}
           >
-            <Link href="/login" variant="body2">
+            <Link href="/login" variant="body2" data-testid="login-link">
               Back to Login
             </Link>
           </Box>
 
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }}>
+          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }} data-testid="recaptcha-text">
             This site is protected by reCAPTCHA and the Google{' '}
-            <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+            <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-testid="privacy-link">
               Privacy Policy
             </Link>{' '}
             and{' '}
-            <Link href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">
+            <Link href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" data-testid="terms-link">
               Terms of Service
             </Link>{' '}
             apply.
