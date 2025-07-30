@@ -52,6 +52,14 @@ const InfoBox = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
+// Notes for specific import formats
+const IMPORT_FORMAT_NOTES: Record<string, string> = {
+  tcgplayer_app:
+    "TCGPlayer App exports files as .txt format. You'll need to rename the file extension from .txt to .csv before importing.",
+  deckbox: "When exporting from Deckbox, make sure to select 'Scryfall ID' and 'TcgPlayer ID' as additional fields.",
+  // Add more format notes here as needed
+};
+
 export const ImportClient: React.FC = () => {
   const [selectedFormat, setSelectedFormat] = useState('mtgcb');
   const [updateMode, setUpdateMode] = useState<'replace' | 'merge'>('replace');
@@ -192,6 +200,17 @@ export const ImportClient: React.FC = () => {
           <>
             <Divider sx={{ my: 3 }} />
 
+            {IMPORT_FORMAT_NOTES[currentFormat.id] && (
+              <Alert severity="info" sx={{ mb: 3 }}>
+                <Typography variant="body2">
+                  <strong>Tips on this import format:</strong>
+                </Typography>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  {IMPORT_FORMAT_NOTES[currentFormat.id]}
+                </Typography>
+              </Alert>
+            )}
+
             <Box>
               <Typography variant="body2" color="text.secondary" paragraph>
                 Required fields for import:
@@ -213,12 +232,7 @@ export const ImportClient: React.FC = () => {
                 ))}
               </Stack>
 
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<FileDownloadIcon />}
-                onClick={handleDownloadTemplate}
-              >
+              <Button variant="outlined" size="small" startIcon={<FileDownloadIcon />} onClick={handleDownloadTemplate}>
                 Download Example
               </Button>
             </Box>
@@ -485,13 +499,13 @@ export const ImportClient: React.FC = () => {
             <Typography variant="body2" color="warning.main">
               {updateMode === 'replace' ? (
                 <>
-                  <strong>Warning:</strong> Replace mode will completely override the quantities for all cards in the CSV
-                  file with the new values. Cards not in the CSV will remain unchanged.
+                  <strong>Warning:</strong> Replace mode will completely override the quantities for all cards in the
+                  CSV file with the new values. Cards not in the CSV will remain unchanged.
                 </>
               ) : (
                 <>
-                  <strong>Warning:</strong> Add mode will add the CSV quantities to your existing collection quantities. Cards not in the CSV will
-                  remain unchanged.
+                  <strong>Warning:</strong> Add mode will add the CSV quantities to your existing collection quantities.
+                  Cards not in the CSV will remain unchanged.
                 </>
               )}
             </Typography>

@@ -41,8 +41,8 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 - Import/Export
 - Be sure to use MTGJSON as a rosetta stone for data
+- Nestable locations
 
-- Card Locations
 - verify default visibility for set boxes and card box fields
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
@@ -56,6 +56,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Other Action Items
 
+- verify the individual value of sets, when added up, add up to the collection value -- Chris request on Discord
 - nuke collection button
 - youtube channel for how to use the site
 - card notes field for card page

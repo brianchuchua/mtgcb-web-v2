@@ -33,6 +33,15 @@ const UNSUPPORTED_FORMAT_EXPLANATIONS: Record<string, string> = {
   // Add more format explanations here as needed
 };
 
+// Notes for supported formats that have limitations or important information
+const SUPPORTED_FORMAT_NOTES: Record<string, string> = {
+  archidekt:
+    "Archidekt's site doesn't allow uploading more than about 40,000 rows at a time. Additionally, once your collection gets that big on their end, their export functionality may also stop working.",
+  deckbox:
+    "When importing many cards (40000+), Deckbox's site may appear to time out with an infinite spinner after about a minute. However, the import may have succeeded - simply refresh the page and your cards may be there.",
+  // Add more format notes here as needed
+};
+
 export const ExportClient: React.FC = () => {
   const [selectedFormat, setSelectedFormat] = useState('mtgcb');
   const [exporting, setExporting] = useState(false);
@@ -159,6 +168,16 @@ export const ExportClient: React.FC = () => {
               </Alert>
             ) : (
               <>
+                {SUPPORTED_FORMAT_NOTES[currentFormat.id] && (
+                  <Alert severity="info" sx={{ mb: 3 }}>
+                    <Typography variant="body2">
+                      <strong>Tips on this export format:</strong>
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {SUPPORTED_FORMAT_NOTES[currentFormat.id]}
+                    </Typography>
+                  </Alert>
+                )}
                 <Box>
                   <Collapse in={!useCustomFields}>
                     <Box>

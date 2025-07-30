@@ -52,47 +52,33 @@ Export: Deckbox, MTG CB, MTG Studio, MTGPrice.com
 
 ### TCGPlayer app
 
-- Users need to change the Default share format to CSV in the app settings.
-- They'll want to have all the CSV fields enabled in the CSV output settings.
-- The app by default names the file a .txt even though the data is in CSV format.
-- It's buggy and doesn't actually work for importing back into the app.
-- Import: Done
-- Export: Not Supported
+- Status: ✅Done
 
 ### Moxfield
 
+- Status: 🏈Punted
 - No unique field unfortunately, but Archidekt lets me do scryfallId, so since Moxfield lets you import Archidekt, I may be able to cross-reference the two to create a mapping.
 - How do they support so many import formats? Do they really? I'll need to cross-test these.
 - Maybe all these sites fail importing when there are naming differences and categorization differences?
 
 ### Archidekt
 
-- This one should be good, they export scryfallId.
-- They set a good example on how to handle import formats.
-- I should have a generic handler that can receive a hierarchy of fields and do its best to map them one step at a time.
-- TODO TOMORROW: I'll probably try uploading all of magic to Archidekt and see how it does. Then try to export it back and cross-reference with Moxfield. If it works, I'll then make mappings. Although I should just implement Archidekt fully end-to-end, making sure that fallback logic is in place.
-- I need a utility to generate sample files with every card in magic. duplicate scryfall ids will have to handle special foils.
-- first test of 1 of each card from a set was great, just failed the ones without scryfall ids.
-- a quick test with every card, 91 + 396 don't import. Some have scryfall ids which is surprising. But out of 92946 cards, that's not bad. 99.5% success rate.
-- Having every card in magic breaks Archidekt. It won't let you export. I'll need to experimentally find the correct chunk size to export from there and then aggregate all the data to help me make moxfield mappings. I should be able to use AI to generate .csvs and then create the table mappings from there. Card name mappings and set name mappings per import/export source and card id and set id. If 1 match found, go for it. If multiple, skip and label the ambiguous ones.
+- Status: ✅Done
 
-csv generator for this test:
+### MTGGoldfish
 
-```sql
-SELECT
-       2                                            AS "Quantity",
-       c."scryfallId"                               AS "Scryfall ID",
-       CASE
-           WHEN lower(c.name) LIKE '%foil%' THEN 'Foil'
-           ELSE 'Normal'
-       END                                          AS "Variant",
-       c.name                                       AS "Card Name",
-       s.name                                       AS "Set Name",
-       s.code                                       AS "Set Code"
-FROM   public."Card" AS c
-JOIN   public."Set"  AS s ON s.id = c."setId"
-WHERE  c."setId" IS NOT NULL
-ORDER  BY c."setId",
-          c."collectorNumberNumeric" NULLS LAST,
-          c.id;
-```
+- Status: 🏈Punted
+- Have to pay to import and their import formats may be limited, unless I check out their supported ones.
+
+### Deckbox.org
+
+- Status: ✅Done
+- They support exporting scryfall id and tcgplayer id, but do not use them for importing.
+- Out of 44000 cards, 43500 are recognized and it splits successes from failures into two files.
+- But trying the actual import just spins. Not sure if it's going to fail after a few minutes.
+- I force-closed and refreshed, then saw my cards.
+- Need to tell the user when exporting in deckbox format to use the "Deckbox CSV" section under Add Cards.
+- Their site times out with 44000 cards after 1 minute, the spinner forever spinning.
+- But they all made it.
+
+TODO: Must unify the logic for identifying cards across all import formats.
