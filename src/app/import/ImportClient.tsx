@@ -52,6 +52,17 @@ const InfoBox = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
+// Explanations for why certain formats are not supported
+const UNSUPPORTED_FORMAT_EXPLANATIONS: Record<string, string> = {
+  tcgplayer_app:
+    'The TCGPlayer App format cannot be supported for import. This is because the TCGPlayer App only has a textbox to manually copy/paste csv contents into, which has a very limited length and also fails silently a lot of the time.',
+  mtgstudio:
+    "MTG Studio uses very different naming conventions for set codes and card names, and doesn't use any unique IDs to identify cards. After spending a lot of time trying to improve compatibility, there are still over 60,000 cards that would need manual fixes. With few users still on this legacy application, it's no longer feasible to maintain support. This is the tool I used before making MTG CB and I have a lot of respect for its legacy. If they ever add support for TCGPlayer IDs or Scryfall IDs, reach out to me.",
+  urzagatherer:
+    'UrzaGatherer uses a proprietary export format (.ugs files) that cannot be imported. Their format does not use a standard CSV structure or known card identifiers and is intended just for internal use.',
+  // Add more format explanations here as needed
+};
+
 // Notes for specific import formats
 const IMPORT_FORMAT_NOTES: Record<string, string> = {
   tcgplayer_app:
@@ -184,7 +195,12 @@ export const ImportClient: React.FC = () => {
                 control={<Radio />}
                 label={
                   <Box>
-                    <Typography variant="body1">{format.name}</Typography>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Typography variant="body1">{format.name}</Typography>
+                      {(format as any).supported === false && (
+                        <Chip label="Unsupported" size="small" color="default" sx={{ height: 20 }} />
+                      )}
+                    </Box>
                     <Typography variant="body2" color="text.secondary">
                       {format.description}
                     </Typography>
@@ -200,255 +216,276 @@ export const ImportClient: React.FC = () => {
           <>
             <Divider sx={{ my: 3 }} />
 
-            {IMPORT_FORMAT_NOTES[currentFormat.id] && (
-              <Alert severity="info" sx={{ mb: 3 }}>
+            {(currentFormat as any).supported === false ? (
+              <Alert severity="info">
                 <Typography variant="body2">
-                  <strong>Tips on this import format:</strong>
+                  <strong>This format is not currently supported.</strong>
                 </Typography>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  {IMPORT_FORMAT_NOTES[currentFormat.id]}
-                </Typography>
-              </Alert>
-            )}
-
-            <Box>
-              <Typography variant="body2" color="text.secondary" paragraph>
-                Required fields for import:
-              </Typography>
-              <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 3 }}>
-                {currentFormat.requiredFields.map((field) => (
-                  <Typography
-                    key={field.name}
-                    variant="caption"
-                    sx={{
-                      px: 1,
-                      py: 0.5,
-                      bgcolor: 'action.selected',
-                      borderRadius: 1,
-                    }}
-                  >
-                    {field.header}
-                  </Typography>
-                ))}
-              </Stack>
-
-              <Button variant="outlined" size="small" startIcon={<FileDownloadIcon />} onClick={handleDownloadTemplate}>
-                Download Example
-              </Button>
-            </Box>
-
-            <Divider sx={{ my: 3 }} />
-
-            <Box>
-              <FormControl component="fieldset" sx={{ mb: 3 }}>
-                <FormLabel component="legend">Update Mode</FormLabel>
-                <RadioGroup
-                  value={updateMode}
-                  onChange={(e) => setUpdateMode(e.target.value as 'replace' | 'merge')}
-                  sx={{ mt: 1 }}
-                >
-                  <FormControlLabel
-                    value="replace"
-                    control={<Radio />}
-                    label={
-                      <Box>
-                        <Typography variant="body2">Replace</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Set quantities to exact values in the CSV
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                  <FormControlLabel
-                    value="merge"
-                    control={<Radio />}
-                    label={
-                      <Box>
-                        <Typography variant="body2">Add</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Add CSV quantities to existing collection
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                </RadioGroup>
-              </FormControl>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv"
-                onChange={handleFileSelect}
-                style={{ display: 'none' }}
-              />
-
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Button
-                  variant="contained"
-                  startIcon={<CloudUploadIcon />}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  Select CSV File
-                </Button>
-
-                {selectedFile && (
-                  <Typography variant="body2">
-                    Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                {UNSUPPORTED_FORMAT_EXPLANATIONS[currentFormat.id] && (
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    {UNSUPPORTED_FORMAT_EXPLANATIONS[currentFormat.id]}
                   </Typography>
                 )}
-              </Stack>
-
-              {selectedFile && !importResult && (
-                <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-                  <Button variant="outlined" onClick={() => handleImportClick(true)} disabled={importing}>
-                    Preview (Dry Run)
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={() => handleImportClick(false)}
-                    disabled={importing}
-                    startIcon={importing ? <CircularProgress size={20} /> : null}
-                  >
-                    {importing ? 'Importing...' : 'Import Collection'}
-                  </Button>
-                </Stack>
-              )}
-
-              {importResult && (
-                <Box sx={{ mt: 4 }}>
-                  <Alert
-                    severity={
-                      importResult.failedRows === 0 ? 'success' : importResult.partialSuccess ? 'warning' : 'error'
-                    }
-                    sx={{ mb: 3 }}
-                  >
-                    {importResult.failedRows === 0 ? (
-                      <>Successfully imported all {importResult.totalRows} rows</>
-                    ) : importResult.partialSuccess ? (
-                      <>
-                        Partially successful: {importResult.successfulRows} of {importResult.totalRows} rows imported
-                      </>
-                    ) : (
-                      <>Import failed: All {importResult.totalRows} rows failed</>
-                    )}
+              </Alert>
+            ) : (
+              <>
+                {IMPORT_FORMAT_NOTES[currentFormat.id] && (
+                  <Alert severity="info" sx={{ mb: 3 }}>
+                    <Typography variant="body2">
+                      <strong>Tips on this import format:</strong>
+                    </Typography>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {IMPORT_FORMAT_NOTES[currentFormat.id]}
+                    </Typography>
                   </Alert>
+                )}
 
-                  <TableContainer component={Paper} variant="outlined">
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Metric</TableCell>
-                          <TableCell align="right">Count</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell>Total Rows</TableCell>
-                          <TableCell align="right">{importResult.totalRows}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <Box display="flex" alignItems="center" gap={1}>
-                              <CheckCircleIcon color="success" fontSize="small" />
-                              Successful
-                            </Box>
-                          </TableCell>
-                          <TableCell align="right">{importResult.successfulRows}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <Box display="flex" alignItems="center" gap={1}>
-                              <ErrorIcon color="error" fontSize="small" />
-                              Failed
-                            </Box>
-                          </TableCell>
-                          <TableCell align="right">{importResult.failedRows}</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Created</TableCell>
-                          <TableCell align="right">
-                            <Chip label={importResult.created} size="small" color="success" />
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Updated</TableCell>
-                          <TableCell align="right">
-                            <Chip label={importResult.updated} size="small" color="primary" />
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>Deleted</TableCell>
-                          <TableCell align="right">
-                            <Chip label={importResult.deleted} size="small" color="warning" />
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
+                <Box>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    Required fields for import:
+                  </Typography>
+                  <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 3 }}>
+                    {currentFormat.requiredFields.map((field) => (
+                      <Typography
+                        key={field.name}
+                        variant="caption"
+                        sx={{
+                          px: 1,
+                          py: 0.5,
+                          bgcolor: 'action.selected',
+                          borderRadius: 1,
+                        }}
+                      >
+                        {field.header}
+                      </Typography>
+                    ))}
+                  </Stack>
 
-                  {importResult.errors.length > 0 && (
-                    <Box sx={{ mt: 3 }}>
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="h6">Errors ({importResult.errors.length})</Typography>
-                        <Stack direction="row" spacing={1}>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            startIcon={<FileDownloadIcon />}
-                            onClick={handleDownloadErrors}
-                          >
-                            Download Errors
-                          </Button>
-                          <IconButton size="small" onClick={() => setShowErrors(!showErrors)}>
-                            {showErrors ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                          </IconButton>
-                        </Stack>
-                      </Box>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<FileDownloadIcon />}
+                    onClick={handleDownloadTemplate}
+                  >
+                    Download Example
+                  </Button>
+                </Box>
 
-                      <Collapse in={showErrors}>
-                        <TableContainer component={Paper} variant="outlined" sx={{ mt: 2, maxHeight: 400 }}>
-                          <Table size="small" stickyHeader>
-                            <TableHead>
-                              <TableRow>
-                                <TableCell>Row</TableCell>
-                                <TableCell>Field</TableCell>
-                                <TableCell>Value</TableCell>
-                                <TableCell>Error</TableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {importResult.errors.map((error, index) => (
-                                <TableRow key={index}>
-                                  <TableCell>{error.row}</TableCell>
-                                  <TableCell>{error.field}</TableCell>
-                                  <TableCell>{error.value}</TableCell>
-                                  <TableCell>{error.message}</TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </TableContainer>
-                      </Collapse>
-                    </Box>
+                <Divider sx={{ my: 3 }} />
+
+                <Box>
+                  <FormControl component="fieldset" sx={{ mb: 3 }}>
+                    <FormLabel component="legend">Update Mode</FormLabel>
+                    <RadioGroup
+                      value={updateMode}
+                      onChange={(e) => setUpdateMode(e.target.value as 'replace' | 'merge')}
+                      sx={{ mt: 1 }}
+                    >
+                      <FormControlLabel
+                        value="replace"
+                        control={<Radio />}
+                        label={
+                          <Box>
+                            <Typography variant="body2">Replace</Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Set quantities to exact values in the CSV
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                      <FormControlLabel
+                        value="merge"
+                        control={<Radio />}
+                        label={
+                          <Box>
+                            <Typography variant="body2">Add</Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              Add CSV quantities to existing collection
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                    </RadioGroup>
+                  </FormControl>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileSelect}
+                    style={{ display: 'none' }}
+                  />
+
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Button
+                      variant="contained"
+                      startIcon={<CloudUploadIcon />}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      Select CSV File
+                    </Button>
+
+                    {selectedFile && (
+                      <Typography variant="body2">
+                        Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
+                      </Typography>
+                    )}
+                  </Stack>
+
+                  {selectedFile && !importResult && (
+                    <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+                      <Button variant="outlined" onClick={() => handleImportClick(true)} disabled={importing}>
+                        Preview (Dry Run)
+                      </Button>
+                      <Button
+                        variant="contained"
+                        onClick={() => handleImportClick(false)}
+                        disabled={importing}
+                        startIcon={importing ? <CircularProgress size={20} /> : null}
+                      >
+                        {importing ? 'Importing...' : 'Import Collection'}
+                      </Button>
+                    </Stack>
                   )}
 
-                  <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() => {
-                        setSelectedFile(null);
-                        setImportResult(null);
-                        if (fileInputRef.current) {
-                          fileInputRef.current.value = '';
+                  {importResult && (
+                    <Box sx={{ mt: 4 }}>
+                      <Alert
+                        severity={
+                          importResult.failedRows === 0 ? 'success' : importResult.partialSuccess ? 'warning' : 'error'
                         }
-                      }}
-                    >
-                      Import Another File
-                    </Button>
-                  </Stack>
+                        sx={{ mb: 3 }}
+                      >
+                        {importResult.failedRows === 0 ? (
+                          <>Successfully imported all {importResult.totalRows} rows</>
+                        ) : importResult.partialSuccess ? (
+                          <>
+                            Partially successful: {importResult.successfulRows} of {importResult.totalRows} rows
+                            imported
+                          </>
+                        ) : (
+                          <>Import failed: All {importResult.totalRows} rows failed</>
+                        )}
+                      </Alert>
+
+                      <TableContainer component={Paper} variant="outlined">
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Metric</TableCell>
+                              <TableCell align="right">Count</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell>Total Rows</TableCell>
+                              <TableCell align="right">{importResult.totalRows}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                  <CheckCircleIcon color="success" fontSize="small" />
+                                  Successful
+                                </Box>
+                              </TableCell>
+                              <TableCell align="right">{importResult.successfulRows}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                  <ErrorIcon color="error" fontSize="small" />
+                                  Failed
+                                </Box>
+                              </TableCell>
+                              <TableCell align="right">{importResult.failedRows}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>Created</TableCell>
+                              <TableCell align="right">
+                                <Chip label={importResult.created} size="small" color="success" />
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>Updated</TableCell>
+                              <TableCell align="right">
+                                <Chip label={importResult.updated} size="small" color="primary" />
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>Deleted</TableCell>
+                              <TableCell align="right">
+                                <Chip label={importResult.deleted} size="small" color="warning" />
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+
+                      {importResult.errors.length > 0 && (
+                        <Box sx={{ mt: 3 }}>
+                          <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography variant="h6">Errors ({importResult.errors.length})</Typography>
+                            <Stack direction="row" spacing={1}>
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={<FileDownloadIcon />}
+                                onClick={handleDownloadErrors}
+                              >
+                                Download Errors
+                              </Button>
+                              <IconButton size="small" onClick={() => setShowErrors(!showErrors)}>
+                                {showErrors ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                              </IconButton>
+                            </Stack>
+                          </Box>
+
+                          <Collapse in={showErrors}>
+                            <TableContainer component={Paper} variant="outlined" sx={{ mt: 2, maxHeight: 400 }}>
+                              <Table size="small" stickyHeader>
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell>Row</TableCell>
+                                    <TableCell>Field</TableCell>
+                                    <TableCell>Value</TableCell>
+                                    <TableCell>Error</TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {importResult.errors.map((error, index) => (
+                                    <TableRow key={index}>
+                                      <TableCell>{error.row}</TableCell>
+                                      <TableCell>{error.field}</TableCell>
+                                      <TableCell>{error.value}</TableCell>
+                                      <TableCell>{error.message}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>
+                          </Collapse>
+                        </Box>
+                      )}
+
+                      <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => {
+                            setSelectedFile(null);
+                            setImportResult(null);
+                            if (fileInputRef.current) {
+                              fileInputRef.current.value = '';
+                            }
+                          }}
+                        >
+                          Import Another File
+                        </Button>
+                      </Stack>
+                    </Box>
+                  )}
                 </Box>
-              )}
-            </Box>
+              </>
+            )}
           </>
         )}
       </Paper>

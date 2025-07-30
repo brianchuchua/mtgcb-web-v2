@@ -30,6 +30,10 @@ const MANDATORY_FIELDS = new Set(['id', 'quantity_regular', 'quantity_foil']);
 const UNSUPPORTED_FORMAT_EXPLANATIONS: Record<string, string> = {
   tcgplayer_app:
     'The TCGPlayer App format cannot be supported for export. This is because the TCGPlayer App only has a textbox to manually copy/paste csv contents into, which has a very limited length and also fails silently a lot of the time. If this ever changes, feel free to let me know!',
+  mtgstudio:
+    "MTG Studio uses very different naming conventions for set codes and card names, and doesn't use any unique IDs to identify cards. After spending a lot of time trying to improve compatibility, there are still over 60,000 cards that would need manual fixes. With few users still on this legacy application, it's no longer feasible to maintain support. This is the tool I used before making MTG CB and I have a lot of respect for its legacy. If they ever add support for TCGPlayer IDs or Scryfall IDs, reach out to me.",
+  urzagatherer:
+    "While UrzaGatherer's import endpoint expects their proprietary .ugs file format, we've found experimentally that it accepts the ManaBox .csv format with a high success rate. You can try exporting in ManaBox format and importing that into UrzaGatherer.",
   // Add more format explanations here as needed
 };
 

@@ -21,21 +21,21 @@
 | **17** | **Card Binder (iOS)**          | Very small install pool; CSV mail-out.                                 |
 
 Formats mentioned to me by email:
-MTG Studio: 4
-Deckbox: 4
-TCGplayer: 2
-Archidekt: 2
-ManaBox: 2
-Gatherer: 2
+~~MTG Studio: 4~~
+~~Deckbox: 4~~
+~~TCGplayer: 2~~
+~~Archidekt: 2~~
+~~ManaBox: 2~~
+~~Gatherer: 2 (must be urza gatherer)~~
 
 Patron requests: Delver Lens
 
 Facebook requests:
-Urza gatherer
+~~Urza gatherer~~
 Moxfield
-moxfield and archidekt and manabox
-Collectr and MTGGoldfish's "Super Brew"
-Moxfield, Archidekt, Manabox, Collectr and MTGGoldfish's "Super Brew"
+moxfield ~~and archidekt and manabox~~
+~~Collectr~~ and MTGGoldfish's "Super Brew"
+Moxfield, ~~Archidekt, Manabox,~~ ~~Collectr~~ and MTGGoldfish's "Super Brew"
 
 Legacy site support:
 Import: MTG Studio, Deckbox, MTGPrice.com, OzGuild, Helvault, TCGPlayer App, ManaBox
@@ -85,5 +85,41 @@ Export: Deckbox, MTG CB, MTG Studio, MTGPrice.com
 
 - Status: ✅Done
 
-TODO: Must mention that I can't guarantee accuracy for every import format -- it'd be a full time job. Some are 95% matches, some are 99% matches. Best effort.
+### MTG Studio (Desktop)
+
+- Status: ❌Cannot support
+- Like most other sites, I can't support this because it doesn't use unique identifiers like TCGPlayer ID or Scryfall ID. It uses set code and card name, but with such naming convention differencs that over 60% of the cards would need manual fixes -- and I would need to keep up with new cards on their end forever.
+
+### Dragon Shield Card Manager
+
+- Status: ❌Intentionally skipped
+- No one has asked for this.
+
+### Delver Lens (Android)
+
+- Status: ⏳Pending
+- Need to borrow my wife's phone to test this. 😅
+- Reassuring to see that even their video tutorials say "yo naming conventions are different, so you may need to fix some cards manually." I'm putting way too much pressure on myself.
+
+### EchoMTG
+
+- Status: ❌Intentionally skipped
+- No one has asked for this.
+
+### TopDecked MTG
+
+- Status: ❌Intentionally skipped
+- No one has asked for this.
+
+### Urza Gatherer
+
+- Status: ❌Cannot support
+- Their export format is a proprietary .ugs file that is not a standard CSV and does not use any known card identifiers. It is intended for internal use only. Users can for some reason import the ManaBox CSV format, though, so I left that hint.
+
+### Collectr
+
+- Status: ❌Intentionally skipped
+- They don't support importing into the app and exporting is locked behind a paywall. If I get more requests, I can revisit this.
+
+TODO: Must mention that I can't guarantee accuracy for every import format -- it'd be a full time job. Some are 95% matches, some are 99% matches. Best effort. Many other tools do this too.
 TODO: Must grok Culling the Weak handling in all import formats for Secret Lair and the TCGPlayer equivalents
