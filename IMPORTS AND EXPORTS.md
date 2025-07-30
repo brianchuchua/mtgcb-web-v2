@@ -7,7 +7,7 @@
 | **3**  | **Archidekt**                  | Fast-growing deck+collection site; multiple direct user mentions.      |
 | **4**  | **MTGGoldfish – “Super Brew”** | High-traffic site; collection upload powers its brew tool.             |
 | **5**  | **Deckbox.org**                | Legacy trader staple; four e-mail requests.                            |
-| **6**  | **ManaBox (Android)**          | 500 K+ installs; four user mentions.                                   |
+| **6**  | **ManaBox (Android/iOS)**      | 500 K+ installs; four user mentions.                                   |
 | **7**  | **MTG Studio (desktop)**       | Dedicated collection editor; four e-mail votes.                        |
 | **8**  | **Dragon Shield Card Manager** | 100 K+ installs; trusted price tracker.                                |
 | **9**  | **Delver Lens (Android)**      | Patron request; exports multiple CSV dialects.                         |
@@ -81,4 +81,9 @@ Export: Deckbox, MTG CB, MTG Studio, MTGPrice.com
 - Their site times out with 44000 cards after 1 minute, the spinner forever spinning.
 - But they all made it.
 
-TODO: Must unify the logic for identifying cards across all import formats.
+### ManaBox
+
+- Status: ✅Done
+
+TODO: Must mention that I can't guarantee accuracy for every import format -- it'd be a full time job. Some are 95% matches, some are 99% matches. Best effort.
+TODO: Must grok Culling the Weak handling in all import formats for Secret Lair and the TCGPlayer equivalents

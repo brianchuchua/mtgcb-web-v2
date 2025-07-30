@@ -39,6 +39,8 @@ const SUPPORTED_FORMAT_NOTES: Record<string, string> = {
     "Archidekt's site doesn't allow uploading more than about 40,000 rows at a time. Additionally, once your collection gets that big on their end, their export functionality may also stop working.",
   deckbox:
     "When importing many cards (40000+), Deckbox's site may appear to time out with an infinite spinner after about a minute. However, the import may have succeeded - simply refresh the page and your cards may be there.",
+  manabox:
+    "The ManaBox app can't handle CSV files with more than ~20,000 cards. You'll need to break up larger exports into multiple files to import them successfully. Note the export here includes many fields with no data on the MTG CB side -- the presence of the columns appears to make the ManaBox import work 10x faster.",
   // Add more format notes here as needed
 };
 
