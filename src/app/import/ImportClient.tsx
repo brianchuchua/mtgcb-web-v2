@@ -68,6 +68,8 @@ const IMPORT_FORMAT_NOTES: Record<string, string> = {
   tcgplayer_app:
     "TCGPlayer App exports files as .txt format. You'll need to rename the file extension from .txt to .csv before importing.",
   deckbox: "When exporting from Deckbox, make sure to select 'Scryfall ID' and 'TcgPlayer ID' as additional fields.",
+  moxfield:
+    "Moxfield doesn't use unique identifiers like Scryfall ID or TCGPlayer ID, so the import takes about a minute to process 20,000 cards, with an accuracy rate of about 98%. Most failures are due to differences in the edition code or how cards are grouped in different sets.",
   // Add more format notes here as needed
 };
 
@@ -91,8 +93,8 @@ export const ImportClient: React.FC = () => {
         alert('Please select a CSV file');
         return;
       }
-      if (file.size > 10 * 1024 * 1024) {
-        alert('File size exceeds 10MB limit');
+      if (file.size > 30 * 1024 * 1024) {
+        alert('File size exceeds 30MB limit');
         return;
       }
       setSelectedFile(file);
@@ -142,9 +144,31 @@ export const ImportClient: React.FC = () => {
   const handleDownloadErrors = () => {
     if (!importResult?.errors || importResult.errors.length === 0) return;
 
+    // Helper function to properly escape CSV values
+    const escapeCSV = (value: string | number | null | undefined): string => {
+      if (value === null || value === undefined) return '';
+      const stringValue = String(value);
+      
+      // Check if value needs escaping (contains comma, double quote, or newline)
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\r')) {
+        // Escape double quotes by doubling them
+        const escaped = stringValue.replace(/"/g, '""');
+        // Wrap in double quotes
+        return `"${escaped}"`;
+      }
+      
+      return stringValue;
+    };
+
     const csv = ['Row,Field,Value,Error Message'];
     importResult.errors.forEach((error: ImportError) => {
-      csv.push(`${error.row},"${error.field}","${error.value}","${error.message}"`);
+      const row = [
+        error.row,
+        escapeCSV(error.field),
+        escapeCSV(error.value),
+        escapeCSV(error.message)
+      ].join(',');
+      csv.push(row);
     });
 
     const blob = new Blob([csv.join('\n')], { type: 'text/csv' });

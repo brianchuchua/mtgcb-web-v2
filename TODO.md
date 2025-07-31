@@ -40,6 +40,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 ### Current Action Items
 
 - Import/Export
+- Just need to add Moxfield and a custom autodetect import format
 - Be sure to use MTGJSON as a rosetta stone for data
 - Nestable locations
 
@@ -53,6 +54,9 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
 - Preload stuff on pagination hover?
 - mass entry, add collector number
+- roadmap page
+- version number near the title (it links to the changelog, on hover shows last updated date)
+-
 
 ## Other Action Items
 
