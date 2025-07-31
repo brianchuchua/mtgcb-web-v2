@@ -18,7 +18,6 @@
 | **14** | **MTG Familiar**               | Legacy Android app; niche but persistent.                              |
 | **15** | **Card Castle**                | AU-centric; supports CSV export.                                       |
 | **16** | **Helvault (iOS)**             | Scanner with mail-CSV feature; shrinking user base.                    |
-| **17** | **Card Binder (iOS)**          | Very small install pool; CSV mail-out.                                 |
 
 Formats mentioned to me by email:
 ~~MTG Studio: 4~~
@@ -38,7 +37,7 @@ moxfield ~~and archidekt and manabox~~
 Moxfield, ~~Archidekt, Manabox,~~ ~~Collectr~~ and MTGGoldfish's "Super Brew"
 
 Legacy site support:
-Import: ~~MTG Studio, Deckbox,~~ ~~MTGPrice.com,~~ ~~OzGuild~~, Helvault, ~~TCGPlayer App,~~ ManaBox
+Import: ~~MTG Studio, Deckbox,~~ ~~MTGPrice.com,~~ ~~OzGuild~~, ~~Helvault~~, ~~TCGPlayer App,~~ ~~ManaBox~~
 Export: ~~Deckbox, MTG CB, MTG Studio,~~ ~~MTGPrice.com~~
 
 ## Import/Export Research
@@ -118,9 +117,6 @@ Export: ~~Deckbox, MTG CB, MTG Studio,~~ ~~MTGPrice.com~~
 - Status: ❌Intentionally skipped
 - They don't support importing into the app and exporting is locked behind a paywall. If I get more requests, I can revisit this.
 
-TODO: Must mention that I can't guarantee accuracy for every import format -- it'd be a full time job. Some are 95% matches, some are 99% matches. Best effort. Many other tools do this too.
-TODO: Must grok Culling the Weak handling in all import formats for Secret Lair and the TCGPlayer equivalents
-
 ### MTGPrice.com
 
 - Status: ❌Intentionally skipped
@@ -135,3 +131,5 @@ TODO: Must grok Culling the Weak handling in all import formats for Secret Lair 
 
 - Status: ✅Done
 - Small userbase, but adding support for their non-legacy app out of respect for my past users.
+
+TODO: Must grok Culling the Weak handling in all import formats for Secret Lair and the TCGPlayer equivalents

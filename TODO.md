@@ -183,6 +183,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Button to report missing card data, notify user is link to scryfall or tcgplayer is missing
 - Sharing and duplicating collection goals
 - Sealed product support
+- Financial history tracking, collection value history, etc.
 
 ## Patron Requests
 

@@ -131,6 +131,14 @@ export const ExportClient: React.FC = () => {
         Export Collection
       </Typography>
 
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <Typography variant="body2">
+          <strong>Format Compatibility:</strong> Import and export formats vary across different collection management
+          platforms. Due to differences in card naming conventions, set codes, and edition handling, you may need to
+          manually update a small percentage (1-5%) of cards after importing into another platform.
+        </Typography>
+      </Alert>
+
       <Paper sx={{ p: 3, mt: 3 }}>
         <FormControl component="fieldset">
           <FormLabel component="legend">Export Format</FormLabel>
