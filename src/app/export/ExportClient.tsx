@@ -45,6 +45,8 @@ const SUPPORTED_FORMAT_NOTES: Record<string, string> = {
     "When importing many cards (40000+), Deckbox's site may appear to time out with an infinite spinner after about a minute. However, the import may have succeeded - simply refresh the page and your cards may be there.",
   manabox:
     "The ManaBox app can't handle CSV files with more than ~20,000 cards. You'll need to break up larger exports into multiple files to import them successfully. Note the export here includes many fields with no data on the MTG CB side -- the presence of the columns appears to make the ManaBox import work 10x faster.",
+  helvault:
+    "Helvault takes over 10 minutes to import 40,000 cards, but it will complete eventually. Be patient and don't close the app while it's processing.",
   // Add more format notes here as needed
 };
 

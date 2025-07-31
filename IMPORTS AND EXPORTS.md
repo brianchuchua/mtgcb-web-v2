@@ -38,17 +38,14 @@ moxfield ~~and archidekt and manabox~~
 Moxfield, ~~Archidekt, Manabox,~~ ~~Collectr~~ and MTGGoldfish's "Super Brew"
 
 Legacy site support:
-Import: MTG Studio, Deckbox, MTGPrice.com, OzGuild, Helvault, TCGPlayer App, ManaBox
-Export: Deckbox, MTG CB, MTG Studio, MTGPrice.com
+Import: ~~MTG Studio, Deckbox,~~ ~~MTGPrice.com,~~ ~~OzGuild~~, Helvault, ~~TCGPlayer App,~~ ManaBox
+Export: ~~Deckbox, MTG CB, MTG Studio,~~ ~~MTGPrice.com~~
 
 ## Import/Export Research
 
-- TODO: Need to add a notes field explaining any special steps.
 - TODO: May need to let user specify price preference, or use the site one.
 - TODO: Top-down testing of each method and auditing of default and sample fields.
-- TODO: I should have a generic handler that can receive a hierarchy of fields and do its best to map them one step at a time.
 - TODO: Just like I label unsupported formats, I should label formats that are not accurate due to no unique identifier. It's not my fault! maybe good and bad levels of support labels. I put so much pressure on myself to get it right, but I can't control the data from other sites. Explain in an info note why the support is not perfect.
-- TODO: I should force the user to include set name and card name and set code to help them with errors.
 
 ### TCGPlayer app
 
@@ -123,3 +120,18 @@ Export: Deckbox, MTG CB, MTG Studio, MTGPrice.com
 
 TODO: Must mention that I can't guarantee accuracy for every import format -- it'd be a full time job. Some are 95% matches, some are 99% matches. Best effort. Many other tools do this too.
 TODO: Must grok Culling the Weak handling in all import formats for Secret Lair and the TCGPlayer equivalents
+
+### MTGPrice.com
+
+- Status: ❌Intentionally skipped
+- Seems behind a paywall, but its advertisements also seem a bit old.
+
+### OzGuild
+
+- Status: ❌Intentionally skipped
+- Became Card Castle in 2018. No one has asked for this.
+
+### Helvault (iOS)
+
+- Status: ✅Done
+- Small userbase, but adding support for their non-legacy app out of respect for my past users.
