@@ -4,7 +4,9 @@ import type {
   ImportFormatsResponse, 
   ImportCollectionParams, 
   ImportCollectionQuery,
-  ImportCollectionResponse 
+  ImportCollectionResponse,
+  PreviewCSVParams,
+  PreviewCSVResponse
 } from './types';
 
 const importApi = mtgcbApi.injectEndpoints({
@@ -17,7 +19,7 @@ const importApi = mtgcbApi.injectEndpoints({
       transformResponse: (response: ImportFormatsResponse) => response.data,
     }),
     importCollection: builder.mutation<ImportCollectionResponse, ImportCollectionParams & { query?: ImportCollectionQuery }>({
-      query: ({ csvData, filename, query }) => {
+      query: ({ csvData, filename, fieldMappings, query }) => {
         const queryParams = new URLSearchParams();
         
         if (query?.format) queryParams.append('format', query.format);
@@ -29,7 +31,7 @@ const importApi = mtgcbApi.injectEndpoints({
         return {
           url: `/collection/import${queryString ? '?' + queryString : ''}`,
           method: 'POST',
-          body: { csvData, filename },
+          body: { csvData, filename, fieldMappings },
         };
       },
       async onQueryStarted(arg, { getState, dispatch, queryFulfilled }) {
@@ -59,6 +61,14 @@ const importApi = mtgcbApi.injectEndpoints({
         }
       },
     }),
+    previewCSV: builder.mutation<PreviewCSVResponse['data'], PreviewCSVParams>({
+      query: ({ csvData, rowLimit }) => ({
+        url: '/collection/import/preview',
+        method: 'POST',
+        body: { csvData, rowLimit },
+      }),
+      transformResponse: (response: PreviewCSVResponse) => response.data,
+    }),
   }),
   overrideExisting: false,
 });
@@ -66,4 +76,5 @@ const importApi = mtgcbApi.injectEndpoints({
 export const {
   useGetImportFormatsQuery,
   useImportCollectionMutation,
+  usePreviewCSVMutation,
 } = importApi;

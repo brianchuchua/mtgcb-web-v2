@@ -37,9 +37,12 @@ import {
   TableHead,
   TableRow,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useRef, useState } from 'react';
+import { CustomCSVMapper } from './CustomCSVMapper';
 import { useGetImportFormatsQuery, useImportCollectionMutation } from '@/api/import/importApi';
 import type { ImportError, ImportResult } from '@/api/import/types';
 import { Link as NextLink } from '@/components/ui/link';
@@ -77,16 +80,21 @@ export const ImportClient: React.FC = () => {
   const [selectedFormat, setSelectedFormat] = useState('mtgcb');
   const [updateMode, setUpdateMode] = useState<'replace' | 'merge'>('replace');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFileContent, setSelectedFileContent] = useState<string>('');
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [showErrors, setShowErrors] = useState(true);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [pendingDryRun, setPendingDryRun] = useState(false);
+  const [customFieldMappings, setCustomFieldMappings] = useState<Array<{ csvHeader: string; mtgcbField: string }>>([]);
+  const [isCustomMappingValid, setIsCustomMappingValid] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { data: formats, isLoading: formatsLoading, error: formatsError } = useGetImportFormatsQuery();
   const [importCollection, { isLoading: importing }] = useImportCollectionMutation();
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (!file.name.toLowerCase().endsWith('.csv')) {
@@ -99,6 +107,12 @@ export const ImportClient: React.FC = () => {
       }
       setSelectedFile(file);
       setImportResult(null);
+
+      // Read file content for custom CSV mapping
+      if (selectedFormat === 'custom') {
+        const content = await file.text();
+        setSelectedFileContent(content);
+      }
     }
   };
 
@@ -121,6 +135,7 @@ export const ImportClient: React.FC = () => {
       const response = await importCollection({
         csvData,
         filename: selectedFile.name,
+        fieldMappings: selectedFormat === 'custom' ? customFieldMappings : undefined,
         query: {
           format: selectedFormat,
           updateMode,
@@ -137,6 +152,10 @@ export const ImportClient: React.FC = () => {
   };
 
   const handleDownloadTemplate = () => {
+    if (selectedFormat === 'custom') {
+      // For custom format, we don't have a template
+      return;
+    }
     const apiBaseUrl = process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL;
     window.location.href = `${apiBaseUrl}/collection/import/template?format=${selectedFormat}`;
   };
@@ -148,26 +167,26 @@ export const ImportClient: React.FC = () => {
     const escapeCSV = (value: string | number | null | undefined): string => {
       if (value === null || value === undefined) return '';
       const stringValue = String(value);
-      
+
       // Check if value needs escaping (contains comma, double quote, or newline)
-      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\r')) {
+      if (
+        stringValue.includes(',') ||
+        stringValue.includes('"') ||
+        stringValue.includes('\n') ||
+        stringValue.includes('\r')
+      ) {
         // Escape double quotes by doubling them
         const escaped = stringValue.replace(/"/g, '""');
         // Wrap in double quotes
         return `"${escaped}"`;
       }
-      
+
       return stringValue;
     };
 
     const csv = ['Row,Field,Value,Error Message'];
     importResult.errors.forEach((error: ImportError) => {
-      const row = [
-        error.row,
-        escapeCSV(error.field),
-        escapeCSV(error.value),
-        escapeCSV(error.message)
-      ].join(',');
+      const row = [error.row, escapeCSV(error.field), escapeCSV(error.value), escapeCSV(error.message)].join(',');
       csv.push(row);
     });
 
@@ -219,7 +238,19 @@ export const ImportClient: React.FC = () => {
       <Paper sx={{ p: 3, mt: 3 }}>
         <FormControl component="fieldset">
           <FormLabel component="legend">Import Format</FormLabel>
-          <RadioGroup value={selectedFormat} onChange={(e) => setSelectedFormat(e.target.value)} sx={{ mt: 2 }}>
+          <RadioGroup
+            value={selectedFormat}
+            onChange={async (e) => {
+              setSelectedFormat(e.target.value);
+              setImportResult(null);
+              // If switching to custom and file already selected, read its content
+              if (e.target.value === 'custom' && selectedFile) {
+                const content = await selectedFile.text();
+                setSelectedFileContent(content);
+              }
+            }}
+            sx={{ mt: 2 }}
+          >
             {formats?.map((format) => (
               <FormControlLabel
                 key={format.id}
@@ -272,36 +303,53 @@ export const ImportClient: React.FC = () => {
                   </Alert>
                 )}
 
-                <Box>
-                  <Typography variant="body2" color="text.secondary" paragraph>
-                    Required fields for import:
-                  </Typography>
-                  <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 3 }}>
-                    {currentFormat.requiredFields.map((field) => (
-                      <Typography
-                        key={field.name}
-                        variant="caption"
-                        sx={{
-                          px: 1,
-                          py: 0.5,
-                          bgcolor: 'action.selected',
-                          borderRadius: 1,
-                        }}
-                      >
-                        {field.header}
-                      </Typography>
-                    ))}
-                  </Stack>
+                {currentFormat.id !== 'custom' ? (
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                      Required fields for import:
+                    </Typography>
+                    <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 3 }}>
+                      {currentFormat.requiredFields.map((field) => (
+                        <Typography
+                          key={field.name}
+                          variant="caption"
+                          sx={{
+                            px: 1,
+                            py: 0.5,
+                            bgcolor: 'action.selected',
+                            borderRadius: 1,
+                          }}
+                        >
+                          {field.header}
+                        </Typography>
+                      ))}
+                    </Stack>
 
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<FileDownloadIcon />}
-                    onClick={handleDownloadTemplate}
-                  >
-                    Download Example
-                  </Button>
-                </Box>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<FileDownloadIcon />}
+                      onClick={handleDownloadTemplate}
+                    >
+                      Download Example
+                    </Button>
+                  </Box>
+                ) : currentFormat.id === 'custom' ? (
+                  selectedFile && selectedFileContent ? (
+                    <CustomCSVMapper
+                      csvData={selectedFileContent}
+                      onMappingsChange={setCustomFieldMappings}
+                      onValidationChange={setIsCustomMappingValid}
+                    />
+                  ) : (
+                    <Alert severity="info">
+                      <Typography variant="body2">
+                        Please select a CSV file first to configure field mappings. It needs its first row to have
+                        column headers.
+                      </Typography>
+                    </Alert>
+                  )
+                ) : null}
 
                 <Divider sx={{ my: 3 }} />
 
@@ -348,17 +396,22 @@ export const ImportClient: React.FC = () => {
                     style={{ display: 'none' }}
                   />
 
-                  <Stack direction="row" spacing={2} alignItems="center">
+                  <Stack
+                    direction={isMobile ? 'column' : 'row'}
+                    spacing={2}
+                    alignItems={isMobile ? 'stretch' : 'center'}
+                  >
                     <Button
                       variant="contained"
                       startIcon={<CloudUploadIcon />}
                       onClick={() => fileInputRef.current?.click()}
+                      fullWidth={isMobile}
                     >
                       Select CSV File
                     </Button>
 
                     {selectedFile && (
-                      <Typography variant="body2">
+                      <Typography variant="body2" sx={{ textAlign: isMobile ? 'center' : 'left' }}>
                         Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
                       </Typography>
                     )}
@@ -366,13 +419,17 @@ export const ImportClient: React.FC = () => {
 
                   {selectedFile && !importResult && (
                     <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-                      <Button variant="outlined" onClick={() => handleImportClick(true)} disabled={importing}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => handleImportClick(true)}
+                        disabled={importing || (selectedFormat === 'custom' && !isCustomMappingValid)}
+                      >
                         Preview (Dry Run)
                       </Button>
                       <Button
                         variant="contained"
                         onClick={() => handleImportClick(false)}
-                        disabled={importing}
+                        disabled={importing || (selectedFormat === 'custom' && !isCustomMappingValid)}
                         startIcon={importing ? <CircularProgress size={20} /> : null}
                       >
                         {importing ? 'Importing...' : 'Import Collection'}

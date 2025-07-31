@@ -24,6 +24,10 @@ export interface ImportFormatsResponse {
 export interface ImportCollectionParams {
   csvData: string;
   filename: string;
+  fieldMappings?: Array<{
+    csvHeader: string;
+    mtgcbField: string;
+  }>;
 }
 
 export interface ImportCollectionQuery {
@@ -53,6 +57,28 @@ export interface ImportResult {
 export interface ImportCollectionResponse {
   success: boolean;
   data: ImportResult | null;
+  error: null | {
+    code: string;
+    message: string;
+    details?: string;
+  };
+}
+
+export interface PreviewCSVParams {
+  csvData: string;
+  rowLimit?: number;
+}
+
+export interface PreviewCSVResponse {
+  success: boolean;
+  data: {
+    headers: string[];
+    sampleRows: string[][];
+    suggestedMappings: Record<string, {
+      field: string;
+      confidence: number;
+    }>;
+  };
   error: null | {
     code: string;
     message: string;
