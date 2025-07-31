@@ -39,6 +39,8 @@ const UNSUPPORTED_FORMAT_EXPLANATIONS: Record<string, string> = {
 
 // Notes for supported formats that have limitations or important information
 const SUPPORTED_FORMAT_NOTES: Record<string, string> = {
+  mtgcb:
+    'The MTG CB format is the best way to backup your collection. It preserves all your data exactly as stored in MTG CB and offers the most configurable export options. You can customize which fields to include, making it perfect for creating custom exports tailored to your specific needs.',
   archidekt:
     "Archidekt's site doesn't allow uploading more than about 40,000 rows at a time. Additionally, once your collection gets that big on their end, their export functionality may also stop working.",
   deckbox:
