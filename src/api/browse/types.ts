@@ -143,6 +143,7 @@ export interface CardApiParams {
   showGoalProgress?: boolean;
   showGoals?: 'all' | 'complete' | 'incomplete';
   locationId?: number;
+  includeChildLocations?: boolean;
   includeLocations?: boolean;
   includeBadDataOnly?: boolean;
 }

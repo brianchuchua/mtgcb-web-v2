@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -15,14 +15,14 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Location, LocationWithCount } from '@/api/locations/types';
-import { useDeleteLocationMutation } from '@/api/locations/locationsApi';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSnackbar } from 'notistack';
-import { formatDate } from '@/utils/dateUtils';
+import { useState } from 'react';
+import { useDeleteLocationMutation } from '@/api/locations/locationsApi';
+import { Location, LocationWithCount } from '@/api/locations/types';
 import { useAuth } from '@/hooks/useAuth';
+import { formatDate } from '@/utils/dateUtils';
 
 interface LocationsListProps {
   locations: (Location | LocationWithCount)[];
@@ -35,7 +35,7 @@ export default function LocationsList({ locations }: LocationsListProps) {
   const [deleteLocation] = useDeleteLocationMutation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [locationToDelete, setLocationToDelete] = useState<Location | null>(null);
-  
+
   const userId = user?.userId;
 
   const handleEditClick = (locationId: number) => {
@@ -75,7 +75,11 @@ export default function LocationsList({ locations }: LocationsListProps) {
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
                   <Box sx={{ flex: 1 }}>
                     {userId ? (
-                      <Link href={`/collections/${userId}?contentType=cards&locationId=${location.id}`} passHref legacyBehavior>
+                      <Link
+                        href={`/collections/${userId}?contentType=cards&locationId=${location.id}`}
+                        passHref
+                        legacyBehavior
+                      >
                         <Typography
                           variant="h6"
                           component="a"
@@ -98,7 +102,11 @@ export default function LocationsList({ locations }: LocationsListProps) {
                   </Box>
                   <Stack direction="row" spacing={0.5}>
                     {userId && (
-                      <Link href={`/collections/${userId}?contentType=cards&locationId=${location.id}`} passHref legacyBehavior>
+                      <Link
+                        href={`/collections/${userId}?contentType=cards&locationId=${location.id}`}
+                        passHref
+                        legacyBehavior
+                      >
                         <Tooltip title="View location">
                           <IconButton size="small" component="a">
                             <VisibilityIcon fontSize="small" />
@@ -118,14 +126,16 @@ export default function LocationsList({ locations }: LocationsListProps) {
                     </Tooltip>
                   </Stack>
                 </Box>
-                
+
                 {location.description && (
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {location.description}
                   </Typography>
                 )}
-                
-                <Box sx={{ mt: 'auto', pt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+
+                <Box
+                  sx={{ mt: 'auto', pt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}
+                >
                   <Box>
                     {'totalCards' in location && (
                       <Typography variant="body2" color="text.secondary">
@@ -133,7 +143,7 @@ export default function LocationsList({ locations }: LocationsListProps) {
                       </Typography>
                     )}
                   </Box>
-                  
+
                   <Box sx={{ textAlign: 'right' }}>
                     {location.updatedAt && location.updatedAt !== location.createdAt ? (
                       <Tooltip title={`Created ${formatDate(location.createdAt)}`} placement="top">
@@ -168,8 +178,8 @@ export default function LocationsList({ locations }: LocationsListProps) {
         <DialogTitle>Delete Location</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete "{locationToDelete?.name}"? This will remove any associations between
-            this location and your collection items.
+            Are you sure you want to delete "{locationToDelete?.name}"? This will remove any associations between this
+            location and your collection items.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

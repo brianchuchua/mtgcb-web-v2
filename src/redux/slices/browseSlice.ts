@@ -469,6 +469,11 @@ export const browseSlice = createSlice({
         state.setsSearchParams.selectedLocationId = action.payload;
       }
     },
+    setIncludeChildLocations: (state, action: PayloadAction<boolean>) => {
+      // Apply to both card and set search params
+      state.cardsSearchParams.includeChildLocations = action.payload;
+      state.setsSearchParams.includeChildLocations = action.payload;
+    },
     clearSelectedLocation: (state) => {
       delete state.cardsSearchParams.selectedLocationId;
       delete state.setsSearchParams.selectedLocationId;
@@ -509,6 +514,7 @@ export const {
   clearSelectedGoal,
   setShowGoals,
   setSelectedLocationId,
+  setIncludeChildLocations,
   clearSelectedLocation,
 } = browseSlice.actions;
 
@@ -591,5 +597,10 @@ export const selectSelectedLocationId = (state: RootState) =>
   state.browse.viewContentType === 'cards' 
     ? state.browse.cardsSearchParams.selectedLocationId 
     : state.browse.setsSearchParams.selectedLocationId;
+
+export const selectIncludeChildLocations = (state: RootState) => 
+  state.browse.viewContentType === 'cards' 
+    ? state.browse.cardsSearchParams.includeChildLocations ?? false 
+    : state.browse.setsSearchParams.includeChildLocations ?? false;
 
 export default browseSlice.reducer;

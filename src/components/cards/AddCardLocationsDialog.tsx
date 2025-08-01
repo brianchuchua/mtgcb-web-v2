@@ -31,7 +31,8 @@ import {
   useGetCardLocationsQuery,
   useUpdateCardLocationMutation,
 } from '@/api/collections/collectionsApi';
-import { useGetLocationsQuery } from '@/api/locations/locationsApi';
+import { useGetLocationsQuery, useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
+import { LocationHierarchy } from '@/api/locations/types';
 import { DualQuantitySelector } from '@/components/shared/QuantitySelector';
 
 interface AddCardLocationsDialogProps {
@@ -63,8 +64,35 @@ export default function AddCardLocationsDialog({
   const [quantityFoil, setQuantityFoil] = useState<number>(0);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Fetch user's locations
-  const { data: locationsResponse, isLoading: locationsLoading } = useGetLocationsQuery(undefined, {
+  // Helper function to render location options with indentation
+  const renderLocationOptions = (locs: LocationHierarchy[], depth = 0): JSX.Element[] => {
+    const options: JSX.Element[] = [];
+    
+    for (const loc of locs) {
+      const indent = '\u00A0\u00A0'.repeat(depth * 2); // Non-breaking spaces
+      const prefix = depth > 0 ? '└ ' : '';
+      
+      options.push(
+        <MenuItem key={loc.id} value={loc.id}>
+          {indent}{prefix}{loc.name}
+          {loc.description && (
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+              ({loc.description})
+            </Typography>
+          )}
+        </MenuItem>
+      );
+      
+      if (loc.children.length > 0) {
+        options.push(...renderLocationOptions(loc.children, depth + 1));
+      }
+    }
+    
+    return options;
+  };
+
+  // Fetch user's locations hierarchy
+  const { data: locationsResponse, isLoading: locationsLoading } = useGetLocationHierarchyQuery(undefined, {
     skip: !open,
   });
 
@@ -76,7 +104,7 @@ export default function AddCardLocationsDialog({
   const [associateCardLocation] = useAssociateCardLocationMutation();
   const [updateCardLocation] = useUpdateCardLocationMutation();
 
-  const locations = locationsResponse?.data?.locations || [];
+  const locations = locationsResponse?.data || [];
   const cardLocations = cardLocationsResponse?.data?.locations || [];
 
   // Calculate totals already assigned
@@ -206,16 +234,7 @@ export default function AddCardLocationsDialog({
                       label="Select Location"
                       onChange={(e) => setSelectedLocationId(e.target.value as number | '')}
                     >
-                      {locations.map((location) => (
-                        <MenuItem key={location.id} value={location.id}>
-                          {location.name}
-                          {location.description && (
-                            <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                              ({location.description})
-                            </Typography>
-                          )}
-                        </MenuItem>
-                      ))}
+                      {renderLocationOptions(locations)}
                     </Select>
                   </FormControl>
                 </Box>

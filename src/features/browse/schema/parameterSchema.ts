@@ -317,6 +317,12 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     urlParam: 'locationId',
     defaultValue: undefined,
   },
+  includeChildLocations: {
+    type: 'boolean',
+    mode: 'cards',
+    urlParam: 'includeChildLocations',
+    defaultValue: false,
+  },
 };
 
 export function getParametersForMode(mode: 'cards' | 'sets'): Record<string, ParameterConfig> {

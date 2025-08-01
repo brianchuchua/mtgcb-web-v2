@@ -2,13 +2,18 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
+import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import FormHelperText from '@mui/material/FormHelperText';
 import { useSnackbar } from 'notistack';
-import { Location, UpdateLocationRequest } from '@/api/locations/types';
-import { useUpdateLocationMutation } from '@/api/locations/locationsApi';
+import { Location, UpdateLocationRequest, LocationHierarchy } from '@/api/locations/types';
+import { useUpdateLocationMutation, useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 
 interface EditLocationFormProps {
   location: Location;
@@ -18,17 +23,70 @@ export default function EditLocationForm({ location }: EditLocationFormProps) {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const [updateLocation, { isLoading }] = useUpdateLocationMutation();
+  const { data: locationsResponse, isLoading: isLoadingHierarchy } = useGetLocationHierarchyQuery();
+  const locations = locationsResponse?.data || [];
 
   const {
     register,
     handleSubmit,
     formState: { errors, isDirty },
+    watch,
+    setValue,
   } = useForm<UpdateLocationRequest>({
     defaultValues: {
       name: location.name,
       description: location.description || '',
+      parentId: location.parentId || undefined,
     },
   });
+
+  const parentId = watch('parentId');
+
+  // Helper function to render location options with indentation, excluding self and descendants
+  const renderLocationOptions = (locs: LocationHierarchy[], depth = 0, excludeId?: number): JSX.Element[] => {
+    const options: JSX.Element[] = [];
+    
+    for (const loc of locs) {
+      // Skip only the current location itself
+      if (loc.id === excludeId) {
+        // Still process its children (they can't be selected as parents anyway due to circular reference check)
+        if (loc.children.length > 0) {
+          options.push(...renderLocationOptions(loc.children, depth, excludeId));
+        }
+        continue;
+      }
+      
+      const indent = '\u00A0\u00A0'.repeat(depth * 2); // Non-breaking spaces
+      const prefix = depth > 0 ? '└ ' : '';
+      
+      options.push(
+        <MenuItem key={loc.id} value={loc.id}>
+          {indent}{prefix}{loc.name}
+        </MenuItem>
+      );
+      
+      // Process children normally
+      if (loc.children.length > 0) {
+        options.push(...renderLocationOptions(loc.children, depth + 1, excludeId));
+      }
+    }
+    
+    return options;
+  };
+
+  // Helper to check if a location or any of its descendants has the given ID
+  const isLocationOrDescendant = (loc: LocationHierarchy, targetId?: number): boolean => {
+    if (!targetId) return false;
+    if (loc.id === targetId) return true;
+    
+    for (const child of loc.children) {
+      if (isLocationOrDescendant(child, targetId)) {
+        return true;
+      }
+    }
+    
+    return false;
+  };
 
   const onSubmit = async (data: UpdateLocationRequest) => {
     if (!isDirty) {
@@ -45,6 +103,10 @@ export default function EditLocationForm({ location }: EditLocationFormProps) {
       
       if (data.description !== (location.description || '')) {
         updates.description = data.description?.trim() || undefined;
+      }
+
+      if (data.parentId !== location.parentId) {
+        updates.parentId = data.parentId || null;
       }
 
       await updateLocation({ id: location.id, data: updates }).unwrap();
@@ -103,6 +165,26 @@ export default function EditLocationForm({ location }: EditLocationFormProps) {
             error={!!errors.description}
             helperText={errors.description?.message}
           />
+
+          {locations.length > 0 && (
+            <FormControl fullWidth>
+              <InputLabel id="parent-location-label">Parent Location (Optional)</InputLabel>
+              <Select
+                labelId="parent-location-label"
+                label="Parent Location (Optional)"
+                value={parentId || ''}
+                onChange={(e) => setValue('parentId', e.target.value === '' ? undefined : Number(e.target.value), { shouldDirty: true })}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                {renderLocationOptions(locations, 0, location.id)}
+              </Select>
+              <FormHelperText>
+                Select a parent location if this location is inside another location
+              </FormHelperText>
+            </FormControl>
+          )}
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">
             <Button onClick={handleCancel} disabled={isLoading}>

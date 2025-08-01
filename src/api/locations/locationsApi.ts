@@ -8,6 +8,7 @@ import type {
   CreateLocationRequest,
   UpdateLocationRequest,
   DeleteLocationResponse,
+  LocationHierarchy,
 } from './types';
 
 interface GetLocationsParams {
@@ -43,7 +44,10 @@ export const locationsApi = mtgcbApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: [{ type: 'Location', id: 'LIST' }],
+      invalidatesTags: [
+        { type: 'Location', id: 'LIST' },
+        { type: 'Location', id: 'HIERARCHY' },
+      ],
     }),
 
     updateLocation: builder.mutation<ApiResponse<Location>, { id: number; data: UpdateLocationRequest }>({
@@ -61,6 +65,7 @@ export const locationsApi = mtgcbApi.injectEndpoints({
             const tags: any[] = [
               { type: 'Location', id },
               { type: 'Location', id: 'LIST' },
+              { type: 'Location', id: 'HIERARCHY' },
             ];
             // Also invalidate cards cache to update location names
             if (userId) {
@@ -88,6 +93,7 @@ export const locationsApi = mtgcbApi.injectEndpoints({
             const tags: any[] = [
               { type: 'Location', id },
               { type: 'Location', id: 'LIST' },
+              { type: 'Location', id: 'HIERARCHY' },
             ];
             // Also invalidate cards cache to remove deleted location from cards
             if (userId) {
@@ -100,6 +106,11 @@ export const locationsApi = mtgcbApi.injectEndpoints({
         }
       },
     }),
+
+    getLocationHierarchy: builder.query<ApiResponse<LocationHierarchy[]>, void>({
+      query: () => '/locations/hierarchy',
+      providesTags: [{ type: 'Location', id: 'HIERARCHY' }],
+    }),
   }),
 });
 
@@ -109,4 +120,5 @@ export const {
   useCreateLocationMutation,
   useUpdateLocationMutation,
   useDeleteLocationMutation,
+  useGetLocationHierarchyQuery,
 } = locationsApi;

@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
-import { selectSelectedGoalId, selectShowGoals, selectSelectedLocationId } from '@/redux/slices/browseSlice';
+import { selectSelectedGoalId, selectShowGoals, selectSelectedLocationId, selectIncludeChildLocations } from '@/redux/slices/browseSlice';
 import { usePriceType } from '@/hooks/usePriceType';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
@@ -27,6 +27,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const showGoals = useSelector(selectShowGoals);
   const selectedLocationId = useSelector(selectSelectedLocationId);
+  const includeChildLocations = useSelector(selectIncludeChildLocations);
   const cardDisplaySettings = useCardDisplaySettings();
   const collectionSettings = useCollectionSettings();
 
@@ -99,7 +100,8 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
         ...(showGoals !== 'all' && { showGoals })
       }),
       ...(selectedLocationId && userId && { 
-        locationId: selectedLocationId
+        locationId: selectedLocationId,
+        includeChildLocations
       }),
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,
@@ -107,7 +109,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       sortDirection: params.sortDirection || ('asc' as const),
       select: selectFields,
     };
-  }, [searchParams, pagination, userId, priceType, selectedGoalId, showGoals, selectedLocationId, cardDisplaySettings.locationsIsVisible, collectionSettings.tableLocationsIsVisible]);
+  }, [searchParams, pagination, userId, priceType, selectedGoalId, showGoals, selectedLocationId, includeChildLocations, cardDisplaySettings.locationsIsVisible, collectionSettings.tableLocationsIsVisible]);
 
   const queryConfig = {
     refetchOnFocus: false,
