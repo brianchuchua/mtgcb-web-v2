@@ -24,7 +24,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CardLocation } from '@/api/collections/collectionLocationsTypes';
 import {
   useAssociateCardLocationMutation,
@@ -65,8 +65,8 @@ export default function AddCardLocationsDialog({
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Helper function to render location options with indentation
-  const renderLocationOptions = (locs: LocationHierarchy[], depth = 0): JSX.Element[] => {
-    const options: JSX.Element[] = [];
+  const renderLocationOptions = (locs: LocationHierarchy[], depth = 0): React.ReactNode[] => {
+    const options: React.ReactNode[] = [];
     
     for (const loc of locs) {
       const indent = '\u00A0\u00A0'.repeat(depth * 2); // Non-breaking spaces

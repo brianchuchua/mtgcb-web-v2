@@ -1,4 +1,5 @@
 import { useRouter } from 'next/navigation';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -39,8 +40,8 @@ export default function CreateLocationForm() {
   const parentId = watch('parentId');
 
   // Helper function to render location options with indentation
-  const renderLocationOptions = (locations: LocationHierarchy[], depth = 0): JSX.Element[] => {
-    const options: JSX.Element[] = [];
+  const renderLocationOptions = (locations: LocationHierarchy[], depth = 0): React.ReactNode[] => {
+    const options: React.ReactNode[] = [];
     
     for (const location of locations) {
       const indent = '\u00A0\u00A0'.repeat(depth * 2); // Non-breaking spaces

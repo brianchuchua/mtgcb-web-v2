@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { LocationHierarchy } from '@/api/locations/types';
@@ -83,8 +84,8 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
   };
 
   // Helper function to render location options with indentation
-  const renderLocationOptions = (locations: LocationHierarchy[], depth = 0): JSX.Element[] => {
-    const options: JSX.Element[] = [];
+  const renderLocationOptions = (locations: LocationHierarchy[], depth = 0): React.ReactNode[] => {
+    const options: React.ReactNode[] = [];
     
     for (const location of locations) {
       const indent = '\u00A0\u00A0'.repeat(depth * 2); // Non-breaking spaces

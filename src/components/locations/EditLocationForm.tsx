@@ -1,4 +1,5 @@
 import { useRouter } from 'next/navigation';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -43,8 +44,8 @@ export default function EditLocationForm({ location }: EditLocationFormProps) {
   const parentId = watch('parentId');
 
   // Helper function to render location options with indentation, excluding self and descendants
-  const renderLocationOptions = (locs: LocationHierarchy[], depth = 0, excludeId?: number): JSX.Element[] => {
-    const options: JSX.Element[] = [];
+  const renderLocationOptions = (locs: LocationHierarchy[], depth = 0, excludeId?: number): React.ReactNode[] => {
+    const options: React.ReactNode[] = [];
     
     for (const loc of locs) {
       // Skip only the current location itself
