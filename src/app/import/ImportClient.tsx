@@ -85,6 +85,7 @@ export const ImportClient: React.FC = () => {
   const [showErrors, setShowErrors] = useState(true);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [pendingDryRun, setPendingDryRun] = useState(false);
+  const [lastImportWasDryRun, setLastImportWasDryRun] = useState(false);
   const [customFieldMappings, setCustomFieldMappings] = useState<Array<{ csvHeader: string; mtgcbField: string }>>([]);
   const [isCustomMappingValid, setIsCustomMappingValid] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -145,6 +146,7 @@ export const ImportClient: React.FC = () => {
 
       if (response.data) {
         setImportResult(response.data);
+        setLastImportWasDryRun(dryRun);
       }
     } catch (error) {
       console.error('Import failed:', error);
@@ -445,15 +447,28 @@ export const ImportClient: React.FC = () => {
                         }
                         sx={{ mb: 3 }}
                       >
-                        {importResult.failedRows === 0 ? (
-                          <>Successfully imported all {importResult.totalRows} rows</>
-                        ) : importResult.partialSuccess ? (
-                          <>
-                            Partially successful: {importResult.successfulRows} of {importResult.totalRows} rows
-                            imported
-                          </>
+                        {lastImportWasDryRun ? (
+                          importResult.failedRows === 0 ? (
+                            <>Dry run successful: All {importResult.totalRows} rows would be imported. No changes have been made to your collection.</>
+                          ) : importResult.partialSuccess ? (
+                            <>
+                              Dry run partially successful: {importResult.successfulRows} of {importResult.totalRows} rows
+                              would be imported. No changes have been made to your collection.
+                            </>
+                          ) : (
+                            <>Dry run failed: All {importResult.totalRows} rows would fail to import. No changes have been made to your collection.</>
+                          )
                         ) : (
-                          <>Import failed: All {importResult.totalRows} rows failed</>
+                          importResult.failedRows === 0 ? (
+                            <>Successfully imported all {importResult.totalRows} rows</>
+                          ) : importResult.partialSuccess ? (
+                            <>
+                              Partially successful: {importResult.successfulRows} of {importResult.totalRows} rows
+                              imported
+                            </>
+                          ) : (
+                            <>Import failed: All {importResult.totalRows} rows failed</>
+                          )
                         )}
                       </Alert>
 
