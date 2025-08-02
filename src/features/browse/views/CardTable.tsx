@@ -60,6 +60,15 @@ const CardTable: React.FC<CardTableProps> = ({
 
   const renderCardRow = useCardRowRenderer(priceType, mergedDisplaySettings, onCardClick, isOwnCollection, goalId);
 
+  const getRowProps = (item: any) => {
+    // Check if item exists and goal progress is visible and if the goal is not fully met
+    const isIncomplete = item && cardDisplaySettings?.goalProgressIsVisible && 
+      (item.goalTargetQuantityReg || item.goalTargetQuantityFoil || item.goalTargetQuantityAll) &&
+      item.goalFullyMet === false;
+    
+    return { isIncomplete: !!isIncomplete };
+  };
+
   return (
     <VirtualizedTable
       key="browse-card-table"
@@ -72,6 +81,7 @@ const CardTable: React.FC<CardTableProps> = ({
       onSortChange={onSort}
       emptyMessage="No cards found"
       computeItemKey={(index) => items[index]?.id || index}
+      getRowProps={getRowProps}
     />
   );
 };

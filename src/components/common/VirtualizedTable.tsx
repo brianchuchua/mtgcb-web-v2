@@ -50,6 +50,7 @@ export interface VirtualizedTableProps<T> {
   emptyMessage?: string;
   computeItemKey?: (index: number) => string | number;
   tableWidth?: number;
+  getRowProps?: (item: T) => { isIncomplete?: boolean };
 }
 
 const VirtualizedTable = <T,>({
@@ -63,6 +64,7 @@ const VirtualizedTable = <T,>({
   emptyMessage = 'No items found',
   computeItemKey,
   tableWidth,
+  getRowProps,
 }: VirtualizedTableProps<T>) => {
   const theme = useTheme();
 
@@ -123,8 +125,10 @@ const VirtualizedTable = <T,>({
   // Custom table row for virtualization
   const CustomTableRow = (props: any) => {
     const { index, item, ...restProps } = props;
+    // Use the item prop that's passed by react-virtuoso, not items[index]
+    const rowProps = getRowProps && item ? getRowProps(item) : {};
 
-    return <StyledTableRow {...restProps} />;
+    return <StyledTableRow {...restProps} isIncomplete={rowProps.isIncomplete} />;
   };
 
   // Table virtualization components
@@ -272,11 +276,42 @@ const VirtualizedTable = <T,>({
   );
 };
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
+const StyledTableRow = styled(TableRow)<{ isIncomplete?: boolean }>(({ theme, isIncomplete }) => ({
   transition: 'background-color 0.2s ease, opacity 0.2s ease',
+  position: 'relative',
+  overflow: 'hidden',
   '&:nth-of-type(odd)': {
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
   },
+  ...(isIncomplete && {
+    opacity: 0.85,
+    '& td': {
+      position: 'relative',
+      '&:first-of-type::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: '-100vw',
+        bottom: 0,
+        backgroundImage: `repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 10px,
+          rgba(255, 152, 0, 0.05) 10px,
+          rgba(255, 152, 0, 0.05) 20px
+        )`,
+        pointerEvents: 'none',
+        zIndex: 1,
+      },
+    },
+    '&:hover': {
+      opacity: 1,
+      '& td:first-of-type::before': {
+        opacity: 0.5,
+      },
+    },
+  }),
 }));
 
 export default VirtualizedTable;
