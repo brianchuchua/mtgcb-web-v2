@@ -60,7 +60,7 @@ const MTGCB_FIELDS = {
 const ALL_FIELDS = [...MTGCB_FIELDS.identifiers, ...MTGCB_FIELDS.cardInfo, ...MTGCB_FIELDS.quantities];
 
 export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, onValidationChange }) => {
-  const [previewCSV, { data: previewData, isLoading }] = usePreviewCSVMutation();
+  const [previewCSV, { data: previewData, isLoading, error }] = usePreviewCSVMutation();
   const [mappings, setMappings] = useState<Record<string, string>>({});
   const [hasLoadedSuggestions, setHasLoadedSuggestions] = useState(false);
   const theme = useTheme();
@@ -118,12 +118,45 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
     return getUsedFields().includes(field);
   };
 
-  if (isLoading || !previewData) {
+  if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
         <CircularProgress />
       </Box>
     );
+  }
+
+  if (error) {
+    let errorMessage = 'Failed to preview CSV file. Please check that your file is properly formatted.';
+    
+    // Handle different error structures
+    const errorData = (error as any)?.data;
+    if (errorData) {
+      if (typeof errorData === 'string') {
+        errorMessage = errorData;
+      } else if (errorData.message) {
+        // Handle {message, code} structure
+        errorMessage = typeof errorData.message === 'string' 
+          ? errorData.message 
+          : errorData.message.message || errorMessage;
+      } else if (errorData.error) {
+        errorMessage = typeof errorData.error === 'string'
+          ? errorData.error
+          : errorData.error.message || errorMessage;
+      }
+    }
+    
+    return (
+      <Alert severity="error" sx={{ mb: 3 }}>
+        <Typography variant="body2">
+          <strong>Error:</strong> {errorMessage}
+        </Typography>
+      </Alert>
+    );
+  }
+
+  if (!previewData) {
+    return null;
   }
 
   return (

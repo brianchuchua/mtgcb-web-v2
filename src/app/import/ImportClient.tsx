@@ -353,51 +353,55 @@ export const ImportClient: React.FC = () => {
                   )
                 ) : null}
 
-                <Divider sx={{ my: 3 }} />
+                {!importResult && (
+                  <>
+                    <Divider sx={{ my: 3 }} />
 
-                <Box>
-                  <FormControl component="fieldset" sx={{ mb: 3 }}>
-                    <FormLabel component="legend">Update Mode</FormLabel>
-                    <RadioGroup
-                      value={updateMode}
-                      onChange={(e) => setUpdateMode(e.target.value as 'replace' | 'merge')}
-                      sx={{ mt: 1 }}
-                    >
-                      <FormControlLabel
-                        value="replace"
-                        control={<Radio />}
-                        label={
-                          <Box>
-                            <Typography variant="body2">Replace</Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              Set quantities to exact values in the CSV
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                      <FormControlLabel
-                        value="merge"
-                        control={<Radio />}
-                        label={
-                          <Box>
-                            <Typography variant="body2">Add</Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              Add CSV quantities to existing collection
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                    </RadioGroup>
-                  </FormControl>
+                    <FormControl component="fieldset" sx={{ mb: 3 }}>
+                      <FormLabel component="legend">Update Mode</FormLabel>
+                      <RadioGroup
+                        value={updateMode}
+                        onChange={(e) => setUpdateMode(e.target.value as 'replace' | 'merge')}
+                        sx={{ mt: 1 }}
+                      >
+                        <FormControlLabel
+                          value="replace"
+                          control={<Radio />}
+                          label={
+                            <Box>
+                              <Typography variant="body2">Replace</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Set quantities to exact values in the CSV
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel
+                          value="merge"
+                          control={<Radio />}
+                          label={
+                            <Box>
+                              <Typography variant="body2">Add</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                Add CSV quantities to existing collection
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                  </>
+                )}
 
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileSelect}
-                    style={{ display: 'none' }}
-                  />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileSelect}
+                  style={{ display: 'none' }}
+                />
 
+                {!importResult && (
                   <Stack
                     direction={isMobile ? 'column' : 'row'}
                     spacing={2}
@@ -418,10 +422,11 @@ export const ImportClient: React.FC = () => {
                       </Typography>
                     )}
                   </Stack>
+                )}
 
-                  {selectedFile && !importResult && (
-                    <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-                      <Button
+                {selectedFile && !importResult && (
+                  <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+                    <Button
                         variant="outlined"
                         onClick={() => handleImportClick(true)}
                         disabled={importing || (selectedFormat === 'custom' && !isCustomMappingValid)}
@@ -436,11 +441,11 @@ export const ImportClient: React.FC = () => {
                       >
                         {importing ? 'Importing...' : 'Import Collection'}
                       </Button>
-                    </Stack>
-                  )}
+                  </Stack>
+                )}
 
-                  {importResult && (
-                    <Box sx={{ mt: 4 }}>
+                {importResult && (
+                  <Box sx={{ mt: 4 }}>
                       <Alert
                         severity={
                           importResult.failedRows === 0 ? 'success' : importResult.partialSuccess ? 'warning' : 'error'
@@ -587,7 +592,6 @@ export const ImportClient: React.FC = () => {
                       </Stack>
                     </Box>
                   )}
-                </Box>
               </>
             )}
           </>
