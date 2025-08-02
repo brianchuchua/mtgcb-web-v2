@@ -38,6 +38,7 @@ interface Props {
   csvData: string;
   onMappingsChange: (mappings: FieldMapping[]) => void;
   onValidationChange: (isValid: boolean) => void;
+  onError?: (hasError: boolean) => void;
 }
 
 const MTGCB_FIELDS = {
@@ -59,7 +60,7 @@ const MTGCB_FIELDS = {
 
 const ALL_FIELDS = [...MTGCB_FIELDS.identifiers, ...MTGCB_FIELDS.cardInfo, ...MTGCB_FIELDS.quantities];
 
-export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, onValidationChange }) => {
+export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, onValidationChange, onError }) => {
   const [previewCSV, { data: previewData, isLoading, error }] = usePreviewCSVMutation();
   const [mappings, setMappings] = useState<Record<string, string>>({});
   const [hasLoadedSuggestions, setHasLoadedSuggestions] = useState(false);
@@ -71,6 +72,12 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
       previewCSV({ csvData, rowLimit: 5 });
     }
   }, [csvData, previewCSV]);
+
+  useEffect(() => {
+    if (onError) {
+      onError(!!error);
+    }
+  }, [error, onError]);
 
   useEffect(() => {
     if (previewData && !hasLoadedSuggestions) {

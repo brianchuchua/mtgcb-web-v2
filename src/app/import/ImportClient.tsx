@@ -88,6 +88,7 @@ export const ImportClient: React.FC = () => {
   const [lastImportWasDryRun, setLastImportWasDryRun] = useState(false);
   const [customFieldMappings, setCustomFieldMappings] = useState<Array<{ csvHeader: string; mtgcbField: string }>>([]);
   const [isCustomMappingValid, setIsCustomMappingValid] = useState(false);
+  const [hasCustomMappingError, setHasCustomMappingError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -108,6 +109,7 @@ export const ImportClient: React.FC = () => {
       }
       setSelectedFile(file);
       setImportResult(null);
+      setHasCustomMappingError(false);
 
       // Read file content for custom CSV mapping
       if (selectedFormat === 'custom') {
@@ -245,6 +247,7 @@ export const ImportClient: React.FC = () => {
             onChange={async (e) => {
               setSelectedFormat(e.target.value);
               setImportResult(null);
+              setHasCustomMappingError(false);
               // If switching to custom and file already selected, read its content
               if (e.target.value === 'custom' && selectedFile) {
                 const content = await selectedFile.text();
@@ -342,6 +345,7 @@ export const ImportClient: React.FC = () => {
                       csvData={selectedFileContent}
                       onMappingsChange={setCustomFieldMappings}
                       onValidationChange={setIsCustomMappingValid}
+                      onError={setHasCustomMappingError}
                     />
                   ) : (
                     <Alert severity="info">
@@ -401,7 +405,7 @@ export const ImportClient: React.FC = () => {
                   style={{ display: 'none' }}
                 />
 
-                {!importResult && (
+                {!importResult && !hasCustomMappingError && (
                   <Stack
                     direction={isMobile ? 'column' : 'row'}
                     spacing={2}
@@ -425,22 +429,40 @@ export const ImportClient: React.FC = () => {
                 )}
 
                 {selectedFile && !importResult && (
-                  <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-                    <Button
-                        variant="outlined"
-                        onClick={() => handleImportClick(true)}
-                        disabled={importing || (selectedFormat === 'custom' && !isCustomMappingValid)}
-                      >
-                        Preview (Dry Run)
-                      </Button>
+                  <Stack direction="row" spacing={2} sx={{ mt: hasCustomMappingError ? 1 : 3 }}>
+                    {hasCustomMappingError ? (
                       <Button
-                        variant="contained"
-                        onClick={() => handleImportClick(false)}
-                        disabled={importing || (selectedFormat === 'custom' && !isCustomMappingValid)}
-                        startIcon={importing ? <CircularProgress size={20} /> : null}
+                        variant="outlined"
+                        onClick={() => {
+                          setSelectedFile(null);
+                          setSelectedFileContent('');
+                          setHasCustomMappingError(false);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                          }
+                        }}
                       >
-                        {importing ? 'Importing...' : 'Import Collection'}
+                        Import Another File
                       </Button>
+                    ) : (
+                      <>
+                        <Button
+                          variant="outlined"
+                          onClick={() => handleImportClick(true)}
+                          disabled={importing || (selectedFormat === 'custom' && !isCustomMappingValid)}
+                        >
+                          Preview (Dry Run)
+                        </Button>
+                        <Button
+                          variant="contained"
+                          onClick={() => handleImportClick(false)}
+                          disabled={importing || (selectedFormat === 'custom' && !isCustomMappingValid)}
+                          startIcon={importing ? <CircularProgress size={20} /> : null}
+                        >
+                          {importing ? 'Importing...' : 'Import Collection'}
+                        </Button>
+                      </>
+                    )}
                   </Stack>
                 )}
 
@@ -581,7 +603,9 @@ export const ImportClient: React.FC = () => {
                           variant="outlined"
                           onClick={() => {
                             setSelectedFile(null);
+                            setSelectedFileContent('');
                             setImportResult(null);
+                            setHasCustomMappingError(false);
                             if (fileInputRef.current) {
                               fileInputRef.current.value = '';
                             }
