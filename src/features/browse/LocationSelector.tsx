@@ -1,5 +1,6 @@
 'use client';
 
+import AddIcon from '@mui/icons-material/Add';
 import {
   Box,
   Checkbox,
@@ -14,20 +15,19 @@ import {
   Skeleton,
   Typography,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { LocationHierarchy } from '@/api/locations/types';
-import { 
-  selectSelectedLocationId, 
-  setSelectedLocationId, 
+import { useAuth } from '@/hooks/useAuth';
+import {
   resetSearch,
   selectIncludeChildLocations,
-  setIncludeChildLocations 
+  selectSelectedLocationId,
+  setIncludeChildLocations,
+  setSelectedLocationId,
 } from '@/redux/slices/browseSlice';
-import { useAuth } from '@/hooks/useAuth';
 
 interface LocationSelectorProps {
   userId: number;
@@ -46,19 +46,19 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
 
   const handleChange = (event: SelectChangeEvent<number | '' | 'create-new-location'>) => {
     const value = event.target.value;
-    
+
     // Ignore the create new location option
     if (value === 'create-new-location') {
       return;
     }
-    
+
     const locationId = value === '' ? null : Number(value);
-    
+
     // Only reset search if the location is actually changing
     if (locationId !== selectedLocationId) {
       // Reset all search filters but preserve both goal and location selections
       dispatch(resetSearch({ preserveGoal: true, preserveLocation: true }));
-      
+
       // Set the new location ID
       dispatch(setSelectedLocationId(locationId));
     }
@@ -86,23 +86,31 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
   // Helper function to render location options with indentation
   const renderLocationOptions = (locations: LocationHierarchy[], depth = 0): React.ReactNode[] => {
     const options: React.ReactNode[] = [];
-    
+
     for (const location of locations) {
       const indent = '\u00A0\u00A0'.repeat(depth * 2); // Non-breaking spaces
       const prefix = depth > 0 ? '└ ' : '';
-      
+
       options.push(
         <MenuItem key={location.id} value={location.id} sx={{ p: 0 }}>
           <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
             <Box sx={{ flex: 1, minWidth: 0, p: 1.5, pr: 0.5 }}>
               <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {indent}{prefix}{location.name}
+                {indent}
+                {prefix}
+                {location.name}
               </Typography>
               {location.description && (
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', pl: depth * 2 }}
+                  sx={{
+                    display: 'block',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    pl: depth * 2,
+                  }}
                 >
                   {location.description}
                 </Typography>
@@ -135,14 +143,14 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
               </Box>
             )}
           </Box>
-        </MenuItem>
+        </MenuItem>,
       );
-      
+
       if (location.children.length > 0) {
         options.push(...renderLocationOptions(location.children, depth + 1));
       }
     }
-    
+
     return options;
   };
 
@@ -158,6 +166,7 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
     return null; // Silently fail if locations can't be loaded
   }
 
+  console.log(locations);
   if (locations.length === 0) {
     return null; // Don't show selector if no locations
   }
@@ -165,7 +174,9 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
   return (
     <Box>
       <FormControl fullWidth margin="dense">
-        <InputLabel id="location-selector-label" shrink>Location</InputLabel>
+        <InputLabel id="location-selector-label" shrink>
+          Location
+        </InputLabel>
         <Select
           labelId="location-selector-label"
           value={selectedLocationId || ''}
@@ -180,51 +191,47 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
             return selectedLocation?.name || 'All locations';
           }}
         >
-        <MenuItem value="">
-          <em>All locations</em>
-        </MenuItem>
-        {renderLocationOptions(locations)}
-        {isOwnCollection && <Divider />}
-        {isOwnCollection && (
-          <MenuItem
-            value="create-new-location"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              router.push('/locations/create');
-            }}
-            onMouseDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-            sx={{ p: 1.5 }}
-            disableRipple
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <AddIcon fontSize="small" />
-              <Typography variant="body2">Create new location</Typography>
-            </Box>
+          <MenuItem value="">
+            <em>All locations</em>
           </MenuItem>
-        )}
-      </Select>
-    </FormControl>
-    {selectedLocationId && (
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={includeChildLocations}
-            onChange={handleIncludeChildLocationsChange}
-            size="small"
-          />
-        }
-        label={
-          <Typography variant="body2" color="text.secondary">
-            Include child locations
-          </Typography>
-        }
-        sx={{ mt: 0.5, ml: 0.5 }}
-      />
-    )}
+          {renderLocationOptions(locations)}
+          {isOwnCollection && <Divider />}
+          {isOwnCollection && (
+            <MenuItem
+              value="create-new-location"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                router.push('/locations/create');
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              sx={{ p: 1.5 }}
+              disableRipple
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <AddIcon fontSize="small" />
+                <Typography variant="body2">Create new location</Typography>
+              </Box>
+            </MenuItem>
+          )}
+        </Select>
+      </FormControl>
+      {selectedLocationId && (
+        <FormControlLabel
+          control={
+            <Checkbox checked={includeChildLocations} onChange={handleIncludeChildLocationsChange} size="small" />
+          }
+          label={
+            <Typography variant="body2" color="text.secondary">
+              Include child locations
+            </Typography>
+          }
+          sx={{ mt: 0.5, ml: 0.5 }}
+        />
+      )}
     </Box>
   );
 };

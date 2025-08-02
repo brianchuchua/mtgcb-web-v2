@@ -214,12 +214,11 @@ function EditLocationDialog({
                 {/* Assignment Status */}
                 <Box>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                    Assigned to locations:
+                    Quantities assigned:
                   </Typography>
                   <Typography variant="body2">
                     {totalAssignedReg} regular
                     {totalAssignedFoil > 0 && `, ${totalAssignedFoil} foil`}
-                    {totalAssignedReg === 0 && totalAssignedFoil === 0 && ' (none)'}
                   </Typography>
                 </Box>
 
@@ -236,8 +235,11 @@ function EditLocationDialog({
                           variant="body2"
                           sx={{ fontWeight: loc.locationId === location.locationId ? 600 : 400 }}
                         >
-                          • {loc.locationName}: {loc.quantityReg} regular
-                          {loc.quantityFoil > 0 && `, ${loc.quantityFoil} foil`}
+                          • {loc.locationName}
+                          {(loc.quantityReg > 0 || loc.quantityFoil > 0) && ': '}
+                          {loc.quantityReg > 0 && `${loc.quantityReg} regular`}
+                          {loc.quantityReg > 0 && loc.quantityFoil > 0 && ', '}
+                          {loc.quantityFoil > 0 && `${loc.quantityFoil} foil`}
                           {loc.locationId === location.locationId && ' (editing)'}
                         </Typography>
                       ))}

@@ -15,8 +15,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Proper flavor name support
 - Left <> right set navigation
 - Art cards
-- Imports and exports (allow exporting from a specific set or whole collection)
-  - Request from Patron: Delver Lens or one that is csv all fields
 - Patron support features
 - Privacy mode
 - Cards page
@@ -38,11 +36,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - canBeFoil/canBeNonFoil -- need to have a page showing all the cards with bad data
 
 ### Current Action Items
-
-- Import/Export
-- Just need to add Moxfield and a custom autodetect import format
-- Be sure to use MTGJSON as a rosetta stone for data
-- Nestable locations
 
 - verify default visibility for set boxes and card box fields
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
@@ -85,6 +78,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## UX Action Items
 
+- Card frame with "..." doesn't look good with 6 width cards -- maybe just get rid of 6 as an option?
 - Audit subsets with collection goals -- data and appearance.
 - Goals should have a computation loading state, especially in the header
 - Not liking set box heights
@@ -181,25 +175,38 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Need a full postman library of my API calls, these should live with api docs
 - Need a fallback if both canBeFoil and canBeNonFoil are false, treat them both as true probably
 
-## Future Feature Work
+## Future Features
 
 - Foreign Cards
-- Button to report missing card data, notify user is link to scryfall or tcgplayer is missing
-- Sharing and duplicating collection goals
 - Sealed product support
+- Button to report missing card data, notify user if link to scryfall or tcgplayer is missing
 - Financial history tracking, collection value history, etc.
+
+## Future Enhancements
+
+### Locations
+
+- Allowing backups, import and export of locations
+
+### Collection Goals
+
+- Sharing and duplicating collection goals
+
+### Performance
+
+- Perhaps don't include location data in searches when the user has no locations, may need a preflight check for this
 
 ## Patron Requests
 
 - Search with scryfall syntax
 - "In terms of import/export, I've got a ton of decks in Moxfield. I'd love the ability to import a deck from Moxfield and then add the name of the Moxfield deck to a location field to help indicate within MTG Collection Builder that a specific card is in a specific Commander deck. Not sure if that's what you were asking with regard to importers and exporters, but it's something that would make my life easier....." "Exactly! This one would be just to import for the location, not to add to the collection. Of course, it would be an added bonus if there were some sort of error handling in case I chose a card variant in Moxfield that I have 0 of in my collection which would notify me so I could change the variant within Moxfield."
-- Nestable locations
 
 ## Maybes
 
 - Showing number of cards in excess of a goal
 - Showing goal criteria in the collection header
 - Allowing editing of card locations in edit cards page
+- Mass updating of card locations
 
 ## Things To Check On
 
