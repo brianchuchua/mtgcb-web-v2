@@ -375,21 +375,23 @@ export default function CardLocationPills({
           />
         ))}
         {onAddLocation && (
-          <Chip
-            label="+"
-            onClick={onAddLocation}
-            size="small"
-            sx={{
-              cursor: 'pointer',
-              color: 'text.secondary',
-              borderColor: 'divider',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-                borderColor: 'text.secondary',
-              },
-            }}
-            variant="outlined"
-          />
+          <Tooltip title="Add card location(s)" placement="top">
+            <Chip
+              label="+"
+              onClick={onAddLocation}
+              size="small"
+              sx={{
+                cursor: 'pointer',
+                color: 'text.secondary',
+                borderColor: 'divider',
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                  borderColor: 'text.secondary',
+                },
+              }}
+              variant="outlined"
+            />
+          </Tooltip>
         )}
       </Box>
 
