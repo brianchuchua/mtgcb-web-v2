@@ -61,11 +61,13 @@ export function GoalStatusTableCell({ card, goalType }: GoalStatusTableCellProps
 
   const message = getGoalMessage();
   const isGoalMet =
-    (goalType === 'regular' && goalRegMet) ||
-    (goalType === 'foil' && goalFoilMet) ||
-    (goalType === 'all' && goalAllMet) ||
-    // Special case for "all" goals shown in both regular and foil columns
-    (goalTargetQuantityAll && !goalTargetQuantityReg && !goalTargetQuantityFoil && goalAllMet);
+    // Special case: If only targetQuantityAll exists (no reg/foil targets)
+    // Check goalAllMet regardless of goalType since it appears in both columns
+    (goalTargetQuantityAll && !goalTargetQuantityReg && !goalTargetQuantityFoil) 
+      ? goalAllMet
+      : (goalType === 'regular' && goalRegMet) ||
+        (goalType === 'foil' && goalFoilMet) ||
+        (goalType === 'all' && goalAllMet);
 
   // Filter out self-contributions (same card ID)
   const otherContributingVersions = goalContributingVersions?.filter((version) => version.cardId !== card.id) || [];
