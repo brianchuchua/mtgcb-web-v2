@@ -398,6 +398,16 @@ const CardItemComponent = ({
                 '&:hover': {
                   textDecoration: onClick ? 'underline' : 'none',
                 },
+                fontSize: '1.25rem',
+                '@container card (max-width: 300px)': {
+                  fontSize: '1.125rem',
+                },
+                '@container card (max-width: 250px)': {
+                  fontSize: '1rem',
+                },
+                '@container card (max-width: 200px)': {
+                  fontSize: '0.875rem',
+                },
               }}
             >
               {name}
@@ -416,6 +426,16 @@ const CardItemComponent = ({
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 maxWidth: '100%',
+                fontSize: '0.875rem',
+                '@container card (max-width: 300px)': {
+                  fontSize: '0.8125rem',
+                },
+                '@container card (max-width: 250px)': {
+                  fontSize: '0.75rem',
+                },
+                '@container card (max-width: 200px)': {
+                  fontSize: '0.6875rem',
+                },
               }}
             >
               {setName && setSlug ? (
@@ -486,12 +506,30 @@ const CardItemComponent = ({
           {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && !isOwnCollection && (
             <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center', gap: 1 }}>
               {quantityReg !== undefined && (
-                <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                <Typography variant="body2" sx={{ 
+                  fontWeight: 'medium',
+                  fontSize: '0.875rem',
+                  '@container card (max-width: 250px)': {
+                    fontSize: '0.8125rem',
+                  },
+                  '@container card (max-width: 200px)': {
+                    fontSize: '0.75rem',
+                  },
+                }}>
                   {quantityReg}x Regular
                 </Typography>
               )}
               {quantityFoil !== undefined && (
-                <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                <Typography variant="body2" sx={{ 
+                  fontWeight: 'medium',
+                  fontSize: '0.875rem',
+                  '@container card (max-width: 250px)': {
+                    fontSize: '0.8125rem',
+                  },
+                  '@container card (max-width: 200px)': {
+                    fontSize: '0.75rem',
+                  },
+                }}>
                   {quantityFoil}x Foil
                 </Typography>
               )}

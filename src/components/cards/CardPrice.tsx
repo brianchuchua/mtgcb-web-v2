@@ -55,7 +55,17 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   if (!prices) {
     return (
-      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}>
+      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}
+        sx={{
+          fontSize: '1rem',
+          '@container card (max-width: 250px)': {
+            fontSize: '0.875rem',
+          },
+          '@container card (max-width: 200px)': {
+            fontSize: '0.75rem',
+          },
+        }}
+      >
         N/A
       </Typography>
     );
@@ -66,7 +76,17 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   if (!normalPriceData && !foilPriceData) {
     return (
-      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}>
+      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}
+        sx={{
+          fontSize: '1rem',
+          '@container card (max-width: 250px)': {
+            fontSize: '0.875rem',
+          },
+          '@container card (max-width: 200px)': {
+            fontSize: '0.75rem',
+          },
+        }}
+      >
         N/A
       </Typography>
     );
@@ -183,7 +203,17 @@ const CardPrice: React.FC<CardPriceProps> = ({
     return (
       <Tooltip title="Foil Price">
         <Box sx={containerStyle}>
-          <Typography variant="subtitle1" fontWeight="medium">
+          <Typography variant="subtitle1" fontWeight="medium"
+            sx={{
+              fontSize: '1rem',
+              '@container card (max-width: 250px)': {
+                fontSize: '0.875rem',
+              },
+              '@container card (max-width: 200px)': {
+                fontSize: '0.75rem',
+              },
+            }}
+          >
             {formatPrice(foilPrice)} foil
           </Typography>
         </Box>
@@ -205,7 +235,17 @@ const CardPrice: React.FC<CardPriceProps> = ({
       <Tooltip title={tooltipTitle}>
         <Box sx={containerStyle}>
           <Box sx={flexContainerStyle}>
-            <Typography variant="subtitle1" fontWeight="medium">
+            <Typography variant="subtitle1" fontWeight="medium"
+              sx={{
+                fontSize: '1rem',
+                '@container card (max-width: 250px)': {
+                  fontSize: '0.875rem',
+                },
+                '@container card (max-width: 200px)': {
+                  fontSize: '0.75rem',
+                },
+              }}
+            >
               {formatPrice(normalPrice)} ({formatPrice(foilPrice)} foil)
             </Typography>
             {isFallback && <InfoIcon fontSize="small" color="action" sx={{ ml: 0.5, fontSize: '1rem' }} />}
@@ -228,7 +268,17 @@ const CardPrice: React.FC<CardPriceProps> = ({
       <Tooltip title={tooltipTitle}>
         <Box sx={containerStyle}>
           <Box sx={flexContainerStyle}>
-            <Typography variant="subtitle1" fontWeight="medium">
+            <Typography variant="subtitle1" fontWeight="medium"
+              sx={{
+                fontSize: '1rem',
+                '@container card (max-width: 250px)': {
+                  fontSize: '0.875rem',
+                },
+                '@container card (max-width: 200px)': {
+                  fontSize: '0.75rem',
+                },
+              }}
+            >
               {formatPrice(normalPrice)}
             </Typography>
             {isFallback && <InfoIcon fontSize="small" color="action" sx={{ ml: 0.5, fontSize: '1rem' }} />}
@@ -250,7 +300,17 @@ const CardPrice: React.FC<CardPriceProps> = ({
       >
         <Box sx={containerStyle}>
           <Box sx={flexContainerStyle}>
-            <Typography variant="subtitle1" fontWeight="medium">
+            <Typography variant="subtitle1" fontWeight="medium"
+              sx={{
+                fontSize: '1rem',
+                '@container card (max-width: 250px)': {
+                  fontSize: '0.875rem',
+                },
+                '@container card (max-width: 200px)': {
+                  fontSize: '0.75rem',
+                },
+              }}
+            >
               {formatPrice(foilPrice)} foil
             </Typography>
             {/* Only show the info icon if this is NOT a foil-only card */}
@@ -264,7 +324,17 @@ const CardPrice: React.FC<CardPriceProps> = ({
   // No prices available
   return (
     <Tooltip title="No prices available">
-      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}>
+      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}
+        sx={{
+          fontSize: '1rem',
+          '@container card (max-width: 250px)': {
+            fontSize: '0.875rem',
+          },
+          '@container card (max-width: 200px)': {
+            fontSize: '0.75rem',
+          },
+        }}
+      >
         N/A
       </Typography>
     </Tooltip>

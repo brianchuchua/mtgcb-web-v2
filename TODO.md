@@ -40,15 +40,16 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Current Action Items
 
+- When idle: Migrate TODOs from README.md to this file
 - instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
-- When idle: Migrate TODOs from README.md to this file
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
 - Preload stuff on pagination hover?
 - mass entry, add collector number
-- roadmap page
--
+- roadmap page (maybe just on the changelog page)
+- mention binders on home page
+- faq page
 
 ## Other Action Items Before Launch
 
@@ -139,7 +140,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Consider breadcrumbs for collection pages, maybe just the subpages since the main collection page is the root
 - Improve card quantity update messages
 - Open Search Options -- should probably scroll to the search options section
-- Shrink card text when scaling down cards via slider
 - Breadcrumbs in collection set view
 - search needs to clear when entering a set page
 - Remove "Showing" from "Showing 1-24 of blah cards" at 1024x768 or smaller
