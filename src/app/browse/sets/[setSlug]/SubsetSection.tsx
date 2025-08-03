@@ -250,8 +250,8 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
             <ErrorBanner type={browseController.view} />
           ) : (
             <>
-              {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} />}
-              {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} />}
+              {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} goalId={goalId ? goalId.toString() : undefined} />}
+              {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} goalId={goalId ? goalId.toString() : undefined} />}
             </>
           )}
 

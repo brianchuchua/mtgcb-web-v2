@@ -25,13 +25,16 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Uncategorized
 
-- Left <> right set navigation
+BUG: Set value of 0 http://local.mtgcb.com:3000/collections/100114/limited-edition-alpha?includeSets=1
+
+- mobile view set name is too big
+- breadcrumbs should never go to two lines
 - Subset data automation and clean-up (basically audit subset groups that have cards in them directly)
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
 - Home page (landing page or statistics dashboard depending on login state, perhaps most valuable card can live here)
 - New price updater
 - In-code TODO audit
-- Feature parity audit
+- Feature parity audit (permalink)
 - Most valuable card collected, maybe in the set header
 - Handle double-sided, sideways, and flip cards
 - New price updater that updates directly in the new database, separate from the old legacy updater

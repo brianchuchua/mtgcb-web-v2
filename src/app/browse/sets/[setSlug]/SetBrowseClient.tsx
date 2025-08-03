@@ -8,7 +8,9 @@ import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
+import { SetNavigationButtons } from '@/components/sets/SetNavigationButtons';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
+import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
@@ -99,6 +101,11 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   const subsets = subsetsData?.data?.sets || [];
   const setName = isSetLoading ? '' : set?.name || 'Set not found';
 
+  const { previousSet, nextSet, handleSetNavigation } = useSetNavigation({
+    currentSetId: set?.id,
+    baseUrl: '/browse/sets',
+  });
+
   const handleSubsetSelect = useCallback((subsetId: string) => {
     // First, open/expand the subset
     const toggleFunction = subsetToggleRefs.current[subsetId];
@@ -181,8 +188,15 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
           flexDirection: 'column',
           alignItems: 'center',
           textAlign: 'center',
+          position: 'relative',
         }}
       >
+        <SetNavigationButtons
+          previousSet={previousSet}
+          nextSet={nextSet}
+          onNavigate={handleSetNavigation}
+        />
+
         <Typography
           variant="h4"
           fontWeight="500"
@@ -226,10 +240,16 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
       {browseController.error ? (
         <ErrorBanner type={browseController.view} />
       ) : (
-        <>
+        <Box
+          sx={{
+            opacity: cardsProps?.items?.[0]?.setSlug === setSlug ? 1 : 0,
+            transition: 'opacity 0.2s ease-in-out',
+            minHeight: cardsProps?.items?.length ? 'auto' : '400px',
+          }}
+        >
           {isCardGridView && <CardGrid {...cardsProps} />}
           {isCardTableView && <CardTable {...cardsProps} />}
-        </>
+        </Box>
       )}
 
       <Pagination {...browseController.paginationProps} position="bottom" hideContentTypeToggle={true} />

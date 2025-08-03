@@ -75,6 +75,27 @@ export const browseApi = mtgcbApi.injectEndpoints({
       keepUnusedDataFor: 3600, // 1 hour
       providesTags: ['SetTypes'],
     }),
+
+    getSetsNavigation: builder.query<
+      ApiResponse<{
+        sets: Array<{
+          id: string;
+          name: string;
+          slug: string;
+          releasedAt: string | null;
+        }>;
+        totalCount: number;
+      }>,
+      { sortBy?: 'releasedAt' | 'name'; sortDirection?: 'asc' | 'desc' } | undefined
+    >({
+      query: (params) => ({
+        url: '/sets/navigation',
+        method: 'GET',
+        params: params || {},
+      }),
+      keepUnusedDataFor: 3600, // 1 hour - aggressive caching since sets rarely change
+      providesTags: ['Sets'],
+    }),
   }),
   overrideExisting: false,
 });
@@ -86,6 +107,7 @@ export const {
   useGetSetsQuery,
   useLazyGetSetsQuery,
   useGetSetTypesQuery,
+  useGetSetsNavigationQuery,
   usePrefetch, // TODO: Rename -- this can get cards or sets
   endpoints,
 } = browseApi;

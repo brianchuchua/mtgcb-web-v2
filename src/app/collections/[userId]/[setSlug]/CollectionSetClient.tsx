@@ -17,7 +17,9 @@ import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/Ma
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
+import { SetNavigationButtons } from '@/components/sets/SetNavigationButtons';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
+import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
@@ -145,6 +147,14 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   const subsets = subsetsData?.data?.sets || [];
   const setName = isSetLoading ? '' : set?.name || 'Set not found';
+
+  const { previousSet, nextSet, handleSetNavigation } = useSetNavigation({
+    currentSetId: set?.id,
+    baseUrl: `/collections/${userId}`,
+    preserveParams: {
+      goalId: selectedGoalId,
+    },
+  });
   const username =
     browseController.setsProps && 'username' in browseController.setsProps
       ? browseController.setsProps.username
@@ -313,7 +323,14 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     <Box>
       {/* Show CollectionHeader when viewing with a goal selected */}
       {selectedGoalId && collectionSummary && set && (
-        <CollectionHeader
+        <Box sx={{ position: 'relative' }}>
+          <SetNavigationButtons
+            previousSet={previousSet}
+            nextSet={nextSet}
+            onNavigate={handleSetNavigation}
+          />
+          
+          <CollectionHeader
           username={username || ''}
           userId={userId}
           uniquePrintingsCollected={collectionSummary.uniquePrintingsCollected || 0}
@@ -339,6 +356,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             costToComplete: set.costToComplete?.goal || 0,
           }}
         />
+        </Box>
       )}
 
       {/* Show regular set header when NOT viewing with a goal */}
@@ -349,8 +367,15 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             flexDirection: 'column',
             alignItems: 'center',
             textAlign: 'center',
+            position: 'relative',
           }}
         >
+          <SetNavigationButtons
+            previousSet={previousSet}
+            nextSet={nextSet}
+            onNavigate={handleSetNavigation}
+          />
+
           <Typography
             variant="h4"
             fontWeight="500"
@@ -454,10 +479,16 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       {browseController.error ? (
         <ErrorBanner type={browseController.view} />
       ) : (
-        <>
+        <Box
+          sx={{
+            opacity: cardsProps?.items?.[0]?.setSlug === setSlug ? 1 : 0,
+            transition: 'opacity 0.2s ease-in-out',
+            minHeight: cardsProps?.items?.length ? 'auto' : '400px',
+          }}
+        >
           {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
           {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
-        </>
+        </Box>
       )}
 
       <Pagination {...browseController.paginationProps} position="bottom" hideContentTypeToggle={true} />
