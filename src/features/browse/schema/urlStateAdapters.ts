@@ -95,6 +95,7 @@ const reduxToSchemaKeyMap: Record<string, string | [string, string]> = {
 export function convertStateToUrlParams(
   state: Partial<BrowseSearchParams>,
   currentMode: 'cards' | 'sets',
+  isSetSpecificPage: boolean = false,
 ): URLSearchParams {
   const params = new URLSearchParams();
 
@@ -104,6 +105,9 @@ export function convertStateToUrlParams(
     if (reduxKey === 'viewMode') return;
     // Skip viewContentType as it's handled separately by useBrowseStateSync
     if (reduxKey === 'viewContentType') return;
+
+    // Skip sets filter parameters on set-specific pages (where set is determined by URL slug)
+    if (isSetSpecificPage && reduxKey === 'sets') return;
 
     const mappedKey = reduxToSchemaKeyMap[reduxKey] || reduxKey;
 

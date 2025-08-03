@@ -100,7 +100,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Link to collection needs to be consistent. Underlined or not, which parts, etc.
 - Improve height of skeleton loader for collectionheader
 - Header and breadcrumb and form and alignment consistency
-- Clicking "Manath's Collection Goal" needs to clear the selection of collection goal
 - Position of created date when hovering edited date on goals page is weird
 - Audit style of info messages and errors
 - Set icons for token subsets
@@ -127,7 +126,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - OpenGraph meta tags for social previews
 - Consider alternate-mobile-filter.png as a design idea (search bar at the top, Filters button that opens a menu with filters)
 - 1 cards instead of 1 card
-- includeSets in URL while on the sets page is a little weird
+- mission statement, like "let's build our collection together" or something -- the point of the site is to make it easy to complete a collection, as easy as a button press
+  - enhancement -- when a person goes to buy the cards, have the site offer to record the cards right there
+- what good are breadcrumbs actually doing on the browse page? like home > browse, the home page is useless
 - See if still happening: On mobile, the hover over card name is doing the whole row, not just the card name
 - Confetti when hitting 100% collection progress, see legacy implementation
 - Alternating table row colors, I feel like the bright ones are too bright

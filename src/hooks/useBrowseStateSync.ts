@@ -215,10 +215,12 @@ export function useBrowseStateSync() {
 
     const sync = debounce(() => {
       const state = viewType === 'cards' ? cardState : setState;
-      const params = convertStateToUrlParams(state, viewType);
       
       // Check if we're on a set-specific page (collection or browse)
       const isSetSpecificPage = /^\/collections\/\d+\/[^\/]+$/.test(pathname) || /^\/browse\/sets\/[^\/]+$/.test(pathname);
+      
+      // Pass context about the page type to convertStateToUrlParams
+      const params = convertStateToUrlParams(state, viewType, isSetSpecificPage);
       
       // Only add contentType if we're not on a set-specific page
       if (!isSetSpecificPage) {
