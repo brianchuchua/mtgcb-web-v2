@@ -2,7 +2,7 @@
 
 I've found over time that maintaining my action items for code in external tools is overkill and burdensome.
 
-Best to keep them in the codebase for now, especially since I'm a team of one.
+Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Remaining Major Feature Work Before 1.0
 
@@ -17,11 +17,14 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ### Home Page
 
+- Should show most valuable card, statistics, etc. I think. Although need stats somewhere else too, maybe in every header of every collection page.
+
 ### Terms and Conditions
 
 ### Migration Path
 
-- Proper flavor name support
+### Uncategorized
+
 - Left <> right set navigation
 - Subset data automation and clean-up (basically audit subset groups that have cards in them directly)
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
@@ -73,7 +76,6 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 ### Uncagetorized
 
 - verify the individual value of sets, when added up, add up to the collection value -- Chris request on Discord
-- nuke collection button
 - youtube channel for how to use the site
 - card notes field for card page
 - support better rendering of which variants of cards exist in searches when limiting one copy per card name, maybe
@@ -97,6 +99,7 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## UX Action Items
 
+- weird flicker with specific cards to include or exclude in goal forms
 - Card frame with "..." doesn't look good with 6 width cards -- maybe just get rid of 6 as an option?
 - Audit subsets with collection goals -- data and appearance.
 - Goals should have a computation loading state, especially in the header

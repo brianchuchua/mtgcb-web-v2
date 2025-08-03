@@ -171,7 +171,7 @@ const EditCardsClient: React.FC = () => {
         id: card.id,
         name: card.name,
         setName: card.setName,
-        label: `${card.name} [${card.setName}]`,
+        label: `${card.name}${card.flavorName ? ` (${card.flavorName})` : ''} [${card.setName}]`,
         card,
       }));
     }
@@ -186,7 +186,7 @@ const EditCardsClient: React.FC = () => {
       id: card.id,
       name: card.name,
       setName: card.setName,
-      label: `${card.name} [${card.setName}]`,
+      label: `${card.name}${card.flavorName ? ` (${card.flavorName})` : ''} [${card.setName}]`,
       card,
     }));
   }, [searchResponse, searchInput, selectedSet, allCards]);

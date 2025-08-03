@@ -19,6 +19,7 @@ export interface CardModel {
   tcgplayerId: string | null;
   tcgplayerName?: string | null;
   tcgplayerSetCode?: string | null;
+  flavorName?: string | null;
   market: string | null;
   low: string | null;
   average: string | null;

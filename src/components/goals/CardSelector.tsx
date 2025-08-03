@@ -90,7 +90,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
       id: card.id.toString(),
       name: card.name,
       setName: card.setName,
-      label: `${card.name} [${card.setName}]`,
+      label: `${card.name}${card.flavorName ? ` (${card.flavorName})` : ''} [${card.setName}]`,
       card,
     }));
   }, [searchResponse]);
@@ -248,7 +248,14 @@ const CardSelector: React.FC<CardSelectorProps> = ({
             <Box component="li" key={key} {...otherProps} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <CardThumbnail src={getCardImageUrl(option.card.id)} alt={option.name} loading="lazy" />
               <Box>
-                <Typography variant="body2">{option.name}</Typography>
+                <Typography variant="body2">
+                  {option.name}
+                  {option.card.flavorName && (
+                    <Typography component="span" variant="body2" color="text.secondary">
+                      {' '}({option.card.flavorName})
+                    </Typography>
+                  )}
+                </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {option.setName}
                 </Typography>
@@ -275,7 +282,10 @@ const CardSelector: React.FC<CardSelectorProps> = ({
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       {isExclude && <Typography variant="inherit">NOT</Typography>}
-                      <Typography variant="inherit">{cardInfo ? cardInfo.name : `Card ${cardId}`}</Typography>
+                      <Typography variant="inherit">
+                        {cardInfo ? cardInfo.name : `Card ${cardId}`}
+                        {cardInfo?.flavorName && ` (${cardInfo.flavorName})`}
+                      </Typography>
                       {cardInfo && (
                         <Typography variant="caption" sx={{ opacity: 0.8 }}>
                           [{cardInfo.setName}]
