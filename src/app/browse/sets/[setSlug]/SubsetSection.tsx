@@ -15,6 +15,7 @@ import { formatISODate } from '@/utils/dateUtils';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
+import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 interface SubsetSectionProps {
   subset: any;
@@ -108,7 +109,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
           {subset.code && (
             <Link
               component={NextLink}
-              href={`/browse/sets/${subset.slug}`}
+              href={userId ? getCollectionSetUrl(userId, subset.slug, goalId) : `/browse/sets/${subset.slug}`}
               onClick={handleLinkClick}
               sx={{
                 display: 'flex',
@@ -125,7 +126,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
             <Typography fontWeight="500">
               <Link
                 component={NextLink}
-                href={`/browse/sets/${subset.slug}`}
+                href={userId ? getCollectionSetUrl(userId, subset.slug, goalId) : `/browse/sets/${subset.slug}`}
                 onClick={handleLinkClick}
                 sx={{
                   textDecoration: 'none',

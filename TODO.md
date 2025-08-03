@@ -167,7 +167,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Bugs
 
-- Bug: Link to subset from name at bottom of set page always links to browse equivalent, even in collection view
 - Severe: Scrolling far down during the virtualization of the set grid view by clicking halfway through scrollbar while viewing 500 sets, jumping up and down in a loop -- maybe need to render further down or something?
 - Moderate: Draft cube calculation when track subsets with sets in on is wrong, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir -- it's incorrectly counting non main set cards as missing just in terms of the value
 - Moderate+ Bug: Collector number sort is broken in collector table view, probably not using the numeric version of collector number
@@ -181,16 +180,13 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Tech Debt
 
+- Switch from Google reCAPTCHA to Cloudflare Turnstile
 - All quantity selectors should be using the same component, QuantitySelector.tsx
-- Type issues in src\api\collections\collectionsApi.ts
-- Switching from desktop to mobile view unmounts a lot of the app, which resets pages like the edit cards page
 - End-to-end tests for every user action
 - CardBrowseClient is a mess and is using deprecated Grid
 - Find deprecated uses of PaperProps and Grid
-- Switch from Google reCAPTCHA to Cloudflare Turnstile
 - Every file needs to follow the code style I established in SetItemRenderer.tsx and browse/page.tsx
 - Minor: prefetch leads to page 2 being loaded when a user invalidates the collection tag, it's a prefetch subscription issue in RTK Query, dev team is aware, no current fix, just bad workarounds, page one still loads on visit, so it's fine
-- fetch API being used in SetSelector
 - Consider removing skeleton loaders from set gallery and experiment with masonry instead of virtuoso
 - I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
 - Audit consistency of naming of fields returned by API for totalCount and values.
