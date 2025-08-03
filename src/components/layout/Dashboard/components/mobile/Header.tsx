@@ -14,7 +14,14 @@ import { AccountMenu } from '@/components/layout/Dashboard/components/AccountMen
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
 const Header = () => {
-  const { isMobileOpen, setMobileOpen } = useDashboardContext();
+  const { isMobileOpen, setMobileOpen, setMainSectionExpanded } = useDashboardContext();
+
+  const handleMenuClick = () => {
+    if (!isMobileOpen) {
+      setMainSectionExpanded(true);
+    }
+    setMobileOpen(!isMobileOpen);
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -26,7 +33,7 @@ const Header = () => {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
-            onClick={() => setMobileOpen(!isMobileOpen)}
+            onClick={handleMenuClick}
           >
             {isMobileOpen ? <KeyboardDoubleArrowLeftIcon /> : <MenuIcon />}
           </IconButton>

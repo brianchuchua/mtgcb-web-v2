@@ -8,6 +8,8 @@ interface DashboardContextProps {
   setDesktopOpen: (open: boolean) => void;
   setMobileOpen: (open: boolean) => void;
   sidenavWidth: number;
+  isMainSectionExpanded: boolean;
+  setMainSectionExpanded: (expanded: boolean) => void;
 }
 
 const DashboardContext = createContext<DashboardContextProps | undefined>(undefined);
@@ -20,6 +22,7 @@ interface DashboardProviderProps {
 export const DashboardProvider = ({ children, sidenavWidth = 320 }: DashboardProviderProps) => {
   const [isDesktopOpen, setDesktopOpen] = useState(true);
   const [isMobileOpen, setMobileOpen] = useState(false);
+  const [isMainSectionExpanded, setMainSectionExpanded] = useState(true);
 
   return (
     <DashboardContext.Provider
@@ -29,6 +32,8 @@ export const DashboardProvider = ({ children, sidenavWidth = 320 }: DashboardPro
         setDesktopOpen,
         setMobileOpen,
         sidenavWidth,
+        isMainSectionExpanded,
+        setMainSectionExpanded,
       }}
     >
       {children}

@@ -319,11 +319,12 @@ const BackToTopButton: React.FC<BackToTopButtonProps> = ({ onClick, isLoading })
 };
 
 const MobileSearchButton: React.FC = () => {
-  const { setMobileOpen } = useDashboardContext();
+  const { setMobileOpen, setMainSectionExpanded } = useDashboardContext();
 
   const handleSearchClick = useCallback(() => {
+    setMainSectionExpanded(false);
     setMobileOpen(true);
-  }, [setMobileOpen]);
+  }, [setMobileOpen, setMainSectionExpanded]);
 
   return (
     <SearchButtonContainer>

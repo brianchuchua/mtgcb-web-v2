@@ -36,6 +36,7 @@ import { useEffect, useState } from 'react';
 import { SearchForms } from '@/components/layout/Dashboard/components/shared/SearchForms';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
+import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
 interface SidenavItemsProps {
   onNavigate?: () => void;
@@ -44,11 +45,11 @@ interface SidenavItemsProps {
 export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
   const pathname = usePathname();
   const { isAuthenticated, user } = useAuth();
+  const { isMainSectionExpanded, setMainSectionExpanded } = useDashboardContext();
   const [isCollectionMenuOpen, setIsCollectionMenuOpen] = useState(false);
-  const [isNavExpanded, setIsNavExpanded] = useState(true);
 
   const toggleNavExpanded = () => {
-    setIsNavExpanded(!isNavExpanded);
+    setMainSectionExpanded(!isMainSectionExpanded);
   };
 
   const handleClick = () => {
@@ -111,14 +112,14 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
               toggleNavExpanded();
             }}
             size="small"
-            aria-label={isNavExpanded ? 'Collapse navigation' : 'Expand navigation'}
+            aria-label={isMainSectionExpanded ? 'Collapse navigation' : 'Expand navigation'}
           >
-            {isNavExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            {isMainSectionExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Box>
         <Divider />
         {/* Collapsible navigation menu */}
-        <Collapse in={isNavExpanded} timeout="auto">
+        <Collapse in={isMainSectionExpanded} timeout="auto">
           <List disablePadding>
             <ListItem disablePadding>
               <ListItemButton component={Link} href="/" selected={pathname === '/'} onClick={handleClick}>

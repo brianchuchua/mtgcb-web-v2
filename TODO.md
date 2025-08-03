@@ -98,13 +98,12 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## UX Action Items
 
+- I don't like the mobile header, version number too close to page name, maybe need to center on mobile
 - bottom pagination, return to top of page
 - weird flicker with specific cards to include or exclude in goal forms
 - Card frame with "..." doesn't look good with 6 width cards -- maybe just get rid of 6 as an option?
 - Audit subsets with collection goals -- data and appearance.
 - Goals should have a computation loading state, especially in the header
-- Not liking set box heights
-- When Open Search Options is clicked, it should scroll to the search options section
 - Link to collection needs to be consistent. Underlined or not, which parts, etc.
 - Improve height of skeleton loader for collectionheader
 - Header and breadcrumb and form and alignment consistency
