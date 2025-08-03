@@ -95,7 +95,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - bottom pagination, return to top of page
 - weird flicker with specific cards to include or exclude in goal forms
-- Card frame with "..." doesn't look good with 6 width cards -- maybe just get rid of 6 as an option?
 - Audit subsets with collection goals -- data and appearance.
 - Goals should have a computation loading state, especially in the header
 - Link to collection needs to be consistent. Underlined or not, which parts, etc.
