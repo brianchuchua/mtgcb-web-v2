@@ -25,8 +25,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Uncategorized
 
-- prevent trying to add a card to a location if you don't have any of that card yet
-- mobile view set name is too big
 - breadcrumbs should never go to two lines
 - Subset data automation and clean-up (basically audit subset groups that have cards in them directly)
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)

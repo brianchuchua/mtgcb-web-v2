@@ -200,13 +200,20 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
         <Typography
           variant="h4"
           fontWeight="500"
-          sx={{
-            color: (theme) => theme.palette.primary.main,
-            whiteSpace: 'nowrap',
+          sx={(theme) => ({
+            color: theme.palette.primary.main,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             maxWidth: '100%',
-          }}
+            [theme.breakpoints.down('sm')]: {
+              fontSize: '1.5rem',
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+            },
+            [theme.breakpoints.up('sm')]: {
+              whiteSpace: 'nowrap',
+            },
+          })}
         >
           {setName}
         </Typography>
