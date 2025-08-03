@@ -1,8 +1,11 @@
+'use client';
+
 import { Suspense } from 'react';
 import { CircularProgress, Box } from '@mui/material';
 import { GoalsClient } from './GoalsClient';
+import { withAuth } from '@/components/auth/withAuth';
 
-export default function GoalsPage() {
+function GoalsPage() {
   return (
     <Suspense
       fallback={
@@ -15,3 +18,5 @@ export default function GoalsPage() {
     </Suspense>
   );
 }
+
+export default withAuth(GoalsPage);

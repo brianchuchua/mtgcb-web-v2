@@ -1,8 +1,11 @@
+'use client';
+
 import { Suspense } from 'react';
 import { CircularProgress, Box } from '@mui/material';
 import { ResetCollectionClient } from './ResetCollectionClient';
+import { withAuth } from '@/components/auth/withAuth';
 
-export default function ResetCollectionPage() {
+function ResetCollectionPage() {
   return (
     <Suspense
       fallback={
@@ -15,3 +18,5 @@ export default function ResetCollectionPage() {
     </Suspense>
   );
 }
+
+export default withAuth(ResetCollectionPage);

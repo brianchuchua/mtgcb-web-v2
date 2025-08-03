@@ -32,7 +32,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - New price updater
 - In-code TODO audit
 - Feature parity audit
-- Audit routes that require authentication
 - Most valuable card collected, maybe in the set header
 - Handle double-sided, sideways, and flip cards
 - New price updater that updates directly in the new database, separate from the old legacy updater
@@ -202,7 +201,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Card comments and rating
 - Patron request: Scryfall syntax support for searches
 
-## Future Enhancements
+## Future Enhancements to Existing Features
 
 ### Locations
 

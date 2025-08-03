@@ -39,10 +39,15 @@ const Header = () => {
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             MTG CB
-            <Tooltip title="Last Updated: 2025-08-02" arrow>
+            <Tooltip title="Last Updated: 2025-08-03" arrow>
               <Link href="/changelog" style={{ textDecoration: 'none', marginLeft: '4px' }}>
-                <Typography variant="caption" color="text.secondary" component="span" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
-                  v0.90.0
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  component="span"
+                  sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                >
+                  v0.91.3
                 </Typography>
               </Link>
             </Tooltip>

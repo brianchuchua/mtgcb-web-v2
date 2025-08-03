@@ -1,10 +1,13 @@
+'use client';
+
 import { Suspense } from 'react';
 import CreateLocationClient from './CreateLocationClient';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
+import { withAuth } from '@/components/auth/withAuth';
 
-export default function CreateLocationPage() {
+function CreateLocationPage() {
   return (
     <Suspense 
       fallback={
@@ -19,3 +22,5 @@ export default function CreateLocationPage() {
     </Suspense>
   );
 }
+
+export default withAuth(CreateLocationPage);

@@ -1,8 +1,11 @@
+'use client';
+
 import { Suspense } from 'react';
 import { CircularProgress, Box } from '@mui/material';
 import { ImportClient } from './ImportClient';
+import { withAuth } from '@/components/auth/withAuth';
 
-export default function ImportPage() {
+function ImportPage() {
   return (
     <Suspense
       fallback={
@@ -15,3 +18,5 @@ export default function ImportPage() {
     </Suspense>
   );
 }
+
+export default withAuth(ImportPage);

@@ -1,14 +1,16 @@
+'use client';
+
 import { EditGoalClient } from './EditGoalClient';
+import { withAuth } from '@/components/auth/withAuth';
 
 interface EditGoalPageProps {
-  params: Promise<{
+  params: {
     goalId: string;
-  }>;
+  };
 }
 
-export default async function EditGoalPage({ params }: EditGoalPageProps) {
-  const { goalId: goalIdParam } = await params;
-  const goalId = parseInt(goalIdParam, 10);
+function EditGoalPage({ params }: EditGoalPageProps) {
+  const goalId = parseInt(params.goalId, 10);
   
   if (isNaN(goalId)) {
     return <div>Invalid goal ID</div>;
@@ -16,3 +18,5 @@ export default async function EditGoalPage({ params }: EditGoalPageProps) {
 
   return <EditGoalClient goalId={goalId} />;
 }
+
+export default withAuth(EditGoalPage);
