@@ -37,10 +37,12 @@ const Header = () => {
           >
             {isMobileOpen ? <KeyboardDoubleArrowLeftIcon /> : <MenuIcon />}
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            MTG CB
+          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'baseline', gap: 1 }}>
+            <Typography variant="h6" component="div">
+              MTG CB
+            </Typography>
             <Tooltip title="Last Updated: 2025-08-03" arrow>
-              <Link href="/changelog" style={{ textDecoration: 'none', marginLeft: '4px' }}>
+              <Link href="/changelog" style={{ textDecoration: 'none' }}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -51,7 +53,7 @@ const Header = () => {
                 </Typography>
               </Link>
             </Tooltip>
-          </Typography>
+          </Box>
           <AccountMenu />
         </Toolbar>
       </StyledAppBar>

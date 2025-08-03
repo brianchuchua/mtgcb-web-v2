@@ -25,7 +25,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Uncategorized
 
-- breadcrumbs should never go to two lines
 - Subset data automation and clean-up (basically audit subset groups that have cards in them directly)
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
 - Home page (landing page or statistics dashboard depending on login state, perhaps most valuable card can live here)
@@ -45,9 +44,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
 - When idle: Migrate TODOs from README.md to this file
-- Probably need to support hide duplicate printings in the set view too
-- Full end-to-end test suite, generate test cases, then automate
-- Testing: Purchasing buttons with different settings
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
 - Preload stuff on pagination hover?
 - mass entry, add collector number
@@ -97,7 +93,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## UX Action Items
 
-- I don't like the mobile header, version number too close to page name, maybe need to center on mobile
 - bottom pagination, return to top of page
 - weird flicker with specific cards to include or exclude in goal forms
 - Card frame with "..." doesn't look good with 6 width cards -- maybe just get rid of 6 as an option?
@@ -220,6 +215,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - The Great Double-Sided Token Mess™
 - Auditing for and preventing duplicate releasedAt dates in sets
 - canBeFoil and canBeNonFoil data cleanup and interaction with etched foils, see Mountain (674) from Secret Lair and compare to tcgplayer data -- see also Culling the Weak and rainbow foils
+
+### Testing
+
+- End-to-end tests for every user action in the test environment
 
 ## Maybes
 
