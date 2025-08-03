@@ -276,7 +276,9 @@ const VirtualizedTable = <T,>({
   );
 };
 
-const StyledTableRow = styled(TableRow)<{ isIncomplete?: boolean }>(({ theme, isIncomplete }) => ({
+const StyledTableRow = styled(TableRow, {
+  shouldForwardProp: (prop) => prop !== 'isIncomplete',
+})<{ isIncomplete?: boolean }>(({ theme, isIncomplete }) => ({
   transition: 'background-color 0.2s ease, opacity 0.2s ease',
   position: 'relative',
   overflow: 'hidden',

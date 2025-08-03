@@ -43,7 +43,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Current Action Items
 
 - instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
-- verify default visibility for set boxes and card box fields
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
 - When idle: Migrate TODOs from README.md to this file
@@ -99,6 +98,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## UX Action Items
 
+- bottom pagination, return to top of page
 - weird flicker with specific cards to include or exclude in goal forms
 - Card frame with "..." doesn't look good with 6 width cards -- maybe just get rid of 6 as an option?
 - Audit subsets with collection goals -- data and appearance.
@@ -167,7 +167,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Bugs
 
-- Severe: Scrolling far down during the virtualization of the set grid view by clicking halfway through scrollbar while viewing 500 sets, jumping up and down in a loop -- maybe need to render further down or something?
 - Moderate: Draft cube calculation when track subsets with sets in on is wrong, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir -- it's incorrectly counting non main set cards as missing just in terms of the value
 - Moderate+ Bug: Collector number sort is broken in collector table view, probably not using the numeric version of collector number
 - Bug: Release date desc in sets view is applying to cards view when switching
