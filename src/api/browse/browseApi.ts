@@ -24,7 +24,7 @@ export const browseApi = mtgcbApi.injectEndpoints({
       serializeQueryArgs: ({ queryArgs }) => {
         if (!queryArgs) return '';
 
-        const { limit = 24, offset = 0, sortBy, sortDirection = 'asc', ...rest } = queryArgs;
+        const { limit = 20, offset = 0, sortBy, sortDirection = 'asc', ...rest } = queryArgs;
         const paginationKey = `limit=${limit}&offset=${offset}`;
         const sortKey = sortBy ? `&sort=${sortBy}:${sortDirection}` : '';
         const filterKey = JSON.stringify(rest);
@@ -50,7 +50,7 @@ export const browseApi = mtgcbApi.injectEndpoints({
       serializeQueryArgs: ({ queryArgs }) => {
         if (!queryArgs) return '';
 
-        const { limit = 24, offset = 0, sortBy, sortDirection = 'asc', ...rest } = queryArgs;
+        const { limit = 20, offset = 0, sortBy, sortDirection = 'asc', ...rest } = queryArgs;
         const paginationKey = `limit=${limit}&offset=${offset}`;
         const sortKey = sortBy ? `&sort=${sortBy}:${sortDirection}` : '';
         const filterKey = JSON.stringify(rest);

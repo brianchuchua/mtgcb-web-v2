@@ -90,13 +90,13 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     type: 'number',
     mode: 'cards',
     urlParam: 'cardsPageSize',
-    defaultValue: 24,
+    defaultValue: 20,
   },
   setsPageSize: {
     type: 'number',
     mode: 'sets',
     urlParam: 'setsPageSize',
-    defaultValue: 24,
+    defaultValue: 20,
   },
 
   cardsSortBy: {

@@ -52,9 +52,9 @@ test.describe('Browse Page', () => {
     
     // Note: Virtualization may adjust the number of rendered items based on viewport
     
-    // Verify page info shows the correct total (should show "1-24 of X")
+    // Verify page info shows the correct total (should show "1-20 of X")
     const pageInfo = await page.getByTestId('page-info').textContent();
-    expect(pageInfo).toMatch(/1-24 of \d+/);
+    expect(pageInfo).toMatch(/1-20 of \d+/);
   });
 
   test('should have clickable set names that navigate to set details', async ({ page }) => {

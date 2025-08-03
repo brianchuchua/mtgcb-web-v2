@@ -32,7 +32,7 @@ const initialState: {
   cardsSearchParams: {
     // Default pagination for cards
     currentPage: 1,
-    pageSize: 24,
+    pageSize: 20,
     viewMode: 'grid',
     sortBy: 'releasedAt',
     sortOrder: 'asc', // Cards default to ascending (oldest first)
@@ -40,7 +40,7 @@ const initialState: {
   setsSearchParams: {
     // Default pagination for sets
     currentPage: 1,
-    pageSize: 24,
+    pageSize: 20,
     viewMode: 'grid',
     showSubsets: true,
     includeSubsetsInSets: false,
@@ -261,7 +261,7 @@ export const browseSlice = createSlice({
       // Preserve pagination if not provided in the payload
       const pagination = {
         currentPage: state.cardsSearchParams.currentPage || 1,
-        pageSize: state.cardsSearchParams.pageSize || 24,
+        pageSize: state.cardsSearchParams.pageSize || 20,
         viewMode: state.cardsSearchParams.viewMode || 'grid',
       };
 
@@ -286,7 +286,7 @@ export const browseSlice = createSlice({
       // Preserve pagination if not provided in the payload
       const pagination = {
         currentPage: state.setsSearchParams.currentPage || 1,
-        pageSize: state.setsSearchParams.pageSize || 24,
+        pageSize: state.setsSearchParams.pageSize || 20,
         viewMode: state.setsSearchParams.viewMode || 'grid',
       };
 
@@ -316,12 +316,12 @@ export const browseSlice = createSlice({
         state.viewContentType === 'cards'
           ? {
               currentPage: state.cardsSearchParams.currentPage || 1,
-              pageSize: state.cardsSearchParams.pageSize || 24,
+              pageSize: state.cardsSearchParams.pageSize || 20,
               viewMode: state.cardsSearchParams.viewMode || 'grid',
             }
           : {
               currentPage: state.setsSearchParams.currentPage || 1,
-              pageSize: state.setsSearchParams.pageSize || 24,
+              pageSize: state.setsSearchParams.pageSize || 20,
               viewMode: state.setsSearchParams.viewMode || 'grid',
             };
 
@@ -389,13 +389,13 @@ export const browseSlice = createSlice({
       // Reset both cards and sets search params but preserve pagination
       const cardsPagination = {
         currentPage: state.cardsSearchParams.currentPage || 1,
-        pageSize: state.cardsSearchParams.pageSize || 24,
+        pageSize: state.cardsSearchParams.pageSize || 20,
         viewMode: state.cardsSearchParams.viewMode || 'grid',
       };
 
       const setsPagination = {
         currentPage: state.setsSearchParams.currentPage || 1,
-        pageSize: state.setsSearchParams.pageSize || 24,
+        pageSize: state.setsSearchParams.pageSize || 20,
         viewMode: state.setsSearchParams.viewMode || 'grid',
       };
 
@@ -543,8 +543,8 @@ export const selectCurrentPage = (state: RootState) =>
 
 export const selectPageSize = (state: RootState) =>
   state.browse.viewContentType === 'cards'
-    ? state.browse.cardsSearchParams.pageSize || 24
-    : state.browse.setsSearchParams.pageSize || 24;
+    ? state.browse.cardsSearchParams.pageSize || 20
+    : state.browse.setsSearchParams.pageSize || 20;
 
 // Card-specific selectors
 export const selectCardSearchParams = (state: RootState) => state.browse.cardsSearchParams;
@@ -561,7 +561,7 @@ export const selectIncludeBadDataOnly = (state: RootState) => state.browse.cards
 export const selectCardSortBy = (state: RootState) => state.browse.cardsSearchParams.sortBy;
 export const selectCardSortOrder = (state: RootState) => state.browse.cardsSearchParams.sortOrder;
 export const selectCardCurrentPage = (state: RootState) => state.browse.cardsSearchParams.currentPage || 1;
-export const selectCardPageSize = (state: RootState) => state.browse.cardsSearchParams.pageSize || 24;
+export const selectCardPageSize = (state: RootState) => state.browse.cardsSearchParams.pageSize || 20;
 
 // Set-specific selectors
 export const selectSetSearchParams = (state: RootState) => state.browse.setsSearchParams;
@@ -570,7 +570,7 @@ export const selectSetCode = (state: RootState) => state.browse.setsSearchParams
 export const selectSetSortBy = (state: RootState) => state.browse.setsSearchParams.sortBy;
 export const selectSetSortOrder = (state: RootState) => state.browse.setsSearchParams.sortOrder;
 export const selectSetCurrentPage = (state: RootState) => state.browse.setsSearchParams.currentPage || 1;
-export const selectSetPageSize = (state: RootState) => state.browse.setsSearchParams.pageSize || 24;
+export const selectSetPageSize = (state: RootState) => state.browse.setsSearchParams.pageSize || 20;
 export const selectSetCategories = (state: RootState) => state.browse.setsSearchParams.setCategories;
 export const selectSetTypes = (state: RootState) => state.browse.setsSearchParams.setTypes;
 export const selectShowSubsets = (state: RootState) => state.browse.setsSearchParams.showSubsets !== false;

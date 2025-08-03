@@ -23,7 +23,7 @@ export const useSearchFromUrl = () => {
 
   const contentType = searchParams.get('contentType') === 'sets' ? 'sets' : 'cards';
   const currentPage = 1;
-  const pageSize = parseInt(searchParams.get(contentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '24', 10);
+  const pageSize = parseInt(searchParams.get(contentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '20', 10);
 
   useEffect(() => {
     const apiParams: CardApiParams = {

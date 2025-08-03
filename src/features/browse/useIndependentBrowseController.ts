@@ -42,7 +42,7 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
   
   // Local state for pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(24);
+  const [pageSize, setPageSize] = useState(20);
   
   // Local state for view mode
   const [viewMode, setViewMode] = usePreferredCardViewMode();

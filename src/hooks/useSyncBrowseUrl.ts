@@ -16,7 +16,7 @@ export const useSyncBrowseUrl = () => {
   const [pagination, setPagination] = useState<BrowsePagination>({
     currentPage: 1,
     pageSize: parseInt(
-      currentSearchParams.get(viewContentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '24',
+      currentSearchParams.get(viewContentType === 'cards' ? 'cardsPageSize' : 'setsPageSize') || '20',
       10,
     ),
     viewMode: currentSearchParams.get('view') === 'table' ? 'table' : 'grid',
@@ -82,7 +82,7 @@ export const useSyncBrowseUrl = () => {
       }
     }
 
-    if (pagination.pageSize !== 24) {
+    if (pagination.pageSize !== 20) {
       // Only add if not default
       params.set(viewContentType === 'cards' ? 'cardsPageSize' : 'setsPageSize', pagination.pageSize.toString());
     }

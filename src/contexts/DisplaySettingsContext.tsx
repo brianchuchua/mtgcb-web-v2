@@ -1,26 +1,26 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { PriceType } from '@/types/pricing';
 
 interface DisplaySettings {
   // Price settings
   priceType: PriceType;
-  
+
   // View preferences
   preferredViewMode: 'grid' | 'table';
   preferredCardViewMode: 'grid' | 'table';
   preferredSetViewMode: 'grid' | 'table';
-  
+
   // Page sizes
   cardsPageSize: number;
   setsPageSize: number;
-  
+
   // Layout settings
   cardsPerRow: number;
   cardSizeMargin: number;
   setsPerRow: number;
-  
+
   // Card display settings
   cardNameIsVisible: boolean;
   cardSetIconIsVisible: boolean;
@@ -35,7 +35,7 @@ interface DisplaySettings {
   cardOwnedFoilIsVisible: boolean;
   cardGoalProgressIsVisible: boolean;
   cardLocationsIsVisible: boolean;
-  
+
   // Set display settings (grid view)
   setNameIsVisible: boolean;
   setCodeIsVisible: boolean;
@@ -47,7 +47,7 @@ interface DisplaySettings {
   setPercentCollectedIsVisible: boolean;
   setCardsCollectedIsVisible: boolean;
   setIconIsVisible: boolean;
-  
+
   // Table-specific card settings
   cardNumberIsVisible: boolean;
   convertedManaCostIsVisible: boolean;
@@ -63,7 +63,7 @@ interface DisplaySettings {
   tableToughnessIsVisible: boolean;
   tableSetIsVisible: boolean;
   tablePriceIsVisible: boolean;
-  
+
   // Table-specific set settings
   tableSetCodeIsVisible: boolean;
   tableSetCardCountIsVisible: boolean;
@@ -71,13 +71,13 @@ interface DisplaySettings {
   tableSetTypeIsVisible: boolean;
   tableSetCategoryIsVisible: boolean;
   tableSetIsDraftableIsVisible: boolean;
-  
+
   // Collection-specific settings
   quantityIsVisible: boolean;
   lastModifiedIsVisible: boolean;
   tableQuantityIsVisible: boolean;
   tableLocationsIsVisible: boolean;
-  
+
   // Collection set-specific settings
   completionIsVisible: boolean;
   costToCompleteIsVisible: boolean;
@@ -97,21 +97,21 @@ interface DisplaySettingsContextType {
 const DEFAULT_SETTINGS: DisplaySettings = {
   // Price settings
   priceType: PriceType.Market,
-  
+
   // View preferences
   preferredViewMode: 'grid',
   preferredCardViewMode: 'grid',
   preferredSetViewMode: 'grid',
-  
+
   // Page sizes
-  cardsPageSize: 24,
-  setsPageSize: 24,
-  
+  cardsPageSize: 20,
+  setsPageSize: 20,
+
   // Layout settings
   cardsPerRow: 5,
   cardSizeMargin: 0.75,
   setsPerRow: 0, // 0 means auto
-  
+
   // Card display settings
   cardNameIsVisible: true,
   cardSetIconIsVisible: true,
@@ -126,7 +126,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   cardOwnedFoilIsVisible: true,
   cardGoalProgressIsVisible: false,
   cardLocationsIsVisible: true,
-  
+
   // Set display settings (grid view)
   setNameIsVisible: true,
   setCodeIsVisible: true,
@@ -138,7 +138,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   setPercentCollectedIsVisible: true,
   setCardsCollectedIsVisible: true,
   setIconIsVisible: true,
-  
+
   // Table-specific card settings
   cardNumberIsVisible: true,
   convertedManaCostIsVisible: false,
@@ -154,7 +154,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   tableToughnessIsVisible: false,
   tableSetIsVisible: true,
   tablePriceIsVisible: true,
-  
+
   // Table-specific set settings
   tableSetCodeIsVisible: true,
   tableSetCardCountIsVisible: true,
@@ -162,13 +162,13 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   tableSetTypeIsVisible: true,
   tableSetCategoryIsVisible: true,
   tableSetIsDraftableIsVisible: false,
-  
+
   // Collection-specific settings
   quantityIsVisible: true,
   lastModifiedIsVisible: false,
   tableQuantityIsVisible: true,
   tableLocationsIsVisible: true,
-  
+
   // Collection set-specific settings
   completionIsVisible: true,
   costToCompleteIsVisible: true,
@@ -185,14 +185,14 @@ const DisplaySettingsContext = createContext<DisplaySettingsContextType | undefi
 export function DisplaySettingsProvider({ children }: { children: React.ReactNode }) {
   // Check if we're on the client
   const isClient = typeof window !== 'undefined';
-  
+
   // Initialize settings - on server use defaults, on client read from localStorage
   const [settings, setSettings] = useState<DisplaySettings>(() => {
     if (!isClient) {
       // Server side - always use defaults
       return DEFAULT_SETTINGS;
     }
-    
+
     // Client side - try to read from localStorage
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
@@ -204,10 +204,9 @@ export function DisplaySettingsProvider({ children }: { children: React.ReactNod
     } catch (error) {
       console.warn('Error loading display settings:', error);
     }
-    
+
     return DEFAULT_SETTINGS;
   });
-
 
   // Save to localStorage whenever settings change
   const saveSettings = useCallback((newSettings: DisplaySettings) => {
@@ -220,42 +219,44 @@ export function DisplaySettingsProvider({ children }: { children: React.ReactNod
     }
   }, []);
 
-  const updateSetting = useCallback(<K extends keyof DisplaySettings>(
-    key: K,
-    value: DisplaySettings[K]
-  ) => {
-    setSettings(prev => {
-      const newSettings = { ...prev, [key]: value };
-      saveSettings(newSettings);
-      return newSettings;
-    });
-  }, [saveSettings]);
+  const updateSetting = useCallback(
+    <K extends keyof DisplaySettings>(key: K, value: DisplaySettings[K]) => {
+      setSettings((prev) => {
+        const newSettings = { ...prev, [key]: value };
+        saveSettings(newSettings);
+        return newSettings;
+      });
+    },
+    [saveSettings],
+  );
 
-  const updateMultipleSettings = useCallback((updates: Partial<DisplaySettings>) => {
-    setSettings(prev => {
-      const newSettings = { ...prev, ...updates };
-      saveSettings(newSettings);
-      return newSettings;
-    });
-  }, [saveSettings]);
+  const updateMultipleSettings = useCallback(
+    (updates: Partial<DisplaySettings>) => {
+      setSettings((prev) => {
+        const newSettings = { ...prev, ...updates };
+        saveSettings(newSettings);
+        return newSettings;
+      });
+    },
+    [saveSettings],
+  );
 
   const resetToDefaults = useCallback(() => {
     setSettings(DEFAULT_SETTINGS);
     saveSettings(DEFAULT_SETTINGS);
   }, [saveSettings]);
 
-  const value = useMemo(() => ({
-    settings,
-    updateSetting,
-    updateMultipleSettings,
-    resetToDefaults
-  }), [settings, updateSetting, updateMultipleSettings, resetToDefaults]);
-
-  return (
-    <DisplaySettingsContext.Provider value={value}>
-      {children}
-    </DisplaySettingsContext.Provider>
+  const value = useMemo(
+    () => ({
+      settings,
+      updateSetting,
+      updateMultipleSettings,
+      resetToDefaults,
+    }),
+    [settings, updateSetting, updateMultipleSettings, resetToDefaults],
   );
+
+  return <DisplaySettingsContext.Provider value={value}>{children}</DisplaySettingsContext.Provider>;
 }
 
 export function useDisplaySettings() {
