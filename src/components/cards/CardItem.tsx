@@ -350,7 +350,12 @@ const CardItemComponent = ({
                   horizontal: 'right',
                 }}
               >
-                <MenuItem onClick={handleAddLocations}>Add card location(s)</MenuItem>
+                <MenuItem 
+                  onClick={handleAddLocations}
+                  disabled={!quantityReg && !quantityFoil}
+                >
+                  Add card location(s)
+                </MenuItem>
               </Menu>
             </Box>
           )}

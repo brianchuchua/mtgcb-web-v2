@@ -375,16 +375,17 @@ export default function CardLocationPills({
           />
         ))}
         {onAddLocation && (
-          <Tooltip title="Add card location(s)" placement="top">
+          <Tooltip title={!totalQuantityReg && !totalQuantityFoil ? "No cards in collection to assign" : "Add card location(s)"} placement="top">
             <Chip
               label="+"
               onClick={onAddLocation}
+              disabled={!totalQuantityReg && !totalQuantityFoil}
               size="small"
               sx={{
-                cursor: 'pointer',
+                cursor: !totalQuantityReg && !totalQuantityFoil ? 'not-allowed' : 'pointer',
                 color: 'text.secondary',
                 borderColor: 'divider',
-                '&:hover': {
+                '&:hover': !totalQuantityReg && !totalQuantityFoil ? {} : {
                   backgroundColor: 'action.hover',
                   borderColor: 'text.secondary',
                 },

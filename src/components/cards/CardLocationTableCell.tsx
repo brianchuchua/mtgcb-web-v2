@@ -34,7 +34,9 @@ export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
 
   const handleAddLocation = (event: React.MouseEvent) => {
     event.stopPropagation();
-    setLocationDialogOpen(true);
+    if (totalQuantityReg || totalQuantityFoil) {
+      setLocationDialogOpen(true);
+    }
   };
 
   return (
@@ -58,11 +60,12 @@ export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
             label="Add Card to Location"
             onClick={handleAddLocation}
             size="small"
+            disabled={!totalQuantityReg && !totalQuantityFoil}
             sx={{
-              cursor: 'pointer',
+              cursor: !totalQuantityReg && !totalQuantityFoil ? 'not-allowed' : 'pointer',
               color: 'text.secondary',
               borderColor: 'divider',
-              '&:hover': {
+              '&:hover': !totalQuantityReg && !totalQuantityFoil ? {} : {
                 backgroundColor: 'action.hover',
                 borderColor: 'text.secondary',
               },
