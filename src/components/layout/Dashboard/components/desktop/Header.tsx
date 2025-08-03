@@ -6,8 +6,10 @@ import AppBar, { AppBarProps } from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
+import Link from 'next/link';
 import { AccountMenu } from '@/components/layout/Dashboard/components/AccountMenu';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
@@ -28,9 +30,18 @@ export const Header = () => {
           >
             {isDesktopOpen ? <KeyboardDoubleArrowLeftIcon /> : <MenuIcon />}
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            MTG Collection Builder
-          </Typography>
+          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'baseline', gap: 1 }}>
+            <Typography variant="h6" component="div">
+              MTG Collection Builder
+            </Typography>
+            <Tooltip title="Last Updated: 2025-08-02" arrow>
+              <Link href="/changelog" style={{ textDecoration: 'none' }}>
+                <Typography variant="caption" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
+                  v0.90.0
+                </Typography>
+              </Link>
+            </Tooltip>
+          </Box>
           <AccountMenu />
         </Toolbar>
       </TopBar>

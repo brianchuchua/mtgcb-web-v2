@@ -6,37 +6,40 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Remaining Major Feature Work Before 1.0
 
-- Card page, for browse and collection contexts, showing other printings needs to be cool
-- User migration -- what if they try a password reset from the new site before logging in? Make sure that works with the migration system.
-- Deck completion
-  - cards should show which decks they are in
-  - Deck building needs to support choosing specific cards so their locations can be labeled
-- Data issues section to show cards that need quantities fixed
+### Privacy Mode
+
+### Card Page
+
+- For browse and colletion contexts
+- Show other printings
+
+### Patron Support Page
+
+### Home Page
+
+### Terms and Conditions
+
+### Migration Path
+
 - Proper flavor name support
 - Left <> right set navigation
-- Art cards
-- Patron support features
-- Privacy mode
-- Cards page
 - Subset data automation and clean-up (basically audit subset groups that have cards in them directly)
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
 - Home page (landing page or statistics dashboard depending on login state, perhaps most valuable card can live here)
 - New price updater
-- Legal disclaimer / terms and conditions research / clear estimate labeling
 - In-code TODO audit
 - Feature parity audit
 - Audit routes that require authentication
 - Most valuable card collected, maybe in the set header
 - Handle double-sided, sideways, and flip cards
-- Art Series cards
 - New price updater that updates directly in the new database, separate from the old legacy updater
 - Audit input field lengths for all API calls
 - Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages
 - Brainstorm patron cosmetic perks
-- canBeFoil/canBeNonFoil -- need to have a page showing all the cards with bad data
 
 ### Current Action Items
 
+- instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
 - verify default visibility for set boxes and card box fields
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
@@ -48,10 +51,26 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 - Preload stuff on pagination hover?
 - mass entry, add collector number
 - roadmap page
-- version number near the title (it links to the changelog, on hover shows last updated date)
 -
 
-## Other Action Items
+## Other Action Items Before Launch
+
+### Organizational
+
+- Move all TODOs from README.md to this file
+
+### Importer
+
+- Error messages aren't great. Try Moxfield. "3285 Card Chrome Mox Could not find card "Chrome Mox"" -- should say the set that was attempted too.
+- Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
+
+### UX
+
+- Consistent header, body, and breadcrumb styles
+- Consistent error and info message styles
+- Clearly label collection values as estimates
+
+### Uncagetorized
 
 - verify the individual value of sets, when added up, add up to the collection value -- Chris request on Discord
 - nuke collection button
@@ -177,10 +196,14 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 ## Future Features
 
+- Art Series cards
+- Deck Completion
 - Foreign Cards
 - Sealed product support
 - Button to report missing card data, notify user if link to scryfall or tcgplayer is missing
 - Financial history tracking, collection value history, etc.
+- Card comments and rating
+- Patron request: Scryfall syntax support for searches
 
 ## Future Enhancements
 
@@ -196,10 +219,10 @@ Best to keep them in the codebase for now, especially since I'm a team of one.
 
 - Perhaps don't include location data in searches when the user has no locations, may need a preflight check for this
 
-## Patron Requests
+### Data Improvements
 
-- Search with scryfall syntax
-- "In terms of import/export, I've got a ton of decks in Moxfield. I'd love the ability to import a deck from Moxfield and then add the name of the Moxfield deck to a location field to help indicate within MTG Collection Builder that a specific card is in a specific Commander deck. Not sure if that's what you were asking with regard to importers and exporters, but it's something that would make my life easier....." "Exactly! This one would be just to import for the location, not to add to the collection. Of course, it would be an added bonus if there were some sort of error handling in case I chose a card variant in Moxfield that I have 0 of in my collection which would notify me so I could change the variant within Moxfield."
+- The Great Double-Sided Token Mess™
+- canBeFoil and canBeNonFoil data cleanup and interaction with etched foils, see Mountain (674) from Secret Lair and compare to tcgplayer data -- see also Culling the Weak and rainbow foils
 
 ## Maybes
 
