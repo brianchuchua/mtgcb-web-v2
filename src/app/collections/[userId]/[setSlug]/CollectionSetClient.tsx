@@ -324,12 +324,6 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       {/* Show CollectionHeader when viewing with a goal selected */}
       {selectedGoalId && collectionSummary && set && (
         <Box sx={{ position: 'relative' }}>
-          <SetNavigationButtons
-            previousSet={previousSet}
-            nextSet={nextSet}
-            onNavigate={handleSetNavigation}
-          />
-          
           <CollectionHeader
           username={username || ''}
           userId={userId}

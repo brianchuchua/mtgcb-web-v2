@@ -25,8 +25,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Uncategorized
 
-BUG: Set value of 0 http://local.mtgcb.com:3000/collections/100114/limited-edition-alpha?includeSets=1
-
+- prevent trying to add a card to a location if you don't have any of that card yet
 - mobile view set name is too big
 - breadcrumbs should never go to two lines
 - Subset data automation and clean-up (basically audit subset groups that have cards in them directly)
@@ -221,6 +220,7 @@ BUG: Set value of 0 http://local.mtgcb.com:3000/collections/100114/limited-editi
 ### Data Improvements
 
 - The Great Double-Sided Token Mess™
+- Auditing for and preventing duplicate releasedAt dates in sets
 - canBeFoil and canBeNonFoil data cleanup and interaction with etched foils, see Mountain (674) from Secret Lair and compare to tcgplayer data -- see also Culling the Weak and rainbow foils
 
 ## Maybes
