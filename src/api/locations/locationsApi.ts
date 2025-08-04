@@ -107,8 +107,11 @@ export const locationsApi = mtgcbApi.injectEndpoints({
       },
     }),
 
-    getLocationHierarchy: builder.query<ApiResponse<LocationHierarchy[]>, void>({
-      query: () => '/locations/hierarchy',
+    getLocationHierarchy: builder.query<ApiResponse<LocationHierarchy[]>, { userId?: number } | void>({
+      query: (params) => ({
+        url: '/locations/hierarchy',
+        params: params || {},
+      }),
       providesTags: [{ type: 'Location', id: 'HIERARCHY' }],
     }),
   }),

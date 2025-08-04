@@ -4,42 +4,10 @@ I've found over time that maintaining my action items for code in external tools
 
 Best to keep them in the codebase, especially since I'm a team of one.
 
-## Remaining Major Feature Work Before 1.0
+## Current Action Items
 
-### Privacy Mode
-
-### Card Page
-
-- For browse and colletion contexts
-- Show other printings
-
-### Patron Support Page
-
-### Home Page
-
-- Should show most valuable card, statistics, etc. I think. Although need stats somewhere else too, maybe in every header of every collection page.
-
-### Terms and Conditions
-
-### Migration Path
-
-### Uncategorized
-
-- Subset data automation and clean-up (basically audit subset groups that have cards in them directly)
-- Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
-- Home page (landing page or statistics dashboard depending on login state, perhaps most valuable card can live here)
-- New price updater
-- In-code TODO audit
-- Feature parity audit (permalink)
-- Most valuable card collected, maybe in the set header
-- Handle double-sided, sideways, and flip cards
-- New price updater that updates directly in the new database, separate from the old legacy updater
-- Audit input field lengths for all API calls
-- Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages
-- Brainstorm patron cosmetic perks
-
-### Current Action Items
-
+- CURRENT TASK: Working on the Privacy Mode now
+  - Need to test viewing another user's collection while logged into your own account
 - When idle: Migrate TODOs from README.md to this file
 - instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
 - Exclude tokens from progress bars when includeSubsetsInSets is true.
@@ -50,6 +18,43 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - roadmap page (maybe just on the changelog page)
 - mention binders on home page
 - faq page
+
+## Remaining Major Feature Work Before 1.0
+
+### Privacy Mode
+
+- Pretty simple -- an isPrivate flag on the user that hides their collection from other users, but still allows them to use the site normally. Guards all endpoints that return user data, like collections, and hides them from the UI. Puts up a nice message if someone tries to access a private collection.
+- Should show their collection is private somewhere. And show a share link to the collection that will show a message that the collection is private.
+
+### Card Page
+
+- For browse and collection contexts
+- Show other printings
+
+### Patron Support Page
+
+- A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.
+
+### Home Page
+
+- Should show most valuable card, statistics, etc. I think. Although need stats somewhere else too, maybe in every header of every collection page.
+
+### Terms and Conditions
+
+- Need to research and implement. I really don't want to make my users have to check an agree box, but need to understand the legal requirement. Biggest concern is bad TCGPlayer data gives an inaccurate collection value and then they make financial decisions based on that. I think a disclaimer is enough, but need to research.
+
+### Account Deletion
+
+- A way for users to delete their account and all associated data. This should be a simple API call that removes the user and all their data, including collections, cards, etc.
+
+### Migration Path
+
+### FAQ Page
+
+### Testing
+
+- Mobile
+- Tablet
 
 ## Other Action Items Before Launch
 
@@ -68,7 +73,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Consistent error and info message styles
 - Clearly label collection values as estimates
 
-### Uncagetorized
+### Uncategorized
 
 - verify the individual value of sets, when added up, add up to the collection value -- Chris request on Discord
 - youtube channel for how to use the site
@@ -91,6 +96,17 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Shopping lists -- reports based on collection goals
 - TCGPlayer supports adding a collector number after the set code -- needed for things like secret lair that have duplicate names
 - Allow selection of default collection goal
+- Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
+- Home page (landing page or statistics dashboard depending on login state, perhaps most valuable card can live here)
+- New price updater
+- In-code TODO audit
+- Feature parity audit (permalink)
+- Most valuable card collected, maybe in the set header
+- Handle double-sided, sideways, and flip cards
+- New price updater that updates directly in the new database, separate from the old legacy updater
+- Audit input field lengths for all API calls
+- Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages
+- Brainstorm patron cosmetic perks
 
 ## UX Action Items
 
@@ -133,7 +149,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - See if still happening: On mobile, the hover over card name is doing the whole row, not just the card name
 - Confetti when hitting 100% collection progress, see legacy implementation
 - Alternating table row colors, I feel like the bright ones are too bright
-- Allow user to show/hide card quantities in table view
 - UX - Make the tab indexes only go to the quantity fields
 - Maybe: Improve rendering of reg and foil quantity when not logged in grid view
 - UX - Why do the pop-ups not dismiss if the screen isn't active?
@@ -215,6 +230,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - The Great Double-Sided Token Mess™
 - Auditing for and preventing duplicate releasedAt dates in sets
 - canBeFoil and canBeNonFoil data cleanup and interaction with etched foils, see Mountain (674) from Secret Lair and compare to tcgplayer data -- see also Culling the Weak and rainbow foils
+- Subset data automation and clean-up (basically audit subset groups that have cards in them directly and sets that should be subsets)
 
 ### Testing
 
@@ -261,3 +277,89 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ## Data Decisions
 
 - Tokens count as part of a set if they're promotional in nature
+
+# TODOs from the README.md file
+
+## Now
+
+### Next
+
+- Continue moving these notes to TODO.md during downtime
+
+- Patron request: Add card number to card name, perhaps as a setting
+- Clean up code base to be more my style -- some of the vibe coding results aren't as readable as my style
+- API Concern: compare "archenemy" set types to NOT "archenemy" set types -- there's an unaccounted for difference in the results length
+- Nuke placeholder error state and improve
+- Test API and database outages
+- Plan for system wide messages
+- Audit back and forward button
+- Confetti when hitting 100%, see legacy implementation
+- FNM Promos are a interesting corner case -- it's a subset group, but also has a child set, General FNM Promos. Need to test everything.
+- Patron request: Highlight recently updated card in some way, perhaps the input box or the price
+- Home page, call to action to register or login
+- Iterate on the complete collection animation for the circular progress bar
+- Smarter knowledge if cards can be foil -- check status of scryfall data for this
+
+## Later
+
+- Consult with an UX designer
+- Sonarcube integration
+- 1024x768 testing of table view and gridview and menus with sidenav open (or determine target resolution)
+- Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
+- Clean up MTG CB collector number
+- Make a cool stats page
+- S3 image storage is costing a lot of money, look into alternatives like Cloudflare R2, Vercel Blob Storage, Cloudflare Images, Digital Ocean Spaces, etc.
+- BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set. Need to tiebreak with card release date.
+- Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
+- Use the new TCGPlayer domain (see below)
+- An Exclude Bulk feature for a collection's value
+- Compare Vercel to Heroku for hosting
+- Data issue: Release date for some sets cause sorting issues if they're exactly the same. Need to nudge some by 1 second.
+- Sorting by release date for cards by using their set's release date isn't great for aggregate sets like Prerelease Cards.
+- Reduce image file size.
+- Remove Artist table, prefer to bake it into cards for now
+- Before open sourcing, full automation suite and readability refactor -- make it work, make it fast, make it clean
+- Before going open source: Clean up all the vibe coding and make it more my style, refactor and reduce file sizes, break up more
+- update rarityNumeric to have special be 6 instead of 1 in production `update "Card" set "rarityNumeric" = 6 where "rarityNumeric" = 1;`
+- Clean up BrowseSearchForm into smaller components
+- Add ability to save searches (even independently of collection goals, a saved searches section)
+- Allow sorting by set names alphabetically in card view
+- Table exporting to CSV
+- Subset data may need to be cleaned up.
+
+## Known Bugs
+
+- Moderate (UX): The search form has prefilling and styling issues.
+- Moderate: Logout isn't redirecting the user -- probably want them back to the login page.
+- Minor: When logging out of a page that requires authentication, redirectTo is set to the page you were on during logout.
+- Minor: Mana doesn't render properly in table view for Kozilek, Compleated
+
+## UX Thoughts
+
+- Let's make UX changes as we port components over.
+- Need a main landing page that doesn't suck. It needs a large call-to-action to register and show off the features of the site.
+- Offer a Classic Skin vs the current Modern Skin
+- Ensure the add/remove buttons are very large and easy to press on tablets and mobile
+- Subsetgroups are confusing to users. Probably just hide this.
+- Allow user to tap a card row to add that card to their collection in table view
+- Some users would like result numbers listed, to help binder placement
+- Some users express that when selecting a number input, they want the entire number highlighted so it's easy to replace
+- Make a button on mobile to open filters side menu
+- Need to search by flavorName too
+- Evaluate if custom image sizes cause performance issues that can be avoided
+
+## Patron Requests
+
+- Basic deck completion -- paste in a deck list and get a report/buy button for missing cards.
+
+## New TCGPlayer Affiliate Links
+
+Hey all! We have some exciting news: we've completed setting up a custom tracking domain within Impact. Why is this important? Certain ad blockers have been flagging TCGplayer links since we migrated the program to Impact. The new tracking domain avoids that! Your current links will still continue to work as they have, but we highly recommend updating to the new link format as soon as possible to take advantage of the new capabilities. If you generated a link from one of our ads in Impact previously, it would look like this example:
+
+https://tcgplayer.pfx.io/c/5252996/1830156/21018
+
+To update to our custom domain, you'll need to change the domain to partner.tcgplayer.com while everything after the domain remains the same. For example, the link above would become:
+
+https://partner.tcgplayer.com/c/5252996/1830156/21018
+
+As for vanity links generated by Impact's link generation tool that look like so https://tcgplayer.pxf.io/N993eP, you'll need to create new links entirely as simply swapping the domain to the custom one will cause the link to no longer work. As I mentioned though, the old format links will continue to track sales if you're not able to make the changes immediately. Please let us know if you have any questions at all in the ⁠affiliate-questions channel.

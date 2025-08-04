@@ -166,3 +166,17 @@ The application uses RTK Query for API management. All API endpoints are defined
 ### User API (`/src/api/user/userApi.ts`)
 
 - **PUT** `/user` - Update user profile (username, email, password)
+
+### Coding Style
+
+1. Functional programming approach with pure functions in TypeScript
+2. React components as constants with arrow functions rather than function declarations
+3. Main component/highest level logic at the top, with smaller subunits below
+4. Interfaces and types placed after the components that use them
+5. No unnecessary comments - prefer self-documenting code instead
+6. Descriptive variable names that clearly convey intent
+7. Named boolean expressions as constants to make conditionals more readable
+8. Minimal use of memoization when using React compiler (Next.js)
+9. Defensive programming (e.g., null/undefined checks in utility functions)
+10. Clean, organized code with logical groupings of related functionality
+11. Code reading like well-written prose.

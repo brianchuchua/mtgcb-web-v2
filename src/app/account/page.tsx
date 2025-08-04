@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Paper, TextField, Typography } from '@mui/material';
+import { Container, FormControlLabel, Paper, Switch, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 interface ProfileFormData {
   username: string;
   email: string;
+  isPublic: boolean;
 }
 
 interface PasswordFormData {
@@ -36,6 +37,7 @@ function ProfileContent() {
     defaultValues: {
       username: user?.username || '',
       email: user?.email || '',
+      isPublic: user?.isPublic ?? false,
     },
   });
 
@@ -54,7 +56,10 @@ function ProfileContent() {
 
   // Track profile form changes
   useEffect(() => {
-    const hasChanges = profileValues.username !== user?.username || profileValues.email !== user?.email;
+    const hasChanges =
+      profileValues.username !== user?.username ||
+      profileValues.email !== user?.email ||
+      profileValues.isPublic !== user?.isPublic;
     setHasProfileChanges(hasChanges);
   }, [profileValues, user]);
 
@@ -155,6 +160,16 @@ function ProfileContent() {
               error={!!profileErrors.email}
               helperText={profileErrors.email?.message}
             />
+
+            <FormControlLabel
+              sx={{ mt: 2, mb: 1 }}
+              control={<Switch {...registerProfile('isPublic')} checked={profileValues.isPublic || false} />}
+              label="Make my collection public"
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mb: 2 }}>
+              When enabled, other users can view your collection data including cards, sets, locations, goals, values
+              and statistics.
+            </Typography>
 
             <ButtonWrapper>
               <Button

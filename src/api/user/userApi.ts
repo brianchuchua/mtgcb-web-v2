@@ -10,6 +10,7 @@ interface UpdateUserRequest {
   email?: string;
   password?: string;
   currentPassword?: string;
+  isPublic?: boolean;
 }
 
 export const userApi = mtgcbApi.injectEndpoints({

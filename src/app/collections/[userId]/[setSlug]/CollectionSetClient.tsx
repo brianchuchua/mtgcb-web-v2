@@ -21,7 +21,7 @@ import { SetNavigationButtons } from '@/components/sets/SetNavigationButtons';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { CardsProps } from '@/features/browse/types/browseController';
-import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
+import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
@@ -152,7 +152,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     currentSetId: set?.id,
     baseUrl: `/collections/${userId}`,
     preserveParams: {
-      goalId: selectedGoalId,
+      goalId: selectedGoalId || undefined,
     },
   });
   const username =
@@ -478,7 +478,11 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       )}
 
       {browseController.error ? (
-        <ErrorBanner type={browseController.view} />
+        browseController.error?.data?.error?.code === 'COLLECTION_PRIVATE' ? (
+          <PrivacyErrorBanner username={browseController.cardsProps?.username} />
+        ) : (
+          <ErrorBanner type={browseController.view} />
+        )
       ) : (
         <Box
           sx={{

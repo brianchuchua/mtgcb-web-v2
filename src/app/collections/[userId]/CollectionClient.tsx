@@ -9,7 +9,7 @@ import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisp
 import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Pagination } from '@/components/pagination';
 import { CardsProps, SetsProps } from '@/features/browse/types';
-import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
+import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
 import { selectSelectedGoalId, selectIncludeSubsetsInSets } from '@/redux/slices/browseSlice';
@@ -130,7 +130,13 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
 
       <Pagination {...paginationProps} />
 
-      {error && <ErrorBanner type={view} />}
+      {error && (
+        error?.data?.error?.code === 'COLLECTION_PRIVATE' ? (
+          <PrivacyErrorBanner username={username} />
+        ) : (
+          <ErrorBanner type={view} />
+        )
+      )}
 
       {/* Show sets view for collections */}
       {view === 'sets' && 'setItems' in setsProps && setsProps.setItems && (

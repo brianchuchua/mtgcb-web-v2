@@ -41,7 +41,12 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
   const { user, isAuthenticated } = useAuth();
   const isOwnCollection = isAuthenticated && user?.userId === userId;
 
-  const { data: locationsResponse, isLoading, error } = useGetLocationHierarchyQuery();
+  // Fetch locations for the specified user
+  // For own collection, don't pass userId (uses current user)
+  // For other users' collections, pass their userId
+  const { data: locationsResponse, isLoading, error } = useGetLocationHierarchyQuery(
+    isOwnCollection ? undefined : { userId }
+  );
   const locations = locationsResponse?.data || [];
 
   const handleChange = (event: SelectChangeEvent<number | '' | 'create-new-location'>) => {
@@ -162,11 +167,14 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
     );
   }
 
+  // Hide the selector if:
+  // 1. There's an error loading locations
+  // 2. The response indicates failure (could be privacy error)
+  // 3. It's not the user's own collection and locations couldn't be loaded
   if (error || !locationsResponse?.success) {
     return null; // Silently fail if locations can't be loaded
   }
 
-  console.log(locations);
   if (locations.length === 0) {
     return null; // Don't show selector if no locations
   }

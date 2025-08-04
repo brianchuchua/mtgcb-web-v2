@@ -23,6 +23,7 @@ export interface UserData {
   userId: number;
   username: string;
   email: string;
+  isPublic: boolean;
 }
 
 export interface ForgotPasswordRequest {
