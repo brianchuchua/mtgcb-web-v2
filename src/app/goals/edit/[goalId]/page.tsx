@@ -2,15 +2,17 @@
 
 import { EditGoalClient } from './EditGoalClient';
 import { withAuth } from '@/components/auth/withAuth';
+import { use } from 'react';
 
 interface EditGoalPageProps {
-  params: {
+  params: Promise<{
     goalId: string;
-  };
+  }>;
 }
 
 function EditGoalPage({ params }: EditGoalPageProps) {
-  const goalId = parseInt(params.goalId, 10);
+  const resolvedParams = use(params);
+  const goalId = parseInt(resolvedParams.goalId, 10);
   
   if (isNaN(goalId)) {
     return <div>Invalid goal ID</div>;

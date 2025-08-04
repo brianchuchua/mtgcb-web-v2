@@ -6,11 +6,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Current Action Items
 
-- CURRENT TASK: Working on the Privacy Mode now
-  - Need to test viewing another user's collection while logged into your own account
-- When idle: Migrate TODOs from README.md to this file
+- Add finishing touches to privacy mode, like the share links and the message that the collection is private
+- Working on this right now also: Account Deletion
 - instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
-- Exclude tokens from progress bars when includeSubsetsInSets is true.
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
 - Preload stuff on pagination hover?
@@ -18,13 +16,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - roadmap page (maybe just on the changelog page)
 - mention binders on home page
 - faq page
+- consider adding prefetching back to pagination, collection goal queries can be slow for big goals
 
 ## Remaining Major Feature Work Before 1.0
-
-### Privacy Mode
-
-- Pretty simple -- an isPrivate flag on the user that hides their collection from other users, but still allows them to use the site normally. Guards all endpoints that return user data, like collections, and hides them from the UI. Puts up a nice message if someone tries to access a private collection.
-- Should show their collection is private somewhere. And show a share link to the collection that will show a message that the collection is private.
 
 ### Card Page
 
@@ -34,6 +28,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Patron Support Page
 
 - A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.
+- Detecting if someone is a patron and linking their accounts.
 
 ### Home Page
 
@@ -60,7 +55,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Organizational
 
-- Move all TODOs from README.md to this file
+- Prioritize, organize, and cull TODOs in this document
 
 ### Importer
 
@@ -76,7 +71,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Uncategorized
 
 - verify the individual value of sets, when added up, add up to the collection value -- Chris request on Discord
-- youtube channel for how to use the site
 - card notes field for card page
 - support better rendering of which variants of cards exist in searches when limiting one copy per card name, maybe
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
@@ -273,6 +267,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ## Nice to Have
 
 - A "money draft" tool to help users during a draft
+- A YouTube channel for the site, including transitioning collectors to limited players -- it's the best way to collect.
+- Consulting with a UX designer -- while Material UI looks nice, IhavenoideawhatIamdoing
 
 ## Data Decisions
 
@@ -302,7 +298,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Later
 
-- Consult with an UX designer
 - Sonarcube integration
 - 1024x768 testing of table view and gridview and menus with sidenav open (or determine target resolution)
 - Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
