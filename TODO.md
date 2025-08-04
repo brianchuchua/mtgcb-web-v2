@@ -37,6 +37,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Terms and Conditions
 
 - Need to research and implement. I really don't want to make my users have to check an agree box, but need to understand the legal requirement. Biggest concern is bad TCGPlayer data gives an inaccurate collection value and then they make financial decisions based on that. I think a disclaimer is enough, but need to research.
+  - Did some good research. Don't need a checkbox, just a link near register, sign up, and in footers, and my legal text is good enough already, although I can add more disclaimers about tcgplayer prices and bugs.
 
 ### Account Deletion
 

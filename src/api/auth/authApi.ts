@@ -78,6 +78,22 @@ export const authApi = mtgcbApi.injectEndpoints({
         body: data,
       }),
     }),
+    deleteAccount: builder.mutation<ApiResponse<{ message: string }>, void>({
+      query: () => ({
+        url: 'auth/account',
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Auth'],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Reset the entire API state after successful account deletion
+          dispatch(authApi.util.resetApiState());
+        } catch {
+          console.error('Account deletion failed');
+        }
+      },
+    }),
   }),
   overrideExisting: false,
 });
@@ -92,4 +108,5 @@ export const {
   useForgotUsernameMutation,
   useResetPasswordMutation,
   useValidatePasswordResetMutation,
+  useDeleteAccountMutation,
 } = authApi;

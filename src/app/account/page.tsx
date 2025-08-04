@@ -1,14 +1,19 @@
 'use client';
 
-import { Container, FormControlLabel, Paper, Switch, TextField, Typography } from '@mui/material';
+import { Alert, Box, Container, FormControlLabel, Paper, Switch, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { WarningAmber as WarningIcon, DeleteForever as DeleteIcon } from '@mui/icons-material';
+import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { useUpdateUserMutation } from '@/api/user/userApi';
+import { useDeleteAccountMutation } from '@/api/auth/authApi';
 import { withAuth } from '@/components/auth/withAuth';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { DeleteAccountDialog } from '@/components/account/DeleteAccountDialog';
 
 interface ProfileFormData {
   username: string;
@@ -24,8 +29,11 @@ interface PasswordFormData {
 function ProfileContent() {
   const { user, isLoading } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
   const [updateUser] = useUpdateUserMutation();
+  const [deleteAccount, { isLoading: isDeletingAccount }] = useDeleteAccountMutation();
   const [hasProfileChanges, setHasProfileChanges] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const {
     register: registerProfile,
@@ -106,6 +114,25 @@ function ProfileContent() {
       enqueueSnackbar('Password updated successfully', { variant: 'success' });
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to update password';
+      enqueueSnackbar(message, { variant: 'error' });
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const result = await deleteAccount().unwrap();
+      
+      if (result.success) {
+        enqueueSnackbar('Your account has been permanently deleted', { variant: 'success' });
+        setDeleteDialogOpen(false);
+        // Redirect to home page after successful deletion
+        router.push('/');
+      } else {
+        throw new Error(result.error?.message || 'Failed to delete account');
+      }
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      const message = error.data?.error?.message || 'An error occurred while deleting your account';
       enqueueSnackbar(message, { variant: 'error' });
     }
   };
@@ -249,7 +276,59 @@ function ProfileContent() {
             </Typography>
           </CardContent>
         </Paper>
+
+        <Paper variant="outlined">
+          <CardHeader>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <WarningIcon 
+                sx={{ 
+                  color: (theme) => theme.palette.error.main,
+                  fontSize: 28,
+                  mr: 1
+                }} 
+              />
+              <Typography variant="h6" sx={{ color: 'error.main' }}>
+                Danger Zone - Delete Account
+              </Typography>
+            </Box>
+          </CardHeader>
+          <CardContent>
+            <Alert severity="error" sx={{ mb: 3 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                Permanently delete your account
+              </Typography>
+              <Typography variant="body2">
+                Once you delete your account, there is no going back. All your data will be permanently removed.
+                This includes your entire collection, locations, goals, and all personal information.
+                Consider <Link href="/export">exporting your collection</Link> first to create a backup of your data.
+              </Typography>
+            </Alert>
+
+            <ButtonWrapper>
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+                onClick={() => setDeleteDialogOpen(true)}
+                disabled={isDeletingAccount}
+                sx={{
+                  px: 3,
+                  py: 1,
+                }}
+              >
+                Delete Account
+              </Button>
+            </ButtonWrapper>
+          </CardContent>
+        </Paper>
       </CardStack>
+
+      <DeleteAccountDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDeleteAccount}
+        isLoading={isDeletingAccount}
+      />
     </Container>
   );
 }
