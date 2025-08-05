@@ -147,7 +147,7 @@ const VirtualizedRowGallery = <T,>({
           computeItemKey={(index) => rows[index].id}
           // Remove the default item wrapper styles that might interfere
           components={{
-            Item: ({ children, ...props }) => (
+            Item: ({ children, item, context, ...props }) => (
               <div {...props} style={{ ...props.style, paddingBottom: 0 }}>
                 {children}
               </div>

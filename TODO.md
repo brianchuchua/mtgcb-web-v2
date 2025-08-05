@@ -168,6 +168,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Bugs
 
+- Severe (Possibly fixed, keeping an eye on): Sometimes not seeing rendering of grid or table in a specific set, reproducible in Brave - http://local.mtgcb.com:3000/collections/100116/edge-of-eternities-commander-tokens, paginations and the buttons render, just not the virtualization content, maybe the logic to defer rendering is broken
 - Moderate: Draft cube calculation when track subsets with sets in on is wrong, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir -- it's incorrectly counting non main set cards as missing just in terms of the value
 - Moderate+ Bug: Collector number sort is broken in collector table view, probably not using the numeric version of collector number
 - Bug: Release date desc in sets view is applying to cards view when switching
