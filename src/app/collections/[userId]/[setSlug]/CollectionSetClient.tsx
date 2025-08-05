@@ -14,6 +14,7 @@ import { CollectionProgressBar } from '@/components/collections/CollectionProgre
 import MassUpdateButton from '@/components/collections/MassUpdateButton';
 import MassUpdateConfirmDialog from '@/components/collections/MassUpdateConfirmDialog';
 import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
+import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
@@ -457,13 +458,22 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         subsets={subsets}
         onSubsetSelect={handleSubsetSelect}
         additionalAction={
-          isOwnCollection && browseController.view === 'cards' && !selectedGoalId ? (
-            <MassUpdateButton
-              onClick={handleMassUpdateToggle}
-              isOpen={isMassUpdateOpen}
-              disabled={isMassUpdateLoading}
+          <>
+            {isOwnCollection && browseController.view === 'cards' && !selectedGoalId && (
+              <MassUpdateButton
+                onClick={handleMassUpdateToggle}
+                isOpen={isMassUpdateOpen}
+                disabled={isMassUpdateLoading}
+              />
+            )}
+            <ShareCollectionButton
+              userId={userId.toString()}
+              username={username || user?.username || 'User'}
+              isPublic={user?.isPublic || false}
+              collectionName={set?.name}
+              setSlug={setSlug}
             />
-          ) : undefined
+          </>
         }
       />
 

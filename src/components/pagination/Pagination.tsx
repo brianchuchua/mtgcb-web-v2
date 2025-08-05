@@ -115,67 +115,69 @@ const Pagination: React.FC<PaginationProps> = ({
             )}
 
             {isSmallScreen && (
-              <MobileControlsRow>
-                <PaginationControlsGroup>
-                  <NavigationControls
-                    currentPage={localCurrentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                    isLoading={isLoading}
-                    isSmallScreen={isSmallScreen}
-                  />
+              <>
+                <MobileControlsRow>
+                  <PaginationControlsGroup>
+                    <NavigationControls
+                      currentPage={localCurrentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                      isLoading={isLoading}
+                      isSmallScreen={isSmallScreen}
+                    />
 
-                  <MobileInfoRow>
-                    {!isLoading && (
-                      <ItemRangeDisplay
-                        startItem={startItem}
-                        endItem={endItem}
-                        totalItems={totalItems}
-                        contentType={contentType}
-                        isSmallScreen={true}
-                        customItemName={customItemName}
-                      />
-                    )}
-                  </MobileInfoRow>
-                </PaginationControlsGroup>
+                    <MobileInfoRow>
+                      {!isLoading && (
+                        <ItemRangeDisplay
+                          startItem={startItem}
+                          endItem={endItem}
+                          totalItems={totalItems}
+                          contentType={contentType}
+                          isSmallScreen={true}
+                          customItemName={customItemName}
+                        />
+                      )}
+                    </MobileInfoRow>
+                  </PaginationControlsGroup>
 
-                <RightControlsGroup>
-                  <PageSizeControl
-                    pageSize={pageSize}
-                    onPageSizeChange={onPageSizeChange}
-                    pageSizeOptions={pageSizeOptions}
-                    viewMode={viewMode}
-                    contentType={contentType}
-                    customSettingGroups={settingGroups}
-                    subsets={subsets}
-                    onSubsetSelect={onSubsetSelect}
-                    customItemName={customItemName}
-                    hideSettingsPanel={hideSettingsPanel}
-                  />
-
-                  {(!hideViewModeToggle || additionalAction) && (
-                    <Box sx={{ mt: 1 }}>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        {!hideViewModeToggle && (
-                          <ViewModeToggle
-                            viewMode={viewMode}
-                            onViewModeChange={onViewModeChange}
-                            isSmallScreen={isSmallScreen}
-                            isLoading={isLoading}
-                            isInitialLoading={isInitialLoading}
-                          />
-                        )}
-                        {additionalAction}
-                      </Stack>
-                    </Box>
-                  )}
-                </RightControlsGroup>
-              </MobileControlsRow>
+                  <RightControlsGroup>
+                    <PageSizeControl
+                      pageSize={pageSize}
+                      onPageSizeChange={onPageSizeChange}
+                      pageSizeOptions={pageSizeOptions}
+                      viewMode={viewMode}
+                      contentType={contentType}
+                      customSettingGroups={settingGroups}
+                      subsets={subsets}
+                      onSubsetSelect={onSubsetSelect}
+                      customItemName={customItemName}
+                      hideSettingsPanel={hideSettingsPanel}
+                    />
+                  </RightControlsGroup>
+                </MobileControlsRow>
+                
+                {(!hideViewModeToggle || additionalAction) && (
+                  <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}>
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      {!hideViewModeToggle && (
+                        <ViewModeToggle
+                          viewMode={viewMode}
+                          onViewModeChange={onViewModeChange}
+                          isSmallScreen={isSmallScreen}
+                          isLoading={isLoading}
+                          isInitialLoading={isInitialLoading}
+                        />
+                      )}
+                      {additionalAction}
+                    </Stack>
+                  </Box>
+                )}
+              </>
             )}
 
             {!isSmallScreen && (!hideViewModeToggle || additionalAction) && (
               <ViewToggleContainer>
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction="row" spacing={0.5} alignItems="center">
                   {!hideViewModeToggle && (
                     <ViewModeToggle
                       viewMode={viewMode}
@@ -707,7 +709,7 @@ const RightSection = styled(Box)(({ theme }) => ({
 const ViewModeToggleGroup = styled(Stack)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
-  gap: theme.spacing(1),
+  gap: theme.spacing(0.5),
 }));
 
 const ItemRangeInfo = styled(Box)(() => ({

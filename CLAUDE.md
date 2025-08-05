@@ -1,9 +1,15 @@
 # MTGCB Web v2
 
 ## Overview
+
 Next.js web app for Magic: The Gathering Collection Builder - Track collections with TCGPlayer pricing.
 
+## For Every Feature
+
+- Update the version number using semver conventions in `package.json` and the headers (including the date) and changelog page
+
 ## Tech Stack
+
 - Next.js 15 + React 19
 - MUI 6 + Emotion
 - Redux Toolkit + RTK Query
@@ -12,6 +18,7 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 - Playwright testing
 
 ## Commands
+
 - `yarn dev` - Development server
 - `yarn build` - Production build
 - `yarn type-check` - TypeScript checking
@@ -19,6 +26,7 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 - `yarn test` - Run tests
 
 ## Code Conventions
+
 - Functional components with arrow functions: `const Component = () => {}`
 - Interfaces after components that use them
 - Top-down readability (main logic first, helpers below)
@@ -27,6 +35,7 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 - MUI styled components for styling
 
 ## Project Structure
+
 ```
 /src/api/         - RTK Query endpoints
 /src/app/         - Next.js pages
@@ -38,6 +47,7 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 ```
 
 ## Architecture
+
 ```
 Pages → Features → API (RTK Query) → Backend
 ```
@@ -45,11 +55,13 @@ Pages → Features → API (RTK Query) → Backend
 ## Key Pages
 
 ### Public Pages
+
 - `/` - Home page
 - `/browse` - Cards/sets browser with filters
 - `/collections/[userId]` - Public collection view
 
 ### Auth Required Pages
+
 - `/collections/edit-cards` - Quick quantity updates
 - `/account` - User settings
 - `/import` - Import collection data
@@ -60,12 +72,15 @@ Pages → Features → API (RTK Query) → Backend
 ## API Structure
 
 ### Local Routes
+
 - `/src/app/api/` - Handle reCAPTCHA validation
 
 ### Backend API (RTK Query)
+
 Uses `NEXT_PUBLIC_MTGCB_API_BASE_URL` environment variable
 
 ### Main Endpoints
+
 - **Auth**: login, logout, register, forgot-password, reset-password
 - **Browse**: cards/search, sets/search, sets/types
 - **Collection**: update, mass-update, summary, export, import, nuke
@@ -73,6 +88,7 @@ Uses `NEXT_PUBLIC_MTGCB_API_BASE_URL` environment variable
 - **Goals**: CRUD operations with progress tracking
 
 ## Important Notes
+
 - All authenticated routes require auth token
 - ReCAPTCHA required for auth flows
 - Collection endpoints marked "UNUSED" should be avoided

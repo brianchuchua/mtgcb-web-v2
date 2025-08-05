@@ -41,7 +41,7 @@ const Header = () => {
             <Typography variant="h6" component="div">
               MTG CB
             </Typography>
-            <Tooltip title="Last Updated: 2025-08-03" arrow>
+            <Tooltip title="Last Updated: 2025-08-05" arrow>
               <Link href="/changelog" style={{ textDecoration: 'none' }}>
                 <Typography
                   variant="caption"
@@ -49,7 +49,7 @@ const Header = () => {
                   component="span"
                   sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
                 >
-                  v0.91.3
+                  v0.96.0
                 </Typography>
               </Link>
             </Tooltip>

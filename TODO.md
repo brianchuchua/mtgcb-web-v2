@@ -6,7 +6,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Current Action Items
 
-- Add finishing touches to privacy mode, like the share links and the message that the collection is private
 - instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
@@ -263,6 +262,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Adequate feature testing
 - Terms and conditions, research
 - Data cleanup for tcgplayer names and codes and tcgplayer ids
+- Test clipboard functionality in staging/production with HTTPS (Share Collection feature)
 
 ## Nice to Have
 

@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisplay';
+import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
 import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Pagination } from '@/components/pagination';
 import { CardsProps, SetsProps } from '@/features/browse/types';
@@ -128,7 +129,16 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
         />
       )}
 
-      <Pagination {...paginationProps} />
+      <Pagination 
+        {...paginationProps} 
+        additionalAction={
+          <ShareCollectionButton
+            userId={userId.toString()}
+            username={username || user?.username || 'User'}
+            isPublic={user?.isPublic || false}
+          />
+        }
+      />
 
       {error && (
         error?.data?.error?.code === 'COLLECTION_PRIVATE' ? (
