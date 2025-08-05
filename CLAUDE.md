@@ -1,182 +1,80 @@
-# MTGCB Web Code Style Guidelines
+# MTGCB Web v2
 
-This document outlines the preferred code style for the MTG CB Web project.
+## Overview
+Next.js web app for Magic: The Gathering Collection Builder - Track collections with TCGPlayer pricing.
 
-## General Principles
+## Tech Stack
+- Next.js 15 + React 19
+- MUI 6 + Emotion
+- Redux Toolkit + RTK Query
+- TypeScript (strict mode)
+- React Hook Form + React Virtuoso
+- Playwright testing
 
-- Follow a top-down readability approach (Clean Code style)
-- Main components/functions appear first, with implementation details below
-- Organize functions by decreasing importance/abstraction level
-- Use descriptive function and variable names
-- Apply single-responsibility principle to component design
-- Create small, focused functions that do one thing well
-- Almost never write commments; prefer self-documenting code
-- Always use the '@/' alias for imports
+## Commands
+- `yarn dev` - Development server
+- `yarn build` - Production build
+- `yarn type-check` - TypeScript checking
+- `yarn lint` - ESLint
+- `yarn test` - Run tests
 
-## React Components
+## Code Conventions
+- Functional components with arrow functions: `const Component = () => {}`
+- Interfaces after components that use them
+- Top-down readability (main logic first, helpers below)
+- Descriptive names, self-documenting (no comments unless essential)
+- Defensive programming with null checks
+- MUI styled components for styling
 
-- Use functional components with hooks instead of class components
-- Define prop interfaces with explicit TypeScript types
-- Place prop interfaces close to the components that use them
-- Use default props within the function parameter destructuring
-- Follow component composition pattern with many small, focused components
-- Use conditional rendering for optional UI elements
-
-```typescript
-// Example component structure
-const MyComponent: React.FC<MyComponentProps> = ({
-  requiredProp,
-  optionalProp = defaultValue,
-}) => {
-  // Component logic here
-
-  return (
-    <Wrapper>
-      {optionalProp && <OptionalElement />}
-      <MainContent>{requiredProp}</MainContent>
-    </Wrapper>
-  );
-};
-
-interface MyComponentProps {
-  requiredProp: string;
-  optionalProp?: boolean;
-}
+## Project Structure
+```
+/src/api/         - RTK Query endpoints
+/src/app/         - Next.js pages
+/src/components/  - Reusable UI components
+/src/features/    - Feature modules
+/src/redux/       - Store & slices
+/src/types/       - TypeScript types
+/src/utils/       - Utilities
 ```
 
-## Styling
-
-- Use Material-UI (MUI) for component styling
-- Prefer styled components approach for custom styling
-- Follow consistent theme spacing and color usage
-- Use responsive design patterns
-
-```typescript
-const StyledComponent = styled(MuiComponent)(({ theme }) => ({
-  padding: theme.spacing(2),
-  color: theme.palette.primary.main,
-  [theme.breakpoints.down('md')]: {
-    // Responsive styles
-  },
-}));
+## Architecture
+```
+Pages → Features → API (RTK Query) → Backend
 ```
 
-## TypeScript
+## Key Pages
 
-- Use explicit typing for all variables, functions, and components
-- Create interfaces for component props and other complex objects
-- Use type guards where appropriate to narrow types
-- Follow TypeScript best practices for null/undefined handling
+### Public Pages
+- `/` - Home page
+- `/browse` - Cards/sets browser with filters
+- `/collections/[userId]` - Public collection view
 
-## File Organization
+### Auth Required Pages
+- `/collections/edit-cards` - Quick quantity updates
+- `/account` - User settings
+- `/import` - Import collection data
+- `/export` - Export collection data
+- `/goals` - Collection goals management
+- `/locations` - Physical storage tracking
 
-- Group related components, interfaces, and utility functions together
-- Export default the main component of a file
-- Export named components/functions that may be reused elsewhere
+## API Structure
 
-## Project Information
+### Local Routes
+- `/src/app/api/` - Handle reCAPTCHA validation
 
-### Project Overview
+### Backend API (RTK Query)
+Uses `NEXT_PUBLIC_MTGCB_API_BASE_URL` environment variable
 
-MTG Collection Builder (MTG CB) is a web application for Magic: The Gathering card collectors to track their collection and its value. The application allows users to browse cards and sets, manage their collection, and view pricing information from TCGPlayer.
+### Main Endpoints
+- **Auth**: login, logout, register, forgot-password, reset-password
+- **Browse**: cards/search, sets/search, sets/types
+- **Collection**: update, mass-update, summary, export, import, nuke
+- **Locations**: CRUD operations, hierarchy, cards-in-location
+- **Goals**: CRUD operations with progress tracking
 
-### Tech Stack
-
-- **Framework**: Next.js 15.x with React 19
-- **UI Library**: Material-UI (MUI) 6.x
-- **State Management**: Redux Toolkit with RTK Query
-- **Styling**: Emotion (CSS-in-JS)
-- **Form Handling**: React Hook Form
-- **Virtualization**: React Virtuoso for performant card lists
-- **Testing**: Playwright for end-to-end testing
-- **TypeScript**: Strict typing throughout the codebase
-
-### Key Features
-
-- Browse Magic: The Gathering cards and sets
-- Toggle between grid and table views
-- Set display preferences for cards and tables
-- Filter cards by various attributes (color, set, type, etc.)
-- Sort results by different criteria
-- User authentication system
-- Collection management
-- TCGPlayer integration for pricing data and affiliate links
-- Responsive design for desktop and mobile devices
-
-### Project Structure
-
-- `/src/api`: API service definitions using RTK Query
-- `/src/app`: Next.js App Router pages and layout components
-- `/src/components`: Reusable UI components
-- `/src/features`: Feature-specific components and logic
-- `/src/hooks`: Custom React hooks
-- `/src/redux`: Redux store configuration and slices
-- `/src/styles`: Global styling and theme
-- `/src/types`: TypeScript type definitions
-- `/src/utils`: Utility functions
-
-### Development Workflow
-
-1. Make it work
-2. Make it fast
-3. Make it clean
-
-### Type Checking
-
-- `yarn type-check`
-
-## API Documentation
-
-The application uses RTK Query for API management. All API endpoints are defined in the `/src/api` directory.
-
-### Authentication API (`/src/api/auth/authApi.ts`)
-
-- **GET** `auth/me` - Get current user data
-- **POST** `auth/login` - User login
-- **POST** `auth/logout` - User logout
-- **POST** `/api/auth/register` - User registration (local endpoint)
-- **POST** `/api/auth/forgot-password` - Request password reset (local endpoint)
-- **POST** `/api/auth/forgot-username` - Request username reminder (local endpoint)
-- **POST** `/api/auth/reset-password` - Reset password with token (local endpoint)
-- **POST** `/api/auth/validate-password-reset` - Validate password reset token (local endpoint)
-
-### Browse API (`/src/api/browse/browseApi.ts`)
-
-- **POST** `/cards/search` - Search and filter cards (supports pagination, sorting, filtering)
-- **POST** `/sets/search` - Search and filter sets (supports pagination, sorting, filtering)
-- **GET** `/sets/types` - Get available set types with categories
-
-### Cards API (`/src/api/cards/cardsApi.ts`)
-
-- **GET** `/cards/types` - Get available card types
-
-### Collections API (`/src/api/collections/collectionsApi.ts`)
-
-- **POST** `/collection/summary` - Get collection summary statistics ⚠️ **UNUSED** (hook `useGetCollectionSummaryQuery` is only used in the unused `useCollectionData` hook)
-- **POST** `/collection/cards` - Get cards in user's collection ⚠️ **UNUSED** (hook `useGetCollectionCardsQuery` is not used)
-- **POST** `/collection/update` - Update collection (add/remove/modify card quantities)
-  - Supports optimistic updates for better UX
-  - Automatically invalidates related caches
-
-### Sets API (`/src/api/sets/setsApi.ts`)
-
-- **GET** `/sets/cost-to-complete` - Calculate cost to complete sets in collection
-  - Query params: `priceType`, `includeSubsetsInSets`
-
-### User API (`/src/api/user/userApi.ts`)
-
-- **PUT** `/user` - Update user profile (username, email, password)
-
-### Coding Style
-
-1. Functional programming approach with pure functions in TypeScript
-2. React components as constants with arrow functions rather than function declarations
-3. Main component/highest level logic at the top, with smaller subunits below
-4. Interfaces and types placed after the components that use them
-5. No unnecessary comments - prefer self-documenting code instead
-6. Descriptive variable names that clearly convey intent
-7. Named boolean expressions as constants to make conditionals more readable
-8. Minimal use of memoization when using React compiler (Next.js)
-9. Defensive programming (e.g., null/undefined checks in utility functions)
-10. Clean, organized code with logical groupings of related functionality
-11. Code reading like well-written prose.
+## Important Notes
+- All authenticated routes require auth token
+- ReCAPTCHA required for auth flows
+- Collection endpoints marked "UNUSED" should be avoided
+- Use existing patterns when adding new features
+- Defensive null checks throughout components

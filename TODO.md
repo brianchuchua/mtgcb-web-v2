@@ -7,7 +7,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ## Current Action Items
 
 - Add finishing touches to privacy mode, like the share links and the message that the collection is private
-- Working on this right now also: Account Deletion
 - instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
@@ -17,6 +16,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - mention binders on home page
 - faq page
 - consider adding prefetching back to pagination, collection goal queries can be slow for big goals
+- make sure the jwt cookie name doesn't clash with the older beta
 
 ## Remaining Major Feature Work Before 1.0
 
@@ -32,16 +32,15 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Home Page
 
+- Should brag about new features and explain the launch (need a news page I think)
 - Should show most valuable card, statistics, etc. I think. Although need stats somewhere else too, maybe in every header of every collection page.
 
 ### Terms and Conditions
 
+- footer
+- info icon next to collection value, estimate, tcgplayer data, etc.
 - Need to research and implement. I really don't want to make my users have to check an agree box, but need to understand the legal requirement. Biggest concern is bad TCGPlayer data gives an inaccurate collection value and then they make financial decisions based on that. I think a disclaimer is enough, but need to research.
   - Did some good research. Don't need a checkbox, just a link near register, sign up, and in footers, and my legal text is good enough already, although I can add more disclaimers about tcgplayer prices and bugs.
-
-### Account Deletion
-
-- A way for users to delete their account and all associated data. This should be a simple API call that removes the user and all their data, including collections, cards, etc.
 
 ### Migration Path
 
