@@ -19,11 +19,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Remaining Major Feature Work Before 1.0
 
-### Card Page
-
-- For browse and collection contexts
-- Show other printings
-
 ### Patron Support Page
 
 - A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.

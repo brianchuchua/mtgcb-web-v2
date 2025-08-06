@@ -1,7 +1,6 @@
 'use client';
 
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Box, Card, CardContent, IconButton, Menu, MenuItem, Skeleton, Typography } from '@mui/material';
+import { Box, Card, CardContent, Chip, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -154,23 +153,15 @@ const CardItemComponent = ({
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const pathname = usePathname();
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleAddLocation = (event: React.MouseEvent) => {
     event.stopPropagation();
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setMenuAnchorEl(null);
-  };
-
-  const handleAddLocations = () => {
-    setLocationDialogOpen(true);
-    handleMenuClose();
+    if (quantityReg || quantityFoil) {
+      setLocationDialogOpen(true);
+    }
   };
 
   const {
@@ -380,47 +371,14 @@ const CardItemComponent = ({
         >
           {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && isOwnCollection && (
             <Box sx={{ mb: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Box sx={{ flex: 1 }}>
-                  <EditableCardQuantity
-                    cardId={parseInt(id)}
-                    cardName={name}
-                    quantityReg={quantityReg || 0}
-                    quantityFoil={quantityFoil || 0}
-                    canBeFoil={canBeFoil}
-                    canBeNonFoil={canBeNonFoil}
-                  />
-                </Box>
-                <IconButton
-                  size="small"
-                  onClick={handleMenuOpen}
-                  sx={{
-                    padding: 0.5,
-                    '&:hover': {
-                      backgroundColor: 'action.hover',
-                    },
-                  }}
-                >
-                  <MoreVertIcon fontSize="small" />
-                </IconButton>
-              </Box>
-              <Menu
-                anchorEl={menuAnchorEl}
-                open={Boolean(menuAnchorEl)}
-                onClose={handleMenuClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-              >
-                <MenuItem onClick={handleAddLocations} disabled={!quantityReg && !quantityFoil}>
-                  Add card location(s)
-                </MenuItem>
-              </Menu>
+              <EditableCardQuantity
+                cardId={parseInt(id)}
+                cardName={name}
+                quantityReg={quantityReg || 0}
+                quantityFoil={quantityFoil || 0}
+                canBeFoil={canBeFoil}
+                canBeNonFoil={canBeNonFoil}
+              />
             </Box>
           )}
 
@@ -554,16 +512,40 @@ const CardItemComponent = ({
 
           {quantityIsVisible && isOwnCollection && locationsIsVisible && (
             <Box sx={{ mt: 1 }}>
-              <CardLocationPills
-                cardId={parseInt(id)}
-                cardName={name}
-                setName={setName}
-                totalQuantityReg={quantityReg || 0}
-                totalQuantityFoil={quantityFoil || 0}
-                canBeFoil={canBeFoil}
-                canBeNonFoil={canBeNonFoil}
-                locations={locations}
-              />
+              {locations && locations.length > 0 ? (
+                <CardLocationPills
+                  cardId={parseInt(id)}
+                  cardName={name}
+                  setName={setName}
+                  totalQuantityReg={quantityReg || 0}
+                  totalQuantityFoil={quantityFoil || 0}
+                  canBeFoil={canBeFoil}
+                  canBeNonFoil={canBeNonFoil}
+                  locations={locations}
+                  align="center"
+                  onAddLocation={handleAddLocation}
+                />
+              ) : (
+                (quantityReg || quantityFoil) ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Chip
+                      label="Add card to location"
+                      onClick={handleAddLocation}
+                      size="small"
+                      sx={{
+                        cursor: 'pointer',
+                        color: 'text.secondary',
+                        borderColor: 'divider',
+                        '&:hover': {
+                          backgroundColor: 'action.hover',
+                          borderColor: 'text.secondary',
+                        },
+                      }}
+                      variant="outlined"
+                    />
+                  </Box>
+                ) : null
+              )}
             </Box>
           )}
 

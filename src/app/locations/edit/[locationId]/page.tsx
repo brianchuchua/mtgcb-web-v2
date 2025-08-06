@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, use } from 'react';
 import EditLocationClient from './EditLocationClient';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -8,12 +8,14 @@ import Container from '@mui/material/Container';
 import { withAuth } from '@/components/auth/withAuth';
 
 interface EditLocationPageProps {
-  params: {
+  params: Promise<{
     locationId: string;
-  };
+  }>;
 }
 
 function EditLocationPage({ params }: EditLocationPageProps) {
+  const unwrappedParams = use(params);
+  
   return (
     <Suspense 
       fallback={
@@ -24,7 +26,7 @@ function EditLocationPage({ params }: EditLocationPageProps) {
         </Container>
       }
     >
-      <EditLocationClient locationId={parseInt(params.locationId, 10)} />
+      <EditLocationClient locationId={parseInt(unwrappedParams.locationId, 10)} />
     </Suspense>
   );
 }
