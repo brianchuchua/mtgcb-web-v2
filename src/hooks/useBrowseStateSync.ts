@@ -150,6 +150,9 @@ export function useBrowseStateSync() {
       dispatch(setCardPagination({ pageSize: cardsPageSize }));
       dispatch(setSetPagination({ pageSize: setsPageSize }));
     } else {
+      // Always reset first to ensure clean state
+      dispatch(resetAllSearches());
+      
       // Parse the new URL state and update Redux
       const cardsUrlState = parseUrlToState(search, 'cards');
       const setsUrlState = parseUrlToState(search, 'sets');
@@ -162,6 +165,9 @@ export function useBrowseStateSync() {
             pageSize: cardsPageSize,
           }),
         );
+      } else {
+        // Even if no card params, still need to set pagination from localStorage
+        dispatch(setCardPagination({ pageSize: cardsPageSize }));
       }
       
       // Clear sets filter if not in URL (prevents persistence from set-specific pages)
@@ -179,6 +185,9 @@ export function useBrowseStateSync() {
             pageSize: setsPageSize,
           }),
         );
+      } else {
+        // Even if no set params, still need to set pagination from localStorage
+        dispatch(setSetPagination({ pageSize: setsPageSize }));
       }
     }
 
