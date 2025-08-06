@@ -98,6 +98,7 @@ export interface CardItemProps {
   onClick?: () => void;
   isOwnCollection?: boolean;
   goalId?: string;
+  imageLinksToTCGPlayer?: boolean; // New prop to enable TCGPlayer link on image
 }
 
 /**
@@ -149,6 +150,7 @@ const CardItemComponent = ({
   onClick,
   isOwnCollection = false,
   goalId,
+  imageLinksToTCGPlayer = false,
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -238,9 +240,9 @@ const CardItemComponent = ({
       data-testid="card-item"
     >
       <CardImageContainer
-        onClick={onClick ? handleCardElementClick : undefined}
+        onClick={!imageLinksToTCGPlayer && onClick ? handleCardElementClick : undefined}
         sx={{
-          cursor: onClick ? 'pointer' : 'default',
+          cursor: imageLinksToTCGPlayer ? 'default' : onClick ? 'pointer' : 'default',
           opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
           transition: 'opacity 0.2s ease-in-out',
           position: 'relative',
@@ -274,38 +276,94 @@ const CardItemComponent = ({
             }),
         }}
       >
-        {!imageLoaded && !imageError && (
-          <Skeleton
-            variant="rectangular"
-            width="100%"
-            height="100%"
-            animation="wave"
+        {imageLinksToTCGPlayer ? (
+          <Box
+            component="a"
+            href={getTCGPlayerLink()}
+            target="_blank"
+            rel="noreferrer"
+            title={`${name} - Buy on TCGPlayer`}
             sx={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
               position: 'absolute',
               top: 0,
               left: 0,
-              borderRadius: getBorderRadius(),
-              backgroundColor: '#22262c',
+              textDecoration: 'none',
+              cursor: 'pointer',
             }}
-          />
-        )}
-        {!imageError ? (
-          <CardImage
-            ref={imageRef}
-            src={getImageUrl()}
-            loading="lazy"
-            alt={name}
-            title={name}
-            setName={setName}
-            onLoad={() => setImageLoaded(true)}
-            onError={() => setImageError(true)}
-            style={{ opacity: imageLoaded ? 1 : 0 }}
-          />
+          >
+            {!imageLoaded && !imageError && (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                animation="wave"
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  borderRadius: getBorderRadius(),
+                  backgroundColor: '#22262c',
+                }}
+              />
+            )}
+            {!imageError ? (
+              <CardImage
+                ref={imageRef}
+                src={getImageUrl()}
+                loading="lazy"
+                alt={`${name} - Buy on TCGPlayer`}
+                title={`${name} - Buy on TCGPlayer`}
+                setName={setName}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageError(true)}
+                style={{ opacity: imageLoaded ? 1 : 0 }}
+              />
+            ) : (
+              <MissingImageFallback setName={setName}>
+                <Typography variant="subtitle2">{name}</Typography>
+                <Typography variant="caption">Image not available</Typography>
+              </MissingImageFallback>
+            )}
+          </Box>
         ) : (
-          <MissingImageFallback setName={setName}>
-            <Typography variant="subtitle2">{name}</Typography>
-            <Typography variant="caption">Image not available</Typography>
-          </MissingImageFallback>
+          <>
+            {!imageLoaded && !imageError && (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                animation="wave"
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  borderRadius: getBorderRadius(),
+                  backgroundColor: '#22262c',
+                }}
+              />
+            )}
+            {!imageError ? (
+              <CardImage
+                ref={imageRef}
+                src={getImageUrl()}
+                loading="lazy"
+                alt={name}
+                title={name}
+                setName={setName}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageError(true)}
+                style={{ opacity: imageLoaded ? 1 : 0 }}
+              />
+            ) : (
+              <MissingImageFallback setName={setName}>
+                <Typography variant="subtitle2">{name}</Typography>
+                <Typography variant="caption">Image not available</Typography>
+              </MissingImageFallback>
+            )}
+          </>
         )}
       </CardImageContainer>
 

@@ -176,8 +176,8 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
           items={[
             { label: 'Home', href: '/' },
             { label: 'Collections', href: `/collections/${userId}` },
-            { label: username },
-            { label: 'Cards' },
+            { label: username, href: `/collections/${userId}` },
+            { label: 'Cards', href: `/collections/${userId}?contentType=cards` },
           ]}
         />
         <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}>Loading...</Box>
@@ -212,8 +212,8 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
           items={[
             { label: 'Home', href: '/' },
             { label: 'Collections', href: `/collections/${userId}` },
-            { label: username },
-            { label: 'Cards' },
+            { label: username, href: `/collections/${userId}` },
+            { label: 'Cards', href: `/collections/${userId}?contentType=cards` },
             { label: 'Card not found' },
           ]}
         />
@@ -229,7 +229,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
           { label: 'Home', href: '/' },
           { label: 'Collections', href: `/collections/${userId}` },
           { label: username, href: `/collections/${userId}` },
-          { label: 'Cards' },
+          { label: 'Cards', href: `/collections/${userId}?contentType=cards` },
           { label: cardName },
         ]}
       />
@@ -255,6 +255,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
             locations={card?.locations}
             isOwnCollection={isOwnCollection}
             priceType={priceType}
+            imageLinksToTCGPlayer={true}
             display={{
               nameIsVisible: true,
               setIsVisible: true,

@@ -1,10 +1,13 @@
 import { Box, Paper, Skeleton, Typography } from '@mui/material';
 import React, { useState, useMemo } from 'react';
+import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
 interface CardImageDisplayProps {
   cardId: string;
   cardName?: string;
   setName?: string;
+  tcgplayerId?: number | string;
+  linkToTCGPlayer?: boolean;
   width?: {
     xs?: number | string;
     sm?: number | string;
@@ -26,6 +29,8 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
   cardId,
   cardName,
   setName,
+  tcgplayerId,
+  linkToTCGPlayer = false,
   width = { xs: '100%' },
   maxWidth = { xs: 300, sm: 400 },
 }) => {
@@ -40,20 +45,13 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
   }, [cardId]);
 
   const borderRadius = useMemo(() => getBorderRadius(setName), [setName]);
+  const tcgPlayerLink = useMemo(() => {
+    if (!linkToTCGPlayer) return null;
+    return generateTCGPlayerLink(tcgplayerId, cardName);
+  }, [linkToTCGPlayer, tcgplayerId, cardName]);
 
-  return (
-    <Box
-      sx={{
-        position: 'relative',
-        width,
-        maxWidth,
-        margin: '0 auto',
-        aspectRatio: '488/680',
-        borderRadius,
-        overflow: 'hidden',
-        boxShadow: 3,
-      }}
-    >
+  const imageContent = (
+    <>
       {!imageLoaded && !imageError && (
         <Skeleton
           variant="rectangular"
@@ -73,7 +71,8 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
         <Box
           component="img"
           src={imageUrl}
-          alt={cardName || 'Card image'}
+          alt={linkToTCGPlayer ? `${cardName} - Buy on TCGPlayer` : (cardName || 'Card image')}
+          title={linkToTCGPlayer ? `${cardName} - Buy on TCGPlayer` : undefined}
           onLoad={() => setImageLoaded(true)}
           onError={() => setImageError(true)}
           sx={{
@@ -113,6 +112,44 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
             Image not available
           </Typography>
         </Paper>
+      )}
+    </>
+  );
+
+  return (
+    <Box
+      sx={{
+        position: 'relative',
+        width,
+        maxWidth,
+        margin: '0 auto',
+        aspectRatio: '488/680',
+        borderRadius,
+        overflow: 'hidden',
+        boxShadow: 3,
+      }}
+    >
+      {linkToTCGPlayer && tcgPlayerLink ? (
+        <Box
+          component="a"
+          href={tcgPlayerLink}
+          target="_blank"
+          rel="noreferrer"
+          sx={{
+            display: 'block',
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            textDecoration: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          {imageContent}
+        </Box>
+      ) : (
+        imageContent
       )}
     </Box>
   );

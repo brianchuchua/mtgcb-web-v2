@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Link, Paper, Typography, Button } from '@mui/material';
+import { Box, Paper, Typography, Button } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import React, { useMemo, useState } from 'react';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
@@ -9,7 +9,6 @@ import { CardImageDisplay } from '@/components/cards/CardImageDisplay';
 import { CardDetailsSection, CardPricesSection, OtherPrintingsSection } from '@/components/cards/CardDetails';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import NextLink from 'next/link';
-import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { extractBaseName } from '@/utils/cards/extractBaseName';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import { useAuth } from '@/hooks/useAuth';
@@ -165,7 +164,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
           items={[
             { label: 'Home', href: '/' },
             { label: 'Browse', href: '/browse' },
-            { label: 'Cards' },
+            { label: 'Cards', href: '/browse?contentType=cards' },
           ]}
         />
         <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}>Loading...</Box>
@@ -180,7 +179,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
           items={[
             { label: 'Home', href: '/' },
             { label: 'Browse', href: '/browse' },
-            { label: 'Cards' },
+            { label: 'Cards', href: '/browse?contentType=cards' },
             { label: 'Card not found' },
           ]}
         />
@@ -195,7 +194,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
         items={[
           { label: 'Home', href: '/' },
           { label: 'Browse', href: '/browse' },
-          { label: 'Cards' },
+          { label: 'Cards', href: '/browse?contentType=cards' },
           { label: cardName },
         ]}
       />
@@ -204,19 +203,14 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
       <Grid container spacing={2} sx={{ mt: 1 }}>
         {/* Column 1: Card Image */}
         <Grid size={{ xs: 12, md: 12, lg: 3.5 }}>
-          <Link
-            href={generateTCGPlayerLink(card?.tcgplayerId || null, card?.name || '')}
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{ display: 'block', textDecoration: 'none' }}
-          >
-            <CardImageDisplay
-              cardId={cardId}
-              cardName={card?.name}
-              setName={card?.setName}
-              maxWidth={{ xs: 350, sm: 400 }}
-            />
-          </Link>
+          <CardImageDisplay
+            cardId={cardId}
+            cardName={card?.name}
+            setName={card?.setName}
+            tcgplayerId={card?.tcgplayerId || undefined}
+            linkToTCGPlayer={true}
+            maxWidth={{ xs: 350, sm: 400 }}
+          />
           
           {/* View in Collection Button */}
           {isAuthenticated && (

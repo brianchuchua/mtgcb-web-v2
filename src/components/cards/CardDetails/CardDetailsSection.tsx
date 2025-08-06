@@ -31,9 +31,22 @@ interface CardDetailsSectionProps {
   isCollectionView?: boolean;
 }
 
+const formatNumeric = (value: string | null | undefined): string => {
+  if (value === null || value === undefined) return '';
+  
+  const parsed = parseFloat(value);
+  const isValidNumber = !isNaN(parsed);
+  if (isValidNumber) {
+    return Math.floor(parsed).toString();
+  }
+  return value;
+};
+
 const formatPowerToughness = (power: string | null, toughness: string | null) => {
   if (!power && !toughness) return null;
-  if (power && toughness) return `${power}/${toughness}`;
+  const formattedPower = formatNumeric(power);
+  const formattedToughness = formatNumeric(toughness);
+  if (formattedPower && formattedToughness) return `${formattedPower}/${formattedToughness}`;
   return null;
 };
 
@@ -118,78 +131,81 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
         </Box>
       )}
 
-      {/* P/T or Loyalty */}
-      {(formatPowerToughness(card.powerNumeric || null, card.toughnessNumeric || null) || card.loyaltyNumeric) && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          <Typography variant="h6" fontWeight="500">
-            {formatPowerToughness(card.powerNumeric || null, card.toughnessNumeric || null) || card.loyaltyNumeric}
-          </Typography>
-        </Box>
-      )}
+      {/* Card Details and P/T Row */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+        {/* Left side: Card Details */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, flex: 1 }}>
+          {/* Artist */}
+          {card.artist && (
+            <Typography variant="body2" color="text.secondary">
+              Illustrated by{' '}
+              <Link
+                component={NextLink}
+                href={artistSearchUrl}
+                sx={{
+                  color: 'inherit',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                    color: (theme) => theme.palette.primary.main,
+                  },
+                }}
+              >
+                {card.artist}
+              </Link>
+            </Typography>
+          )}
 
-      {/* Card Details Grid */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-        {/* Set */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {card.setCode && <SetIcon code={card.setCode} size="1x" fixedWidth />}
-          <Link
-            component={NextLink}
-            href={setUrl}
-            sx={{
-              textDecoration: 'none',
-              color: 'inherit',
-              fontSize: '0.875rem',
-              '&:hover': {
-                textDecoration: 'underline',
-                color: (theme) => theme.palette.primary.main,
-              },
-            }}
-          >
-            {card.setName}
-          </Link>
-          <Typography variant="body2" color="text.secondary">
-            #{card.collectorNumber} • {capitalize(card.rarity || 'Unknown')}
-          </Typography>
-        </Box>
-
-        {/* Artist */}
-        {card.artist && (
-          <Typography variant="body2" color="text.secondary">
-            Illustrated by{' '}
+          {/* Set */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {card.setCode && <SetIcon code={card.setCode} size="1x" fixedWidth />}
             <Link
               component={NextLink}
-              href={artistSearchUrl}
+              href={setUrl}
               sx={{
-                color: 'inherit',
                 textDecoration: 'none',
+                color: 'inherit',
+                fontSize: '0.875rem',
                 '&:hover': {
                   textDecoration: 'underline',
                   color: (theme) => theme.palette.primary.main,
                 },
               }}
             >
-              {card.artist}
+              {card.setName}
             </Link>
-          </Typography>
-        )}
+            <Typography variant="body2" color="text.secondary">
+              #{card.collectorNumber} • {capitalize(card.rarity || 'Unknown')}
+            </Typography>
+          </Box>
 
-        {/* Available Printings */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-          <Typography variant="body2" color="text.secondary">Available printings:</Typography>
-          {card.canBeNonFoil !== false && (
-            <Chip label="Regular" size="small" variant="outlined" sx={{ height: 20 }} />
-          )}
-          {card.canBeFoil && (
-            <Chip 
-              label="Foil" 
-              size="small" 
-              variant="outlined" 
-              sx={{ 
-                height: 20
-              }} 
-            />
-          )}
+          {/* Available Printings */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+            <Typography variant="body2" color="text.secondary">Available printings:</Typography>
+            {card.canBeNonFoil !== false && (
+              <Chip label="Regular" size="small" variant="outlined" sx={{ height: 20 }} />
+            )}
+            {card.canBeFoil && (
+              <Chip 
+                label="Foil" 
+                size="small" 
+                variant="outlined" 
+                sx={{ 
+                  height: 20
+                }} 
+              />
+            )}
+          </Box>
         </Box>
+
+        {/* Right side: P/T or Loyalty */}
+        {(formatPowerToughness(card.powerNumeric || null, card.toughnessNumeric || null) || card.loyaltyNumeric) && (
+          <Box sx={{ ml: 2 }}>
+            <Typography variant="h6" fontWeight="500">
+              {formatPowerToughness(card.powerNumeric || null, card.toughnessNumeric || null) || formatNumeric(card.loyaltyNumeric)}
+            </Typography>
+          </Box>
+        )}
       </Box>
     </>
   );
