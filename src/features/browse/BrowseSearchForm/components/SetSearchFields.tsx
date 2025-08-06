@@ -35,6 +35,7 @@ const SetSearchFields: React.FC<SetSearchFieldsProps> = ({
         value={localSetName}
         onChange={handleSetNameChange}
         placeholder="Search by set name"
+        autoFocus
       />
       <SearchField
         label="Set Code"

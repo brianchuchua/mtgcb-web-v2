@@ -10,6 +10,7 @@ interface SearchFieldProps {
   startAdornment?: React.ReactNode;
   inputTestId?: string;
   iconTestId?: string;
+  autoFocus?: boolean;
 }
 
 const SearchField: React.FC<SearchFieldProps> = ({
@@ -20,6 +21,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
   startAdornment = <SearchIcon color="disabled" />,
   inputTestId,
   iconTestId,
+  autoFocus = false,
 }) => {
   const adornmentWithTestId = iconTestId ? (
     <SearchIcon color="disabled" data-testid={iconTestId} />
@@ -36,6 +38,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
       placeholder={placeholder}
       margin="dense"
       data-testid={inputTestId}
+      autoFocus={autoFocus}
       slotProps={{
         input: {
           startAdornment: <InputAdornment position="start">{adornmentWithTestId}</InputAdornment>,

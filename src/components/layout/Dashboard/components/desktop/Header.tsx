@@ -12,9 +12,11 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { AccountMenu } from '@/components/layout/Dashboard/components/AccountMenu';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
+import { getLatestRelease } from '@/app/changelog/changelog';
 
 export const Header = () => {
   const { isDesktopOpen, setDesktopOpen, sidenavWidth } = useDashboardContext();
+  const latestRelease = getLatestRelease();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -34,17 +36,19 @@ export const Header = () => {
             <Typography variant="h6" component="div">
               MTG Collection Builder
             </Typography>
-            <Tooltip title="Last Updated: 2025-08-06" arrow>
-              <Link href="/changelog" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
-                >
-                  v0.99.1
-                </Typography>
-              </Link>
-            </Tooltip>
+            {latestRelease && (
+              <Tooltip title={`Last Updated: ${latestRelease.date}`} arrow>
+                <Link href="/changelog" style={{ textDecoration: 'none' }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                  >
+                    v{latestRelease.version}
+                  </Typography>
+                </Link>
+              </Tooltip>
+            )}
           </Box>
           <AccountMenu />
         </Toolbar>

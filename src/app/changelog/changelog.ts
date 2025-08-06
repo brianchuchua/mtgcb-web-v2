@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-06',
+      version: '0.100.0',
+      changes: [
+        'Added contextual autofocus to Card Name and Set Name fields in browse search form',
+      ],
+    },
+    {
+      date: '2025-08-06',
       version: '0.99.0',
       changes: [
         'Added price settings section to Account page allowing users to configure how prices are displayed throughout the application',
@@ -63,6 +70,17 @@ const changelogData: ChangelogData = {
       changes: ['Added support for nested locations'],
     },
   ],
+};
+
+export const getLatestRelease = (): { date: string; version: string } | null => {
+  if (changelogData.releases.length === 0) {
+    return null;
+  }
+  const latest = changelogData.releases[0];
+  return {
+    date: latest.date,
+    version: latest.version,
+  };
 };
 
 export default changelogData;

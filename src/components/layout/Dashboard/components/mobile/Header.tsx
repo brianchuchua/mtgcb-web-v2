@@ -12,9 +12,11 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { AccountMenu } from '@/components/layout/Dashboard/components/AccountMenu';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
+import { getLatestRelease } from '@/app/changelog/changelog';
 
 const Header = () => {
   const { isMobileOpen, setMobileOpen, setMainSectionExpanded } = useDashboardContext();
+  const latestRelease = getLatestRelease();
 
   const handleMenuClick = () => {
     if (!isMobileOpen) {
@@ -41,18 +43,20 @@ const Header = () => {
             <Typography variant="h6" component="div">
               MTG CB
             </Typography>
-            <Tooltip title="Last Updated: 2025-08-06" arrow>
-              <Link href="/changelog" style={{ textDecoration: 'none' }}>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  component="span"
-                  sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
-                >
-                  v0.99.1
-                </Typography>
-              </Link>
-            </Tooltip>
+            {latestRelease && (
+              <Tooltip title={`Last Updated: ${latestRelease.date}`} arrow>
+                <Link href="/changelog" style={{ textDecoration: 'none' }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    component="span"
+                    sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
+                  >
+                    v{latestRelease.version}
+                  </Typography>
+                </Link>
+              </Tooltip>
+            )}
           </Box>
           <AccountMenu />
         </Toolbar>
