@@ -4,9 +4,10 @@
 
 Next.js web app for Magic: The Gathering Collection Builder - Track collections with TCGPlayer pricing.
 
-## For Every Feature
+## For Every Feature (Once I Confirm It's Complete)
 
 - Update the version number using semver conventions in `package.json` and the headers (including the date) and changelog page
+  - Update the minor version if it's a feature, and the patch version if it's a bug fix
 
 ## Tech Stack
 

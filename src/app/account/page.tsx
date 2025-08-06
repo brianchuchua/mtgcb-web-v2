@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Box, Container, FormControlLabel, Paper, Switch, TextField, Typography } from '@mui/material';
+import { Alert, Box, Container, FormControlLabel, MenuItem, Paper, Select, Switch, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { WarningAmber as WarningIcon, DeleteForever as DeleteIcon } from '@mui/icons-material';
 import Link from 'next/link';
@@ -14,11 +14,12 @@ import { withAuth } from '@/components/auth/withAuth';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { DeleteAccountDialog } from '@/components/account/DeleteAccountDialog';
+import { usePriceType } from '@/contexts/DisplaySettingsContext';
+import { PriceType } from '@/types/pricing';
 
 interface ProfileFormData {
   username: string;
   email: string;
-  isPublic: boolean;
 }
 
 interface PasswordFormData {
@@ -34,6 +35,8 @@ function ProfileContent() {
   const [deleteAccount, { isLoading: isDeletingAccount }] = useDeleteAccountMutation();
   const [hasProfileChanges, setHasProfileChanges] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [priceType, setPriceType] = usePriceType();
+  const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
 
   const {
     register: registerProfile,
@@ -45,7 +48,6 @@ function ProfileContent() {
     defaultValues: {
       username: user?.username || '',
       email: user?.email || '',
-      isPublic: user?.isPublic ?? false,
     },
   });
 
@@ -62,14 +64,13 @@ function ProfileContent() {
   const profileValues = watchProfile();
   const passwordFormValues = watchPassword();
 
-  // Track profile form changes
+  // Track profile form changes (excluding isPublic since it auto-saves)
   useEffect(() => {
     const hasChanges =
       profileValues.username !== user?.username ||
-      profileValues.email !== user?.email ||
-      profileValues.isPublic !== user?.isPublic;
+      profileValues.email !== user?.email;
     setHasProfileChanges(hasChanges);
-  }, [profileValues, user]);
+  }, [profileValues.username, profileValues.email, user]);
 
   // Check if password form is valid and matching
   const isPasswordFormValid =
@@ -115,6 +116,24 @@ function ProfileContent() {
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to update password';
       enqueueSnackbar(message, { variant: 'error' });
+    }
+  };
+
+  const handlePrivacyToggle = async (isPublic: boolean) => {
+    setIsUpdatingPrivacy(true);
+    try {
+      const result = await updateUser({ isPublic }).unwrap();
+      
+      if (!result.success) {
+        throw new Error(result.error?.message);
+      }
+      
+      enqueueSnackbar('Privacy settings updated successfully', { variant: 'success' });
+    } catch (error: any) {
+      const message = error.data?.error?.message || 'Failed to update privacy settings';
+      enqueueSnackbar(message, { variant: 'error' });
+    } finally {
+      setIsUpdatingPrivacy(false);
     }
   };
 
@@ -188,15 +207,6 @@ function ProfileContent() {
               helperText={profileErrors.email?.message}
             />
 
-            <FormControlLabel
-              sx={{ mt: 2, mb: 1 }}
-              control={<Switch {...registerProfile('isPublic')} checked={profileValues.isPublic || false} />}
-              label="Make my collection public"
-            />
-            <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mb: 2 }}>
-              When enabled, other users can view your collection data including cards, sets, locations, goals, values
-              and statistics.
-            </Typography>
 
             <ButtonWrapper>
               <Button
@@ -260,6 +270,50 @@ function ProfileContent() {
               </Button>
             </ButtonWrapper>
           </Form>
+        </Paper>
+
+        <Paper variant="outlined">
+          <CardHeader>
+            <Typography variant="h6">Privacy</Typography>
+          </CardHeader>
+          <CardContent>
+            <FormControlLabel
+              control={
+                <Switch 
+                  checked={user?.isPublic || false} 
+                  onChange={(e) => handlePrivacyToggle(e.target.checked)}
+                  disabled={isUpdatingPrivacy}
+                />
+              }
+              label="Make my collection public"
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 1 }}>
+              When enabled, anyone with the link can view your collection data including cards, sets, locations, goals, values
+              and statistics.
+            </Typography>
+          </CardContent>
+        </Paper>
+
+        <Paper variant="outlined">
+          <CardHeader>
+            <Typography variant="h6">Price Settings</Typography>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Choose how prices are displayed throughout the application. This setting is saved on your device.
+            </Typography>
+            <Select
+              value={priceType}
+              onChange={(e) => setPriceType(e.target.value as PriceType)}
+              fullWidth
+              sx={{ maxWidth: 300 }}
+            >
+              <MenuItem value={PriceType.Market}>Market</MenuItem>
+              <MenuItem value={PriceType.Low}>Low</MenuItem>
+              <MenuItem value={PriceType.Average}>Average</MenuItem>
+              <MenuItem value={PriceType.High}>High</MenuItem>
+            </Select>
+          </CardContent>
         </Paper>
 
         <Paper variant="outlined">

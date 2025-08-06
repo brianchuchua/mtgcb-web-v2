@@ -12,6 +12,20 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-06',
+      version: '0.99.0',
+      changes: [
+        'Added price settings section to Account page allowing users to configure how prices are displayed throughout the application',
+        'Created separate Privacy section with auto-save toggle for collection visibility',
+        'Reorganized Account page sections for better logical flow: Profile, Password, Privacy, Price Settings',
+      ],
+    },
+    {
+      date: '2025-08-06',
+      version: '0.98.1',
+      changes: ['Added delete account functionality with confirmation dialog and proper cleanup'],
+    },
+    {
+      date: '2025-08-06',
       version: '0.98.0',
       changes: ['Added individual card detail pages accessible by clicking on any card'],
     },

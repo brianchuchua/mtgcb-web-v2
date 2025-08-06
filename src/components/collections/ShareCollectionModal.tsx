@@ -136,7 +136,7 @@ export const ShareCollectionModal = ({
           </Typography>
 
           <Alert severity="info" sx={{ mb: 3 }}>
-            When public, others can view your collection including cards, sets, locations, goals, values and statistics.
+            When public, anyone with the link can view your collection including cards, sets, locations, goals, values and statistics.
           </Alert>
 
           <FormControlLabel
@@ -172,8 +172,8 @@ export const ShareCollectionModal = ({
 
       <Typography variant="body2" sx={{ mb: 2 }}>
         {collectionName
-          ? `Share ${username}'s ${collectionName} collection`
-          : `Share ${username}'s collection`}
+          ? `Anyone with this link can view ${username}'s ${collectionName} collection`
+          : `Anyone with this link can view ${username}'s collection`}
       </Typography>
 
       {hasQueryParams && (

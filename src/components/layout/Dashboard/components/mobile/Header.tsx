@@ -49,7 +49,7 @@ const Header = () => {
                   component="span"
                   sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
                 >
-                  v0.98.0
+                  v0.99.1
                 </Typography>
               </Link>
             </Tooltip>
