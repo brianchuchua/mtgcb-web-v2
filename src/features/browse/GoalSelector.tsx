@@ -23,9 +23,10 @@ import { useAuth } from '@/hooks/useAuth';
 
 interface GoalSelectorProps {
   userId: number;
+  alwaysShow?: boolean; // Optional prop to always show the selector even with no goals
 }
 
-const GoalSelector = ({ userId }: GoalSelectorProps) => {
+const GoalSelector = ({ userId, alwaysShow = false }: GoalSelectorProps) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const selectedGoalId = useSelector(selectSelectedGoalId);
@@ -82,8 +83,8 @@ const GoalSelector = ({ userId }: GoalSelectorProps) => {
     return null; // Silently fail if goals can't be loaded
   }
 
-  if (activeGoals.length === 0) {
-    return null; // Don't show selector if no active goals
+  if (activeGoals.length === 0 && !alwaysShow) {
+    return null; // Don't show selector if no active goals (unless alwaysShow is true)
   }
 
   return (

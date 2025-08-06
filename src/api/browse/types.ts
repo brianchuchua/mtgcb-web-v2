@@ -5,6 +5,7 @@ export interface CardModel {
   setId: string;
   setName: string;
   setSlug: string;
+  setCode: string;
   rarity: string;
   rarityNumeric: number;
   collectorNumber: string;

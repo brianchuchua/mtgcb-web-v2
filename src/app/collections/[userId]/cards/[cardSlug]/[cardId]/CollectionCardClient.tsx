@@ -1,21 +1,21 @@
 'use client';
 
-import { Box, Link, Paper, Typography, Button } from '@mui/material';
+import { Box, Link, Paper, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import React, { useMemo, useState } from 'react';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
-import { CardImageDisplay } from '@/components/cards/CardImageDisplay';
+import CardItem from '@/components/cards/CardItem';
 import { CardDetailsSection, CardPricesSection, OtherPrintingsSection } from '@/components/cards/CardDetails';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import NextLink from 'next/link';
-import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
-import { extractBaseName } from '@/utils/cards/extractBaseName';
-import CollectionsIcon from '@mui/icons-material/Collections';
 import { useAuth } from '@/hooks/useAuth';
 import { usePriceType } from '@/hooks/usePriceType';
+import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import { extractBaseName } from '@/utils/cards/extractBaseName';
+import PrivacyErrorBanner from '@/features/browse/views/PrivacyErrorBanner';
 
-interface CardBrowseClientProps {
+interface CollectionCardClientProps {
+  userId: number;
   cardId: string;
   cardSlug: string;
 }
@@ -51,6 +51,9 @@ const selectFields: Array<keyof CardModel | string> = [
   'releasedAt',
   'canBeFoil',
   'canBeNonFoil',
+  'quantityReg',
+  'quantityFoil',
+  'locations',
   'flavorName',
   'oracleText',
   'flavorText',
@@ -73,17 +76,19 @@ const otherPrintingsSelectFields: Array<keyof CardModel | string> = [
   'foil',
   'prices',
   'releasedAt',
-  'flavorName',
   'quantityReg',
   'quantityFoil',
+  'flavorName',
 ];
 
-export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientProps) {
-  const { user, isAuthenticated } = useAuth();
+
+export default function CollectionCardClient({ userId, cardId, cardSlug }: CollectionCardClientProps) {
+  const { user } = useAuth();
+  const isOwnCollection = user?.userId === userId;
   const priceType = usePriceType();
   const [otherPrintingsPage, setOtherPrintingsPage] = useState(0);
   const printingsPerPage = 20;
-  
+
   const {
     data: cardsData,
     isLoading,
@@ -91,9 +96,12 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
   } = useGetCardsQuery(
     {
       id: cardId,
+      userId,
+      priceType,
       limit: 1,
       offset: 0,
       select: selectFields as string[],
+      includeLocations: true,
     },
     {
       skip: !cardId,
@@ -102,6 +110,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
 
   const card = cardsData?.data?.cards?.[0];
   const cardName = isLoading ? 'Loading...' : card?.name || 'Card not found';
+  const username = cardsData?.data?.username || `User ${userId}`;
 
   // Calculate which batch of 500 we need based on current page
   const apiOffset = Math.floor((otherPrintingsPage * printingsPerPage) / 500) * 500;
@@ -109,6 +118,8 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
   const { data: otherPrintingsData, isLoading: isOtherPrintingsLoading } = useGetCardsQuery(
     {
       pureName: `"${(card as any)?.pureName || extractBaseName(card?.name)}"`,
+      userId,
+      priceType,
       limit: 500,
       offset: apiOffset,
       sortBy: 'releasedAt',
@@ -124,7 +135,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
     if (!otherPrintingsData?.data?.cards || !cardId) return [];
     return otherPrintingsData.data.cards.filter((printing) => printing.id !== cardId);
   }, [otherPrintingsData?.data?.cards, cardId]);
-  
+
   const paginatedPrintings = useMemo(() => {
     // Calculate position within the current 500-item batch
     const localStart = (otherPrintingsPage * printingsPerPage) % 500;
@@ -164,7 +175,8 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Browse', href: '/browse' },
+            { label: 'Collections', href: `/collections/${userId}` },
+            { label: username },
             { label: 'Cards' },
           ]}
         />
@@ -173,13 +185,34 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
     );
   }
 
+  // Check for privacy error (403)
+  const isPrivacyError = error && 'status' in error && error.status === 403;
+  
+  if (isPrivacyError) {
+    return (
+      <Box>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Collections', href: `/collections/${userId}` },
+            { label: 'Private user' },
+          ]}
+        />
+        <Box sx={{ mt: 3 }}>
+          <PrivacyErrorBanner />
+        </Box>
+      </Box>
+    );
+  }
+  
   if (error || (!card && !isLoading)) {
     return (
       <Box>
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Browse', href: '/browse' },
+            { label: 'Collections', href: `/collections/${userId}` },
+            { label: username },
             { label: 'Cards' },
             { label: 'Card not found' },
           ]}
@@ -194,7 +227,8 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Browse', href: '/browse' },
+          { label: 'Collections', href: `/collections/${userId}` },
+          { label: username, href: `/collections/${userId}` },
           { label: 'Cards' },
           { label: cardName },
         ]}
@@ -202,47 +236,34 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
 
       {/* Compact Three Column Layout */}
       <Grid container spacing={2} sx={{ mt: 1 }}>
-        {/* Column 1: Card Image */}
+        {/* Column 1: Card Image & Collection Management */}
         <Grid size={{ xs: 12, md: 12, lg: 3.5 }}>
-          <Link
-            href={generateTCGPlayerLink(card?.tcgplayerId || null, card?.name || '')}
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{ display: 'block', textDecoration: 'none' }}
-          >
-            <CardImageDisplay
-              cardId={cardId}
-              cardName={card?.name}
-              setName={card?.setName}
-              maxWidth={{ xs: 350, sm: 400 }}
-            />
-          </Link>
-          
-          {/* View in Collection Button */}
-          {isAuthenticated && (
-            <Paper
-              elevation={0}
-              sx={{
-                mt: 2,
-                p: 1.5,
-                backgroundColor: (theme) => theme.palette.background.default,
-              }}
-            >
-              <Button
-                component={NextLink}
-                href={`/collections/${user?.userId}/cards/${cardSlug}/${cardId}`}
-                variant="contained"
-                startIcon={<CollectionsIcon />}
-                fullWidth
-                sx={{
-                  textTransform: 'none',
-                  fontWeight: 500,
-                }}
-              >
-                View in your collection
-              </Button>
-            </Paper>
-          )}
+          <CardItem
+            id={cardId}
+            name={card?.name || ''}
+            setCode={card?.setCode}
+            setName={card?.setName}
+            setSlug={card?.setSlug}
+            tcgplayerId={card?.tcgplayerId ? Number(card.tcgplayerId) : undefined}
+            collectorNumber={card?.collectorNumber}
+            rarity={card?.rarity}
+            prices={priceData || undefined}
+            quantityReg={card?.quantityReg}
+            quantityFoil={card?.quantityFoil}
+            canBeFoil={card?.canBeFoil}
+            canBeNonFoil={card?.canBeNonFoil}
+            locations={card?.locations}
+            isOwnCollection={isOwnCollection}
+            priceType={priceType}
+            display={{
+              nameIsVisible: true,
+              setIsVisible: true,
+              priceIsVisible: true,
+              quantityIsVisible: true,
+              goalProgressIsVisible: false,
+              locationsIsVisible: true,
+            }}
+          />
         </Grid>
 
         {/* Column 2: Card Details */}
@@ -250,7 +271,8 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
           <Paper elevation={0} sx={{ p: 3, backgroundColor: (theme) => theme.palette.background.default }}>
             <CardDetailsSection 
               card={card as any} 
-              isCollectionView={false} 
+              userId={userId} 
+              isCollectionView={true} 
             />
           </Paper>
         </Grid>
@@ -288,7 +310,8 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
               itemsPerPage={printingsPerPage}
               isLoading={isOtherPrintingsLoading}
               priceType={priceType}
-              isCollectionView={false}
+              userId={userId}
+              isCollectionView={true}
               onPageChange={setOtherPrintingsPage}
             />
           </Paper>

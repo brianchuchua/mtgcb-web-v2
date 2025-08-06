@@ -5,12 +5,36 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import { Box, Collapse, Divider, IconButton, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BrowseSearchForm from '@/features/browse/BrowseSearchForm';
+import GoalSelector from '@/features/browse/GoalSelector';
 
 export const SearchForms = () => {
   const pathname = usePathname();
-  const [isExpanded, setIsExpanded] = useState(true);
+  
+  // Auto-expand for Browse and Collection pages
+  const shouldAutoExpand = pathname?.startsWith('/browse') || pathname?.startsWith('/collections');
+  
+  // Start expanded for browse and collection pages - MUST be called before any returns
+  const [isExpanded, setIsExpanded] = useState(shouldAutoExpand);
+  
+  // Update expansion state when navigating to browse or collection pages
+  // MUST be called before any conditional returns to follow React's rules of hooks
+  useEffect(() => {
+    if (shouldAutoExpand) {
+      setIsExpanded(true);
+    }
+  }, [pathname, shouldAutoExpand]);
+  
+  // Check if this is a collection card detail page
+  const isCollectionCardPage = pathname?.startsWith('/collections/') && 
+                               pathname?.includes('/cards/') && 
+                               pathname?.split('/').length > 4;
+  
+  // Don't show on collection card pages (no search options there)
+  if (isCollectionCardPage) {
+    return null;
+  }
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
@@ -23,6 +47,11 @@ export const SearchForms = () => {
   
   // Don't render on the edit-cards page
   if (pathname === '/collections/edit-cards') {
+    return null;
+  }
+  
+  // Don't render on browse card detail pages
+  if (pathname?.startsWith('/browse/cards/') && pathname?.split('/').length > 3) {
     return null;
   }
 
@@ -68,7 +97,8 @@ export const SearchForms = () => {
       </Box>
       <Divider />
       <Collapse in={isExpanded} timeout="auto">
-        <Box>
+        <Box sx={{ p: 0 }}>
+          {/* Show BrowseSearchForm on browse and collection pages */}
           {(pathname?.startsWith('/browse') || pathname?.startsWith('/collections')) && <BrowseSearchForm />}
           {/* Add other forms here later, like:
             pathname.startsWith('/inventory') && <InventorySearchForm />

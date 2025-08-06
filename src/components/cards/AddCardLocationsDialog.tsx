@@ -17,6 +17,7 @@ import {
   IconButton,
   InputLabel,
   LinearProgress,
+  Link,
   MenuItem,
   Select,
   Stack,
@@ -213,7 +214,12 @@ export default function AddCardLocationsDialog({
         ) : (
           <Stack spacing={2} sx={{ mt: 0 }}>
             {locations.length === 0 ? (
-              <Alert severity="info">No locations found. Please create a location first.</Alert>
+              <Alert severity="info">
+                No locations found.{' '}
+                <Link href="/locations" underline="hover">
+                  Please create a location first.
+                </Link>
+              </Alert>
             ) : (
               <>
                 {/* Action and Selectors */}

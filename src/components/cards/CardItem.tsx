@@ -1,16 +1,16 @@
 'use client';
 
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Box, Card, CardContent, IconButton, Menu, MenuItem, Skeleton, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
+import AddCardLocationsDialog from './AddCardLocationsDialog';
+import CardLocationPills from './CardLocationPills';
 import CardPrice from './CardPrice';
 import { EditableCardQuantity } from './EditableCardQuantity';
 import { GoalStatusDisplay } from './GoalStatusDisplay';
-import AddCardLocationsDialog from './AddCardLocationsDialog';
-import CardLocationPills from './CardLocationPills';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
@@ -156,16 +156,16 @@ const CardItemComponent = ({
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
   const pathname = usePathname();
-  
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     setMenuAnchorEl(event.currentTarget);
   };
-  
+
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
   };
-  
+
   const handleAddLocations = () => {
     setLocationDialogOpen(true);
     handleMenuClose();
@@ -237,43 +237,43 @@ const CardItemComponent = ({
       setName={setName}
       data-testid="card-item"
     >
-        <CardImageContainer
-          onClick={onClick ? handleCardElementClick : undefined}
-          sx={{
-            cursor: onClick ? 'pointer' : 'default',
-            opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
-            transition: 'opacity 0.2s ease-in-out',
-            position: 'relative',
-            '&:hover': {
-              opacity: 1,
-            },
-            // Add diagonal stripes overlay for incomplete goals
-            ...(goalProgressIsVisible &&
-              goalFullyMet === false && {
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundImage: `repeating-linear-gradient(
+      <CardImageContainer
+        onClick={onClick ? handleCardElementClick : undefined}
+        sx={{
+          cursor: onClick ? 'pointer' : 'default',
+          opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
+          transition: 'opacity 0.2s ease-in-out',
+          position: 'relative',
+          '&:hover': {
+            opacity: 1,
+          },
+          // Add diagonal stripes overlay for incomplete goals
+          ...(goalProgressIsVisible &&
+            goalFullyMet === false && {
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `repeating-linear-gradient(
                   45deg,
                   transparent,
                   transparent 10px,
                   rgba(255, 152, 0, 0.2) 10px,
                   rgba(255, 152, 0, 0.2) 20px
                 )`,
-                  pointerEvents: 'none',
-                  borderRadius: 'inherit',
-                  transition: 'opacity 0.2s ease-in-out',
-                },
-                '&:hover::after': {
-                  opacity: 0,
-                },
-              }),
-          }}
-        >
+                pointerEvents: 'none',
+                borderRadius: 'inherit',
+                transition: 'opacity 0.2s ease-in-out',
+              },
+              '&:hover::after': {
+                opacity: 0,
+              },
+            }),
+        }}
+      >
         {!imageLoaded && !imageError && (
           <Skeleton
             variant="rectangular"
@@ -310,7 +310,16 @@ const CardItemComponent = ({
       </CardImageContainer>
 
       {(nameIsVisible || setIsVisible || priceIsVisible || quantityIsVisible || goalProgressIsVisible) && (
-        <CardContent sx={{ p: 1, '&:last-child': { pb: 1 }, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+        <CardContent
+          sx={{
+            p: 1,
+            '&:last-child': { pb: 1 },
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+          }}
+        >
           {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && isOwnCollection && (
             <Box sx={{ mb: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -327,11 +336,11 @@ const CardItemComponent = ({
                 <IconButton
                   size="small"
                   onClick={handleMenuOpen}
-                  sx={{ 
+                  sx={{
                     padding: 0.5,
                     '&:hover': {
                       backgroundColor: 'action.hover',
-                    }
+                    },
                   }}
                 >
                   <MoreVertIcon fontSize="small" />
@@ -350,10 +359,7 @@ const CardItemComponent = ({
                   horizontal: 'right',
                 }}
               >
-                <MenuItem 
-                  onClick={handleAddLocations}
-                  disabled={!quantityReg && !quantityFoil}
-                >
+                <MenuItem onClick={handleAddLocations} disabled={!quantityReg && !quantityFoil}>
                   Add card location(s)
                 </MenuItem>
               </Menu>
@@ -487,13 +493,13 @@ const CardItemComponent = ({
               <CardPrice prices={priceData} isLoading={false} priceType={priceType} />
             </Box>
           )}
-          
+
           {quantityIsVisible && isOwnCollection && locationsIsVisible && (
             <Box sx={{ mt: 1 }}>
-              <CardLocationPills 
-                cardId={parseInt(id)} 
-                cardName={name} 
-                setName={setName} 
+              <CardLocationPills
+                cardId={parseInt(id)}
+                cardName={name}
+                setName={setName}
                 totalQuantityReg={quantityReg || 0}
                 totalQuantityFoil={quantityFoil || 0}
                 canBeFoil={canBeFoil}
@@ -506,30 +512,36 @@ const CardItemComponent = ({
           {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && !isOwnCollection && (
             <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center', gap: 1 }}>
               {quantityReg !== undefined && (
-                <Typography variant="body2" sx={{ 
-                  fontWeight: 'medium',
-                  fontSize: '0.875rem',
-                  '@container card (max-width: 250px)': {
-                    fontSize: '0.8125rem',
-                  },
-                  '@container card (max-width: 200px)': {
-                    fontSize: '0.75rem',
-                  },
-                }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 'medium',
+                    fontSize: '0.875rem',
+                    '@container card (max-width: 250px)': {
+                      fontSize: '0.8125rem',
+                    },
+                    '@container card (max-width: 200px)': {
+                      fontSize: '0.75rem',
+                    },
+                  }}
+                >
                   {quantityReg}x Regular
                 </Typography>
               )}
               {quantityFoil !== undefined && (
-                <Typography variant="body2" sx={{ 
-                  fontWeight: 'medium',
-                  fontSize: '0.875rem',
-                  '@container card (max-width: 250px)': {
-                    fontSize: '0.8125rem',
-                  },
-                  '@container card (max-width: 200px)': {
-                    fontSize: '0.75rem',
-                  },
-                }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 'medium',
+                    fontSize: '0.875rem',
+                    '@container card (max-width: 250px)': {
+                      fontSize: '0.8125rem',
+                    },
+                    '@container card (max-width: 200px)': {
+                      fontSize: '0.75rem',
+                    },
+                  }}
+                >
                   {quantityFoil}x Foil
                 </Typography>
               )}
@@ -537,7 +549,7 @@ const CardItemComponent = ({
           )}
         </CardContent>
       )}
-      
+
       {locationDialogOpen && (
         <AddCardLocationsDialog
           open={locationDialogOpen}
@@ -557,6 +569,12 @@ const CardItemComponent = ({
 
 const CardItem = React.memo(CardItemComponent, (prevProps, nextProps) => {
   // Skip re-render if all relevant props are the same
+
+  // Compare locations array if locations are visible
+  const locationsEqual =
+    !prevProps.display?.locationsIsVisible ||
+    JSON.stringify(prevProps.locations) === JSON.stringify(nextProps.locations);
+
   return (
     prevProps.id === nextProps.id &&
     prevProps.name === nextProps.name &&
@@ -564,6 +582,7 @@ const CardItem = React.memo(CardItemComponent, (prevProps, nextProps) => {
     prevProps.quantityFoil === nextProps.quantityFoil &&
     prevProps.isOwnCollection === nextProps.isOwnCollection &&
     prevProps.priceType === nextProps.priceType &&
+    locationsEqual &&
     // Deep compare display settings
     prevProps.display?.nameIsVisible === nextProps.display?.nameIsVisible &&
     prevProps.display?.setIsVisible === nextProps.display?.setIsVisible &&

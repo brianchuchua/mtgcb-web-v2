@@ -34,14 +34,14 @@ export const Header = () => {
             <Typography variant="h6" component="div">
               MTG Collection Builder
             </Typography>
-            <Tooltip title="Last Updated: 2025-08-05" arrow>
+            <Tooltip title="Last Updated: 2025-08-06" arrow>
               <Link href="/changelog" style={{ textDecoration: 'none' }}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
                   sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
                 >
-                  v0.96.0
+                  v0.98.0
                 </Typography>
               </Link>
             </Tooltip>

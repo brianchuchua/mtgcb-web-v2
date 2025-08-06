@@ -143,14 +143,19 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
 
   const handleCardClick = useCallback(
     (cardId: string, cardName?: string) => {
-      if (cardName) {
-        const cardUrl = generateCardUrl(cardName, cardId);
-        router.push(cardUrl);
-      } else {
-        router.push(`/browse/cards/unknown/${cardId}`);
-      }
+      // Generate the slug part of the URL
+      const cardSlug = cardName ? cardName.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '') : 'unknown';
+      
+      // Context-aware navigation: if we have a userId, navigate to collection context
+      const cardUrl = userId 
+        ? `/collections/${userId}/cards/${cardSlug}/${cardId}`
+        : `/browse/cards/${cardSlug}/${cardId}`;
+      
+      router.push(cardUrl);
     },
-    [router],
+    [router, userId],
   );
 
   return {
