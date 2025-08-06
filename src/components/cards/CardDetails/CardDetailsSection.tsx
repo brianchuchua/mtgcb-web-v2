@@ -157,24 +157,33 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
           )}
 
           {/* Set */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {card.setCode && <SetIcon code={card.setCode} size="1x" fixedWidth />}
-            <Link
-              component={NextLink}
-              href={setUrl}
-              sx={{
-                textDecoration: 'none',
-                color: 'inherit',
-                fontSize: '0.875rem',
-                '&:hover': {
-                  textDecoration: 'underline',
-                  color: (theme) => theme.palette.primary.main,
-                },
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {card.setCode && <SetIcon code={card.setCode} size="1x" fixedWidth />}
+              <Link
+                component={NextLink}
+                href={setUrl}
+                sx={{
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  fontSize: '0.875rem',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                    color: (theme) => theme.palette.primary.main,
+                  },
+                }}
+              >
+                {card.setName}
+              </Link>
+            </Box>
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{ 
+                width: { xs: '100%', sm: 'auto' },
+                pl: { xs: 3, sm: 0 }
               }}
             >
-              {card.setName}
-            </Link>
-            <Typography variant="body2" color="text.secondary">
               #{card.collectorNumber} • {capitalize(card.rarity || 'Unknown')}
             </Typography>
           </Box>

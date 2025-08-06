@@ -204,8 +204,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Sealed product support
 - Button to report missing card data, notify user if link to scryfall or tcgplayer is missing
 - Financial history tracking, collection value history, etc.
-- Card comments and rating
+- Card comments and rating by format
+- 17Lands data integration
 - Patron request: Scryfall syntax support for searches
+-
 
 ## Future Enhancements to Existing Features
 

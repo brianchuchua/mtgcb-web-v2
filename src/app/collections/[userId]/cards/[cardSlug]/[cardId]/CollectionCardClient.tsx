@@ -235,7 +235,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
       />
 
       {/* Compact Three Column Layout */}
-      <Grid container spacing={2} sx={{ mt: 1 }}>
+      <Grid container spacing={2} sx={{ mt: 1, alignItems: 'flex-start' }}>
         {/* Column 1: Card Image & Collection Management */}
         <Grid size={{ xs: 12, md: 12, lg: 3.5 }}>
           <CardItem

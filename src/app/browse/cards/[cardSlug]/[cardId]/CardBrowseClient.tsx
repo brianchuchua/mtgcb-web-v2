@@ -10,7 +10,7 @@ import { CardDetailsSection, CardPricesSection, OtherPrintingsSection } from '@/
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import NextLink from 'next/link';
 import { extractBaseName } from '@/utils/cards/extractBaseName';
-import CollectionsIcon from '@mui/icons-material/Collections';
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import { useAuth } from '@/hooks/useAuth';
 import { usePriceType } from '@/hooks/usePriceType';
 
@@ -200,7 +200,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
       />
 
       {/* Compact Three Column Layout */}
-      <Grid container spacing={2} sx={{ mt: 1 }}>
+      <Grid container spacing={2} sx={{ mt: 1, alignItems: 'flex-start' }}>
         {/* Column 1: Card Image */}
         <Grid size={{ xs: 12, md: 12, lg: 3.5 }}>
           <CardImageDisplay
@@ -209,7 +209,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
             setName={card?.setName}
             tcgplayerId={card?.tcgplayerId || undefined}
             linkToTCGPlayer={true}
-            maxWidth={{ xs: 350, sm: 400 }}
+            maxWidth={{ xs: 400, sm: 500, md: 600 }}
           />
           
           {/* View in Collection Button */}
@@ -220,14 +220,17 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
                 mt: 2,
                 p: 1.5,
                 backgroundColor: (theme) => theme.palette.background.default,
+                display: 'flex',
+                justifyContent: 'center',
               }}
             >
               <Button
                 component={NextLink}
                 href={`/collections/${user?.userId}/cards/${cardSlug}/${cardId}`}
                 variant="contained"
-                startIcon={<CollectionsIcon />}
-                fullWidth
+                color="secondary"
+                size="small"
+                startIcon={<ImportContactsIcon sx={{ mb: 0.25 }} />}
                 sx={{
                   textTransform: 'none',
                   fontWeight: 500,

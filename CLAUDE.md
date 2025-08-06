@@ -58,7 +58,9 @@ Pages → Features → API (RTK Query) → Backend
 
 - `/` - Home page
 - `/browse` - Cards/sets browser with filters
+- `/browse/cards/[cardSlug]/[cardId]` - Individual card details
 - `/collections/[userId]` - Public collection view
+- `/collections/[userId]/cards/[cardSlug]/[cardId]` - Card details in collection context
 
 ### Auth Required Pages
 
