@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -13,7 +13,7 @@ interface SearchFieldProps {
   autoFocus?: boolean;
 }
 
-const SearchField: React.FC<SearchFieldProps> = ({
+const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(({
   label,
   value,
   onChange,
@@ -22,7 +22,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
   inputTestId,
   iconTestId,
   autoFocus = false,
-}) => {
+}, ref) => {
   const adornmentWithTestId = iconTestId ? (
     <SearchIcon color="disabled" data-testid={iconTestId} />
   ) : (
@@ -39,6 +39,7 @@ const SearchField: React.FC<SearchFieldProps> = ({
       margin="dense"
       data-testid={inputTestId}
       autoFocus={autoFocus}
+      inputRef={ref}
       slotProps={{
         input: {
           startAdornment: <InputAdornment position="start">{adornmentWithTestId}</InputAdornment>,
@@ -46,6 +47,8 @@ const SearchField: React.FC<SearchFieldProps> = ({
       }}
     />
   );
-};
+});
+
+SearchField.displayName = 'SearchField';
 
 export default SearchField;

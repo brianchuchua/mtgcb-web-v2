@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import SearchField from './SearchField';
 import ToggleSwitch from './ToggleSwitch';
 import CompletionStatusSelector from '@/features/browse/CompletionStatusSelector';
@@ -28,9 +28,17 @@ const SetSearchFields: React.FC<SetSearchFieldsProps> = ({
   handleIncludeSubsetsInSetChange,
   isCollectionPage,
 }) => {
+  const setNameRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Focus the set name field when the component mounts or updates
+    setNameRef.current?.focus();
+  }, []);
+
   return (
     <>
       <SearchField
+        ref={setNameRef}
         label="Set Name"
         value={localSetName}
         onChange={handleSetNameChange}

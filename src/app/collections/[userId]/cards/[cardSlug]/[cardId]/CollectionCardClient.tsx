@@ -7,8 +7,11 @@ import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import CardItem from '@/components/cards/CardItem';
 import { CardDetailsSection, CardPricesSection, OtherPrintingsSection } from '@/components/cards/CardDetails';
+import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
+import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useAuth } from '@/hooks/useAuth';
+import { useShareTokenContext } from '@/contexts/ShareTokenContext';
 import { usePriceType } from '@/hooks/usePriceType';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { extractBaseName } from '@/utils/cards/extractBaseName';
@@ -84,6 +87,7 @@ const otherPrintingsSelectFields: Array<keyof CardModel | string> = [
 
 export default function CollectionCardClient({ userId, cardId, cardSlug }: CollectionCardClientProps) {
   const { user } = useAuth();
+  const { shareToken, isViewingSharedCollection } = useShareTokenContext();
   const isOwnCollection = user?.userId === userId;
   const priceType = usePriceType();
   const [otherPrintingsPage, setOtherPrintingsPage] = useState(0);
@@ -187,6 +191,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
 
   // Check for privacy error (403)
   const isPrivacyError = error && 'status' in error && error.status === 403;
+  const hasInvalidShareLink = shareToken && isViewingSharedCollection(userId) && isPrivacyError;
   
   if (isPrivacyError) {
     return (
@@ -195,11 +200,15 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
           items={[
             { label: 'Home', href: '/' },
             { label: 'Collections', href: `/collections/${userId}` },
-            { label: 'Private user' },
+            { label: hasInvalidShareLink ? 'Invalid share link' : 'Private user' },
           ]}
         />
         <Box sx={{ mt: 3 }}>
-          <PrivacyErrorBanner />
+          {hasInvalidShareLink ? (
+            <InvalidShareLinkBanner username={username} />
+          ) : (
+            <PrivacyErrorBanner />
+          )}
         </Box>
       </Box>
     );
@@ -224,6 +233,10 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
 
   return (
     <Box>
+      {!hasInvalidShareLink && (
+        <SharedCollectionBanner username={username || 'User'} userId={userId} />
+      )}
+      
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },

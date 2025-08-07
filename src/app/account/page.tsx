@@ -14,6 +14,8 @@ import { withAuth } from '@/components/auth/withAuth';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { DeleteAccountDialog } from '@/components/account/DeleteAccountDialog';
+import { ShareLinkManager } from '@/components/account/ShareLinkManager';
+import { AccessSummary } from '@/components/account/AccessSummary';
 import { usePriceType } from '@/contexts/DisplaySettingsContext';
 import { PriceType } from '@/types/pricing';
 
@@ -274,23 +276,30 @@ function ProfileContent() {
 
         <Paper variant="outlined">
           <CardHeader>
-            <Typography variant="h6">Privacy</Typography>
+            <Typography variant="h6">Privacy & Sharing</Typography>
           </CardHeader>
-          <CardContent>
-            <FormControlLabel
-              control={
-                <Switch 
-                  checked={user?.isPublic || false} 
-                  onChange={(e) => handlePrivacyToggle(e.target.checked)}
-                  disabled={isUpdatingPrivacy}
-                />
-              }
-              label="Make my collection public"
-            />
-            <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 1 }}>
-              When enabled, anyone with the link can view your collection data including cards, sets, locations, goals, values
-              and statistics.
-            </Typography>
+          <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch 
+                    checked={user?.isPublic || false} 
+                    onChange={(e) => handlePrivacyToggle(e.target.checked)}
+                    disabled={isUpdatingPrivacy}
+                  />
+                }
+                label="Make my collection public"
+              />
+              <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 1 }}>
+                When enabled, your collection is visible at its public URL that anyone can access.
+              </Typography>
+            </Box>
+            
+            <AccessSummary isPublic={user?.isPublic || false} />
+            
+            {!user?.isPublic && (
+              <ShareLinkManager />
+            )}
           </CardContent>
         </Paper>
 

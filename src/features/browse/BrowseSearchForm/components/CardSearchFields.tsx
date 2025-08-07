@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import SearchField from './SearchField';
 import OracleTextField from './OracleTextField';
 import ToggleSwitch from './ToggleSwitch';
@@ -40,9 +40,17 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
   isCollectionPage,
   isCollectionSetPage,
 }) => {
+  const cardNameRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Focus the card name field when the component mounts or updates
+    cardNameRef.current?.focus();
+  }, []);
+
   return (
     <>
       <SearchField
+        ref={cardNameRef}
         label="Card Name"
         value={localCardName}
         onChange={handleCardNameChange}

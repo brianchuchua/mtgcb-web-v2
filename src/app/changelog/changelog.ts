@@ -11,6 +11,18 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-08-07',
+      version: '0.101.0',
+      changes: [
+        'Added private share links feature - generate secure links to share private collections',
+        'Enhanced privacy controls with visual access summary showing who can view collections',
+        'Implemented share link manager with expiration options (1 day to permanent)',
+        'Added invalid/expired share link detection with clear error messaging',
+        'Updated share modal with dual options: make public or generate private share link',
+        'Share links persist for browser session and properly handle UTC timestamps',
+      ],
+    },
+    {
       date: '2025-08-06',
       version: '0.100.0',
       changes: [

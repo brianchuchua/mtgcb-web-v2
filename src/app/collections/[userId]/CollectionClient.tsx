@@ -7,12 +7,15 @@ import { CollectionSetSummary } from '@/api/collections/types';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisplay';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
+import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
+import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Pagination } from '@/components/pagination';
 import { CardsProps, SetsProps } from '@/features/browse/types';
 import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
+import { useShareTokenContext } from '@/contexts/ShareTokenContext';
 import { selectSelectedGoalId, selectIncludeSubsetsInSets } from '@/redux/slices/browseSlice';
 
 interface CollectionClientProps {
@@ -24,9 +27,14 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
   
   const { view, viewMode, error, paginationProps, setsProps, cardsProps } = useCollectionBrowseController({ userId });
   const { user } = useAuth();
+  const { shareToken, isViewingSharedCollection } = useShareTokenContext();
   const isOwnCollection = user?.userId === userId;
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
+  
+  // Check if we have a share token but got a privacy error (403)
+  const hasInvalidShareLink = shareToken && isViewingSharedCollection(userId) && 
+    error?.data?.error?.code === 'COLLECTION_PRIVATE';
 
 
   // Create collection sets map from the sets data
@@ -112,6 +120,10 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
 
   return (
     <>
+      {!hasInvalidShareLink && (
+        <SharedCollectionBanner username={username || 'User'} userId={userId} />
+      )}
+      
       {(collectionSummary || isLoading) && (
         <CollectionHeader
           username={username || ''}
@@ -141,7 +153,9 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
       />
 
       {error && (
-        error?.data?.error?.code === 'COLLECTION_PRIVATE' ? (
+        hasInvalidShareLink ? (
+          <InvalidShareLinkBanner username={username} />
+        ) : error?.data?.error?.code === 'COLLECTION_PRIVATE' ? (
           <PrivacyErrorBanner username={username} />
         ) : (
           <ErrorBanner type={view} />

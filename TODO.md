@@ -6,6 +6,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Current Action Items
 
+- Privacy mode links: I'll look into adding private hashed links as a layer on top of the privacy system. A collection can be private, but as an exception, a user can make that special link to share. Maybe just as a hash query parameter that acts like a key to unlock the links, so the rest of the site still works.
 - instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
@@ -206,6 +207,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Future Enhancements to Existing Features
 
+### Search
+
+- Saving searches
+
 ### Locations
 
 - Allowing backups, import and export of locations
@@ -213,6 +218,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Collection Goals
 
 - Sharing and duplicating collection goals
+- "Save this search as a collection goal"
 
 ### Performance
 

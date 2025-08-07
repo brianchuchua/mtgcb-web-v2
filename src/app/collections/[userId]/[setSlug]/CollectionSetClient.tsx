@@ -15,6 +15,8 @@ import MassUpdateButton from '@/components/collections/MassUpdateButton';
 import MassUpdateConfirmDialog from '@/components/collections/MassUpdateConfirmDialog';
 import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
+import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
+import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
@@ -26,6 +28,7 @@ import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features
 import InfoBanner from '@/features/browse/views/InfoBanner';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
+import { useShareTokenContext } from '@/contexts/ShareTokenContext';
 import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import {
@@ -58,8 +61,13 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
   const setPriceType = useSetPriceType();
   const { user } = useAuth();
+  const { shareToken, isViewingSharedCollection } = useShareTokenContext();
   const isOwnCollection = user?.userId === userId;
   const { enqueueSnackbar } = useSnackbar();
+  
+  // Check if we have a share token but got a privacy error (403)
+  const hasInvalidShareLink = shareToken && isViewingSharedCollection(userId) && 
+    browseController.error?.data?.error?.code === 'COLLECTION_PRIVATE';
 
   // Mass Update state
   const [isMassUpdateOpen, setIsMassUpdateOpen] = useState(false);
@@ -322,6 +330,10 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   return (
     <Box>
+      {!hasInvalidShareLink && (
+        <SharedCollectionBanner username={username || 'User'} userId={userId} />
+      )}
+      
       {/* Show CollectionHeader when viewing with a goal selected */}
       {selectedGoalId && collectionSummary && set && (
         <Box sx={{ position: 'relative' }}>
@@ -488,7 +500,9 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       )}
 
       {browseController.error ? (
-        browseController.error?.data?.error?.code === 'COLLECTION_PRIVATE' ? (
+        hasInvalidShareLink ? (
+          <InvalidShareLinkBanner username={browseController.cardsProps?.username} />
+        ) : browseController.error?.data?.error?.code === 'COLLECTION_PRIVATE' ? (
           <PrivacyErrorBanner username={browseController.cardsProps?.username} />
         ) : (
           <ErrorBanner type={browseController.view} />
