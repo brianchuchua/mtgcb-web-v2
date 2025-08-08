@@ -1,12 +1,5 @@
-import { Box, Typography } from '@mui/material';
+import HomePageClient from '@/app/HomePageClient';
 
 export default function HomePage() {
-  return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Home
-      </Typography>
-      <Typography>Home page placeholder</Typography>
-    </Box>
-  );
+  return <HomePageClient />;
 }

@@ -1,4 +1,4 @@
-# MTGCB Web v2
+# MTG CB Web v2
 
 ## Overview
 
@@ -6,7 +6,8 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 
 ## For Every Feature (Once I Confirm It's Complete)
 
-- Update the version number using semver conventions in `package.json` and the headers (including the date) and changelog page
+- Update the version number using semver conventions in `package.json` and `src/data/changelog.ts`
+  - The headers auto-update based on what's in the changelog.ts file
   - Update the minor version if it's a feature, and the patch version if it's a bug fix
 
 ## Tech Stack

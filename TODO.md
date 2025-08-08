@@ -6,7 +6,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Current Action Items
 
-- Privacy mode links: I'll look into adding private hashed links as a layer on top of the privacy system. A collection can be private, but as an exception, a user can make that special link to share. Maybe just as a hash query parameter that acts like a key to unlock the links, so the rest of the site still works.
 - instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
 - I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
@@ -27,8 +26,19 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Home Page
 
+- Some of the below has been done, but will be revisited as I complete other connected sections.
 - Should brag about new features and explain the launch (need a news page I think)
 - Should show most valuable card, statistics, etc. I think. Although need stats somewhere else too, maybe in every header of every collection page.
+- Need to mention the site name more prominently
+- Need to rewrite the descriptions and link to my binders somewhere, maybe a tools section that links to my 17 lands tool too
+- Need to mention Patreon and voting on future features
+- When logged in, should have statistics and action buttons to lead them to different pages, in like a boxy layout, "what would you like to do today?", browse cards independent of your collection, etc.
+- logo and favicon
+- meta tag stuff, probably its own project
+- Emphasize collection completion and costs to complete
+- Browse sample collection
+- Needs preview of news section
+- Still needs a refactoring
 
 ### Terms and Conditions
 
@@ -41,7 +51,16 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Migration Path
 
+- need to clean up old collection entries, the 0 ones
+- need easy buttons to handle imports locally based on exports from the live site
+- need a scheduled downtime plan after proving the import process works in staging
+- need to clean up out of date schemas and generate the final database locally
+
 ### FAQ Page
+
+### News Page
+
+### Announcements Banner
 
 ### Testing
 
@@ -64,9 +83,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Consistent header, body, and breadcrumb styles
 - Consistent error and info message styles
 - Clearly label collection values as estimates
+- Bring in the MTG CB logo
 
 ### Uncategorized
 
+- plan an interface to show site news, like scheduled downtime alerts and stuff, that once closed would not re-open
 - verify the individual value of sets, when added up, add up to the collection value -- Chris request on Discord
 - card notes field for card page
 - support better rendering of which variants of cards exist in searches when limiting one copy per card name, maybe
@@ -191,6 +212,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Audit consistency of naming of fields returned by API for totalCount and values.
 - Need a full postman library of my API calls, these should live with api docs
 - Need a fallback if both canBeFoil and canBeNonFoil are false, treat them both as true probably
+- CI/CD pipeline
 
 ## Future Features
 
