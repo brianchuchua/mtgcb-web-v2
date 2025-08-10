@@ -27,13 +27,14 @@ const SetItemRenderer: React.FC<SetItemRendererProps> = ({
     setIsVisible(true);
   }, []);
 
-
   return (
     <SetBoxWrapper data-testid="set-item">
-      <SetBoxContent sx={{ 
-        opacity: isVisible ? 1 : 0, 
-        transition: 'opacity 0.7s ease-in-out' 
-      }}>
+      <SetBoxContent
+        sx={{
+          opacity: isVisible ? 1 : 0,
+          transition: 'opacity 0.7s ease-in-out',
+        }}
+      >
         <SetNameAndCode set={set} nameIsVisible={settings.nameIsVisible} codeIsVisible={settings.codeIsVisible} />
         <SetCategoryAndType
           set={set}
@@ -177,7 +178,13 @@ const SetReleaseDate: React.FC<SetReleaseDateProps> = ({ set, isVisible = true }
   if (!isVisible) return null;
 
   return (
-    <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center' }} data-testid="set-release-date">
+    <Typography
+      component="div"
+      variant="body2"
+      color="text.secondary"
+      sx={{ textAlign: 'center' }}
+      data-testid="set-release-date"
+    >
       {formatISODate(set.releasedAt)}
     </Typography>
   );
@@ -221,7 +228,13 @@ const SetCardCount: React.FC<SetCardCountProps> = ({
   const cardCount = includeSubsetsInSets ? cardCountIncludingSubsets : set.cardCount;
 
   return (
-    <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 0.5 }} data-testid="set-card-count">
+    <Typography
+      component="div"
+      variant="body2"
+      color="text.secondary"
+      sx={{ textAlign: 'center', mt: 0.5 }}
+      data-testid="set-card-count"
+    >
       {cardCount ? `${cardCount} cards` : 'N/A'}
     </Typography>
   );
@@ -266,7 +279,7 @@ const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({
       }}
     >
       <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1 }}>
-        Costs to purchase:
+        Costs to complete:
       </Typography>
 
       <Box sx={{ width: '100%', maxWidth: '350px' }}>

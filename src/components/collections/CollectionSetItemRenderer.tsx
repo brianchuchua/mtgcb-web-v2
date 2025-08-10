@@ -287,7 +287,7 @@ const CostToPurchaseSection: React.FC<{
       }}
     >
       <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1 }}>
-        Costs to purchase:
+        Costs to complete:
       </Typography>
 
       <Box sx={{ width: '100%', maxWidth: '350px' }}>
@@ -509,7 +509,6 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
   React.useEffect(() => {
     setIsVisible(true);
   }, []);
-
 
   return (
     <SetBoxWrapper>

@@ -1,14 +1,14 @@
 'use client';
 
-import { 
+import { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
+import {
   useDisplaySettings,
+  useLayoutSettings,
+  usePreferredViewMode,
+  usePriceType,
   useSetDisplaySettings,
   useTableSetSettings,
-  useLayoutSettings,
-  usePriceType,
-  usePreferredViewMode
 } from '@/contexts/DisplaySettingsContext';
-import { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 import { PriceType } from '@/types/pricing';
 
 export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
@@ -98,7 +98,7 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
       },
       {
         key: 'costs',
-        label: 'Costs to Purchase',
+        label: 'Costs to Complete',
         isVisible: setDisplaySettings.priceIsVisible,
         setVisibility: (value: boolean) => updateSetting('setPriceIsVisible', value),
         type: 'toggle',
