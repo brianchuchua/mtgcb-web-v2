@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-10',
+      version: '0.104.1',
+      changes: [
+        'Fixed Share button to only show for logged-in users viewing their own collection',
+      ],
+    },
+    {
+      date: '2025-08-10',
       version: '0.104.0',
       changes: [
         'Added private collection sharing with shortened, anonymous URLs that hide user IDs',

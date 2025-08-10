@@ -103,6 +103,8 @@ Now:
 
 ### Uncategorized
 
+- reduce logo image size
+- audit autocomplete fields and autocorrect
 - info icon next to collection value, estimate, tcgplayer data, etc. showing when prices last updated, number of cards missing price data
 - plan an interface to show site news, like scheduled downtime alerts and stuff, that once closed would not re-open
 - verify the individual value of sets, when added up, add up to the collection value -- Chris request on Discord

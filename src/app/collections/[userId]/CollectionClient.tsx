@@ -144,11 +144,13 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
       <Pagination 
         {...paginationProps} 
         additionalAction={
-          <ShareCollectionButton
-            userId={userId.toString()}
-            username={username || user?.username || 'User'}
-            isPublic={user?.isPublic || false}
-          />
+          isOwnCollection && (
+            <ShareCollectionButton
+              userId={userId.toString()}
+              username={username || user?.username || 'User'}
+              isPublic={user?.isPublic || false}
+            />
+          )
         }
       />
 

@@ -479,13 +479,15 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                 disabled={isMassUpdateLoading}
               />
             )}
-            <ShareCollectionButton
-              userId={userId.toString()}
-              username={username || user?.username || 'User'}
-              isPublic={user?.isPublic || false}
-              collectionName={set?.name}
-              setSlug={setSlug}
-            />
+            {isOwnCollection && (
+              <ShareCollectionButton
+                userId={userId.toString()}
+                username={username || user?.username || 'User'}
+                isPublic={user?.isPublic || false}
+                collectionName={set?.name}
+                setSlug={setSlug}
+              />
+            )}
           </>
         }
       />
