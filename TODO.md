@@ -298,7 +298,6 @@ Now:
 - Ping johnny on Discord once card locations are released. :)
 - Grok database backups in new system
 - Integration with Sonarcloud (open source the repo, make development easy for new devs)
-- Integration with Sentry
 - Integration with Google Analytics
 - Need an announcement banner for the home page
 - Need a temporary downtime page for the home page (database maintenance, etc.)
