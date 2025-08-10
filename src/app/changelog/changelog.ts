@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-08-09',
+      version: '0.102.1',
+      changes: [
+        'Fixed card visibility issue in aggregate sets like Secret Lair Drop Series where cards would be invisible despite data being loaded',
+        'Improved navigation transitions to prevent showing stale cards when switching between sets',
+      ],
+    },
+    {
       date: '2025-08-08',
       version: '0.102.0',
       changes: [

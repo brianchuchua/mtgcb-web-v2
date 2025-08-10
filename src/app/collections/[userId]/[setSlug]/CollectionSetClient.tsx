@@ -510,7 +510,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       ) : (
         <Box
           sx={{
-            opacity: cardsProps?.items?.[0]?.setSlug === setSlug ? 1 : 0,
+            opacity: cardsProps?.isFetching ? 0 : 1,
             transition: 'opacity 0.2s ease-in-out',
             minHeight: cardsProps?.items?.length ? 'auto' : '400px',
           }}

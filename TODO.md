@@ -16,6 +16,7 @@ Mostly ready:
   - bring collections and users to v3, hard truncate, skip 0-quantity collections
   - update the user id autoincrement value to match 1 more than the highest user id
 - Then do the new price updater
+- not a bug: i want to try location detection before sending in include locations, calls taking 410ms in secret lair drop series
 
 Soon:
 
@@ -84,6 +85,10 @@ Now:
 
 - Mobile
 - Tablet
+
+### Performance
+
+- Index audit and API measurement
 
 ## Other Action Items Before Launch
 
@@ -201,10 +206,13 @@ Now:
 - error state of quantity selectors not affecting button properly in goal editing or creation form
 - improve loading states, http://local.mtgcb.com:3000/collections/1337?goalId=14&oneResultPerCardName=true&contentType=cards and switch to "all except alpha" goal -- the transition is jarring
 - improve rendering of quantities of another person's collection, maybe just hide left/right buttons and disable, still need to show bad data indicators
+- detect old card images, track when they were updated and their quality, scryfall has a value for this too
 
 ## Bugs
 
-- Severe (Possibly fixed, keeping an eye on): Sometimes not seeing rendering of grid or table in a specific set, reproducible in Brave - http://local.mtgcb.com:3000/collections/100116/edge-of-eternities-commander-tokens, paginations and the buttons render, just not the virtualization content, maybe the logic to defer rendering is broken
+- release date desc for sets in browse view <--
+- pagination is persisting when browsing around sometimes, see browse page
+
 - Moderate: Draft cube calculation when track subsets with sets in on is wrong, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir -- it's incorrectly counting non main set cards as missing just in terms of the value
 - Moderate+ Bug: Collector number sort is broken in collector table view, probably not using the numeric version of collector number
 - Bug: Release date desc in sets view is applying to cards view when switching

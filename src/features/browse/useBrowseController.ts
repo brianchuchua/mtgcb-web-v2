@@ -186,6 +186,7 @@ function buildCardPayload({
     cardsProps: {
       items: cardData.items,
       loading: isApiLoading,
+      isFetching: cardData.isFetching,
       viewMode,
       onSort: sorting.handleSort,
       onCardClick: cardData.handleCardClick,

@@ -249,7 +249,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
       ) : (
         <Box
           sx={{
-            opacity: cardsProps?.items?.[0]?.setSlug === setSlug ? 1 : 0,
+            opacity: cardsProps?.isFetching ? 0 : 1,
             transition: 'opacity 0.2s ease-in-out',
             minHeight: cardsProps?.items?.length ? 'auto' : '400px',
           }}

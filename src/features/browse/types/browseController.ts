@@ -116,6 +116,7 @@ export interface CardData {
   rawItems: any[];
   total: number;
   isLoading: boolean;
+  isFetching: boolean;
   error: any;
   apiArgs: any;
   handleCardClick: (cardId: string, cardName?: string) => void;
@@ -170,6 +171,7 @@ export interface DisplaySettings {
 export interface CardsProps {
   items: any[];
   loading: boolean;
+  isFetching?: boolean;
   viewMode: ViewMode;
   onSort: (columnId: string) => void;
   onCardClick: (cardId: string, cardName?: string) => void;
