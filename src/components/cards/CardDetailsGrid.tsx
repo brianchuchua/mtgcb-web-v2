@@ -6,6 +6,7 @@ import { CardModel } from '@/api/browse/types';
 import SetIcon from '@/components/sets/SetIcon';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
+import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 interface CardDetailsGridProps {
   card: CardModel;
@@ -53,7 +54,7 @@ export const CardDetailsGrid: React.FC<CardDetailsGridProps> = ({
   
   // Determine the set link based on context
   const setLink = isCollectionContext && userId && card.setSlug
-    ? `/collections/${userId}/${card.setSlug}`
+    ? getCollectionSetUrl(userId, card.setSlug)
     : `/browse/sets/${card.setSlug}`;
 
   return (

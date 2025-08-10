@@ -19,6 +19,7 @@ import SetIcon from '@/components/sets/SetIcon';
 import capitalize from '@/utils/capitalize';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { formatISODate } from '@/utils/dateUtils';
+import { getCollectionCardUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
 
 interface OtherPrintingsTableProps {
   otherPrintings: CardModel[];
@@ -124,12 +125,16 @@ export const OtherPrintingsTable: React.FC<OtherPrintingsTableProps> = ({
               const foilPrice = 
                 printing.prices?.foil?.market || (printing.foil ? parseFloat(printing.foil) : null);
               
+              const cardUrlParts = generateCardUrl(printing.name, printing.id).split('/').slice(-2);
+              const cardSlug = cardUrlParts[0];
+              const cardId = cardUrlParts[1];
+              
               const cardUrl = isCollectionContext && userId
-                ? `/collections/${userId}/cards/${generateCardUrl(printing.name, printing.id).split('/').slice(-2).join('/')}`
+                ? getCollectionCardUrl(userId, cardSlug, cardId)
                 : generateCardUrl(printing.name, printing.id);
 
               const setUrl = isCollectionContext && userId && printing.setSlug
-                ? `/collections/${userId}/${printing.setSlug}`
+                ? getCollectionSetUrl(userId, printing.setSlug)
                 : `/browse/sets/${printing.setSlug}`;
 
               return (
@@ -346,8 +351,12 @@ export const OtherPrintingsTable: React.FC<OtherPrintingsTableProps> = ({
             const marketPrice =
               printing.prices?.normal?.market || (printing.market ? parseFloat(printing.market) : null);
             
+            const cardUrlParts = generateCardUrl(printing.name, printing.id).split('/').slice(-2);
+            const cardSlug = cardUrlParts[0];
+            const cardId = cardUrlParts[1];
+            
             const cardUrl = isCollectionContext && userId
-              ? `/collections/${userId}/cards/${generateCardUrl(printing.name, printing.id).split('/').slice(-2).join('/')}`
+              ? getCollectionCardUrl(userId, cardSlug, cardId)
               : generateCardUrl(printing.name, printing.id);
 
             return (

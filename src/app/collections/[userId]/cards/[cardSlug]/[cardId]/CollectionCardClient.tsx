@@ -16,6 +16,7 @@ import { usePriceType } from '@/hooks/usePriceType';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { extractBaseName } from '@/utils/cards/extractBaseName';
 import PrivacyErrorBanner from '@/features/browse/views/PrivacyErrorBanner';
+import { getCollectionUrl } from '@/utils/collectionUrls';
 
 interface CollectionCardClientProps {
   userId: number;
@@ -179,9 +180,9 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Collections', href: `/collections/${userId}` },
-            { label: username, href: `/collections/${userId}` },
-            { label: 'Cards', href: `/collections/${userId}?contentType=cards` },
+            { label: 'Collections', href: getCollectionUrl({ userId }) },
+            { label: username, href: getCollectionUrl({ userId }) },
+            { label: 'Cards', href: getCollectionUrl({ userId, contentType: 'cards' }) },
           ]}
         />
         <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}>Loading...</Box>
@@ -199,7 +200,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Collections', href: `/collections/${userId}` },
+            { label: 'Collections', href: getCollectionUrl({ userId }) },
             { label: hasInvalidShareLink ? 'Invalid share link' : 'Private user' },
           ]}
         />
@@ -220,9 +221,9 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Collections', href: `/collections/${userId}` },
-            { label: username, href: `/collections/${userId}` },
-            { label: 'Cards', href: `/collections/${userId}?contentType=cards` },
+            { label: 'Collections', href: getCollectionUrl({ userId }) },
+            { label: username, href: getCollectionUrl({ userId }) },
+            { label: 'Cards', href: getCollectionUrl({ userId, contentType: 'cards' }) },
             { label: 'Card not found' },
           ]}
         />
@@ -240,9 +241,9 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Collections', href: `/collections/${userId}` },
-          { label: username, href: `/collections/${userId}` },
-          { label: 'Cards', href: `/collections/${userId}?contentType=cards` },
+          { label: 'Collections', href: getCollectionUrl({ userId }) },
+          { label: username, href: getCollectionUrl({ userId }) },
+          { label: 'Cards', href: getCollectionUrl({ userId, contentType: 'cards' }) },
           { label: cardName },
         ]}
       />

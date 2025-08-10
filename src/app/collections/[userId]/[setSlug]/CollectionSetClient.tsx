@@ -43,6 +43,7 @@ import {
 import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
+import { getCollectionUrl } from '@/utils/collectionUrls';
 
 interface CollectionSetClientProps {
   userId: number;
@@ -159,7 +160,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   const { previousSet, nextSet, handleSetNavigation } = useSetNavigation({
     currentSetId: set?.id,
-    baseUrl: `/collections/${userId}`,
+    baseUrl: getCollectionUrl({ userId }),
     preserveParams: {
       goalId: selectedGoalId || undefined,
     },
@@ -408,7 +409,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             <Typography variant="body1" color="text.secondary" sx={{ m: 0.5 }}>
               (Part of{' '}
               <Link
-                href={`/collections/${userId}`}
+                href={getCollectionUrl({ userId })}
                 style={{
                   color: 'inherit',
                   textDecoration: 'underline',

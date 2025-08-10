@@ -13,6 +13,7 @@ import { extractBaseName } from '@/utils/cards/extractBaseName';
 import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import { useAuth } from '@/hooks/useAuth';
 import { usePriceType } from '@/hooks/usePriceType';
+import { getCollectionCardUrl } from '@/utils/collectionUrls';
 
 interface CardBrowseClientProps {
   cardId: string;
@@ -226,7 +227,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
             >
               <Button
                 component={NextLink}
-                href={`/collections/${user?.userId}/cards/${cardSlug}/${cardId}`}
+                href={user?.userId ? getCollectionCardUrl(user.userId, cardSlug, cardId) : '#'}
                 variant="contained"
                 color="secondary"
                 size="small"

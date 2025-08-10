@@ -12,6 +12,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-10',
+      version: '0.104.0',
+      changes: [
+        'Added private collection sharing with shortened, anonymous URLs that hide user IDs',
+        'Fixed all collection navigation links to maintain privacy when viewing shared collections',
+        'Improved shared collection banner visibility and detection for token-based URLs',
+      ],
+    },
+    {
+      date: '2025-08-10',
       version: '0.103.0',
       changes: [
         'Added site-wide footer with copyright, terms and privacy, and contact information',
@@ -31,9 +40,7 @@ const changelogData: ChangelogData = {
     {
       date: '2025-08-08',
       version: '0.102.0',
-      changes: [
-        'Added home page with platform statistics, feature showcase, and collection highlights',
-      ],
+      changes: ['Added home page with platform statistics, feature showcase, and collection highlights'],
     },
     {
       date: '2025-08-07',
@@ -50,9 +57,7 @@ const changelogData: ChangelogData = {
     {
       date: '2025-08-06',
       version: '0.100.0',
-      changes: [
-        'Added contextual autofocus to Card Name and Set Name fields in browse search form',
-      ],
+      changes: ['Added contextual autofocus to Card Name and Set Name fields in browse search form'],
     },
     {
       date: '2025-08-06',

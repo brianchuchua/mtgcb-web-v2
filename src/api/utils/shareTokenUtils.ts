@@ -24,6 +24,19 @@ export const appendShareToken = (url: string, shareToken?: string | null): strin
 export const getShareTokenFromWindow = (): string | null => {
   if (typeof window === 'undefined') return null;
   
+  const pathSegments = window.location.pathname.split('/');
+  
+  // Check for new token-only URL format: /shared/[token]
+  const sharedIndex = pathSegments.indexOf('shared');
+  if (sharedIndex !== -1 && pathSegments[sharedIndex + 1]) {
+    // Token is already stored in sessionStorage by useShareToken hook
+    const storedToken = sessionStorage.getItem('mtgcb_share_token');
+    if (storedToken) {
+      return storedToken;
+    }
+  }
+  
+  // Legacy: Check query params
   const params = new URLSearchParams(window.location.search);
   const shareToken = params.get('share');
   
@@ -36,7 +49,6 @@ export const getShareTokenFromWindow = (): string | null => {
   const storedUserId = sessionStorage.getItem('mtgcb_share_user');
   
   // Only return stored token if we're viewing the same user's collection
-  const pathSegments = window.location.pathname.split('/');
   const collectionsIndex = pathSegments.indexOf('collections');
   const currentUserId = collectionsIndex !== -1 ? pathSegments[collectionsIndex + 1] : null;
   

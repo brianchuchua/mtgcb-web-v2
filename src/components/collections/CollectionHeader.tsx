@@ -5,7 +5,7 @@ import React from 'react';
 import { CollectionProgressBar } from './CollectionProgressBar';
 import SetIcon from '@/components/sets/SetIcon';
 import TCGPlayerGoalMassImportButton from '@/components/tcgplayer/TCGPlayerGoalMassImportButton';
-import { getCollectionSetUrl } from '@/utils/collectionUrls';
+import { getCollectionSetUrl, getCollectionUrl } from '@/utils/collectionUrls';
 
 interface CollectionHeaderProps {
   username: string;
@@ -89,7 +89,7 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
         </Typography>
 
         <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 0.5 }}>
-          <Link href={`/collections/${userId}?contentType=cards&goalId=${selectedGoalId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link href={userId ? getCollectionUrl({ userId, contentType: 'cards', goalId: selectedGoalId }) : '#'} style={{ textDecoration: 'none', color: 'inherit' }}>
             <Box
               component="span"
               sx={{
@@ -184,7 +184,7 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
         </Typography>
 
         {userId ? (
-          <Link href={`/collections/${userId}`} style={{ textDecoration: 'none' }}>
+          <Link href={userId ? getCollectionUrl({ userId }) : '#'} style={{ textDecoration: 'none' }}>
             <Typography
               variant="subtitle1"
               sx={{

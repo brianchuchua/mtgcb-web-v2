@@ -46,6 +46,7 @@ import {
 import { useSnackbar } from 'notistack';
 import { formatDistanceToNow, parseISO } from '@/utils/shareTokenDateUtils';
 import { getAbsoluteShareUrl } from '@/utils/shareLinkUtils';
+import { smartEncodeToken } from '@/utils/tokenEncoder';
 
 const EXPIRATION_OPTIONS = [
   { value: 0, label: 'Never expires' },
@@ -74,19 +75,35 @@ export const ShareLinkManager = () => {
   const hasShareLink = shareData?.hasShareLink || false;
   const isExpired = shareData?.expiresAt ? new Date(shareData.expiresAt) < new Date() : false;
 
+  const getShareUrl = () => {
+    if (!shareData?.shareUrl) return '';
+    
+    // Always convert to token-only URL
+    const urlParts = shareData.shareUrl.split('?share=');
+    if (urlParts.length === 2) {
+      const token = urlParts[1];
+      const encodedToken = smartEncodeToken(token);
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      return `${origin}/shared/${encodedToken}`;
+    }
+    
+    // Fallback to original URL if parsing fails
+    return getAbsoluteShareUrl(shareData.shareUrl);
+  };
+
   const handleCopyLink = async () => {
     if (!shareData?.shareUrl) return;
 
-    const absoluteUrl = getAbsoluteShareUrl(shareData.shareUrl);
+    const urlToCopy = getShareUrl();
     
     try {
-      await navigator.clipboard.writeText(absoluteUrl);
+      await navigator.clipboard.writeText(urlToCopy);
       setCopied(true);
       enqueueSnackbar('Share link copied to clipboard!', { variant: 'success' });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       const textArea = document.createElement('textarea');
-      textArea.value = absoluteUrl;
+      textArea.value = urlToCopy;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand('copy');
@@ -231,7 +248,7 @@ export const ShareLinkManager = () => {
 
                 <TextField
                   fullWidth
-                  value={shareData?.shareUrl ? getAbsoluteShareUrl(shareData.shareUrl) : ''}
+                  value={getShareUrl()}
                   InputProps={{
                     readOnly: true,
                     endAdornment: (

@@ -23,6 +23,7 @@ import { useDeleteLocationMutation } from '@/api/locations/locationsApi';
 import { Location, LocationWithCount } from '@/api/locations/types';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate } from '@/utils/dateUtils';
+import { getCollectionUrl } from '@/utils/collectionUrls';
 
 interface LocationsListProps {
   locations: (Location | LocationWithCount)[];
@@ -76,7 +77,7 @@ export default function LocationsList({ locations }: LocationsListProps) {
                   <Box sx={{ flex: 1 }}>
                     {userId ? (
                       <Link
-                        href={`/collections/${userId}?contentType=cards&locationId=${location.id}`}
+                        href={`${getCollectionUrl({ userId, contentType: 'cards' })}&locationId=${location.id}`}
                         passHref
                         legacyBehavior
                       >
@@ -103,7 +104,7 @@ export default function LocationsList({ locations }: LocationsListProps) {
                   <Stack direction="row" spacing={0.5}>
                     {userId && (
                       <Link
-                        href={`/collections/${userId}?contentType=cards&locationId=${location.id}`}
+                        href={`${getCollectionUrl({ userId, contentType: 'cards' })}&locationId=${location.id}`}
                         passHref
                         legacyBehavior
                       >

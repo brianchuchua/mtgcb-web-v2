@@ -31,6 +31,7 @@ import { Goal } from '@/api/goals/types';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate } from '@/utils/dateUtils';
+import { getCollectionUrl } from '@/utils/collectionUrls';
 
 interface GoalsListProps {
   goals: Goal[];
@@ -90,7 +91,7 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                       </Tooltip>
                     )}
                     {goal.isActive ? (
-                      <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
+                      <Link href={`${getCollectionUrl({ userId, contentType: 'cards', goalId: goal.id })}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
                         <Typography
                           variant="h6"
                           component="a"
@@ -118,7 +119,7 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                   </Box>
                   <Stack direction="row" spacing={0.5}>
                     {goal.isActive ? (
-                      <Link href={`/collections/${userId}?contentType=cards&goalId=${goal.id}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
+                      <Link href={`${getCollectionUrl({ userId, contentType: 'cards', goalId: goal.id })}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
                         <Tooltip title="View goal">
                           <IconButton size="small" component="a">
                             <VisibilityIcon fontSize="small" />

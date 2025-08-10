@@ -10,6 +10,7 @@ import { usePriceType } from '@/hooks/usePriceType';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 import { useCardDisplaySettings, useCollectionSettings } from '@/contexts/DisplaySettingsContext';
+import { getCollectionCardUrl } from '@/utils/collectionUrls';
 
 interface UseCardDataProps {
   searchParams: any;
@@ -150,7 +151,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       
       // Context-aware navigation: if we have a userId, navigate to collection context
       const cardUrl = userId 
-        ? `/collections/${userId}/cards/${cardSlug}/${cardId}`
+        ? getCollectionCardUrl(userId, cardSlug, cardId)
         : `/browse/cards/${cardSlug}/${cardId}`;
       
       router.push(cardUrl);

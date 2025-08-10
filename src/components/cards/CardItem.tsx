@@ -173,9 +173,19 @@ const CardItemComponent = ({
     locationsIsVisible = true,
   } = display;
 
-  // Check if we're in a collection view and extract userId
+  // Check if we're in a collection view
+  // Could be /collections/[userId] or /shared/[token]
+  const isCollectionView = pathname?.startsWith('/collections/') || pathname?.startsWith('/shared/');
+  
+  // Extract userId for /collections/[userId] pattern
   const collectionMatch = pathname?.match(/^\/collections\/(\d+)/);
-  const userId = collectionMatch ? collectionMatch[1] : null;
+  const directUserId = collectionMatch ? collectionMatch[1] : null;
+  
+  // For shared URLs, get userId from sessionStorage (set by SharedCollectionPage)
+  const sharedUserId = pathname?.startsWith('/shared/') ? sessionStorage.getItem('mtgcb_share_user') : null;
+  
+  // Use whichever userId is available
+  const userId = directUserId || sharedUserId;
 
   // Create structured price data from the raw API values if not already provided
   const priceData = prices || {
@@ -462,7 +472,7 @@ const CardItemComponent = ({
             >
               {setName && setSlug ? (
                 <Link
-                  href={userId ? getCollectionSetUrl(userId, setSlug, goalId) : `/browse/sets/${setSlug}`}
+                  href={isCollectionView && userId ? getCollectionSetUrl(parseInt(userId), setSlug, goalId) : `/browse/sets/${setSlug}`}
                   style={{
                     color: 'inherit',
                     textDecoration: 'none',

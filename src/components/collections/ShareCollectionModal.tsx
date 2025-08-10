@@ -39,6 +39,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow, parseISO } from '@/utils/shareTokenDateUtils';
 import { getAbsoluteShareUrl } from '@/utils/shareLinkUtils';
+import { smartEncodeToken } from '@/utils/tokenEncoder';
 
 interface ShareCollectionModalProps {
   open: boolean;
@@ -233,15 +234,30 @@ export const ShareCollectionModal = ({
           <TextField
             fullWidth
             value={(() => {
-              const baseUrl = getAbsoluteShareUrl(shareLinkData.data.shareUrl);
+              let baseUrl = '';
+              
+              // Always convert to token-only URL
+              if (shareLinkData.data.shareUrl) {
+                const urlParts = shareLinkData.data.shareUrl.split('?share=');
+                if (urlParts.length === 2) {
+                  const token = urlParts[1];
+                  const encodedToken = smartEncodeToken(token);
+                  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+                  baseUrl = `${origin}/shared/${encodedToken}`;
+                }
+              }
+              
               if (includeFilters && hasQueryParams) {
                 // Remove the share param and the leading ? from the search string
                 const filteredParams = window.location.search
                   .replace(/[?&]share=[^&]+/g, '')
                   .replace(/^[?&]/, ''); // Remove leading ? or &
                 
-                // If there are params left, append them with & since baseUrl already has ?
-                return filteredParams ? `${baseUrl}&${filteredParams}` : baseUrl;
+                // If there are params left, append them
+                if (filteredParams) {
+                  const separator = baseUrl.includes('?') ? '&' : '?';
+                  return `${baseUrl}${separator}${filteredParams}`;
+                }
               }
               return baseUrl;
             })()}
@@ -254,14 +270,27 @@ export const ShareCollectionModal = ({
                 <InputAdornment position="end">
                   <IconButton onClick={() => {
                     if (shareLinkData.data?.shareUrl) {
-                      const baseUrl = getAbsoluteShareUrl(shareLinkData.data.shareUrl);
+                      let baseUrl = '';
+                      
+                      // Always convert to token-only URL
+                      const urlParts = shareLinkData.data.shareUrl.split('?share=');
+                      if (urlParts.length === 2) {
+                        const token = urlParts[1];
+                        const encodedToken = smartEncodeToken(token);
+                        const origin = typeof window !== 'undefined' ? window.location.origin : '';
+                        baseUrl = `${origin}/shared/${encodedToken}`;
+                      }
+                      
                       let urlToCopy = baseUrl;
                       
                       if (includeFilters && hasQueryParams) {
                         const filteredParams = window.location.search
                           .replace(/[?&]share=[^&]+/g, '')
                           .replace(/^[?&]/, '');
-                        urlToCopy = filteredParams ? `${baseUrl}&${filteredParams}` : baseUrl;
+                        if (filteredParams) {
+                          const separator = baseUrl.includes('?') ? '&' : '?';
+                          urlToCopy = `${baseUrl}${separator}${filteredParams}`;
+                        }
                       }
                       
                       handleCopyLink(urlToCopy);
@@ -276,7 +305,7 @@ export const ShareCollectionModal = ({
             helperText={
               includeFilters && hasQueryParams
                 ? "Sharing current view with filters"
-                : "Sharing plain collection link"
+                : "Sharing collection link"
             }
           />
           

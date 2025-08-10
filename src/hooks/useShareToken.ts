@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { smartDecodeToken } from '@/utils/tokenEncoder';
 
 const SHARE_TOKEN_KEY = 'mtgcb_share_token';
 const SHARE_USER_KEY = 'mtgcb_share_user';
@@ -14,10 +15,58 @@ export const useShareToken = () => {
   const searchParams = useSearchParams();
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [shareUserId, setShareUserId] = useState<string | null>(null);
+  const [isSharedUrl, setIsSharedUrl] = useState(false);
+
+  // Poll sessionStorage for userId updates when on shared URLs
+  useEffect(() => {
+    if (!pathname.startsWith('/shared/')) return;
+    
+    const checkForUserId = () => {
+      const storedUserId = sessionStorage.getItem(SHARE_USER_KEY);
+      if (storedUserId && storedUserId !== shareUserId) {
+        setShareUserId(storedUserId);
+      }
+    };
+    
+    // Check immediately
+    checkForUserId();
+    
+    // Poll every 500ms for up to 5 seconds
+    const interval = setInterval(checkForUserId, 500);
+    const timeout = setTimeout(() => clearInterval(interval), 5000);
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [pathname, shareUserId]);
 
   useEffect(() => {
-    const token = searchParams.get('share');
     const pathSegments = pathname.split('/');
+    
+    // Check for new token-only URL format: /shared/[token]
+    const sharedIndex = pathSegments.indexOf('shared');
+    if (sharedIndex !== -1 && pathSegments[sharedIndex + 1]) {
+      const encodedToken = pathSegments[sharedIndex + 1];
+      const decodedToken = smartDecodeToken(encodedToken);
+      
+      // Store the token
+      sessionStorage.setItem(SHARE_TOKEN_KEY, decodedToken);
+      setShareToken(decodedToken);
+      setIsSharedUrl(true);
+      
+      // Check if userId has been set by the shared page component
+      const storedUserId = sessionStorage.getItem(SHARE_USER_KEY);
+      if (storedUserId) {
+        setShareUserId(storedUserId);
+      }
+      return;
+    }
+    
+    setIsSharedUrl(false);
+    
+    // Legacy format: /collections/[userId]?share=[token]
+    const token = searchParams.get('share');
     const collectionsIndex = pathSegments.indexOf('collections');
     const userId = collectionsIndex !== -1 ? pathSegments[collectionsIndex + 1] : null;
 
@@ -55,9 +104,16 @@ export const useShareToken = () => {
   }, []);
 
   const isViewingSharedCollection = useCallback((userId: string | number) => {
+    // First check if we have a share token
+    if (!shareToken) return false;
+    
+    // For /shared/ URLs, we're always viewing a shared collection
+    if (isSharedUrl) return true;
+    
+    // For legacy URLs, check if the userId matches
     const userIdStr = String(userId);
-    return shareToken !== null && shareUserId === userIdStr;
-  }, [shareToken, shareUserId]);
+    return shareUserId === userIdStr;
+  }, [shareToken, shareUserId, isSharedUrl]);
 
   const appendShareParam = useCallback((url: string) => {
     if (!shareToken) return url;

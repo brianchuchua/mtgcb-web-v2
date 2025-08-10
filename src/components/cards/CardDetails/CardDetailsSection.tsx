@@ -6,6 +6,7 @@ import NextLink from 'next/link';
 import SetIcon from '@/components/sets/SetIcon';
 import { formatManaCost } from '@/utils/manaFormatter';
 import capitalize from '@/utils/capitalize';
+import { getCollectionUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
 
 interface CardDetailsSectionProps {
   card: {
@@ -56,12 +57,12 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
   isCollectionView = false 
 }) => {
   // Determine the base URL for links
-  const baseUrl = isCollectionView && userId ? `/collections/${userId}` : '/browse';
+  const baseUrl = isCollectionView && userId ? getCollectionUrl({ userId }) : '/browse';
   const artistSearchUrl = isCollectionView && userId 
-    ? `/collections/${userId}?contentType=cards&artist=${encodeURIComponent(card.artist || '')}`
+    ? `${getCollectionUrl({ userId, contentType: 'cards' })}&artist=${encodeURIComponent(card.artist || '')}`
     : `/browse?contentType=cards&artist=${encodeURIComponent(card.artist || '')}`;
   const setUrl = isCollectionView && userId 
-    ? `/collections/${userId}/${card.setSlug}`
+    ? getCollectionSetUrl(userId, card.setSlug || '')
     : `/browse/sets/${card.setSlug}`;
 
   return (
