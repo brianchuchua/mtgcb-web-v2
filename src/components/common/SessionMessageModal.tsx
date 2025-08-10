@@ -49,7 +49,7 @@ const getSeverityColor = (severity: string) => {
 };
 
 export const SessionMessageModal = () => {
-  const { messages, dismissMessage, isDismissed, isLoaded } = useSessionMessages();
+  const { messages, dismissModal, isModalDismissed, isLoaded } = useSessionMessages();
   const [open, setOpen] = useState(false);
   const [currentMessage, setCurrentMessage] = useState<typeof messages[0] | null>(null);
 
@@ -61,18 +61,18 @@ export const SessionMessageModal = () => {
 
     // Find the first non-dismissed modal message
     const modalMessage = messages.find(
-      msg => !isDismissed(msg.id) && (msg.displayType === 'modal' || msg.displayType === 'both')
+      msg => !isModalDismissed(msg.id) && (msg.displayType === 'modal' || msg.displayType === 'both')
     );
     
     if (modalMessage) {
       setCurrentMessage(modalMessage);
       setOpen(true);
     }
-  }, [messages, isDismissed, isLoaded]);
+  }, [messages, isModalDismissed, isLoaded]);
 
   const handleClose = () => {
     if (currentMessage) {
-      dismissMessage(currentMessage.id);
+      dismissModal(currentMessage.id);
     }
     setOpen(false);
     setCurrentMessage(null);
@@ -87,7 +87,7 @@ export const SessionMessageModal = () => {
   return (
     <Dialog
       open={open}
-      onClose={currentMessage.dismissable ? handleClose : undefined}
+      onClose={handleClose}
       maxWidth="sm"
       fullWidth
       PaperProps={{
@@ -112,33 +112,29 @@ export const SessionMessageModal = () => {
         <Typography variant="h6" component="span" sx={{ flexGrow: 1 }}>
           {currentMessage.title}
         </Typography>
-        {currentMessage.dismissable && (
-          <IconButton
-            aria-label="close"
-            onClick={handleClose}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        )}
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+            color: (theme) => theme.palette.grey[500],
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
       </DialogTitle>
       <DialogContent dividers>
         <Typography variant="body1">
           {currentMessage.message}
         </Typography>
       </DialogContent>
-      {currentMessage.dismissable && (
-        <DialogActions>
-          <Button onClick={handleClose} variant="contained" color="primary">
-            I Understand
-          </Button>
-        </DialogActions>
-      )}
+      <DialogActions>
+        <Button onClick={handleClose} variant="contained" color="primary">
+          I Understand
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };

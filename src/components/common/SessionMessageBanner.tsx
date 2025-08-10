@@ -32,7 +32,7 @@ const getDefaultIcon = (severity: string) => {
 };
 
 export const SessionMessageBanner = () => {
-  const { messages, dismissMessage, isDismissed, isLoaded } = useSessionMessages();
+  const { messages, dismissBanner, isBannerDismissed, isLoaded } = useSessionMessages();
 
   // Don't show anything until we've loaded the dismissed state
   if (!isLoaded) {
@@ -41,7 +41,7 @@ export const SessionMessageBanner = () => {
 
   // Get the first non-dismissed banner message
   const activeMessage = messages.find(
-    msg => !isDismissed(msg.id) && (!msg.displayType || msg.displayType === 'banner' || msg.displayType === 'both')
+    msg => !isBannerDismissed(msg.id) && (!msg.displayType || msg.displayType === 'banner' || msg.displayType === 'both')
   );
 
   if (!activeMessage) {
@@ -59,7 +59,7 @@ export const SessionMessageBanner = () => {
               aria-label="close"
               color="inherit"
               size="small"
-              onClick={() => dismissMessage(activeMessage.id)}
+              onClick={() => dismissBanner(activeMessage.id)}
             >
               <CloseIcon fontSize="inherit" />
             </IconButton>
