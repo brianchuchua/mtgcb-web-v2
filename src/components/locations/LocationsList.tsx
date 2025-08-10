@@ -78,14 +78,11 @@ export default function LocationsList({ locations }: LocationsListProps) {
                     {userId ? (
                       <Link
                         href={`${getCollectionUrl({ userId, contentType: 'cards' })}&locationId=${location.id}`}
-                        passHref
-                        legacyBehavior
+                        style={{ textDecoration: 'none' }}
                       >
                         <Typography
                           variant="h6"
-                          component="a"
                           sx={{
-                            textDecoration: 'none',
                             color: 'inherit',
                             '&:hover': {
                               textDecoration: 'underline',
@@ -103,17 +100,15 @@ export default function LocationsList({ locations }: LocationsListProps) {
                   </Box>
                   <Stack direction="row" spacing={0.5}>
                     {userId && (
-                      <Link
-                        href={`${getCollectionUrl({ userId, contentType: 'cards' })}&locationId=${location.id}`}
-                        passHref
-                        legacyBehavior
-                      >
-                        <Tooltip title="View location">
-                          <IconButton size="small" component="a">
+                      <Tooltip title="View location">
+                        <Link
+                          href={`${getCollectionUrl({ userId, contentType: 'cards' })}&locationId=${location.id}`}
+                        >
+                          <IconButton size="small">
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
-                        </Tooltip>
-                      </Link>
+                        </Link>
+                      </Tooltip>
                     )}
                     <Tooltip title="Edit location">
                       <IconButton size="small" onClick={() => handleEditClick(location.id)}>

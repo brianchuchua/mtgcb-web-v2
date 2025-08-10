@@ -91,12 +91,13 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                       </Tooltip>
                     )}
                     {goal.isActive ? (
-                      <Link href={`${getCollectionUrl({ userId, contentType: 'cards', goalId: goal.id })}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
+                      <Link 
+                        href={`${getCollectionUrl({ userId, contentType: 'cards', goalId: goal.id })}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`}
+                        style={{ textDecoration: 'none' }}
+                      >
                         <Typography
                           variant="h6"
-                          component="a"
                           sx={{
-                            textDecoration: 'none',
                             color: 'inherit',
                             '&:hover': {
                               textDecoration: 'underline',
@@ -119,13 +120,13 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                   </Box>
                   <Stack direction="row" spacing={0.5}>
                     {goal.isActive ? (
-                      <Link href={`${getCollectionUrl({ userId, contentType: 'cards', goalId: goal.id })}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`} passHref legacyBehavior>
-                        <Tooltip title="View goal">
-                          <IconButton size="small" component="a">
+                      <Tooltip title="View goal">
+                        <Link href={`${getCollectionUrl({ userId, contentType: 'cards', goalId: goal.id })}&oneResultPerCardName=${goal.onePrintingPerPureName ? 'true' : 'false'}`}>
+                          <IconButton size="small">
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
-                        </Tooltip>
-                      </Link>
+                        </Link>
+                      </Tooltip>
                     ) : (
                       <Tooltip title="View goal (Inactive)">
                         <span>
