@@ -6,16 +6,14 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Current Action Items
 
-- instead of sql.raw, should be doing https://orm.drizzle.team/docs/sql -- it's still a raw query, just safe <--
+- audit database and api for deprecated or unused fields, make new database and migration pipeline, scripts for moving legacy to new and updating cards in the new experience without needing the old
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
-- I absolutely hate mergeSearchConditions in the API. This needs a major refactor.
 - Preload stuff on pagination hover?
 - mass entry, add collector number
 - roadmap page (maybe just on the changelog page)
 - mention binders on home page
 - faq page
 - consider adding prefetching back to pagination, collection goal queries can be slow for big goals
-- make sure the jwt cookie name doesn't clash with the older beta
 
 ## Remaining Major Feature Work Before 1.0
 
@@ -24,7 +22,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.
 - Detecting if someone is a patron and linking their accounts.
 
-### Home Page
+### Home Page (Partially complete)
 
 - Some of the below has been done, but will be revisited as I complete other connected sections.
 - Should brag about new features and explain the launch (need a news page I think)
@@ -39,6 +37,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Browse sample collection
 - Needs preview of news section
 - Still needs a refactoring
+- Work on the "Why Choose MTG CB" section -- I really think all tools are wonderful, so it's an exclusive choice. Focus more on the ad-free, free experience that is supported by patreon.
+- Binder templates need to be their own page
+- De-emphasize physical locations in main blurb, the focus is collection completion
 
 ### Terms and Conditions
 
@@ -75,7 +76,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Importer
 
-- Error messages aren't great. Try Moxfield. "3285 Card Chrome Mox Could not find card "Chrome Mox"" -- should say the set that was attempted too.
 - Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
 
 ### UX
@@ -213,6 +213,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Need a full postman library of my API calls, these should live with api docs
 - Need a fallback if both canBeFoil and canBeNonFoil are false, treat them both as true probably
 - CI/CD pipeline
+- Rate limiting for API calls
 
 ## Future Features
 
@@ -274,14 +275,15 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ## Production Checklist
 
 - Ping johnny on Discord once card locations are released. :)
+- Grok database backups in new system
 - Integration with Sonarcloud (open source the repo, make development easy for new devs)
 - Integration with Sentry
 - Integration with Google Analytics
+- Need an announcement banner for the home page
+- Need a temporary downtime page for the home page (database maintenance, etc.)
 - Load testing
 - Performance testing / index audit
 - Add an index for set slug probably
-- SQL injection audit
-- Security audit -- confirm I cannot edit a JWT to change the userId
 - Automated database backups
 - Dogfooding and UX testing
 - UX - Must test rendering of input fields on native devices

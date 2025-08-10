@@ -1,10 +1,6 @@
 import {
-  CollectionCardsParams,
-  CollectionCardsResponse,
   CollectionMassUpdateRequest,
   CollectionMassUpdateResponse,
-  CollectionSummaryParams,
-  CollectionSummaryResponse,
   CollectionUpdateRequest,
   CollectionUpdateResponse,
 } from './types';
@@ -22,26 +18,8 @@ import type { RootState } from '@/redux/store';
 
 const collectionsApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
-    getCollectionSummary: builder.query<CollectionSummaryResponse, CollectionSummaryParams>({
-      query: (params) => ({
-        url: '/collection/summary',
-        method: 'POST',
-        body: params,
-      }),
-      // Cache for 5 minutes
-      keepUnusedDataFor: 300,
-      providesTags: ['Collection'],
-    }),
-    getCollectionCards: builder.query<CollectionCardsResponse, CollectionCardsParams>({
-      query: (params) => ({
-        url: '/collection/cards',
-        method: 'POST',
-        body: params,
-      }),
-      // Cache for 5 minutes
-      keepUnusedDataFor: 300,
-      providesTags: ['Collection'],
-    }),
+    // Removed unused endpoints - these were deprecated and moved to browse API
+    // getCollectionSummary and getCollectionCards are no longer needed
     updateCollection: builder.mutation<CollectionUpdateResponse, CollectionUpdateRequest>({
       query: (body) => ({
         url: '/collection/update',
@@ -105,29 +83,7 @@ const collectionsApi = mtgcbApi.injectEndpoints({
           }
         }
 
-        // Update getCollectionCards cache entries
-        const collectionCache = mtgcbApi.util.selectInvalidatedBy(state, ['Collection']);
-
-        for (const cacheEntry of collectionCache as any[]) {
-          const { endpointName, originalArgs } = cacheEntry;
-          if (endpointName === 'getCollectionCards' && originalArgs) {
-            const patchResult = (dispatch as any)(
-              (mtgcbApi.util as any).updateQueryData('getCollectionCards', originalArgs, (draft: any) => {
-                if (draft?.data?.cards) {
-                  // Update quantities for matching cards
-                  for (const updateCard of arg.cards) {
-                    const cardIndex = draft.data.cards.findIndex((card: any) => card.id === updateCard.cardId);
-                    if (cardIndex !== -1) {
-                      draft.data.cards[cardIndex].quantityReg = updateCard.quantityReg;
-                      draft.data.cards[cardIndex].quantityFoil = updateCard.quantityFoil;
-                    }
-                  }
-                }
-              }),
-            );
-            patchResults.push(patchResult);
-          }
-        }
+        // Removed getCollectionCards cache update - no longer needed
 
         try {
           const { data } = await queryFulfilled;
@@ -345,9 +301,6 @@ const collectionsApi = mtgcbApi.injectEndpoints({
 });
 
 export const {
-  useGetCollectionSummaryQuery,
-  useGetCollectionCardsQuery,
-  useLazyGetCollectionCardsQuery,
   useUpdateCollectionMutation,
   useMassUpdateCollectionMutation,
   useAssociateCardLocationMutation,

@@ -1,10 +1,8 @@
 import { ApiResponse } from '@/api/types/apiTypes';
 
-export interface CollectionSummaryParams {
-  userId: number;
-  priceType: 'market' | 'low' | 'average' | 'high';
-  includeSubsetsInSets: boolean;
-}
+// Removed unused types: CollectionSummaryParams, CollectionSummary, CollectionSummaryResponse,
+// CollectionCardsParams, CollectionCardsResponse, CollectionCardsData
+// These were for deprecated endpoints that have been moved to the browse API
 
 export interface CostToComplete {
   oneOfEachCard: number;
@@ -43,42 +41,6 @@ export interface CollectionSetSummary {
   percentageCollected: number;
   costToComplete: CostToComplete;
 }
-
-export interface CollectionSummary {
-  userId: number;
-  username: string;
-  totalCardsCollected: number;
-  uniquePrintingsCollected: number;
-  numberOfCardsInMagic: number;
-  percentageCollected: number;
-  totalValue: number;
-  sets: CollectionSetSummary[];
-}
-
-export type CollectionSummaryResponse = ApiResponse<CollectionSummary>;
-
-export interface CollectionCardsParams {
-  userId: number;
-  setId: number;
-  includeSubsetsInSets: boolean;
-  goalId?: number;
-}
-
-export interface CollectionCard {
-  cardId: number;
-  quantityReg: number;
-  quantityFoil: number;
-}
-
-export interface CollectionCardsData {
-  userId: number;
-  username: string;
-  setId: number;
-  setName: string;
-  cards: CollectionCard[];
-}
-
-export type CollectionCardsResponse = ApiResponse<CollectionCardsData>;
 
 export interface CollectionUpdateRequest {
   mode: 'set' | 'increment';
