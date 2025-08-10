@@ -11,6 +11,16 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-08-10',
+      version: '0.103.0',
+      changes: [
+        'Added site-wide footer with copyright, terms and privacy, and contact information',
+        'Created Terms and Privacy page with user-friendly TL;DR section and full legal text',
+        'Added terms agreement notices to login and signup forms',
+        'Implemented spam-resistant email contact link in footer',
+      ],
+    },
+    {
       date: '2025-08-09',
       version: '0.102.1',
       changes: [

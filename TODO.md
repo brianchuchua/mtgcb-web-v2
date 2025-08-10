@@ -6,6 +6,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Current Action Items
 
+- social media links
+
 Mostly ready:
 
 - audit database and api for deprecated or unused fields, make new database and migration pipeline, scripts for moving legacy to new and updating cards in the new experience without needing the old, need to document the process
@@ -17,6 +19,7 @@ Mostly ready:
   - update the user id autoincrement value to match 1 more than the highest user id
 - Then do the new price updater
 - not a bug: i want to try location detection before sending in include locations, calls taking 410ms in secret lair drop series
+- i want to add a tcgplayerPricesUpdatedAt field to Cards
 
 Soon:
 
@@ -59,15 +62,6 @@ Now:
 - Binder templates need to be their own page
 - De-emphasize physical locations in main blurb, the focus is collection completion
 
-### Terms and Conditions
-
-- footer
-- info icon next to collection value, estimate, tcgplayer data, etc.
-- Need to research and implement. I really don't want to make my users have to check an agree box, but need to understand the legal requirement. Biggest concern is bad TCGPlayer data gives an inaccurate collection value and then they make financial decisions based on that. I think a disclaimer is enough, but need to research.
-  - Did some good research. Don't need a checkbox, just a link near register, sign up, and in footers, and my legal text is good enough already, although I can add more disclaimers about tcgplayer prices and bugs.
-  - contact link in the footer
-  - social media links
-
 ### Migration Path
 
 - need to clean up old collection entries, the 0 ones
@@ -109,6 +103,7 @@ Now:
 
 ### Uncategorized
 
+- info icon next to collection value, estimate, tcgplayer data, etc. showing when prices last updated, number of cards missing price data
 - plan an interface to show site news, like scheduled downtime alerts and stuff, that once closed would not re-open
 - verify the individual value of sets, when added up, add up to the collection value -- Chris request on Discord
 - card notes field for card page
@@ -214,7 +209,6 @@ Now:
 - pagination is persisting when browsing around sometimes, see browse page
 
 - Moderate: Draft cube calculation when track subsets with sets in on is wrong, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir -- it's incorrectly counting non main set cards as missing just in terms of the value
-- Moderate+ Bug: Collector number sort is broken in collector table view, probably not using the numeric version of collector number
 - Bug: Release date desc in sets view is applying to cards view when switching
 - Bug: seeing a query for /search/sets with release desc and then asc when loading set collection page
 - Bug: Reset Search doesn't clear the stat filters graphically.
@@ -315,7 +309,6 @@ Now:
 - Verify parameter edge cases, minimums and maximums
 - Audit field length limits
 - Adequate feature testing
-- Terms and conditions, research
 - Data cleanup for tcgplayer names and codes and tcgplayer ids
 - Test clipboard functionality in staging/production with HTTPS (Share Collection feature)
 
@@ -353,13 +346,14 @@ Now:
 
 ## Later
 
+- would be nice to report how many of a user's cards are missing price data
+- BUG: Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set. Need to tiebreak with card release date.
 - Sonarcube integration
 - 1024x768 testing of table view and gridview and menus with sidenav open (or determine target resolution)
 - Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
 - Clean up MTG CB collector number
 - Make a cool stats page
 - S3 image storage is costing a lot of money, look into alternatives like Cloudflare R2, Vercel Blob Storage, Cloudflare Images, Digital Ocean Spaces, etc.
-- BUG: Sorting by collector number isn't working great for Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set. Need to tiebreak with card release date.
 - Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
 - Use the new TCGPlayer domain (see below)
 - An Exclude Bulk feature for a collection's value

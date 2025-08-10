@@ -190,7 +190,20 @@ export default function LoginPage() {
             variant="caption"
             color="text.secondary"
             align="center"
-            sx={{ mt: 2 }}
+            sx={{ mt: 2, mb: 1, display: 'block' }}
+          >
+            By logging in, you agree to our{' '}
+            <Link href="/terms-and-privacy" data-testid="terms-privacy-link">
+              Terms and Privacy
+            </Link>
+            .
+          </Typography>
+
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            align="center"
+            sx={{ display: 'block' }}
             data-testid="recaptcha-text"
           >
             This site is protected by reCAPTCHA and the Google{' '}

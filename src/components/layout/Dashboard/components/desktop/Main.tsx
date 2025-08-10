@@ -3,6 +3,7 @@
 import { styled } from '@mui/material/styles';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { SessionMessageBanner } from '@/components/common/SessionMessageBanner';
+import Footer from '@/components/layout/Footer';
 
 interface MainProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ const Main = ({ children }: MainProps) => {
         <SessionMessageBanner />
         {children}
       </MainContent>
+      <Footer />
     </StyledMain>
   );
 };
@@ -36,7 +38,8 @@ const StyledMain = styled('main', {
   paddingTop: '64px',
   minHeight: '100vh',
   display: 'flex',
-  justifyContent: 'center',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -49,4 +52,5 @@ const StyledMain = styled('main', {
 const MainContent = styled('div')(({ theme }) => ({
   width: '100%',
   padding: `${theme.spacing(2)} ${theme.spacing(4)} ${theme.spacing(4)} ${theme.spacing(4)}`,
+  flexGrow: 1,
 }));
