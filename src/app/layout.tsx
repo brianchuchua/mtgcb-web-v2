@@ -11,6 +11,7 @@ import ClientLayout from './ClientLayout';
 import { TCGPlayerProvider } from '@/context/TCGPlayerContext';
 import StoreProvider from '@/redux/StoreProvider';
 import darkTheme from '@/styles/darkTheme';
+import { SessionMessagesProvider } from '@/contexts/SessionMessagesContext';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -44,7 +45,9 @@ export default function RootLayout({
                 <ReCaptchaProvider>
                   <SnackbarProvider>
                     <TCGPlayerProvider>
-                      <Dashboard>{children}</Dashboard>
+                      <SessionMessagesProvider>
+                        <Dashboard>{children}</Dashboard>
+                      </SessionMessagesProvider>
                     </TCGPlayerProvider>
                   </SnackbarProvider>
                 </ReCaptchaProvider>

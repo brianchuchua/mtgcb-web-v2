@@ -6,7 +6,24 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Current Action Items
 
-- audit database and api for deprecated or unused fields, make new database and migration pipeline, scripts for moving legacy to new and updating cards in the new experience without needing the old
+Mostly ready:
+
+- audit database and api for deprecated or unused fields, make new database and migration pipeline, scripts for moving legacy to new and updating cards in the new experience without needing the old, need to document the process
+  - I think I need to do the clean-up of 0 entry, nah way too slow, it's like 14 seconds for 5000 entries locally -- faster to just filter at import time from legacy to new
+- I think it's time to deploy the current new database, then figure out migration scripts
+  - grab collections and users from legacy as sql scripts, put into v2 (hard truncate, skip 0-quantity collections)
+  - update new sets and cards from v2 to v3, just the new ones
+  - bring collections and users to v3, hard truncate, skip 0-quantity collections
+  - update the user id autoincrement value to match 1 more than the highest user id
+- Then do the new price updater
+
+Soon:
+
+- Deploying to production
+
+Now:
+
+- Work on annoying bugs and issues, cleaning up this TODO document
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
 - Preload stuff on pagination hover?
 - mass entry, add collector number

@@ -5,6 +5,7 @@ import { ReactNode } from 'react';
 import { DashboardDesktop } from './DashboardDesktop';
 import { DashboardMobile } from './DashboardMobile';
 import { DashboardProvider } from './context/DashboardContext';
+import { SessionMessageModal } from '@/components/common/SessionMessageModal';
 
 interface DashboardProps {
   sidenavWidth?: number;
@@ -17,6 +18,7 @@ const Dashboard = ({ children, sidenavWidth = 320 }: DashboardProps) => {
 
   return (
     <DashboardProvider sidenavWidth={sidenavWidth}>
+      <SessionMessageModal />
       {isMobile ? <DashboardMobile>{children}</DashboardMobile> : <DashboardDesktop>{children}</DashboardDesktop>}
     </DashboardProvider>
   );

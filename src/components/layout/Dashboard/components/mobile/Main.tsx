@@ -1,13 +1,19 @@
 'use client';
 
 import { styled } from '@mui/material/styles';
+import { SessionMessageBanner } from '@/components/common/SessionMessageBanner';
 
 interface MainProps {
   children: React.ReactNode;
 }
 
 const Main = ({ children }: MainProps) => {
-  return <StyledMain>{children}</StyledMain>;
+  return (
+    <StyledMain>
+      <SessionMessageBanner />
+      {children}
+    </StyledMain>
+  );
 };
 
 const StyledMain = styled('main')(({ theme }) => ({

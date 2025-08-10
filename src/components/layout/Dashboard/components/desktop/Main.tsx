@@ -2,6 +2,7 @@
 
 import { styled } from '@mui/material/styles';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
+import { SessionMessageBanner } from '@/components/common/SessionMessageBanner';
 
 interface MainProps {
   children: React.ReactNode;
@@ -12,7 +13,10 @@ const Main = ({ children }: MainProps) => {
 
   return (
     <StyledMain open={isDesktopOpen} sidenavwidth={sidenavWidth}>
-      <MainContent>{children}</MainContent>
+      <MainContent>
+        <SessionMessageBanner />
+        {children}
+      </MainContent>
     </StyledMain>
   );
 };
