@@ -8,6 +8,16 @@ export const verifyEnvironmentVariables = () => {
 };
 verifyEnvironmentVariables();
 
+// Create the base query outside to avoid recreation on every request
+const baseQuery = fetchBaseQuery({
+  baseUrl: process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL,
+  credentials: 'include',
+  prepareHeaders: (headers) => {
+    headers.set('Content-Type', 'application/json');
+    return headers;
+  },
+});
+
 export const mtgcbApi = createApi({
   reducerPath: 'mtgcbApi',
   baseQuery: async (args, api, extraOptions) => {
@@ -23,16 +33,6 @@ export const mtgcbApi = createApi({
         url: appendShareToken(args.url || '', shareToken),
       };
     }
-    
-    // Use the default fetchBaseQuery with our modifications
-    const baseQuery = fetchBaseQuery({
-      baseUrl: process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL,
-      credentials: 'include',
-      prepareHeaders: (headers) => {
-        headers.set('Content-Type', 'application/json');
-        return headers;
-      },
-    });
     
     return baseQuery(modifiedArgs, api, extraOptions);
   },
