@@ -46,6 +46,7 @@ export interface CardTableRendererProps {
 export const useCardTableColumns = (
   { priceType, displaySettings }: CardTableRendererProps,
   currentSortBy: string,
+  isOwnCollection?: boolean,
 ): TableColumn<CardItemProps>[] => {
   // Tooltip components
   const ReleaseDateTooltip = () => (
@@ -245,7 +246,7 @@ export const useCardTableColumns = (
   ];
 
   // Filter columns based on visibility settings
-  return allColumns.filter((column) => {
+  const filteredColumns = allColumns.filter((column) => {
     if (column.id === 'collectorNumber') return displaySettings.collectorNumberIsVisible;
     if (column.id === 'mtgcbCollectorNumber') return displaySettings.mtgcbNumberIsVisible;
     if (column.id === 'name') return true; // Always show name
@@ -272,11 +273,14 @@ export const useCardTableColumns = (
     }
 
     if (column.id === 'locations') {
-      return displaySettings.locationsIsVisible ?? false;
+      // Only show locations column for own collections
+      return (displaySettings.locationsIsVisible ?? false) && !!isOwnCollection;
     }
 
     return true;
   });
+
+  return filteredColumns;
 };
 
 // Table-specific styled components for editable quantity

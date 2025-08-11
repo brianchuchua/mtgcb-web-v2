@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-11',
+      version: '0.104.3',
+      changes: [
+        'Fixed table column alignment issue where prices appeared under the wrong header when browsing cards',
+      ],
+    },
+    {
+      date: '2025-08-11',
       version: '0.104.2',
       changes: [
         'Made Beta Test Environment banner dismissable for the current session',

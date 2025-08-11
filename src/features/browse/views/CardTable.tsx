@@ -56,7 +56,7 @@ const CardTable: React.FC<CardTableProps> = ({
     locationsIsVisible: tableSettings.locationsIsVisible ?? cardDisplaySettings?.locationsIsVisible,
   };
 
-  const tableColumns = useCardTableColumns({ priceType, displaySettings: mergedDisplaySettings }, sortBy);
+  const tableColumns = useCardTableColumns({ priceType, displaySettings: mergedDisplaySettings }, sortBy, isOwnCollection);
 
   const renderCardRow = useCardRowRenderer(priceType, mergedDisplaySettings, onCardClick, isOwnCollection, goalId);
 
