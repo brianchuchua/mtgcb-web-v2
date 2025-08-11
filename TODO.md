@@ -279,6 +279,11 @@ Now:
 
 - End-to-end tests for every user action in the test environment
 
+### Post Production
+
+- Decomission v2 apps and database
+- Decomission v1 apps and database
+
 ## Maybes
 
 - Showing number of cards in excess of a goal
@@ -298,8 +303,7 @@ Now:
 - Ping johnny on Discord once card locations are released. :)
 - Grok database backups in new system
 - Integration with Sonarcloud (open source the repo, make development easy for new devs)
-- Integration with Google Analytics
-- Need an announcement banner for the home page
+- Integration with Google Analytics (after production launch, using the same account as the legacy site)
 - Need a temporary downtime page for the home page (database maintenance, etc.)
 - Load testing
 - Performance testing / index audit
@@ -312,6 +316,8 @@ Now:
 - Adequate feature testing
 - Data cleanup for tcgplayer names and codes and tcgplayer ids
 - Test clipboard functionality in staging/production with HTTPS (Share Collection feature)
+- test jwt expiration and possible refresh
+- audit USE_OPTIMIZED_GOAL_PROGRESS
 
 ## Nice to Have
 
