@@ -99,7 +99,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
       title: 'Beta Test Environment',
       message:
         'Do not make real updates to your collection here as any changes made will not be saved permanently. Just play around and feel free to share feedback.',
-      dismissable: false,
+      dismissable: true,
       displayType: 'both', // Show as both banner and modal
     },
   ];
