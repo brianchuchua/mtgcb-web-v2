@@ -279,6 +279,10 @@ Now:
 
 - End-to-end tests for every user action in the test environment
 
+### Deployment
+
+- update NEXT_PUBLIC_LOCAL_API_BASE_URL to the production URL
+
 ### Post Production
 
 - Decomission v2 apps and database
