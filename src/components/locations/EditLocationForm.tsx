@@ -13,8 +13,10 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
 import { useSnackbar } from 'notistack';
+import { DeleteLocationDialog } from './DeleteLocationDialog';
 import { Location, UpdateLocationRequest, LocationHierarchy } from '@/api/locations/types';
 import { useUpdateLocationMutation, useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
+import { useDeleteLocation } from '@/hooks/locations/useDeleteLocation';
 
 interface EditLocationFormProps {
   location: Location;
@@ -26,6 +28,16 @@ export default function EditLocationForm({ location }: EditLocationFormProps) {
   const [updateLocation, { isLoading }] = useUpdateLocationMutation();
   const { data: locationsResponse, isLoading: isLoadingHierarchy } = useGetLocationHierarchyQuery();
   const locations = locationsResponse?.data || [];
+  const {
+    isDeleting,
+    deleteDialogOpen,
+    locationToDelete,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+  } = useDeleteLocation({
+    onSuccess: () => router.push('/locations'),
+  });
 
   const {
     register,
@@ -187,16 +199,34 @@ export default function EditLocationForm({ location }: EditLocationFormProps) {
             </FormControl>
           )}
 
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button onClick={handleCancel} disabled={isLoading}>
-              Cancel
+          <Stack direction="row" spacing={2} justifyContent="space-between">
+            <Button 
+              variant="contained" 
+              color="error" 
+              onClick={() => handleDeleteClick(location)}
+              disabled={isLoading || isDeleting}
+            >
+              Delete
             </Button>
-            <Button type="submit" variant="contained" disabled={isLoading || !isDirty}>
-              {isLoading ? 'Saving...' : 'Save Changes'}
-            </Button>
+            <Stack direction="row" spacing={2}>
+              <Button onClick={handleCancel} disabled={isLoading || isDeleting}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="contained" disabled={isLoading || isDeleting || !isDirty}>
+                {isLoading ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </Stack>
           </Stack>
         </Stack>
       </Box>
+
+      <DeleteLocationDialog
+        open={deleteDialogOpen}
+        locationName={location?.name || ''}
+        isDeleting={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </Paper>
   );
 }

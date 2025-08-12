@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-11',
+      version: '0.105.0',
+      changes: [
+        'Added delete button to Goals and Locations edit pages for easier deletion without returning to list view',
+      ],
+    },
+    {
+      date: '2025-08-11',
       version: '0.104.4',
       changes: [
         'Added "Back to Top" button when viewing sets in collection pages for easier navigation',

@@ -6,7 +6,7 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 
 ## For Every Feature (Once I Confirm It's Complete)
 
-- Update the version number using semver conventions in `package.json` and `src/data/changelog.ts`
+- Update the version number using semver conventions in `package.json` and `src/app/changelog.ts`
   - The headers auto-update based on what's in the changelog.ts file
   - Update the minor version if it's a feature, and the patch version if it's a bug fix
 

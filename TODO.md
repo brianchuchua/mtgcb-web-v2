@@ -360,6 +360,7 @@ Now:
 
 ## Later
 
+- when deleting locations (and maybe goals), briefly see an error state on the edit page, since it doesn't exist anymore
 - would be nice to report how many of a user's cards are missing price data
 - BUG: Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set. Need to tiebreak with card release date.
 - Sonarcube integration

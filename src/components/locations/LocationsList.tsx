@@ -2,14 +2,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
@@ -17,10 +11,9 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSnackbar } from 'notistack';
-import { useState } from 'react';
-import { useDeleteLocationMutation } from '@/api/locations/locationsApi';
+import { DeleteLocationDialog } from './DeleteLocationDialog';
 import { Location, LocationWithCount } from '@/api/locations/types';
+import { useDeleteLocation } from '@/hooks/locations/useDeleteLocation';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate } from '@/utils/dateUtils';
 import { getCollectionUrl } from '@/utils/collectionUrls';
@@ -32,38 +25,18 @@ interface LocationsListProps {
 export default function LocationsList({ locations }: LocationsListProps) {
   const router = useRouter();
   const { user } = useAuth();
-  const { enqueueSnackbar } = useSnackbar();
-  const [deleteLocation] = useDeleteLocationMutation();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [locationToDelete, setLocationToDelete] = useState<Location | null>(null);
+  const {
+    deleteDialogOpen,
+    locationToDelete,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+  } = useDeleteLocation();
 
   const userId = user?.userId;
 
   const handleEditClick = (locationId: number) => {
     router.push(`/locations/edit/${locationId}`);
-  };
-
-  const handleDeleteClick = (location: Location) => {
-    setLocationToDelete(location);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!locationToDelete) return;
-
-    try {
-      await deleteLocation(locationToDelete.id).unwrap();
-      enqueueSnackbar('Location deleted successfully', { variant: 'success' });
-      setDeleteDialogOpen(false);
-      setLocationToDelete(null);
-    } catch (error) {
-      enqueueSnackbar('Failed to delete location', { variant: 'error' });
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteDialogOpen(false);
-    setLocationToDelete(null);
   };
 
   return (
@@ -170,21 +143,12 @@ export default function LocationsList({ locations }: LocationsListProps) {
         ))}
       </Grid>
 
-      <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
-        <DialogTitle>Delete Location</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete "{locationToDelete?.name}"? This will remove any associations between this
-            location and your collection items.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteCancel}>Cancel</Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteLocationDialog
+        open={deleteDialogOpen}
+        locationName={locationToDelete?.name || ''}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </>
   );
 }

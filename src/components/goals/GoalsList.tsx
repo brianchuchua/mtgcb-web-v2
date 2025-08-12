@@ -7,14 +7,9 @@ import {
 } from '@mui/icons-material';
 import {
   Box,
-  Button,
   Card,
   CardContent,
   Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Grid,
   IconButton,
   Stack,
@@ -23,12 +18,11 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSnackbar } from 'notistack';
-import { useState } from 'react';
+import { DeleteGoalDialog } from './DeleteGoalDialog';
 import { GoalDescription } from './GoalDescription';
-import { useDeleteGoalMutation } from '@/api/goals/goalsApi';
 import { Goal } from '@/api/goals/types';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
+import { useDeleteGoal } from '@/hooks/goals/useDeleteGoal';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate } from '@/utils/dateUtils';
 import { getCollectionUrl } from '@/utils/collectionUrls';
@@ -40,37 +34,16 @@ interface GoalsListProps {
 
 export function GoalsList({ goals, userId }: GoalsListProps) {
   const { user } = useAuth();
-  const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
-  const [deleteGoal] = useDeleteGoalMutation();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [goalToDelete, setGoalToDelete] = useState<Goal | null>(null);
+  const {
+    deleteDialogOpen,
+    goalToDelete,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+  } = useDeleteGoal(userId);
 
   const isOwner = user?.userId === userId;
-
-  const handleDeleteClick = (goal: Goal) => {
-    setGoalToDelete(goal);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!goalToDelete) return;
-
-    try {
-      await deleteGoal({ userId, goalId: goalToDelete.id }).unwrap();
-      enqueueSnackbar('Goal deleted successfully', { variant: 'success' });
-    } catch (error) {
-      enqueueSnackbar('Failed to delete goal', { variant: 'error' });
-    } finally {
-      setDeleteDialogOpen(false);
-      setGoalToDelete(null);
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteDialogOpen(false);
-    setGoalToDelete(null);
-  };
 
   const handleEditClick = (goal: Goal) => {
     router.push(`/goals/edit/${goal.id}`);
@@ -246,18 +219,12 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
         ))}
       </Grid>
 
-      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
-        <DialogTitle>Delete Goal</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete "{goalToDelete?.name}"? This action cannot be undone.</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelDelete}>Cancel</Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteGoalDialog
+        open={deleteDialogOpen}
+        goalName={goalToDelete?.name || ''}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </>
   );
 }

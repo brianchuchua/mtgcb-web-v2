@@ -13,13 +13,16 @@ import {
   Typography,
   styled,
 } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { DeleteGoalDialog } from './DeleteGoalDialog';
 import { GoalSearchForm } from './GoalSearchForm';
 import { CardApiParams } from '@/api/browse/types';
 import { useUpdateGoalMutation } from '@/api/goals/goalsApi';
 import { Goal, UpdateGoalRequest } from '@/api/goals/types';
+import { useDeleteGoal } from '@/hooks/goals/useDeleteGoal';
 import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
 import { useSetNames } from '@/utils/goals/useSetNames';
 
@@ -40,8 +43,19 @@ interface FormValues {
 }
 
 export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormProps) {
+  const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const [updateGoal, { isLoading }] = useUpdateGoalMutation();
+  const {
+    isDeleting,
+    deleteDialogOpen,
+    goalToDelete,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+  } = useDeleteGoal(userId, {
+    onSuccess: () => router.push('/goals'),
+  });
   const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>(
     goal?.targetQuantityAll ? 'all' : 'separate'
   );
@@ -537,13 +551,31 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
           </Alert>
         )}
 
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={isLoading}>
-            Update Goal
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between' }}>
+          <Button 
+            variant="contained" 
+            color="error" 
+            onClick={() => handleDeleteClick(goal)}
+            disabled={isLoading || isDeleting}
+          >
+            Delete
           </Button>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button type="submit" variant="contained" disabled={isLoading || isDeleting}>
+              Update Goal
+            </Button>
+          </Box>
         </Box>
       </Box>
+
+      <DeleteGoalDialog
+        open={deleteDialogOpen}
+        goalName={goal?.name || ''}
+        isDeleting={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </form>
   );
 }
