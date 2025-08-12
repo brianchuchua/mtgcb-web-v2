@@ -24,5 +24,5 @@ export const featureFlags = {
    *
    * To enable: Change this value to true
    */
-  enablePrefetchNextPage: false,
+  enablePrefetchNextPage: true,
 } as const;

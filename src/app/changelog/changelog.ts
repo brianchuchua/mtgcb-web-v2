@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-12',
+      version: '0.106.0',
+      changes: ['Added smart prefetching for next page of results to improve pagination performance'],
+    },
+    {
+      date: '2025-08-12',
       version: '0.105.2',
       changes: [
         "Improved collection goals summary calculation performance (when viewing one or more goal's summaries) by 73%",
