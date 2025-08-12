@@ -1,11 +1,11 @@
 {
   "name": "mtgcb-web-v2",
-  "version": "0.104.3",
+  "version": "0.104.4",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "lint": "next lint && prettier --check .",
     "type-check": "tsc --noEmit",
     "format": "prettier --write 'src/**/*.{ts,js,tsx,jsx,json,md}'",

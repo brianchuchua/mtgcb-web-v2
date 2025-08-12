@@ -68,6 +68,7 @@ Now:
 - need easy buttons to handle imports locally based on exports from the live site
 - need a scheduled downtime plan after proving the import process works in staging
 - need to clean up out of date schemas and generate the final database locally
+- need to make sure createdAt is ported over from legacy field
 
 ### FAQ Page
 
@@ -221,6 +222,7 @@ Now:
 
 ## Tech Debt
 
+- Switch to Git Flow once the site is in production
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - All quantity selectors should be using the same component, QuantitySelector.tsx
 - End-to-end tests for every user action
@@ -235,6 +237,7 @@ Now:
 - Need a fallback if both canBeFoil and canBeNonFoil are false, treat them both as true probably
 - CI/CD pipeline
 - Rate limiting for API calls
+- Slug size is huge (348 MB) when deploying to Heroku, likely due to the SWC binaries. This is why some devs move to Vercel.
 
 ## Future Features
 
@@ -391,9 +394,7 @@ Now:
 
 ## UX Thoughts
 
-- Let's make UX changes as we port components over.
-- Need a main landing page that doesn't suck. It needs a large call-to-action to register and show off the features of the site.
-- Offer a Classic Skin vs the current Modern Skin
+- consider if cost to complete should be hidden by default -- imagine a "Costs to complete this set" expandable section
 - Ensure the add/remove buttons are very large and easy to press on tablets and mobile
 - Subsetgroups are confusing to users. Probably just hide this.
 - Allow user to tap a card row to add that card to their collection in table view

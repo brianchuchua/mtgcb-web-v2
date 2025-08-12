@@ -12,6 +12,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-11',
+      version: '0.104.4',
+      changes: [
+        'Added "Back to Top" button when viewing sets in collection pages for easier navigation',
+        'Improved spacing between content and navigation buttons for better visual clarity',
+      ],
+    },
+    {
+      date: '2025-08-11',
       version: '0.104.3',
       changes: [
         'Fixed table column alignment issue where prices appeared under the wrong header when browsing cards',

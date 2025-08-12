@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 const Footer = () => {
   const [emailLink, setEmailLink] = useState<string>('');
+  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
     // Client-side only email construction
@@ -20,7 +21,7 @@ const Footer = () => {
       <Container maxWidth="lg">
         <FooterContent>
           <Typography variant="body2" color="text.secondary">
-            © 2013-2025 MTG Collection Builder ·{' '}
+            © 2013-{currentYear} MTG Collection Builder ·{' '}
             <Link component={NextLink} href="/terms-and-privacy" color="inherit">
               Terms and Privacy
             </Link>{' '}

@@ -183,6 +183,8 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
           {viewMode === 'table' && <CardTable {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
         </>
       )}
+
+      <Pagination {...paginationProps} position="bottom" />
     </>
   );
 };
