@@ -12,8 +12,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-12',
+      version: '0.105.2',
+      changes: [
+        "Improved collection goals summary calculation performance (when viewing one or more goal's summaries) by 73%",
+      ],
+    },
+    {
+      date: '2025-08-12',
       version: '0.105.1',
-      changes: ['Improved collection goal calculation performance by 83%'],
+      changes: ['Improved collection goal performance (when viewing a list of cards) by 83%'],
     },
     {
       date: '2025-08-11',
