@@ -88,29 +88,23 @@ export function usePrefetchNextPage({
       return;
     }
 
-    const prefetchTimer = setTimeout(() => {
-      // Use initiate with subscribe: false instead of usePrefetch
-      // This ensures no subscription is created
-      if (isCardsView) {
-        dispatch(
-          browseApi.endpoints.getCards.initiate(nextPageApiParams, {
-            subscribe: false,
-            forceRefetch: false,
-          }),
-        );
-      } else {
-        dispatch(
-          browseApi.endpoints.getSets.initiate(nextPageApiParams, {
-            subscribe: false,
-            forceRefetch: false,
-          }),
-        );
-      }
-    }, 1000);
-
-    return () => {
-      clearTimeout(prefetchTimer);
-    };
+    // Prefetch immediately since we're already waiting for main query to settle
+    // Use initiate with subscribe: false to ensure no subscription is created
+    if (isCardsView) {
+      dispatch(
+        browseApi.endpoints.getCards.initiate(nextPageApiParams, {
+          subscribe: false,
+          forceRefetch: false,
+        }),
+      );
+    } else {
+      dispatch(
+        browseApi.endpoints.getSets.initiate(nextPageApiParams, {
+          subscribe: false,
+          forceRefetch: false,
+        }),
+      );
+    }
   }, [
     dispatch,
     isCardsView,
