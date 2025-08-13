@@ -201,7 +201,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
   // If specifically asking for foil, just use foil price
   if (isFoil && foilPrice !== null) {
     return (
-      <Tooltip title="Foil Price - Click to buy on TCGPlayer">
+      <Tooltip title="Foil Price - Click to buy on TCGPlayer" placement="top">
         <Box sx={containerStyle}>
           <Typography variant="subtitle1" fontWeight="medium"
             sx={{
@@ -232,7 +232,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
       : `${actualPriceTypeLabel} Price (with Foil) - Click to buy on TCGPlayer`;
 
     return (
-      <Tooltip title={tooltipTitle}>
+      <Tooltip title={tooltipTitle} placement="top">
         <Box sx={containerStyle}>
           <Box sx={flexContainerStyle}>
             <Typography variant="subtitle1" fontWeight="medium"
@@ -265,7 +265,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
       : `${actualPriceTypeLabel} Price - Click to buy on TCGPlayer`;
 
     return (
-      <Tooltip title={tooltipTitle}>
+      <Tooltip title={tooltipTitle} placement="top">
         <Box sx={containerStyle}>
           <Box sx={flexContainerStyle}>
             <Typography variant="subtitle1" fontWeight="medium"
@@ -297,6 +297,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
             ? 'Foil Price - Click to buy on TCGPlayer'
             : `No ${requestedPriceTypeLabel.toLowerCase()} price available — showing foil price instead - Click to buy on TCGPlayer`
         }
+        placement="top"
       >
         <Box sx={containerStyle}>
           <Box sx={flexContainerStyle}>
@@ -323,7 +324,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   // No prices available
   return (
-    <Tooltip title="No prices available - Click to buy on TCGPlayer">
+    <Tooltip title="No prices available - Click to buy on TCGPlayer" placement="top">
       <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}
         sx={{
           fontSize: '1rem',

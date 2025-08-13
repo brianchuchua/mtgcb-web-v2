@@ -520,7 +520,7 @@ const CardItemComponent = ({
             </Box>
           )}
 
-          {quantityIsVisible && isOwnCollection && locationsIsVisible && (
+          {quantityIsVisible && locationsIsVisible && (
             <Box sx={{ mt: 1 }}>
               {locations && locations.length > 0 ? (
                 <CardLocationPills
@@ -533,10 +533,11 @@ const CardItemComponent = ({
                   canBeNonFoil={canBeNonFoil}
                   locations={locations}
                   align="center"
-                  onAddLocation={handleAddLocation}
+                  onAddLocation={isOwnCollection ? handleAddLocation : undefined}
+                  isOwnCollection={isOwnCollection}
                 />
               ) : (
-                (quantityReg || quantityFoil) ? (
+                isOwnCollection && (quantityReg || quantityFoil) ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Chip
                       label="Add card to location"

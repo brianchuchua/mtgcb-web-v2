@@ -38,6 +38,7 @@ interface CardLocationPillsProps {
   }[];
   align?: 'left' | 'center';
   onAddLocation?: (event: React.MouseEvent) => void;
+  isOwnCollection?: boolean;
 }
 
 interface EditLocationDialogProps {
@@ -282,6 +283,7 @@ export default function CardLocationPills({
   locations: propLocations,
   align = 'center',
   onAddLocation,
+  isOwnCollection = false,
 }: CardLocationPillsProps) {
   const { enqueueSnackbar } = useSnackbar();
   const [editingLocation, setEditingLocation] = useState<CardLocation | null>(null);
@@ -356,21 +358,23 @@ export default function CardLocationPills({
               </Box>
             }
             size="small"
-            onClick={() => handleChipClick(location)}
-            onDelete={(e) => handleRemoveClick(location, e as any)}
+            onClick={isOwnCollection ? () => handleChipClick(location) : undefined}
+            onDelete={isOwnCollection ? (e) => handleRemoveClick(location, e as any) : undefined}
             deleteIcon={
-              <IconButton size="small" sx={{ padding: 0, ml: 0.5 }}>
-                <CloseIcon sx={{ fontSize: 16 }} />
-              </IconButton>
+              isOwnCollection ? (
+                <IconButton size="small" sx={{ padding: 0, ml: 0.5 }}>
+                  <CloseIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              ) : undefined
             }
             sx={{
-              cursor: 'pointer',
-              '& .MuiChip-deleteIcon': {
+              cursor: isOwnCollection ? 'pointer' : 'default',
+              '& .MuiChip-deleteIcon': isOwnCollection ? {
                 color: 'text.secondary',
                 '&:hover': {
                   color: 'error.main',
                 },
-              },
+              } : {},
             }}
           />
         ))}

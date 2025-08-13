@@ -331,6 +331,7 @@ Now:
 - A "money draft" tool to help users during a draft
 - A YouTube channel for the site, including transitioning collectors to limited players -- it's the best way to collect.
 - Consulting with a UX designer -- while Material UI looks nice, IhavenoideawhatIamdoing
+- Sentry profiling and tracing
 
 ## Data Decisions
 

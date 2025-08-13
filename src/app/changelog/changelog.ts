@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-08-13',
+      version: '0.107.0',
+      changes: [
+        'Made card locations visible when viewing other users\' collections in both table and grid views',
+        'Changed price tooltips to appear above prices instead of below for better visibility',
+      ],
+    },
+    {
       date: '2025-08-12',
       version: '0.106.0',
       changes: ['Added smart prefetching for next page of results to improve pagination performance'],

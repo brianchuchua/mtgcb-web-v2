@@ -18,6 +18,7 @@ interface CardLocationTableCellProps {
     quantityReg: number;
     quantityFoil: number;
   }[];
+  isOwnCollection?: boolean;
 }
 
 export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
@@ -29,6 +30,7 @@ export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
   canBeFoil = true,
   canBeNonFoil = true,
   locations,
+  isOwnCollection = false,
 }) => {
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
 
@@ -52,27 +54,30 @@ export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
           canBeNonFoil={canBeNonFoil}
           locations={locations}
           align="center"
-          onAddLocation={handleAddLocation}
+          onAddLocation={isOwnCollection ? handleAddLocation : undefined}
+          isOwnCollection={isOwnCollection}
         />
       ) : (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Chip
-            label="Add Card to Location"
-            onClick={handleAddLocation}
-            size="small"
-            disabled={!totalQuantityReg && !totalQuantityFoil}
-            sx={{
-              cursor: !totalQuantityReg && !totalQuantityFoil ? 'not-allowed' : 'pointer',
-              color: 'text.secondary',
-              borderColor: 'divider',
-              '&:hover': !totalQuantityReg && !totalQuantityFoil ? {} : {
-                backgroundColor: 'action.hover',
-                borderColor: 'text.secondary',
-              },
-            }}
-            variant="outlined"
-          />
-        </Box>
+        isOwnCollection ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Chip
+              label="Add Card to Location"
+              onClick={handleAddLocation}
+              size="small"
+              disabled={!totalQuantityReg && !totalQuantityFoil}
+              sx={{
+                cursor: !totalQuantityReg && !totalQuantityFoil ? 'not-allowed' : 'pointer',
+                color: 'text.secondary',
+                borderColor: 'divider',
+                '&:hover': !totalQuantityReg && !totalQuantityFoil ? {} : {
+                  backgroundColor: 'action.hover',
+                  borderColor: 'text.secondary',
+                },
+              }}
+              variant="outlined"
+            />
+          </Box>
+        ) : null
       )}
 
       {locationDialogOpen && (

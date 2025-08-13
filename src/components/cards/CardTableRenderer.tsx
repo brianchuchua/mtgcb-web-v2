@@ -273,8 +273,8 @@ export const useCardTableColumns = (
     }
 
     if (column.id === 'locations') {
-      // Only show locations column for own collections
-      return (displaySettings.locationsIsVisible ?? false) && !!isOwnCollection;
+      // Show locations column when enabled in settings
+      return displaySettings.locationsIsVisible ?? false;
     }
 
     return true;
@@ -982,7 +982,7 @@ export const useCardRowRenderer = (
     }
 
     // Locations Cell
-    if (displaySettings.locationsIsVisible && isOwnCollection) {
+    if (displaySettings.locationsIsVisible) {
       cells.push(
         <CardLocationTableCell
           key="locations"
@@ -994,6 +994,7 @@ export const useCardRowRenderer = (
           canBeFoil={card.canBeFoil}
           canBeNonFoil={card.canBeNonFoil}
           locations={card.locations}
+          isOwnCollection={isOwnCollection}
         />,
       );
     }
