@@ -4,6 +4,11 @@ I've found over time that maintaining my action items for code in external tools
 
 Best to keep them in the codebase, especially since I'm a team of one.
 
+## Recent Things I Noticed
+
+http://local.mtgcb.com:3000/collections/1337/khans-of-tarkir, update quantity, everything is flashing
+just on the set page though, not on the main collection page
+
 ## Recent Actions
 
 Deployed mtgcb-web-v2 and mtgcb-api-v3 to production, using a rough draft of the migration process.
@@ -17,7 +22,6 @@ Still need to do the new price updater, which will be a generic job scheduler th
 
 test mobile, fix issues
 
-- autofocus feels bad on mobile
 - mobile is confusing sometimes, need a summary of current search
 - default set view in table view too many for mobile
 
@@ -43,6 +47,10 @@ Now:
 - audit existing features in legacy site
 
 ## Remaining Major Feature Work Before 1.0
+
+### Data Issues
+
+- isDraftable missing from a ton of sets, look into import pipeline too
 
 ### Patron Support Page
 
@@ -325,7 +333,6 @@ Now:
 - A "money draft" tool to help users during a draft
 - A YouTube channel for the site, including transitioning collectors to limited players -- it's the best way to collect.
 - Consulting with a UX designer -- while Material UI looks nice, IhavenoideawhatIamdoing
-- Sentry profiling and tracing
 
 ## Data Decisions
 

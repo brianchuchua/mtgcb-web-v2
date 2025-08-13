@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-13',
+      version: '0.107.4',
+      changes: ['Removed autofocus that was disruptive on mobile'],
+    },
+    {
+      date: '2025-08-13',
       version: '0.107.3',
       changes: ['Fixed issue with sorting sets by release date'],
     },

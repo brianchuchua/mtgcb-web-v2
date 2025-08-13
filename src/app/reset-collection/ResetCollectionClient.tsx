@@ -176,7 +176,6 @@ export const ResetCollectionClient = () => {
             variant="contained" 
             color="error" 
             onClick={handleReset} 
-            autoFocus
             disabled={isLoading}
           >
             Yes, Reset My Collection

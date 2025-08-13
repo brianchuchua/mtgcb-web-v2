@@ -107,7 +107,6 @@ export const DeleteAccountDialog: React.FC<DeleteAccountDialogProps> = ({
         </DialogContentText>
 
         <TextField
-          autoFocus
           fullWidth
           value={confirmationInput}
           onChange={(e) => setConfirmationInput(e.target.value)}
