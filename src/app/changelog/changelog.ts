@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-13',
+      version: '0.107.3',
+      changes: ['Fixed issue with sorting sets by release date'],
+    },
+    {
+      date: '2025-08-13',
       version: '0.107.2',
       changes: ['Fixed stat filters not syncing visually when using quantity quick selectors'],
     },
@@ -24,7 +29,7 @@ const changelogData: ChangelogData = {
       date: '2025-08-13',
       version: '0.107.0',
       changes: [
-        'Made card locations visible when viewing other users\' collections in both table and grid views',
+        "Made card locations visible when viewing other users' collections in both table and grid views",
         'Changed price tooltips to appear above prices instead of below for better visibility',
       ],
     },

@@ -130,7 +130,6 @@ Now:
 - Showing 2501-3000 of 92769 cards goes to two lines on desktop
 - Performance pass, some API calls have gotten a little worse I think
 - Performance benchmark scripts and documentation
-- Card page: Other Printings should just be the standard pagination with those cards filtered, collection aware, maybe goal aware
 - Shopping lists -- reports based on collection goals
 - TCGPlayer supports adding a collector number after the set code -- needed for things like secret lair that have duplicate names
 - Allow selection of default collection goal
@@ -148,7 +147,6 @@ Now:
 
 ## UX Action Items
 
-- bottom pagination, return to top of page
 - weird flicker with specific cards to include or exclude in goal forms
 - Audit subsets with collection goals -- data and appearance.
 - Goals should have a computation loading state, especially in the header
@@ -174,7 +172,6 @@ Now:
 - Confirm functionality of back and forward browser buttons
 - Handle sideways cards and flip cards
 - On hover contextual stuff, like increasing quantity or removing a card, or visiting the card page, or buying on tcgplayer
-- It would be nice if pagination didn't change when changing track subsets with main set or price type
 - See if I can prevent the entire card grid from reloading when the price type is changed
 - Add skeleton loader for collection header to prevent vertical shift when loading (audit set header too)
 - Audit table field orders and their corresponding visibility filters
@@ -200,7 +197,6 @@ Now:
 - Make default number of cards per page a multiple of 5 and 4.
 - Header consistency on pages, make a shared component for text headers -- centered vs not, Goals vs Add/Remove Cards for example.
 - Money value consistency -- success and warning colors
-- Quantity selectors -- going from custom filter to normal doesn't reset the states as you'd expect
 - A cool stats page, icon can be a graph, most valuable card can move there -- can make an expandable region in a set view too. How much of each color selected, etc. Check what MTG Arena and other tools do. Some easy wins. Most common creature type, most valuable card, etc.
 - When any prices are missing, add an info icon explaining it's an underestimate
 - Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
@@ -214,14 +210,8 @@ Now:
 
 ## Bugs
 
-- release date desc for sets in browse view <--
-- pagination is persisting when browsing around sometimes, see browse page
-
 - Moderate: Draft cube calculation when track subsets with sets in on is wrong, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir -- it's incorrectly counting non main set cards as missing just in terms of the value
-- Bug: Release date desc in sets view is applying to cards view when switching
-- Bug: seeing a query for /search/sets with release desc and then asc when loading set collection page
 - See if still present: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
-- See if still present: paginating too far in the future in the url bug may be back
 - Matching cards by their pure name for collection goals doesn't work well with tokens, because they have the same name but are physically distinct in terms of type lines and power and toughness and color identity
 
 ## Tech Debt
