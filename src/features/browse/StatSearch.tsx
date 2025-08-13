@@ -143,12 +143,26 @@ const StatSearch: React.FC<StatSearchProps> = ({ resetTrigger }) => {
     }
   }, [resetTrigger]);
 
-  // Sync with Redux state when it changes (but only when not user-modified)
+  // Track last conditions we sent to Redux to detect external changes
+  const lastSentToRedux = useRef<string>('');
+
+  // Sync with Redux state when it changes
   useEffect(() => {
     if (!userModified.current) {
+      // Normal sync when not user-modified
       const parsedConditions = parseReduxStats(reduxStats);
       setConditions(parsedConditions);
       setFiltersActive(parsedConditions.length > 0);
+    } else {
+      // Check if Redux changed to something different than what we last sent
+      const reduxStr = JSON.stringify(reduxStats);
+      if (reduxStr !== lastSentToRedux.current) {
+        // Redux was changed externally (e.g., from QuantitySelector)
+        userModified.current = false;
+        const parsedConditions = parseReduxStats(reduxStats);
+        setConditions(parsedConditions);
+        setFiltersActive(parsedConditions.length > 0);
+      }
     }
   }, [reduxStats]);
 
@@ -206,7 +220,9 @@ const StatSearch: React.FC<StatSearchProps> = ({ resetTrigger }) => {
 
     // If filters are not active, ensure we clear any existing stats from redux
     if (!filtersActive) {
-      dispatch(setStats({}));
+      const emptyStats = {};
+      lastSentToRedux.current = JSON.stringify(emptyStats);
+      dispatch(setStats(emptyStats));
       return;
     }
 
@@ -221,6 +237,7 @@ const StatSearch: React.FC<StatSearchProps> = ({ resetTrigger }) => {
       statFilters[attribute].push(`${operator}${value}`);
     });
 
+    lastSentToRedux.current = JSON.stringify(statFilters);
     dispatch(setStats(statFilters));
   }, [conditions, dispatch, filtersActive]);
 

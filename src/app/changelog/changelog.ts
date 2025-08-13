@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-13',
+      version: '0.107.2',
+      changes: ['Fixed stat filters not syncing visually when using quantity quick selectors'],
+    },
+    {
+      date: '2025-08-13',
       version: '0.107.1',
       changes: ['Fixed Reset Search button not clearing stat filters visually in the search form'],
     },

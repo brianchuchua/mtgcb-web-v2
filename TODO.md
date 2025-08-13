@@ -220,7 +220,6 @@ Now:
 - Moderate: Draft cube calculation when track subsets with sets in on is wrong, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir -- it's incorrectly counting non main set cards as missing just in terms of the value
 - Bug: Release date desc in sets view is applying to cards view when switching
 - Bug: seeing a query for /search/sets with release desc and then asc when loading set collection page
-- Bug: Reset Search doesn't clear the stat filters graphically.
 - See if still present: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - See if still present: paginating too far in the future in the url bug may be back
 - Matching cards by their pure name for collection goals doesn't work well with tokens, because they have the same name but are physically distinct in terms of type lines and power and toughness and color identity
