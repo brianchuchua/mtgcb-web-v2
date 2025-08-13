@@ -45,6 +45,7 @@ const BrowseSearchForm: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { setMobileOpen } = useDashboardContext();
+  const [statResetTrigger, setStatResetTrigger] = React.useState(0);
 
   const contentType = useSelector(selectViewContentType);
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
@@ -126,6 +127,7 @@ const BrowseSearchForm: React.FC = () => {
 
   const handleResetSearch = () => {
     dispatch(resetSearch());
+    setStatResetTrigger((prev) => prev + 1);
   };
 
   const handleSeeResults = () => {
@@ -175,6 +177,7 @@ const BrowseSearchForm: React.FC = () => {
               isSetPage={isSetPage}
               isCollectionPage={isCollectionPage}
               isCollectionSetPage={isCollectionSetPage}
+              statResetTrigger={statResetTrigger}
             />
           ) : (
             <SetSearchFields

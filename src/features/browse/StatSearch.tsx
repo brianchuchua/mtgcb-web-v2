@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { usePriceType } from '@/hooks/usePriceType';
-import { selectSearchParams, selectStats, setStats } from '@/redux/slices/browseSlice';
+import { selectStats, setStats } from '@/redux/slices/browseSlice';
 import { StatCondition, StatFilters } from '@/types/browse';
 import { PriceType } from '@/types/pricing';
 
@@ -98,12 +98,15 @@ const isQuantityAttribute = (attribute: string): boolean => {
   return ['quantityReg', 'quantityFoil', 'quantityAll'].includes(attribute);
 };
 
-const StatSearch = () => {
+interface StatSearchProps {
+  resetTrigger?: number;
+}
+
+const StatSearch: React.FC<StatSearchProps> = ({ resetTrigger }) => {
   const dispatch = useDispatch();
   const pathname = usePathname();
   const { enqueueSnackbar } = useSnackbar();
   const reduxStats = useSelector(selectStats);
-  const searchParams = useSelector(selectSearchParams);
   const userModified = useRef(false);
   const [conditions, setConditions] = useState<StatCondition[]>(() => parseReduxStats(reduxStats));
   const prevDisplayPriceType = useRef<string | null>(null);
@@ -131,26 +134,23 @@ const StatSearch = () => {
     return parsedConditions.length > 0;
   });
 
-  // Check if search parameters are being reset
-  const isSearchParamsReset = Object.keys(searchParams || {}).length === 0;
-
-  // Sync with Redux state when it changes (but only for URL/reset changes)
+  // Reset when resetTrigger changes
   useEffect(() => {
-    // Reset our local state if we detect a reset action from outside
-    if (isSearchParamsReset) {
+    if (resetTrigger && resetTrigger > 0) {
       userModified.current = false;
       setConditions([]);
       setFiltersActive(false);
-      return;
     }
+  }, [resetTrigger]);
 
-    // Only sync from Redux when not user-modified
+  // Sync with Redux state when it changes (but only when not user-modified)
+  useEffect(() => {
     if (!userModified.current) {
       const parsedConditions = parseReduxStats(reduxStats);
       setConditions(parsedConditions);
       setFiltersActive(parsedConditions.length > 0);
     }
-  }, [reduxStats, isSearchParamsReset]);
+  }, [reduxStats]);
 
   // When display price type changes, update any price filters to match
   useEffect(() => {

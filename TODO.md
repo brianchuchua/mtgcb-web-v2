@@ -4,37 +4,43 @@ I've found over time that maintaining my action items for code in external tools
 
 Best to keep them in the codebase, especially since I'm a team of one.
 
-## Current Action Items
+## Recent Actions
 
+Deployed mtgcb-web-v2 and mtgcb-api-v3 to production, using a rough draft of the migration process.
+Have fixed major perf issues and minor bugs.
+Still need to do the new price updater, which will be a generic job scheduler that can handle other tasks too.
+
+## Current Action Items (kinda disorganized now)
+
+- home page flash when loading is kinda annoying for stats
 - social media links
+
+test mobile, fix issues
+
+- autofocus feels bad on mobile
+- mobile is confusing sometimes, need a summary of current search
+- default set view in table view too many for mobile
+
+test tablet, fix issues
 
 Mostly ready:
 
-- audit database and api for deprecated or unused fields, make new database and migration pipeline, scripts for moving legacy to new and updating cards in the new experience without needing the old, need to document the process
-  - I think I need to do the clean-up of 0 entry, nah way too slow, it's like 14 seconds for 5000 entries locally -- faster to just filter at import time from legacy to new
-- I think it's time to deploy the current new database, then figure out migration scripts
-  - grab collections and users from legacy as sql scripts, put into v2 (hard truncate, skip 0-quantity collections)
-  - update new sets and cards from v2 to v3, just the new ones
-  - bring collections and users to v3, hard truncate, skip 0-quantity collections
-  - update the user id autoincrement value to match 1 more than the highest user id
-- Then do the new price updater
-- not a bug: i want to try location detection before sending in include locations, calls taking 410ms in secret lair drop series
+- Formalize the migration process from old db to new db. Don't forget the userId autoincrement fix. Document and test.
+- Then do the new price updater -- which will really be a generic job scheduler that can handle other tasks too
+- not a bug: i want to try location detection before sending in include locations, calls taking 410ms in secret lair drop series -- same for rendering the add locations buttons
 - i want to add a tcgplayerPricesUpdatedAt field to Cards
-
-Soon:
-
-- Deploying to production
+  heroku thinks i am using too much memory, but i upgraded dynos, a bug in their interface?
+  questioning how i gather the platform statistics, it's such a heavy api call
 
 Now:
 
 - Work on annoying bugs and issues, cleaning up this TODO document
 - UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
-- Preload stuff on pagination hover?
-- mass entry, add collector number
+- mass entry for tcgplaye, add collector number
 - roadmap page (maybe just on the changelog page)
 - mention binders on home page
 - faq page
-- consider adding prefetching back to pagination, collection goal queries can be slow for big goals
+- audit existing features in legacy site
 
 ## Remaining Major Feature Work Before 1.0
 
@@ -215,7 +221,6 @@ Now:
 - Bug: Release date desc in sets view is applying to cards view when switching
 - Bug: seeing a query for /search/sets with release desc and then asc when loading set collection page
 - Bug: Reset Search doesn't clear the stat filters graphically.
-- Make sure 99% doesn't round to 100% in progress bars and collection progress (see Duel Decks: Anthology and Gatecrash)
 - See if still present: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - See if still present: paginating too far in the future in the url bug may be back
 - Matching cards by their pure name for collection goals doesn't work well with tokens, because they have the same name but are physically distinct in terms of type lines and power and toughness and color identity

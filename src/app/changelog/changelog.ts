@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-13',
+      version: '0.107.1',
+      changes: ['Fixed Reset Search button not clearing stat filters visually in the search form'],
+    },
+    {
+      date: '2025-08-13',
       version: '0.107.0',
       changes: [
         'Made card locations visible when viewing other users\' collections in both table and grid views',

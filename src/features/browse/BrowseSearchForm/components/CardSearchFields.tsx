@@ -23,6 +23,7 @@ interface CardSearchFieldsProps {
   isSetPage: boolean;
   isCollectionPage: boolean;
   isCollectionSetPage: boolean;
+  statResetTrigger?: number;
 }
 
 const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
@@ -39,6 +40,7 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
   isSetPage,
   isCollectionPage,
   isCollectionSetPage,
+  statResetTrigger,
 }) => {
   const cardNameRef = useRef<HTMLInputElement>(null);
 
@@ -88,7 +90,7 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
         />
       )}
       <QuantitySelector isCollectionPage={isCollectionPage} />
-      <StatSearch />
+      <StatSearch resetTrigger={statResetTrigger} />
     </>
   );
 };
