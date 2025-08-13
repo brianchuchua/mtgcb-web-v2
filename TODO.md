@@ -312,10 +312,10 @@ Now:
 - Integration with Sonarcloud (open source the repo, make development easy for new devs)
 - Integration with Google Analytics (after production launch, using the same account as the legacy site)
 - Need a temporary downtime page for the home page (database maintenance, etc.)
-- Load testing
+- Load testing - look into npx autocannon
 - Performance testing / index audit
 - Add an index for set slug probably
-- Automated database backups
+- Automated database backups - see https://devcenter.heroku.com/articles/heroku-postgres-backups
 - Dogfooding and UX testing
 - UX - Must test rendering of input fields on native devices
 - Verify parameter edge cases, minimums and maximums
