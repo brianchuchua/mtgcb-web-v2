@@ -52,6 +52,7 @@ const selectFields: Array<keyof CardModel | string> = [
   'high',
   'foil',
   'prices',
+  'pricesUpdatedAt',
   'releasedAt',
   'canBeFoil',
   'canBeNonFoil',
@@ -306,7 +307,8 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
             <CardPricesSection 
               priceData={priceData} 
               tcgplayerId={card?.tcgplayerId} 
-              cardName={card?.name} 
+              cardName={card?.name}
+              pricesUpdatedAt={card?.pricesUpdatedAt}
             />
           </Paper>
 

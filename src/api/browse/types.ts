@@ -40,6 +40,7 @@ export interface CardModel {
       high: number | null;
     } | null;
   };
+  pricesUpdatedAt?: string | null;
   releaseDate: string | null;
   canBeFoil?: boolean;
   canBeNonFoil?: boolean;

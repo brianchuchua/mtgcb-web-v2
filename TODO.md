@@ -4,11 +4,15 @@ I've found over time that maintaining my action items for code in external tools
 
 Best to keep them in the codebase, especially since I'm a team of one.
 
+## Just noticed
+
+Default table fields in card view sucks on mobile, locations should not be first
+
 ## Recent Actions
 
 Deployed mtgcb-web-v2 and mtgcb-api-v3 to production, using a rough draft of the migration process.
 Have fixed major perf issues and minor bugs.
-Still need to do the new price updater, which will be a generic job scheduler that can handle other tasks too.
+mtgcb-jobs app is done and tested locally, don't want to swamp tcgplayer, so won't deploy or run it until after go-live so i don't have the legacy and new updater going at the same time
 
 ## Current Action Items (kinda disorganized now)
 
@@ -16,14 +20,11 @@ Still need to do the new price updater, which will be a generic job scheduler th
 
 test mobile, fix issues
 
-- default set view in table view too many for mobile
-
 test tablet, fix issues
 
 Mostly ready:
 
 - Formalize the migration process from old db to new db. Don't forget the userId autoincrement fix. Document and test.
-- Then do the new price updater -- which will really be a generic job scheduler that can handle other tasks too
 - not a bug: i want to try location detection before sending in include locations, calls taking 410ms in secret lair drop series -- same for rendering the add locations buttons
 - i want to add a tcgplayerPricesUpdatedAt field to Cards
   heroku thinks i am using too much memory, but i upgraded dynos, a bug in their interface?
@@ -136,12 +137,10 @@ Now:
 - Allow selection of default collection goal
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
 - Home page (landing page or statistics dashboard depending on login state, perhaps most valuable card can live here)
-- New price updater
 - In-code TODO audit
 - Feature parity audit (permalink)
 - Most valuable card collected, maybe in the set header
 - Handle double-sided, sideways, and flip cards
-- New price updater that updates directly in the new database, separate from the old legacy updater
 - Audit input field lengths for all API calls
 - Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages
 - Brainstorm patron cosmetic perks

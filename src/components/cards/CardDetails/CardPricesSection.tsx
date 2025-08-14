@@ -23,18 +23,55 @@ interface CardPricesSectionProps {
   priceData: PriceData | null;
   tcgplayerId?: number | string | null;
   cardName?: string;
+  pricesUpdatedAt?: string | null;
 }
+
+const formatPriceUpdateDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return 'Unknown';
+  
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffHours < 1) {
+      return 'Updated less than an hour ago';
+    } else if (diffHours === 1) {
+      return 'Updated 1 hour ago';
+    } else if (diffHours < 24) {
+      return `Updated ${diffHours} hours ago`;
+    } else if (diffDays === 1) {
+      return 'Updated 1 day ago';
+    } else if (diffDays < 7) {
+      return `Updated ${diffDays} days ago`;
+    } else {
+      return `Updated on ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    }
+  } catch {
+    return 'Unknown';
+  }
+};
 
 export const CardPricesSection: React.FC<CardPricesSectionProps> = ({ 
   priceData, 
   tcgplayerId, 
-  cardName 
+  cardName,
+  pricesUpdatedAt 
 }) => {
   return (
     <>
-      <Typography variant="subtitle2" fontWeight="600" sx={{ mb: 1.5 }}>
-        Prices
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1.5 }}>
+        <Typography variant="subtitle2" fontWeight="600">
+          Prices
+        </Typography>
+        {pricesUpdatedAt && (
+          <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1 }}>
+            ({formatPriceUpdateDate(pricesUpdatedAt)})
+          </Typography>
+        )}
+      </Box>
       
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         {priceData?.normal && (

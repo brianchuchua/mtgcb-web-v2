@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-08-14',
+      version: '0.109.0',
+      changes: [
+        'Completed new price updater system',
+        'Added price update timestamp display on card detail pages',
+      ],
+    },
+    {
       date: '2025-08-13',
       version: '0.108.5',
       changes: [
