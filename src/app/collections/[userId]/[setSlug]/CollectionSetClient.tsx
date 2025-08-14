@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { useMassUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
+import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import MassUpdateButton from '@/components/collections/MassUpdateButton';
@@ -491,6 +492,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
           </>
         }
       />
+      <SearchDescription forceView="cards" />
 
       {/* Mass Update Panel */}
       {isOwnCollection && browseController.view === 'cards' && !selectedGoalId && (

@@ -22,7 +22,7 @@ const MTG_COLOR_NAMES: Record<string, string> = {
   'G': 'Green',
 };
 
-export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, onePrintingPerPureName?: boolean): string {
+export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, onePrintingPerPureName?: boolean, isForGoal: boolean = true, isSetPage?: boolean): string {
   const { conditions } = searchCriteria;
   const parts: string[] = [];
   const typeParts: string[] = [];
@@ -63,20 +63,16 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     } else if (conditions.colors_array.exactly) {
       const colorNames = conditions.colors_array.exactly.map((c: string) => MTG_COLOR_NAMES[c] || c);
       if (conditions.colors_array.exactly.length === 1) {
-        colorPart.push(colorNames[0]);
+        colorPart.push(`only ${colorNames[0]}`);
       } else {
-        colorPart.push(colorNames.join('/'));
+        colorPart.push(`only ${colorNames.join('/')}`);
       }
     } else if (conditions.colors_array.atLeast) {
       const colorNames = conditions.colors_array.atLeast.map((c: string) => MTG_COLOR_NAMES[c] || c);
       colorPart.push(`with ${colorNames.join('/')}`);
     } else if (conditions.colors_array.atMost) {
       const colorNames = conditions.colors_array.atMost.map((c: string) => MTG_COLOR_NAMES[c] || c);
-      if (conditions.colors_array.atMost.length === 1 && conditions.colors_array.atMost[0] === 'W') {
-        colorPart.push('non-White');
-      } else {
-        colorPart.push(`without ${colorNames.join('/')}`);
-      }
+      colorPart.push(`at most ${colorNames.join('/')}`);
     }
   }
 
@@ -122,20 +118,23 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
 
   // Artist
   if (conditions.artist) {
-    attributeParts.push(`by ${conditions.artist}`);
+    attributeParts.push(`by artist "${conditions.artist}"`);
   }
 
-  // Sets
-  if (conditions.setId) {
+  // Sets - handle separately to place at the end (skip if on a set page for search descriptions)
+  let setsPart = '';
+  let setsExcludePart = '';
+  if (conditions.setId && (!isSetPage || isForGoal)) {
     if (conditions.setId.OR && conditions.setId.OR.length > 0) {
-      attributeParts.push(`specific sets`);
+      const setCount = conditions.setId.OR.length;
+      setsPart = `from specific set${setCount > 1 ? 's' : ''}`;
     }
     
     if (conditions.setId.AND && conditions.setId.AND.length > 0) {
       // Count excluded sets
       const excludedCount = conditions.setId.AND.filter((s: string) => s.startsWith('!=')).length;
       if (excludedCount > 0) {
-        attributeParts.push(`excluding ${excludedCount} set${excludedCount > 1 ? 's' : ''}`);
+        setsExcludePart = `excluding ${excludedCount} set${excludedCount > 1 ? 's' : ''}`;
       }
     }
   }
@@ -324,23 +323,51 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
   // Build the final description
   const mainParts: string[] = [];
   
-  // Start with card name if specified
-  if (conditions.name) {
-    // If we have a name and types, format it specially
-    if (typeParts.length > 0) {
-      mainParts.push(`${typeParts.join(' ')} named "${conditions.name}"`);
+  // For search descriptions (not goals), we'll structure it differently
+  if (!isForGoal) {
+    // Start with "cards" for search descriptions
+    if (conditions.name) {
+      // If we have a name, include it along with colors/rarity/types
+      const cardDescParts: string[] = [];
+      if (colorPart.length > 0) cardDescParts.push(...colorPart);
+      if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
+      if (typeParts.length > 0) cardDescParts.push(...typeParts);
+      
+      if (cardDescParts.length > 0) {
+        mainParts.push(`cards: ${cardDescParts.join(' ')} named "${conditions.name}"`);
+      } else {
+        mainParts.push(`cards matching "${conditions.name}"`);
+      }
     } else {
-      mainParts.push(`card named "${conditions.name}"`);
+      // Otherwise, compose: cards: [color] [rarity] [type]
+      const cardDescParts: string[] = [];
+      if (colorPart.length > 0) cardDescParts.push(...colorPart);
+      if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
+      if (typeParts.length > 0) cardDescParts.push(...typeParts);
+      
+      if (cardDescParts.length > 0) {
+        mainParts.push(`cards: ${cardDescParts.join(' ')}`);
+      }
     }
   } else {
-    // Otherwise, compose: [color] [rarity] [type]
-    const cardDescParts: string[] = [];
-    if (colorPart.length > 0) cardDescParts.push(...colorPart);
-    if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
-    if (typeParts.length > 0) cardDescParts.push(...typeParts);
-    
-    if (cardDescParts.length > 0) {
-      mainParts.push(cardDescParts.join(' '));
+    // For goals, keep the original format
+    if (conditions.name) {
+      // If we have a name and types, format it specially
+      if (typeParts.length > 0) {
+        mainParts.push(`${typeParts.join(' ')} named "${conditions.name}"`);
+      } else {
+        mainParts.push(`card named "${conditions.name}"`);
+      }
+    } else {
+      // Otherwise, compose: [color] [rarity] [type]
+      const cardDescParts: string[] = [];
+      if (colorPart.length > 0) cardDescParts.push(...colorPart);
+      if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
+      if (typeParts.length > 0) cardDescParts.push(...typeParts);
+      
+      if (cardDescParts.length > 0) {
+        mainParts.push(cardDescParts.join(' '));
+      }
     }
   }
   
@@ -354,22 +381,53 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     const includedCards = conditions.id.OR?.length || 0;
     const excludedCards = conditions.id.AND?.filter((id: string) => id.startsWith('!=')).length || 0;
     
-    if (includedCards > 0 && excludedCards === 0) {
-      return `${includedCards} specific card${includedCards > 1 ? 's' : ''}`;
-    } else if (includedCards === 0 && excludedCards > 0) {
-      return `every card except ${excludedCards} specific card${excludedCards > 1 ? 's' : ''}`;
-    } else if (includedCards > 0 && excludedCards > 0) {
-      return `${includedCards} specific card${includedCards > 1 ? 's' : ''} (excluding ${excludedCards} other${excludedCards > 1 ? 's' : ''})`;
+    if (isForGoal) {
+      // For goals, use the original format without forcing "cards" at the end
+      if (includedCards > 0 && excludedCards === 0) {
+        return `${includedCards} specific card${includedCards > 1 ? 's' : ''}`;
+      } else if (includedCards === 0 && excludedCards > 0) {
+        return `every card except ${excludedCards} specific card${excludedCards > 1 ? 's' : ''}`;
+      } else if (includedCards > 0 && excludedCards > 0) {
+        return `${includedCards} specific card${includedCards > 1 ? 's' : ''} (excluding ${excludedCards} other${excludedCards > 1 ? 's' : ''})`;
+      }
+    } else {
+      // For search descriptions, always use "cards"
+      if (includedCards > 0 && excludedCards === 0) {
+        return `${includedCards} specific cards`;
+      } else if (includedCards === 0 && excludedCards > 0) {
+        return `all cards except ${excludedCards} specific cards`;
+      } else if (includedCards > 0 && excludedCards > 0) {
+        return `${includedCards} specific cards (excluding ${excludedCards} others)`;
+      }
     }
   }
   
-  // If no criteria specified
+  // If no criteria specified except possibly sets
   if (mainParts.length === 0) {
-    return 'every card';
+    // Check if we only have set filters
+    if (setsPart && !setsExcludePart) {
+      return isForGoal ? `every card ${setsPart}` : `cards: all ${setsPart}`;
+    } else if (setsPart && setsExcludePart) {
+      return isForGoal ? `every card ${setsPart} ${setsExcludePart}` : `cards: all ${setsPart} ${setsExcludePart}`;
+    } else if (!setsPart && setsExcludePart) {
+      return isForGoal ? `every card ${setsExcludePart}` : `cards: all ${setsExcludePart}`;
+    }
+    return isForGoal ? 'every card' : 'cards: all';
   }
 
   // Join all parts
-  return mainParts.join(' ');
+  let result = mainParts.join(' ');
+  
+  // Add sets part at the end if present
+  if (setsPart) {
+    result = `${result} ${setsPart}`;
+  }
+  
+  if (setsExcludePart) {
+    result = `${result} ${setsExcludePart}`;
+  }
+  
+  return result;
 }
 
 export function formatGoalDescription(

@@ -12,6 +12,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-13',
+      version: '0.108.0',
+      changes: [
+        'Added search descriptions showing active filters below pagination in browse and collection pages',
+        'Moved reset search button to the top of the search form for better visibility',
+      ],
+    },
+    {
+      date: '2025-08-13',
       version: '0.107.4',
       changes: ['Removed autofocus that was disruptive on mobile'],
     },

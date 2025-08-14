@@ -4,6 +4,7 @@ import { Box, CircularProgress } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { CollectionSetSummary } from '@/api/collections/types';
+import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisplay';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
@@ -153,6 +154,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
           )
         }
       />
+      <SearchDescription />
 
       {error && (
         hasInvalidShareLink ? (

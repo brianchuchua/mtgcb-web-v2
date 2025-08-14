@@ -38,7 +38,7 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
   const { setNames } = useSetNames(allSetIds);
 
   const description = useMemo(() => {
-    const criteriaText = formatSearchCriteria(goal.searchCriteria, goal.onePrintingPerPureName);
+    const criteriaText = formatSearchCriteria(goal.searchCriteria, goal.onePrintingPerPureName, true);
     
     // Determine quantity text
     let quantityText = '';
@@ -61,9 +61,6 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
     if (criteriaText.startsWith('every card') || criteriaText.startsWith('card named')) {
       // Don't add "of" for these cases
       finalText = `${quantityText} ${criteriaText}`;
-    } else if (criteriaText.includes('specific sets')) {
-      // For sets, we'll add "from" when we do the replacement
-      finalText = `${quantityText} from ${criteriaText}`;
     } else {
       // For other cases, use "of"
       finalText = `${quantityText} of ${criteriaText}`;
@@ -76,8 +73,8 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
         .join(', ');
       
       if (setNamesList) {
-        // Replace "specific sets" with the actual set names
-        finalText = finalText.replace('specific sets', setNamesList);
+        // Replace "from specific set(s)" with the actual set names
+        finalText = finalText.replace(/from specific sets?/, `from ${setNamesList}`);
       }
     }
     

@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SubsetSection from './SubsetSection';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
+import { SearchDescription } from '@/components/browse/SearchDescription';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
@@ -243,6 +244,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
         subsets={subsets}
         onSubsetSelect={handleSubsetSelect}
       />
+      <SearchDescription forceView="cards" />
 
       {browseController.error ? (
         <ErrorBanner type={browseController.view} />

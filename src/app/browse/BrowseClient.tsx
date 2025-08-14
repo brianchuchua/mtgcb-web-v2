@@ -2,6 +2,7 @@
 
 import { Box } from '@mui/material';
 import React from 'react';
+import { SearchDescription } from '@/components/browse/SearchDescription';
 import { Pagination } from '@/components/pagination';
 import SetDisplay, { SetDisplayProps } from '@/components/sets/SetDisplay';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
@@ -24,6 +25,7 @@ export default function BrowseClient() {
     <Box>
       <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Browse' }]} />
       <Pagination {...browseController.paginationProps} />
+      <SearchDescription />
 
       {browseController.error ? (
         <ErrorBanner type={browseController.view} />

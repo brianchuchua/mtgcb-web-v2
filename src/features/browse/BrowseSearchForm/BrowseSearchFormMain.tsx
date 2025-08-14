@@ -152,6 +152,10 @@ const BrowseSearchForm: React.FC = () => {
             <ContentTypeToggle contentType={contentType} onCardsClick={handleCardsClick} onSetsClick={handleSetsClick} />
           )}
 
+          <Button variant="outlined" startIcon={<RestartAltIcon />} onClick={handleResetSearch}>
+            Reset Search
+          </Button>
+
           <Divider />
 
           {isCollectionPage && userId && (
@@ -200,10 +204,6 @@ const BrowseSearchForm: React.FC = () => {
             onSortOrderChange={handleSortOrderChange}
             sortOptions={getSortOptions()}
           />
-
-          <Button variant="outlined" startIcon={<RestartAltIcon />} onClick={handleResetSearch} sx={{ mt: 1 }}>
-            Reset Search
-          </Button>
         </Stack>
       </Form>
     </FormWrapper>
