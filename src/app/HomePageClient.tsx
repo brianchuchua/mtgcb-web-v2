@@ -184,58 +184,62 @@ const HeroButtons: React.FC<HeroButtonsProps> = ({ isMobile, theme, router }) =>
 const HeroStats: React.FC<HeroStatsProps> = ({ theme }) => {
   const { data, isLoading } = useGetPlatformStatisticsQuery();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isSmallMobile = useMediaQuery(theme.breakpoints.down(400));
 
   const isReady = data?.success && data.data && !('status' in data.data);
   const stats = isReady ? (data.data as PlatformStatisticsReady) : null;
 
   return (
     <Stack
-      direction={isSmallMobile ? 'column' : 'row'}
-      spacing={isSmallMobile ? 2 : 3}
-      sx={{ mt: 4 }}
+      direction={isMobile ? 'column' : 'row'}
+      spacing={isMobile ? 2 : 3}
+      sx={{ 
+        mt: 4,
+        visibility: stats ? 'visible' : 'hidden',
+      }}
       divider={
-        !isSmallMobile ? (
+        !isMobile ? (
           <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.3)' }} />
         ) : undefined
       }
     >
-      <Box sx={{ textAlign: isSmallMobile ? 'center' : 'left' }}>
+      <Box sx={{ textAlign: isMobile ? 'center' : 'left' }}>
         <Typography
-          variant={isMobile ? 'h5' : 'h4'}
+          variant="h4"
           fontWeight="bold"
           sx={{
+            fontSize: isMobile ? '1.75rem' : undefined,
             color: 'success.main',
           }}
         >
           {stats ? `${stats.totalCardsTracked.toLocaleString()}+` : '71,243,672+'}
         </Typography>
-        <Typography variant="body2">Cards Tracked</Typography>
+        <Typography variant={isMobile ? 'body1' : 'body2'}>Cards Tracked</Typography>
       </Box>
-      <Box sx={{ textAlign: isSmallMobile ? 'center' : 'left' }}>
+      <Box sx={{ textAlign: isMobile ? 'center' : 'left' }}>
         <Typography
-          variant={isMobile ? 'h5' : 'h4'}
+          variant="h4"
           fontWeight="bold"
           sx={{
+            fontSize: isMobile ? '1.75rem' : undefined,
             color: 'success.main',
           }}
         >
           {stats ? `${stats.totalCollectors.toLocaleString()}+` : '54,573+'}
         </Typography>
-        <Typography variant="body2">Collectors</Typography>
+        <Typography variant={isMobile ? 'body1' : 'body2'}>Collectors</Typography>
       </Box>
-      <Box sx={{ textAlign: isSmallMobile ? 'center' : 'left' }}>
+      <Box sx={{ textAlign: isMobile ? 'center' : 'left' }}>
         <Typography
-          variant={isMobile ? 'h5' : 'h4'}
+          variant="h4"
           fontWeight="bold"
           sx={{
-            fontSize: isMobile ? '1.2rem' : undefined,
+            fontSize: isMobile ? '1.5rem' : undefined,
             color: 'success.main',
           }}
         >
           {stats ? `${stats.totalPlatformValue.formattedUsd}+` : '$198,625,973.21+'}
         </Typography>
-        <Typography variant="body2">Total Value Tracked</Typography>
+        <Typography variant={isMobile ? 'body1' : 'body2'}>Total Value Tracked</Typography>
       </Box>
     </Stack>
   );

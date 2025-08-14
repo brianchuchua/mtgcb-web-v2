@@ -12,12 +12,10 @@ Still need to do the new price updater, which will be a generic job scheduler th
 
 ## Current Action Items (kinda disorganized now)
 
-- home page flash when loading is kinda annoying for stats
 - social media links
 
 test mobile, fix issues
 
-- mobile is confusing sometimes, need a summary of current search
 - default set view in table view too many for mobile
 
 test tablet, fix issues
