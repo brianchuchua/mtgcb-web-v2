@@ -144,13 +144,6 @@ export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table
         type: 'toggle',
       },
       {
-        key: 'tableCardCount',
-        label: 'Cards In Set',
-        isVisible: tableSetSettings.cardCountIsVisible,
-        setVisibility: (value: boolean) => updateSetting('tableSetCardCountIsVisible', value),
-        type: 'toggle',
-      },
-      {
         key: 'tableCompletion',
         label: 'Completion',
         isVisible: collectionSetSettings.tableCompletionIsVisible,
@@ -162,6 +155,13 @@ export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table
         label: 'Value',
         isVisible: collectionSetSettings.tableValueIsVisible,
         setVisibility: (value: boolean) => updateSetting('tableCollectionValueIsVisible', value),
+        type: 'toggle',
+      },
+      {
+        key: 'tableCardCount',
+        label: 'Cards In Set',
+        isVisible: tableSetSettings.cardCountIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableSetCardCountIsVisible', value),
         type: 'toggle',
       },
       {

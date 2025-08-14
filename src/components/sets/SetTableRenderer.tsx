@@ -135,10 +135,7 @@ export const useSetRowRenderer = (
             }}
             onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-              {set.code && <SetIcon code={set.code} size="2x" fixedWidth />}
-              <SetLinkText>{set.code || 'N/A'}</SetLinkText>
-            </Box>
+            <SetLinkText>{set.code || 'N/A'}</SetLinkText>
           </Link>
         </TableCell>,
       );
@@ -155,7 +152,10 @@ export const useSetRowRenderer = (
           }}
           onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
         >
-          <ClickableText>{set.name}</ClickableText>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {set.code && <SetIcon code={set.code} size="2x" fixedWidth />}
+            <ClickableText>{set.name}</ClickableText>
+          </Box>
         </Link>
       </TableCell>,
     );

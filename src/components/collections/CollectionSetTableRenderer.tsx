@@ -59,16 +59,9 @@ export const useCollectionSetTableColumns = (
       sortable: true,
     },
     {
-      id: 'cardCount',
-      label: 'Cards',
-      width: { default: '90px' },
-      hasInfoIcon: true,
-      sortable: true,
-    },
-    {
       id: 'percentageCollected',
       label: 'Completion',
-      width: { default: '110px' },
+      width: { default: '160px' },
       align: 'center',
       sortable: true,
     },
@@ -77,6 +70,13 @@ export const useCollectionSetTableColumns = (
       label: 'Value',
       width: { default: '100px' },
       align: 'right',
+      sortable: true,
+    },
+    {
+      id: 'cardCount',
+      label: 'Cards',
+      width: { default: '90px' },
+      hasInfoIcon: true,
       sortable: true,
     },
     {
@@ -118,9 +118,9 @@ export const useCollectionSetTableColumns = (
   return allColumns.filter((column) => {
     if (column.id === 'code') return displaySettings.codeIsVisible !== false;
     if (column.id === 'name') return true; // Always show name
-    if (column.id === 'cardCount') return displaySettings.cardCountIsVisible !== false;
     if (column.id === 'percentageCollected') return displaySettings.completionIsVisible !== false;
     if (column.id === 'totalValue') return displaySettings.valueIsVisible !== false;
+    if (column.id === 'cardCount') return displaySettings.cardCountIsVisible !== false;
     if (column.id === 'costToComplete.oneOfEachCard') return displaySettings.costToCompleteIsVisible !== false;
     if (column.id === 'releasedAt') return displaySettings.releaseDateIsVisible !== false;
     if (column.id === 'setType') return displaySettings.typeIsVisible !== false;
@@ -163,10 +163,7 @@ export const useCollectionSetRowRenderer = (
             }}
             onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-              {set.code && <SetIcon code={set.code} size="2x" fixedWidth />}
-              <SetLinkText>{set.code || 'N/A'}</SetLinkText>
-            </Box>
+            <SetLinkText>{set.code || 'N/A'}</SetLinkText>
           </Link>
         </TableCell>,
       );
@@ -183,27 +180,13 @@ export const useCollectionSetRowRenderer = (
           }}
           onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
         >
-          <ClickableText>{set.name}</ClickableText>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {set.code && <SetIcon code={set.code} size="2x" fixedWidth />}
+            <ClickableText>{set.name}</ClickableText>
+          </Box>
         </Link>
       </TableCell>,
     );
-
-    // Card Count Cell
-    if (displaySettings.cardCountIsVisible !== false) {
-      cells.push(
-        <TableCell key="cardCount" align="right">
-          {set.cardCount && set.uniquePrintingsCollectedInSet !== undefined ? (
-            <Typography variant="body2">
-              {set.uniquePrintingsCollectedInSet.toLocaleString()}/{parseInt(set.cardCount).toLocaleString()}
-            </Typography>
-          ) : set.cardCount ? (
-            parseInt(set.cardCount).toLocaleString()
-          ) : (
-            'N/A'
-          )}
-        </TableCell>,
-      );
-    }
 
     // Percentage Collected Cell (collection-specific)
     if (displaySettings.completionIsVisible !== false) {
@@ -216,7 +199,7 @@ export const useCollectionSetRowRenderer = (
               showLabel={true}
               labelFormat="short"
               minWidth="80px"
-              maxWidth="100px"
+              maxWidth="150px"
             />
           ) : (
             <Typography variant="body2" color="text.secondary">
@@ -234,6 +217,23 @@ export const useCollectionSetRowRenderer = (
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
             {set.totalValue !== undefined ? `$${set.totalValue.toFixed(2)}` : 'N/A'}
           </Typography>
+        </TableCell>,
+      );
+    }
+
+    // Card Count Cell
+    if (displaySettings.cardCountIsVisible !== false) {
+      cells.push(
+        <TableCell key="cardCount" align="right">
+          {set.cardCount && set.uniquePrintingsCollectedInSet !== undefined ? (
+            <Typography variant="body2">
+              {set.uniquePrintingsCollectedInSet.toLocaleString()}/{parseInt(set.cardCount).toLocaleString()}
+            </Typography>
+          ) : set.cardCount ? (
+            parseInt(set.cardCount).toLocaleString()
+          ) : (
+            'N/A'
+          )}
         </TableCell>,
       );
     }

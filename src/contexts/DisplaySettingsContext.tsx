@@ -156,7 +156,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   tablePriceIsVisible: true,
 
   // Table-specific set settings
-  tableSetCodeIsVisible: true,
+  tableSetCodeIsVisible: false,
   tableSetCardCountIsVisible: true,
   tableSetReleaseDateIsVisible: true,
   tableSetTypeIsVisible: true,

@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-13',
+      version: '0.108.5',
+      changes: [
+        'Improved set tables on mobile',
+      ],
+    },
+    {
+      date: '2025-08-13',
       version: '0.108.4',
       changes: [
         'Fixed alternating row colors in virtualized tables',
