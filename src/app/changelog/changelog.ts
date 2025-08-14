@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-13',
+      version: '0.108.1',
+      changes: [
+        'Fixed flashing when updating card quantities on set collection pages',
+      ],
+    },
+    {
+      date: '2025-08-13',
       version: '0.108.0',
       changes: [
         'Added search descriptions showing active filters below pagination in browse and collection pages',

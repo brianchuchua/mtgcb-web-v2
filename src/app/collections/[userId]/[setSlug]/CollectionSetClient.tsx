@@ -513,16 +513,10 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
           <ErrorBanner type={browseController.view} />
         )
       ) : (
-        <Box
-          sx={{
-            opacity: cardsProps?.isFetching ? 0 : 1,
-            transition: 'opacity 0.2s ease-in-out',
-            minHeight: cardsProps?.items?.length ? 'auto' : '400px',
-          }}
-        >
+        <>
           {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
           {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
-        </Box>
+        </>
       )}
 
       <Pagination {...browseController.paginationProps} position="bottom" hideContentTypeToggle={true} />

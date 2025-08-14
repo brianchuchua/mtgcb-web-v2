@@ -6,11 +6,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Recent Things I Noticed
 
-http://local.mtgcb.com:3000/collections/1337/khans-of-tarkir, update quantity, everything is flashing
-just on the set page though, not on the main collection page <--
-below or above open search options button, should show a summary of the search being executed, like "Searching for all red cards"
-probably want to move the reset search button to the top
 perf test the re-rendering, i think whole form is re-rendering when i type in a text field, maybe the new search descriptions are causing it
+search summary doesn't account for quantity
+check on re-renders
 
 ## Recent Actions
 
