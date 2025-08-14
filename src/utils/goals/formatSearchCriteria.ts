@@ -1,7 +1,11 @@
 import { CardApiParams } from '@/api/browse/types';
 
 interface SearchCriteriaDescription {
-  conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>;
+  conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'> & {
+    quantityReg?: { AND: string[] };
+    quantityFoil?: { AND: string[] };
+    quantityAll?: { AND: string[] };
+  };
   sort?: string;
   order?: 'asc' | 'desc';
 }
@@ -316,6 +320,67 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     statConditions.push(...foilConditions);
   }
   
+  // Quantity filters - extract them separately to display at the beginning
+  let quantityText: string | null = null;
+  
+  if (conditions.quantityAll?.AND) {
+    // If we have total quantity, use that (like goals do with targetQuantityAll)
+    conditions.quantityAll.AND.forEach((c: string) => {
+      const match = c.match(/^([<>=!]+)(.+)$/);
+      if (match) {
+        const op = match[1];
+        const value = match[2];
+        if (op === '=') {
+          quantityText = `${value}x`;
+        } else {
+          quantityText = `${op} ${value}x`;
+        }
+      }
+    });
+  } else {
+    // Check for separate regular and foil quantities
+    let regPart: string | null = null;
+    let foilPart: string | null = null;
+    
+    if (conditions.quantityReg?.AND) {
+      conditions.quantityReg.AND.forEach((c: string) => {
+        const match = c.match(/^([<>=!]+)(.+)$/);
+        if (match) {
+          const op = match[1];
+          const value = match[2];
+          if (op === '=') {
+            regPart = `${value}x`;
+          } else {
+            regPart = `${op} ${value}x`;
+          }
+        }
+      });
+    }
+    
+    if (conditions.quantityFoil?.AND) {
+      conditions.quantityFoil.AND.forEach((c: string) => {
+        const match = c.match(/^([<>=!]+)(.+)$/);
+        if (match) {
+          const op = match[1];
+          const value = match[2];
+          if (op === '=') {
+            foilPart = `${value}x foil`;
+          } else {
+            foilPart = `${op} ${value}x foil`;
+          }
+        }
+      });
+    }
+    
+    if (regPart && foilPart) {
+      quantityText = `${regPart} and ${foilPart}`;
+    } else if (regPart) {
+      quantityText = regPart;
+    } else if (foilPart) {
+      quantityText = foilPart;
+    }
+  }
+  
   if (statConditions.length > 0) {
     attributeParts.push(`(${statConditions.join(', ')})`);
   }
@@ -325,28 +390,59 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
   
   // For search descriptions (not goals), we'll structure it differently
   if (!isForGoal) {
-    // Start with "cards" for search descriptions
-    if (conditions.name) {
-      // If we have a name, include it along with colors/rarity/types
-      const cardDescParts: string[] = [];
-      if (colorPart.length > 0) cardDescParts.push(...colorPart);
-      if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
-      if (typeParts.length > 0) cardDescParts.push(...typeParts);
-      
-      if (cardDescParts.length > 0) {
-        mainParts.push(`cards: ${cardDescParts.join(' ')} named "${conditions.name}"`);
+    // If we have quantity filters, format like goals do
+    if (quantityText) {
+      // Start with quantity
+      if (conditions.name) {
+        // If we have a name, include it along with colors/rarity/types
+        const cardDescParts: string[] = [];
+        if (colorPart.length > 0) cardDescParts.push(...colorPart);
+        if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
+        if (typeParts.length > 0) cardDescParts.push(...typeParts);
+        
+        if (cardDescParts.length > 0) {
+          mainParts.push(`cards: ${quantityText} of ${cardDescParts.join(' ')} named "${conditions.name}"`);
+        } else {
+          mainParts.push(`cards: ${quantityText} matching "${conditions.name}"`);
+        }
       } else {
-        mainParts.push(`cards matching "${conditions.name}"`);
+        // Otherwise, compose: cards: [quantity] of [color] [rarity] [type]
+        const cardDescParts: string[] = [];
+        if (colorPart.length > 0) cardDescParts.push(...colorPart);
+        if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
+        if (typeParts.length > 0) cardDescParts.push(...typeParts);
+        
+        if (cardDescParts.length > 0) {
+          mainParts.push(`cards: ${quantityText} of ${cardDescParts.join(' ')}`);
+        } else {
+          // Just quantity filter, no other filters
+          mainParts.push(`cards: ${quantityText}`);
+        }
       }
     } else {
-      // Otherwise, compose: cards: [color] [rarity] [type]
-      const cardDescParts: string[] = [];
-      if (colorPart.length > 0) cardDescParts.push(...colorPart);
-      if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
-      if (typeParts.length > 0) cardDescParts.push(...typeParts);
-      
-      if (cardDescParts.length > 0) {
-        mainParts.push(`cards: ${cardDescParts.join(' ')}`);
+      // No quantity filter, original logic
+      if (conditions.name) {
+        // If we have a name, include it along with colors/rarity/types
+        const cardDescParts: string[] = [];
+        if (colorPart.length > 0) cardDescParts.push(...colorPart);
+        if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
+        if (typeParts.length > 0) cardDescParts.push(...typeParts);
+        
+        if (cardDescParts.length > 0) {
+          mainParts.push(`cards: ${cardDescParts.join(' ')} named "${conditions.name}"`);
+        } else {
+          mainParts.push(`cards matching "${conditions.name}"`);
+        }
+      } else {
+        // Otherwise, compose: cards: [color] [rarity] [type]
+        const cardDescParts: string[] = [];
+        if (colorPart.length > 0) cardDescParts.push(...colorPart);
+        if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
+        if (typeParts.length > 0) cardDescParts.push(...typeParts);
+        
+        if (cardDescParts.length > 0) {
+          mainParts.push(`cards: ${cardDescParts.join(' ')}`);
+        }
       }
     }
   } else {

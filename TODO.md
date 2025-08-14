@@ -4,12 +4,6 @@ I've found over time that maintaining my action items for code in external tools
 
 Best to keep them in the codebase, especially since I'm a team of one.
 
-## Recent Things I Noticed
-
-perf test the re-rendering, i think whole form is re-rendering when i type in a text field, maybe the new search descriptions are causing it
-search summary doesn't account for quantity
-check on re-renders
-
 ## Recent Actions
 
 Deployed mtgcb-web-v2 and mtgcb-api-v3 to production, using a rough draft of the migration process.
@@ -225,6 +219,7 @@ Now:
 
 ## Tech Debt
 
+- Thorough re-rendering audit
 - Switch to Git Flow once the site is in production
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - All quantity selectors should be using the same component, QuantitySelector.tsx
@@ -325,7 +320,6 @@ Now:
 - Audit field length limits
 - Adequate feature testing
 - Data cleanup for tcgplayer names and codes and tcgplayer ids
-- Test clipboard functionality in staging/production with HTTPS (Share Collection feature)
 - test jwt expiration and possible refresh
 - audit USE_OPTIMIZED_GOAL_PROGRESS
 

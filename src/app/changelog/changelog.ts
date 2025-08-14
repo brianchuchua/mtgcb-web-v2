@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-08-14',
+      version: '0.108.2',
+      changes: [
+        'Fixed search summary not displaying quantity stat filters',
+      ],
+    },
+    {
       date: '2025-08-13',
       version: '0.108.1',
       changes: [

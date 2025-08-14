@@ -121,6 +121,9 @@ export function formatSearchDescription(
       ...(apiParams.average && { average: apiParams.average }),
       ...(apiParams.high && { high: apiParams.high }),
       ...(apiParams.foil && { foil: apiParams.foil }),
+      ...(apiParams.quantityReg && { quantityReg: apiParams.quantityReg }),
+      ...(apiParams.quantityFoil && { quantityFoil: apiParams.quantityFoil }),
+      ...(apiParams.quantityAll && { quantityAll: apiParams.quantityAll }),
     },
   };
   
