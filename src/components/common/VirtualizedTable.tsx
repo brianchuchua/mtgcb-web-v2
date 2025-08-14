@@ -124,11 +124,14 @@ const VirtualizedTable = <T,>({
 
   // Custom table row for virtualization
   const CustomTableRow = (props: any) => {
-    const { index, item, ...restProps } = props;
+    const { index, item, style, ...restProps } = props;
     // Use the item prop that's passed by react-virtuoso, not items[index]
     const rowProps = getRowProps && item ? getRowProps(item) : {};
+    // Extract the data-index from the data attributes to determine odd/even
+    const dataIndex = props['data-index'];
+    const isOddRow = dataIndex !== undefined ? parseInt(dataIndex, 10) % 2 === 1 : false;
 
-    return <StyledTableRow {...restProps} isIncomplete={rowProps.isIncomplete} />;
+    return <StyledTableRow {...restProps} style={style} isIncomplete={rowProps.isIncomplete} isOddRow={isOddRow} />;
   };
 
   // Table virtualization components
@@ -277,14 +280,14 @@ const VirtualizedTable = <T,>({
 };
 
 const StyledTableRow = styled(TableRow, {
-  shouldForwardProp: (prop) => prop !== 'isIncomplete',
-})<{ isIncomplete?: boolean }>(({ theme, isIncomplete }) => ({
+  shouldForwardProp: (prop) => prop !== 'isIncomplete' && prop !== 'isOddRow',
+})<{ isIncomplete?: boolean; isOddRow?: boolean }>(({ theme, isIncomplete, isOddRow }) => ({
   transition: 'background-color 0.2s ease, opacity 0.2s ease',
   position: 'relative',
   overflow: 'hidden',
-  '&:nth-of-type(odd)': {
+  ...(isOddRow && {
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
-  },
+  }),
   ...(isIncomplete && {
     opacity: 0.85,
     '& td': {
