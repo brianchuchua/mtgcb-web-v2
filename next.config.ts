@@ -17,8 +17,8 @@ export default withSentryConfig(nextConfig, {
   org: 'brian-chuchua',
   project: 'mtgcb-web-v2',
 
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
+  // Print logs in heroku build output
+  silent: false,
 
   // For all available options, see:
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
