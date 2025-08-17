@@ -112,11 +112,11 @@ Now:
 
 ### Uncategorized
 
+- costs to complete buttons should also be on the set page
 - reduce logo image size
 - audit autocomplete fields and autocorrect
 - info icon next to collection value, estimate, tcgplayer data, etc. showing when prices last updated, number of cards missing price data
 - plan an interface to show site news, like scheduled downtime alerts and stuff, that once closed would not re-open
-- verify the individual value of sets, when added up, add up to the collection value -- Chris request on Discord
 - card notes field for card page
 - support better rendering of which variants of cards exist in searches when limiting one copy per card name, maybe
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
@@ -216,6 +216,8 @@ Now:
 
 ## Tech Debt
 
+- ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from means your .eslintrc
+- Integrating Sentry sourcemaps for mtgcb-api-v3 -- more manual than next.js
 - Thorough re-rendering audit
 - Switch to Git Flow once the site is in production
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
@@ -248,6 +250,11 @@ Now:
 -
 
 ## Future Enhancements to Existing Features
+
+### Price Updater
+
+- Auto-fix missing tcgplayerIds from scryfall data
+- Properly report the 404s for the cancelled cards like Crusade
 
 ### Search
 
@@ -302,6 +309,8 @@ Now:
 
 ## Production Checklist
 
+- evaluate cost to complete cache and price updating
+- grok SSL Certificates on the Heroku side vs Dreamhost vs Cloudflare
 - Ping johnny on Discord once card locations are released. :)
 - Grok database backups in new system
 - Integration with Sonarcloud (open source the repo, make development easy for new devs)

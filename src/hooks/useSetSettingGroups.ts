@@ -8,6 +8,7 @@ import {
   usePriceType,
   useSetDisplaySettings,
   useTableSetSettings,
+  useCostsToCompleteExpanded,
 } from '@/contexts/DisplaySettingsContext';
 import { PriceType } from '@/types/pricing';
 
@@ -18,6 +19,7 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
   const layoutSettings = useLayoutSettings();
   const [priceType, setPriceType] = usePriceType();
   const [preferredViewMode] = usePreferredViewMode();
+  const [costsToCompleteExpanded, setCostsToCompleteExpanded] = useCostsToCompleteExpanded();
 
   const handleSetPriceType = (value: number): void => {
     setPriceType(value as unknown as PriceType);
@@ -47,6 +49,28 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
         },
       ],
     },
+    // Complete This Set Settings (only shown in grid view)
+    ...(viewMode === 'grid'
+      ? [
+          {
+            label: 'Complete This Set Settings',
+            type: 'select',
+            settings: [
+              {
+                key: 'costsExpansion',
+                label: 'Default State',
+                value: costsToCompleteExpanded ? 1 : 0,
+                setValue: (value: number) => setCostsToCompleteExpanded(value === 1),
+                type: 'select',
+                options: [
+                  { value: 0, label: 'Collapsed' },
+                  { value: 1, label: 'Expanded' },
+                ],
+              },
+            ],
+          } as CardSettingGroup,
+        ]
+      : []),
   ];
 
   // Create set gallery settings group (only shown in grid view)
@@ -94,13 +118,6 @@ export const useSetSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSe
         label: 'Cards In Set',
         isVisible: setDisplaySettings.cardCountIsVisible,
         setVisibility: (value: boolean) => updateSetting('setCardCountIsVisible', value),
-        type: 'toggle',
-      },
-      {
-        key: 'costs',
-        label: 'Costs to Complete',
-        isVisible: setDisplaySettings.priceIsVisible,
-        setVisibility: (value: boolean) => updateSetting('setPriceIsVisible', value),
         type: 'toggle',
       },
     ],

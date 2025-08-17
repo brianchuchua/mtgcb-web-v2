@@ -1,9 +1,11 @@
 'use client';
 
-import { Box, Button, Card, CardContent, CircularProgress, Typography, keyframes, styled } from '@mui/material';
+import { Box, Button, Card, CardContent, CircularProgress, Typography, keyframes, styled, Collapse } from '@mui/material';
+import { ExpandMore } from '@mui/icons-material';
 import { isDraft } from '@reduxjs/toolkit';
 import Link from 'next/link';
 import React from 'react';
+import { useCostsToCompleteExpanded } from '@/contexts/DisplaySettingsContext';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { CostToComplete } from '@/api/sets/types';
 import SetIcon from '@/components/sets/SetIcon';
@@ -266,32 +268,94 @@ const CollectionInfoSection: React.FC<{
 
 const CostToPurchaseSection: React.FC<{
   costToComplete: CostToComplete;
-  isVisible?: boolean;
   setId: string;
   includeSubsetsInSets?: boolean;
   set?: Set;
   userId?: number;
   goalId?: number;
-}> = ({ costToComplete, isVisible = true, setId, includeSubsetsInSets = false, set, userId, goalId }) => {
-  if (!isVisible) return null;
+}> = ({ costToComplete, setId, includeSubsetsInSets = false, set, userId, goalId }) => {
+  const [globalExpanded] = useCostsToCompleteExpanded();
+  const [expanded, setExpanded] = React.useState(globalExpanded);
+
+  // Update local state when global setting changes
+  React.useEffect(() => {
+    setExpanded(globalExpanded);
+  }, [globalExpanded]);
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
 
   return (
     <Box
       sx={{
         mt: 0,
-        pt: 1,
-        borderTop: '1px solid rgba(255, 255, 255, 0.12)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
       }}
     >
-      <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1 }}>
-        Costs to complete:
-      </Typography>
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        <Button
+          component={Link}
+          href={userId ? getCollectionSetUrl(userId, set?.slug || '', goalId) : `/browse/sets/${set?.slug}`}
+          variant="outlined"
+          size="small"
+          sx={{
+            textTransform: 'none',
+            color: 'text.secondary',
+            borderColor: 'divider',
+            fontSize: '0.813rem',
+            py: 0.25,
+            px: 1.5,
+            opacity: 0.8,
+            '&:hover': {
+              backgroundColor: 'action.hover',
+              borderColor: 'text.disabled',
+              opacity: 1,
+            },
+          }}
+        >
+          View set
+        </Button>
+        <Button
+          onClick={handleExpandClick}
+          variant="outlined"
+          size="small"
+        sx={{
+          textTransform: 'none',
+          color: 'text.secondary',
+          borderColor: 'divider',
+          fontSize: '0.813rem',
+          py: 0.25,
+          px: 1.5,
+          opacity: 0.8,
+          '&:hover': {
+            backgroundColor: 'action.hover',
+            borderColor: 'text.disabled',
+            opacity: 1,
+          },
+        }}
+        endIcon={
+          <ExpandMore
+            sx={{
+              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s',
+              fontSize: '1rem',
+            }}
+          />
+        }
+      >
+          Complete this set
+        </Button>
+      </Box>
 
-      <Box sx={{ width: '100%', maxWidth: '350px' }}>
-        <CostToCompleteRow
+      <Collapse in={expanded} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
+        <Box sx={{ width: '100%', maxWidth: '350px', mx: 'auto', mt: 1 }}>
+          <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1, textAlign: 'center' }}>
+            Cost to complete:
+          </Typography>
+          <CostToCompleteRow
           label="All cards"
           cost={costToComplete.oneOfEachCard}
           setId={setId}
@@ -378,23 +442,24 @@ const CostToPurchaseSection: React.FC<{
           </Box>
         )}
 
-        {goalId && userId && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              mt: 1.5,
-            }}
-          >
-            <TCGPlayerGoalMassImportButton
-              setId={setId}
-              userId={userId}
-              goalId={goalId}
-              includeSubsetsInSets={includeSubsetsInSets}
-            />
-          </Box>
-        )}
-      </Box>
+          {goalId && userId && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                mt: 1.5,
+              }}
+            >
+              <TCGPlayerGoalMassImportButton
+                setId={setId}
+                userId={userId}
+                goalId={goalId}
+                includeSubsetsInSets={includeSubsetsInSets}
+              />
+            </Box>
+          )}
+        </Box>
+      </Collapse>
     </Box>
   );
 };
@@ -547,7 +612,6 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
         {costToComplete && (
           <CostToPurchaseSection
             costToComplete={costToComplete}
-            isVisible={settings.costsIsVisible}
             setId={set.id}
             set={set}
             includeSubsetsInSets={includeSubsetsInSets}

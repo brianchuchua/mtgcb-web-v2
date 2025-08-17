@@ -85,6 +85,9 @@ interface DisplaySettings {
   tableCollectionCompletionIsVisible: boolean;
   tableCollectionCostToCompleteIsVisible: boolean;
   tableCollectionValueIsVisible: boolean;
+
+  // Costs to Complete expansion settings
+  costsToCompleteExpanded: boolean;
 }
 
 interface DisplaySettingsContextType {
@@ -176,6 +179,9 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   tableCollectionCompletionIsVisible: true,
   tableCollectionCostToCompleteIsVisible: true,
   tableCollectionValueIsVisible: true,
+
+  // Costs to Complete expansion settings
+  costsToCompleteExpanded: false,
 };
 
 const STORAGE_KEY = 'mtgcb-display-settings';
@@ -290,6 +296,11 @@ export function useCardDisplaySettings() {
     goalProgressIsVisible: settings.cardGoalProgressIsVisible,
     locationsIsVisible: settings.cardLocationsIsVisible,
   };
+}
+
+export function useCostsToCompleteExpanded(): [boolean, (value: boolean) => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.costsToCompleteExpanded, (value) => updateSetting('costsToCompleteExpanded', value)];
 }
 
 export function useSetDisplaySettings() {

@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-08-17',
+      version: '0.110.0',
+      changes: [
+        'Added expandable "Complete This Set" section for purchase options in set grid views',
+        'Added settings to control default expansion state (collapsed/expanded)',
+      ],
+    },
+    {
       date: '2025-08-14',
       version: '0.109.0',
       changes: [
