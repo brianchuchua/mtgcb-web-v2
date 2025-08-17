@@ -10,6 +10,7 @@ import {
   useSetDisplaySettings,
   useTableSetSettings,
   useCostsToCompleteExpanded,
+  useSetProgressBarStyle,
 } from '@/contexts/DisplaySettingsContext';
 import { PriceType } from '@/types/pricing';
 
@@ -22,9 +23,14 @@ export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table
   const [priceType, setPriceType] = usePriceType();
   const [preferredViewMode] = usePreferredViewMode();
   const [costsToCompleteExpanded, setCostsToCompleteExpanded] = useCostsToCompleteExpanded();
+  const [progressBarStyle, setProgressBarStyle] = useSetProgressBarStyle();
 
   const handleSetPriceType = (value: number): void => {
     setPriceType(value as unknown as PriceType);
+  };
+
+  const handleSetProgressBarStyle = (value: number): void => {
+    setProgressBarStyle(value === 0 ? 'radial' : 'linear');
   };
 
   const viewMode = explicitViewMode || preferredViewMode;
@@ -51,6 +57,28 @@ export const useCollectionSetSettingGroups = (explicitViewMode?: 'grid' | 'table
         },
       ],
     },
+    // Progress Bar Settings (only shown in grid view)
+    ...(viewMode === 'grid'
+      ? [
+          {
+            label: 'Progress Bar Settings',
+            type: 'select',
+            settings: [
+              {
+                key: 'progressBarStyle',
+                label: '',
+                value: progressBarStyle === 'radial' ? 0 : 1,
+                setValue: handleSetProgressBarStyle,
+                type: 'select',
+                options: [
+                  { value: 0, label: 'Radial' },
+                  { value: 1, label: 'Linear' },
+                ],
+              },
+            ],
+          } as CardSettingGroup,
+        ]
+      : []),
     // Complete This Set Settings (only shown in grid view)
     ...(viewMode === 'grid'
       ? [

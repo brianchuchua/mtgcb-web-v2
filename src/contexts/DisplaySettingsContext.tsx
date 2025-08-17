@@ -88,6 +88,9 @@ interface DisplaySettings {
 
   // Costs to Complete expansion settings
   costsToCompleteExpanded: boolean;
+
+  // Set progress bar style
+  setProgressBarStyle: 'radial' | 'linear';
 }
 
 interface DisplaySettingsContextType {
@@ -182,6 +185,9 @@ const DEFAULT_SETTINGS: DisplaySettings = {
 
   // Costs to Complete expansion settings
   costsToCompleteExpanded: false,
+
+  // Set progress bar style
+  setProgressBarStyle: 'linear',
 };
 
 const STORAGE_KEY = 'mtgcb-display-settings';
@@ -408,4 +414,9 @@ export function usePreferredCardViewMode(): ['grid' | 'table', (value: 'grid' | 
 export function usePreferredSetViewMode(): ['grid' | 'table', (value: 'grid' | 'table') => void] {
   const { settings, updateSetting } = useDisplaySettings();
   return [settings.preferredSetViewMode, (value) => updateSetting('preferredSetViewMode', value)];
+}
+
+export function useSetProgressBarStyle(): ['radial' | 'linear', (value: 'radial' | 'linear') => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.setProgressBarStyle, (value) => updateSetting('setProgressBarStyle', value)];
 }

@@ -5,9 +5,10 @@ import { ExpandMore } from '@mui/icons-material';
 import { isDraft } from '@reduxjs/toolkit';
 import Link from 'next/link';
 import React from 'react';
-import { useCostsToCompleteExpanded } from '@/contexts/DisplaySettingsContext';
+import { useCostsToCompleteExpanded, useSetProgressBarStyle } from '@/contexts/DisplaySettingsContext';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { CostToComplete } from '@/api/sets/types';
+import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import SetIcon from '@/components/sets/SetIcon';
 import { SetCategoryAndType, SetItemSettings } from '@/components/sets/SetItemRenderer';
 import TCGPlayerGoalMassImportButton from '@/components/tcgplayer/TCGPlayerGoalMassImportButton';
@@ -129,6 +130,7 @@ const SetIconDisplay: React.FC<{
   userId?: number;
   goalId?: number;
 }> = ({ set, collectionData, userId, goalId }) => {
+  const [progressBarStyle] = useSetProgressBarStyle();
   const percentageCollected = collectionData?.percentageCollected || 0;
 
   // Determine rarity based on percentage
@@ -140,9 +142,12 @@ const SetIconDisplay: React.FC<{
   };
 
   const rarity = collectionData ? getRarityByPercentage(percentageCollected) : 'common';
+  
+  // Use less spacing when linear progress bar is selected or when there's no collection data
+  const useCompactSpacing = !collectionData || progressBarStyle === 'linear';
 
   return (
-    <Box sx={{ textAlign: 'center', m: 0.5 }}>
+    <Box sx={{ textAlign: 'center', m: useCompactSpacing ? 0 : 0.5 }}>
       {set.code && (
         <Link
           href={userId ? getCollectionSetUrl(userId, set.slug, goalId) : `/browse/sets/${set.slug}`}
@@ -153,7 +158,7 @@ const SetIconDisplay: React.FC<{
           onClick={(e) => e.stopPropagation()}
         >
           <Box sx={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-            {collectionData && (
+            {collectionData && progressBarStyle === 'radial' && (
               <>
                 {/* SVG gradient definitions */}
                 <svg width="0" height="0" style={{ position: 'absolute' }}>
@@ -208,7 +213,14 @@ const SetIconDisplay: React.FC<{
                 />
               </>
             )}
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 130, height: 130 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              width: useCompactSpacing ? 'auto' : 130, 
+              height: useCompactSpacing ? 'auto' : 130,
+              py: useCompactSpacing ? 0.5 : 0,
+            }}>
               <SetIcon code={set.code} size="5x" fixedWidth rarity={rarity} />
             </Box>
           </Box>
@@ -248,18 +260,35 @@ const CollectionInfoSection: React.FC<{
   collectionData: CollectionSetSummary;
   includeSubsetsInSets?: boolean;
 }> = ({ collectionData, includeSubsetsInSets = false }) => {
+  const [progressBarStyle] = useSetProgressBarStyle();
   const percentage = Math.ceil(collectionData.percentageCollected);
   const totalCards = includeSubsetsInSets ? collectionData.cardCountIncludingSubsets : collectionData.cardCount;
 
   return (
-    <Box sx={{ textAlign: 'center', mt: 1.5, mb: 1.5 }}>
+    <Box sx={{ textAlign: 'center', mt: progressBarStyle === 'linear' ? 0.5 : 1.5, mb: 1.5 }}>
       <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
         {collectionData.uniquePrintingsCollectedInSet}/{totalCards}
       </Typography>
-      <Typography variant="caption" color="text.secondary">
-        ({percentage}% collected, {collectionData.totalCardsCollectedInSet} total cards)
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+      {progressBarStyle === 'linear' ? (
+        <>
+          <Typography variant="caption" color="text.secondary">
+            ({collectionData.totalCardsCollectedInSet} total cards)
+          </Typography>
+          <Box sx={{ mt: 1, mb: 1 }}>
+            <CollectionProgressBar 
+              percentage={collectionData.percentageCollected} 
+              height={20}
+              showLabel={true}
+              labelFormat='long'
+            />
+          </Box>
+        </>
+      ) : (
+        <Typography variant="caption" color="text.secondary">
+          ({percentage}% collected, {collectionData.totalCardsCollectedInSet} total cards)
+        </Typography>
+      )}
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
         Current set value: {formatPrice(collectionData.costToComplete.totalValue)}
       </Typography>
     </Box>

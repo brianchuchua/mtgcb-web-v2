@@ -12,6 +12,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-17',
+      version: '0.111.0',
+      changes: [
+        'Added progress bar style toggle for set collections (radial vs linear)',
+        'Linear progress bars now display below set icons with cleaner layout',
+        'Changed default progress bar style to linear for better visual hierarchy',
+      ],
+    },
+    {
+      date: '2025-08-17',
       version: '0.110.0',
       changes: [
         'Added expandable "Complete This Set" section for purchase options in set grid views',
