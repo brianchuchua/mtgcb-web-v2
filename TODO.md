@@ -7,6 +7,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ## Just noticed
 
 Default table fields in card view sucks on mobile, locations should not be first
+Goal met\* needs to be easier to read on mobile
 
 ## Recent Actions
 

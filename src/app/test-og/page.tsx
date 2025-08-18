@@ -1,11 +1,14 @@
 'use client';
 
-import { Box, Button, Paper, TextField, Typography } from '@mui/material';
+import { Box, Button, Paper, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { useState } from 'react';
 
 export default function TestOGPage() {
   const [userId, setUserId] = useState('1337');
   const [shareToken, setShareToken] = useState('');
+  const [setSlug, setSetSlug] = useState('');
+  const [cardId, setCardId] = useState('');
+  const [previewType, setPreviewType] = useState('collection');
   const [imageUrl, setImageUrl] = useState('');
 
   const generatePreview = () => {
@@ -14,7 +17,31 @@ export default function TestOGPage() {
     if (shareToken) {
       params.set('shareToken', shareToken);
     }
-    setImageUrl(`/api/og/collection?${params.toString()}`);
+
+    let url = '';
+    switch (previewType) {
+      case 'collection':
+        url = `/api/og/collection?${params.toString()}`;
+        break;
+      case 'set':
+        if (!setSlug) {
+          alert('Please enter a set slug');
+          return;
+        }
+        params.set('setSlug', setSlug);
+        url = `/api/og/set?${params.toString()}`;
+        break;
+      case 'card':
+        if (!cardId) {
+          alert('Please enter a card ID');
+          return;
+        }
+        params.set('cardId', cardId);
+        url = `/api/og/card?${params.toString()}`;
+        break;
+    }
+
+    setImageUrl(url);
   };
 
   return (
@@ -24,8 +51,47 @@ export default function TestOGPage() {
       </Typography>
 
       <Paper sx={{ p: 3, mb: 3 }}>
-        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-          <TextField label="User ID" value={userId} onChange={(e) => setUserId(e.target.value)} size="small" />
+        <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Preview Type</InputLabel>
+            <Select
+              value={previewType}
+              label="Preview Type"
+              onChange={(e) => setPreviewType(e.target.value)}
+            >
+              <MenuItem value="collection">Collection</MenuItem>
+              <MenuItem value="set">Set</MenuItem>
+              <MenuItem value="card">Card</MenuItem>
+            </Select>
+          </FormControl>
+
+          <TextField 
+            label="User ID" 
+            value={userId} 
+            onChange={(e) => setUserId(e.target.value)} 
+            size="small" 
+          />
+
+          {previewType === 'set' && (
+            <TextField
+              label="Set Slug (e.g., foundations)"
+              value={setSlug}
+              onChange={(e) => setSetSlug(e.target.value)}
+              size="small"
+              sx={{ minWidth: 200 }}
+            />
+          )}
+
+          {previewType === 'card' && (
+            <TextField
+              label="Card ID"
+              value={cardId}
+              onChange={(e) => setCardId(e.target.value)}
+              size="small"
+              sx={{ minWidth: 150 }}
+            />
+          )}
+
           <TextField
             label="Share Token (optional)"
             value={shareToken}
@@ -33,15 +99,28 @@ export default function TestOGPage() {
             size="small"
             sx={{ minWidth: 200 }}
           />
+
           <Button variant="contained" onClick={generatePreview}>
             Generate Preview
           </Button>
         </Box>
 
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Test different user IDs to see how the OpenGraph image looks for different collections. Add a share token if
+          Test different preview types: Collection overview, specific set, or specific card. Add a share token if
           testing private collection access.
         </Typography>
+
+        {previewType === 'set' && (
+          <Typography variant="body2" color="text.secondary">
+            Example set slugs: foundations, duskmourn-house-of-horror, the-lost-caverns-of-ixalan
+          </Typography>
+        )}
+
+        {previewType === 'card' && (
+          <Typography variant="body2" color="text.secondary">
+            Enter a card ID to preview how it appears in the collection
+          </Typography>
+        )}
       </Paper>
 
       {imageUrl && (
@@ -76,7 +155,9 @@ export default function TestOGPage() {
               Direct URL: <code>{imageUrl}</code>
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Collection Page: <code>/collections/{userId}</code>
+              {previewType === 'collection' && `Collection Page: /collections/${userId}`}
+              {previewType === 'set' && `Set Page: /collections/${userId}/${setSlug}`}
+              {previewType === 'card' && `Card Page: /collections/${userId}/cards/[cardSlug]/${cardId}`}
             </Typography>
           </Box>
         </Paper>
