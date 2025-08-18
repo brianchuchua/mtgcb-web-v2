@@ -26,7 +26,6 @@ async function fetchCollectionData(userId: string, shareToken?: string): Promise
     }
 
     const apiUrl = `${MTGCB_API_BASE_URL}/sets/search`;
-    console.log('Fetching collection data from:', apiUrl, 'for userId:', userId);
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -39,12 +38,9 @@ async function fetchCollectionData(userId: string, shareToken?: string): Promise
       }),
     });
 
-    console.log('Response status:', response.status);
-
     if (!response.ok) {
       if (response.status === 403) {
         const errorData = await response.json();
-        console.log('403 error data:', errorData);
         if (errorData?.error?.code === 'COLLECTION_PRIVATE') {
           return {
             username: 'User',
@@ -57,12 +53,10 @@ async function fetchCollectionData(userId: string, shareToken?: string): Promise
           };
         }
       }
-      console.error('Non-OK response:', response.status, response.statusText);
       return null;
     }
 
     const data = await response.json();
-    console.log('API response data:', JSON.stringify(data, null, 2));
     
     if (data?.success && data?.data) {
       return {
@@ -76,10 +70,8 @@ async function fetchCollectionData(userId: string, shareToken?: string): Promise
       };
     }
     
-    console.error('Invalid data structure:', data);
     return null;
   } catch (error) {
-    console.error('Error fetching collection data:', error);
     return null;
   }
 }
@@ -98,7 +90,6 @@ export async function GET(request: NextRequest) {
     
     // If we couldn't fetch data at all (network error, API down, etc.), show a generic message
     if (!collectionData) {
-      console.error('Failed to fetch collection data for userId:', userId);
       // Default to showing as if it's a public collection with no data yet
       // This prevents showing "private" when the API is just unreachable
     }
@@ -315,7 +306,7 @@ export async function GET(request: NextRequest) {
                     color: '#999999',
                   }}
                 >
-                  Collection Progress (as of {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
+                  Collection Progress
                 </div>
                 
                 {/* Progress Bar */}
@@ -480,7 +471,6 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('Error generating OG image:', error);
     return new Response('Failed to generate image', { status: 500 });
   }
 }
