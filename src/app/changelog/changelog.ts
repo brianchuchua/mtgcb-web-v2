@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-08-17',
+      version: '0.112.0',
+      changes: [
+        'Added OpenGraph social preview images for collection pages',
+      ],
+    },
+    {
+      date: '2025-08-17',
       version: '0.111.0',
       changes: [
         'Added progress bar style toggle for set collections (radial vs linear)',

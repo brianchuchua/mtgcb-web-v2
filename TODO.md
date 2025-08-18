@@ -25,7 +25,6 @@ test tablet, fix issues
 Mostly ready:
 
 - Formalize the migration process from old db to new db. Don't forget the userId autoincrement fix. Document and test.
-- not a bug: i want to try location detection before sending in include locations, calls taking 410ms in secret lair drop series -- same for rendering the add locations buttons
 - i want to add a tcgplayerPricesUpdatedAt field to Cards
   heroku thinks i am using too much memory, but i upgraded dynos, a bug in their interface?
   questioning how i gather the platform statistics, it's such a heavy api call
@@ -218,6 +217,7 @@ Now:
 
 - ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from means your .eslintrc
 - Integrating Sentry sourcemaps for mtgcb-api-v3 -- more manual than next.js
+- Upgrading to Business Plan in Sentry to get custom dashboards
 - Thorough re-rendering audit
 - Switch to Git Flow once the site is in production
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
@@ -318,7 +318,6 @@ Now:
 - Need a temporary downtime page for the home page (database maintenance, etc.)
 - Load testing - look into npx autocannon
 - Performance testing / index audit
-- Add an index for set slug probably
 - Automated database backups - see https://devcenter.heroku.com/articles/heroku-postgres-backups
 - Dogfooding and UX testing
 - UX - Must test rendering of input fields on native devices
