@@ -137,32 +137,6 @@ export async function GET(request: NextRequest) {
             }}
           />
           
-          {/* Subtle branding footer */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 60,
-              right: 60,
-              height: 80,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 2,
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                fontSize: 20,
-                color: 'rgba(255, 255, 255, 0.5)',
-                letterSpacing: '0.5px',
-                fontWeight: 500,
-              }}
-            >
-              mtgcollectionbuilder.com • Track your Magic collection for free!
-            </div>
-          </div>
           {isPrivate ? (
             // Private Collection View
             <div
@@ -186,8 +160,8 @@ export async function GET(request: NextRequest) {
                 <img
                   src="https://r2.mtgcollectionbuilder.com/images/mtgcb-logo.png"
                   alt="MTG Collection Builder"
-                  width={100}
-                  height={100}
+                  width={130}
+                  height={130}
                   style={{
                     objectFit: 'contain',
                   }}
@@ -203,7 +177,7 @@ export async function GET(request: NextRequest) {
                   <div
                     style={{
                       display: 'flex',
-                      fontSize: 56,
+                      fontSize: 72,
                       fontWeight: 700,
                       color: '#ffffff',
                     }}
@@ -213,7 +187,7 @@ export async function GET(request: NextRequest) {
                   <div
                     style={{
                       display: 'flex',
-                      fontSize: 28,
+                      fontSize: 36,
                       color: '#999999',
                     }}
                   >
@@ -257,7 +231,7 @@ export async function GET(request: NextRequest) {
                   <div
                     style={{
                       display: 'flex',
-                      fontSize: 30,
+                      fontSize: 36,
                       color: '#999999',
                     }}
                   >
@@ -289,8 +263,8 @@ export async function GET(request: NextRequest) {
                 <img
                   src="https://r2.mtgcollectionbuilder.com/images/mtgcb-logo.png"
                   alt="MTG Collection Builder"
-                  width={100}
-                  height={100}
+                  width={130}
+                  height={130}
                   style={{
                     objectFit: 'contain',
                   }}
@@ -306,7 +280,7 @@ export async function GET(request: NextRequest) {
                   <div
                     style={{
                       display: 'flex',
-                      fontSize: 56,
+                      fontSize: 72,
                       fontWeight: 700,
                       color: '#ffffff',
                     }}
@@ -316,7 +290,7 @@ export async function GET(request: NextRequest) {
                   <div
                     style={{
                       display: 'flex',
-                      fontSize: 28,
+                      fontSize: 36,
                       color: '#999999',
                     }}
                   >
@@ -337,7 +311,7 @@ export async function GET(request: NextRequest) {
                 <div
                   style={{
                     display: 'flex',
-                    fontSize: 24,
+                    fontSize: 30,
                     color: '#999999',
                   }}
                 >
@@ -371,7 +345,7 @@ export async function GET(request: NextRequest) {
                       <div
                         style={{
                           display: 'flex',
-                          fontSize: 24,
+                          fontSize: 30,
                           fontWeight: 600,
                           color: '#ffffff',
                         }}
@@ -388,7 +362,7 @@ export async function GET(request: NextRequest) {
                         left: 20,
                         top: '50%',
                         transform: 'translateY(-50%)',
-                        fontSize: 24,
+                        fontSize: 30,
                         fontWeight: 600,
                         color: '#ffffff',
                       }}
@@ -426,7 +400,7 @@ export async function GET(request: NextRequest) {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        fontSize: 48,
+                        fontSize: 60,
                         fontWeight: 700,
                         color: '#1976d2',
                       }}
@@ -437,7 +411,7 @@ export async function GET(request: NextRequest) {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        fontSize: 32,
+                        fontSize: 40,
                         color: '#666666',
                       }}
                     >
@@ -447,7 +421,7 @@ export async function GET(request: NextRequest) {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        fontSize: 48,
+                        fontSize: 60,
                         fontWeight: 700,
                         color: '#ffffff',
                       }}
@@ -459,7 +433,7 @@ export async function GET(request: NextRequest) {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      fontSize: 28,
+                      fontSize: 36,
                       color: '#999999',
                     }}
                   >
@@ -477,7 +451,7 @@ export async function GET(request: NextRequest) {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      fontSize: 36,
+                      fontSize: 44,
                       fontWeight: 600,
                       color: '#1976d2',
                     }}
@@ -488,7 +462,7 @@ export async function GET(request: NextRequest) {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      fontSize: 24,
+                      fontSize: 30,
                       color: '#999999',
                     }}
                   >
