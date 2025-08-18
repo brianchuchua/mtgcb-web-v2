@@ -137,7 +137,6 @@ export async function GET(request: NextRequest) {
                 flexDirection: 'column',
                 gap: 30,
                 position: 'relative',
-                zIndex: 1,
               }}
             >
               {/* Logo and Title */}
@@ -240,7 +239,6 @@ export async function GET(request: NextRequest) {
                 flexDirection: 'column',
                 gap: 25,
                 position: 'relative',
-                zIndex: 1,
               }}
             >
               {/* Title Section with Logo */}

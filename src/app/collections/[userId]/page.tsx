@@ -11,13 +11,19 @@ export async function generateMetadata({
   const { userId } = await params;
   const resolvedSearchParams = await searchParams;
   const shareToken = resolvedSearchParams.shareToken as string | undefined;
+  const goalId = resolvedSearchParams.goalId as string | undefined;
 
   const baseUrl = process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL;
 
   let ogImageUrl: string | undefined;
   if (baseUrl) {
-    const imageUrl = new URL(`${baseUrl}/api/og/collection`);
+    // Use goal-specific OG image if goalId is present
+    const endpoint = goalId ? 'goal' : 'collection';
+    const imageUrl = new URL(`${baseUrl}/api/og/${endpoint}`);
     imageUrl.searchParams.set('userId', userId);
+    if (goalId) {
+      imageUrl.searchParams.set('goalId', goalId);
+    }
     if (shareToken) {
       imageUrl.searchParams.set('shareToken', shareToken);
     }
@@ -43,7 +49,7 @@ export async function generateMetadata({
             url: ogImageUrl,
             width: 1200,
             height: 630,
-            alt: 'MTG Collection',
+            alt: 'MTG Collection Builder',
           },
         ],
       }),

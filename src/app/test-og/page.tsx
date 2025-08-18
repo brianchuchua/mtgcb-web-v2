@@ -8,6 +8,7 @@ export default function TestOGPage() {
   const [shareToken, setShareToken] = useState('');
   const [setSlug, setSetSlug] = useState('');
   const [cardId, setCardId] = useState('');
+  const [goalId, setGoalId] = useState('');
   const [previewType, setPreviewType] = useState('collection');
   const [imageUrl, setImageUrl] = useState('');
 
@@ -39,6 +40,14 @@ export default function TestOGPage() {
         params.set('cardId', cardId);
         url = `/api/og/card?${params.toString()}`;
         break;
+      case 'goal':
+        if (!goalId) {
+          alert('Please enter a goal ID');
+          return;
+        }
+        params.set('goalId', goalId);
+        url = `/api/og/goal?${params.toString()}`;
+        break;
     }
 
     setImageUrl(url);
@@ -62,6 +71,7 @@ export default function TestOGPage() {
               <MenuItem value="collection">Collection</MenuItem>
               <MenuItem value="set">Set</MenuItem>
               <MenuItem value="card">Card</MenuItem>
+              <MenuItem value="goal">Goal</MenuItem>
             </Select>
           </FormControl>
 
@@ -87,6 +97,16 @@ export default function TestOGPage() {
               label="Card ID"
               value={cardId}
               onChange={(e) => setCardId(e.target.value)}
+              size="small"
+              sx={{ minWidth: 150 }}
+            />
+          )}
+
+          {previewType === 'goal' && (
+            <TextField
+              label="Goal ID"
+              value={goalId}
+              onChange={(e) => setGoalId(e.target.value)}
               size="small"
               sx={{ minWidth: 150 }}
             />
@@ -119,6 +139,12 @@ export default function TestOGPage() {
         {previewType === 'card' && (
           <Typography variant="body2" color="text.secondary">
             Enter a card ID to preview how it appears in the collection
+          </Typography>
+        )}
+
+        {previewType === 'goal' && (
+          <Typography variant="body2" color="text.secondary">
+            Enter a goal ID to preview the goal progress
           </Typography>
         )}
       </Paper>
@@ -158,6 +184,7 @@ export default function TestOGPage() {
               {previewType === 'collection' && `Collection Page: /collections/${userId}`}
               {previewType === 'set' && `Set Page: /collections/${userId}/${setSlug}`}
               {previewType === 'card' && `Card Page: /collections/${userId}/cards/[cardSlug]/${cardId}`}
+              {previewType === 'goal' && `Goal Page: /collections/${userId}?goalId=${goalId}`}
             </Typography>
           </Box>
         </Paper>
