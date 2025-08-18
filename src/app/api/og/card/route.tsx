@@ -420,7 +420,7 @@ export async function GET(request: NextRequest) {
                           display: 'flex',
                           fontSize: 48,
                           fontWeight: 700,
-                          color: '#42a5f5',
+                          color: '#1976d2',
                         }}
                       >
                         {foilQuantity}x
