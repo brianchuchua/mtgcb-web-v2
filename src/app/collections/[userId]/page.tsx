@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import { CollectionClient } from './CollectionClient';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://mtgcb.app';
-
 export async function generateMetadata({
   params,
   searchParams,
@@ -14,14 +12,20 @@ export async function generateMetadata({
   const resolvedSearchParams = await searchParams;
   const shareToken = resolvedSearchParams.shareToken as string | undefined;
 
-  const ogImageUrl = new URL(`${APP_URL}/api/og/collection`);
-  ogImageUrl.searchParams.set('userId', userId);
-  if (shareToken) {
-    ogImageUrl.searchParams.set('shareToken', shareToken);
+  const baseUrl = process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL;
+
+  let ogImageUrl: string | undefined;
+  if (baseUrl) {
+    const imageUrl = new URL(`${baseUrl}/api/og/collection`);
+    imageUrl.searchParams.set('userId', userId);
+    if (shareToken) {
+      imageUrl.searchParams.set('shareToken', shareToken);
+    }
+    ogImageUrl = imageUrl.toString();
   }
 
-  const title = 'Collection | MTG Collection Builder';
-  const description = 'Track and manage your Magic: The Gathering card collection for free!';
+  const title = 'MTG Collection Builder';
+  const description = 'Track and manage your Magic: The Gathering collection!';
 
   return {
     title,
@@ -30,20 +34,22 @@ export async function generateMetadata({
       title,
       description,
       type: 'website',
-      images: [
-        {
-          url: ogImageUrl.toString(),
-          width: 1200,
-          height: 630,
-          alt: 'MTG Collection',
-        },
-      ],
+      ...(ogImageUrl && {
+        images: [
+          {
+            url: ogImageUrl,
+            width: 1200,
+            height: 630,
+            alt: 'MTG Collection',
+          },
+        ],
+      }),
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: [ogImageUrl.toString()],
+      ...(ogImageUrl && { images: [ogImageUrl] }),
     },
   };
 }
