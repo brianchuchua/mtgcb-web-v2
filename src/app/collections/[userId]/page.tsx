@@ -21,6 +21,9 @@ export async function generateMetadata({
     if (shareToken) {
       imageUrl.searchParams.set('shareToken', shareToken);
     }
+    if (process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE) {
+      imageUrl.searchParams.set('v', process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE);
+    }
     ogImageUrl = imageUrl.toString();
   }
 
