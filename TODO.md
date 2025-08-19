@@ -8,6 +8,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 Default table fields in card view sucks on mobile, locations should not be first
 Goal met\* needs to be easier to read on mobile
+footer flashes before content load, may need a min height
+goal header inside of a set page needs ux work -- buy button is awkward near progress bar
 
 ## Recent Actions
 
@@ -50,6 +52,12 @@ Now:
 
 - A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.
 - Detecting if someone is a patron and linking their accounts.
+
+### Patron Perks
+
+- Definitely want that card customizer.
+- Weather effects? Custom themes?
+- What other additional cosmetics?
 
 ### Home Page (Partially complete)
 
@@ -182,7 +190,6 @@ Now:
   - enhancement -- when a person goes to buy the cards, have the site offer to record the cards right there
 - what good are breadcrumbs actually doing on the browse page? like home > browse, the home page is useless
 - See if still happening: On mobile, the hover over card name is doing the whole row, not just the card name
-- Confetti when hitting 100% collection progress, see legacy implementation
 - Alternating table row colors, I feel like the bright ones are too bright
 - UX - Make the tab indexes only go to the quantity fields
 - Maybe: Improve rendering of reg and foil quantity when not logged in grid view
@@ -334,6 +341,7 @@ Now:
 - A "money draft" tool to help users during a draft
 - A YouTube channel for the site, including transitioning collectors to limited players -- it's the best way to collect.
 - Consulting with a UX designer -- while Material UI looks nice, IhavenoideawhatIamdoing
+- Mana symbol confetti
 
 ## Data Decisions
 
@@ -354,7 +362,6 @@ Now:
 - Test API and database outages
 - Plan for system wide messages
 - Audit back and forward button
-- Confetti when hitting 100%, see legacy implementation
 - FNM Promos are a interesting corner case -- it's a subset group, but also has a child set, General FNM Promos. Need to test everything.
 - Patron request: Highlight recently updated card in some way, perhaps the input box or the price
 - Home page, call to action to register or login

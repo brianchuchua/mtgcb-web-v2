@@ -6,8 +6,10 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 
 ## For Every Feature (Once I Confirm It's Complete)
 
+- First run `date` command to get the current date
 - Update the version number using semver conventions in `package.json` and `src/app/changelog/changelog.ts`
   - The headers auto-update based on what's in the changelog.ts file
+  - Use the current date from the `date` command for the changelog entry
   - Update the minor version if it's a feature, and the patch version if it's a bug fix
   - After updating, provide a commit message under 50 characters in this style: "feat: add feature name here"
 

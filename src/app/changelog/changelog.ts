@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-08-18',
+      version: '0.113.0',
+      changes: [
+        'Added confetti celebration animation when completing 100% of a set collection',
+      ],
+    },
+    {
       date: '2025-08-17',
       version: '0.112.0',
       changes: [

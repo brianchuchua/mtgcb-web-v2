@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Confetti from 'react-confetti';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { useMassUpdateCollectionMutation } from '@/api/collections/collectionsApi';
@@ -12,25 +13,26 @@ import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
+import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import MassUpdateButton from '@/components/collections/MassUpdateButton';
 import MassUpdateConfirmDialog from '@/components/collections/MassUpdateConfirmDialog';
 import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
 import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
-import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
 import { SetNavigationButtons } from '@/components/sets/SetNavigationButtons';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { useSetNavigation } from '@/hooks/useSetNavigation';
+import { useShareTokenContext } from '@/contexts/ShareTokenContext';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
-import { useShareTokenContext } from '@/contexts/ShareTokenContext';
+import { useConfetti } from '@/hooks/useConfetti';
 import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
+import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import {
   selectCardSearchParams,
@@ -43,8 +45,8 @@ import {
 } from '@/redux/slices/browseSlice';
 import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
-import { formatISODate } from '@/utils/dateUtils';
 import { getCollectionUrl } from '@/utils/collectionUrls';
+import { formatISODate } from '@/utils/dateUtils';
 
 interface CollectionSetClientProps {
   userId: number;
@@ -54,10 +56,10 @@ interface CollectionSetClientProps {
 export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId, setSlug }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
-  
+
   // Sync goalId from URL to Redux on mount
   useInitialUrlSync({ syncView: false, syncGoalId: true });
-  
+
   const browseController = useCollectionBrowseController({ userId, isSetSpecificPage: true });
   const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
@@ -66,9 +68,11 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const { shareToken, isViewingSharedCollection } = useShareTokenContext();
   const isOwnCollection = user?.userId === userId;
   const { enqueueSnackbar } = useSnackbar();
-  
+
   // Check if we have a share token but got a privacy error (403)
-  const hasInvalidShareLink = shareToken && isViewingSharedCollection(userId) && 
+  const hasInvalidShareLink =
+    shareToken &&
+    isViewingSharedCollection(userId) &&
     browseController.error?.data?.error?.code === 'COLLECTION_PRIVATE';
 
   // Mass Update state
@@ -82,7 +86,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const currentSetsFilter = useSelector(selectSets);
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
   const selectedGoalId = useSelector(selectSelectedGoalId);
-  
+
   // Check if we're waiting for goalId to sync from URL
   const goalIdParam = searchParams?.get('goalId');
   const hasGoalInUrl = goalIdParam !== null;
@@ -93,16 +97,19 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     data: setsData,
     isSuccess,
     isLoading: isSetLoading,
-  } = useGetSetsQuery({
-    limit: 1,
-    slug: setSlug,
-    userId: userId,
-    priceType: setPriceType,
-    includeSubsetsInSets,
-    goalId: selectedGoalId || undefined,
-  }, {
-    skip: isWaitingForGoalSync,
-  });
+  } = useGetSetsQuery(
+    {
+      limit: 1,
+      slug: setSlug,
+      userId: userId,
+      priceType: setPriceType,
+      includeSubsetsInSets,
+      goalId: selectedGoalId || undefined,
+    },
+    {
+      skip: isWaitingForGoalSync,
+    },
+  );
 
   const set = setsData?.data?.sets?.[0];
 
@@ -119,11 +126,15 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     },
   );
 
+  const { showConfetti, recycleConfetti, handleConfettiComplete } = useConfetti(
+    isSetLoading || isSubsetsLoading,
+    set?.percentageCollected || 0
+  );
 
   useEffect(() => {
     // Always set view to cards for this page
     dispatch(setViewContentType('cards'));
-    
+
     if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
       const set = setsData.data.sets[0];
 
@@ -234,34 +245,34 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       if (response.success) {
         const updatedCount = response.data?.updatedCards || 0;
         const totalSkipped = response.data?.totalSkipped;
-        
+
         // Special case: No cards could be updated
         if (updatedCount === 0 && totalSkipped && (totalSkipped.cannotBeFoil > 0 || totalSkipped.cannotBeNonFoil > 0)) {
           const skippedCount = totalSkipped.cannotBeFoil + totalSkipped.cannotBeNonFoil;
           let message = `0 cards updated. All ${skippedCount} card${skippedCount !== 1 ? 's have' : ' has'} foil restrictions. `;
-          
+
           // Add specific details
           if (totalSkipped.cannotBeFoil > 0 && totalSkipped.cannotBeNonFoil > 0) {
             message += `${totalSkipped.cannotBeFoil} card${totalSkipped.cannotBeFoil !== 1 ? 's' : ''} cannot be foil and ${totalSkipped.cannotBeNonFoil} card${totalSkipped.cannotBeNonFoil !== 1 ? 's' : ''} cannot be non-foil.`;
           } else if (totalSkipped.cannotBeFoil > 0) {
-            message += `These card${totalSkipped.cannotBeFoil !== 1 ? 's don\'t' : ' doesn\'t'} exist in foil.`;
+            message += `These card${totalSkipped.cannotBeFoil !== 1 ? "s don't" : " doesn't"} exist in foil.`;
           } else if (totalSkipped.cannotBeNonFoil > 0) {
-            message += `These card${totalSkipped.cannotBeNonFoil !== 1 ? 's don\'t' : ' doesn\'t'} exist in non-foil.`;
+            message += `These card${totalSkipped.cannotBeNonFoil !== 1 ? "s don't" : " doesn't"} exist in non-foil.`;
           }
-          
-          enqueueSnackbar(message, { 
+
+          enqueueSnackbar(message, {
             variant: 'warning',
-            autoHideDuration: 6000 // Display for 6 seconds
+            autoHideDuration: 6000, // Display for 6 seconds
           });
         } else {
           // Normal case: Some or all cards were updated
           let message = `Successfully updated ${updatedCount} cards in ${set.name}`;
-          
+
           // Add information about skipped cards if any
           if (totalSkipped && (totalSkipped.cannotBeFoil > 0 || totalSkipped.cannotBeNonFoil > 0)) {
             const skippedCount = totalSkipped.cannotBeFoil + totalSkipped.cannotBeNonFoil;
             message += `. ${skippedCount} card${skippedCount !== 1 ? 's were' : ' was'} skipped: `;
-            
+
             // Add specific details
             if (totalSkipped.cannotBeFoil > 0 && totalSkipped.cannotBeNonFoil > 0) {
               message += `${totalSkipped.cannotBeFoil} cannot be foil, ${totalSkipped.cannotBeNonFoil} cannot be non-foil.`;
@@ -270,10 +281,10 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             } else if (totalSkipped.cannotBeNonFoil > 0) {
               message += `${totalSkipped.cannotBeNonFoil} cannot be non-foil.`;
             }
-            
+
             enqueueSnackbar(message, {
               variant: 'warning',
-              autoHideDuration: 6000 // Display for 6 seconds
+              autoHideDuration: 6000, // Display for 6 seconds
             });
           } else {
             enqueueSnackbar(message, {
@@ -281,7 +292,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             });
           }
         }
-        
+
         setIsMassUpdateOpen(false);
         setShowConfirmDialog(false);
         setMassUpdateFormData(null);
@@ -312,8 +323,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   if (!set && !isSetLoading) {
     return (
       <Box>
-        <InfoBanner 
-          title="Set not found or no cards found in it matching your criteria" 
+        <InfoBanner
+          title="Set not found or no cards found in it matching your criteria"
           message="The requested set might not exist, or there are no cards that match your current filter settings."
         />
       </Box>
@@ -332,39 +343,47 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   return (
     <Box>
-      {!hasInvalidShareLink && (
-        <SharedCollectionBanner username={username || 'User'} userId={userId} />
+      {showConfetti && (
+        <Confetti
+          style={{ position: 'fixed', height: '100vh', width: '100vw', zIndex: 9999 }}
+          gravity={0.1}
+          recycle={recycleConfetti}
+          run={true}
+          numberOfPieces={400}
+          onConfettiComplete={handleConfettiComplete}
+        />
       )}
-      
+      {!hasInvalidShareLink && <SharedCollectionBanner username={username || 'User'} userId={userId} />}
+
       {/* Show CollectionHeader when viewing with a goal selected */}
       {selectedGoalId && collectionSummary && set && (
         <Box sx={{ position: 'relative' }}>
           <CollectionHeader
-          username={username || ''}
-          userId={userId}
-          uniquePrintingsCollected={collectionSummary.uniquePrintingsCollected || 0}
-          numberOfCardsInMagic={collectionSummary.numberOfCardsInMagic || 0}
-          totalCardsCollected={collectionSummary.totalCardsCollected || 0}
-          percentageCollected={collectionSummary.percentageCollected || 0}
-          totalValue={collectionSummary.totalValue || 0}
-          isLoading={false}
-          goalSummary={goalSummary || undefined}
-          view="cards"
-          selectedGoalId={selectedGoalId}
-          includeSubsetsInSets={includeSubsetsInSets}
-          setInfo={{
-            name: set.name,
-            code: set.code || '',
-            id: set.id,
-            slug: setSlug,
-            uniquePrintingsCollectedInSet: set.uniquePrintingsCollectedInSet || 0,
-            cardCount: set.cardCount || '0',
-            totalCardsCollectedInSet: set.totalCardsCollectedInSet || 0,
-            totalValue: set.costToComplete?.totalValue || 0,
-            percentageCollected: set.percentageCollected || 0,
-            costToComplete: set.costToComplete?.goal || 0,
-          }}
-        />
+            username={username || ''}
+            userId={userId}
+            uniquePrintingsCollected={collectionSummary.uniquePrintingsCollected || 0}
+            numberOfCardsInMagic={collectionSummary.numberOfCardsInMagic || 0}
+            totalCardsCollected={collectionSummary.totalCardsCollected || 0}
+            percentageCollected={collectionSummary.percentageCollected || 0}
+            totalValue={collectionSummary.totalValue || 0}
+            isLoading={false}
+            goalSummary={goalSummary || undefined}
+            view="cards"
+            selectedGoalId={selectedGoalId}
+            includeSubsetsInSets={includeSubsetsInSets}
+            setInfo={{
+              name: set.name,
+              code: set.code || '',
+              id: set.id,
+              slug: setSlug,
+              uniquePrintingsCollectedInSet: set.uniquePrintingsCollectedInSet || 0,
+              cardCount: set.cardCount || '0',
+              totalCardsCollectedInSet: set.totalCardsCollectedInSet || 0,
+              totalValue: set.costToComplete?.totalValue || 0,
+              percentageCollected: set.percentageCollected || 0,
+              costToComplete: set.costToComplete?.goal || 0,
+            }}
+          />
         </Box>
       )}
 
@@ -379,11 +398,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             position: 'relative',
           }}
         >
-          <SetNavigationButtons
-            previousSet={previousSet}
-            nextSet={nextSet}
-            onNavigate={handleSetNavigation}
-          />
+          <SetNavigationButtons previousSet={previousSet} nextSet={nextSet} onNavigate={handleSetNavigation} />
 
           <Typography
             variant="h4"
@@ -445,7 +460,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               <Typography variant="h6" color="text.secondary" sx={{}}>
                 Set value:{' '}
                 <Box component="span" sx={{ color: 'success.main' }}>
-                  ${(set.totalValue || 0).toLocaleString('en-US', {
+                  $
+                  {(set.totalValue || 0).toLocaleString('en-US', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -514,8 +530,20 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         )
       ) : (
         <>
-          {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
-          {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
+          {isCardGridView && (
+            <CardGrid
+              {...cardsProps}
+              isOwnCollection={isOwnCollection}
+              goalId={selectedGoalId ? selectedGoalId.toString() : undefined}
+            />
+          )}
+          {isCardTableView && (
+            <CardTable
+              {...cardsProps}
+              isOwnCollection={isOwnCollection}
+              goalId={selectedGoalId ? selectedGoalId.toString() : undefined}
+            />
+          )}
         </>
       )}
 
