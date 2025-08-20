@@ -6,9 +6,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Just noticed
 
-Default table fields in card view sucks on mobile, locations should not be first
+Default table fields in card view sucks on mobile, locations should not be first, quantities need to be easy
 Goal met\* needs to be easier to read on mobile
-footer flashes before content load, may need a min height
+footer flashes before content load, may need a min height+6
 goal header inside of a set page needs ux work -- buy button is awkward near progress bar
 
 ## Recent Actions
@@ -378,7 +378,6 @@ Now:
 - Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
 - Clean up MTG CB collector number
 - Make a cool stats page
-- S3 image storage is costing a lot of money, look into alternatives like Cloudflare R2, Vercel Blob Storage, Cloudflare Images, Digital Ocean Spaces, etc.
 - Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
 - Use the new TCGPlayer domain (see below)
 - An Exclude Bulk feature for a collection's value
