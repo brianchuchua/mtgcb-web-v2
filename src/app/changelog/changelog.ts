@@ -11,18 +11,19 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-08-23',
+      version: '0.113.1',
+      changes: ['Improved goal calculation performance by 10x.'],
+    },
+    {
       date: '2025-08-18',
       version: '0.113.0',
-      changes: [
-        'Added confetti celebration animation when completing 100% of a set collection',
-      ],
+      changes: ['Added confetti celebration animation when completing 100% of a set collection'],
     },
     {
       date: '2025-08-17',
       version: '0.112.0',
-      changes: [
-        'Added OpenGraph social preview images for collection pages',
-      ],
+      changes: ['Added OpenGraph social preview images for collection pages'],
     },
     {
       date: '2025-08-17',
@@ -44,45 +45,32 @@ const changelogData: ChangelogData = {
     {
       date: '2025-08-14',
       version: '0.109.0',
-      changes: [
-        'Completed new price updater system',
-        'Added price update timestamp display on card detail pages',
-      ],
+      changes: ['Completed new price updater system', 'Added price update timestamp display on card detail pages'],
     },
     {
       date: '2025-08-13',
       version: '0.108.5',
-      changes: [
-        'Improved set tables on mobile',
-      ],
+      changes: ['Improved set tables on mobile'],
     },
     {
       date: '2025-08-13',
       version: '0.108.4',
-      changes: [
-        'Fixed alternating row colors in virtualized tables',
-      ],
+      changes: ['Fixed alternating row colors in virtualized tables'],
     },
     {
       date: '2025-08-13',
       version: '0.108.3',
-      changes: [
-        'Improved home page layout on mobile devices',
-      ],
+      changes: ['Improved home page layout on mobile devices'],
     },
     {
       date: '2025-08-13',
       version: '0.108.2',
-      changes: [
-        'Fixed search summary not displaying quantity stat filters',
-      ],
+      changes: ['Fixed search summary not displaying quantity stat filters'],
     },
     {
       date: '2025-08-13',
       version: '0.108.1',
-      changes: [
-        'Fixed flashing when updating card quantities on set collection pages',
-      ],
+      changes: ['Fixed flashing when updating card quantities on set collection pages'],
     },
     {
       date: '2025-08-13',
