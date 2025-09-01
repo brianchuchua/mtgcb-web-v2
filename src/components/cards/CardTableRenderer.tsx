@@ -102,12 +102,6 @@ export const useCardTableColumns = (
   // Define all possible columns
   const allColumns: TableColumn<CardItemProps>[] = [
     {
-      id: 'collectorNumber',
-      label: '#',
-      width: { default: '60px' },
-      sortable: true,
-    },
-    {
       id: 'mtgcbCollectorNumber',
       label: 'M#',
       width: { default: '60px' },
@@ -155,6 +149,12 @@ export const useCardTableColumns = (
       },
       sortable: false,
       align: 'center' as const,
+    },
+    {
+      id: 'collectorNumber',
+      label: '#',
+      width: { default: '60px' },
+      sortable: true,
     },
     {
       id: 'releasedAt', // This renders as a set name, but sorts by release date
@@ -829,11 +829,6 @@ export const useCardRowRenderer = (
     // Create a collection of cells based on visible columns
     const cells = [];
 
-    // Collector Number Cell
-    if (displaySettings.collectorNumberIsVisible) {
-      cells.push(<TableCell key="collectorNumber">{card.collectorNumber || 'N/A'}</TableCell>);
-    }
-
     // MTG CB Number Cell
     if (displaySettings.mtgcbNumberIsVisible) {
       cells.push(<TableCell key="mtgcbNumber">{card.mtgcbCollectorNumber || 'N/A'}</TableCell>);
@@ -997,6 +992,11 @@ export const useCardRowRenderer = (
           isOwnCollection={isOwnCollection}
         />,
       );
+    }
+
+    // Collector Number Cell
+    if (displaySettings.collectorNumberIsVisible) {
+      cells.push(<TableCell key="collectorNumber">{card.collectorNumber || 'N/A'}</TableCell>);
     }
 
     // Set Cell

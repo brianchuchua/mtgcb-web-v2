@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-01',
+      version: '0.113.2',
+      changes: ['Improved card table column ordering for better viewing experience'],
+    },
+    {
       date: '2025-08-23',
       version: '0.113.1',
       changes: ['Improved goal calculation performance by 10x.'],
