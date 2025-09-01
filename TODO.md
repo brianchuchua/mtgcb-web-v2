@@ -6,10 +6,26 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Just noticed
 
+buy missing cards for this goal -- should just not have this button if it's a large number of cards
+when viewing sets with a collection goal on, should add a note that the total cards are those actually collected in the set, maybe
+statistics calculation should save to db with a timestamp, only update once every 24 hours, not every dyno restart
+consider removing preload of pagination when goals are involved since it double-hits the db
+must save script of how to populate otherPrintings in case the trigger doesn't work
+npx drizzle-kit introspect doesn't bring in triggers and stuff
+Need a scroll region when a card with a goal has a lot of contributions (like a basic land).
+Mention somewhere that the cheapest available printing is shown for collection goals
+Bug: Trying to sort by quantity in collection view reverts back to release date, need to test goal refactor with this
 Default table fields in card view sucks on mobile, locations should not be first, quantities need to be easy
 Goal met\* needs to be easier to read on mobile
 footer flashes before content load, may need a min height+6
 goal header inside of a set page needs ux work -- buy button is awkward near progress bar
+If you know the user, ask them to set their collection to public. <-- needs to say or share a private link
+confirm default cards per row is auto
+cost to complete for goal doesn't really line up with the card that is rendered -- and sending the most expensive card to tcgplayer to buy can hurt the user. <-- See https://mtgcb-web-v2.mtgcollectionbuilder.com/collections/1337?cardsSortBy=market&oneResultPerCardName=true&goalId=1&showGoals=incomplete&contentType=cards, should perhaps always show the cheapest
+Maybe (Need 1 or regular) should say "of any printing" contextually
+maybe a separate call can hydrate other printings for cards in current pagination, at least the number of them
+maybe instead of a pop-up when cards are updated, status updating in the labe ⚠ Cross origin request detected from local.mtgcb.com to /\_next/\* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
 
 ## Recent Actions
 
@@ -223,6 +239,9 @@ Now:
 
 ## Tech Debt
 
+- Formalize how I use Claude Code locally to automate database-level testing
+- Statistics calculations, while now using the follower database, should be run by mtgcb-jobs, not the api, and their results should be stored in a statistics table, not in-memory in an application, at least not until cached.
+- Clean up old cloudflare settings
 - ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from means your .eslintrc
 - Integrating Sentry sourcemaps for mtgcb-api-v3 -- more manual than next.js
 - Upgrading to Business Plan in Sentry to get custom dashboards
@@ -322,7 +341,7 @@ Now:
 - Ping johnny on Discord once card locations are released. :)
 - Grok database backups in new system
 - Integration with Sonarcloud (open source the repo, make development easy for new devs)
-- Integration with Google Analytics (after production launch, using the same account as the legacy site)
+- Integration with Google Analytics (right before production launch, using the same account as the legacy site)
 - Need a temporary downtime page for the home page (database maintenance, etc.)
 - Load testing - look into npx autocannon
 - Performance testing / index audit
@@ -333,7 +352,6 @@ Now:
 - Audit field length limits
 - Adequate feature testing
 - Data cleanup for tcgplayer names and codes and tcgplayer ids
-- test jwt expiration and possible refresh
 - audit USE_OPTIMIZED_GOAL_PROGRESS
 
 ## Nice to Have
