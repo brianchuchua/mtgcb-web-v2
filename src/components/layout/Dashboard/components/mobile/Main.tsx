@@ -23,18 +23,16 @@ const Main = ({ children }: MainProps) => {
 const StyledMain = styled('main')(({ theme }) => ({
   flexGrow: 1,
   marginTop: theme.spacing(8), // Account for fixed header
-  minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'space-between',
   [theme.breakpoints.up('md')]: {
     display: 'none',
   },
 }));
 
 const MainContent = styled('div')(({ theme }) => ({
-  flexGrow: 1,
   padding: `${theme.spacing(1)} ${theme.spacing(3)} ${theme.spacing(3)} ${theme.spacing(3)}`,
+  minHeight: 'calc(100vh - 64px)', // Full viewport minus header, pushes footer below fold
   [theme.breakpoints.up('sm')]: {
     padding: `${theme.spacing(2)} ${theme.spacing(3)} ${theme.spacing(3)} ${theme.spacing(3)}`,
   },

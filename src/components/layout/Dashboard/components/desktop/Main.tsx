@@ -36,10 +36,8 @@ const StyledMain = styled('main', {
   flexGrow: 1,
   marginLeft: open ? `${sidenavwidth}px` : 0,
   paddingTop: '64px',
-  minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'space-between',
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -52,5 +50,5 @@ const StyledMain = styled('main', {
 const MainContent = styled('div')(({ theme }) => ({
   width: '100%',
   padding: `${theme.spacing(2)} ${theme.spacing(4)} ${theme.spacing(4)} ${theme.spacing(4)}`,
-  flexGrow: 1,
+  minHeight: 'calc(100vh - 64px)', // Full viewport minus header, pushes footer below fold
 }));

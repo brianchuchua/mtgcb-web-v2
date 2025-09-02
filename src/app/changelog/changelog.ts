@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-01',
+      version: '0.113.4',
+      changes: ['Improved footer layout and prevented layout shift during page load'],
+    },
+    {
+      date: '2025-09-01',
       version: '0.113.3',
       changes: ['Improved notifications to be less spammy when updating card quantities'],
     },

@@ -20,7 +20,7 @@ const Footer = () => {
     <StyledFooter>
       <Container maxWidth="lg">
         <FooterContent>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
             © 2013-{currentYear} MTG Collection Builder ·{' '}
             <Link component={NextLink} href="/terms-and-privacy" color="inherit">
               Terms and Privacy
@@ -34,6 +34,24 @@ const Footer = () => {
               <span>Contact</span>
             )}
           </Typography>
+          <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+            <Typography variant="body2" color="text.secondary">
+              © 2013-{currentYear} MTG Collection Builder
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              <Link component={NextLink} href="/terms-and-privacy" color="inherit">
+                Terms and Privacy
+              </Link>{' '}
+              ·{' '}
+              {emailLink ? (
+                <Link href={emailLink} color="inherit">
+                  Contact
+                </Link>
+              ) : (
+                <span>Contact</span>
+              )}
+            </Typography>
+          </Box>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             Magic the Gathering and all related properties are copyright Wizards of the Coast. All rights reserved.
           </Typography>
