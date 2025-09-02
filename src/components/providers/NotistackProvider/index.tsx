@@ -34,8 +34,8 @@ export default function SnackbarProvider({ children }: { children: ReactNode }) 
 
   return (
     <NotistackProvider
-      maxSnack={3}
-      autoHideDuration={5000}
+      maxSnack={2}
+      autoHideDuration={3000}
       disableWindowBlurListener={true}
       anchorOrigin={{
         vertical: 'bottom',

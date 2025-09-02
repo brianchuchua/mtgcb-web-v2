@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-01',
+      version: '0.113.3',
+      changes: ['Improved notifications to be less spammy when updating card quantities'],
+    },
+    {
+      date: '2025-09-01',
       version: '0.113.2',
       changes: ['Improved card table column ordering for better viewing experience'],
     },
