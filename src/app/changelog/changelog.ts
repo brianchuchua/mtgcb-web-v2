@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-02',
+      version: '0.113.5',
+      changes: ['Fixed collection sorting bug where quantity-based sort options would revert to release date'],
+    },
+    {
       date: '2025-09-01',
       version: '0.113.4',
       changes: ['Improved footer layout and prevented layout shift during page load'],
