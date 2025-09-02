@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-02',
+      version: '0.113.6',
+      changes: ['Hide "Show bad data" toggle when viewing goal-filtered collections'],
+    },
+    {
+      date: '2025-09-02',
       version: '0.113.5',
       changes: ['Fixed collection sorting bug where quantity-based sort options would revert to release date'],
     },

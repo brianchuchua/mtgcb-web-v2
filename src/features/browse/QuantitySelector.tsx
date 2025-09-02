@@ -15,7 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useDispatch, useSelector } from 'react-redux';
-import { setStats, selectStats, setIncludeBadDataOnly, selectIncludeBadDataOnly } from '@/redux/slices/browseSlice';
+import { setStats, selectStats, setIncludeBadDataOnly, selectIncludeBadDataOnly, selectSelectedGoalId } from '@/redux/slices/browseSlice';
 import { StatFilters } from '@/types/browse';
 import OutlinedBox from '@/components/ui/OutlinedBox';
 
@@ -52,6 +52,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
   const dispatch = useDispatch();
   const statFilters = useSelector(selectStats);
   const includeBadDataOnly = useSelector(selectIncludeBadDataOnly) ?? false;
+  const selectedGoalId = useSelector(selectSelectedGoalId);
   const [expanded, setExpanded] = useState(false);
 
   // Parse current stat filters to determine selected values and custom filters
@@ -227,30 +228,32 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
           {renderQuantitySelector('Foil Cards', 'quantityFoil', foilFilterState)}
         </Box>
         
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={includeBadDataOnly}
-                onChange={handleIncludeBadDataToggle}
-                name="includeBadDataOnly"
-                color="primary"
-                size="small"
-              />
-            }
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Typography variant="body2">Show Bad Data</Typography>
-                <Tooltip
-                  title="Shows cards that were input that aren't possible to own, like foil printings of cards that don't come in foil"
-                  placement="top"
-                >
-                  <InfoOutlinedIcon sx={{ fontSize: '1rem', color: 'text.secondary', cursor: 'help' }} />
-                </Tooltip>
-              </Box>
-            }
-          />
-        </Box>
+        {!selectedGoalId && (
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={includeBadDataOnly}
+                  onChange={handleIncludeBadDataToggle}
+                  name="includeBadDataOnly"
+                  color="primary"
+                  size="small"
+                />
+              }
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Typography variant="body2">Show Bad Data</Typography>
+                  <Tooltip
+                    title="Shows cards that were input that aren't possible to own, like foil printings of cards that don't come in foil"
+                    placement="top"
+                  >
+                    <InfoOutlinedIcon sx={{ fontSize: '1rem', color: 'text.secondary', cursor: 'help' }} />
+                  </Tooltip>
+                </Box>
+              }
+            />
+          </Box>
+        )}
       </Collapse>
     </OutlinedBox>
   );
