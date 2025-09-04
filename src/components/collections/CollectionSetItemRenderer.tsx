@@ -381,71 +381,80 @@ const CostToPurchaseSection: React.FC<{
 
       <Collapse in={expanded} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
         <Box sx={{ width: '100%', maxWidth: '350px', mx: 'auto', mt: 1 }}>
-          <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1, textAlign: 'center' }}>
-            Cost to complete:
-          </Typography>
-          <CostToCompleteRow
-          label="All cards"
-          cost={costToComplete.oneOfEachCard}
-          setId={setId}
-          countType="all"
-          includeSubsetsInSets={includeSubsetsInSets}
-          userId={userId}
-          goalId={goalId}
-        />
+          {goalId && costToComplete.goal !== undefined ? (
+            // When goalId is selected, show only the goal cost as a single line
+            <Typography variant="body2" color="textSecondary" sx={{ mb: 1, textAlign: 'center' }}>
+              Cost to complete this goal: {formatPrice(costToComplete.goal)}
+            </Typography>
+          ) : (
+            <>
+              <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1, textAlign: 'center' }}>
+                Cost to complete:
+              </Typography>
+              <CostToCompleteRow
+                label="All cards"
+                cost={costToComplete.oneOfEachCard}
+                setId={setId}
+                countType="all"
+                includeSubsetsInSets={includeSubsetsInSets}
+                userId={userId}
+                goalId={goalId}
+              />
 
-        <CostToCompleteRow
-          label="Mythics"
-          cost={costToComplete.oneOfEachMythic}
-          setId={setId}
-          countType="mythic"
-          includeSubsetsInSets={includeSubsetsInSets}
-          userId={userId}
-          goalId={goalId}
-        />
+              <CostToCompleteRow
+                label="Mythics"
+                cost={costToComplete.oneOfEachMythic}
+                setId={setId}
+                countType="mythic"
+                includeSubsetsInSets={includeSubsetsInSets}
+                userId={userId}
+                goalId={goalId}
+              />
 
-        <CostToCompleteRow
-          label="Rares"
-          cost={costToComplete.oneOfEachRare}
-          setId={setId}
-          countType="rare"
-          includeSubsetsInSets={includeSubsetsInSets}
-          userId={userId}
-          goalId={goalId}
-        />
+              <CostToCompleteRow
+                label="Rares"
+                cost={costToComplete.oneOfEachRare}
+                setId={setId}
+                countType="rare"
+                includeSubsetsInSets={includeSubsetsInSets}
+                userId={userId}
+                goalId={goalId}
+              />
 
-        <CostToCompleteRow
-          label="Uncommons"
-          cost={costToComplete.oneOfEachUncommon}
-          setId={setId}
-          countType="uncommon"
-          includeSubsetsInSets={includeSubsetsInSets}
-          userId={userId}
-          goalId={goalId}
-        />
+              <CostToCompleteRow
+                label="Uncommons"
+                cost={costToComplete.oneOfEachUncommon}
+                setId={setId}
+                countType="uncommon"
+                includeSubsetsInSets={includeSubsetsInSets}
+                userId={userId}
+                goalId={goalId}
+              />
 
-        <CostToCompleteRow
-          label="Commons"
-          cost={costToComplete.oneOfEachCommon}
-          setId={setId}
-          countType="common"
-          includeSubsetsInSets={includeSubsetsInSets}
-          userId={userId}
-          goalId={goalId}
-        />
+              <CostToCompleteRow
+                label="Commons"
+                cost={costToComplete.oneOfEachCommon}
+                setId={setId}
+                countType="common"
+                includeSubsetsInSets={includeSubsetsInSets}
+                userId={userId}
+                goalId={goalId}
+              />
 
-        {set?.isDraftable && (
-          <CostToCompleteRow
-            label="Draft Cube"
-            cost={costToComplete.draftCube}
-            setId={setId}
-            countType="draftcube"
-            includeSubsetsInSets={includeSubsetsInSets}
-            userId={userId}
-            goalId={goalId}
-            singleButton
-          />
-        )}
+              {set?.isDraftable && (
+                <CostToCompleteRow
+                  label="Draft Cube"
+                  cost={costToComplete.draftCube}
+                  setId={setId}
+                  countType="draftcube"
+                  includeSubsetsInSets={includeSubsetsInSets}
+                  userId={userId}
+                  goalId={goalId}
+                  singleButton
+                />
+              )}
+            </>
+          )}
 
         {set?.sealedProductUrl && (
           <Box

@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-03',
+      version: '0.113.7',
+      changes: [
+        'Improved rendering of costs to complete for goals',
+        'Improved goal calculation performance during load tests by another 4x',
+      ],
+    },
+    {
       date: '2025-09-02',
       version: '0.113.6',
       changes: ['Hide "Show bad data" toggle when viewing goal-filtered collections'],
