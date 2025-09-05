@@ -3,14 +3,18 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import {
   Alert,
   Box,
-  Button,
   Chip,
+  CircularProgress,
+  Dialog,
+  DialogContent,
   Divider,
   IconButton,
+  LinearProgress,
   TextField,
   Typography,
   styled,
 } from '@mui/material';
+import { Button } from '@/components/ui/button';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -100,8 +104,39 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <>
+      <Dialog
+        open={isLoading}
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            minWidth: { xs: '90%', sm: 400 },
+          },
+        }}
+      >
+        <DialogContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            py: 4,
+            px: 3,
+          }}
+        >
+          <CircularProgress size={56} sx={{ mb: 3 }} />
+          <Typography variant="h6" gutterBottom>
+            Compiling Goal
+          </Typography>
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
+            Your goal is undergoing a one-time compilation to optimize performance.
+            This may take 5-10 seconds for complex search criteria.
+          </Typography>
+          <LinearProgress sx={{ width: '100%', maxWidth: 300 }} />
+        </DialogContent>
+      </Dialog>
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Controller
           name="name"
           control={control}
@@ -114,6 +149,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
               error={!!errors.name}
               helperText={errors.name?.message}
               autoFocus
+              disabled={isLoading}
             />
           )}
         />
@@ -131,6 +167,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
               rows={2}
               error={!!errors.description}
               helperText={errors.description?.message}
+              disabled={isLoading}
             />
           )}
         />
@@ -171,11 +208,13 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
               label="Any Type"
               onClick={() => setQuantityMode('all')}
               color={quantityMode === 'all' ? 'primary' : 'default'}
+              disabled={isLoading}
             />
             <Chip
               label="Separate Regular/Foil"
               onClick={() => setQuantityMode('separate')}
               color={quantityMode === 'separate' ? 'primary' : 'default'}
+              disabled={isLoading}
             />
           </Box>
 
@@ -220,7 +259,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                           const newValue = Math.max(0, currentVal - 1);
                           onChange(newValue);
                         }}
-                        disabled={!value || value === 0}
+                        disabled={!value || value === 0 || isLoading}
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityReg}
@@ -244,6 +283,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         variant="outlined"
                         size="small"
                         error={!!errors.targetQuantityReg}
+                        disabled={isLoading}
                       />
                       <QuantityRightButton
                         size="small"
@@ -255,6 +295,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityReg}
+                        disabled={isLoading}
                       >
                         <AddIcon />
                       </QuantityRightButton>
@@ -297,7 +338,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                           const newValue = Math.max(0, currentVal - 1);
                           onChange(newValue);
                         }}
-                        disabled={!value || value === 0}
+                        disabled={!value || value === 0 || isLoading}
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityFoil}
@@ -321,6 +362,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         variant="outlined"
                         size="small"
                         error={!!errors.targetQuantityFoil}
+                        disabled={isLoading}
                       />
                       <QuantityRightButton
                         size="small"
@@ -332,6 +374,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityFoil}
+                        disabled={isLoading}
                       >
                         <AddIcon />
                       </QuantityRightButton>
@@ -380,7 +423,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                           const newValue = Math.max(0, currentVal - 1);
                           onChange(newValue);
                         }}
-                        disabled={!value || value === 0}
+                        disabled={!value || value === 0 || isLoading}
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityAll}
@@ -404,6 +447,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         variant="outlined"
                         size="small"
                         error={!!errors.targetQuantityAll}
+                        disabled={isLoading}
                       />
                       <QuantityRightButton
                         size="small"
@@ -415,6 +459,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityAll}
+                        disabled={isLoading}
                       >
                         <AddIcon />
                       </QuantityRightButton>
@@ -473,13 +518,14 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
         )}
 
         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={isLoading}>
-            Create Goal
+          <Button onClick={onClose} disabled={isLoading}>Cancel</Button>
+          <Button type="submit" variant="contained" isSubmitting={isLoading}>
+            {isLoading ? 'Creating Goal...' : 'Create Goal'}
           </Button>
         </Box>
-      </Box>
-    </form>
+        </Box>
+      </form>
+    </>
   );
 }
 

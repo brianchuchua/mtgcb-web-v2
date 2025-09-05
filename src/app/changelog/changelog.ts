@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-04',
+      version: '0.114.0',
+      changes: [
+        'Improved goal loading experience with compilation status modal that explains the 5-10 second optimization process',
+      ],
+    },
+    {
       date: '2025-09-03',
       version: '0.113.7',
       changes: [

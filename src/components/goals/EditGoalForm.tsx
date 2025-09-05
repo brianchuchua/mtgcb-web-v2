@@ -3,16 +3,20 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import {
   Alert,
   Box,
-  Button,
   Chip,
+  CircularProgress,
+  Dialog,
+  DialogContent,
   Divider,
   FormControlLabel,
   IconButton,
+  LinearProgress,
   Switch,
   TextField,
   Typography,
   styled,
 } from '@mui/material';
+import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -156,8 +160,39 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <>
+      <Dialog
+        open={isLoading}
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            minWidth: { xs: '90%', sm: 400 },
+          },
+        }}
+      >
+        <DialogContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            py: 4,
+            px: 3,
+          }}
+        >
+          <CircularProgress size={56} sx={{ mb: 3 }} />
+          <Typography variant="h6" gutterBottom>
+            Recompiling Goal
+          </Typography>
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
+            Your updated goal is being recompiled to optimize performance.
+            This one-time process may take 5-10 seconds for complex search criteria.
+          </Typography>
+          <LinearProgress sx={{ width: '100%', maxWidth: 300 }} />
+        </DialogContent>
+      </Dialog>
+
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Controller
           name="name"
           control={control}
@@ -169,6 +204,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
               fullWidth
               error={!!errors.name}
               helperText={errors.name?.message}
+              disabled={isLoading}
             />
           )}
         />
@@ -186,6 +222,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
               rows={2}
               error={!!errors.description}
               helperText={errors.description?.message}
+              disabled={isLoading}
             />
           )}
         />
@@ -194,7 +231,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
           name="isActive"
           control={control}
           render={({ field }) => (
-            <FormControlLabel control={<Switch {...field} checked={field.value} />} label="Active" />
+            <FormControlLabel control={<Switch {...field} checked={field.value} disabled={isLoading} />} label="Active" />
           )}
         />
 
@@ -240,6 +277,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                 setTimeout(() => setIsChangingMode(false), 100);
               }}
               color={quantityMode === 'all' ? 'primary' : 'default'}
+              disabled={isLoading}
             />
             <Chip
               label="Separate Regular/Foil"
@@ -250,6 +288,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                 setTimeout(() => setIsChangingMode(false), 100);
               }}
               color={quantityMode === 'separate' ? 'primary' : 'default'}
+              disabled={isLoading}
             />
           </Box>
 
@@ -295,7 +334,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                           const newValue = Math.max(0, currentVal - 1);
                           onChange(newValue);
                         }}
-                        disabled={!value || Number(value) === 0}
+                        disabled={!value || Number(value) === 0 || isLoading}
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityReg}
@@ -319,6 +358,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         variant="outlined"
                         size="small"
                         error={!!errors.targetQuantityReg}
+                        disabled={isLoading}
                       />
                       <QuantityRightButton
                         size="small"
@@ -330,6 +370,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityReg}
+                        disabled={isLoading}
                       >
                         <AddIcon />
                       </QuantityRightButton>
@@ -372,7 +413,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                           const newValue = Math.max(0, currentVal - 1);
                           onChange(newValue);
                         }}
-                        disabled={!value || Number(value) === 0}
+                        disabled={!value || Number(value) === 0 || isLoading}
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityFoil}
@@ -396,6 +437,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         variant="outlined"
                         size="small"
                         error={!!errors.targetQuantityFoil}
+                        disabled={isLoading}
                       />
                       <QuantityRightButton
                         size="small"
@@ -407,6 +449,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityFoil}
+                        disabled={isLoading}
                       >
                         <AddIcon />
                       </QuantityRightButton>
@@ -459,7 +502,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                             onChange(newValue);
                           }
                         }}
-                        disabled={!value || Number(value) === 0}
+                        disabled={!value || Number(value) === 0 || isLoading}
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityAll}
@@ -483,6 +526,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         variant="outlined"
                         size="small"
                         error={!!errors.targetQuantityAll}
+                        disabled={isLoading}
                       />
                       <QuantityRightButton
                         size="small"
@@ -494,6 +538,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
                         tabIndex={-1}
                         disableFocusRipple
                         error={!!errors.targetQuantityAll}
+                        disabled={isLoading}
                       >
                         <AddIcon />
                       </QuantityRightButton>
@@ -561,9 +606,9 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
             Delete
           </Button>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button onClick={onClose}>Cancel</Button>
-            <Button type="submit" variant="contained" disabled={isLoading || isDeleting}>
-              Update Goal
+            <Button onClick={onClose} disabled={isLoading}>Cancel</Button>
+            <Button type="submit" variant="contained" isSubmitting={isLoading} disabled={isDeleting}>
+              {isLoading ? 'Updating Goal...' : 'Update Goal'}
             </Button>
           </Box>
         </Box>
@@ -576,7 +621,8 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />
-    </form>
+      </form>
+    </>
   );
 }
 
