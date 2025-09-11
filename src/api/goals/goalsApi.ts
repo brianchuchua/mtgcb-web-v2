@@ -36,8 +36,14 @@ export const goalsApi = mtgcbApi.injectEndpoints({
       }),
       providesTags: (result, error, { userId }) => [{ type: 'Goals', id: `user-${userId}` }, 'Goals'],
     }),
-    getGoal: builder.query<ApiResponse<Goal>, { userId: number; goalId: number }>({
-      query: ({ userId, goalId }) => `goals/${userId}/${goalId}`,
+    getGoal: builder.query<ApiResponse<Goal>, { userId: number; goalId: number; includeProgress?: boolean; priceType?: string }>({
+      query: ({ userId, goalId, includeProgress, priceType }) => ({
+        url: `goals/${userId}/${goalId}`,
+        params: {
+          ...(includeProgress !== undefined && { includeProgress }),
+          ...(priceType && { priceType }),
+        },
+      }),
       providesTags: (result, error, { goalId }) => [{ type: 'Goals', id: goalId }],
     }),
     deleteGoal: builder.mutation<ApiResponse<{ message: string }>, { userId: number; goalId: number }>({
@@ -79,6 +85,7 @@ export const goalsApi = mtgcbApi.injectEndpoints({
 export const {
   useCreateGoalMutation,
   useGetUserGoalsQuery,
+  useLazyGetUserGoalsQuery,
   useGetGoalQuery,
   useLazyGetGoalQuery,
   useDeleteGoalMutation,

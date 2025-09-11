@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-11',
+      version: '0.115.2',
+      changes: ['Optimized goals page to load incrementally, reducing server load and improving performance'],
+    },
+    {
       date: '2025-09-10',
       version: '0.115.1',
       changes: ['Fixed performance issue causing page slowdowns when browsing collections'],

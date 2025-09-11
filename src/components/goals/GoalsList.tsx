@@ -5,6 +5,7 @@ import {
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
+import CircularProgress from '@mui/material/CircularProgress';
 import {
   Box,
   Card,
@@ -147,7 +148,7 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                 </Box>
 
                 <Stack spacing={1} sx={{ mt: 'auto' }}>
-                  {goal.progress && (
+                  {goal.progress ? (
                     <Box>
                       <Stack spacing={0.5}>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -184,6 +185,58 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                             >
                               ${goal.progress.costToComplete.toFixed(2)}
                             </Typography>
+                          </Box>
+                          <Box sx={{ flex: 1, textAlign: 'right' }}>
+                            {goal.updatedAt && goal.updatedAt !== goal.createdAt ? (
+                              <Tooltip title={`Created ${formatDate(goal.createdAt)}`} placement="top">
+                                <Box>
+                                  <Typography variant="caption" color="text.secondary">
+                                    Edited
+                                  </Typography>
+                                  <Typography variant="body2" color="text.secondary" sx={{ cursor: 'help' }}>
+                                    {formatDate(goal.updatedAt)}
+                                  </Typography>
+                                </Box>
+                              </Tooltip>
+                            ) : (
+                              <Box>
+                                <Typography variant="caption" color="text.secondary">
+                                  Created
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  {formatDate(goal.createdAt)}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  ) : (
+                    <Box>
+                      <Stack spacing={0.5}>
+                        {/* Progress header with loading spinner */}
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="caption" color="text.secondary">
+                            Progress
+                          </Typography>
+                          <CircularProgress size={12} thickness={5} />
+                        </Box>
+                        {/* Placeholder for progress bar - same height as real one */}
+                        <Box sx={{ height: 20, bgcolor: 'action.hover', borderRadius: 1 }} />
+                        {/* Placeholder for stats row - same layout as real stats */}
+                        <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Collection Value
+                            </Typography>
+                            <Box sx={{ height: 20, width: 60, bgcolor: 'action.hover', borderRadius: 0.5, mt: 0.25 }} />
+                          </Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Cost to Complete
+                            </Typography>
+                            <Box sx={{ height: 20, width: 60, bgcolor: 'action.hover', borderRadius: 0.5, mt: 0.25 }} />
                           </Box>
                           <Box sx={{ flex: 1, textAlign: 'right' }}>
                             {goal.updatedAt && goal.updatedAt !== goal.createdAt ? (

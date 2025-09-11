@@ -14,13 +14,15 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { GoalsList } from '@/components/goals/GoalsList';
+import { GoalWithHydration } from '@/components/goals/GoalWithHydration';
 import Pagination, { PaginationProps } from '@/components/pagination/Pagination';
 import { usePriceType } from '@/contexts/DisplaySettingsContext';
 import { useGoalsPagination } from '@/hooks/goals/useGoalsPagination';
 import { useAuth } from '@/hooks/useAuth';
+import { Goal } from '@/api/goals/types';
 
 export function GoalsClient() {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
@@ -28,22 +30,46 @@ export function GoalsClient() {
   const [displayPriceType] = usePriceType();
   const { currentPage, pageSize, onPageChange, onPageSizeChange } = useGoalsPagination();
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
+  const [hydratedGoals, setHydratedGoals] = useState<Map<number, Goal>>(new Map());
 
-  const queryArgs = {
+  // First, fetch all goals without progress data (lightweight query)
+  const listQueryArgs = {
     userId: user?.userId ?? 0,
-    includeProgress: true,
+    includeProgress: false,
     priceType: displayPriceType.toLowerCase(),
-    limit: pageSize,
-    offset: (currentPage - 1) * pageSize,
+    limit: 500, // Get all goals for pagination
+    offset: 0,
   };
 
-  const { data, isLoading, error } = useGetUserGoalsQuery(queryArgs, {
+  const { data: listData, isLoading: isListLoading, error: listError } = useGetUserGoalsQuery(listQueryArgs, {
     skip: !user?.userId,
   });
 
-  const goals = data?.data?.goals || [];
-  const totalCount = data?.data?.totalCount || 0;
+  const allGoals = listData?.data?.goals || [];
+  const totalCount = allGoals.length;
   const totalPages = Math.ceil(totalCount / pageSize);
+
+  // Calculate which goals should be visible on current page
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalCount);
+  const visibleGoals = allGoals.slice(startIndex, endIndex);
+
+  // Handle hydration callback
+  const handleGoalHydrated = useCallback((goal: Goal) => {
+    setHydratedGoals(prev => {
+      const newMap = new Map(prev);
+      newMap.set(goal.id, goal);
+      return newMap;
+    });
+  }, []);
+
+  // Start with visible goals, then replace with hydrated versions as they come in
+  const goals = visibleGoals.map(goal => {
+    const hydratedVersion = hydratedGoals.get(goal.id);
+    return hydratedVersion || goal;
+  });
+  const isLoading = isListLoading;
+  const error = listError;
 
   const paginationProps: PaginationProps = {
     contentType: 'cards', // Goals use card-like display
@@ -121,6 +147,17 @@ export function GoalsClient() {
           <Pagination {...paginationProps} />
           <Box sx={{ mt: { xs: 2, sm: 0 } }}>
             <GoalsList goals={goals} userId={user?.userId || 0} />
+            {/* Render hydration components for visible goals */}
+            {visibleGoals.map((goal, index) => (
+              <GoalWithHydration
+                key={`${goal.id}-${currentPage}`}
+                goal={goal}
+                userId={user?.userId || 0}
+                priceType={displayPriceType.toLowerCase()}
+                delay={index * 2000}
+                onHydrated={handleGoalHydrated}
+              />
+            ))}
           </Box>
           <Pagination {...paginationProps} position="bottom" />
         </>
