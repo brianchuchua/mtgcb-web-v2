@@ -49,4 +49,7 @@ export interface SetsSearchResult {
   totalValue?: number;
   // Goal summary (present when goalId provided)
   goalSummary?: GoalSummary;
+  // Goal compilation fields (present when goal needs recompilation)
+  compilationInProgress?: boolean;
+  message?: string;
 }

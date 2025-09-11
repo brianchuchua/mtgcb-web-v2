@@ -31,6 +31,7 @@
 import { useSelector } from 'react-redux';
 import {
   useCardData,
+  useCompilationHandler,
   useDisplaySettings,
   usePaginationSync,
   usePrefetchNextPage,
@@ -105,6 +106,11 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
   // Column sorting helpers
   const sorting = useSort();
 
+  // Compilation handler for goal compilation states
+  const compilationHandler = useCompilationHandler({
+    refetch: currentView === 'cards' ? cardData.refetch : setData.refetch,
+  });
+
   usePrefetchNextPage({
     view: currentView,
     pagination,
@@ -127,6 +133,7 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
         initialLoadComplete,
         selectedGoalId,
         userId: options?.userId,
+        compilationHandler,
       })
     : buildSetPayload({
         currentView: currentView as 'cards' | 'sets',
@@ -142,6 +149,7 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
         includeSubsetsInSets,
         selectedGoalId,
         userId: options?.userId,
+        compilationHandler,
       });
 }
 
@@ -159,7 +167,8 @@ function buildCardPayload({
   initialLoadComplete,
   selectedGoalId,
   userId,
-}: CardPayloadProps) {
+  compilationHandler,
+}: CardPayloadProps & { compilationHandler: any }) {
   const isApiLoading = cardData.isLoading;
   const isInitialLoading = !initialLoadComplete && !cardData.items.length && !cardData.error;
 
@@ -223,7 +232,8 @@ function buildSetPayload({
   sorting,
   initialLoadComplete,
   includeSubsetsInSets,
-}: SetPayloadProps) {
+  compilationHandler,
+}: SetPayloadProps & { compilationHandler: any }) {
   const isApiLoading = setData.isLoading;
   const isInitialLoading = !initialLoadComplete && !setData.items.length && !setData.error;
 

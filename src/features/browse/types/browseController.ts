@@ -120,6 +120,7 @@ export interface CardData {
   error: any;
   apiArgs: any;
   handleCardClick: (cardId: string, cardName?: string) => void;
+  refetch: () => void;
   username?: string;
   collectionSummary?: {
     totalCardsCollected?: number;
@@ -142,6 +143,7 @@ export interface SetData {
   apiArgs: any;
   costToComplete: any;
   handleSetClick: (set: any) => void;
+  refetch: () => void;
   username?: string;
   collectionSummary?: {
     totalCardsCollected?: number;

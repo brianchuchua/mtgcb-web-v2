@@ -83,6 +83,7 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
     data: setsSearchResult,
     isFetching: isLoading,
     error,
+    refetch,
   } = useGetSetsQuery(apiArgs, {
     ...queryConfig,
     skip,
@@ -120,6 +121,7 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
     isLoading,
     error,
     apiArgs,
+    refetch,
     costToComplete: costToCompleteData?.data,
     handleSetClick,
     username: setsSearchResult?.data?.username,

@@ -102,6 +102,9 @@ export interface CardSearchData {
   totalValue?: number;
   // Goal summary (present when goalId provided)
   goalSummary?: GoalSummary;
+  // Goal compilation fields (present when goal needs recompilation)
+  compilationInProgress?: boolean;
+  message?: string;
 }
 
 export interface CardApiParams {

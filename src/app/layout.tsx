@@ -9,7 +9,7 @@ import SnackbarProvider from '@/components/providers/NotistackProvider';
 import ReCaptchaProvider from '@/components/providers/ReCaptchaProvider';
 import ClientLayout from './ClientLayout';
 import { TCGPlayerProvider } from '@/context/TCGPlayerContext';
-import StoreProvider from '@/redux/StoreProvider';
+import StoreProvider from '@/redux/storeProvider';
 import darkTheme from '@/styles/darkTheme';
 import { SessionMessagesProvider } from '@/contexts/SessionMessagesContext';
 

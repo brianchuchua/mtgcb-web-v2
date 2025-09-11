@@ -122,6 +122,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     isLoading,
     isFetching,
     error,
+    refetch,
   } = useGetCardsQuery(apiArgs, {
     ...queryConfig,
     skip,
@@ -168,6 +169,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     error,
     apiArgs,
     handleCardClick,
+    refetch,
     username: cardsSearchResult?.data?.username,
     collectionSummary: cardsSearchResult?.data ? {
       totalCardsCollected: cardsSearchResult.data.totalCardsCollected,

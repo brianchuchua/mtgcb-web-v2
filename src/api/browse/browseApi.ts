@@ -2,6 +2,8 @@ import { CardApiParams, CardSearchData, SetApiParams } from './types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 import { SetsSearchResult } from '@/types/sets';
+import { store } from '@/redux/storeProvider';
+import { setCompilationState } from '@/redux/slices/compilationSlice';
 
 export const browseApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -39,6 +41,28 @@ export const browseApi = mtgcbApi.injectEndpoints({
         }
         return tags;
       },
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          // Check if compilation is in progress
+          if (data?.data?.compilationInProgress) {
+            store.dispatch(setCompilationState({
+              isCompiling: true,
+              message: data.data.message || 'Your collection goal is being updated...',
+              goalId: arg.goalId || null,
+            }));
+          } else if (arg.goalId && store.getState().compilation.isCompiling) {
+            // Compilation completed for this goal
+            store.dispatch(setCompilationState({
+              isCompiling: false,
+              message: null,
+              goalId: null,
+            }));
+          }
+        } catch (error) {
+          // Error handling if needed
+        }
+      },
     }),
 
     getSets: builder.query<ApiResponse<SetsSearchResult>, SetApiParams>({
@@ -64,6 +88,28 @@ export const browseApi = mtgcbApi.injectEndpoints({
           tags.push({ type: 'Sets', id: `user-${arg.userId}` });
         }
         return tags;
+      },
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          // Check if compilation is in progress
+          if (data?.data?.compilationInProgress) {
+            store.dispatch(setCompilationState({
+              isCompiling: true,
+              message: data.data.message || 'Your collection goal is being updated...',
+              goalId: arg.goalId || null,
+            }));
+          } else if (arg.goalId && store.getState().compilation.isCompiling) {
+            // Compilation completed for this goal
+            store.dispatch(setCompilationState({
+              isCompiling: false,
+              message: null,
+              goalId: null,
+            }));
+          }
+        } catch (error) {
+          // Error handling if needed
+        }
       },
     }),
 
