@@ -1,6 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { useMemo } from 'react';
-import { useCallback } from 'react';
+import { useMemo, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
@@ -11,6 +10,8 @@ import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 import { useCardDisplaySettings, useCollectionSettings } from '@/contexts/DisplaySettingsContext';
 import { getCollectionCardUrl } from '@/utils/collectionUrls';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setCompilationState } from '@/redux/slices/compilationSlice';
 
 interface UseCardDataProps {
   searchParams: any;
@@ -117,6 +118,9 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     refetchOnReconnect: false,
   };
 
+  const dispatch = useAppDispatch();
+  const compilationState = useAppSelector((state) => state.compilation);
+
   const {
     data: cardsSearchResult,
     isLoading,
@@ -127,6 +131,30 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     ...queryConfig,
     skip,
   });
+
+  // Handle compilation state detection
+  useEffect(() => {
+    // Don't handle compilation state if this hook is skipped
+    if (skip) return;
+    
+    // Only handle compilation if we actually have a goalId in the request
+    const hasGoalInRequest = selectedGoalId && userId;
+    
+    if (cardsSearchResult?.data?.compilationInProgress) {
+      dispatch(setCompilationState({
+        isCompiling: true,
+        message: cardsSearchResult.data.message || 'Your collection goal is being updated...',
+        goalId: hasGoalInRequest ? selectedGoalId : null,
+      }));
+    } else if (hasGoalInRequest && compilationState.isCompiling && compilationState.goalId === selectedGoalId && cardsSearchResult?.data) {
+      // Only clear if we have a response AND it's not showing compilation
+      dispatch(setCompilationState({
+        isCompiling: false,
+        message: null,
+        goalId: null,
+      }));
+    }
+  }, [cardsSearchResult, selectedGoalId, userId, compilationState.isCompiling, compilationState.goalId, dispatch, skip]);
 
   const items = useMemo(
     () => {

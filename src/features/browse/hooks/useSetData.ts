@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
@@ -9,6 +9,8 @@ import { useSetPriceType } from '@/hooks/useSetPriceType';
 import { Set } from '@/types/sets';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setCompilationState } from '@/redux/slices/compilationSlice';
 
 interface UseSetDataProps {
   searchParams: any;
@@ -79,6 +81,9 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
     refetchOnReconnect: false,
   };
 
+  const dispatch = useAppDispatch();
+  const compilationState = useAppSelector((state) => state.compilation);
+
   const {
     data: setsSearchResult,
     isFetching: isLoading,
@@ -88,6 +93,30 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
     ...queryConfig,
     skip,
   });
+
+  // Handle compilation state detection
+  useEffect(() => {
+    // Don't handle compilation state if this hook is skipped
+    if (skip) return;
+    
+    // Only handle compilation if we actually have a goalId in the request
+    const hasGoalInRequest = selectedGoalId && userId;
+    
+    if (setsSearchResult?.data?.compilationInProgress) {
+      dispatch(setCompilationState({
+        isCompiling: true,
+        message: setsSearchResult.data.message || 'Your collection goal is being updated...',
+        goalId: hasGoalInRequest ? selectedGoalId : null,
+      }));
+    } else if (hasGoalInRequest && compilationState.isCompiling && compilationState.goalId === selectedGoalId && setsSearchResult?.data) {
+      // Only clear if we have a response AND it's not showing compilation
+      dispatch(setCompilationState({
+        isCompiling: false,
+        message: null,
+        goalId: null,
+      }));
+    }
+  }, [setsSearchResult, selectedGoalId, userId, compilationState.isCompiling, compilationState.goalId, dispatch, skip]);
 
   const { data: costToCompleteData } = useGetCostToCompleteQuery(
     {

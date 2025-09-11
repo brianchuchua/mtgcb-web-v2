@@ -11,10 +11,15 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-10',
+      version: '0.115.0',
+      changes: ['Added a loading indicator and auto-retries for goal compilation status'],
+    },
+    {
       date: '2025-09-04',
       version: '0.114.0',
       changes: [
-        'Improved goal loading experience with compilation status modal that explains the 5-10 second optimization process',
+        'Improved goal loading experience with compilation status modal that explains the optimization process',
       ],
     },
     {
