@@ -4,14 +4,14 @@ import { ThemeProvider } from '@mui/material/styles';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import { ReactNode } from 'react';
+import ClientLayout from './ClientLayout';
 import Dashboard from '@/components/layout/Dashboard';
 import SnackbarProvider from '@/components/providers/NotistackProvider';
 import ReCaptchaProvider from '@/components/providers/ReCaptchaProvider';
-import ClientLayout from './ClientLayout';
 import { TCGPlayerProvider } from '@/context/TCGPlayerContext';
-import StoreProvider from '@/redux/storeProvider';
-import darkTheme from '@/styles/darkTheme';
 import { SessionMessagesProvider } from '@/contexts/SessionMessagesContext';
+import StoreProvider from '@/redux/StoreProvider';
+import darkTheme from '@/styles/darkTheme';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
