@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-10',
+      version: '0.115.1',
+      changes: ['Fixed performance issue causing page slowdowns when browsing collections'],
+    },
+    {
+      date: '2025-09-10',
       version: '0.115.0',
       changes: ['Added a loading indicator and auto-retries for goal compilation status'],
     },

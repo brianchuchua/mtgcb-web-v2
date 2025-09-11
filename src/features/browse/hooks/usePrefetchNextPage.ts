@@ -46,22 +46,35 @@ export function usePrefetchNextPage({
 
   // Read RTKQ cache entries directly (no subscription overhead)
   const currentApiArgs = isCardsView ? cardApiArgs : setApiArgs;
-  const currentEntry = useSelector((state: any) => {
-    if (isCardsView) {
-      return browseApi.endpoints.getCards.select(currentApiArgs)(state);
-    } else {
-      return browseApi.endpoints.getSets.select(currentApiArgs)(state);
-    }
-  });
+  
+  // Create memoized selectors to avoid recreation on each render
+  const currentCardsSelector = useMemo(
+    () => (isCardsView ? browseApi.endpoints.getCards.select(currentApiArgs) : null),
+    [isCardsView, currentApiArgs]
+  );
 
-  const nextEntry = useSelector((state: any) => {
-    if (!nextPageApiParams) return undefined;
-    if (isCardsView) {
-      return browseApi.endpoints.getCards.select(nextPageApiParams)(state);
-    } else {
-      return browseApi.endpoints.getSets.select(nextPageApiParams)(state);
-    }
-  });
+  const currentSetsSelector = useMemo(
+    () => (!isCardsView ? browseApi.endpoints.getSets.select(currentApiArgs) : null),
+    [isCardsView, currentApiArgs]
+  );
+
+  const nextCardsSelector = useMemo(
+    () => (isCardsView && nextPageApiParams ? browseApi.endpoints.getCards.select(nextPageApiParams) : null),
+    [isCardsView, nextPageApiParams]
+  );
+
+  const nextSetsSelector = useMemo(
+    () => (!isCardsView && nextPageApiParams ? browseApi.endpoints.getSets.select(nextPageApiParams) : null),
+    [isCardsView, nextPageApiParams]
+  );
+
+  const currentCardsEntry = useSelector((state: any) => currentCardsSelector?.(state));
+  const currentSetsEntry = useSelector((state: any) => currentSetsSelector?.(state));
+  const currentEntry = isCardsView ? currentCardsEntry : currentSetsEntry;
+
+  const nextCardsEntry = useSelector((state: any) => nextCardsSelector?.(state));
+  const nextSetsEntry = useSelector((state: any) => nextSetsSelector?.(state));
+  const nextEntry = isCardsView ? nextCardsEntry : nextSetsEntry;
 
   // Only prefetch when main query is settled (not during invalidation/refetch)
   const mainSettled =
