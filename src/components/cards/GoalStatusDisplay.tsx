@@ -1,5 +1,6 @@
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { CardModel } from '@/api/browse/types';
+import { GoalContributionsPopover } from './GoalContributionsPopover';
 
 interface GoalStatusDisplayProps {
   card: Partial<CardModel> & {
@@ -86,74 +87,29 @@ export function GoalStatusDisplay({ card }: GoalStatusDisplayProps) {
 
   const hasContributingVersions = showAsterisk;
 
-  // Render tooltip content
-  const renderTooltipContent = () => {
-    // Always use filtered list to exclude self-contributions
-    const versionsToShow = otherContributingVersions;
-
-    if (!versionsToShow || versionsToShow.length === 0) return null;
-
-    return (
-      <Box sx={{ p: 1 }}>
-        <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-          Contributions from other sets:
-        </Typography>
-        {versionsToShow.map((version, index) => (
-          <Box key={`${version.cardId}-${index}`} sx={{ mb: 0.5 }}>
-            <Typography variant="body2">
-              {version.setName || `Set ${version.setId}`}:{version.quantityReg > 0 && ` ${version.quantityReg} regular`}
-              {version.quantityReg > 0 && version.quantityFoil > 0 && ','}
-              {version.quantityFoil > 0 && ` ${version.quantityFoil} foil`}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
-    );
-  };
-
   if (!message) return null;
 
-  // If there are contributing versions, wrap in tooltip
+  // If there are contributing versions, show with info icon
   if (hasContributingVersions) {
     return (
-      <Tooltip
-        title={renderTooltipContent()}
-        placement="top"
-        arrow
-        enterDelay={300}
-        componentsProps={{
-          tooltip: {
-            sx: {
-              bgcolor: 'background.paper',
-              color: 'text.primary',
-              boxShadow: 3,
-              border: 1,
-              borderColor: 'divider',
-              '& .MuiTooltip-arrow': {
-                color: 'background.paper',
-                '&::before': {
-                  border: 1,
-                  borderColor: 'divider',
-                },
-              },
-            },
-          },
-        }}
+      <GoalContributionsPopover
+        contributingVersions={otherContributingVersions}
+        isGoalMet={isGoalMet}
+        anchorOriginHorizontal="center"
+        transformOriginHorizontal="center"
+        justifyContent="center"
       >
         <Typography
           variant="caption"
           sx={{
-            display: 'block',
             color: isGoalMet ? 'success.main' : 'warning.main',
             fontWeight: 'medium',
-            textAlign: 'center',
-            cursor: 'help',
+            display: 'inline-block',
           }}
         >
           {message}
-          <span style={{ marginLeft: '2px' }}>*</span>
         </Typography>
-      </Tooltip>
+      </GoalContributionsPopover>
     );
   }
 

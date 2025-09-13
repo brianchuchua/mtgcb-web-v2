@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-13',
+      version: '0.117.0',
+      changes: [
+        'Improved goal contribution tooltips with click-to-open info icons, scrollable content, and better mobile support',
+      ],
+    },
+    {
+      date: '2025-09-13',
       version: '0.116.1',
       changes: [
         'Fixed collection table view card links to navigate to collection-specific card pages instead of browse pages',
