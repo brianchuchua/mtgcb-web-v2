@@ -29,8 +29,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useGetHomeStatisticsQuery } from '@/api/statistics/statisticsApi';
 import { HomeStatisticsData } from '@/api/statistics/types';
-import { useAuth } from '@/hooks/useAuth';
 import { useDisplaySettings } from '@/contexts/DisplaySettingsContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function AuthenticatedHomePageClient() {
   const router = useRouter();
@@ -93,6 +93,11 @@ export default function AuthenticatedHomePageClient() {
       )}
       <StatisticsSection stats={stats} isMobile={isMobile} theme={theme} />
       <QuickWinsSection stats={stats} router={router} isMobile={isMobile} userId={user?.userId || 0} />
+      <Container maxWidth="lg" sx={{ mt: 1, textAlign: 'center' }}>
+        <Typography variant="caption" color="text.secondary">
+          (Statistics update hourly)
+        </Typography>
+      </Container>
     </Box>
   );
 }
