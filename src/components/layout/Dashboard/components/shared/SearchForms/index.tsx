@@ -12,8 +12,8 @@ import GoalSelector from '@/features/browse/GoalSelector';
 export const SearchForms = () => {
   const pathname = usePathname();
   
-  // Auto-expand for Browse and Collection pages
-  const shouldAutoExpand = pathname?.startsWith('/browse') || pathname?.startsWith('/collections');
+  // Auto-expand for Browse, Collection, and Shared Collection pages
+  const shouldAutoExpand = pathname?.startsWith('/browse') || pathname?.startsWith('/collections') || pathname?.startsWith('/shared/');
   
   // Start expanded for browse and collection pages - MUST be called before any returns
   const [isExpanded, setIsExpanded] = useState(shouldAutoExpand);
@@ -41,7 +41,7 @@ export const SearchForms = () => {
   };
 
   // Only render the component if we're on a page that needs a search form
-  if (!pathname?.startsWith('/browse') && !pathname?.startsWith('/collections')) {
+  if (!pathname?.startsWith('/browse') && !pathname?.startsWith('/collections') && !pathname?.startsWith('/shared/')) {
     return null;
   }
   
@@ -59,6 +59,7 @@ export const SearchForms = () => {
   const getFormTitle = () => {
     if (pathname === '/browse') return 'Search Options';
     if (pathname?.startsWith('/collections')) return 'Search Options';
+    if (pathname?.startsWith('/shared/')) return 'Search Options';
     // Add other form titles here as needed
     return 'Search Options';
   };
@@ -98,8 +99,8 @@ export const SearchForms = () => {
       <Divider />
       <Collapse in={isExpanded} timeout="auto">
         <Box sx={{ p: 0 }}>
-          {/* Show BrowseSearchForm on browse and collection pages */}
-          {(pathname?.startsWith('/browse') || pathname?.startsWith('/collections')) && <BrowseSearchForm />}
+          {/* Show BrowseSearchForm on browse, collection, and shared collection pages */}
+          {(pathname?.startsWith('/browse') || pathname?.startsWith('/collections') || pathname?.startsWith('/shared/')) && <BrowseSearchForm />}
           {/* Add other forms here later, like:
             pathname.startsWith('/inventory') && <InventorySearchForm />
             etc...

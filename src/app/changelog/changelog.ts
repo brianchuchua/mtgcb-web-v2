@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-13',
+      version: '0.117.4',
+      changes: ['Fixed search form not showing on shared collection pages'],
+    },
+    {
+      date: '2025-09-13',
       version: '0.117.3',
       changes: ['Fixed several bugs with goals for collecting all printings of specific cards'],
     },
