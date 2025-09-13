@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-13',
+      version: '0.116.1',
+      changes: [
+        'Fixed collection table view card links to navigate to collection-specific card pages instead of browse pages',
+      ],
+    },
+    {
       date: '2025-09-12',
       version: '0.116.0',
       changes: [

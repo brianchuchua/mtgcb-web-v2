@@ -815,7 +815,7 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
 export const useCardRowRenderer = (
   priceType: PriceType,
   displaySettings: CardTableRendererProps['displaySettings'],
-  onCardClick?: (cardId: string) => void,
+  onCardClick?: (cardId: string, cardName?: string) => void,
   isOwnCollection?: boolean,
   goalId?: string,
 ) => {
@@ -843,16 +843,32 @@ export const useCardRowRenderer = (
         onMouseEnter={() => showCardPreview(card)}
         onMouseLeave={hideCardPreview}
       >
-        <Link
-          href={`/browse/cards/${generateCardSlug(card.name)}/${card.id}`}
-          style={{
-            color: 'inherit',
-            textDecoration: 'none',
-          }}
-          onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
-        >
-          <ClickableText>{card.name}</ClickableText>
-        </Link>
+        {userId ? (
+          // In collection context, use onCardClick for proper routing
+          <ClickableText
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onCardClick) {
+                onCardClick(card.id, card.name);
+              }
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            {card.name}
+          </ClickableText>
+        ) : (
+          // In browse context, use direct link
+          <Link
+            href={`/browse/cards/${generateCardSlug(card.name)}/${card.id}`}
+            style={{
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+            onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
+          >
+            <ClickableText>{card.name}</ClickableText>
+          </Link>
+        )}
       </TableCell>,
     );
 
