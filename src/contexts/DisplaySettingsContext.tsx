@@ -114,7 +114,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   setsPageSize: 20,
 
   // Layout settings
-  cardsPerRow: 5,
+  cardsPerRow: 0, // 0 means auto
   cardSizeMargin: 0.75,
   setsPerRow: 0, // 0 means auto
 

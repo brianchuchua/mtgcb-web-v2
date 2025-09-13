@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-13',
+      version: '0.117.2',
+      changes: [
+        'Changed default "Cards per row (desktop only)" setting to auto for responsive layout',
+      ],
+    },
+    {
+      date: '2025-09-13',
       version: '0.117.1',
       changes: [
         'Fixed goal striping background to display consistently across all table cells including card names',
