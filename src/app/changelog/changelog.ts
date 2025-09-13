@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-13',
+      version: '0.117.1',
+      changes: [
+        'Fixed goal striping background to display consistently across all table cells including card names',
+      ],
+    },
+    {
+      date: '2025-09-13',
       version: '0.117.0',
       changes: [
         'Improved goal contribution tooltips with click-to-open info icons, scrollable content, and better mobile support',

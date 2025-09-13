@@ -284,37 +284,23 @@ const StyledTableRow = styled(TableRow, {
 })<{ isIncomplete?: boolean; isOddRow?: boolean }>(({ theme, isIncomplete, isOddRow }) => ({
   transition: 'background-color 0.2s ease, opacity 0.2s ease',
   position: 'relative',
-  overflow: 'hidden',
   ...(isOddRow && {
     backgroundColor: 'rgba(255, 255, 255, 0.03)',
   }),
   ...(isIncomplete && {
     opacity: 0.85,
-    '& td': {
-      position: 'relative',
-      '&:first-of-type::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: '-100vw',
-        bottom: 0,
-        backgroundImage: `repeating-linear-gradient(
-          45deg,
-          transparent,
-          transparent 10px,
-          rgba(255, 152, 0, 0.05) 10px,
-          rgba(255, 152, 0, 0.05) 20px
-        )`,
-        pointerEvents: 'none',
-        zIndex: 1,
-      },
-    },
+    backgroundImage: `repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 152, 0, 0.05) 10px,
+      rgba(255, 152, 0, 0.05) 20px
+    )`,
+    backgroundSize: '28.28px 28.28px',
+    backgroundPosition: '0 0',
+    backgroundAttachment: 'fixed',
     '&:hover': {
       opacity: 1,
-      '& td:first-of-type::before': {
-        opacity: 0.5,
-      },
     },
   }),
 }));
