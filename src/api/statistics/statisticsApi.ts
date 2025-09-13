@@ -15,7 +15,11 @@ export const statisticsApi = mtgcbApi.injectEndpoints({
         method: 'GET',
         params: { priceType },
       }),
-      providesTags: ['Collection'],
+      // Note: This endpoint is computationally heavy, so we cache for 1 hour
+      // and don't invalidate on collection changes. Users can manually refresh
+      // the page to get updated statistics after making collection changes.
+      keepUnusedDataFor: 3600, // 1 hour
+      // providesTags: ['Collection'], // Intentionally removed to prevent auto-invalidation
     }),
   }),
 });
