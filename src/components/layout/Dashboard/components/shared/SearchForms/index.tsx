@@ -26,12 +26,15 @@ export const SearchForms = () => {
     }
   }, [pathname, shouldAutoExpand]);
   
-  // Check if this is a collection card detail page
-  const isCollectionCardPage = pathname?.startsWith('/collections/') && 
-                               pathname?.includes('/cards/') && 
-                               pathname?.split('/').length > 4;
+  // Check if this is a collection or shared card detail page
+  const isCollectionCardPage = (pathname?.startsWith('/collections/') && 
+                                pathname?.includes('/cards/') && 
+                                pathname?.split('/').length > 4) ||
+                               (pathname?.startsWith('/shared/') && 
+                                pathname?.includes('/cards/') && 
+                                pathname?.split('/').length > 4);
   
-  // Don't show on collection card pages (no search options there)
+  // Don't show on card detail pages (no search options there)
   if (isCollectionCardPage) {
     return null;
   }

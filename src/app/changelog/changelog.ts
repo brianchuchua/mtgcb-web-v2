@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-13',
+      version: '0.117.5',
+      changes: ['Fixed search form visibility and selectors on shared collection pages'],
+    },
+    {
+      date: '2025-09-13',
       version: '0.117.4',
       changes: ['Fixed search form not showing on shared collection pages'],
     },
