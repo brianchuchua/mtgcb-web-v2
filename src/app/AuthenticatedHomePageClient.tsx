@@ -30,6 +30,7 @@ import { useEffect, useState } from 'react';
 import { useGetHomeStatisticsQuery } from '@/api/statistics/statisticsApi';
 import { HomeStatisticsData } from '@/api/statistics/types';
 import { useAuth } from '@/hooks/useAuth';
+import { useDisplaySettings } from '@/contexts/DisplaySettingsContext';
 
 export default function AuthenticatedHomePageClient() {
   const router = useRouter();
@@ -37,10 +38,10 @@ export default function AuthenticatedHomePageClient() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { user } = useAuth();
-  const [priceType] = useState<'market' | 'low' | 'average' | 'high'>('market');
+  const { settings } = useDisplaySettings();
   const [isNewUser, setIsNewUser] = useState(false);
 
-  const { data, isLoading, error } = useGetHomeStatisticsQuery({ priceType });
+  const { data, isLoading, error } = useGetHomeStatisticsQuery({ priceType: settings.priceType });
   const stats = data?.success && data.data ? data.data : null;
 
   useEffect(() => {
