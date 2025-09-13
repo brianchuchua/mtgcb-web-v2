@@ -1,6 +1,6 @@
 {
   "name": "mtgcb-web-v2",
-  "version": "0.115.2",
+  "version": "0.116.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -20,6 +20,7 @@
     "@mui/icons-material": "6.3.0",
     "@mui/material": "6.3.0",
     "@mui/material-nextjs": "6.3.0",
+    "@mui/x-charts": "8.11.2",
     "@reduxjs/toolkit": "2.5.0",
     "@sentry/nextjs": "10",
     "@types/node": "22.10.4",

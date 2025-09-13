@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-12',
+      version: '0.116.0',
+      changes: [
+        'Added snazzy new home page dashboard upon login with statistics and charts',
+        'Redirect users to their personalized dashboard after login or registration',
+      ],
+    },
+    {
       date: '2025-09-11',
       version: '0.115.2',
       changes: ['Optimized goals page to load incrementally, reducing server load and improving performance'],

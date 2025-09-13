@@ -17,6 +17,7 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
   Container,
   Divider,
   Grid2 as Grid,
@@ -27,14 +28,37 @@ import {
   useTheme,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useGetPlatformStatisticsQuery } from '@/api/statistics/statisticsApi';
 import { PlatformStatisticsReady } from '@/api/statistics/types';
+import { useAuth } from '@/hooks/useAuth';
+
+const AuthenticatedHomePageClient = dynamic(() => import('./AuthenticatedHomePageClient'), {
+  loading: () => (
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+      <CircularProgress />
+    </Box>
+  ),
+});
 
 export default function HomePageClient() {
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <AuthenticatedHomePageClient />;
+  }
 
   return (
     <Box

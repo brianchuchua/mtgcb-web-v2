@@ -47,11 +47,7 @@ export const ResetCollectionClient = () => {
       if (result.success && result.data) {
         enqueueSnackbar(`Successfully deleted ${result.data.deletedCount} collection entries`, { variant: 'success' });
         setConfirmDialogOpen(false);
-        if (user?.userId) {
-          router.push(`/collections/${user.userId}`);
-        } else {
-          router.push('/');
-        }
+        router.push('/');
       } else {
         enqueueSnackbar('Failed to reset collection', { variant: 'error' });
       }

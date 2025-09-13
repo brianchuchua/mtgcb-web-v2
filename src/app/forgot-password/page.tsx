@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.userId) {
-      router.push(`/collections/${user.userId}`);
+      router.push('/');
     }
   }, [isAuthenticated, user, router, isLoading]);
 

@@ -30,7 +30,7 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.userId) {
-      router.push(`/collections/${user.userId}`);
+      router.push('/');
     }
   }, [isAuthenticated, user, router, isLoading]);
 
@@ -93,9 +93,9 @@ export default function SignUpPage() {
         return;
       }
 
-      // If both succeed, redirect to collection
+      // If both succeed, redirect to home with new user parameter
       if (loginResult.success && loginResult.data?.userId) {
-        router.push(`/collections/${loginResult.data.userId}`);
+        router.push('/?new=true');
       }
     } catch (error: any) {
       const errorData = error.data as ApiResponse<SignUpData | LoginData>;

@@ -32,7 +32,7 @@ export default function LoginPage() {
       if (redirectTo) {
         router.push(decodeURIComponent(redirectTo));
       } else {
-        router.push(`/collections/${user.userId}`);
+        router.push('/');
       }
     }
   }, [isAuthenticated, user, router, isLoading, redirectTo]);
@@ -69,7 +69,7 @@ export default function LoginPage() {
         if (redirectTo) {
           router.push(decodeURIComponent(redirectTo));
         } else {
-          router.push(`/collections/${result.data.userId}`);
+          router.push('/');
         }
       } else if (!result.success) {
         setError('root', {

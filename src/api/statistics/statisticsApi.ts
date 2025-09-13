@@ -1,5 +1,5 @@
 import { mtgcbApi } from '@/api/mtgcbApi';
-import { PlatformStatisticsResponse } from './types';
+import { HomeStatisticsResponse, PlatformStatisticsResponse, PriceType } from './types';
 
 export const statisticsApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -9,7 +9,15 @@ export const statisticsApi = mtgcbApi.injectEndpoints({
         method: 'GET',
       }),
     }),
+    getHomeStatistics: builder.query<HomeStatisticsResponse, { priceType: PriceType }>({
+      query: ({ priceType }) => ({
+        url: '/home/statistics',
+        method: 'GET',
+        params: { priceType },
+      }),
+      providesTags: ['Collection'],
+    }),
   }),
 });
 
-export const { useGetPlatformStatisticsQuery } = statisticsApi;
+export const { useGetPlatformStatisticsQuery, useGetHomeStatisticsQuery } = statisticsApi;
