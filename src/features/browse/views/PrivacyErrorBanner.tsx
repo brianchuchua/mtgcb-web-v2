@@ -22,7 +22,7 @@ const PrivacyErrorBanner: React.FC<PrivacyErrorBannerProps> = ({ username }) => 
         If you're the user, just log in.
       </Typography>
       <Typography color="text.secondary" mt={1}>
-        If you know the user, ask them to set their collection to public.
+        If you know the user, ask them to set their collection to public or share a private link.
       </Typography>
     </ErrorContainer>
   );
