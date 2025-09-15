@@ -18,7 +18,7 @@ import {
   Newspaper as NewsIcon,
   HelpOutline as FAQIcon,
   ContactSupport as ContactIcon,
-  Description as TemplateIcon,
+  Storage as TemplateIcon,
   Analytics as DraftHelperIcon,
   ViewModule,
 } from '@mui/icons-material';

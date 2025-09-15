@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-15',
+      version: '0.118.1',
+      changes: ['Improved homepage formatting'],
+    },
+    {
       date: '2025-09-14',
       version: '0.118.0',
       changes: [

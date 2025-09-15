@@ -2,12 +2,12 @@
 
 import {
   AutoAwesome,
+  BlockOutlined,
   CheckCircle,
   Flag,
   Groups,
   ImportExport,
   LocationOn,
-  Public,
   Speed,
   Storage,
   TrendingUp,
@@ -32,6 +32,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useGetPlatformStatisticsQuery } from '@/api/statistics/statisticsApi';
 import { PlatformStatisticsReady } from '@/api/statistics/types';
+import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
 
 const AuthenticatedHomePageClient = dynamic(() => import('./AuthenticatedHomePageClient'), {
@@ -167,8 +168,7 @@ const HeroContent: React.FC<HeroContentProps> = ({ isMobile, theme, router }) =>
           Track and Complete Your Magic Collection
         </Typography>
         <Typography variant={isMobile ? 'body2' : 'body1'} sx={{ maxWidth: 600, mx: 'auto', opacity: 0.9 }}>
-          Organize your cards, track values, manage physical locations, and easily set and complete your collection
-          goals.
+          Organize your cards, track values, and easily set and complete your collection goals.
         </Typography>
       </Box>
 
@@ -216,14 +216,12 @@ const HeroStats: React.FC<HeroStatsProps> = ({ theme }) => {
     <Stack
       direction={isMobile ? 'column' : 'row'}
       spacing={isMobile ? 2 : 3}
-      sx={{ 
+      sx={{
         mt: 4,
         visibility: stats ? 'visible' : 'hidden',
       }}
       divider={
-        !isMobile ? (
-          <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.3)' }} />
-        ) : undefined
+        !isMobile ? <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.3)' }} /> : undefined
       }
     >
       <Box sx={{ textAlign: isMobile ? 'center' : 'left' }}>
@@ -235,7 +233,7 @@ const HeroStats: React.FC<HeroStatsProps> = ({ theme }) => {
             color: 'success.main',
           }}
         >
-          {stats ? `${stats.totalCardsTracked.toLocaleString()}+` : '71,243,672+'}
+          {stats ? `${stats.totalCardsTracked.toLocaleString()}` : '71,243,672'}
         </Typography>
         <Typography variant={isMobile ? 'body1' : 'body2'}>Cards Tracked</Typography>
       </Box>
@@ -248,7 +246,7 @@ const HeroStats: React.FC<HeroStatsProps> = ({ theme }) => {
             color: 'success.main',
           }}
         >
-          {stats ? `${stats.totalCollectors.toLocaleString()}+` : '54,573+'}
+          {stats ? `${stats.totalCollectors.toLocaleString()}` : '54,573'}
         </Typography>
         <Typography variant={isMobile ? 'body1' : 'body2'}>Collectors</Typography>
       </Box>
@@ -261,7 +259,7 @@ const HeroStats: React.FC<HeroStatsProps> = ({ theme }) => {
             color: 'success.main',
           }}
         >
-          {stats ? `${stats.totalPlatformValue.formattedUsd}+` : '$198,625,973.21+'}
+          {stats ? `$${Math.floor(stats.totalPlatformValue.usd).toLocaleString()}` : '$198,625,973'}
         </Typography>
         <Typography variant={isMobile ? 'body1' : 'body2'}>Total Value Tracked</Typography>
       </Box>
@@ -323,8 +321,9 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({ theme }) => {
             Why Choose MTG CB?
           </Typography>
           <Typography variant="body1" color="text.secondary" paragraph>
-            We've rebuilt everything from the ground up to create the fastest, most feature-rich version so far. No
-            limits, no paywalls, just pure functionality.
+            Honestly, use as many tools and sites that fit your use cases as you want. :) If you want to see progress
+            bars for your collection and track progress toward specific goals, MTG CB may be a good addition to your
+            toolbelt!
           </Typography>
           <Stack spacing={2} sx={{ mt: 3 }}>
             {benefits.map((benefit, index) => (
@@ -348,23 +347,31 @@ const StatsGrid: React.FC = () => {
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, sm: 6 }}>
         <StatsGridBox>
-          <Public fontSize="large" color="primary" />
-          <StatsGridTitle variant="h5" fontWeight="bold">
-            Open Source
-          </StatsGridTitle>
-          <StatsGridDescription variant="body2" color="text.secondary">
-            Transparent development
-          </StatsGridDescription>
-        </StatsGridBox>
-      </Grid>
-      <Grid size={{ xs: 12, sm: 6 }}>
-        <StatsGridBox>
           <AutoAwesome fontSize="large" color="primary" />
           <StatsGridTitle variant="h5" fontWeight="bold">
             It's Free
           </StatsGridTitle>
           <StatsGridDescription variant="body2" color="text.secondary">
             (Like an ornithopter)
+          </StatsGridDescription>
+        </StatsGridBox>
+      </Grid>
+      <Grid size={{ xs: 12, sm: 6 }}>
+        <StatsGridBox>
+          <BlockOutlined fontSize="large" color="primary" />
+          <StatsGridTitle variant="h5" fontWeight="bold">
+            No Annoying Ads
+          </StatsGridTitle>
+          <StatsGridDescription variant="body2" color="text.secondary">
+            Thanks to{' '}
+            <Link
+              href="https://patreon.com/mtgcollectionbuilder"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'inherit', textDecoration: 'underline' }}
+            >
+              Patreon supporters
+            </Link>
           </StatsGridDescription>
         </StatsGridBox>
       </Grid>
@@ -514,18 +521,13 @@ const features = [
     title: 'Binder Templates',
     description: (
       <>
-        <a
-          href="https://drive.google.com/drive/folders/1-4f_ba2kTf4E37CAN_KG6PTIOKnkPaWn?usp=sharing"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: 'inherit', textDecoration: 'underline' }}
-        >
+        <Link href="/binder-templates" style={{ color: 'inherit', textDecoration: 'underline' }}>
           Printable templates
-        </a>{' '}
+        </Link>{' '}
         for three-ring binders, perfect for organizing your collection physically.
       </>
     ),
   },
 ];
 
-const benefits = ['Collection-focused design', 'Community-driven development', 'No annoying ads'];
+const benefits = ["It's free", 'No annoying ads', 'Community-driven development'];
