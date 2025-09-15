@@ -33,9 +33,11 @@ export const Header = () => {
             {isDesktopOpen ? <KeyboardDoubleArrowLeftIcon /> : <MenuIcon />}
           </IconButton>
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'baseline', gap: 1 }}>
-            <Typography variant="h6" component="div">
-              MTG Collection Builder
-            </Typography>
+            <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Typography variant="h6" component="div">
+                MTG Collection Builder
+              </Typography>
+            </Link>
             {latestRelease && (
               <Tooltip title={`Last Updated: ${latestRelease.date}`} arrow>
                 <Link href="/changelog" style={{ textDecoration: 'none' }}>

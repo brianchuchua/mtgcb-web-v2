@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-15',
+      version: '0.118.2',
+      changes: ['Made header title link to home page'],
+    },
+    {
+      date: '2025-09-15',
       version: '0.118.1',
       changes: ['Improved homepage formatting'],
     },

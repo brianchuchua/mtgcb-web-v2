@@ -40,9 +40,11 @@ const Header = () => {
             {isMobileOpen ? <KeyboardDoubleArrowLeftIcon /> : <MenuIcon />}
           </IconButton>
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'baseline', gap: 1 }}>
-            <Typography variant="h6" component="div">
-              MTG CB
-            </Typography>
+            <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Typography variant="h6" component="div">
+                MTG CB
+              </Typography>
+            </Link>
             {latestRelease && (
               <Tooltip title={`Last Updated: ${latestRelease.date}`} arrow>
                 <Link href="/changelog" style={{ textDecoration: 'none' }}>
