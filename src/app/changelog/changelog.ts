@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-15',
+      version: '0.118.3',
+      changes: ['Improved home page loading skeleton to prevent layout shift'],
+    },
+    {
+      date: '2025-09-15',
       version: '0.118.2',
       changes: ['Made header title link to home page'],
     },

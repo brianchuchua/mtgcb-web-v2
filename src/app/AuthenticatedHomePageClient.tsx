@@ -309,13 +309,21 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box sx={{ width: 120, flexShrink: 0 }}>
+                  <Box sx={{ 
+                    width: 120, 
+                    flexShrink: 0,
+                    position: 'relative',
+                    height: 167,
+                    bgcolor: 'action.hover',
+                    borderRadius: 1,
+                  }}>
                     <img
                       src={`https://r2.mtgcollectionbuilder.com/cards/images/normal/${stats.trophyCard.cardId}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`}
                       alt={stats.trophyCard.name}
                       style={{
                         width: '100%',
-                        height: 'auto',
+                        height: '100%',
+                        objectFit: 'cover',
                         borderRadius: stats.trophyCard.setName === 'Limited Edition Alpha' ? '7%' : '5%',
                         display: 'block',
                       }}
@@ -360,13 +368,21 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
                   Most Collected
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box sx={{ width: 120, flexShrink: 0 }}>
+                  <Box sx={{ 
+                    width: 120, 
+                    flexShrink: 0,
+                    position: 'relative',
+                    height: 167,
+                    bgcolor: 'action.hover',
+                    borderRadius: 1,
+                  }}>
                     <img
                       src={`https://r2.mtgcollectionbuilder.com/cards/images/normal/${stats.mostCollectedCard.cardId}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`}
                       alt={stats.mostCollectedCard.name}
                       style={{
                         width: '100%',
-                        height: 'auto',
+                        height: '100%',
+                        objectFit: 'cover',
                         borderRadius: stats.mostCollectedCard.setName === 'Limited Edition Alpha' ? '7%' : '5%',
                         display: 'block',
                       }}
@@ -407,13 +423,21 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
                   Least Valuable Mythic
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box sx={{ width: 120, flexShrink: 0 }}>
+                  <Box sx={{ 
+                    width: 120, 
+                    flexShrink: 0,
+                    position: 'relative',
+                    height: 167,
+                    bgcolor: 'action.hover',
+                    borderRadius: 1,
+                  }}>
                     <img
                       src={`https://r2.mtgcollectionbuilder.com/cards/images/normal/${stats.leastValuableMythic.cardId}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`}
                       alt={stats.leastValuableMythic.name}
                       style={{
                         width: '100%',
-                        height: 'auto',
+                        height: '100%',
+                        objectFit: 'cover',
                         borderRadius: stats.leastValuableMythic.setName === 'Limited Edition Alpha' ? '7%' : '5%',
                         display: 'block',
                       }}
@@ -701,26 +725,201 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
 };
 
 const LoadingState: React.FC<{ isMobile: boolean }> = ({ isMobile }) => {
+  const { user } = useAuth();
+  const router = useRouter();
+  
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Stack spacing={3}>
-        <Skeleton variant="rectangular" height={200} />
-        <Grid container spacing={2}>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <Grid key={i} size={{ xs: 6, sm: 4, md: 3 }}>
-              <Skeleton variant="rectangular" height={48} />
-            </Grid>
-          ))}
-        </Grid>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pb: 4 }}>
+      <Container maxWidth="lg" sx={{ pt: 4, pb: 2 }}>
+        <Stack spacing={3}>
+          <Box>
+            <Typography variant={isMobile ? 'h5' : 'h4'} fontWeight="bold">
+              Welcome back, {user?.username}!
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Here's your collection overview
+            </Typography>
+          </Box>
+          <Grid container spacing={2}>
+            {[
+              { width: '40%', label: 'Collection Value' },
+              { width: '30%', label: 'Total Cards Collected' },
+              { width: '35%', label: 'Unique Printings Collected' },
+              { width: '25%', label: 'of All Magic Cards Collected' },
+            ].map((item, i) => (
+              <Grid key={i} size={{ xs: 12, sm: 6, md: 3 }}>
+                <Card sx={{ height: '100%' }}>
+                  <CardContent sx={{ textAlign: 'center' }}>
+                    <Typography variant="h4" fontWeight="bold" color="primary.main">
+                      <Skeleton variant="text" width={item.width} sx={{ mx: 'auto' }} />
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      {item.label}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Stack>
+      </Container>
+      
+      <Container maxWidth="lg" sx={{ mb: 4 }}>
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
+          Quick Actions
+        </Typography>
         <Grid container spacing={3}>
-          {[1, 2, 3, 4].map((i) => (
+          <Grid size={{ xs: 12, md: 4 }}>
+            <ActionCard onClick={() => router.push(`/collections/${user?.userId}`)}>
+              <LibraryIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                View My Collection
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Browse your entire collection, track values, and monitor your progress
+              </Typography>
+            </ActionCard>
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <ActionCard onClick={() => router.push('/collections/edit-cards')}>
+              <IsoIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Add or Remove Cards
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Quickly update card quantities in your collection with our dedicated editor
+              </Typography>
+            </ActionCard>
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <ActionCard onClick={() => router.push('/browse')}>
+              <DashboardIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                Browse Magic Cards
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Explore all Magic cards and sets with advanced search and filters
+              </Typography>
+            </ActionCard>
+          </Grid>
+        </Grid>
+      </Container>
+      
+      <Container maxWidth="lg" sx={{ mb: 4 }}>
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
+          Collection Statistics
+        </Typography>
+        <Grid container spacing={3}>
+          {[
+            { Component: TrophyCard, icon: <AutoAwesome color="warning" />, title: 'Most Valuable Card' },
+            { Component: MostCollectedCard, icon: null, title: 'Most Collected' },
+            { Component: LeastValuableCard, icon: null, title: 'Least Valuable Mythic' },
+          ].map((item, i) => {
+            const CardComponent = item.Component;
+            return (
+              <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
+                <CardComponent sx={{ height: '100%' }}>
+                  <CardContent sx={{ p: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                      {item.icon && item.icon}
+                      <Typography variant="h6" fontWeight="bold">
+                        {item.title}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                      <Skeleton variant="rectangular" width={120} height={167} sx={{ borderRadius: 1 }} />
+                      <Stack spacing={1} sx={{ flex: 1 }}>
+                        <Skeleton variant="text" width="80%" />
+                        <Skeleton variant="text" width="60%" />
+                        <Skeleton variant="text" width="40%" sx={{ fontSize: '1.5rem' }} />
+                      </Stack>
+                    </Box>
+                  </CardContent>
+                </CardComponent>
+              </Grid>
+            );
+          })}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <StatsCard>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Money vs Bulk Card Quantity
+                </Typography>
+                <Box sx={{ height: isMobile ? 250 : 350 }}>
+                  <Skeleton variant="rectangular" width="100%" height="100%" />
+                </Box>
+              </CardContent>
+            </StatsCard>
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <StatsCard>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Money vs Bulk Card Value
+                </Typography>
+                <Box sx={{ height: isMobile ? 250 : 350 }}>
+                  <Skeleton variant="rectangular" width="100%" height="100%" />
+                </Box>
+              </CardContent>
+            </StatsCard>
+          </Grid>
+        </Grid>
+      </Container>
+      
+      <Container maxWidth="lg">
+        <Typography variant="h5" fontWeight="bold" gutterBottom>
+          Quick Wins
+        </Typography>
+        <Grid container spacing={3}>
+          {['Closest Set to Complete', 'Second Closest Set to Complete'].map((title, i) => (
             <Grid key={i} size={{ xs: 12, md: 6 }}>
-              <Skeleton variant="rectangular" height={300} />
+              <QuickWinCard>
+                <CardContent>
+                  <Stack spacing={2}>
+                    <Typography variant="h6" fontWeight="bold">
+                      {title}
+                    </Typography>
+                    <Box>
+                      <Typography variant="body1" fontWeight="bold">
+                        <Skeleton variant="text" width="70%" />
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        <Skeleton variant="text" width="40%" />
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Typography variant="h4" color="primary.main" fontWeight="bold">
+                          <Skeleton variant="text" width={60} />
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Complete
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'right' }}>
+                        <Typography variant="h5" color="success.main" fontWeight="bold">
+                          <Skeleton variant="text" width={80} />
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          To Complete
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Skeleton variant="rectangular" height={36.5} sx={{ borderRadius: 1 }} />
+                  </Stack>
+                </CardContent>
+              </QuickWinCard>
             </Grid>
           ))}
         </Grid>
-      </Stack>
-    </Container>
+      </Container>
+      
+      <Container maxWidth="lg" sx={{ mt: 1, textAlign: 'center' }}>
+        <Typography variant="caption" color="text.secondary">
+          (Statistics update hourly)
+        </Typography>
+      </Container>
+    </Box>
   );
 };
 
