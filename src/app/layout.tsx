@@ -35,6 +35,7 @@ export default function RootLayout({
       <head>
         <link href="//cdn.jsdelivr.net/npm/mana-font@latest/css/mana.css" rel="stylesheet" type="text/css" />
         <link href="//cdn.jsdelivr.net/npm/keyrune@latest/css/keyrune.css" rel="stylesheet" type="text/css" />
+        <meta name="apple-mobile-web-app-title" content="MTG CB" />
       </head>
       <body className={roboto.variable}>
         <AppRouterCacheProvider>
