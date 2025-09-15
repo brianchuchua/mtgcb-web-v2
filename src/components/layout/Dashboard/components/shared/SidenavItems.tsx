@@ -14,6 +14,13 @@ import {
   Timeline as TimelineIcon,
   DeleteForever as ResetIcon,
   Tune as TuneIcon,
+  Article as ArticleIcon,
+  Newspaper as NewsIcon,
+  HelpOutline as FAQIcon,
+  ContactSupport as ContactIcon,
+  Description as TemplateIcon,
+  Analytics as DraftHelperIcon,
+  ViewModule,
 } from '@mui/icons-material';
 import { AutoStories as BinderIcon } from '@mui/icons-material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -47,6 +54,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
   const { isAuthenticated, user } = useAuth();
   const { isMainSectionExpanded, setMainSectionExpanded } = useDashboardContext();
   const [isCollectionMenuOpen, setIsCollectionMenuOpen] = useState(false);
+  const [isResourcesMenuOpen, setIsResourcesMenuOpen] = useState(false);
 
   const toggleNavExpanded = () => {
     setMainSectionExpanded(!isMainSectionExpanded);
@@ -58,13 +66,26 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
     }
   };
 
+  const handleHomeClick = () => {
+    setIsCollectionMenuOpen(false);
+    setIsResourcesMenuOpen(false);
+    handleClick();
+  };
+
   const handleCollectionClick = () => {
     setIsCollectionMenuOpen(false);
+    setIsResourcesMenuOpen(false);
     handleClick();
   };
 
   const handleBrowseClick = () => {
     setIsCollectionMenuOpen(false);
+    setIsResourcesMenuOpen(false);
+    handleClick();
+  };
+
+  const handleResourceClick = () => {
+    // Don't close the menu when clicking items inside it
     handleClick();
   };
 
@@ -78,8 +99,21 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
       pathname === '/import' ||
       pathname === '/reset-collection';
 
+    const isOnResourcesPage =
+      pathname === '/news' ||
+      pathname === '/changelog' ||
+      pathname === '/faq' ||
+      pathname === '/contact' ||
+      pathname === '/binder-templates' ||
+      pathname === '/draft-helper' ||
+      pathname === '/draft-cubes';
+
     if (isOnCollectionPage && isAuthenticated && user?.userId) {
       setIsCollectionMenuOpen(true);
+    }
+    
+    if (isOnResourcesPage) {
+      setIsResourcesMenuOpen(true);
     }
   }, [pathname, isAuthenticated, user?.userId]);
 
@@ -122,7 +156,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
         <Collapse in={isMainSectionExpanded} timeout="auto">
           <List disablePadding>
             <ListItem disablePadding>
-              <ListItemButton component={Link} href="/" selected={pathname === '/'} onClick={handleClick}>
+              <ListItemButton component={Link} href="/" selected={pathname === '/'} onClick={handleHomeClick}>
                 <ListItemIcon>
                   <HomeIcon />
                 </ListItemIcon>
@@ -291,25 +325,139 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
             )}
 
             <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => setIsResourcesMenuOpen(!isResourcesMenuOpen)}
+                selected={
+                  pathname === '/news' ||
+                  pathname === '/changelog' ||
+                  pathname === '/faq' ||
+                  pathname === '/contact' ||
+                  pathname === '/binder-templates' ||
+                  pathname === '/draft-helper' ||
+                  pathname === '/draft-cubes'
+                }
+              >
+                <ListItemIcon>
+                  <ArticleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Resources" />
+                {isResourcesMenuOpen ? (
+                  <ExpandLessIcon sx={{ mr: '5px' }} />
+                ) : (
+                  <ExpandMoreIcon sx={{ mr: '5px' }} />
+                )}
+              </ListItemButton>
+            </ListItem>
+
+            <Collapse in={isResourcesMenuOpen} timeout="auto">
+              <List component="div" disablePadding>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/news"
+                    selected={pathname === '/news'}
+                    onClick={handleResourceClick}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemIcon>
+                      <NewsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="News" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/changelog"
+                    selected={pathname === '/changelog'}
+                    onClick={handleResourceClick}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemIcon>
+                      <TimelineIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Changelog" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/faq"
+                    selected={pathname === '/faq'}
+                    onClick={handleResourceClick}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemIcon>
+                      <FAQIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="FAQ" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/contact"
+                    selected={pathname === '/contact'}
+                    onClick={handleResourceClick}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemIcon>
+                      <ContactIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Contact" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/binder-templates"
+                    selected={pathname === '/binder-templates'}
+                    onClick={handleResourceClick}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemIcon>
+                      <TemplateIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Binder Templates" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/draft-helper"
+                    selected={pathname === '/draft-helper'}
+                    onClick={handleResourceClick}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemIcon>
+                      <DraftHelperIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Draft Helper" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/draft-cubes"
+                    selected={pathname === '/draft-cubes'}
+                    onClick={handleResourceClick}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemIcon>
+                      <ViewModule />
+                    </ListItemIcon>
+                    <ListItemText primary="Draft Cubes" />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </Collapse>
+
+            <ListItem disablePadding>
               <ListItemButton disabled>
                 <ListItemIcon>
                   <FavoriteIcon />
                 </ListItemIcon>
                 <ListItemText primary="Patrons (In Development)" />
-              </ListItemButton>
-            </ListItem>
-
-            <ListItem disablePadding>
-              <ListItemButton
-                component={Link}
-                href="/changelog"
-                selected={pathname === '/changelog'}
-                onClick={handleClick}
-              >
-                <ListItemIcon>
-                  <TimelineIcon />
-                </ListItemIcon>
-                <ListItemText primary="Changelog" />
               </ListItemButton>
             </ListItem>
           </List>

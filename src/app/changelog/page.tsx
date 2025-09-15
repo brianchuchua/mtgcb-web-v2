@@ -1,8 +1,11 @@
 'use client';
 
-import { Box, Typography, Paper, Chip, Divider } from '@mui/material';
+import { Box, Typography, Paper, Chip, Divider, Pagination } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { useState } from 'react';
 import changelogData from './changelog';
+
+const ITEMS_PER_PAGE = 10;
 
 const VersionChip = styled(Chip)(({ theme }) => ({
   fontWeight: 600,
@@ -33,14 +36,26 @@ const formatDate = (dateString: string) => {
 };
 
 export default function ChangelogPage() {
+  const [page, setPage] = useState(1);
+  
+  const totalPages = Math.ceil(changelogData.releases.length / ITEMS_PER_PAGE);
+  const startIndex = (page - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedReleases = changelogData.releases.slice(startIndex, endIndex);
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
+    <Box sx={{ p: 3, maxWidth: 900, mx: 'auto' }}>
       <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700, mb: 4 }}>
         Changelog
       </Typography>
       
-      {changelogData.releases.map((release, index) => (
-        <Paper key={index} elevation={0} sx={{ p: 3, mb: 3 }}>
+      {paginatedReleases.map((release, index) => (
+        <Paper key={startIndex + index} elevation={0} sx={{ p: 3, mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
               {formatDate(release.date)}
@@ -61,6 +76,20 @@ export default function ChangelogPage() {
           </Box>
         </Paper>
       ))}
+      
+      {totalPages > 1 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
+          <Pagination 
+            count={totalPages} 
+            page={page} 
+            onChange={handlePageChange}
+            color="primary"
+            size="large"
+            showFirstButton
+            showLastButton
+          />
+        </Box>
+      )}
     </Box>
   );
 }

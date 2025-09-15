@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-14',
+      version: '0.118.0',
+      changes: [
+        'Added Resources section to sidenav with News, FAQ, Contact, Binder Templates, Draft Helper, and Draft Cubes pages',
+      ],
+    },
+    {
       date: '2025-09-13',
       version: '0.117.5',
       changes: ['Fixed search form visibility and selectors on shared collection pages'],
