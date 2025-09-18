@@ -91,6 +91,12 @@ interface DisplaySettings {
 
   // Set progress bar style
   setProgressBarStyle: 'radial' | 'linear';
+
+  // Collection progress bar style
+  progressBarStyle: 'mythic' | 'boring' | 'boring-green';
+
+  // Set icon style
+  setIconStyle: 'mythic' | 'boring';
 }
 
 interface DisplaySettingsContextType {
@@ -188,6 +194,12 @@ const DEFAULT_SETTINGS: DisplaySettings = {
 
   // Set progress bar style
   setProgressBarStyle: 'linear',
+
+  // Collection progress bar style
+  progressBarStyle: 'mythic',
+
+  // Set icon style
+  setIconStyle: 'mythic',
 };
 
 const STORAGE_KEY = 'mtgcb-display-settings';
@@ -419,4 +431,14 @@ export function usePreferredSetViewMode(): ['grid' | 'table', (value: 'grid' | '
 export function useSetProgressBarStyle(): ['radial' | 'linear', (value: 'radial' | 'linear') => void] {
   const { settings, updateSetting } = useDisplaySettings();
   return [settings.setProgressBarStyle, (value) => updateSetting('setProgressBarStyle', value)];
+}
+
+export function useProgressBarStyle(): ['mythic' | 'boring' | 'boring-green', (value: 'mythic' | 'boring' | 'boring-green') => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.progressBarStyle, (value) => updateSetting('progressBarStyle', value)];
+}
+
+export function useSetIconStyle(): ['mythic' | 'boring', (value: 'mythic' | 'boring') => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.setIconStyle, (value) => updateSetting('setIconStyle', value)];
 }

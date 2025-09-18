@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-18',
+      version: '0.119.0',
+      changes: ['Added customizable style settings for progress bars and set icons in account page'],
+    },
+    {
       date: '2025-09-15',
       version: '0.118.3',
       changes: ['Improved home page loading skeleton to prevent layout shift'],

@@ -1,6 +1,7 @@
 import { Box, LinearProgress, Typography, keyframes } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
+import { useProgressBarStyle } from '@/contexts/DisplaySettingsContext';
 
 // Animation for completed collection - sliding gradient
 const slideGradientAnimation = keyframes`
@@ -27,6 +28,7 @@ interface CollectionProgressBarProps {
 interface StyledProgressProps {
   percentage: number;
   height: number;
+  progressBarStyle: 'mythic' | 'boring' | 'boring-green';
 }
 
 const ProgressBarContainer = styled(Box, {
@@ -39,18 +41,22 @@ const ProgressBarContainer = styled(Box, {
 }));
 
 const StyledLinearProgress = styled(LinearProgress, {
-  shouldForwardProp: (prop) => !['percentage', 'height'].includes(prop as string),
-})<StyledProgressProps>(({ theme, percentage, height }) => ({
+  shouldForwardProp: (prop) => !['percentage', 'height', 'progressBarStyle'].includes(prop as string),
+})<StyledProgressProps>(({ theme, percentage, height, progressBarStyle }) => ({
   height: height,
   borderRadius: height / 2,
   backgroundColor: theme.palette.action.hover,
   '& .MuiLinearProgress-bar': {
     background:
-      percentage === 100
+      progressBarStyle === 'boring'
+        ? 'linear-gradient(45deg, #90CAF9 0%, #1976D2 100%)'
+        : progressBarStyle === 'boring-green'
+        ? 'linear-gradient(45deg, #66BB6A 0%, #388E3C 100%)'
+        : percentage === 100
         ? 'linear-gradient(270deg, #BF4427 0%, #E85D39 25%, #FFB347 50%, #E85D39 75%, #BF4427 100%)'
         : 'linear-gradient(45deg, #90CAF9 0%, #1976D2 100%)',
-    backgroundSize: percentage === 100 ? '200% 200%' : 'auto',
-    animation: percentage === 100 ? `${slideGradientAnimation} 6s ease-in-out infinite` : 'none',
+    backgroundSize: progressBarStyle === 'mythic' && percentage === 100 ? '200% 200%' : 'auto',
+    animation: progressBarStyle === 'mythic' && percentage === 100 ? `${slideGradientAnimation} 6s ease-in-out infinite` : 'none',
     borderRadius: height / 2,
   },
 }));
@@ -78,6 +84,7 @@ export const CollectionProgressBar: React.FC<CollectionProgressBarProps> = ({
   maxWidth,
   minWidth,
 }) => {
+  const [progressBarStyle] = useProgressBarStyle();
   const roundedPercentage = Math.round(percentage);
   const labelText = labelFormat === 'long' ? `${roundedPercentage}% collected` : `${roundedPercentage}%`;
 
@@ -88,6 +95,7 @@ export const CollectionProgressBar: React.FC<CollectionProgressBarProps> = ({
         value={percentage}
         percentage={percentage}
         height={height}
+        progressBarStyle={progressBarStyle}
       />
       {showLabel && (
         <ProgressLabel height={height}>

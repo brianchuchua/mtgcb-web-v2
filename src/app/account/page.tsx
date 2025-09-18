@@ -1,22 +1,35 @@
 'use client';
 
-import { Alert, Box, Container, FormControlLabel, MenuItem, Paper, Select, Switch, TextField, Typography } from '@mui/material';
+import { DeleteForever as DeleteIcon, WarningAmber as WarningIcon } from '@mui/icons-material';
+import {
+  Alert,
+  Box,
+  Container,
+  FormControlLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Switch,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { WarningAmber as WarningIcon, DeleteForever as DeleteIcon } from '@mui/icons-material';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRouter } from 'next/navigation';
-import { useUpdateUserMutation } from '@/api/user/userApi';
 import { useDeleteAccountMutation } from '@/api/auth/authApi';
-import { withAuth } from '@/components/auth/withAuth';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/hooks/useAuth';
+import { useUpdateUserMutation } from '@/api/user/userApi';
+import { AccessSummary } from '@/components/account/AccessSummary';
 import { DeleteAccountDialog } from '@/components/account/DeleteAccountDialog';
 import { ShareLinkManager } from '@/components/account/ShareLinkManager';
-import { AccessSummary } from '@/components/account/AccessSummary';
-import { usePriceType } from '@/contexts/DisplaySettingsContext';
+import { withAuth } from '@/components/auth/withAuth';
+import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
+import SetIcon from '@/components/sets/SetIcon';
+import { Button } from '@/components/ui/button';
+import { usePriceType, useProgressBarStyle, useSetIconStyle } from '@/contexts/DisplaySettingsContext';
+import { useAuth } from '@/hooks/useAuth';
 import { PriceType } from '@/types/pricing';
 
 interface ProfileFormData {
@@ -38,6 +51,8 @@ function ProfileContent() {
   const [hasProfileChanges, setHasProfileChanges] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [priceType, setPriceType] = usePriceType();
+  const [progressBarStyle, setProgressBarStyle] = useProgressBarStyle();
+  const [setIconStyle, setSetIconStyle] = useSetIconStyle();
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
 
   const {
@@ -68,9 +83,7 @@ function ProfileContent() {
 
   // Track profile form changes (excluding isPublic since it auto-saves)
   useEffect(() => {
-    const hasChanges =
-      profileValues.username !== user?.username ||
-      profileValues.email !== user?.email;
+    const hasChanges = profileValues.username !== user?.username || profileValues.email !== user?.email;
     setHasProfileChanges(hasChanges);
   }, [profileValues.username, profileValues.email, user]);
 
@@ -125,11 +138,11 @@ function ProfileContent() {
     setIsUpdatingPrivacy(true);
     try {
       const result = await updateUser({ isPublic }).unwrap();
-      
+
       if (!result.success) {
         throw new Error(result.error?.message);
       }
-      
+
       enqueueSnackbar('Privacy settings updated successfully', { variant: 'success' });
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to update privacy settings';
@@ -142,7 +155,7 @@ function ProfileContent() {
   const handleDeleteAccount = async () => {
     try {
       const result = await deleteAccount().unwrap();
-      
+
       if (result.success) {
         enqueueSnackbar('Your account has been permanently deleted', { variant: 'success' });
         setDeleteDialogOpen(false);
@@ -208,7 +221,6 @@ function ProfileContent() {
               error={!!profileErrors.email}
               helperText={profileErrors.email?.message}
             />
-
 
             <ButtonWrapper>
               <Button
@@ -282,8 +294,8 @@ function ProfileContent() {
             <Box>
               <FormControlLabel
                 control={
-                  <Switch 
-                    checked={user?.isPublic || false} 
+                  <Switch
+                    checked={user?.isPublic || false}
                     onChange={(e) => handlePrivacyToggle(e.target.checked)}
                     disabled={isUpdatingPrivacy}
                   />
@@ -294,12 +306,10 @@ function ProfileContent() {
                 When enabled, your collection is visible at its public URL that anyone can access.
               </Typography>
             </Box>
-            
+
             <AccessSummary isPublic={user?.isPublic || false} />
-            
-            {!user?.isPublic && (
-              <ShareLinkManager />
-            )}
+
+            {!user?.isPublic && <ShareLinkManager />}
           </CardContent>
         </Paper>
 
@@ -327,6 +337,162 @@ function ProfileContent() {
 
         <Paper variant="outlined">
           <CardHeader>
+            <Typography variant="h6">Progress Bar Style</Typography>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Choose how progress bars appear throughout the site. This setting is saved on your device.
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                alignItems: { xs: 'stretch', md: 'flex-start' },
+                gap: 3,
+              }}
+            >
+              <Box sx={{ minWidth: { xs: '100%', md: 200 } }}>
+                <Select
+                  value={progressBarStyle}
+                  onChange={(e) => setProgressBarStyle(e.target.value as 'mythic' | 'boring' | 'boring-green')}
+                  fullWidth
+                >
+                  <MenuItem value="mythic">Going Mythic</MenuItem>
+                  <MenuItem value="boring">Boring</MenuItem>
+                  <MenuItem value="boring-green">Boring Green</MenuItem>
+                </Select>
+                <Box sx={{ mt: 2 }}>
+                  {progressBarStyle === 'mythic' && (
+                    <Typography variant="body2" color="text.secondary">
+                      Progress bars turn mythic orange and animate when full
+                    </Typography>
+                  )}
+                  {progressBarStyle === 'boring' && (
+                    <Typography variant="body2" color="text.secondary">
+                      Progress bars keep the same theme color always and don't animate
+                    </Typography>
+                  )}
+                  {progressBarStyle === 'boring-green' && (
+                    <Typography variant="body2" color="text.secondary">
+                      Progress bars use green always instead of the theme color and don't animate
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                  mt: { xs: 2, md: 0 },
+                }}
+              >
+                <Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    75% Complete
+                  </Typography>
+                  <CollectionProgressBar
+                    percentage={75}
+                    height={20}
+                    showLabel={true}
+                    maxWidth={300}
+                  />
+                </Box>
+                <Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    100% Complete
+                  </Typography>
+                  <CollectionProgressBar
+                    percentage={100}
+                    height={20}
+                    showLabel={true}
+                    maxWidth={300}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          </CardContent>
+        </Paper>
+
+        <Paper variant="outlined">
+          <CardHeader>
+            <Typography variant="h6">Set Icon Style</Typography>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Choose how set icons change color based on collection progress. This setting is saved on your device.
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                alignItems: { xs: 'stretch', md: 'flex-start' },
+                gap: 3,
+              }}
+            >
+              <Box sx={{ minWidth: { xs: '100%', md: 200 } }}>
+                <Select
+                  value={setIconStyle}
+                  onChange={(e) => setSetIconStyle(e.target.value as 'mythic' | 'boring')}
+                  fullWidth
+                >
+                  <MenuItem value="mythic">Going Mythic</MenuItem>
+                  <MenuItem value="boring">Boring</MenuItem>
+                </Select>
+                <Box sx={{ mt: 2 }}>
+                  {setIconStyle === 'mythic' && (
+                    <Typography variant="body2" color="text.secondary">
+                      Set icons move through rarity colors as progress in a set increases
+                    </Typography>
+                  )}
+                  {setIconStyle === 'boring' && (
+                    <Typography variant="body2" color="text.secondary">
+                      Set icons stay the default color and never change based on progress
+                    </Typography>
+                  )}
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                  mt: { xs: 2, md: 0 },
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <SetIcon code="LGN" size="2x" rarity="common" />
+                  <Typography variant="body2" color="text.secondary">
+                    0-33% Complete (Common)
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <SetIcon code="LGN" size="2x" rarity="uncommon" />
+                  <Typography variant="body2" color="text.secondary">
+                    34-66% Complete (Uncommon)
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <SetIcon code="LGN" size="2x" rarity="rare" />
+                  <Typography variant="body2" color="text.secondary">
+                    67-99% Complete (Rare)
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <SetIcon code="LGN" size="2x" rarity="mythic" />
+                  <Typography variant="body2" color="text.secondary">
+                    100% Complete (Mythic)
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          </CardContent>
+        </Paper>
+
+        <Paper variant="outlined">
+          <CardHeader>
             <Typography variant="h6">Patreon</Typography>
           </CardHeader>
           <CardContent>
@@ -343,12 +509,12 @@ function ProfileContent() {
         <Paper variant="outlined">
           <CardHeader>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <WarningIcon 
-                sx={{ 
+              <WarningIcon
+                sx={{
                   color: (theme) => theme.palette.error.main,
                   fontSize: 28,
-                  mr: 1
-                }} 
+                  mr: 1,
+                }}
               />
               <Typography variant="h6" sx={{ color: 'error.main' }}>
                 Danger Zone - Delete Account
@@ -361,9 +527,9 @@ function ProfileContent() {
                 Permanently delete your account
               </Typography>
               <Typography variant="body2">
-                Once you delete your account, there is no going back. All your data will be permanently removed.
-                This includes your entire collection, locations, goals, and all personal information.
-                Consider <Link href="/export">exporting your collection</Link> first to create a backup of your data.
+                Once you delete your account, there is no going back. All your data will be permanently removed. This
+                includes your entire collection, locations, goals, and all personal information. Consider{' '}
+                <Link href="/export">exporting your collection</Link> first to create a backup of your data.
               </Typography>
             </Alert>
 

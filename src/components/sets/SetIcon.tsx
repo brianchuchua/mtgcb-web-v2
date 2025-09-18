@@ -2,6 +2,7 @@
 
 import Box from '@mui/material/Box';
 import React from 'react';
+import { useSetIconStyle } from '@/contexts/DisplaySettingsContext';
 
 export type SetIconSize = '1x' | '2x' | '3x' | '4x' | '5x' | '6x' | '7x' | '10x' | 'lg';
 
@@ -35,22 +36,27 @@ const SetIcon: React.FC<SetIconProps> = ({
   className = '',
   style = {},
 }) => {
+  const [setIconStyle] = useSetIconStyle();
+
   // Ensure code is lowercase as the keyrune CSS uses lowercase codes
   const normalizedCode = code.toLowerCase();
+
+  // Apply rarity only if style is 'mythic', otherwise always use 'common'
+  const effectiveRarity = setIconStyle === 'mythic' ? rarity : 'common';
 
   // Build the CSS class string
   const classes = [
     'ss',
     `ss-${normalizedCode}`,
     `ss-${size}`,
-    ...(rarity ? [`ss-${rarity}`] : []),
-    ...(rarity && rarity !== 'common' ? ['ss-grad'] : []),
+    ...(effectiveRarity ? [`ss-${effectiveRarity}`] : []),
+    ...(effectiveRarity && effectiveRarity !== 'common' ? ['ss-grad'] : []),
     ...(fixedWidth ? ['ss-fw'] : []),
     className,
   ].join(' ');
 
   // Simulates a 1px white stroke around the icon (only for common rarity)
-  const shadowStyle = border && rarity === 'common'
+  const shadowStyle = border && effectiveRarity === 'common'
     ? {
         textShadow:
           'rgb(255, 255, 255) -1px -1px 0px, rgb(255, 255, 255) 1px -1px 0px, rgb(255, 255, 255) -1px 1px 0px, rgb(255, 255, 255) 1px 1px 0px',
