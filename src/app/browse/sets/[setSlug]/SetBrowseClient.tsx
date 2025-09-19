@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { Box, Button, Typography } from '@mui/material';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SubsetSection from './SubsetSection';
@@ -16,7 +17,7 @@ import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
-import { selectCardSearchParams, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
+import { resetSearch, selectCardSearchParams, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
 import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
@@ -144,6 +145,10 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   }
 
   if (!set && !isSetLoading) {
+    const handleResetSearch = () => {
+      dispatch(resetSearch());
+    };
+
     return (
       <Box>
         <Breadcrumbs
@@ -157,6 +162,11 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
         <InfoBanner
           title="Set not found or no cards found in it matching your criteria"
           message="The requested set might not exist, or there are no cards that match your current filter settings."
+          action={
+            <Button variant="outlined" startIcon={<RestartAltIcon />} onClick={handleResetSearch}>
+              Reset Search
+            </Button>
+          }
         />
       </Box>
     );

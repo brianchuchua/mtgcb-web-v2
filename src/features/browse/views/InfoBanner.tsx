@@ -7,9 +7,10 @@ import React from 'react';
 interface InfoBannerProps {
   title: string;
   message?: string;
+  action?: React.ReactNode;
 }
 
-const InfoBanner: React.FC<InfoBannerProps> = ({ title, message }) => {
+const InfoBanner: React.FC<InfoBannerProps> = ({ title, message, action }) => {
   return (
     <InfoContainer mb={3}>
       <InfoIcon />
@@ -17,6 +18,7 @@ const InfoBanner: React.FC<InfoBannerProps> = ({ title, message }) => {
         {title}
       </InfoTitle>
       {message && <Typography color="text.primary">{message}</Typography>}
+      {action && <Box sx={{ mt: 2 }}>{action}</Box>}
     </InfoContainer>
   );
 };

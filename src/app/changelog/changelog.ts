@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-18',
+      version: '0.120.0',
+      changes: ['Added reset search link to "Set not found" message in browse and collection pages'],
+    },
+    {
+      date: '2025-09-18',
       version: '0.119.1',
       changes: ['Fixed home page infinite loading spinner when database is unavailable'],
     },

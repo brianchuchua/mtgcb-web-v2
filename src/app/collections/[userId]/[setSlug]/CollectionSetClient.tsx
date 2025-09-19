@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { Box, Button, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useSnackbar } from 'notistack';
@@ -35,6 +36,7 @@ import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import {
+  resetSearch,
   selectCardSearchParams,
   selectIncludeSubsetsInSets,
   selectSelectedGoalId,
@@ -321,11 +323,20 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   }
 
   if (!set && !isSetLoading) {
+    const handleResetSearch = () => {
+      dispatch(resetSearch());
+    };
+
     return (
       <Box>
         <InfoBanner
           title="Set not found or no cards found in it matching your criteria"
           message="The requested set might not exist, or there are no cards that match your current filter settings."
+          action={
+            <Button variant="outlined" startIcon={<RestartAltIcon />} onClick={handleResetSearch}>
+              Reset Search
+            </Button>
+          }
         />
       </Box>
     );
