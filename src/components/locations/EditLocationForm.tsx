@@ -177,6 +177,12 @@ export default function EditLocationForm({ location }: EditLocationFormProps) {
             })}
             error={!!errors.description}
             helperText={errors.description?.message}
+            slotProps={{
+              htmlInput: {
+                spellCheck: 'true',
+                autoCapitalize: 'sentences',
+              },
+            }}
           />
 
           {locations.length > 0 && (

@@ -122,6 +122,8 @@ export default function ForgotUsernamePage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                spellCheck: 'false',
+                autoCapitalize: 'off',
                 'data-testid': 'email-input',
               },
             }}

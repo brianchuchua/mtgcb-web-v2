@@ -223,6 +223,12 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
               error={!!errors.description}
               helperText={errors.description?.message}
               disabled={isLoading}
+              slotProps={{
+                htmlInput: {
+                  spellCheck: 'true',
+                  autoCapitalize: 'sentences',
+                },
+              }}
             />
           )}
         />

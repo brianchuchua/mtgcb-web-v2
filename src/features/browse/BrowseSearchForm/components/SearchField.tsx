@@ -40,9 +40,18 @@ const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(({
       data-testid={inputTestId}
       autoFocus={autoFocus}
       inputRef={ref}
+      type="search"
+      autoComplete="off"
       slotProps={{
         input: {
           startAdornment: <InputAdornment position="start">{adornmentWithTestId}</InputAdornment>,
+        },
+        htmlInput: {
+          spellCheck: 'false',
+          autoCapitalize: 'off',
+          autoCorrect: 'off',
+          inputMode: 'search',
+          enterKeyHint: 'search',
         },
       }}
     />

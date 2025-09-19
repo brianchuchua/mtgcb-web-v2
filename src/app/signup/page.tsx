@@ -126,13 +126,16 @@ export default function SignUpPage() {
             margin="normal"
             required
             fullWidth
-            autoComplete="nickname"
+            autoComplete="username"
             autoFocus
             error={Boolean(errors.username)}
             helperText={errors.username?.message}
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                spellCheck: 'false',
+                autoCapitalize: 'off',
+                autoCorrect: 'off',
                 'data-testid': 'username-input',
               },
             }}
@@ -158,6 +161,8 @@ export default function SignUpPage() {
             slotProps={{
               htmlInput: {
                 maxLength: 255,
+                spellCheck: 'false',
+                autoCapitalize: 'off',
                 'data-testid': 'email-input',
               },
             }}

@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-18',
+      version: '0.120.1',
+      changes: ['Fixed autocorrect and spellcheck behavior on search fields and authentication forms'],
+    },
+    {
+      date: '2025-09-18',
       version: '0.120.0',
       changes: ['Added reset search link to "Set not found" message in browse and collection pages'],
     },

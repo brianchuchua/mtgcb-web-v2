@@ -17,6 +17,8 @@ const OracleTextField: React.FC<OracleTextFieldProps> = ({ value, onChange }) =>
       onChange={onChange}
       placeholder="Search card text"
       margin="dense"
+      type="search"
+      autoComplete="off"
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
@@ -25,6 +27,14 @@ const OracleTextField: React.FC<OracleTextFieldProps> = ({ value, onChange }) =>
             </Tooltip>
           </InputAdornment>
         ),
+      }}
+      slotProps={{
+        htmlInput: {
+          spellCheck: 'false',
+          autoCapitalize: 'off',
+          autoCorrect: 'off',
+          enterKeyHint: 'search',
+        },
       }}
     />
   );

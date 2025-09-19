@@ -198,8 +198,16 @@ function ProfileContent() {
               margin="normal"
               fullWidth
               label="Username"
+              autoComplete="username"
               error={!!profileErrors.username}
               helperText={profileErrors.username?.message}
+              slotProps={{
+                htmlInput: {
+                  spellCheck: 'false',
+                  autoCapitalize: 'off',
+                  autoCorrect: 'off',
+                },
+              }}
             />
 
             <TextField
@@ -218,8 +226,15 @@ function ProfileContent() {
               fullWidth
               label="Email"
               type="email"
+              autoComplete="email"
               error={!!profileErrors.email}
               helperText={profileErrors.email?.message}
+              slotProps={{
+                htmlInput: {
+                  spellCheck: 'false',
+                  autoCapitalize: 'off',
+                },
+              }}
             />
 
             <ButtonWrapper>

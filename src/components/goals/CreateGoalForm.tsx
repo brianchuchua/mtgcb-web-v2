@@ -168,6 +168,12 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
               error={!!errors.description}
               helperText={errors.description?.message}
               disabled={isLoading}
+              slotProps={{
+                htmlInput: {
+                  spellCheck: 'true',
+                  autoCapitalize: 'sentences',
+                },
+              }}
             />
           )}
         />

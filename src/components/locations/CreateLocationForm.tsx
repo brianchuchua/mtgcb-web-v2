@@ -126,6 +126,12 @@ export default function CreateLocationForm() {
             error={!!errors.description}
             helperText={errors.description?.message}
             placeholder="Add any notes about this location..."
+            slotProps={{
+              htmlInput: {
+                spellCheck: 'true',
+                autoCapitalize: 'sentences',
+              },
+            }}
           />
 
           {locations.length > 0 && (
