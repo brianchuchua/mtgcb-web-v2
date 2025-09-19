@@ -21,8 +21,8 @@ export function renderGameScreen(state: GameStateData, config: GameConfig): void
     } else if (icon.failed) {
       renderFailureAnimation(ctx, icon);
     } else {
-      renderFallingIcon(ctx, icon, state);
-      if (icon.showHint >= 0) {
+      renderFallingIcon(ctx, icon, state, config);
+      if (icon.showHint >= 0 && !config.hintsDisabled) {
         renderHint(ctx, icon);
       }
     }
@@ -45,17 +45,17 @@ function drawDangerZone(ctx: CanvasRenderingContext2D, width: number): void {
   drawRect(ctx, 0, y, width, GROUND_HEIGHT, color);
 }
 
-function renderFallingIcon(ctx: CanvasRenderingContext2D, icon: Icon, state: GameStateData): void {
+function renderFallingIcon(ctx: CanvasRenderingContext2D, icon: Icon, state: GameStateData, config: GameConfig): void {
   const image = state.imageCache.get(icon.iconUrl);
 
   if (image && image.complete && image.naturalWidth !== 0) {
-    renderIconImage(ctx, icon, image);
+    renderIconImage(ctx, icon, image, config);
   } else {
     renderIconPlaceholder(ctx, icon);
   }
 }
 
-function renderIconImage(ctx: CanvasRenderingContext2D, icon: Icon, image: HTMLImageElement): void {
+function renderIconImage(ctx: CanvasRenderingContext2D, icon: Icon, image: HTMLImageElement, config: GameConfig): void {
   const aspectRatio = image.naturalWidth / image.naturalHeight;
   const { width, height, x, y } = calculateDrawDimensions(
     icon.x,
@@ -64,8 +64,24 @@ function renderIconImage(ctx: CanvasRenderingContext2D, icon: Icon, image: HTMLI
     aspectRatio
   );
 
-  // Apply shadow effect for visibility
-  applyIconShadow(ctx);
+  // Calculate accuracy for this set
+  let shadowColor = 'rgba(255, 255, 255, 0.8)'; // Default white
+  if (config.statistics && config.statistics[icon.setCode]) {
+    const stats = config.statistics[icon.setCode];
+    const total = stats.successes + stats.failures;
+    if (total > 0) {
+      const accuracy = stats.successes / total;
+      if (accuracy >= 0.7) {
+        shadowColor = 'rgba(76, 175, 80, 0.9)'; // Green for >= 70% accuracy
+      } else if (accuracy < 0.5) {
+        shadowColor = 'rgba(244, 67, 54, 0.9)'; // Red for < 50% accuracy
+      }
+    }
+  }
+
+  // Apply shadow effect with color based on accuracy
+  ctx.shadowBlur = 8;
+  ctx.shadowColor = shadowColor;
 
   // Draw the icon
   ctx.drawImage(image, x, y, width, height);

@@ -112,6 +112,53 @@ export function createGameEngine(config: GameConfig): GameEngine {
     }
   }
 
+  // Skip the currently falling icon (counts as failure)
+  function skipCurrentIcon(): void {
+    if (state.state !== 'playing') return;
+
+    // Find the first active (non-destroyed, non-failed) icon
+    const activeIcon = state.icons.find(icon => !icon.destroyed && !icon.failed);
+    if (!activeIcon) return;
+
+    // Mark it as failed with animation
+    const updatedIcons = state.icons.map(icon => {
+      if (icon.id === activeIcon.id) {
+        return {
+          ...icon,
+          failed: true,
+          animationTimer: 30,  // Start animation timer
+          animationRadius: 0   // Start animation radius
+        };
+      }
+      return icon;
+    });
+
+    state = { ...state, icons: updatedIcons };
+
+    // Decrement lives
+    state = { ...state, lives: state.lives - 1 };
+
+    // Fire callbacks
+    config.callbacks.onMissedIcon(activeIcon.setName);
+    config.callbacks.onSetFailure(activeIcon.setCode, activeIcon.setName);
+    config.callbacks.onLivesChange(state.lives);
+    config.callbacks.onMessage(`Skipped: ${activeIcon.setName}`, 2000);
+
+    // Check for game over
+    if (state.lives <= 0) {
+      // Trigger game over
+      state = { ...state, blockSpawning: true };
+      state.scheduledStateChange = {
+        state: 'gameover',
+        time: Date.now() + 1500
+      };
+
+      setTimeout(() => {
+        config.callbacks.onStateChange('gameover');
+      }, 1500);
+    }
+  }
+
   // Destroy the engine
   function destroy(): void {
     isDestroyed = true;
@@ -127,6 +174,16 @@ export function createGameEngine(config: GameConfig): GameEngine {
     // Canvas will be resized on next render
   }
 
+  // Update statistics
+  function updateStatistics(statistics: GameConfig['statistics']): void {
+    config.statistics = statistics;
+  }
+
+  // Update hints disabled setting
+  function updateHintsDisabled(hintsDisabled: boolean): void {
+    config.hintsDisabled = hintsDisabled;
+  }
+
   // Start the game loop
   gameLoop();
 
@@ -139,5 +196,8 @@ export function createGameEngine(config: GameConfig): GameEngine {
     handleClick,
     destroy,
     updateSize,
+    updateStatistics,
+    updateHintsDisabled,
+    skipCurrentIcon,
   };
 }

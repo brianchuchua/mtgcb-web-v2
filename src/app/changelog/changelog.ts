@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-19',
+      version: '0.123.0',
+      changes: ['Added statistics tracking, game modes, and skip button to Iconic Impact game'],
+    },
+    {
+      date: '2025-09-19',
       version: '0.122.1',
       changes: ['Fixed Iconic Impact hint system for small set names and improved progressive reveal logic'],
     },

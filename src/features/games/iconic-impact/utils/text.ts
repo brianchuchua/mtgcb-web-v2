@@ -76,8 +76,8 @@ export function createHintText(
   const keyWords = ['classic', 'core set', 'edition'];
 
   for (let i = 0; i < setName.length; i++) {
-    // Always show spaces, colons, and apostrophes
-    if (setName[i] === ' ' || setName[i] === ':' || setName[i] === "'") {
+    // Always show spaces, colons, apostrophes, and dashes
+    if (setName[i] === ' ' || setName[i] === ':' || setName[i] === "'" || setName[i] === '-') {
       hint += setName[i];
     } else {
       // Check if this position is part of a key word
@@ -141,8 +141,8 @@ function getHiddenCharacterCount(setName: string): number {
   let hiddenCount = 0;
 
   for (let i = 0; i < setName.length; i++) {
-    // Skip spaces, colons, and apostrophes
-    if (setName[i] === ' ' || setName[i] === ':' || setName[i] === "'") {
+    // Skip spaces, colons, apostrophes, and dashes
+    if (setName[i] === ' ' || setName[i] === ':' || setName[i] === "'" || setName[i] === '-') {
       continue;
     }
 

@@ -42,6 +42,7 @@ export function processAnswer(
 
   // Fire callbacks
   config.callbacks.onCorrectGuess(matchedIcon.setName, points);
+  config.callbacks.onSetSuccess(matchedIcon.setCode, matchedIcon.setName);
   config.callbacks.onScoreChange(newState.score);
   config.callbacks.onMessage(message, 2000);
   config.callbacks.onProgressUpdate(newState.correctGuesses, config.sets.length);

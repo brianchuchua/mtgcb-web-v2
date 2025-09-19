@@ -6,4 +6,5 @@ export type {
   GameConfig,
   SetData,
   GameLogEntry,
+  SetStatistics,
 } from './types';

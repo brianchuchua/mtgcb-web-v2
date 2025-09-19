@@ -50,6 +50,7 @@ function checkIconCollisions(state: GameStateData, config: GameConfig): GameStat
     if (!beforeFailed && updatedIcon.failed) {
       // Fire callback for missed icon
       config.callbacks.onMissedIcon(icon.setName);
+      config.callbacks.onSetFailure(icon.setCode, icon.setName);
       config.callbacks.onMessage(`Missed: ${icon.setName}`, 2000);
 
       // Decrement lives will be handled after mapping

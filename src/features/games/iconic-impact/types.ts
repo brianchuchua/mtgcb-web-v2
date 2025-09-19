@@ -21,6 +21,16 @@ export interface GameCallbacks {
   onMessage: (message: string, duration?: number) => void;
   onProgressUpdate: (completed: number, total: number) => void;
   onGameComplete: () => void;
+  onSetSuccess: (setCode: string, setName: string) => void;
+  onSetFailure: (setCode: string, setName: string) => void;
+}
+
+export interface SetStatistics {
+  [setCode: string]: {
+    setName: string;
+    successes: number;
+    failures: number;
+  };
 }
 
 export interface GameConfig {
@@ -29,6 +39,8 @@ export interface GameConfig {
   height: number;
   sets: SetData[];
   callbacks: GameCallbacks;
+  statistics?: SetStatistics;
+  hintsDisabled?: boolean;
 }
 
 export interface Icon {
@@ -87,4 +99,7 @@ export interface GameEngine {
   handleClick: () => void;
   destroy: () => void;
   updateSize: (width: number) => void;
+  updateStatistics: (statistics: SetStatistics | undefined) => void;
+  updateHintsDisabled: (hintsDisabled: boolean) => void;
+  skipCurrentIcon: () => void;
 }

@@ -16,7 +16,16 @@ import {
   ListItemText,
   useMediaQuery,
   useTheme,
+  Tabs,
+  Tab,
+  Menu,
+  MenuItem,
+  IconButton,
+  Switch,
+  FormControlLabel,
+  Divider,
 } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { styled } from '@mui/material/styles';
 import {
   createGameEngine,
@@ -26,6 +35,10 @@ import {
   type SetData,
   type GameLogEntry,
 } from '@/features/games/iconic-impact';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+
+// Import the type from the game engine
+import type { SetStatistics } from '@/features/games/iconic-impact';
 
 const MAX_GAME_WIDTH = 800;
 const GAME_HEIGHT = 500;
@@ -102,6 +115,9 @@ interface GameStatsProps {
   gameState: GameState;
   onButtonClick: () => void;
   setsLoaded: boolean;
+  onMenuOpen: (event: React.MouseEvent<HTMLElement>) => void;
+  gameMode: 'standard' | 'bad-at';
+  onSkipSet: () => void;
 }
 
 const GameStats = memo(function GameStats({
@@ -112,6 +128,9 @@ const GameStats = memo(function GameStats({
   gameState,
   onButtonClick,
   setsLoaded,
+  onMenuOpen,
+  gameMode,
+  onSkipSet,
 }: GameStatsProps) {
   return (
     <Paper elevation={3} sx={{ p: 2 }}>
@@ -126,19 +145,42 @@ const GameStats = memo(function GameStats({
         </Box>
         <Box>
           {gameState === 'idle' && (
-            <Button variant="contained" fullWidth onClick={onButtonClick} disabled={!setsLoaded}>
-              {!setsLoaded ? 'Loading Sets...' : 'Start Game'}
-            </Button>
+            <Box display="flex" gap={1}>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={onButtonClick}
+                disabled={!setsLoaded}
+              >
+                {!setsLoaded ? 'Loading Sets...' :
+                  gameMode === 'bad-at' ? 'Start (Bad At)' : 'Start Game'}
+              </Button>
+              <IconButton onClick={onMenuOpen} disabled={!setsLoaded}>
+                <SettingsIcon />
+              </IconButton>
+            </Box>
           )}
           {(gameState === 'playing' || gameState === 'paused') && (
-            <Button variant="contained" fullWidth onClick={onButtonClick}>
-              {gameState === 'paused' ? 'Resume' : 'Pause'}
-            </Button>
+            <Box display="flex" gap={1}>
+              <Button variant="contained" sx={{ flex: 1 }} onClick={onButtonClick}>
+                {gameState === 'paused' ? 'Resume' : 'Pause'}
+              </Button>
+              {gameState === 'playing' && (
+                <Button variant="contained" color="error" sx={{ whiteSpace: 'nowrap' }} onClick={onSkipSet}>
+                  Skip Set
+                </Button>
+              )}
+            </Box>
           )}
           {(gameState === 'gameover' || gameState === 'won') && (
-            <Button variant="contained" fullWidth onClick={onButtonClick}>
-              Play Again
-            </Button>
+            <Box display="flex" gap={1}>
+              <Button variant="contained" fullWidth onClick={onButtonClick}>
+                Play Again
+              </Button>
+              <IconButton onClick={onMenuOpen}>
+                <SettingsIcon />
+              </IconButton>
+            </Box>
           )}
         </Box>
       </Box>
@@ -152,6 +194,8 @@ interface GameLogProps {
   gameState: GameState;
   score: number;
   totalSets: number;
+  statistics: SetStatistics;
+  onClearStatistics: () => void;
 }
 
 const GameLogComponent = memo(function GameLogComponent({
@@ -159,51 +203,142 @@ const GameLogComponent = memo(function GameLogComponent({
   gameState,
   score,
   totalSets,
+  statistics,
+  onClearStatistics,
 }: GameLogProps) {
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
+  // Calculate statistics data
+  const statsData = Object.entries(statistics)
+    .map(([code, data]) => ({
+      code,
+      setName: data.setName || code.toUpperCase(), // Fallback to code if name not available
+      successes: data.successes,
+      failures: data.failures,
+      total: data.successes + data.failures,
+      rate: data.successes + data.failures > 0
+        ? Math.round((data.successes / (data.successes + data.failures)) * 100)
+        : 0,
+    }))
+    .sort((a, b) => {
+      // Sort by lowest success rate first (highest failure rate)
+      if (a.rate !== b.rate) {
+        return a.rate - b.rate;
+      }
+      // Then alphabetically by set name as tie breaker
+      return a.setName.localeCompare(b.setName);
+    });
+
   return (
-    <Paper elevation={3} sx={{ p: 2, flexGrow: 1, overflow: 'auto' }}>
-      <Typography variant="h6" gutterBottom>
-        Game Log
-      </Typography>
-      {gameState === 'gameover' && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          Game Over! Final Score: {score}
-        </Alert>
+    <Paper elevation={3} sx={{ p: 2, flexGrow: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+      <Tabs value={tabValue} onChange={handleTabChange} sx={{ mb: 2, minHeight: '36px' }}>
+        <Tab label="Game Log" sx={{ minHeight: '36px', py: 1 }} />
+        <Tab label="Statistics" sx={{ minHeight: '36px', py: 1 }} />
+      </Tabs>
+
+      {tabValue === 0 && (
+        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+          {gameState === 'gameover' && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              Game Over! Final Score: {score}
+            </Alert>
+          )}
+          {gameState === 'won' && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              You Win! All {totalSets} sets identified!
+            </Alert>
+          )}
+          <List dense>
+            {gameLog.length === 0 ? (
+              <ListItem>
+                <ListItemText secondary="No attempts yet..." />
+              </ListItem>
+            ) : (
+              [...gameLog].reverse().map((entry, index) => (
+                <ListItem key={gameLog.length - index - 1}>
+                  <ListItemText
+                    primary={
+                      <Typography
+                        variant="body2"
+                        color={entry.type === 'correct' ? 'success.main' : 'error.main'}
+                      >
+                        {entry.type === 'correct' ? '✓' : '✗'} {entry.setName}
+                      </Typography>
+                    }
+                    secondary={
+                      entry.type === 'correct' ? (
+                        <Typography variant="caption">+{entry.points} points</Typography>
+                      ) : (
+                        <Typography variant="caption">Missed</Typography>
+                      )
+                    }
+                  />
+                </ListItem>
+              ))
+            )}
+          </List>
+        </Box>
       )}
-      {gameState === 'won' && (
-        <Alert severity="success" sx={{ mb: 2 }}>
-          You Win! All {totalSets} sets identified!
-        </Alert>
+
+      {tabValue === 1 && (
+        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+            <List dense>
+              {statsData.length === 0 ? (
+                <ListItem>
+                  <ListItemText secondary="No statistics yet. Play a game to see your performance!" />
+                </ListItem>
+              ) : (
+                statsData.map(({ code, setName, successes, failures, rate }) => {
+                  let percentColor: 'success.main' | 'error.main' | 'text.secondary' = 'text.secondary';
+                  if (rate >= 70) {
+                    percentColor = 'success.main';
+                  } else if (rate < 50) {
+                    percentColor = 'error.main';
+                  }
+
+                  return (
+                    <ListItem key={code}>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2">
+                            {setName}
+                          </Typography>
+                        }
+                        secondary={
+                          <Typography variant="caption" component="span">
+                            {successes}/{successes + failures} correct (
+                            <Typography variant="caption" component="span" color={percentColor}>
+                              {rate}%
+                            </Typography>
+                            )
+                          </Typography>
+                        }
+                      />
+                    </ListItem>
+                  );
+                })
+              )}
+            </List>
+          </Box>
+          {statsData.length > 0 && (
+            <Box sx={{ pt: 2, borderTop: 1, borderColor: 'divider' }}>
+              <Button
+                variant="outlined"
+                size="small"
+                fullWidth
+                onClick={onClearStatistics}
+              >
+                Clear Statistics
+              </Button>
+            </Box>
+          )}
+        </Box>
       )}
-      <List dense>
-        {gameLog.length === 0 ? (
-          <ListItem>
-            <ListItemText secondary="No attempts yet..." />
-          </ListItem>
-        ) : (
-          [...gameLog].reverse().map((entry, index) => (
-            <ListItem key={gameLog.length - index - 1}>
-              <ListItemText
-                primary={
-                  <Typography
-                    variant="body2"
-                    color={entry.type === 'correct' ? 'success.main' : 'error.main'}
-                  >
-                    {entry.type === 'correct' ? '✓' : '✗'} {entry.setName}
-                  </Typography>
-                }
-                secondary={
-                  entry.type === 'correct' ? (
-                    <Typography variant="caption">+{entry.points} points</Typography>
-                  ) : (
-                    <Typography variant="caption">Missed</Typography>
-                  )
-                }
-              />
-            </ListItem>
-          ))
-        )}
-      </List>
     </Paper>
   );
 });
@@ -223,6 +358,16 @@ export default function IconicImpactPage() {
   const [normalSets, setNormalSets] = useState<SetData[]>([]);
   const [gameLog, setGameLog] = useState<GameLogEntry[]>([]);
   const [gameWidth, setGameWidth] = useState(MAX_GAME_WIDTH);
+  const [statistics, setStatistics] = useLocalStorage<SetStatistics>('mtgcb_iconic_impact_stats', {});
+  const setStatisticsRef = useRef(setStatistics);
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [gameMode, setGameMode] = useState<'standard' | 'bad-at'>('standard');
+  const [hintsDisabled, setHintsDisabled] = useLocalStorage<boolean>('mtgcb_iconic_impact_hints_disabled', false);
+
+  // Keep ref updated with latest setStatistics function
+  useEffect(() => {
+    setStatisticsRef.current = setStatistics;
+  }, [setStatistics]);
 
   // Handle responsive canvas sizing
   useEffect(() => {
@@ -292,9 +437,33 @@ export default function IconicImpactPage() {
     fetchSets();
   }, []);
 
+  // Filter sets based on game mode - memoize the initial set list
+  const [initialBadAtSets, setInitialBadAtSets] = useState<SetData[]>([]);
+
   // Initialize game engine when canvas and sets are ready
   useEffect(() => {
     if (!canvasRef.current || normalSets.length === 0) return;
+
+    // Determine which sets to use based on mode
+    let filteredSets = normalSets;
+    if (gameMode === 'bad-at') {
+      // Use locked sets during gameplay, calculate fresh when idle
+      if (gameState !== 'idle' && initialBadAtSets.length > 0) {
+        filteredSets = initialBadAtSets;
+      } else {
+        filteredSets = normalSets.filter(set => {
+          const stats = statistics[set.code];
+          if (!stats || stats.successes + stats.failures === 0) return false;
+          const accuracy = stats.successes / (stats.successes + stats.failures);
+          return accuracy < 0.5;
+        });
+      }
+
+      if (filteredSets.length === 0) {
+        // No sets match criteria for "bad-at" mode
+        return;
+      }
+    }
 
     const callbacks: GameCallbacks = {
       onScoreChange: setScore,
@@ -315,26 +484,83 @@ export default function IconicImpactPage() {
       onGameComplete: () => {
         // Game complete is handled by state change to 'won'
       },
+      onSetSuccess: (setCode, setName) => {
+        setStatisticsRef.current(prev => {
+          const updated = { ...prev };
+          if (!updated[setCode]) {
+            updated[setCode] = { setName, successes: 0, failures: 0 };
+          }
+          updated[setCode].successes++;
+          updated[setCode].setName = setName; // Update name in case it wasn't set
+          return updated;
+        });
+      },
+      onSetFailure: (setCode, setName) => {
+        setStatisticsRef.current(prev => {
+          const updated = { ...prev };
+          if (!updated[setCode]) {
+            updated[setCode] = { setName, successes: 0, failures: 0 };
+          }
+          updated[setCode].failures++;
+          updated[setCode].setName = setName; // Update name in case it wasn't set
+          return updated;
+        });
+      },
     };
 
     engineRef.current = createGameEngine({
       canvas: canvasRef.current,
       width: gameWidth,
       height: GAME_HEIGHT,
-      sets: normalSets,
+      sets: filteredSets,
       callbacks,
+      statistics,
+      hintsDisabled,
     });
 
     return () => {
       engineRef.current?.destroy();
       engineRef.current = null;
     };
-  }, [normalSets, gameWidth]);
+  }, [normalSets, gameWidth, gameMode]);
+
+  // Update statistics in game engine when they change
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.updateStatistics(statistics);
+    }
+  }, [statistics]);
+
+  // Update hints disabled setting when it changes
+  useEffect(() => {
+    if (engineRef.current) {
+      engineRef.current.updateHintsDisabled(hintsDisabled);
+    }
+  }, [hintsDisabled]);
 
   const startGame = useCallback(() => {
     setGameLog([]);
+    // Lock in the bad-at sets at game start
+    if (gameMode === 'bad-at') {
+      const badSets = normalSets.filter(set => {
+        const stats = statistics[set.code];
+        if (!stats || stats.successes + stats.failures === 0) return false;
+        const accuracy = stats.successes / (stats.successes + stats.failures);
+        return accuracy < 0.5;
+      });
+
+      // If no bad sets available, switch to standard mode
+      if (badSets.length === 0) {
+        setGameMode('standard');
+        setInitialBadAtSets([]);
+        // Don't start the game, let user click again in standard mode
+        return;
+      }
+
+      setInitialBadAtSets(badSets);
+    }
     engineRef.current?.start();
-  }, []);
+  }, [gameMode, normalSets, statistics]);
 
   // Stable callback for GameInput component
   const handleAnswer = useCallback((input: string): boolean => {
@@ -345,8 +571,46 @@ export default function IconicImpactPage() {
   }, [gameState]);
 
   const handleCanvasClick = useCallback(() => {
+    // If starting a new game, clear the log
+    if (gameState === 'gameover' || gameState === 'won') {
+      setGameLog([]);
+    }
     engineRef.current?.handleClick();
+  }, [gameState]);
+
+  const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchor(event.currentTarget);
   }, []);
+
+  const handleMenuClose = useCallback(() => {
+    setMenuAnchor(null);
+  }, []);
+
+  const handleModeChange = useCallback((mode: 'standard' | 'bad-at') => {
+    // Check if bad-at mode is viable
+    if (mode === 'bad-at') {
+      const badSets = normalSets.filter(set => {
+        const stats = statistics[set.code];
+        if (!stats || stats.successes + stats.failures === 0) return false;
+        const accuracy = stats.successes / (stats.successes + stats.failures);
+        return accuracy < 0.5;
+      });
+
+      // If no bad sets, stay in standard mode
+      if (badSets.length === 0) {
+        setGameMode('standard');
+        setMenuAnchor(null);
+        return;
+      }
+    }
+
+    setGameMode(mode);
+    setMenuAnchor(null);
+    // Clear the locked sets when changing modes
+    if (mode === 'standard') {
+      setInitialBadAtSets([]);
+    }
+  }, [normalSets, statistics]);
 
   const handleButtonClick = useCallback(() => {
     if (gameState === 'idle') {
@@ -357,6 +621,10 @@ export default function IconicImpactPage() {
       startGame();
     }
   }, [gameState, startGame]);
+
+  const handleSkipSet = useCallback(() => {
+    engineRef.current?.skipCurrentIcon();
+  }, []);
 
   // Show desktop-only message on mobile
   if (isMobile) {
@@ -415,21 +683,78 @@ export default function IconicImpactPage() {
               score={score}
               lives={lives}
               correctGuesses={correctGuesses}
-              totalSets={normalSets.length}
+              totalSets={gameMode === 'bad-at' && gameState !== 'idle' && initialBadAtSets.length > 0 ? initialBadAtSets.length :
+                        gameMode === 'bad-at' ? normalSets.filter(set => {
+                          const stats = statistics[set.code];
+                          if (!stats || stats.successes + stats.failures === 0) return false;
+                          const accuracy = stats.successes / (stats.successes + stats.failures);
+                          return accuracy < 0.5;
+                        }).length : normalSets.length}
               gameState={gameState}
               onButtonClick={handleButtonClick}
               setsLoaded={normalSets.length > 0}
+              onMenuOpen={handleMenuOpen}
+              gameMode={gameMode}
+              onSkipSet={handleSkipSet}
             />
 
             <GameLogComponent
               gameLog={gameLog}
               gameState={gameState}
               score={score}
-              totalSets={normalSets.length}
+              totalSets={gameMode === 'bad-at' && gameState !== 'idle' && initialBadAtSets.length > 0 ? initialBadAtSets.length :
+                        gameMode === 'bad-at' ? normalSets.filter(set => {
+                          const stats = statistics[set.code];
+                          if (!stats || stats.successes + stats.failures === 0) return false;
+                          const accuracy = stats.successes / (stats.successes + stats.failures);
+                          return accuracy < 0.5;
+                        }).length : normalSets.length}
+              statistics={statistics}
+              onClearStatistics={() => setStatisticsRef.current({})}
             />
           </Box>
         </Grid>
       </Grid>
+
+      {/* Game Mode Menu */}
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem
+          onClick={() => handleModeChange('standard')}
+          selected={gameMode === 'standard'}
+        >
+          Standard Mode
+        </MenuItem>
+        <MenuItem
+          onClick={() => handleModeChange('bad-at')}
+          selected={gameMode === 'bad-at'}
+          disabled={
+            Object.values(statistics).filter(stats => {
+              const total = stats.successes + stats.failures;
+              return total > 0 && (stats.successes / total) < 0.5;
+            }).length === 0
+          }
+        >
+          Sets I'm Bad At
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={(e) => e.stopPropagation()}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={hintsDisabled}
+                onChange={(e) => setHintsDisabled(e.target.checked)}
+                size="small"
+              />
+            }
+            label="Disable Hints"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </MenuItem>
+      </Menu>
 
       {/* Disclaimer */}
       <Box sx={{ mt: 4, mb: 2, textAlign: 'center' }}>
