@@ -124,7 +124,8 @@ export default function IconicImpactPage() {
   useEffect(() => {
     const fetchSets = async () => {
       try {
-        const response = await fetch('http://local.mtgcb.com:5000/sets/search', {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL || '';
+        const response = await fetch(`${apiBaseUrl}/sets/search`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -204,12 +205,15 @@ export default function IconicImpactPage() {
     setIconIdCounter((prev) => prev + 1);
   }, [normalSets, iconIdCounter, gameWidth]);
 
-  const checkAnswer = useCallback(() => {
-    const normalizedInput = inputValue.trim().toLowerCase();
+  const checkAnswer = useCallback((input?: string) => {
+    const normalizedInput = (input || inputValue).trim().toLowerCase();
+    if (!normalizedInput) return false; // Return false if no input
 
+    let foundMatch = false;
     fallingIconsRef.current = fallingIconsRef.current.map((icon) => {
       const normalizedSetName = icon.setName.toLowerCase();
       if (!icon.destroyed && !icon.failed && normalizedSetName === normalizedInput) {
+        foundMatch = true;
         // Calculate bonus based on distance from ground (farther from ground = more points)
         const maxDistance = GAME_HEIGHT - GROUND_HEIGHT; // Total distance icon can fall
         const distanceFromTop = icon.y + ICON_SIZE; // How far icon has fallen from top
@@ -231,9 +235,9 @@ export default function IconicImpactPage() {
         // Mark icon as destroyed with success animation
         const updatedIcon = { ...icon, destroyed: true, animationTimer: 540, animationRadius: 0 };
 
-        // Check for win condition (TEMP: Only 2 sets for testing)
+        // Check for win condition
         // Delay the win state to allow the final animation to play
-        if (completedSetsRef.current.size >= 2) {
+        if (completedSetsRef.current.size >= normalSets.length) {
           // Immediately block all spawning
           blockSpawningRef.current = true;
           gameStateRef.current = 'won';
@@ -247,7 +251,10 @@ export default function IconicImpactPage() {
       return icon;
     });
 
-    setInputValue('');
+    if (foundMatch) {
+      setInputValue('');
+    }
+    return foundMatch;
   }, [inputValue]);
 
   const renderTitleScreen = useCallback(() => {
@@ -456,7 +463,7 @@ export default function IconicImpactPage() {
     // Draw message
     ctx.font = '24px Arial';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('Perfect! All 2 sets identified!', gameWidth / 2, 240);
+    ctx.fillText(`Perfect! All ${normalSets.length} sets identified!`, gameWidth / 2, 240);
 
     ctx.font = '20px Arial';
     ctx.fillStyle = '#b0b0b0';
@@ -473,7 +480,7 @@ export default function IconicImpactPage() {
     if (gameStateRef.current === 'won') {
       titleAnimationRef.current = requestAnimationFrame(renderWinScreen);
     }
-  }, [gameWidth, score]);
+  }, [gameWidth, score, normalSets.length]);
 
   const gameLoop = useCallback(() => {
     if (!canvasRef.current) return;
@@ -944,7 +951,14 @@ export default function IconicImpactPage() {
                   fullWidth
                   label="Type set name here"
                   value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
+                  onChange={(e) => {
+                    const newValue = e.target.value;
+                    setInputValue(newValue);
+                    // Check if this completes a correct answer
+                    if (gameState === 'playing') {
+                      checkAnswer(newValue);
+                    }
+                  }}
                   onKeyPress={handleKeyPress}
                   disabled={gameState !== 'playing'}
                   placeholder="e.g., Innistrad: Midnight Hunt"
@@ -1000,7 +1014,7 @@ export default function IconicImpactPage() {
               )}
               {gameState === 'won' && (
                 <Alert severity="success" sx={{ mb: 2 }}>
-                  You Win! All 2 sets identified!
+                  You Win! All {normalSets.length} sets identified!
                 </Alert>
               )}
               <List dense>
