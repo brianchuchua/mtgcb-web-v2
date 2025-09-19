@@ -54,7 +54,7 @@ export default function AuthenticatedHomePageClient() {
     }
   }, [searchParams]);
 
-  if (isLoading) {
+  if (isLoading && !data && !error) {
     return <LoadingState isMobile={isMobile} />;
   }
 

@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-18',
+      version: '0.119.1',
+      changes: ['Fixed home page infinite loading spinner when database is unavailable'],
+    },
+    {
+      date: '2025-09-18',
       version: '0.119.0',
       changes: ['Added customizable style settings for progress bars and set icons in account page'],
     },

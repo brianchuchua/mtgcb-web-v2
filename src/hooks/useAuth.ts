@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLogoutMutation, useMeQuery } from '@/api/auth/authApi';
-import { clearAuth, setUser, startLoading } from '@/redux/slices/authSlice';
+import { clearAuth, setUser, startLoading, stopLoading } from '@/redux/slices/authSlice';
 import type { RootState } from '@/redux/store';
 
 export function useAuth() {
@@ -20,6 +20,8 @@ export function useAuth() {
       const status = (meError as any)?.status;
       if (status === 401 || status === 403) {
         dispatch(clearAuth());
+      } else {
+        dispatch(stopLoading());
       }
     }
   }, [meData, isMeLoading, isMeError, meError, dispatch]);

@@ -25,6 +25,9 @@ const authSlice = createSlice({
     startLoading: (state) => {
       state.isLoading = true;
     },
+    stopLoading: (state) => {
+      state.isLoading = false;
+    },
     clearAuth: (state) => {
       state.user = null;
       state.isAuthenticated = false;
@@ -33,5 +36,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, startLoading, clearAuth } = authSlice.actions;
+export const { setUser, startLoading, stopLoading, clearAuth } = authSlice.actions;
 export default authSlice.reducer;
