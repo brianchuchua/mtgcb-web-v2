@@ -70,14 +70,14 @@ export function createHintText(
 ): string {
   const lowerName = setName.toLowerCase();
   let hint = '';
+  let revealedCount = 0;
 
-  // Words to always show
+  // Words to always show (they're BS and inconsistent)
   const keyWords = ['classic', 'core set', 'edition'];
 
   for (let i = 0; i < setName.length; i++) {
-    if (i < visibleLength) {
-      hint += setName[i];
-    } else if (setName[i] === ' ' || setName[i] === ':') {
+    // Always show spaces, colons, and apostrophes
+    if (setName[i] === ' ' || setName[i] === ':' || setName[i] === "'") {
       hint += setName[i];
     } else {
       // Check if this position is part of a key word
@@ -89,11 +89,79 @@ export function createHintText(
           break;
         }
       }
-      hint += isKeyWord ? setName[i] : '_';
+
+      if (isKeyWord) {
+        hint += setName[i];
+      } else if (revealedCount < visibleLength) {
+        hint += setName[i];
+        revealedCount++;
+      } else {
+        hint += '_';
+      }
     }
   }
 
   return `(${setCode}) ${hint}`;
+}
+
+function calculateProgressiveHints(hiddenLength: number): number[] {
+  // Calculate progressive hints based on the length of the unrevealed portion
+  if (hiddenLength <= 4) {
+    // Very short names: reveal 1 letter at a time
+    return [1, 2, hiddenLength - 1];
+  } else if (hiddenLength <= 8) {
+    // Short names like "Lorwyn": reveal progressively
+    return [
+      2,
+      Math.ceil(hiddenLength * 0.5),
+      hiddenLength - 1
+    ];
+  } else if (hiddenLength <= 15) {
+    // Medium names: reveal in larger chunks
+    return [
+      3,
+      Math.ceil(hiddenLength * 0.4),
+      Math.ceil(hiddenLength * 0.75)
+    ];
+  } else {
+    // Long names: reveal in percentage-based chunks
+    return [
+      4,
+      Math.ceil(hiddenLength * 0.35),
+      Math.ceil(hiddenLength * 0.65),
+      Math.ceil(hiddenLength * 0.85)
+    ];
+  }
+}
+
+function getHiddenCharacterCount(setName: string): number {
+  // Count characters that would be hidden (not including always-shown words, spaces, colons)
+  const lowerName = setName.toLowerCase();
+  const keyWords = ['classic', 'core set', 'edition'];
+  let hiddenCount = 0;
+
+  for (let i = 0; i < setName.length; i++) {
+    // Skip spaces, colons, and apostrophes
+    if (setName[i] === ' ' || setName[i] === ':' || setName[i] === "'") {
+      continue;
+    }
+
+    // Check if this position is part of a key word
+    let isKeyWord = false;
+    for (const word of keyWords) {
+      const index = lowerName.indexOf(word);
+      if (index !== -1 && i >= index && i < index + word.length) {
+        isKeyWord = true;
+        break;
+      }
+    }
+
+    if (!isKeyWord) {
+      hiddenCount++;
+    }
+  }
+
+  return hiddenCount;
 }
 
 export function getHintForLevel(
@@ -101,32 +169,38 @@ export function getHintForLevel(
   setCode: string,
   hintLevel: number
 ): string {
-  const nameLength = setName.length;
-  const lowerName = setName.toLowerCase();
-
-  // For the first hint, show key words even before the set code
+  // Always show set code first
   if (hintLevel === 0) {
+    // Check if there are pre-shown keywords
+    const lowerName = setName.toLowerCase();
     const hasKeyWord = lowerName.includes('classic') ||
                        lowerName.includes('core set') ||
                        lowerName.includes('edition');
 
     if (hasKeyWord) {
+      // Show set code plus the keywords/colons
       return createHintText(setName, setCode, 0);
     }
+    // Just show set code
     return `(${setCode})`;
   }
 
-  const visibleChars = [
-    4,
-    Math.floor(nameLength / 2),
-    Math.max(0, nameLength - 3),  // Always leave at least 3 letters hidden
-  ];
+  // Calculate how many characters are actually hideable
+  const hiddenCharCount = getHiddenCharacterCount(setName);
 
-  if (hintLevel <= visibleChars.length) {
-    return createHintText(setName, setCode, visibleChars[hintLevel - 1]);
+  // Get progressive hints based on the hidden character count
+  const visibleChars = calculateProgressiveHints(hiddenCharCount);
+
+  // Ensure we have a valid hint level index
+  const levelIndex = Math.min(hintLevel - 1, visibleChars.length - 1);
+
+  if (levelIndex >= 0 && levelIndex < visibleChars.length) {
+    return createHintText(setName, setCode, visibleChars[levelIndex]);
   }
 
-  return createHintText(setName, setCode, nameLength);
+  // Never show the full name - use the last hint level
+  const lastHintChars = visibleChars[visibleChars.length - 1] || hiddenCharCount - 1;
+  return createHintText(setName, setCode, Math.min(lastHintChars, hiddenCharCount - 1));
 }
 
 export function normalizeInput(input: string): string {

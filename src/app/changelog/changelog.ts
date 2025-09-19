@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-19',
+      version: '0.122.1',
+      changes: ['Fixed Iconic Impact hint system for small set names and improved progressive reveal logic'],
+    },
+    {
+      date: '2025-09-19',
       version: '0.122.0',
       changes: ['Improved Iconic Impact game performance and fixed display issues'],
     },
