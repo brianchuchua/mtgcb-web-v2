@@ -22,7 +22,7 @@ import {
   Analytics as DraftHelperIcon,
   ViewModule,
 } from '@mui/icons-material';
-import { AutoStories as BinderIcon } from '@mui/icons-material';
+import { AutoStories as BinderIcon, SportsEsports as GameIcon } from '@mui/icons-material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
@@ -106,7 +106,8 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
       pathname === '/contact' ||
       pathname === '/binder-templates' ||
       pathname === '/draft-helper' ||
-      pathname === '/draft-cubes';
+      pathname === '/draft-cubes' ||
+      pathname === '/iconic-impact';
 
     if (isOnCollectionPage && isAuthenticated && user?.userId) {
       setIsCollectionMenuOpen(true);
@@ -334,7 +335,8 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                   pathname === '/contact' ||
                   pathname === '/binder-templates' ||
                   pathname === '/draft-helper' ||
-                  pathname === '/draft-cubes'
+                  pathname === '/draft-cubes' ||
+                  pathname === '/iconic-impact'
                 }
               >
                 <ListItemIcon>
@@ -447,6 +449,20 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                       <ViewModule />
                     </ListItemIcon>
                     <ListItemText primary="Draft Cubes" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/iconic-impact"
+                    selected={pathname === '/iconic-impact'}
+                    onClick={handleResourceClick}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemIcon>
+                      <GameIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Iconic Impact" />
                   </ListItemButton>
                 </ListItem>
               </List>

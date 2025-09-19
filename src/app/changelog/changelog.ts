@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-18',
+      version: '0.121.0',
+      changes: ['Added Iconic Impact game - a typing game to learn Magic: The Gathering set icons'],
+    },
+    {
+      date: '2025-09-18',
       version: '0.120.1',
       changes: ['Fixed autocorrect and spellcheck behavior on search fields and authentication forms'],
     },
