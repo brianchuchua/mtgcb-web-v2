@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-19',
+      version: '0.122.0',
+      changes: ['Improved Iconic Impact game performance and fixed display issues'],
+    },
+    {
       date: '2025-09-18',
       version: '0.121.0',
       changes: ['Added Iconic Impact game - a typing game to learn Magic: The Gathering set icons'],
