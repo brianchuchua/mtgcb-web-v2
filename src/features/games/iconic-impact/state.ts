@@ -1,4 +1,4 @@
-import { GameStateData, SetData, Icon, TitleIcon, GameState } from './types';
+import { GameStateData, SetData, Icon, TitleIcon, GameState, WaveState } from './types';
 import { INITIAL_LIVES } from './constants';
 
 export function createInitialState(sets: SetData[]): GameStateData {
@@ -15,6 +15,15 @@ export function createInitialState(sets: SetData[]): GameStateData {
     iconIdCounter: 0,
     animationFrame: null,
     imageCache: new Map<string, HTMLImageElement>(),
+    waveState: {
+      currentWave: 0,
+      setsInCurrentWave: [],
+      completedInWave: 0,
+      totalSetsShown: [],
+      waveStartLives: INITIAL_LIVES,
+      waveStartScore: 0,
+    },
+    allAvailableSets: sets,
   };
 }
 
@@ -128,4 +137,91 @@ export function clearCompletedSets(state: GameStateData): GameStateData {
     ...state,
     completedSets: new Set<string>(),
   };
+}
+
+// Wave management functions
+export function initializeWave(state: GameStateData, waveNumber: number, waveSize: number = 10): GameStateData {
+  // Filter out already-shown sets
+  const availableSets = state.allAvailableSets.filter(
+    set => !state.waveState.totalSetsShown.includes(set.code)
+  );
+
+  // Shuffle and select sets for this wave
+  const shuffled = [...availableSets].sort(() => Math.random() - 0.5);
+  const waveSets = shuffled.slice(0, Math.min(waveSize, availableSets.length));
+  const waveSetCodes = waveSets.map(set => set.code);
+
+  return {
+    ...state,
+    waveState: {
+      ...state.waveState,
+      currentWave: waveNumber,
+      setsInCurrentWave: waveSetCodes,
+      completedInWave: 0,
+      waveStartLives: state.lives,
+      waveStartScore: state.score,
+    },
+    completedSets: new Set<string>(), // Clear completed sets for the new wave
+  };
+}
+
+export function updateWaveProgress(state: GameStateData, setCode: string): GameStateData {
+  // Check if this set is part of the current wave
+  if (!state.waveState.setsInCurrentWave.includes(setCode)) {
+    return state;
+  }
+
+  // Update completed in wave count
+  const completedInWave = state.waveState.setsInCurrentWave.filter(
+    code => state.completedSets.has(code) || code === setCode
+  ).length;
+
+  // Add to total sets shown if not already there
+  const totalSetsShown = state.waveState.totalSetsShown.includes(setCode)
+    ? state.waveState.totalSetsShown
+    : [...state.waveState.totalSetsShown, setCode];
+
+  return {
+    ...state,
+    waveState: {
+      ...state.waveState,
+      completedInWave,
+      totalSetsShown,
+    },
+  };
+}
+
+export function isWaveComplete(state: GameStateData): boolean {
+  return state.waveState.completedInWave >= state.waveState.setsInCurrentWave.length;
+}
+
+export function createCheckpointData(state: GameStateData, gameMode: 'standard' | 'bad-at', hintsDisabled: boolean): any {
+  return {
+    version: 1,
+    timestamp: Date.now(),
+    gameMode,
+    currentWave: state.waveState.currentWave,
+    lives: state.lives,
+    score: state.score,
+    setsShownHistory: state.waveState.totalSetsShown,
+    hintsDisabled,
+  };
+}
+
+export function restoreFromCheckpoint(state: GameStateData, checkpointData: any, waveSize: number = 10): GameStateData {
+  // Restore wave state from checkpoint
+  const restoredState = {
+    ...state,
+    score: checkpointData.score,
+    lives: checkpointData.lives,
+    waveState: {
+      ...state.waveState,
+      currentWave: checkpointData.currentWave,
+      totalSetsShown: checkpointData.setsShownHistory || [],
+    },
+  };
+
+  // Initialize the NEXT wave (checkpoint saves at end of completed wave)
+  const nextWave = checkpointData.currentWave + 1;
+  return initializeWave(restoredState, nextWave, waveSize);
 }

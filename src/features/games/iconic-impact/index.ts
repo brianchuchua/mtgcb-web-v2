@@ -7,4 +7,5 @@ export type {
   SetData,
   GameLogEntry,
   SetStatistics,
+  CheckpointData,
 } from './types';

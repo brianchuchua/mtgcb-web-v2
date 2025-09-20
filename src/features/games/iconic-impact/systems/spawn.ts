@@ -17,9 +17,16 @@ export function shouldSpawnIcon(state: GameStateData): boolean {
 
 export function selectRandomSet(
   availableSets: SetData[],
-  completedSets: Set<string>
+  completedSets: Set<string>,
+  waveSetCodes?: string[]
 ): SetData | null {
-  const uncompleted = availableSets.filter(set => !completedSets.has(set.code));
+  // If wave sets are provided, only select from those
+  let setsToChooseFrom = availableSets;
+  if (waveSetCodes && waveSetCodes.length > 0) {
+    setsToChooseFrom = availableSets.filter(set => waveSetCodes.includes(set.code));
+  }
+
+  const uncompleted = setsToChooseFrom.filter(set => !completedSets.has(set.code));
 
   if (uncompleted.length === 0) {
     return null; // All sets completed

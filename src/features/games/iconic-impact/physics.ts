@@ -98,9 +98,14 @@ function handleIconSpawning(state: GameStateData, config: GameConfig): GameState
     newState = clearCompletedSets(newState);
   }
 
-  const selectedSet = selectRandomSet(config.sets, newState.completedSets);
+  // Use wave-based selection if wave is active
+  const waveSetCodes = newState.waveState.currentWave > 0
+    ? newState.waveState.setsInCurrentWave
+    : undefined;
+
+  const selectedSet = selectRandomSet(config.sets, newState.completedSets, waveSetCodes);
   if (!selectedSet) {
-    // All sets completed - this should trigger win condition elsewhere
+    // All sets in wave completed - this should trigger wave completion
     return newState;
   }
 

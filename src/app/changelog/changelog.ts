@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-20',
+      version: '0.124.0',
+      changes: ['Added wave-based checkpoint system and in-game HUD to Iconic Impact game'],
+    },
+    {
       date: '2025-09-19',
       version: '0.123.1',
       changes: ['Fixed Iconic Impact bad mode win display showing incorrect set count'],

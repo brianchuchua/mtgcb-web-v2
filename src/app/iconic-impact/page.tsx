@@ -1,47 +1,53 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
+import SettingsIcon from '@mui/icons-material/Settings';
+import WavesIcon from '@mui/icons-material/Waves';
 import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  TextField,
-  Button,
-  Grid,
   Alert,
+  Box,
+  Button,
   Chip,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  FormControlLabel,
+  Grid,
+  IconButton,
   List,
   ListItem,
   ListItemText,
-  useMediaQuery,
-  useTheme,
-  Tabs,
-  Tab,
   Menu,
   MenuItem,
-  IconButton,
+  Paper,
   Switch,
-  FormControlLabel,
-  Divider,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
 import { styled } from '@mui/material/styles';
+import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
-  createGameEngine,
-  type GameEngine,
-  type GameState,
+  type CheckpointData,
   type GameCallbacks,
-  type SetData,
+  type GameEngine,
   type GameLogEntry,
+  type GameState,
+  type SetData,
+  createGameEngine,
 } from '@/features/games/iconic-impact';
-import { useLocalStorage } from '@/hooks/useLocalStorage';
-
 // Import the type from the game engine
 import type { SetStatistics } from '@/features/games/iconic-impact';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 const MAX_GAME_WIDTH = 800;
 const GAME_HEIGHT = 500;
+const WAVE_SIZE = 10;
 
 const GameCanvas = styled('canvas')(({ theme }) => ({
   border: `2px solid ${theme.palette.divider}`,
@@ -74,23 +80,29 @@ const GameInput = memo(function GameInput({ onAnswer, disabled, placeholder }: G
     }
   }, [disabled]);
 
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setLocalValue(value);
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setLocalValue(value);
 
-    // Check answer on every change
-    if (!disabled && onAnswer(value)) {
-      setLocalValue('');
-    }
-  }, [disabled, onAnswer]);
-
-  const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !disabled) {
-      if (onAnswer(localValue)) {
+      // Check answer on every change
+      if (!disabled && onAnswer(value)) {
         setLocalValue('');
       }
-    }
-  }, [disabled, localValue, onAnswer]);
+    },
+    [disabled, onAnswer],
+  );
+
+  const handleKeyPress = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && !disabled) {
+        if (onAnswer(localValue)) {
+          setLocalValue('');
+        }
+      }
+    },
+    [disabled, localValue, onAnswer],
+  );
 
   return (
     <TextField
@@ -118,6 +130,9 @@ interface GameStatsProps {
   onMenuOpen: (event: React.MouseEvent<HTMLElement>) => void;
   gameMode: 'standard' | 'bad-at';
   onSkipSet: () => void;
+  currentWave: number;
+  completedInWave: number;
+  totalWaves: number;
 }
 
 const GameStats = memo(function GameStats({
@@ -131,58 +146,45 @@ const GameStats = memo(function GameStats({
   onMenuOpen,
   gameMode,
   onSkipSet,
+  currentWave,
+  completedInWave,
+  totalWaves,
 }: GameStatsProps) {
   return (
     <Paper elevation={3} sx={{ p: 2 }}>
-      <Typography variant="h6" gutterBottom>
-        Game Stats
-      </Typography>
-      <Box display="flex" flexDirection="column" gap={2}>
-        <Box display="flex" gap={1} flexWrap="wrap">
-          <Chip label={`Score: ${score}`} color="primary" size="small" />
-          <Chip label={`Lives: ${lives}`} color={lives > 1 ? 'success' : 'error'} size="small" />
-          <Chip label={`${correctGuesses}/${totalSets}`} color="secondary" size="small" />
-        </Box>
-        <Box>
-          {gameState === 'idle' && (
-            <Box display="flex" gap={1}>
-              <Button
-                variant="contained"
-                fullWidth
-                onClick={onButtonClick}
-                disabled={!setsLoaded}
-              >
-                {!setsLoaded ? 'Loading Sets...' :
-                  gameMode === 'bad-at' ? 'Start (Bad At)' : 'Start Game'}
+      <Box>
+        {gameState === 'idle' && (
+          <Box display="flex" gap={1}>
+            <Button variant="contained" fullWidth onClick={onButtonClick} disabled={!setsLoaded}>
+              {!setsLoaded ? 'Loading Sets...' : gameMode === 'bad-at' ? 'Start (Bad At)' : 'Start Game'}
+            </Button>
+            <IconButton onClick={onMenuOpen} disabled={!setsLoaded}>
+              <SettingsIcon />
+            </IconButton>
+          </Box>
+        )}
+        {(gameState === 'playing' || gameState === 'paused') && (
+          <Box display="flex" gap={1}>
+            <Button variant="contained" sx={{ flex: 1 }} onClick={onButtonClick}>
+              {gameState === 'paused' ? 'Resume' : 'Pause'}
+            </Button>
+            {gameState === 'playing' && (
+              <Button variant="contained" color="error" sx={{ whiteSpace: 'nowrap' }} onClick={onSkipSet}>
+                Skip Set
               </Button>
-              <IconButton onClick={onMenuOpen} disabled={!setsLoaded}>
-                <SettingsIcon />
-              </IconButton>
-            </Box>
-          )}
-          {(gameState === 'playing' || gameState === 'paused') && (
-            <Box display="flex" gap={1}>
-              <Button variant="contained" sx={{ flex: 1 }} onClick={onButtonClick}>
-                {gameState === 'paused' ? 'Resume' : 'Pause'}
-              </Button>
-              {gameState === 'playing' && (
-                <Button variant="contained" color="error" sx={{ whiteSpace: 'nowrap' }} onClick={onSkipSet}>
-                  Skip Set
-                </Button>
-              )}
-            </Box>
-          )}
-          {(gameState === 'gameover' || gameState === 'won') && (
-            <Box display="flex" gap={1}>
-              <Button variant="contained" fullWidth onClick={onButtonClick}>
-                Play Again
-              </Button>
-              <IconButton onClick={onMenuOpen}>
-                <SettingsIcon />
-              </IconButton>
-            </Box>
-          )}
-        </Box>
+            )}
+          </Box>
+        )}
+        {(gameState === 'gameover' || gameState === 'won') && (
+          <Box display="flex" gap={1}>
+            <Button variant="contained" fullWidth onClick={onButtonClick}>
+              Play Again
+            </Button>
+            <IconButton onClick={onMenuOpen}>
+              <SettingsIcon />
+            </IconButton>
+          </Box>
+        )}
       </Box>
     </Paper>
   );
@@ -220,9 +222,8 @@ const GameLogComponent = memo(function GameLogComponent({
       successes: data.successes,
       failures: data.failures,
       total: data.successes + data.failures,
-      rate: data.successes + data.failures > 0
-        ? Math.round((data.successes / (data.successes + data.failures)) * 100)
-        : 0,
+      rate:
+        data.successes + data.failures > 0 ? Math.round((data.successes / (data.successes + data.failures)) * 100) : 0,
     }))
     .sort((a, b) => {
       // Sort by lowest success rate first (highest failure rate)
@@ -262,10 +263,7 @@ const GameLogComponent = memo(function GameLogComponent({
                 <ListItem key={gameLog.length - index - 1}>
                   <ListItemText
                     primary={
-                      <Typography
-                        variant="body2"
-                        color={entry.type === 'correct' ? 'success.main' : 'error.main'}
-                      >
+                      <Typography variant="body2" color={entry.type === 'correct' ? 'success.main' : 'error.main'}>
                         {entry.type === 'correct' ? '✓' : '✗'} {entry.setName}
                       </Typography>
                     }
@@ -304,11 +302,7 @@ const GameLogComponent = memo(function GameLogComponent({
                   return (
                     <ListItem key={code}>
                       <ListItemText
-                        primary={
-                          <Typography variant="body2">
-                            {setName}
-                          </Typography>
-                        }
+                        primary={<Typography variant="body2">{setName}</Typography>}
                         secondary={
                           <Typography variant="caption" component="span">
                             {successes}/{successes + failures} correct (
@@ -327,12 +321,7 @@ const GameLogComponent = memo(function GameLogComponent({
           </Box>
           {statsData.length > 0 && (
             <Box sx={{ pt: 2, borderTop: 1, borderColor: 'divider' }}>
-              <Button
-                variant="outlined"
-                size="small"
-                fullWidth
-                onClick={onClearStatistics}
-              >
+              <Button variant="outlined" size="small" fullWidth onClick={onClearStatistics}>
                 Clear Statistics
               </Button>
             </Box>
@@ -363,6 +352,11 @@ export default function IconicImpactPage() {
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [gameMode, setGameMode] = useState<'standard' | 'bad-at'>('standard');
   const [hintsDisabled, setHintsDisabled] = useLocalStorage<boolean>('mtgcb_iconic_impact_hints_disabled', false);
+  const [checkpoint, setCheckpoint] = useState<CheckpointData | null>(null);
+  const [showResumeDialog, setShowResumeDialog] = useState(false);
+  const [currentWave, setCurrentWave] = useState(0);
+  const [completedInWave, setCompletedInWave] = useState(0);
+  const [totalWaves, setTotalWaves] = useState(0);
 
   // Keep ref updated with latest setStatistics function
   useEffect(() => {
@@ -395,6 +389,25 @@ export default function IconicImpactPage() {
     };
   }, []);
 
+  // Load checkpoint on mount
+  useEffect(() => {
+    const savedCheckpoint = localStorage.getItem('mtgcb_iconic_impact_checkpoint');
+    if (savedCheckpoint) {
+      try {
+        const checkpointData = JSON.parse(savedCheckpoint) as CheckpointData;
+        if (checkpointData.version === 1 && checkpointData.currentWave > 0) {
+          setCheckpoint(checkpointData);
+          setShowResumeDialog(true);
+          // Set to the next wave since checkpoint saves at wave completion
+          setCurrentWave(checkpointData.currentWave + 1);
+          setCompletedInWave(0);
+        }
+      } catch (e) {
+        console.error('Failed to load checkpoint:', e);
+      }
+    }
+  }, []);
+
   // Fetch normal sets on mount
   useEffect(() => {
     const fetchSets = async () => {
@@ -411,7 +424,17 @@ export default function IconicImpactPage() {
             category: { OR: ['normal'] },
             limit: 500,
             offset: 0,
-            select: ['name', 'slug', 'code', 'setType', 'category', 'releasedAt', 'cardCount', 'isDraftable', 'sealedProductUrl'],
+            select: [
+              'name',
+              'slug',
+              'code',
+              'setType',
+              'category',
+              'releasedAt',
+              'cardCount',
+              'isDraftable',
+              'sealedProductUrl',
+            ],
           }),
         });
 
@@ -425,6 +448,8 @@ export default function IconicImpactPage() {
           if (Array.isArray(setsArray)) {
             // No need to filter since we're requesting normal sets from the API
             setNormalSets(setsArray);
+            // Calculate total waves
+            setTotalWaves(Math.ceil(setsArray.length / WAVE_SIZE));
           } else {
             console.error('Unexpected data structure:', actualData);
           }
@@ -451,7 +476,7 @@ export default function IconicImpactPage() {
       if (gameState !== 'idle' && initialBadAtSets.length > 0) {
         filteredSets = initialBadAtSets;
       } else {
-        filteredSets = normalSets.filter(set => {
+        filteredSets = normalSets.filter((set) => {
           const stats = statistics[set.code];
           if (!stats || stats.successes + stats.failures === 0) return false;
           const accuracy = stats.successes / (stats.successes + stats.failures);
@@ -468,24 +493,32 @@ export default function IconicImpactPage() {
     const callbacks: GameCallbacks = {
       onScoreChange: setScore,
       onLivesChange: setLives,
-      onStateChange: setGameState,
+      onStateChange: (state) => {
+        setGameState(state);
+        // Clear checkpoint if game over
+        if (state === 'gameover') {
+          localStorage.removeItem('mtgcb_iconic_impact_checkpoint');
+          setCheckpoint(null);
+        }
+      },
       onCorrectGuess: (setName, points) => {
-        setGameLog(prev => [...prev, { type: 'correct', setName, points }]);
+        setGameLog((prev) => [...prev, { type: 'correct', setName, points }]);
       },
       onMissedIcon: (setName) => {
-        setGameLog(prev => [...prev, { type: 'missed', setName }]);
+        setGameLog((prev) => [...prev, { type: 'missed', setName }]);
       },
       onMessage: () => {
         // Messages are no longer displayed in UI
       },
-      onProgressUpdate: (completed) => {
+      onProgressUpdate: (completed, total) => {
         setCorrectGuesses(completed);
+        setCompletedInWave(completed);
       },
       onGameComplete: () => {
         // Game complete is handled by state change to 'won'
       },
       onSetSuccess: (setCode, setName) => {
-        setStatisticsRef.current(prev => {
+        setStatisticsRef.current((prev) => {
           const updated = { ...prev };
           if (!updated[setCode]) {
             updated[setCode] = { setName, successes: 0, failures: 0 };
@@ -496,7 +529,7 @@ export default function IconicImpactPage() {
         });
       },
       onSetFailure: (setCode, setName) => {
-        setStatisticsRef.current(prev => {
+        setStatisticsRef.current((prev) => {
           const updated = { ...prev };
           if (!updated[setCode]) {
             updated[setCode] = { setName, successes: 0, failures: 0 };
@@ -505,6 +538,27 @@ export default function IconicImpactPage() {
           updated[setCode].setName = setName; // Update name in case it wasn't set
           return updated;
         });
+      },
+      onWaveComplete: (waveNumber, nextWaveNumber) => {
+        setCurrentWave(waveNumber);
+        // Set to WAVE_SIZE when wave completes
+        setCompletedInWave(WAVE_SIZE);
+      },
+      onRequestCheckpointSave: (checkpointData) => {
+        try {
+          localStorage.setItem('mtgcb_iconic_impact_checkpoint', JSON.stringify(checkpointData));
+        } catch (e) {
+          console.error('Failed to save checkpoint:', e);
+        }
+      },
+      onWaveTransition: (fromWave, toWave) => {
+        setCurrentWave(toWave);
+        setCompletedInWave(0);
+        setGameLog([]); // Clear log for new wave
+      },
+      onAllWavesComplete: () => {
+        // Clear checkpoint when all waves complete
+        localStorage.removeItem('mtgcb_iconic_impact_checkpoint');
       },
     };
 
@@ -516,13 +570,16 @@ export default function IconicImpactPage() {
       callbacks,
       statistics,
       hintsDisabled,
+      gameMode,
+      initialCheckpoint: checkpoint || undefined,
+      waveSize: WAVE_SIZE,
     });
 
     return () => {
       engineRef.current?.destroy();
       engineRef.current = null;
     };
-  }, [normalSets, gameWidth, gameMode]);
+  }, [normalSets, gameWidth, gameMode, checkpoint]);
 
   // Update statistics in game engine when they change
   useEffect(() => {
@@ -540,9 +597,15 @@ export default function IconicImpactPage() {
 
   const startGame = useCallback(() => {
     setGameLog([]);
+    setCurrentWave(1); // Set to wave 1 when starting
+    setCompletedInWave(0);
+    // Clear checkpoint when starting fresh
+    localStorage.removeItem('mtgcb_iconic_impact_checkpoint');
+    setCheckpoint(null);
+
     // Lock in the bad-at sets at game start
     if (gameMode === 'bad-at') {
-      const badSets = normalSets.filter(set => {
+      const badSets = normalSets.filter((set) => {
         const stats = statistics[set.code];
         if (!stats || stats.successes + stats.failures === 0) return false;
         const accuracy = stats.successes / (stats.successes + stats.failures);
@@ -564,12 +627,15 @@ export default function IconicImpactPage() {
   }, [gameMode, normalSets, statistics]);
 
   // Stable callback for GameInput component
-  const handleAnswer = useCallback((input: string): boolean => {
-    if (engineRef.current && gameState === 'playing') {
-      return engineRef.current.checkAnswer(input);
-    }
-    return false;
-  }, [gameState]);
+  const handleAnswer = useCallback(
+    (input: string): boolean => {
+      if (engineRef.current && gameState === 'playing') {
+        return engineRef.current.checkAnswer(input);
+      }
+      return false;
+    },
+    [gameState],
+  );
 
   const handleCanvasClick = useCallback(() => {
     // If starting a new game, clear the log
@@ -587,32 +653,35 @@ export default function IconicImpactPage() {
     setMenuAnchor(null);
   }, []);
 
-  const handleModeChange = useCallback((mode: 'standard' | 'bad-at') => {
-    // Check if bad-at mode is viable
-    if (mode === 'bad-at') {
-      const badSets = normalSets.filter(set => {
-        const stats = statistics[set.code];
-        if (!stats || stats.successes + stats.failures === 0) return false;
-        const accuracy = stats.successes / (stats.successes + stats.failures);
-        return accuracy < 0.5;
-      });
+  const handleModeChange = useCallback(
+    (mode: 'standard' | 'bad-at') => {
+      // Check if bad-at mode is viable
+      if (mode === 'bad-at') {
+        const badSets = normalSets.filter((set) => {
+          const stats = statistics[set.code];
+          if (!stats || stats.successes + stats.failures === 0) return false;
+          const accuracy = stats.successes / (stats.successes + stats.failures);
+          return accuracy < 0.5;
+        });
 
-      // If no bad sets, stay in standard mode
-      if (badSets.length === 0) {
-        setGameMode('standard');
-        setGameState('idle');
-        setMenuAnchor(null);
-        return;
+        // If no bad sets, stay in standard mode
+        if (badSets.length === 0) {
+          setGameMode('standard');
+          setGameState('idle');
+          setMenuAnchor(null);
+          return;
+        }
       }
-    }
 
-    setGameMode(mode);
-    setMenuAnchor(null);
-    // Clear the locked sets when changing modes
-    if (mode === 'standard') {
-      setInitialBadAtSets([]);
-    }
-  }, [normalSets, statistics]);
+      setGameMode(mode);
+      setMenuAnchor(null);
+      // Clear the locked sets when changing modes
+      if (mode === 'standard') {
+        setInitialBadAtSets([]);
+      }
+    },
+    [normalSets, statistics],
+  );
 
   const handleButtonClick = useCallback(() => {
     if (gameState === 'idle') {
@@ -680,37 +749,62 @@ export default function IconicImpactPage() {
         </Grid>
 
         <Grid item xs={12} md={3}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1, height: `calc(${GAME_HEIGHT}px + 107px)` }}>
+          <Box
+            sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1, height: `calc(${GAME_HEIGHT}px + 107px)` }}
+          >
             <GameStats
               score={score}
               lives={lives}
               correctGuesses={correctGuesses}
-              totalSets={gameMode === 'bad-at' && (gameState === 'playing' || gameState === 'paused' || gameState === 'won' || gameState === 'gameover') && initialBadAtSets.length > 0 ? initialBadAtSets.length :
-                        gameMode === 'bad-at' ? normalSets.filter(set => {
-                          const stats = statistics[set.code];
-                          if (!stats || stats.successes + stats.failures === 0) return false;
-                          const accuracy = stats.successes / (stats.successes + stats.failures);
-                          return accuracy < 0.5;
-                        }).length : normalSets.length}
+              totalSets={
+                gameMode === 'bad-at' &&
+                (gameState === 'playing' ||
+                  gameState === 'paused' ||
+                  gameState === 'won' ||
+                  gameState === 'gameover') &&
+                initialBadAtSets.length > 0
+                  ? initialBadAtSets.length
+                  : gameMode === 'bad-at'
+                    ? normalSets.filter((set) => {
+                        const stats = statistics[set.code];
+                        if (!stats || stats.successes + stats.failures === 0) return false;
+                        const accuracy = stats.successes / (stats.successes + stats.failures);
+                        return accuracy < 0.5;
+                      }).length
+                    : normalSets.length
+              }
               gameState={gameState}
               onButtonClick={handleButtonClick}
               setsLoaded={normalSets.length > 0}
               onMenuOpen={handleMenuOpen}
               gameMode={gameMode}
               onSkipSet={handleSkipSet}
+              currentWave={currentWave}
+              completedInWave={completedInWave}
+              totalWaves={totalWaves}
             />
 
             <GameLogComponent
               gameLog={gameLog}
               gameState={gameState}
               score={score}
-              totalSets={gameMode === 'bad-at' && (gameState === 'playing' || gameState === 'paused' || gameState === 'won' || gameState === 'gameover') && initialBadAtSets.length > 0 ? initialBadAtSets.length :
-                        gameMode === 'bad-at' ? normalSets.filter(set => {
-                          const stats = statistics[set.code];
-                          if (!stats || stats.successes + stats.failures === 0) return false;
-                          const accuracy = stats.successes / (stats.successes + stats.failures);
-                          return accuracy < 0.5;
-                        }).length : normalSets.length}
+              totalSets={
+                gameMode === 'bad-at' &&
+                (gameState === 'playing' ||
+                  gameState === 'paused' ||
+                  gameState === 'won' ||
+                  gameState === 'gameover') &&
+                initialBadAtSets.length > 0
+                  ? initialBadAtSets.length
+                  : gameMode === 'bad-at'
+                    ? normalSets.filter((set) => {
+                        const stats = statistics[set.code];
+                        if (!stats || stats.successes + stats.failures === 0) return false;
+                        const accuracy = stats.successes / (stats.successes + stats.failures);
+                        return accuracy < 0.5;
+                      }).length
+                    : normalSets.length
+              }
               statistics={statistics}
               onClearStatistics={() => setStatisticsRef.current({})}
             />
@@ -719,24 +813,17 @@ export default function IconicImpactPage() {
       </Grid>
 
       {/* Game Mode Menu */}
-      <Menu
-        anchorEl={menuAnchor}
-        open={Boolean(menuAnchor)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem
-          onClick={() => handleModeChange('standard')}
-          selected={gameMode === 'standard'}
-        >
+      <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
+        <MenuItem onClick={() => handleModeChange('standard')} selected={gameMode === 'standard'}>
           Standard Mode
         </MenuItem>
         <MenuItem
           onClick={() => handleModeChange('bad-at')}
           selected={gameMode === 'bad-at'}
           disabled={
-            Object.values(statistics).filter(stats => {
+            Object.values(statistics).filter((stats) => {
               const total = stats.successes + stats.failures;
-              return total > 0 && (stats.successes / total) < 0.5;
+              return total > 0 && stats.successes / total < 0.5;
             }).length === 0
           }
         >
@@ -746,11 +833,7 @@ export default function IconicImpactPage() {
         <MenuItem onClick={(e) => e.stopPropagation()}>
           <FormControlLabel
             control={
-              <Switch
-                checked={hintsDisabled}
-                onChange={(e) => setHintsDisabled(e.target.checked)}
-                size="small"
-              />
+              <Switch checked={hintsDisabled} onChange={(e) => setHintsDisabled(e.target.checked)} size="small" />
             }
             label="Disable Hints"
             onClick={(e) => e.stopPropagation()}
@@ -761,10 +844,58 @@ export default function IconicImpactPage() {
       {/* Disclaimer */}
       <Box sx={{ mt: 4, mb: 2, textAlign: 'center' }}>
         <Typography variant="body2" color="text.secondary">
-          Iconic Impact is a fan-made educational game for learning Magic: The Gathering set icons.
-          Magic: The Gathering is a trademark of Wizards of the Coast.
+          Iconic Impact is a fan-made educational game for learning Magic: The Gathering set icons. Magic: The Gathering
+          is a trademark of Wizards of the Coast.
         </Typography>
       </Box>
+
+      {/* Resume Dialog */}
+      <Dialog open={showResumeDialog} onClose={() => setShowResumeDialog(false)}>
+        <DialogTitle>Resume Previous Game?</DialogTitle>
+        <DialogContent>
+          <Typography>You completed Wave {checkpoint?.currentWave || 1}</Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            Ready to start Wave {(checkpoint?.currentWave || 0) + 1}
+          </Typography>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Score: {checkpoint?.score || 0}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Lives: {checkpoint?.lives || 3}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Saved: {checkpoint ? new Date(checkpoint.timestamp).toLocaleDateString() : ''}
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setShowResumeDialog(false);
+              localStorage.removeItem('mtgcb_iconic_impact_checkpoint');
+              setCheckpoint(null);
+              setCurrentWave(0);
+              setCompletedInWave(0);
+              setGameState('idle');
+            }}
+          >
+            New Game
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setShowResumeDialog(false);
+              // Start the game after dialog closes
+              setTimeout(() => {
+                engineRef.current?.start();
+              }, 100);
+            }}
+          >
+            Resume
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

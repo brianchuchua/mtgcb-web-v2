@@ -15,7 +15,7 @@ export function processAnswer(
   state: GameStateData,
   config: GameConfig,
   input: string
-): { matched: boolean; newState: GameStateData } {
+): { matched: boolean; newState: GameStateData; matchedSetCode?: string } {
   const normalized = normalizeInput(input);
   if (!normalized) {
     return { matched: false, newState: state };
@@ -45,14 +45,19 @@ export function processAnswer(
   config.callbacks.onSetSuccess(matchedIcon.setCode, matchedIcon.setName);
   config.callbacks.onScoreChange(newState.score);
   config.callbacks.onMessage(message, 2000);
-  config.callbacks.onProgressUpdate(newState.correctGuesses, config.sets.length);
+  // Update progress based on completed sets in current wave
+  const completedInWave = newState.waveState.setsInCurrentWave.filter(
+    code => newState.completedSets.has(code)
+  ).length;
+  config.callbacks.onProgressUpdate(completedInWave, newState.waveState.setsInCurrentWave.length);
 
-  // Check win condition
-  if (checkWinCondition(newState, config)) {
-    newState = triggerWin(newState, config);
-  }
+  // Check win condition (disabled for wave mode)
+  // Win is now handled by wave completion
+  // if (checkWinCondition(newState, config)) {
+  //   newState = triggerWin(newState, config);
+  // }
 
-  return { matched: true, newState };
+  return { matched: true, newState, matchedSetCode: matchedIcon.setCode };
 }
 
 export function findMatchingIcon(icons: Icon[], normalizedInput: string): Icon | undefined {

@@ -10,7 +10,27 @@ export interface SetData {
   sealedProductUrl: string;
 }
 
-export type GameState = 'idle' | 'playing' | 'paused' | 'gameover' | 'won';
+export type GameState = 'idle' | 'playing' | 'paused' | 'gameover' | 'won' | 'wave-complete';
+
+export interface WaveState {
+  currentWave: number;        // 1-indexed wave number
+  setsInCurrentWave: string[]; // Array of set codes for current wave
+  completedInWave: number;     // Number of sets completed in current wave (0-10)
+  totalSetsShown: string[];    // All set codes shown across all waves
+  waveStartLives: number;      // Lives at wave start (for potential retry)
+  waveStartScore: number;      // Score at wave start (for potential retry)
+}
+
+export interface CheckpointData {
+  version: number;             // For migration if needed
+  timestamp: number;           // When saved
+  gameMode: 'standard' | 'bad-at';
+  currentWave: number;
+  lives: number;
+  score: number;
+  setsShownHistory: string[];  // All sets shown so far
+  hintsDisabled: boolean;
+}
 
 export interface GameCallbacks {
   onScoreChange: (score: number) => void;
@@ -23,6 +43,10 @@ export interface GameCallbacks {
   onGameComplete: () => void;
   onSetSuccess: (setCode: string, setName: string) => void;
   onSetFailure: (setCode: string, setName: string) => void;
+  onWaveComplete: (waveNumber: number, nextWaveNumber: number) => void;
+  onRequestCheckpointSave: (checkpointData: CheckpointData) => void;
+  onWaveTransition: (fromWave: number, toWave: number) => void;
+  onAllWavesComplete: () => void;
 }
 
 export interface SetStatistics {
@@ -41,6 +65,9 @@ export interface GameConfig {
   callbacks: GameCallbacks;
   statistics?: SetStatistics;
   hintsDisabled?: boolean;
+  gameMode?: 'standard' | 'bad-at';
+  initialCheckpoint?: CheckpointData;
+  waveSize?: number; // Default 10
 }
 
 export interface Icon {
@@ -88,6 +115,8 @@ export interface GameStateData {
   animationFrame: number | null;
   imageCache: Map<string, HTMLImageElement>;
   scheduledStateChange?: { state: GameState; time: number };
+  waveState: WaveState;
+  allAvailableSets: SetData[]; // Store all sets for wave generation
 }
 
 export interface GameEngine {
