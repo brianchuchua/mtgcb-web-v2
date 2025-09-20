@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-19',
+      version: '0.123.1',
+      changes: ['Fixed Iconic Impact bad mode win display showing incorrect set count'],
+    },
+    {
+      date: '2025-09-19',
       version: '0.123.0',
       changes: ['Added statistics tracking, game modes, and skip button to Iconic Impact game'],
     },

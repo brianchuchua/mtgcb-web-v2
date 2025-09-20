@@ -553,6 +553,7 @@ export default function IconicImpactPage() {
       if (badSets.length === 0) {
         setGameMode('standard');
         setInitialBadAtSets([]);
+        setGameState('idle');
         // Don't start the game, let user click again in standard mode
         return;
       }
@@ -599,6 +600,7 @@ export default function IconicImpactPage() {
       // If no bad sets, stay in standard mode
       if (badSets.length === 0) {
         setGameMode('standard');
+        setGameState('idle');
         setMenuAnchor(null);
         return;
       }
@@ -683,7 +685,7 @@ export default function IconicImpactPage() {
               score={score}
               lives={lives}
               correctGuesses={correctGuesses}
-              totalSets={gameMode === 'bad-at' && gameState !== 'idle' && initialBadAtSets.length > 0 ? initialBadAtSets.length :
+              totalSets={gameMode === 'bad-at' && (gameState === 'playing' || gameState === 'paused' || gameState === 'won' || gameState === 'gameover') && initialBadAtSets.length > 0 ? initialBadAtSets.length :
                         gameMode === 'bad-at' ? normalSets.filter(set => {
                           const stats = statistics[set.code];
                           if (!stats || stats.successes + stats.failures === 0) return false;
@@ -702,7 +704,7 @@ export default function IconicImpactPage() {
               gameLog={gameLog}
               gameState={gameState}
               score={score}
-              totalSets={gameMode === 'bad-at' && gameState !== 'idle' && initialBadAtSets.length > 0 ? initialBadAtSets.length :
+              totalSets={gameMode === 'bad-at' && (gameState === 'playing' || gameState === 'paused' || gameState === 'won' || gameState === 'gameover') && initialBadAtSets.length > 0 ? initialBadAtSets.length :
                         gameMode === 'bad-at' ? normalSets.filter(set => {
                           const stats = statistics[set.code];
                           if (!stats || stats.successes + stats.failures === 0) return false;
