@@ -43,7 +43,7 @@ const faqData: FAQData = {
       question: 'Why is this card or set missing?',
       answer: `
         <p>It's probably on my TODO list to add. I'm pretty good about adding new cards before or on 
-        release dates, but there is backlog of miscellaneous cards to support, not to mention the 
+        release dates, but there is a backlog of miscellaneous cards to support, not to mention the 
         eventual project to support all language printings of all cards.</p>
 
         <p>Feel free to contact me if a particular set or card is important to you. I can update you 

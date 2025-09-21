@@ -21,6 +21,7 @@ import {
   Storage as TemplateIcon,
   Analytics as DraftHelperIcon,
   ViewModule,
+  Warning as WarningIcon,
 } from '@mui/icons-material';
 import { AutoStories as BinderIcon, SportsEsports as GameIcon } from '@mui/icons-material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -55,6 +56,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
   const { isMainSectionExpanded, setMainSectionExpanded } = useDashboardContext();
   const [isCollectionMenuOpen, setIsCollectionMenuOpen] = useState(false);
   const [isResourcesMenuOpen, setIsResourcesMenuOpen] = useState(false);
+  const [isDangerZoneOpen, setIsDangerZoneOpen] = useState(false);
 
   const toggleNavExpanded = () => {
     setMainSectionExpanded(!isMainSectionExpanded);
@@ -309,18 +311,38 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                   </ListItem>
                   <ListItem disablePadding>
                     <ListItemButton
-                      component={Link}
-                      href="/reset-collection"
-                      selected={pathname === '/reset-collection'}
-                      onClick={handleClick}
+                      onClick={() => setIsDangerZoneOpen(!isDangerZoneOpen)}
                       sx={{ pl: 4 }}
                     >
                       <ListItemIcon>
-                        <ResetIcon />
+                        <WarningIcon />
                       </ListItemIcon>
-                      <ListItemText primary="Reset Collection" />
+                      <ListItemText primary="Danger Zone" />
+                      {isDangerZoneOpen ? (
+                        <ExpandLessIcon sx={{ mr: '5px' }} />
+                      ) : (
+                        <ExpandMoreIcon sx={{ mr: '5px' }} />
+                      )}
                     </ListItemButton>
                   </ListItem>
+                  <Collapse in={isDangerZoneOpen} timeout="auto">
+                    <List component="div" disablePadding>
+                      <ListItem disablePadding>
+                        <ListItemButton
+                          component={Link}
+                          href="/reset-collection"
+                          selected={pathname === '/reset-collection'}
+                          onClick={handleClick}
+                          sx={{ pl: 6 }}
+                        >
+                          <ListItemIcon>
+                            <ResetIcon />
+                          </ListItemIcon>
+                          <ListItemText primary="Reset Collection" />
+                        </ListItemButton>
+                      </ListItem>
+                    </List>
+                  </Collapse>
                 </List>
               </Collapse>
             )}

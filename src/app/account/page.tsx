@@ -1,11 +1,18 @@
 'use client';
 
-import { DeleteForever as DeleteIcon, WarningAmber as WarningIcon } from '@mui/icons-material';
+import {
+  DeleteForever as DeleteIcon,
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+  WarningAmber as WarningIcon,
+} from '@mui/icons-material';
 import {
   Alert,
   Box,
+  Collapse,
   Container,
   FormControlLabel,
+  IconButton,
   MenuItem,
   Paper,
   Select,
@@ -50,6 +57,7 @@ function ProfileContent() {
   const [deleteAccount, { isLoading: isDeletingAccount }] = useDeleteAccountMutation();
   const [hasProfileChanges, setHasProfileChanges] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDangerZoneOpen, setIsDangerZoneOpen] = useState(false);
   const [priceType, setPriceType] = usePriceType();
   const [progressBarStyle, setProgressBarStyle] = useProgressBarStyle();
   const [setIconStyle, setSetIconStyle] = useSetIconStyle();
@@ -522,48 +530,64 @@ function ProfileContent() {
         </Paper>
 
         <Paper variant="outlined">
-          <CardHeader>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <WarningIcon
-                sx={{
-                  color: (theme) => theme.palette.error.main,
-                  fontSize: 28,
-                  mr: 1,
-                }}
-              />
-              <Typography variant="h6" sx={{ color: 'error.main' }}>
-                Danger Zone - Delete Account
-              </Typography>
+          <CardHeader
+            sx={{
+              cursor: 'pointer',
+              userSelect: 'none',
+              '&:hover': {
+                backgroundColor: (theme) => theme.palette.action.hover,
+              },
+            }}
+            onClick={() => setIsDangerZoneOpen(!isDangerZoneOpen)}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <WarningIcon
+                  sx={{
+                    color: (theme) => theme.palette.error.main,
+                    fontSize: 28,
+                    mr: 1,
+                  }}
+                />
+                <Typography variant="h6" sx={{ color: 'error.main' }}>
+                  Danger Zone - Delete Account
+                </Typography>
+              </Box>
+              <IconButton size="small" sx={{ color: 'error.main' }}>
+                {isDangerZoneOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
             </Box>
           </CardHeader>
-          <CardContent>
-            <Alert severity="error" sx={{ mb: 3 }}>
-              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                Permanently delete your account
-              </Typography>
-              <Typography variant="body2">
-                Once you delete your account, there is no going back. All your data will be permanently removed. This
-                includes your entire collection, locations, goals, and all personal information. Consider{' '}
-                <Link href="/export">exporting your collection</Link> first to create a backup of your data.
-              </Typography>
-            </Alert>
+          <Collapse in={isDangerZoneOpen}>
+            <CardContent>
+              <Alert severity="error" sx={{ mb: 3 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Permanently delete your account
+                </Typography>
+                <Typography variant="body2">
+                  Once you delete your account, there is no going back. All your data will be permanently removed. This
+                  includes your entire collection, locations, goals, and all personal information. Consider{' '}
+                  <Link href="/export">exporting your collection</Link> first to create a backup of your data.
+                </Typography>
+              </Alert>
 
-            <ButtonWrapper>
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<DeleteIcon />}
-                onClick={() => setDeleteDialogOpen(true)}
-                disabled={isDeletingAccount}
-                sx={{
-                  px: 3,
-                  py: 1,
-                }}
-              >
-                Delete Account
-              </Button>
-            </ButtonWrapper>
-          </CardContent>
+              <ButtonWrapper>
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<DeleteIcon />}
+                  onClick={() => setDeleteDialogOpen(true)}
+                  disabled={isDeletingAccount}
+                  sx={{
+                    px: 3,
+                    py: 1,
+                  }}
+                >
+                  Delete Account
+                </Button>
+              </ButtonWrapper>
+            </CardContent>
+          </Collapse>
         </Paper>
       </CardStack>
 

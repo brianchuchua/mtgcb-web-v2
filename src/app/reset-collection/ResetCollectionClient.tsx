@@ -14,6 +14,7 @@ import {
   DialogContentText,
   DialogTitle,
   Paper,
+  TextField,
   Typography,
   styled,
   useTheme,
@@ -32,21 +33,33 @@ const InfoBox = styled(Box)(({ theme }) => ({
   marginTop: theme.spacing(2),
 }));
 
+const CONFIRMATION_TEXT = 'reset my collection';
+
 export const ResetCollectionClient = () => {
   const router = useRouter();
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAuth();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [confirmationInput, setConfirmationInput] = useState('');
   const [nukeCollection, { isLoading }] = useNukeCollectionMutation();
 
+  const isConfirmationValid = confirmationInput.toLowerCase() === CONFIRMATION_TEXT;
+
+  const handleClose = () => {
+    setConfirmationInput('');
+    setConfirmDialogOpen(false);
+  };
+
   const handleReset = async () => {
+    if (!isConfirmationValid) return;
+
     try {
       const result = await nukeCollection().unwrap();
-      
+
       if (result.success && result.data) {
         enqueueSnackbar(`Successfully deleted ${result.data.deletedCount} collection entries`, { variant: 'success' });
-        setConfirmDialogOpen(false);
+        handleClose();
         router.push('/');
       } else {
         enqueueSnackbar('Failed to reset collection', { variant: 'error' });
@@ -125,7 +138,7 @@ export const ResetCollectionClient = () => {
       {/* Confirmation Dialog */}
       <Dialog
         open={confirmDialogOpen}
-        onClose={() => setConfirmDialogOpen(false)}
+        onClose={handleClose}
         maxWidth="sm"
         fullWidth
         PaperProps={{
@@ -160,21 +173,40 @@ export const ResetCollectionClient = () => {
             </Typography>
           </InfoBox>
 
-          <DialogContentText sx={{ fontWeight: 500, mt: 2 }}>
-            Are you absolutely sure you want to reset your entire collection?
+          <DialogContentText sx={{ fontWeight: 500, mt: 2, mb: 2 }}>
+            To confirm, please type <strong>{CONFIRMATION_TEXT}</strong> below:
           </DialogContentText>
+
+          <TextField
+            fullWidth
+            value={confirmationInput}
+            onChange={(e) => setConfirmationInput(e.target.value)}
+            placeholder={CONFIRMATION_TEXT}
+            disabled={isLoading}
+            error={confirmationInput !== '' && !isConfirmationValid}
+            helperText={
+              confirmationInput !== '' && !isConfirmationValid
+                ? 'Text does not match'
+                : ''
+            }
+            sx={{ mb: 2 }}
+          />
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
-          <Button variant="outlined" onClick={() => setConfirmDialogOpen(false)}>
-            Cancel
-          </Button>
-          <Button 
-            variant="contained" 
-            color="error" 
-            onClick={handleReset} 
+          <Button
+            variant="outlined"
+            onClick={handleClose}
             disabled={isLoading}
           >
-            Yes, Reset My Collection
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleReset}
+            disabled={!isConfirmationValid || isLoading}
+          >
+            {isLoading ? 'Resetting...' : 'Yes, Reset My Collection'}
           </Button>
         </DialogActions>
       </Dialog>

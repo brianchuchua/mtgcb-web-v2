@@ -24,17 +24,28 @@ export default function BinderTemplatesPage() {
             href="https://drive.google.com/drive/folders/1-4f_ba2kTf4E37CAN_KG6PTIOKnkPaWn?usp=sharing"
             target="_blank"
             rel="noopener noreferrer"
-            sx={{ display: 'flex', justifyContent: 'center' }}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              position: 'relative',
+              width: '100%',
+              maxWidth: '667px',
+              mx: 'auto',
+              aspectRatio: '667/500',
+            }}
           >
             <Box
               component="img"
               src="https://r2.mtgcollectionbuilder.com/images/mtgcb-binders.png"
               alt="Binder Templates Example"
               sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
                 width: '100%',
-                maxWidth: '667px', // Maintain aspect ratio (900/675 = 1.33, so 500*1.33 = 667)
-                height: 'auto',
+                height: '100%',
                 borderRadius: '20px',
+                objectFit: 'cover',
               }}
             />
           </Box>

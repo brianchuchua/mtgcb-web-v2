@@ -3,18 +3,9 @@
 import { Box, Container, Link, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import NextLink from 'next/link';
-import { useEffect, useState } from 'react';
 
 const Footer = () => {
-  const [emailLink, setEmailLink] = useState<string>('');
   const currentYear = new Date().getFullYear();
-
-  useEffect(() => {
-    // Client-side only email construction
-    const lhs = 'brian';
-    const rhs = 'mtgcb.com';
-    setEmailLink(`mailto:${lhs}@${rhs}`);
-  }, []);
 
   return (
     <StyledFooter>
@@ -26,13 +17,9 @@ const Footer = () => {
               Terms and Privacy
             </Link>{' '}
             ·{' '}
-            {emailLink ? (
-              <Link href={emailLink} color="inherit">
-                Contact
-              </Link>
-            ) : (
-              <span>Contact</span>
-            )}
+            <Link component={NextLink} href="/contact" color="inherit">
+              Contact
+            </Link>
           </Typography>
           <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
             <Typography variant="body2" color="text.secondary">
@@ -43,13 +30,9 @@ const Footer = () => {
                 Terms and Privacy
               </Link>{' '}
               ·{' '}
-              {emailLink ? (
-                <Link href={emailLink} color="inherit">
-                  Contact
-                </Link>
-              ) : (
-                <span>Contact</span>
-              )}
+              <Link component={NextLink} href="/contact" color="inherit">
+                Contact
+              </Link>
             </Typography>
           </Box>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>

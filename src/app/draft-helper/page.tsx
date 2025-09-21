@@ -44,18 +44,26 @@ export default function DraftHelperPage() {
             href="https://17lands.mtgcb.tools/"
             target="_blank"
             rel="noopener noreferrer"
-            sx={{ display: 'block' }}
+            sx={{
+              display: 'block',
+              position: 'relative',
+              width: '100%',
+              paddingBottom: '56.25%', // 16:9 aspect ratio, adjust if needed
+              overflow: 'hidden',
+              borderRadius: 1,
+            }}
           >
             <Box
               component="img"
               src="https://r2.mtgcollectionbuilder.com/images/17-lands-tool-cropped.png"
               alt="17Lands Visual Comparison Tool Screenshot"
               sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
                 width: '100%',
-                height: 'auto',
-                maxHeight: '500px',
+                height: '100%',
                 objectFit: 'contain',
-                borderRadius: 1,
               }}
             />
           </Box>

@@ -38,7 +38,7 @@ export const DeleteAccountDialog: React.FC<DeleteAccountDialogProps> = ({
   isLoading = false,
 }) => {
   const [confirmationInput, setConfirmationInput] = useState('');
-  
+
   const isConfirmationValid = confirmationInput.toLowerCase() === CONFIRMATION_TEXT;
 
   const handleClose = () => {
@@ -81,9 +81,9 @@ export const DeleteAccountDialog: React.FC<DeleteAccountDialogProps> = ({
             This action is permanent and cannot be undone!
           </Typography>
           <Typography variant="body2">
-            All your data will be permanently deleted, including your collection, 
-            locations, goals, and all personal information. We strongly recommend{' '}
-            <Link href="/export">exporting your collection</Link> first to create a backup.
+            All your data will be permanently deleted, including your collection, locations, goals, and all personal
+            information. We strongly recommend <Link href="/export">exporting your collection</Link> first to create a
+            backup of your collection. Note that goals and locations are not backed up.
           </Typography>
         </Alert>
 
@@ -113,28 +113,15 @@ export const DeleteAccountDialog: React.FC<DeleteAccountDialogProps> = ({
           placeholder={CONFIRMATION_TEXT}
           disabled={isLoading}
           error={confirmationInput !== '' && !isConfirmationValid}
-          helperText={
-            confirmationInput !== '' && !isConfirmationValid
-              ? 'Text does not match'
-              : ''
-          }
+          helperText={confirmationInput !== '' && !isConfirmationValid ? 'Text does not match' : ''}
           sx={{ mb: 2 }}
         />
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
-        <Button 
-          variant="outlined" 
-          onClick={handleClose}
-          disabled={isLoading}
-        >
+        <Button variant="outlined" onClick={handleClose} disabled={isLoading}>
           Cancel
         </Button>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={handleConfirm}
-          disabled={!isConfirmationValid || isLoading}
-        >
+        <Button variant="contained" color="error" onClick={handleConfirm} disabled={!isConfirmationValid || isLoading}>
           {isLoading ? 'Deleting...' : 'Delete My Account'}
         </Button>
       </DialogActions>
