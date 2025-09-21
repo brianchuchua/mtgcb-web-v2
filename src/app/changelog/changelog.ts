@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-21',
+      version: '0.124.3',
+      changes: ['Fixed error flash when deleting locations and goals from their edit pages'],
+    },
+    {
       date: '2025-09-20',
       version: '0.124.2',
       changes: ['Miscellaneous typo fixes and interface tidying'],
@@ -438,7 +443,10 @@ const changelogData: ChangelogData = {
     {
       date: '2025-08-02',
       version: '0.90.0',
-      changes: ['Added support for nested locations'],
+      changes: [
+        'Added support for nested locations',
+        'Added changelog page to track version history -- older history can be seen in GitHub.',
+      ],
     },
   ],
 };

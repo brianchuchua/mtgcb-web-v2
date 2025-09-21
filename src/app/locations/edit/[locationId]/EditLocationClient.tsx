@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -18,8 +18,9 @@ interface EditLocationClientProps {
 export default function EditLocationClient({ locationId }: EditLocationClientProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
+  const [isDeleting, setIsDeleting] = useState(false);
   const { data: locationResponse, isLoading, error } = useGetLocationQuery(locationId, {
-    skip: !isAuthenticated || !locationId,
+    skip: !isAuthenticated || !locationId || isDeleting,
   });
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function EditLocationClient({ locationId }: EditLocationClientPro
     }
   }, [isAuthenticated, router]);
 
-  if (isLoading) {
+  if (isLoading || isDeleting) {
     return (
       <Container>
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -65,7 +66,10 @@ export default function EditLocationClient({ locationId }: EditLocationClientPro
       <Typography variant="h4" component="h1" gutterBottom>
         Edit Location
       </Typography>
-      <EditLocationForm location={locationResponse.data} />
+      <EditLocationForm
+        location={locationResponse.data}
+        onDeleteStart={() => setIsDeleting(true)}
+      />
     </Container>
   );
 }

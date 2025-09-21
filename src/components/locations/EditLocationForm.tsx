@@ -20,9 +20,10 @@ import { useDeleteLocation } from '@/hooks/locations/useDeleteLocation';
 
 interface EditLocationFormProps {
   location: Location;
+  onDeleteStart?: () => void;
 }
 
-export default function EditLocationForm({ location }: EditLocationFormProps) {
+export default function EditLocationForm({ location, onDeleteStart }: EditLocationFormProps) {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const [updateLocation, { isLoading }] = useUpdateLocationMutation();
@@ -36,7 +37,10 @@ export default function EditLocationForm({ location }: EditLocationFormProps) {
     handleConfirmDelete,
     handleCancelDelete,
   } = useDeleteLocation({
-    onSuccess: () => router.push('/locations'),
+    onSuccess: () => {
+      onDeleteStart?.();
+      router.push('/locations');
+    },
   });
 
   const {

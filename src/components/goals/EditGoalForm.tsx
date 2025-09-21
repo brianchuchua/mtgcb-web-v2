@@ -35,6 +35,7 @@ interface EditGoalFormProps {
   userId: number;
   onClose: () => void;
   onSuccess: (goal: Goal) => void;
+  onDeleteStart?: () => void;
 }
 
 interface FormValues {
@@ -46,7 +47,7 @@ interface FormValues {
   isActive: boolean;
 }
 
-export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormProps) {
+export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }: EditGoalFormProps) {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const [updateGoal, { isLoading }] = useUpdateGoalMutation();
@@ -58,7 +59,10 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess }: EditGoalFormP
     handleConfirmDelete,
     handleCancelDelete,
   } = useDeleteGoal(userId, {
-    onSuccess: () => router.push('/goals'),
+    onSuccess: () => {
+      onDeleteStart?.();
+      router.push('/goals');
+    },
   });
   const [quantityMode, setQuantityMode] = useState<'separate' | 'all'>(
     goal?.targetQuantityAll ? 'all' : 'separate'

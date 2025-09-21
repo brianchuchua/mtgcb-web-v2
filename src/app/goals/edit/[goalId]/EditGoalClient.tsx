@@ -19,6 +19,7 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
   const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const [goal, setGoal] = useState<Goal | null>(null);
   const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { data, isLoading, error } = useGetGoalQuery(
     {
@@ -26,7 +27,7 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
       goalId,
     },
     {
-      skip: !user?.userId,
+      skip: !user?.userId || isDeleting,
     },
   );
 
@@ -62,7 +63,7 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
     }
   };
 
-  if (isAuthLoading || isLoading) {
+  if (isAuthLoading || isLoading || isDeleting) {
     return (
       <Box display="flex" justifyContent="center" p={4}>
         <CircularProgress />
@@ -113,7 +114,13 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
             p: 2,
           }}
         >
-          <EditGoalForm goal={goal} userId={user?.userId || 0} onClose={handleClose} onSuccess={handleSuccess} />
+          <EditGoalForm
+            goal={goal}
+            userId={user?.userId || 0}
+            onClose={handleClose}
+            onSuccess={handleSuccess}
+            onDeleteStart={() => setIsDeleting(true)}
+          />
         </Paper>
       </Box>
     </Box>
