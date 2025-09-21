@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-20',
+      version: '0.124.1',
+      changes: ['Fixed Iconic Impact Skip Set button animation to properly show failure effects'],
+    },
+    {
+      date: '2025-09-20',
       version: '0.124.0',
       changes: ['Added wave-based checkpoint system and in-game HUD to Iconic Impact game'],
     },

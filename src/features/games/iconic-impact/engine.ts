@@ -16,6 +16,7 @@ import { renderGameplayScreen } from './screens/game';
 import { renderPauseScreen } from './screens/pause';
 import { renderGameOverScreen } from './screens/gameover';
 import { renderWinScreen } from './screens/win';
+import { FAILURE_ANIMATION_DURATION } from './constants';
 
 export function createGameEngine(config: GameConfig): GameEngine {
   let state = createInitialState(config.sets);
@@ -233,7 +234,7 @@ export function createGameEngine(config: GameConfig): GameEngine {
         return {
           ...icon,
           failed: true,
-          animationTimer: 30,  // Start animation timer
+          animationTimer: FAILURE_ANIMATION_DURATION,  // Start animation timer with proper duration
           animationRadius: 0   // Start animation radius
         };
       }
