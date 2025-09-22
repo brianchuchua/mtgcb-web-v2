@@ -4,101 +4,100 @@ I've found over time that maintaining my action items for code in external tools
 
 Best to keep them in the codebase, especially since I'm a team of one.
 
-## Just noticed
+Currently, I am either knocking out items in this list or moving them to TODO-organized.md, which will eventually replace this file.
 
-buy missing cards for this goal -- should just not have this button if it's a large number of cards
-when viewing sets with a collection goal on, should add a note that the total cards are those actually collected in the set, maybe
-statistics calculation should save to db with a timestamp, only update once every 24 hours, not every dyno restart
-consider removing preload of pagination when goals are involved since it double-hits the db
-must save script of how to populate otherPrintings in case the trigger doesn't work
-npx drizzle-kit introspect doesn't bring in triggers and stuff
-Need a scroll region when a card with a goal has a lot of contributions (like a basic land).
-Mention somewhere that the cheapest available printing is shown for collection goals
-Bug: Trying to sort by quantity in collection view reverts back to release date, need to test goal refactor with this
-Default table fields in card view sucks on mobile, locations should not be first, quantities need to be easy
-Goal met\* needs to be easier to read on mobile
-footer flashes before content load, may need a min height+6
-goal header inside of a set page needs ux work -- buy button is awkward near progress bar
-If you know the user, ask them to set their collection to public. <-- needs to say or share a private link
-confirm default cards per row is auto
-cost to complete for goal doesn't really line up with the card that is rendered -- and sending the most expensive card to tcgplayer to buy can hurt the user. <-- See https://mtgcb-web-v2.mtgcollectionbuilder.com/collections/1337?cardsSortBy=market&oneResultPerCardName=true&goalId=1&showGoals=incomplete&contentType=cards, should perhaps always show the cheapest
-Maybe (Need 1 or regular) should say "of any printing" contextually
-maybe a separate call can hydrate other printings for cards in current pagination, at least the number of them
+## Real Current Action Items
+
+- i think price update jobs frequently don't finish, need to check logs -- i see, dyno restart, i need these things to auto-start on bootup, account for this, ensuring only one job of a type runs at a time, etc
+- I want a test suite of every goal type and filtering option that Claude runs through or mayne just a custom node script runs against test env or local creates and deletes goals
+- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local
+- considering: "Complete this set" buttons don't make sense with goals -- like complete this subgoal maybe? buy missing cards in other contexts? rename and consider.
+- Need these equivalent buttons on the set pages too.
+- Mtg cb price table on card page needs to show foil price if it’s the only price -- and fallback prices too like card views
+- Buy on TCGPlayer should be near the top above the fold on mobile
+- Scroll to top mobile after adding card looks blank
+- audit the goal url preview for centering and check performance, still works after refactor?
+- test card url preview with long card and set names
+- subset data clean-up has to be the next phase of mtg cb, data fixes, 100% parity and accuracy with English cards and adding art series cards, image quality fixes, collector number fixes, Ae/apostrophe fixes, whitespace trimming, etc, release date/set sorting issues, etc
+- release date sort?
+- image quality audit, need to use scryfall's system of labeling bad images, etc.
+- maybe clearly label cards that aren't legal for play?
+- major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
+- repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal <-- <-- do the home stuff below too
+- add a note in the locations section saying not to use it for everything, like individual set binders, busywork
+- make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
+
+- Knocking out all small action items in this file that are needed for release
+- (or moving them to organized future todos if they're not needed for release)
+
+-pie chart color distribution color pie i want this, multicolor pie "your color pie"
+
+- ux: consider a change to header styles for collection headers similar to the home page
+- ux: info icon not aligned well next to prices, behaves differently than the info icon for goals, probably needs negative margin
+- ux: one printing of each unique card / every printing of each unique card is confusing when the quantity is more than one (goals page)
+
+- your goal is updating notistack can persist during navigation and i've seen goals get stuck recomputing locally (just when you configure one that has 0 cards matching, like time spiral remastered + non-basics + commons + 4 of each)
+
+- big: need to audit buy missing cards for goal buttons, macro scale and set scale -- can't just click it for a goal with 30000 cards. can't do the prefetching for like an hour and then pop up the modal, need to be smarter and break it into chunks ahead of time. buy missing cards for this goal -- should just not have this button if it's a large number of cards, see basic land goals
+  -- related ux: goal header inside of a set page needs ux work -- buy button is awkward near progress bar
+- considering: when viewing sets with a collection goal on, should add a note that the total cards are those actually collected in the set, maybe
+  Mention somewhere that the cheapest available printing is shown for collection goals
+
+- small: console log warnings on home page
+
+  cost to complete for goal doesn't really line up with the card that is rendered -- and sending the most expensive card to tcgplayer to buy can hurt the user. <-- See https://mtgcb-web-v2.mtgcollectionbuilder.com/collections/1337?cardsSortBy=market&oneResultPerCardName=true&goalId=1&showGoals=incomplete&contentType=cards, should perhaps always show the cheapest
+  Maybe (Need 1 or regular) should say "of any printing" contextually
+
 maybe instead of a pop-up when cards are updated, status updating in the labe ⚠ Cross origin request detected from local.mtgcb.com to /\_next/\* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
 Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
 
 ## Recent Actions
 
-Deployed mtgcb-web-v2 and mtgcb-api-v3 to production, using a rough draft of the migration process.
-Have fixed major perf issues and minor bugs.
 mtgcb-jobs app is done and tested locally, don't want to swamp tcgplayer, so won't deploy or run it until after go-live so i don't have the legacy and new updater going at the same time
 
 ## Current Action Items (kinda disorganized now)
 
-- social media links
-
-test mobile, fix issues
-
-test tablet, fix issues
-
 Mostly ready:
-
-- Formalize the migration process from old db to new db. Don't forget the userId autoincrement fix. Document and test.
-- i want to add a tcgplayerPricesUpdatedAt field to Cards
-  heroku thinks i am using too much memory, but i upgraded dynos, a bug in their interface?
-  questioning how i gather the platform statistics, it's such a heavy api call
 
 Now:
 
-- Work on annoying bugs and issues, cleaning up this TODO document
-- UX or bug: FNM Promos set, when a card is both a member of a subsetgroup and has a parent set that is the same set, it's listed on the bottom and also within the set, think about this more. Could just be a data issue.
-- mass entry for tcgplaye, add collector number
-- roadmap page (maybe just on the changelog page)
-- mention binders on home page
-- faq page
-- audit existing features in legacy site
-
 ## Remaining Major Feature Work Before 1.0
 
-### Data Issues
+### MTG CB Data Importer
 
-- isDraftable missing from a ton of sets, look into import pipeline too
+- Needs to work for MTG CB v3 flawlessly
 
-### Patron Support Page
+### Patron Support Page 🔁
 
 - A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.
+- A supporter badge of some sort would be great.
 - Detecting if someone is a patron and linking their accounts.
 
-### Patron Perks
+### Patron Perks 🔁
 
 - Definitely want that card customizer.
 - Weather effects? Custom themes?
 - What other additional cosmetics?
+- Direct contact on Discord and voting on features
+- roadmap page showing patrons voted on stuff
+- Based on a funny conversation we had, extreme progress bar styles, see Discord
 
 ### Home Page (Partially complete)
 
+- Rephrase this all, change We to I <-- <-- do home page next time you work on this
 - Some of the below has been done, but will be revisited as I complete other connected sections.
 - Should brag about new features and explain the launch (need a news page I think)
 - Should show most valuable card, statistics, etc. I think. Although need stats somewhere else too, maybe in every header of every collection page.
 - Need to mention the site name more prominently
 - Need to rewrite the descriptions and link to my binders somewhere, maybe a tools section that links to my 17 lands tool too
 - Need to mention Patreon and voting on future features
-- When logged in, should have statistics and action buttons to lead them to different pages, in like a boxy layout, "what would you like to do today?", browse cards independent of your collection, etc.
-- logo and favicon
 - meta tag stuff, probably its own project
 - Emphasize collection completion and costs to complete
-- Browse sample collection
 - Needs preview of news section
 - Still needs a refactoring
-- Work on the "Why Choose MTG CB" section -- I really think all tools are wonderful, so it's an exclusive choice. Focus more on the ad-free, free experience that is supported by patreon.
-- Binder templates need to be their own page
-- De-emphasize physical locations in main blurb, the focus is collection completion
 
-### Migration Path
+### Migration Path 🔁
 
-- need to clean up old collection entries, the 0 ones
-- need easy buttons to handle imports locally based on exports from the live site
-- need a scheduled downtime plan after proving the import process works in staging
 - need to clean up out of date schemas and generate the final database locally
 - need to make sure createdAt is ported over from legacy field
 
@@ -108,12 +107,7 @@ Now:
 
 ### Announcements Banner
 
-### Testing
-
-- Mobile
-- Tablet
-
-### Performance
+### Performance 🔁
 
 - Index audit and API measurement
 
@@ -122,8 +116,11 @@ Now:
 ### Organizational
 
 - Prioritize, organize, and cull TODOs in this document
+- More social media presence and clean-up
+- Subreddit?
+- Podcast?
 
-### Importer
+### Importers and Exporters
 
 - Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
 
@@ -133,16 +130,15 @@ Now:
 - Consistent error and info message styles
 - Clearly label collection values as estimates
 - Bring in the MTG CB logo
+- Home page looks bad on tablet -- tablet may want to hide the sidenav by default maybe
+
+### Before Open-Sourcing
+
+- remove dangerous claude code permissions from my repos since i wouldn't want other devs to be surprised by claude code having full bash powers
 
 ### Uncategorized
 
-- costs to complete buttons should also be on the set page
-- reduce logo image size
-- audit autocomplete fields and autocorrect
 - info icon next to collection value, estimate, tcgplayer data, etc. showing when prices last updated, number of cards missing price data
-- plan an interface to show site news, like scheduled downtime alerts and stuff, that once closed would not re-open
-- card notes field for card page
-- support better rendering of which variants of cards exist in searches when limiting one copy per card name, maybe
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
 - numberOfCardsInMagic in API coming back isn't always right, see http://local.mtgcb.com:3000/collections/1337/surprise-slivers?goalId=16&includeSets=1056
 - Setting to change going mythic to plain green progress bars
@@ -152,21 +148,18 @@ Now:
 - Support searching by collector number and collector number ranges
 - Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
 - Missing data detector and clean-up for every card and set field in the database (pureName for example)
-- Probably a bug: When using hide duplicate printings, we should definitely show the card the user owns, not just whatever one corresponds to the sort order
 - Showing 2501-3000 of 92769 cards goes to two lines on desktop
 - Performance pass, some API calls have gotten a little worse I think
 - Performance benchmark scripts and documentation
 - Shopping lists -- reports based on collection goals
-- TCGPlayer supports adding a collector number after the set code -- needed for things like secret lair that have duplicate names
+- TCGPlayer supports adding a collector number after the set code -- needed for things like secret lair that have duplicate names 🔁
 - Allow selection of default collection goal
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
 - Home page (landing page or statistics dashboard depending on login state, perhaps most valuable card can live here)
-- In-code TODO audit
 - Feature parity audit (permalink)
 - Most valuable card collected, maybe in the set header
-- Handle double-sided, sideways, and flip cards
 - Audit input field lengths for all API calls
-- Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages
+- Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages 🔁
 - Brainstorm patron cosmetic perks
 
 ## UX Action Items
@@ -194,7 +187,6 @@ Now:
 - Add title tags to all set and card links
 - Audit API failure rendering in every page
 - Confirm functionality of back and forward browser buttons
-- Handle sideways cards and flip cards
 - On hover contextual stuff, like increasing quantity or removing a card, or visiting the card page, or buying on tcgplayer
 - See if I can prevent the entire card grid from reloading when the price type is changed
 - Add skeleton loader for collection header to prevent vertical shift when loading (audit set header too)
@@ -220,7 +212,7 @@ Now:
 - Make default number of cards per page a multiple of 5 and 4.
 - Header consistency on pages, make a shared component for text headers -- centered vs not, Goals vs Add/Remove Cards for example.
 - Money value consistency -- success and warning colors
-- A cool stats page, icon can be a graph, most valuable card can move there -- can make an expandable region in a set view too. How much of each color selected, etc. Check what MTG Arena and other tools do. Some easy wins. Most common creature type, most valuable card, etc.
+- A cool stats page, icon can be a graph, most valuable card can move there -- can make an expandable region in a set view too. How much of each color selected, etc. Check what MTG Arena and other tools do. Some easy wins. Most common creature type, most valuable card, etc. 🔁
 - When any prices are missing, add an info icon explaining it's an underestimate
 - Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues
@@ -239,20 +231,11 @@ Now:
 
 ## Tech Debt
 
-- Formalize how I use Claude Code locally to automate database-level testing
-- Statistics calculations, while now using the follower database, should be run by mtgcb-jobs, not the api, and their results should be stored in a statistics table, not in-memory in an application, at least not until cached.
-- Clean up old cloudflare settings
-- ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from means your .eslintrc
-- Integrating Sentry sourcemaps for mtgcb-api-v3 -- more manual than next.js
-- Upgrading to Business Plan in Sentry to get custom dashboards
-- Thorough re-rendering audit
-- Switch to Git Flow once the site is in production
-- Switch from Google reCAPTCHA to Cloudflare Turnstile
-- All quantity selectors should be using the same component, QuantitySelector.tsx
-- End-to-end tests for every user action
+### Uncategorized
+
 - CardBrowseClient is a mess and is using deprecated Grid
 - Find deprecated uses of PaperProps and Grid
-- Every file needs to follow the code style I established in SetItemRenderer.tsx and browse/page.tsx
+- Every file needs to follow the code style I established in SetItemRenderer.tsx and browse/page.tsx 🔁
 - Minor: prefetch leads to page 2 being loaded when a user invalidates the collection tag, it's a prefetch subscription issue in RTK Query, dev team is aware, no current fix, just bad workarounds, page one still loads on visit, so it's fine
 - Consider removing skeleton loaders from set gallery and experiment with masonry instead of virtuoso
 - I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
@@ -263,18 +246,49 @@ Now:
 - Rate limiting for API calls
 - Slug size is huge (348 MB) when deploying to Heroku, likely due to the SWC binaries. This is why some devs move to Vercel.
 
+### Collector number sorting
+
+The collectorNumberNumeric field is parsing these special format collector
+numbers by removing the prefix and keeping just the numeric part:
+
+- "2025-10" → 202510 (concatenated)
+- "A25-223" → 25223 (removed 'A', concatenated)
+- "J22-803" → 22803 (removed 'J', concatenated)
+
+This creates an incorrect sort order because:
+
+1. "2025-10" becomes 202510 which is much larger than the others
+2. The letter prefixes are stripped, losing important information
+
+The sorting IS working correctly based on the numeric values stored, but the parsing logic that creates
+collectorNumberNumeric doesn't handle these hyphenated collector numbers properly. It's treating "2025-10" as a
+single number 202510 instead of understanding it's a set prefix and number.
+
+This isn't really a sorting bug - it's working as designed. The issue is how hyphenated collector numbers are
+converted to numeric values. These special List (PLIST) cards have collector numbers that reference their original
+set and number, and the current parsing concatenates them into a single number which doesn't sort meaningfully.
+
 ## Future Features
 
-- Art Series cards
-- Deck Completion
-- Foreign Cards
+- Art Series cards 🔁
+- Deck Completion / Deck Building (I started on this and this feature can go very deep)
+- Foreign Cards (although English support must include all cards never printed in English, etc.)
 - Sealed product support
 - Button to report missing card data, notify user if link to scryfall or tcgplayer is missing
 - Financial history tracking, collection value history, etc.
 - Card comments and rating by format
-- 17Lands data integration
 - Patron request: Scryfall syntax support for searches
--
+- A dedicated statistics section with even more statistics 🔁
+- Card scanning -- I have a rough prototype
+- Collection value tracking over time (this can be super deep, increase of individual values over time vs increase of adding cards to collection, tracking purchase prices and profits, etc.)
+- Card ratings and comments
+- Fluff: A set icon game where set icons fall toward the bottom of the screen and you have to shoot them by typing the set name, give hints as they get closer to the bottom
+
+## Roadmap
+
+- Release: v1.0 to production
+- Data Fixes: Add all missing cards (art series too) and clean up existing data and subsets and set codes
+- Have Patrons vote on the next one
 
 ## Future Enhancements to Existing Features
 
@@ -341,10 +355,10 @@ Now:
 - Ping johnny on Discord once card locations are released. :)
 - Grok database backups in new system
 - Integration with Sonarcloud (open source the repo, make development easy for new devs)
-- Integration with Google Analytics (right before production launch, using the same account as the legacy site)
+- Integration with Google Analytics (right before production launch, using the same account as the legacy site) 🔁
 - Need a temporary downtime page for the home page (database maintenance, etc.)
 - Load testing - look into npx autocannon
-- Performance testing / index audit
+- Performance testing / index audit 🔁
 - Automated database backups - see https://devcenter.heroku.com/articles/heroku-postgres-backups
 - Dogfooding and UX testing
 - UX - Must test rendering of input fields on native devices
@@ -371,41 +385,9 @@ Now:
 
 ### Next
 
-- Continue moving these notes to TODO.md during downtime
-
-- Patron request: Add card number to card name, perhaps as a setting
-- Clean up code base to be more my style -- some of the vibe coding results aren't as readable as my style
-- API Concern: compare "archenemy" set types to NOT "archenemy" set types -- there's an unaccounted for difference in the results length
-- Nuke placeholder error state and improve
-- Test API and database outages
-- Plan for system wide messages
-- Audit back and forward button
-- FNM Promos are a interesting corner case -- it's a subset group, but also has a child set, General FNM Promos. Need to test everything.
-- Patron request: Highlight recently updated card in some way, perhaps the input box or the price
-- Home page, call to action to register or login
-- Iterate on the complete collection animation for the circular progress bar
-- Smarter knowledge if cards can be foil -- check status of scryfall data for this
-
 ## Later
 
-- when deleting locations (and maybe goals), briefly see an error state on the edit page, since it doesn't exist anymore
-- would be nice to report how many of a user's cards are missing price data
-- BUG: Secret Lair. Sorting by releaseDate is also god awful since it's an aggregate set. Need to tiebreak with card release date.
-- Sonarcube integration
-- 1024x768 testing of table view and gridview and menus with sidenav open (or determine target resolution)
-- Browse view should explain itself, showing all cards in Magic might confuse some users, they may expect to see a blank search page to start
-- Clean up MTG CB collector number
-- Make a cool stats page
-- Move these TODOs to a TODO.md file :) Maybe once the project is near completion.
-- Use the new TCGPlayer domain (see below)
-- An Exclude Bulk feature for a collection's value
-- Compare Vercel to Heroku for hosting
-- Data issue: Release date for some sets cause sorting issues if they're exactly the same. Need to nudge some by 1 second.
-- Sorting by release date for cards by using their set's release date isn't great for aggregate sets like Prerelease Cards.
 - Reduce image file size.
-- Remove Artist table, prefer to bake it into cards for now
-- Before open sourcing, full automation suite and readability refactor -- make it work, make it fast, make it clean
-- Before going open source: Clean up all the vibe coding and make it more my style, refactor and reduce file sizes, break up more
 - update rarityNumeric to have special be 6 instead of 1 in production `update "Card" set "rarityNumeric" = 6 where "rarityNumeric" = 1;`
 - Clean up BrowseSearchForm into smaller components
 - Add ability to save searches (even independently of collection goals, a saved searches section)
@@ -422,7 +404,6 @@ Now:
 
 ## UX Thoughts
 
-- consider if cost to complete should be hidden by default -- imagine a "Costs to complete this set" expandable section
 - Ensure the add/remove buttons are very large and easy to press on tablets and mobile
 - Subsetgroups are confusing to users. Probably just hide this.
 - Allow user to tap a card row to add that card to their collection in table view
@@ -435,15 +416,3 @@ Now:
 ## Patron Requests
 
 - Basic deck completion -- paste in a deck list and get a report/buy button for missing cards.
-
-## New TCGPlayer Affiliate Links
-
-Hey all! We have some exciting news: we've completed setting up a custom tracking domain within Impact. Why is this important? Certain ad blockers have been flagging TCGplayer links since we migrated the program to Impact. The new tracking domain avoids that! Your current links will still continue to work as they have, but we highly recommend updating to the new link format as soon as possible to take advantage of the new capabilities. If you generated a link from one of our ads in Impact previously, it would look like this example:
-
-https://tcgplayer.pfx.io/c/5252996/1830156/21018
-
-To update to our custom domain, you'll need to change the domain to partner.tcgplayer.com while everything after the domain remains the same. For example, the link above would become:
-
-https://partner.tcgplayer.com/c/5252996/1830156/21018
-
-As for vanity links generated by Impact's link generation tool that look like so https://tcgplayer.pxf.io/N993eP, you'll need to create new links entirely as simply swapping the domain to the custom one will cause the link to no longer work. As I mentioned though, the old format links will continue to track sales if you're not able to make the changes immediately. Please let us know if you have any questions at all in the ⁠affiliate-questions channel.
