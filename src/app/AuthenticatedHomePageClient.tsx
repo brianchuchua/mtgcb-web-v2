@@ -39,23 +39,20 @@ export default function AuthenticatedHomePageClient() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { user } = useAuth();
   const { settings } = useDisplaySettings();
-  const [isNewUser, setIsNewUser] = useState(false);
+  const [isNewUser] = useState(() => searchParams.get('new') === 'true');
 
   const { data, isLoading, error } = useGetHomeStatisticsQuery({ priceType: settings.priceType });
   const stats = data?.success && data.data ? data.data : null;
 
   useEffect(() => {
-    // Check if this is a new user
     if (searchParams.get('new') === 'true') {
-      setIsNewUser(true);
-      // Remove the query parameter from the URL without causing a refresh
       const newUrl = window.location.pathname;
       window.history.replaceState({}, '', newUrl);
     }
   }, [searchParams]);
 
   if (isLoading && !data && !error) {
-    return <LoadingState isMobile={isMobile} />;
+    return <LoadingState isMobile={isMobile} isNewUser={isNewUser} />;
   }
 
   if (error || !stats) {
@@ -724,20 +721,20 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
   );
 };
 
-const LoadingState: React.FC<{ isMobile: boolean }> = ({ isMobile }) => {
+const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isMobile, isNewUser }) => {
   const { user } = useAuth();
   const router = useRouter();
-  
+
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pb: 4 }}>
       <Container maxWidth="lg" sx={{ pt: 4, pb: 2 }}>
         <Stack spacing={3}>
           <Box>
             <Typography variant={isMobile ? 'h5' : 'h4'} fontWeight="bold">
-              Welcome back, {user?.username}!
+              {isNewUser ? 'Welcome' : 'Welcome back'}, {user?.username}!
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Here's your collection overview
+              {isNewUser ? "Let's get started with your collection" : "Here's your collection overview"}
             </Typography>
           </Box>
           <Grid container spacing={2}>

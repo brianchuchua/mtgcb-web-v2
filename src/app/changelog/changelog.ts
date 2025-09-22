@@ -12,6 +12,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-21',
+      version: '0.124.4',
+      changes: [
+        'Fixed welcome message flicker for new users on homepage',
+        'Improved database performance for some queries by 30x-170x.',
+      ],
+    },
+    {
+      date: '2025-09-21',
       version: '0.124.3',
       changes: ['Fixed error flash when deleting locations and goals from their edit pages'],
     },
