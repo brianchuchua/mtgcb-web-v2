@@ -145,9 +145,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Maybe a better 100% completion progress bar animation? I'm only 90% happy with it.
 
-### Technical Debt
+### Tech Debt
 
 - Audit database schema for unused fields
+- Audit API for unused endpoints
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - Find deprecated uses of PaperProps and Grid
 

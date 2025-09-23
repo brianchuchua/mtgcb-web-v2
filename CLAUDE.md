@@ -12,6 +12,9 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
   - The headers auto-update based on what's in the changelog.ts file
   - Use the current date from the `date` command for the changelog entry
   - Update the minor version if it's a feature, and the patch version if it's a bug fix
+  - IMPORTANT: Write changelog entries in user-friendly language, avoiding technical jargon
+    - Good: "Fixed pagination text wrapping to two lines on wider screens"
+    - Bad: "Fixed pagination text wrapping by allowing dynamic width expansion for item range display"
   - After updating, provide a commit message under 50 characters in this style: "feat: add feature name here"
 
 ## Tech Stack

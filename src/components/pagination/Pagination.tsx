@@ -673,7 +673,7 @@ const SearchButtonContainer = styled(Box)(({ theme }) => ({
 const LeftSection = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  width: '240px',
+  minWidth: '240px',
   justifyContent: 'flex-start',
   [theme.breakpoints.down('md')]: {
     width: '100%',
@@ -699,7 +699,7 @@ const RightSection = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
-  width: '240px',
+  minWidth: '240px',
   [theme.breakpoints.down('md')]: {
     width: '100%',
     order: 2,

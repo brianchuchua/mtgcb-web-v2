@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-22',
+      version: '0.125.2',
+      changes: ['Fixed pagination "Showing X-X of X cards" text wrapping to two lines on wider screens'],
+    },
+    {
+      date: '2025-09-22',
       version: '0.125.1',
       changes: ['Fixed social media preview images to handle long card names and usernames properly'],
     },
