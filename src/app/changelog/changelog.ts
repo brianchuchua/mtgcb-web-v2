@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-22',
+      version: '0.125.1',
+      changes: ['Fixed social media preview images to handle long card names and usernames properly'],
+    },
+    {
+      date: '2025-09-22',
       version: '0.125.0',
       changes: [
         'Added context menu to card prices with options to view card page or buy on TCGPlayer',

@@ -14,21 +14,10 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 - considering: "Complete this set" buttons don't make sense with goals -- like complete this subgoal maybe? buy missing cards in other contexts? rename and consider.
 - Need these equivalent buttons on the set pages too.
 - Buy on TCGPlayer should be near the top above the fold on mobile
-- Scroll to top mobile after adding card looks blank
-- audit the goal url preview for centering and check performance, still works after refactor?
-- test card url preview with long card and set names
 - subset data clean-up has to be the next phase of mtg cb, data fixes, 100% parity and accuracy with English cards and adding art series cards, image quality fixes, collector number fixes, Ae/apostrophe fixes, whitespace trimming, etc, release date/set sorting issues, etc
-- release date sort?
-- image quality audit, need to use scryfall's system of labeling bad images, etc.
-- maybe clearly label cards that aren't legal for play?
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
 - repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal <-- <-- do the home stuff below too
 - make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
-
-- Knocking out all small action items in this file that are needed for release
-- (or moving them to organized future todos if they're not needed for release)
-
--pie chart color distribution color pie i want this, multicolor pie "your color pie"
 
 - ux: consider a change to header styles for collection headers similar to the home page
 - ux: info icon not aligned well next to prices, behaves differently than the info icon for goals, probably needs negative margin
@@ -135,7 +124,7 @@ Now:
 - Home page (landing page or statistics dashboard depending on login state, perhaps most valuable card can live here)
 - Feature parity audit (permalink)
 - Most valuable card collected, maybe in the set header
-- Audit input field lengths for all API calls
+- Important: Audit input field lengths for all API calls and make front-end enforce them too
 - Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages 🔁
 - Brainstorm patron cosmetic perks
 
@@ -208,11 +197,6 @@ Now:
 
 ### Uncategorized
 
-- CardBrowseClient is a mess and is using deprecated Grid
-- Find deprecated uses of PaperProps and Grid
-- Every file needs to follow the code style I established in SetItemRenderer.tsx and browse/page.tsx 🔁
-- Minor: prefetch leads to page 2 being loaded when a user invalidates the collection tag, it's a prefetch subscription issue in RTK Query, dev team is aware, no current fix, just bad workarounds, page one still loads on visit, so it's fine
-- Consider removing skeleton loaders from set gallery and experiment with masonry instead of virtuoso
 - I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
 - Audit consistency of naming of fields returned by API for totalCount and values.
 - Need a full postman library of my API calls, these should live with api docs

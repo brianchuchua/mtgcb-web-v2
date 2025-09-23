@@ -252,6 +252,7 @@ export async function GET(request: NextRequest) {
                 flexDirection: 'column',
                 gap: 25,
                 position: 'relative',
+                paddingTop: 25,
               }}
             >
               {/* Title Section with Logo */}
@@ -277,6 +278,7 @@ export async function GET(request: NextRequest) {
                     flexDirection: 'column',
                     gap: 8,
                     flex: 1,
+                    minWidth: 0,
                   }}
                 >
                   <div
@@ -285,6 +287,10 @@ export async function GET(request: NextRequest) {
                       fontSize: 64,
                       fontWeight: 700,
                       color: '#ffffff',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '100%',
                     }}
                   >
                     {goalName}
@@ -294,6 +300,10 @@ export async function GET(request: NextRequest) {
                       display: 'flex',
                       fontSize: 32,
                       color: '#999999',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '100%',
                     }}
                   >
                     Collection Goal by {username} on MTG CB

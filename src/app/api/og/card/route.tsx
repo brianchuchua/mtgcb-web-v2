@@ -292,6 +292,8 @@ export async function GET(request: NextRequest) {
                     flexDirection: 'column',
                     gap: 8,
                     flex: 1,
+                    minWidth: 0,
+                    maxWidth: 590, // Adjusted for better visual balance
                   }}
                 >
                   <div
@@ -300,6 +302,10 @@ export async function GET(request: NextRequest) {
                       fontSize: 56,
                       fontWeight: 700,
                       color: '#ffffff',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '100%',
                     }}
                   >
                     {cardName}
@@ -309,6 +315,10 @@ export async function GET(request: NextRequest) {
                       display: 'flex',
                       fontSize: 30,
                       color: '#999999',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '100%',
                     }}
                   >
                     {setName}
@@ -323,6 +333,10 @@ export async function GET(request: NextRequest) {
                   fontSize: 28,
                   color: '#666666',
                   marginTop: -10,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: 750, // Account for card image on the right
                 }}
               >
                 in {username}'s Collection on MTG CB

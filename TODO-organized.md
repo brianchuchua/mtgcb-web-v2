@@ -114,6 +114,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Feature Enhancements
 
+#### Card Format Legality
+
+- Would be nice to warn users if cards aren't tournament legal, even though this is a collecting site and not a deckbuilding site.
+- Would also be nice to just show format legality while I'm at it -- and do allow filtering by it. I will have to stay on top of changes as they happen however, so mtgcb-jobs will need to be on top of this, detecting changes in scryfall data updating the database along with alerting me.
+
 #### Card Images for multifaced cards
 
 - Handle double-sided, sideways, and flip cards
@@ -129,6 +134,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Stats Page
 
 - A dedicated collection stats page and enhancements for set-specific stat pages
+- "Your color pie" -- pie chart of colors in your collection
 
 ### TCGPlayer Integration
 
@@ -143,10 +149,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Audit database schema for unused fields
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
+- Find deprecated uses of PaperProps and Grid
 
 #### Code Style
 
-- Refactor vibe-coded files to my style
+- Refactor vibe-coded files to my clean code style (SetItemRenderer.tsx and browse/page.tsx are fair examples)
 - All quantity selectors should be using the same component, QuantitySelector.tsx
 
 #### Open Sourcing

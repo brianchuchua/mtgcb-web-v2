@@ -275,6 +275,7 @@ export async function GET(request: NextRequest) {
                     flexDirection: 'column',
                     gap: 8,
                     flex: 1,
+                    minWidth: 0,
                   }}
                 >
                   <div
@@ -283,6 +284,10 @@ export async function GET(request: NextRequest) {
                       fontSize: 60,
                       fontWeight: 700,
                       color: '#ffffff',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '100%',
                     }}
                   >
                     {setName}
@@ -292,6 +297,10 @@ export async function GET(request: NextRequest) {
                       display: 'flex',
                       fontSize: 32,
                       color: '#999999',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '100%',
                     }}
                   >
                     in {username}'s Collection on MTG Collection Builder

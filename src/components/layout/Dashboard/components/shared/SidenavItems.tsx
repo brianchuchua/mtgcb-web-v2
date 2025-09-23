@@ -1,25 +1,25 @@
 'use client';
 
 import {
+  Article as ArticleIcon,
   BarChart as BarChartIcon,
+  ContactSupport as ContactIcon,
   Dashboard as DashboardIcon,
+  Analytics as DraftHelperIcon,
   Launch as ExportIcon,
+  HelpOutline as FAQIcon,
   Favorite as FavoriteIcon,
   Home as HomeIcon,
   SaveAlt as ImportIcon,
   Iso as IsoIcon,
   ImportContacts as LibraryIcon,
   ListAlt as ListAltIcon,
-  Style as StyleIcon,
-  Timeline as TimelineIcon,
-  DeleteForever as ResetIcon,
-  Tune as TuneIcon,
-  Article as ArticleIcon,
   Newspaper as NewsIcon,
-  HelpOutline as FAQIcon,
-  ContactSupport as ContactIcon,
+  DeleteForever as ResetIcon,
+  Style as StyleIcon,
   Storage as TemplateIcon,
-  Analytics as DraftHelperIcon,
+  Timeline as TimelineIcon,
+  Tune as TuneIcon,
   ViewModule,
   Warning as WarningIcon,
 } from '@mui/icons-material';
@@ -42,9 +42,9 @@ import { styled } from '@mui/material/styles';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SearchForms } from '@/components/layout/Dashboard/components/shared/SearchForms';
+import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
-import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 
 interface SidenavItemsProps {
   onNavigate?: () => void;
@@ -114,7 +114,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
     if (isOnCollectionPage && isAuthenticated && user?.userId) {
       setIsCollectionMenuOpen(true);
     }
-    
+
     if (isOnResourcesPage) {
       setIsResourcesMenuOpen(true);
     }
@@ -268,7 +268,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                       <ListItemText primary="Locations" />
                     </ListItemButton>
                   </ListItem>
-                  <ListItem disablePadding>
+                  {/* <ListItem disablePadding>
                     <ListItemButton disabled sx={{ pl: 4 }}>
                       <ListItemIcon>
                         <StyleIcon
@@ -280,7 +280,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                       </ListItemIcon>
                       <ListItemText primary="Decks (In Development)" />
                     </ListItemButton>
-                  </ListItem>
+                  </ListItem> */}
                   <ListItem disablePadding>
                     <ListItemButton
                       component={Link}
@@ -310,19 +310,12 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                     </ListItemButton>
                   </ListItem>
                   <ListItem disablePadding>
-                    <ListItemButton
-                      onClick={() => setIsDangerZoneOpen(!isDangerZoneOpen)}
-                      sx={{ pl: 4 }}
-                    >
+                    <ListItemButton onClick={() => setIsDangerZoneOpen(!isDangerZoneOpen)} sx={{ pl: 4 }}>
                       <ListItemIcon>
                         <WarningIcon />
                       </ListItemIcon>
                       <ListItemText primary="Danger Zone" />
-                      {isDangerZoneOpen ? (
-                        <ExpandLessIcon sx={{ mr: '5px' }} />
-                      ) : (
-                        <ExpandMoreIcon sx={{ mr: '5px' }} />
-                      )}
+                      {isDangerZoneOpen ? <ExpandLessIcon sx={{ mr: '5px' }} /> : <ExpandMoreIcon sx={{ mr: '5px' }} />}
                     </ListItemButton>
                   </ListItem>
                   <Collapse in={isDangerZoneOpen} timeout="auto">
@@ -365,11 +358,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                   <ArticleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Resources" />
-                {isResourcesMenuOpen ? (
-                  <ExpandLessIcon sx={{ mr: '5px' }} />
-                ) : (
-                  <ExpandMoreIcon sx={{ mr: '5px' }} />
-                )}
+                {isResourcesMenuOpen ? <ExpandLessIcon sx={{ mr: '5px' }} /> : <ExpandMoreIcon sx={{ mr: '5px' }} />}
               </ListItemButton>
             </ListItem>
 
