@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-22',
+      version: '0.125.4',
+      changes: ['Fixed tooltip positioning for edited dates on Goals and Locations pages'],
+    },
+    {
+      date: '2025-09-22',
       version: '0.125.3',
       changes: ['Fixed layout shift when viewing collection sets as "Part of collection" text loads'],
     },

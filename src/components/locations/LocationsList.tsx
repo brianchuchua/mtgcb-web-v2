@@ -115,7 +115,7 @@ export default function LocationsList({ locations }: LocationsListProps) {
 
                   <Box sx={{ textAlign: 'right' }}>
                     {location.updatedAt && location.updatedAt !== location.createdAt ? (
-                      <Tooltip title={`Created ${formatDate(location.createdAt)}`} placement="top">
+                      <Tooltip title={`Created ${formatDate(location.createdAt)}`} placement="bottom-end">
                         <Box>
                           <Typography variant="caption" color="text.secondary">
                             Edited

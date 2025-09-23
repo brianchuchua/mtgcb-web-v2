@@ -36,6 +36,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from
 - Hide duplicate printings doesn't do anything with goals -- maybe just hide it from the front-end.
 
+### mtgcb-jobs
+
+- Enable jobs on restart and make them resilient to heroku dyno restarts - database table to track progress of jobs?
+
 ### Data Issues
 
 ### Performance Issues
@@ -55,12 +59,14 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Need to detect and remove dead code from my goal refactorings using sonarcube -- it's becoming a bit of a vibe coding issue
 
-### Patron Features
+### Patron Features / Patreon Integration
 
 #### The Reserved List
 
 - Immortal/Reserved List tier patrons will get the ability to customize a card to represent their collection in a hall of fame.
 - Other Patrons will be listed in a Hall of Fame just as usernames -- private by default, controlled with a setting
+- Mention Patreon on the home page and wherever else is appropriate
+- Mention that patrons get to vote on future features
 
 ### UX/Design
 
@@ -100,6 +106,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Project: Data Cleanup
 
+#### Subset Splitting
+
+- Needs to be done as before. Audit current and any missing from the established pattern.
+
 #### MTG CB Collector Number
 
 - Clean up MTG CB collector number -- it's really just a card release date order / wubrg / alphabetical (for tokens) tiebreaker in many contexts. Its intent is to help sorting in a binder where a collector number is not available or unhelpful, especially for subset groups, like sorting every FNM promo that ever existed in order of release date. Also add this number to the FAQ.
@@ -111,6 +121,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Prices
 
 - Address as many cards missing a tcgplayerId as possible
+
+#### Token Set Icons
+
+- Tokens have set codes that start with a T and thus don't get the correct set icon from keyrune.
 
 ### Feature Enhancements
 
@@ -131,10 +145,26 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Make it easier to exclude tokens (isToken card field perhaps?)
 
+#### Default Collection Goals
+
+- Allow selection of default collection goal
+
+#### Better Token Handling with duplicate printings
+
+- Hide duplicate printings has an interesting interaction with tokens -- an Elemental token can be a x/x or a 1/1 or what-have-you, but the current logic is to remove duplicates based on a pure card name. This doesn't work for tokens.
+- This impacts collection goals too.
+
+#### The Great Double-Sided Token Mess™
+
+- Scryfall treats double-sided tokens as two separate cards, one for each side. This is a problem for collectors, who just want to see one entry for the dual token in their collection. It's a disconnect with how TCGPlayer handles them too.
+- I'll probably create corrected entries and deprecate the old ones. This is a recent problem since WotC started making all new tokens double-sided.
+
 ### Stats Page
 
-- A dedicated collection stats page and enhancements for set-specific stat pages
+- A dedicated collection stats page and enhancements for set-specific stat pages, a little pie chart icon in the set view probably will expand a region to show stats for that set.
 - "Your color pie" -- pie chart of colors in your collection
+- Most collected creature type, etc. I have ideas in Notion.
+- Easy to implement, but caching and performance will be the biggest factors.
 
 ### TCGPlayer Integration
 
@@ -209,6 +239,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Cards could really use a notes field, like "This promo was given out at this obscure event that is only mentioned in a deleted WotC page before their redesign"
 
+#### Card Scanning
+
+- I built a super rough prototype of this.
+
 #### Importers and Exporters
 
 - Allowing import/export of locations and goals
@@ -216,10 +250,18 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Missing Price Report
 
 - Would be nice to report how many of a user's cards are missing price data
+- And to perhaps show an info icon next to collection and set values saying which cards are not contributing to the total due to missing price data
 
 #### Patron Requests
 
 - Highlight recently updated card in some way, perhaps the input box or the price
+
+#### Patron Features
+
+- Weather effects? Custom themes? Confetti customization?
+- What other additional cosmetics?
+- Based on a funny conversation we had, extreme progress bar styles
+- Must only be cosmetic -- never want to paywall features
 
 #### SEO, Page Titles, and Social Sharing
 
@@ -242,7 +284,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### mtgcb-jobs
 
-- mtgcb-jobs should be resilient to heroku dyno restarts -- database table to track progress of jobs?
 - mtgcb-jobs should alert me as to new scryfall cards
 
 ### mtgcb-importer

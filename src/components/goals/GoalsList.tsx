@@ -188,7 +188,7 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                           </Box>
                           <Box sx={{ flex: 1, textAlign: 'right' }}>
                             {goal.updatedAt && goal.updatedAt !== goal.createdAt ? (
-                              <Tooltip title={`Created ${formatDate(goal.createdAt)}`} placement="top">
+                              <Tooltip title={`Created ${formatDate(goal.createdAt)}`} placement="bottom-end">
                                 <Box>
                                   <Typography variant="caption" color="text.secondary">
                                     Edited
@@ -240,7 +240,7 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                           </Box>
                           <Box sx={{ flex: 1, textAlign: 'right' }}>
                             {goal.updatedAt && goal.updatedAt !== goal.createdAt ? (
-                              <Tooltip title={`Created ${formatDate(goal.createdAt)}`} placement="top">
+                              <Tooltip title={`Created ${formatDate(goal.createdAt)}`} placement="bottom-end">
                                 <Box>
                                   <Typography variant="caption" color="text.secondary">
                                     Edited

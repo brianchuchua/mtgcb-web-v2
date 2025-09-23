@@ -8,6 +8,7 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 
 ## Real Current Action Items
 
+- Remove "Showing" from "Showing 1-24 of blah cards" at 1024x768 or smaller -- actually the entire rendering sucks at this resolution, fix it
 - i think price update jobs frequently don't finish, need to check logs -- i see, dyno restart, i need these things to auto-start on bootup, account for this, ensuring only one job of a type runs at a time, etc
 - I want a test suite of every goal type and filtering option that Claude runs through or mayne just a custom node script runs against test env or local creates and deletes goals
 - importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local
@@ -16,7 +17,7 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 - Buy on TCGPlayer should be near the top above the fold on mobile
 - subset data clean-up has to be the next phase of mtg cb, data fixes, 100% parity and accuracy with English cards and adding art series cards, image quality fixes, collector number fixes, Ae/apostrophe fixes, whitespace trimming, etc, release date/set sorting issues, etc
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
-- repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal <-- <-- do the home stuff below too
+- repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal
 - make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
 
 - ux: consider a change to header styles for collection headers similar to the home page
@@ -31,12 +32,9 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
   cost to complete for goal doesn't really line up with the card that is rendered -- and sending the most expensive card to tcgplayer to buy can hurt the user. <-- See https://mtgcb-web-v2.mtgcollectionbuilder.com/collections/1337?cardsSortBy=market&oneResultPerCardName=true&goalId=1&showGoals=incomplete&contentType=cards, should perhaps always show the cheapest
   Maybe (Need 1 or regular) should say "of any printing" contextually
 
-maybe instead of a pop-up when cards are updated, status updating in the labe ⚠ Cross origin request detected from local.mtgcb.com to /\_next/\* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
-Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+maybe instead of a pop-up when cards are updated, status updating in the labe
 
 ## Recent Actions
-
-mtgcb-jobs app is done and tested locally, don't want to swamp tcgplayer, so won't deploy or run it until after go-live so i don't have the legacy and new updater going at the same time
 
 ## Current Action Items (kinda disorganized now)
 
@@ -55,20 +53,6 @@ Now:
 - A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.
 - A supporter badge of some sort would be great.
 - Detecting if someone is a patron and linking their accounts.
-
-### Patron Perks 🔁
-
-- Definitely want that card customizer for their listing in the Reserved List.
-- Weather effects? Custom themes?
-- What other additional cosmetics?
-- Direct contact on Discord and voting on features
-- roadmap page showing patrons voted on stuff
-- Based on a funny conversation we had, extreme progress bar styles, see Discord
-
-### Home Page (Partially complete)
-
-- Some of the below has been done, but will be revisited as I complete other connected sections.
-- Need to mention Patreon and voting on future features
 
 ### Migration Path 🔁
 
@@ -104,33 +88,24 @@ Now:
 
 ### Uncategorized
 
-- info icon next to collection value, estimate, tcgplayer data, etc. showing when prices last updated, number of cards missing price data
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
 - numberOfCardsInMagic in API coming back isn't always right, see http://local.mtgcb.com:3000/collections/1337/surprise-slivers?goalId=16&includeSets=1056
 - Setting to change going mythic to plain green progress bars
 - Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
 - Remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
 - Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
-- TCGPlayer supports adding a collector number after the set code -- needed for things like secret lair that have duplicate names 🔁
-- Allow selection of default collection goal
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
 - Important: Audit input field lengths for all API calls and make front-end enforce them too
-- Statistics -- think a pie chart icon that you click and it switches to viewing stats, including most valuable card -- on both the main page and in set pages 🔁
 - Brainstorm patron cosmetic perks
 
 ## UX Action Items
 
 - weird flicker with specific cards to include or exclude in goal forms
 - Audit subsets with collection goals -- data and appearance.
-- Goals should have a computation loading state, especially in the header
 - Link to collection needs to be consistent. Underlined or not, which parts, etc.
 - Improve height of skeleton loader for collectionheader
 - Header and breadcrumb and form and alignment consistency
-- Position of created date when hovering edited date on goals page is weird
 - Audit style of info messages and errors
-- Set icons for token subsets
-- Hide duplicate printings -- should show in the card view how many printings are hidden, and maybe a link to show them
-- Hide duplicate printings has an interesting interaction with tokens -- an Elemental token can be a x/x or a 1/1 or what-have-you, but the current logic is to remove duplicates based on a pure card name. This doesn't work for tokens.
 - Evaluate default sort order on a set page, especially subset groups
 - Render "Subset" instead of Set and Subset Group instead of Set where relevant.
 - Consider an easier-to-use card quantity filter, add stat filter works, but users may be used to the easier one (I did this in the legacy new page)
@@ -139,7 +114,6 @@ Now:
 - Add title tags to all set and card links
 - Audit API failure rendering in every page
 - Confirm functionality of back and forward browser buttons
-- On hover contextual stuff, like increasing quantity or removing a card, or visiting the card page, or buying on tcgplayer
 - See if I can prevent the entire card grid from reloading when the price type is changed
 - Audit table field orders and their corresponding visibility filters
 - Consider alternate-mobile-filter.png as a design idea (search bar at the top, Filters button that opens a menu with filters)
@@ -153,16 +127,12 @@ Now:
 - UX - Why do the pop-ups not dismiss if the screen isn't active?
 - Consider breadcrumbs for collection pages, maybe just the subpages since the main collection page is the root
 - Improve card quantity update messages
-- Open Search Options -- should probably scroll to the search options section
 - Breadcrumbs in collection set view
 - search needs to clear when entering a set page
-- Remove "Showing" from "Showing 1-24 of blah cards" at 1024x768 or smaller
 - (A subset of link) in the header for subsets -- or actually do breadcrumbs
 - Make default number of cards per page a multiple of 5 and 4.
 - Header consistency on pages, make a shared component for text headers -- centered vs not, Goals vs Add/Remove Cards for example.
 - Money value consistency -- success and warning colors
-- A cool stats page, icon can be a graph, most valuable card can move there -- can make an expandable region in a set view too. How much of each color selected, etc. Check what MTG Arena and other tools do. Some easy wins. Most common creature type, most valuable card, etc. 🔁
-- When any prices are missing, add an info icon explaining it's an underestimate
 - Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues
 - Add a note to Cost to complete that it's based on the cheapest printing of a card, which may differ from the one being shown.
@@ -222,7 +192,6 @@ set and number, and the current parsing concatenates them into a single number w
 - Card comments and rating by format
 - Patron request: Scryfall syntax support for searches
 - A dedicated statistics section with even more statistics 🔁
-- Card scanning -- I have a rough prototype
 - Collection value tracking over time (this can be super deep, increase of individual values over time vs increase of adding cards to collection, tracking purchase prices and profits, etc.)
 - Card ratings and comments
 - Fluff: A set icon game where set icons fall toward the bottom of the screen and you have to shoot them by typing the set name, give hints as they get closer to the bottom
@@ -259,7 +228,6 @@ set and number, and the current parsing concatenates them into a single number w
 
 ### Data Improvements
 
-- The Great Double-Sided Token Mess™
 - Auditing for and preventing duplicate releasedAt dates in sets
 - canBeFoil and canBeNonFoil data cleanup and interaction with etched foils, see Mountain (674) from Secret Lair and compare to tcgplayer data -- see also Culling the Weak and rainbow foils
 - Subset data automation and clean-up (basically audit subset groups that have cards in them directly and sets that should be subsets)
