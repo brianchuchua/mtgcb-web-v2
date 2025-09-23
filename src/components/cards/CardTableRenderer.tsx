@@ -17,7 +17,6 @@ import { GoalStatusTableCell } from './GoalStatusTableCell';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import { ResponsiveWidth, TableColumn } from '@/components/common/VirtualizedTable';
 import { PriceType } from '@/types/pricing';
-import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
@@ -1101,20 +1100,16 @@ export const useCardRowRenderer = (
     // Price Cell
     if (displaySettings.priceIsVisible) {
       cells.push(
-        <TableCell key="price">
-          <PriceLink
-            href={generateTCGPlayerLink('tcgplayerId' in card ? card.tcgplayerId : undefined, card.name)}
-            target="_blank"
-            rel="noreferrer"
-            onClick={(e) => e.stopPropagation()} // Prevent row click when clicking price
-          >
-            <CardPrice
-              prices={preparePriceData(card) || null}
-              isLoading={false}
-              priceType={priceType}
-              centered={false}
-            />
-          </PriceLink>
+        <TableCell key="price" onClick={(e) => e.stopPropagation()}>
+          <CardPrice
+            prices={preparePriceData(card) || null}
+            isLoading={false}
+            priceType={priceType}
+            centered={false}
+            cardId={card.id}
+            cardName={card.name}
+            tcgplayerId={'tcgplayerId' in card ? card.tcgplayerId : undefined}
+          />
         </TableCell>,
       );
     }
@@ -1329,13 +1324,6 @@ const ClickableText = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const PriceLink = styled('a')(({ theme }) => ({
-  color: theme.palette.primary.main,
-  textDecoration: 'none',
-  '&:hover': {
-    textDecoration: 'underline',
-  },
-}));
 
 const SetLinkText = styled(Typography)(({ theme }) => ({
   '&:hover': {

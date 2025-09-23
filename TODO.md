@@ -8,7 +8,6 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 
 ## Real Current Action Items
 
-- showing which price type on mouseover is problematic and gets in the way, remove, keep info icon but make it a click one like the contributing sets one
 - i think price update jobs frequently don't finish, need to check logs -- i see, dyno restart, i need these things to auto-start on bootup, account for this, ensuring only one job of a type runs at a time, etc
 - I want a test suite of every goal type and filtering option that Claude runs through or mayne just a custom node script runs against test env or local creates and deletes goals
 - importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local

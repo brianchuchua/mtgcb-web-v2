@@ -98,6 +98,7 @@ export interface CardItemProps {
   isOwnCollection?: boolean;
   goalId?: string;
   imageLinksToTCGPlayer?: boolean; // New prop to enable TCGPlayer link on image
+  directPriceToTCGPlayer?: boolean; // If true, clicking price goes directly to TCGPlayer (no menu)
 }
 
 /**
@@ -150,6 +151,7 @@ const CardItemComponent = ({
   isOwnCollection = false,
   goalId,
   imageLinksToTCGPlayer = false,
+  directPriceToTCGPlayer = false,
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -500,23 +502,16 @@ const CardItemComponent = ({
           )}
 
           {priceIsVisible && (
-            <Box
-              component="a"
-              href={getTCGPlayerLink()}
-              target="_blank"
-              rel="noreferrer"
-              sx={{
-                mt: 0.5,
-                display: 'block',
-                textDecoration: 'none',
-                '&:hover': {
-                  textDecoration: 'underline',
-                },
-                cursor: 'pointer',
-                color: (theme) => theme.palette.primary.main,
-              }}
-            >
-              <CardPrice prices={priceData} isLoading={false} priceType={priceType} />
+            <Box sx={{ mt: 0.5 }}>
+              <CardPrice
+                prices={priceData}
+                isLoading={false}
+                priceType={priceType}
+                cardId={id}
+                cardName={name}
+                tcgplayerId={tcgplayerId}
+                directToTCGPlayer={directPriceToTCGPlayer}
+              />
             </Box>
           )}
 

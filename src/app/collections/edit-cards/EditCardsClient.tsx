@@ -569,42 +569,29 @@ interface CardMetadataProps {
 const CardMetadata: React.FC<CardMetadataProps> = ({ selectedCard, handleCardClick, priceType }) => {
   return (
     <Box sx={{ mt: 1, flexShrink: 0, textAlign: 'center' }}>
-      <Box
-        component="a"
-        href={generateTCGPlayerLink(selectedCard.card.tcgplayerId, selectedCard.card.name)}
-        target="_blank"
-        rel="noreferrer"
-        sx={{
-          display: 'block',
-          textDecoration: 'none',
-          '&:hover': {
-            textDecoration: 'underline',
+      <CardPrice
+        prices={{
+          normal: {
+            market: selectedCard.card.market ? parseFloat(selectedCard.card.market) : null,
+            low: selectedCard.card.low ? parseFloat(selectedCard.card.low) : null,
+            average: selectedCard.card.average ? parseFloat(selectedCard.card.average) : null,
+            high: selectedCard.card.high ? parseFloat(selectedCard.card.high) : null,
           },
-          cursor: 'pointer',
-          color: (theme) => theme.palette.primary.main,
+          foil: selectedCard.card.foil
+            ? {
+                market: parseFloat(selectedCard.card.foil) || null,
+                low: null,
+                average: null,
+                high: null,
+              }
+            : null,
         }}
-      >
-        <CardPrice
-          prices={{
-            normal: {
-              market: selectedCard.card.market ? parseFloat(selectedCard.card.market) : null,
-              low: selectedCard.card.low ? parseFloat(selectedCard.card.low) : null,
-              average: selectedCard.card.average ? parseFloat(selectedCard.card.average) : null,
-              high: selectedCard.card.high ? parseFloat(selectedCard.card.high) : null,
-            },
-            foil: selectedCard.card.foil
-              ? {
-                  market: parseFloat(selectedCard.card.foil) || null,
-                  low: null,
-                  average: null,
-                  high: null,
-                }
-              : null,
-          }}
-          priceType={priceType as any}
-          centered={true}
-        />
-      </Box>
+        priceType={priceType as any}
+        centered={true}
+        cardId={selectedCard.card.id}
+        cardName={selectedCard.card.name}
+        tcgplayerId={selectedCard.card.tcgplayerId || undefined}
+      />
     </Box>
   );
 };

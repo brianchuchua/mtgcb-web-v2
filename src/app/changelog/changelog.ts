@@ -12,6 +12,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-22',
+      version: '0.125.0',
+      changes: [
+        'Added context menu to card prices with options to view card page or buy on TCGPlayer',
+        'Made info icon on fallback prices clickable to show explanation popover',
+        'Removed hover tooltips from card prices for cleaner interaction',
+      ],
+    },
+    {
+      date: '2025-09-22',
       version: '0.124.5',
       changes: [
         'Fixed Other Printings table to show foil prices for foil-only cards',

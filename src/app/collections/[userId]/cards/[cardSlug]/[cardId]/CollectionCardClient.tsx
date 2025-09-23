@@ -271,6 +271,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
             isOwnCollection={isOwnCollection}
             priceType={priceType}
             imageLinksToTCGPlayer={true}
+            directPriceToTCGPlayer={true}
             display={{
               nameIsVisible: true,
               setIsVisible: true,
