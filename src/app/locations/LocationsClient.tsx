@@ -172,6 +172,12 @@ export default function LocationsClient() {
             Locations help you organize your physical card collection by tracking where cards are stored. Whether you
             use binders, boxes, or other storage methods, you can create locations to match your organization system.
           </Typography>
+          <Typography variant="body2" paragraph sx={{ backgroundColor: 'action.hover', p: 2, borderRadius: 1 }}>
+            <strong>Recommendation:</strong> Use locations sparingly! If you store cards in a binder for that set, it's
+            not worth recording that location explicitly – it's self-evident. Locations work best when they actually
+            help you find cards, like when they're in a specific deckbox or filing cabinet. Don't give yourself a ton of
+            busywork.
+          </Typography>
           <Typography variant="body2" paragraph>
             <strong>Key points:</strong>
           </Typography>

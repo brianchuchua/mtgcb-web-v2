@@ -92,6 +92,12 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## 📦 Post-Release
 
+### Communication
+
+- Ping johnny on Discord once card locations are released. :)
+- Announce on social media and discord
+- Announce to patrons
+
 ### Project: Data Cleanup
 
 #### MTG CB Collector Number
@@ -111,6 +117,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Card Images for multifaced cards
 
 - Handle double-sided, sideways, and flip cards
+
+#### Card Image Size
+
+- Assess if I should reduce the image size. It doesn't matter much on my end in terms of cost, more thinking about user bandwidth. I personally love big high res images.
 
 #### Custom Collection Goals
 

@@ -23,7 +23,6 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 - maybe clearly label cards that aren't legal for play?
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
 - repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal <-- <-- do the home stuff below too
-- add a note in the locations section saying not to use it for everything, like individual set binders, busywork
 - make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
 
 - Knocking out all small action items in this file that are needed for release
@@ -327,7 +326,6 @@ set and number, and the current parsing concatenates them into a single number w
 
 - evaluate cost to complete cache and price updating
 - grok SSL Certificates on the Heroku side vs Dreamhost vs Cloudflare
-- Ping johnny on Discord once card locations are released. :)
 - Grok database backups in new system
 - Integration with Sonarcloud (open source the repo, make development easy for new devs)
 - Integration with Google Analytics (right before production launch, using the same account as the legacy site) 🔁
@@ -362,7 +360,6 @@ set and number, and the current parsing concatenates them into a single number w
 
 ## Later
 
-- Reduce image file size.
 - update rarityNumeric to have special be 6 instead of 1 in production `update "Card" set "rarityNumeric" = 6 where "rarityNumeric" = 1;`
 - Clean up BrowseSearchForm into smaller components
 - Add ability to save searches (even independently of collection goals, a saved searches section)
