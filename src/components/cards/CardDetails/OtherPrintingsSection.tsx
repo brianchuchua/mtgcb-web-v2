@@ -24,6 +24,7 @@ interface Printing {
   low?: string | null;
   average?: string | null;
   high?: string | null;
+  foil?: string | null;
 }
 
 interface OtherPrintingsSectionProps {
@@ -51,31 +52,111 @@ export const OtherPrintingsSection: React.FC<OtherPrintingsSectionProps> = ({
 }) => {
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
-  // Get price based on user's priceType preference
-  const getPrintingPrice = (printing: Printing) => {
-    // Try nested prices structure first, then fall back to flat structure
-    const prices = printing.prices?.normal;
-    
+  // Get price based on user's priceType preference with fallback logic
+  const getPrintingPrice = (printing: Printing): { price: number | null; isFoil: boolean } => {
+    const normalPrices = printing.prices?.normal;
+    const foilPrices = printing.prices?.foil;
+
+    // Try to get the requested price type from normal prices first
     let selectedPrice = null;
-    if (prices) {
-      // Use nested structure
+    let isFoil = false;
+
+    if (normalPrices) {
+      // Try the requested price type first
       switch (priceType) {
         case 'low':
-          selectedPrice = prices.low;
+          if (normalPrices.low !== null && normalPrices.low !== undefined) {
+            selectedPrice = normalPrices.low;
+          }
           break;
         case 'average':
-          selectedPrice = prices.average;
+          if (normalPrices.average !== null && normalPrices.average !== undefined) {
+            selectedPrice = normalPrices.average;
+          }
           break;
         case 'high':
-          selectedPrice = prices.high;
+          if (normalPrices.high !== null && normalPrices.high !== undefined) {
+            selectedPrice = normalPrices.high;
+          }
           break;
         case 'market':
         default:
-          selectedPrice = prices.market;
+          if (normalPrices.market !== null && normalPrices.market !== undefined) {
+            selectedPrice = normalPrices.market;
+          }
           break;
       }
-    } else {
-      // Use flat structure (old API format)
+
+      // If requested price type not available, apply fallback logic: market → low → average → high
+      if (selectedPrice === null) {
+        const fallbackOrder = [
+          normalPrices.market,
+          normalPrices.low,
+          normalPrices.average,
+          normalPrices.high
+        ];
+
+        for (const fallbackPrice of fallbackOrder) {
+          if (fallbackPrice !== null && fallbackPrice !== undefined) {
+            selectedPrice = fallbackPrice;
+            break;
+          }
+        }
+      }
+    }
+
+    // If no normal price found, try foil prices
+    if (selectedPrice === null && foilPrices) {
+      // For foil, try the requested price type first, then fallback
+      switch (priceType) {
+        case 'low':
+          if (foilPrices.low !== null && foilPrices.low !== undefined) {
+            selectedPrice = foilPrices.low;
+            isFoil = true;
+          }
+          break;
+        case 'average':
+          if (foilPrices.average !== null && foilPrices.average !== undefined) {
+            selectedPrice = foilPrices.average;
+            isFoil = true;
+          }
+          break;
+        case 'high':
+          if (foilPrices.high !== null && foilPrices.high !== undefined) {
+            selectedPrice = foilPrices.high;
+            isFoil = true;
+          }
+          break;
+        case 'market':
+        default:
+          if (foilPrices.market !== null && foilPrices.market !== undefined) {
+            selectedPrice = foilPrices.market;
+            isFoil = true;
+          }
+          break;
+      }
+
+      // If still no price, apply foil fallback logic
+      if (selectedPrice === null) {
+        const foilFallbackOrder = [
+          foilPrices.market,
+          foilPrices.low,
+          foilPrices.average,
+          foilPrices.high
+        ];
+
+        for (const foilPrice of foilFallbackOrder) {
+          if (foilPrice !== null && foilPrice !== undefined) {
+            selectedPrice = foilPrice;
+            isFoil = true;
+            break;
+          }
+        }
+      }
+    }
+
+    // Fallback to flat structure (old API format) if still no price
+    if (selectedPrice === null && !printing.prices) {
       switch (priceType) {
         case 'low':
           selectedPrice = printing.low ? parseFloat(printing.low) : null;
@@ -91,9 +172,32 @@ export const OtherPrintingsSection: React.FC<OtherPrintingsSectionProps> = ({
           selectedPrice = printing.market ? parseFloat(printing.market) : null;
           break;
       }
+
+      // Apply fallback logic for flat structure
+      if (selectedPrice === null) {
+        const flatFallbackOrder = [
+          printing.market ? parseFloat(printing.market) : null,
+          printing.low ? parseFloat(printing.low) : null,
+          printing.average ? parseFloat(printing.average) : null,
+          printing.high ? parseFloat(printing.high) : null
+        ];
+
+        for (const fallbackPrice of flatFallbackOrder) {
+          if (fallbackPrice !== null) {
+            selectedPrice = fallbackPrice;
+            break;
+          }
+        }
+      }
+
+      // If still no price and there's a foil price in flat structure, use it
+      if (selectedPrice === null && printing.foil) {
+        selectedPrice = parseFloat(printing.foil);
+        isFoil = true;
+      }
     }
-    
-    return selectedPrice;
+
+    return { price: selectedPrice, isFoil };
   };
 
   // Generate the appropriate URL for each printing
@@ -139,9 +243,9 @@ export const OtherPrintingsSection: React.FC<OtherPrintingsSectionProps> = ({
       ) : printings.length > 0 ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           {printings.map((printing) => {
-            const displayPrice = getPrintingPrice(printing);
+            const { price: displayPrice, isFoil } = getPrintingPrice(printing);
             const hasInCollection = (printing.quantityReg || 0) > 0 || (printing.quantityFoil || 0) > 0;
-            
+
             return (
               <CardHoverPreview
                 key={printing.id}
@@ -212,7 +316,7 @@ export const OtherPrintingsSection: React.FC<OtherPrintingsSectionProps> = ({
                       </Box>
                     )}
                     <Typography variant="body2" sx={{ fontSize: '0.813rem' }}>
-                      {displayPrice ? `$${displayPrice.toFixed(2)}` : '—'}
+                      {displayPrice ? `$${displayPrice.toFixed(2)}${isFoil ? ' foil' : ''}` : '—'}
                     </Typography>
                   </Box>
                 </Link>

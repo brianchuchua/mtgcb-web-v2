@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-22',
+      version: '0.124.5',
+      changes: [
+        'Fixed Other Printings table to show foil prices for foil-only cards',
+        'Improved price display in Other Printings to show best available price when preferred type is unavailable',
+      ],
+    },
+    {
       date: '2025-09-21',
       version: '0.124.4',
       changes: [

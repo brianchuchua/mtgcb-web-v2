@@ -8,12 +8,12 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 
 ## Real Current Action Items
 
+- showing which price type on mouseover is problematic and gets in the way, remove, keep info icon but make it a click one like the contributing sets one
 - i think price update jobs frequently don't finish, need to check logs -- i see, dyno restart, i need these things to auto-start on bootup, account for this, ensuring only one job of a type runs at a time, etc
 - I want a test suite of every goal type and filtering option that Claude runs through or mayne just a custom node script runs against test env or local creates and deletes goals
 - importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local
 - considering: "Complete this set" buttons don't make sense with goals -- like complete this subgoal maybe? buy missing cards in other contexts? rename and consider.
 - Need these equivalent buttons on the set pages too.
-- Mtg cb price table on card page needs to show foil price if it’s the only price -- and fallback prices too like card views
 - Buy on TCGPlayer should be near the top above the fold on mobile
 - Scroll to top mobile after adding card looks blank
 - audit the goal url preview for centering and check performance, still works after refactor?
@@ -36,14 +36,10 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 - ux: info icon not aligned well next to prices, behaves differently than the info icon for goals, probably needs negative margin
 - ux: one printing of each unique card / every printing of each unique card is confusing when the quantity is more than one (goals page)
 
-- your goal is updating notistack can persist during navigation and i've seen goals get stuck recomputing locally (just when you configure one that has 0 cards matching, like time spiral remastered + non-basics + commons + 4 of each)
-
 - big: need to audit buy missing cards for goal buttons, macro scale and set scale -- can't just click it for a goal with 30000 cards. can't do the prefetching for like an hour and then pop up the modal, need to be smarter and break it into chunks ahead of time. buy missing cards for this goal -- should just not have this button if it's a large number of cards, see basic land goals
   -- related ux: goal header inside of a set page needs ux work -- buy button is awkward near progress bar
 - considering: when viewing sets with a collection goal on, should add a note that the total cards are those actually collected in the set, maybe
   Mention somewhere that the cheapest available printing is shown for collection goals
-
-- small: console log warnings on home page
 
   cost to complete for goal doesn't really line up with the card that is rendered -- and sending the most expensive card to tcgplayer to buy can hurt the user. <-- See https://mtgcb-web-v2.mtgcollectionbuilder.com/collections/1337?cardsSortBy=market&oneResultPerCardName=true&goalId=1&showGoals=incomplete&contentType=cards, should perhaps always show the cheapest
   Maybe (Need 1 or regular) should say "of any printing" contextually
@@ -75,7 +71,7 @@ Now:
 
 ### Patron Perks 🔁
 
-- Definitely want that card customizer.
+- Definitely want that card customizer for their listing in the Reserved List.
 - Weather effects? Custom themes?
 - What other additional cosmetics?
 - Direct contact on Discord and voting on features
@@ -84,28 +80,13 @@ Now:
 
 ### Home Page (Partially complete)
 
-- Rephrase this all, change We to I <-- <-- do home page next time you work on this
 - Some of the below has been done, but will be revisited as I complete other connected sections.
-- Should brag about new features and explain the launch (need a news page I think)
-- Should show most valuable card, statistics, etc. I think. Although need stats somewhere else too, maybe in every header of every collection page.
-- Need to mention the site name more prominently
-- Need to rewrite the descriptions and link to my binders somewhere, maybe a tools section that links to my 17 lands tool too
 - Need to mention Patreon and voting on future features
-- meta tag stuff, probably its own project
-- Emphasize collection completion and costs to complete
-- Needs preview of news section
-- Still needs a refactoring
 
 ### Migration Path 🔁
 
 - need to clean up out of date schemas and generate the final database locally
 - need to make sure createdAt is ported over from legacy field
-
-### FAQ Page
-
-### News Page
-
-### Announcements Banner
 
 ### Performance 🔁
 
@@ -117,7 +98,6 @@ Now:
 
 - Prioritize, organize, and cull TODOs in this document
 - More social media presence and clean-up
-- Subreddit?
 - Podcast?
 
 ### Importers and Exporters
@@ -129,7 +109,6 @@ Now:
 - Consistent header, body, and breadcrumb styles
 - Consistent error and info message styles
 - Clearly label collection values as estimates
-- Bring in the MTG CB logo
 - Home page looks bad on tablet -- tablet may want to hide the sidenav by default maybe
 
 ### Before Open-Sourcing
@@ -183,7 +162,6 @@ Now:
 - Header consistency
 - Make set symbols change color on set table and set page too
 - Add link from child set to parent set
-- Add titles to all pages
 - Add title tags to all set and card links
 - Audit API failure rendering in every page
 - Confirm functionality of back and forward browser buttons
@@ -194,8 +172,7 @@ Now:
 - OpenGraph meta tags for social previews
 - Consider alternate-mobile-filter.png as a design idea (search bar at the top, Filters button that opens a menu with filters)
 - 1 cards instead of 1 card
-- mission statement, like "let's build our collection together" or something -- the point of the site is to make it easy to complete a collection, as easy as a button press
-  - enhancement -- when a person goes to buy the cards, have the site offer to record the cards right there
+- enhancement -- when a person goes to buy the cards, have the site offer to record the cards right there
 - what good are breadcrumbs actually doing on the browse page? like home > browse, the home page is useless
 - See if still happening: On mobile, the hover over card name is doing the whole row, not just the card name
 - Alternating table row colors, I feel like the bright ones are too bright
@@ -244,7 +221,6 @@ Now:
 - Need a fallback if both canBeFoil and canBeNonFoil are false, treat them both as true probably
 - CI/CD pipeline
 - Rate limiting for API calls
-- Slug size is huge (348 MB) when deploying to Heroku, likely due to the SWC binaries. This is why some devs move to Vercel.
 
 ### Collector number sorting
 
@@ -397,8 +373,6 @@ set and number, and the current parsing concatenates them into a single number w
 
 ## Known Bugs
 
-- Moderate (UX): The search form has prefilling and styling issues.
-- Moderate: Logout isn't redirecting the user -- probably want them back to the login page.
 - Minor: When logging out of a page that requires authentication, redirectTo is set to the page you were on during logout.
 - Minor: Mana doesn't render properly in table view for Kozilek, Compleated
 

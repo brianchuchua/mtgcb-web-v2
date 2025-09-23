@@ -28,6 +28,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Need a message for migration downtime in v2 as well
 - Test migration end-to-end one more time
+- Add a migration verification script to mtgcb-importer that checks user counts and collection counts match between old and new databases, accounting for those removed due to a 0 quantity count or for cards or users that no longer exist
 - Switch to Git Flow for the v1.0 release
 
 ### Bugs
@@ -63,6 +64,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### UX/Design
 
+- Consider bottom pagination controls that scroll to top when clicked
+
 ### Testing & Quality
 
 - Test Heroku pipeline for using a backup to restore service.
@@ -89,7 +92,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## 📦 Post-Release
 
-### Data Cleanup
+### Project: Data Cleanup
 
 #### MTG CB Collector Number
 
@@ -98,6 +101,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Images
 
 - Scryfall has a field to track if card images are good. I know I have some early images from their initial scans where I haven't updated them since. Add a field to track this myself and clean them all up.
+
+#### Prices
+
+- Address as many cards missing a tcgplayerId as possible
 
 ### Feature Enhancements
 
@@ -140,6 +147,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Statistics calculations, while now using the follower database, should be run by mtgcb-jobs, not the api, and their results should be stored in a statistics table, not in-memory in an application, at least not until cached.
 - Should seriously consider a Redis caching layer
+- Should probably cache the API call needed for Iconic Impact
 
 #### Observability
 
@@ -182,6 +190,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Card Notes
 
 - Cards could really use a notes field, like "This promo was given out at this obscure event that is only mentioned in a deleted WotC page before their redesign"
+
+#### Importers and Exporters
+
+- Allowing import/export of locations and goals
 
 #### Missing Price Report
 
