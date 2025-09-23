@@ -432,21 +432,27 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             {setName}
           </Typography>
 
-          {username && (
-            <Typography variant="body1" color="text.secondary" sx={{ m: 0.5 }}>
-              (Part of{' '}
-              <Link
-                href={getCollectionUrl({ userId })}
-                style={{
-                  color: 'inherit',
-                  textDecoration: 'underline',
-                }}
-              >
-                {username}'s collection
-              </Link>
-              )
-            </Typography>
-          )}
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{
+              m: 0.5,
+              minHeight: '24px', // Reserve space to prevent layout shift
+              visibility: username ? 'visible' : 'hidden'
+            }}
+          >
+            (Part of{' '}
+            <Link
+              href={getCollectionUrl({ userId })}
+              style={{
+                color: 'inherit',
+                textDecoration: 'underline',
+              }}
+            >
+              {username || 'User'}'s collection
+            </Link>
+            )
+          </Typography>
 
           {set?.code && (
             <Box>

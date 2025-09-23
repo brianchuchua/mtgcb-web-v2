@@ -225,6 +225,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Title/opengraph seo stuff pass for every page, can be kinda a pain in Next.js, research best practices
 
+#### Shopping Lists
+
+- Shopping lists based on collection goals and missing cards
+
 #### System Messages
 
 - Would be nice to have a system for site-wide messages, like "Scheduled Maintenance on DATE from TIME to TIME" or "New Feature: XYZ"
