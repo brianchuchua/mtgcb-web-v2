@@ -12,6 +12,16 @@ import {
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 
+// Helper to get the current origin for local API calls
+const getLocalApiUrl = (path: string) => {
+  // In the browser, use window.location.origin
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}${path}`;
+  }
+  // During SSR, construct from environment or use relative path
+  return path;
+};
+
 export const authApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
     me: builder.query<ApiResponse<UserData>, void>({
@@ -28,7 +38,7 @@ export const authApi = mtgcbApi.injectEndpoints({
     }),
     signUp: builder.mutation<ApiResponse<SignUpData>, SignUpRequest>({
       query: (data) => ({
-        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/register`,
+        url: getLocalApiUrl('/api/auth/register'),
         method: 'POST',
         body: data,
       }),
@@ -52,28 +62,28 @@ export const authApi = mtgcbApi.injectEndpoints({
     }),
     forgotPassword: builder.mutation<ApiResponse<void>, ForgotPasswordRequest>({
       query: (data) => ({
-        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/forgot-password`,
+        url: getLocalApiUrl('/api/auth/forgot-password'),
         method: 'POST',
         body: data,
       }),
     }),
     forgotUsername: builder.mutation<ApiResponse<void>, ForgotUsernameRequest>({
       query: (data) => ({
-        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/forgot-username`,
+        url: getLocalApiUrl('/api/auth/forgot-username'),
         method: 'POST',
         body: data,
       }),
     }),
     resetPassword: builder.mutation<ApiResponse<void>, Omit<ResetPasswordRequest, 'privateKey'>>({
       query: (data) => ({
-        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/reset-password`,
+        url: getLocalApiUrl('/api/auth/reset-password'),
         method: 'POST',
         body: data,
       }),
     }),
     validatePasswordReset: builder.mutation<ApiResponse<void>, Omit<ValidatePasswordResetRequest, 'privateKey'>>({
       query: (data) => ({
-        url: `${process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL}/api/auth/validate-password-reset`,
+        url: getLocalApiUrl('/api/auth/validate-password-reset'),
         method: 'POST',
         body: data,
       }),

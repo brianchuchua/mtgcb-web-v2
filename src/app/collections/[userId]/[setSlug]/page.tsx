@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { CollectionSetClient } from './CollectionSetClient';
 
 interface CollectionSetPageProps {
@@ -17,11 +18,14 @@ export async function generateMetadata({
   const resolvedSearchParams = await searchParams;
   const shareToken = resolvedSearchParams.shareToken as string | undefined;
 
-  const baseUrl = process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL;
-
+  // Dynamically construct the OG image URL
+  const headersList = await headers();
+  const host = headersList.get('host');
   let ogImageUrl: string | undefined;
-  if (baseUrl) {
-    const imageUrl = new URL(`${baseUrl}/api/og/set`);
+
+  if (host) {
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+    const imageUrl = new URL(`${protocol}://${host}/api/og/set`);
     imageUrl.searchParams.set('userId', userId);
     imageUrl.searchParams.set('setSlug', setSlug);
     if (shareToken) {

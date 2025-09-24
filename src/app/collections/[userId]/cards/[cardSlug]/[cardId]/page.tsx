@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import CollectionCardClient from './CollectionCardClient';
 
@@ -19,11 +20,14 @@ export async function generateMetadata({
   const resolvedSearchParams = await searchParams;
   const shareToken = resolvedSearchParams.shareToken as string | undefined;
 
-  const baseUrl = process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL;
-
+  // Dynamically construct the OG image URL
+  const headersList = await headers();
+  const host = headersList.get('host');
   let ogImageUrl: string | undefined;
-  if (baseUrl) {
-    const imageUrl = new URL(`${baseUrl}/api/og/card`);
+
+  if (host) {
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+    const imageUrl = new URL(`${protocol}://${host}/api/og/card`);
     imageUrl.searchParams.set('userId', userId);
     imageUrl.searchParams.set('cardId', cardId);
     if (shareToken) {

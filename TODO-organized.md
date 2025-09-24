@@ -166,6 +166,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Custom Collection Goals
 
 - Make it easier to exclude tokens (isToken card field perhaps?)
+- Sharing and duplicating collection goals
+- "Save this search as a collection goal"
 
 #### Default Collection Goals
 
@@ -255,6 +257,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Testing
 
 - I want a test suite of every goal type and filtering option that Claude runs through or maybe just a custom node script runs against test env or local creates and deletes goals
+- End-to-end front-end tests for every user action in the test environment
 
 #### Chores
 
@@ -368,6 +371,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### mtgcb-jobs
 
 - mtgcb-jobs should alert me as to new scryfall cards
+- Grok what to do about card prices of cancelled cards like Crusade
+- Auto-fix missing tcgplayerIds from scryfall data
 - remove claude settings file from repo, rm --cached and add to gitignore
 
 ### mtgcb-importer

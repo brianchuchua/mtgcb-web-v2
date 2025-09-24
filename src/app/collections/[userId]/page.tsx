@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { CollectionClient } from './CollectionClient';
 
 export async function generateMetadata({
@@ -13,13 +14,16 @@ export async function generateMetadata({
   const shareToken = resolvedSearchParams.shareToken as string | undefined;
   const goalId = resolvedSearchParams.goalId as string | undefined;
 
-  const baseUrl = process.env.NEXT_PUBLIC_LOCAL_API_BASE_URL;
-
+  // Dynamically construct the OG image URL
+  const headersList = await headers();
+  const host = headersList.get('host');
   let ogImageUrl: string | undefined;
-  if (baseUrl) {
+
+  if (host) {
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
     // Use goal-specific OG image if goalId is present
     const endpoint = goalId ? 'goal' : 'collection';
-    const imageUrl = new URL(`${baseUrl}/api/og/${endpoint}`);
+    const imageUrl = new URL(`${protocol}://${host}/api/og/${endpoint}`);
     imageUrl.searchParams.set('userId', userId);
     if (goalId) {
       imageUrl.searchParams.set('goalId', goalId);

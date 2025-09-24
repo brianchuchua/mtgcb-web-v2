@@ -45,37 +45,11 @@
 
 ## Future Enhancements to Existing Features
 
-### Price Updater
-
-- Auto-fix missing tcgplayerIds from scryfall data
-- Properly report the 404s for the cancelled cards like Crusade
-
-### Locations
-
-- Allowing backups, import and export of locations
-
-### Collection Goals
-
-- Sharing and duplicating collection goals
-- "Save this search as a collection goal"
-
-### Performance
-
-- Perhaps don't include location data in searches when the user has no locations, may need a preflight check for this
-
 ### Data Improvements
 
 - Auditing for and preventing duplicate releasedAt dates in sets
 - canBeFoil and canBeNonFoil data cleanup and interaction with etched foils, see Mountain (674) from Secret Lair and compare to tcgplayer data -- see also Culling the Weak and rainbow foils
 - Subset data automation and clean-up (basically audit subset groups that have cards in them directly and sets that should be subsets)
-
-### Testing
-
-- End-to-end tests for every user action in the test environment
-
-### Deployment
-
-- update NEXT_PUBLIC_LOCAL_API_BASE_URL to the production URL
 
 ### Post Production
 
