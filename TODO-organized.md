@@ -38,7 +38,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Bugs
 
-- Most Valuable Card is adding up all their values, not just a single copy
 - ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from
 - Hide duplicate printings doesn't do anything with goals -- maybe just hide it from the front-end.
 
@@ -125,6 +124,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Announce on social media and discord
 - Announce to patrons
 - Start up the podcast again
+- YouTube channel? Draft streaming as a way to encourage collectors to transition to limited players?
 
 ### Project: Data Cleanup
 
@@ -219,6 +219,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Find deprecated uses of PaperProps and Grid
 - Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
 - Remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
+- Audit consistency of naming of fields returned by API, like for totalCount and values.
+- Need a full postman library of my API calls, these should live with api docs
+- CI/CD pipeline
+- Rate limiting for API calls
 
 #### Code Style
 
@@ -267,10 +271,40 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - After release, adding all remaining missing cards and fixing data issues, including:
 - Adding Art Series cards
 - Need to add cardFaces data and come up with a plan to render the backside of cards
+- Sorting of collectorNumberNumeric when the original collector number is like "A25-223"
 
 ## 🎯 Future Features
 
 ### Major Features
+
+#### Deck Building / Completion
+
+- Almost added a slim version of this before release, but basic deck completion didn't feel like enough, and there's a tie-in to format legality too. This feature should probably be bigger that I originally thought.
+
+#### Saved Searches
+
+- Ability to save searches. It's like a collection goal but without computation.
+
+#### Foreign Card Support
+
+- Massive data volume, interface implications, and a new external price source
+
+#### Sealed Product Tracking
+
+- For folks that collect unopened boxes and packs and decks
+- Related: When adding a sealed product to a collection, can add it in an "opened" state and automatically add all the cards inside to the collection
+
+#### Financial History Tracking
+
+- Track collection value over time, including purchases and sales
+- Track individual card price history over time
+- Track profits from sales
+- Track purchase prices for cards
+- Increase of individual values over time vs increase of adding cards to collection
+
+#### Card Comments and Ratings
+
+- Allow users to comment on cards and rate them by format
 
 ### Nice-to-Have Enhancements
 
@@ -322,6 +356,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Other Ideas
 
 - Consider alternate-mobile-filter.png as a design idea for mobile (search bar at the top, Filters button that opens a menu with filters -- need to vibe check current implementation first)
+- A money draft page that helps you quickly know the money cards for a draft, including bonus sheet content.
 
 ## MTG CB Tech Stack
 

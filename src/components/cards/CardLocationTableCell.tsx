@@ -60,18 +60,17 @@ export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
           isOwnCollection={isOwnCollection}
         />
       ) : (
-        isOwnCollection && hasLocations ? (
+        isOwnCollection && hasLocations && (totalQuantityReg || totalQuantityFoil) ? (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Chip
               label="Add Card to Location"
               onClick={handleAddLocation}
               size="small"
-              disabled={!totalQuantityReg && !totalQuantityFoil}
               sx={{
-                cursor: !totalQuantityReg && !totalQuantityFoil ? 'not-allowed' : 'pointer',
+                cursor: 'pointer',
                 color: 'text.secondary',
                 borderColor: 'divider',
-                '&:hover': !totalQuantityReg && !totalQuantityFoil ? {} : {
+                '&:hover': {
                   backgroundColor: 'action.hover',
                   borderColor: 'text.secondary',
                 },

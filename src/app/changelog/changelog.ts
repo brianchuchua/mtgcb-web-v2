@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-24',
+      version: '0.129.2',
+      changes: ['Fixed table view to hide "Add card to location" button for cards with no quantity'],
+    },
+    {
+      date: '2025-09-24',
       version: '0.129.1',
       changes: ['Fixed display of colorless Phyrexian mana symbols in card tables'],
     },

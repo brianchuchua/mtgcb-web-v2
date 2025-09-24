@@ -38,51 +38,9 @@
 - search needs to clear when entering a set page
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues
 
-## Tech Debt
-
-### Uncategorized
-
-- Audit consistency of naming of fields returned by API for totalCount and values.
-- Need a full postman library of my API calls, these should live with api docs
-- Need a fallback if both canBeFoil and canBeNonFoil are false, treat them both as true probably
-- CI/CD pipeline
-- Rate limiting for API calls
-
-### Collector number sorting
-
-The collectorNumberNumeric field is parsing these special format collector
-numbers by removing the prefix and keeping just the numeric part:
-
-- "2025-10" → 202510 (concatenated)
-- "A25-223" → 25223 (removed 'A', concatenated)
-- "J22-803" → 22803 (removed 'J', concatenated)
-
-This creates an incorrect sort order because:
-
-1. "2025-10" becomes 202510 which is much larger than the others
-2. The letter prefixes are stripped, losing important information
-
-The sorting IS working correctly based on the numeric values stored, but the parsing logic that creates
-collectorNumberNumeric doesn't handle these hyphenated collector numbers properly. It's treating "2025-10" as a
-single number 202510 instead of understanding it's a set prefix and number.
-
-This isn't really a sorting bug - it's working as designed. The issue is how hyphenated collector numbers are
-converted to numeric values. These special List (PLIST) cards have collector numbers that reference their original
-set and number, and the current parsing concatenates them into a single number which doesn't sort meaningfully.
-
 ## Future Features
 
-- Art Series cards 🔁
-- Deck Completion / Deck Building (I started on this and this feature can go very deep)
-- Foreign Cards (although English support must include all cards never printed in English, etc.)
-- Sealed product support
-- Button to report missing card data, notify user if link to scryfall or tcgplayer is missing
-- Financial history tracking, collection value history, etc.
-- Card comments and rating by format
 - Patron request: Scryfall syntax support for searches
-- A dedicated statistics section with even more statistics 🔁
-- Collection value tracking over time (this can be super deep, increase of individual values over time vs increase of adding cards to collection, tracking purchase prices and profits, etc.)
-- Card ratings and comments
 - Fluff: A set icon game where set icons fall toward the bottom of the screen and you have to shoot them by typing the set name, give hints as they get closer to the bottom
 
 ## Future Enhancements to Existing Features
@@ -91,10 +49,6 @@ set and number, and the current parsing concatenates them into a single number w
 
 - Auto-fix missing tcgplayerIds from scryfall data
 - Properly report the 404s for the cancelled cards like Crusade
-
-### Search
-
-- Saving searches
 
 ### Locations
 
@@ -163,8 +117,6 @@ set and number, and the current parsing concatenates them into a single number w
 
 ## Nice to Have
 
-- A "money draft" tool to help users during a draft
-- A YouTube channel for the site, including transitioning collectors to limited players -- it's the best way to collect.
 - Consulting with a UX designer -- while Material UI looks nice, IhavenoideawhatIamdoing
 - Mana symbol confetti
 
@@ -174,32 +126,10 @@ set and number, and the current parsing concatenates them into a single number w
 
 # TODOs from the README.md file
 
-## Now
-
-### Next
-
 ## Later
 
 - update rarityNumeric to have special be 6 instead of 1 in production `update "Card" set "rarityNumeric" = 6 where "rarityNumeric" = 1;`
-- Clean up BrowseSearchForm into smaller components
-- Add ability to save searches (even independently of collection goals, a saved searches section)
-- Allow sorting by set names alphabetically in card view
-- Table exporting to CSV
-- Subset data may need to be cleaned up.
-
-## Known Bugs
-
-- Minor: When logging out of a page that requires authentication, redirectTo is set to the page you were on during logout.
 
 ## UX Thoughts
 
 - Ensure the add/remove buttons are very large and easy to press on tablets and mobile
-- Subsetgroups are confusing to users. Probably just hide this.
-- Allow user to tap a card row to add that card to their collection in table view
-- Some users would like result numbers listed, to help binder placement
-- Some users express that when selecting a number input, they want the entire number highlighted so it's easy to replace
-- Evaluate if custom image sizes cause performance issues that can be avoided
-
-## Patron Requests
-
-- Basic deck completion -- paste in a deck list and get a report/buy button for missing cards.
