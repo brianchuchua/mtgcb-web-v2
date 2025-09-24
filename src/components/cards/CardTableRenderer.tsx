@@ -1,9 +1,10 @@
 'use client';
 
 import AddIcon from '@mui/icons-material/Add';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { Box, IconButton, TableCell, TextField, Tooltip, Typography } from '@mui/material';
+import { Box, CircularProgress, IconButton, TableCell, TextField, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
 import Link from 'next/link';
@@ -123,7 +124,7 @@ export const useCardTableColumns = (
     {
       id: 'quantityReg',
       label: 'Regular',
-      width: { default: '100px' },
+      width: { default: '110px' },
       align: 'center',
       tooltip: <QuantityRegTooltip />,
       hasInfoIcon: true,
@@ -132,7 +133,7 @@ export const useCardTableColumns = (
     {
       id: 'quantityFoil',
       label: 'Foils',
-      width: { default: '100px' },
+      width: { default: '110px' },
       align: 'center',
       tooltip: <QuantityFoilTooltip />,
       hasInfoIcon: true,
@@ -301,6 +302,7 @@ const TableQuantityContainer = styled(Box)(({ theme }) => ({
 }));
 
 const TableQuantityInput = styled(TextField)(({ theme }) => ({
+  position: 'relative',
   '& .MuiOutlinedInput-input': {
     padding: '2px 4px',
     width: '30px',
@@ -371,6 +373,8 @@ const InlineEditableQuantity: React.FC<{
 }> = ({ cardId, cardName, quantity, quantityType, otherQuantity = 0, canBeFoil = true, canBeNonFoil = true }) => {
   const [localQuantity, setLocalQuantity] = useState(quantity);
   const [inputValue, setInputValue] = useState(quantity.toString());
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [updateCollection] = useUpdateCollectionMutation();
   const { enqueueSnackbar } = useSnackbar();
   const updatePromiseRef = useRef<{ abort: () => void } | null>(null);
@@ -407,6 +411,10 @@ const InlineEditableQuantity: React.FC<{
         updatePromiseRef.current.abort();
       }
 
+      // Set loading state
+      setIsLoading(true);
+      setShowSuccess(false);
+
       try {
         const promise = updateCollection({
           mode: 'set',
@@ -424,12 +432,13 @@ const InlineEditableQuantity: React.FC<{
 
         await promise.unwrap();
 
-        const message =
-          quantityType === 'regular'
-            ? `${cardName} has been set to ${newQuantity}`
-            : `${cardName} (Foil) has been set to ${newQuantity}`;
-        enqueueSnackbar(message, { variant: 'success', autoHideDuration: 3000 });
+        // Set success state - persists until page navigation
+        setIsLoading(false);
+        setShowSuccess(true);
+        // Success is now shown inline with checkmark icon
       } catch (error: any) {
+        // Clear loading state on error
+        setIsLoading(false);
         // Don't show error or reset for aborted requests
         if (error.name !== 'AbortError' && error.message !== 'Aborted') {
           enqueueSnackbar(`Failed to update ${cardName} quantity`, { variant: 'error' });
@@ -549,45 +558,72 @@ const InlineEditableQuantity: React.FC<{
       disableFocusListener={!isDisabled}
       disableTouchListener={!isDisabled}
     >
-      <TableQuantityContainer className={hasError ? 'error' : ''}>
-        <TableLeftButton
-          size="small"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleDecrement(e);
-          }}
-          disabled={localQuantity === 0}
-          tabIndex={-1}
-          disableFocusRipple
-        >
-          <RemoveIcon />
-        </TableLeftButton>
-        <TableQuantityInput
-          type="number"
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleInputBlur}
-          onFocus={handleInputFocus}
-          onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
-          inputProps={{ min: 0 }}
-          variant="outlined"
-          size="small"
-          disabled={isDisabled}
-          error={hasError}
-        />
-        <TableRightButton
-          size="small"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleIncrement(e);
-          }}
-          tabIndex={-1}
-          disableFocusRipple
-          disabled={isDisabled}
-        >
-          <AddIcon />
-        </TableRightButton>
-      </TableQuantityContainer>
+      <Box position="relative" display="inline-flex">
+        <TableQuantityContainer className={hasError ? 'error' : ''}>
+          <TableLeftButton
+            size="small"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleDecrement(e);
+            }}
+            disabled={localQuantity === 0}
+            tabIndex={-1}
+            disableFocusRipple
+          >
+            <RemoveIcon />
+          </TableLeftButton>
+          <TableQuantityInput
+            type="number"
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
+            onFocus={handleInputFocus}
+            onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
+            inputProps={{ min: 0 }}
+            variant="outlined"
+            size="small"
+            disabled={isDisabled}
+            error={hasError}
+          />
+          <TableRightButton
+            size="small"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleIncrement(e);
+            }}
+            tabIndex={-1}
+            disableFocusRipple
+            disabled={isDisabled}
+          >
+            <AddIcon />
+          </TableRightButton>
+        </TableQuantityContainer>
+        {isLoading && (
+          <CircularProgress
+            size={10}
+            thickness={5}
+            sx={{
+              position: 'absolute',
+              right: '-14px',
+              top: '29%',
+              transform: 'translateY(-25%)',
+              color: 'primary.main',
+            }}
+          />
+        )}
+        {showSuccess && (
+          <CheckCircleIcon
+            sx={{
+              position: 'absolute',
+              right: '-14px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              fontSize: '0.75rem',
+              color: 'inherit',
+            }}
+          />
+        )}
+      </Box>
     </Tooltip>
   );
 };
@@ -1307,7 +1343,6 @@ const ClickableText = styled(Typography)(({ theme }) => ({
     textDecoration: 'underline',
   },
 }));
-
 
 const SetLinkText = styled(Typography)(({ theme }) => ({
   '&:hover': {

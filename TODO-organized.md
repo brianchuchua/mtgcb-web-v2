@@ -49,6 +49,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Performance Issues
 
+- Look into re-rendering when editing quantities in table view -- seems like a lot of re-renders, test on mobile
+
 ## 📋 Pre-Release Required
 
 ### Scaling
@@ -296,10 +298,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Would be nice to report how many of a user's cards are missing price data
 - And to perhaps show an info icon next to collection and set values saying which cards are not contributing to the total due to missing price data
-
-#### Patron Requests
-
-- Highlight recently updated card in some way, perhaps the input box or the price
 
 #### Patron Features
 

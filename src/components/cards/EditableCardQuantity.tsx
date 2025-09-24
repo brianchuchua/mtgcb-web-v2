@@ -1,8 +1,10 @@
 'use client';
 
 import AddIcon from '@mui/icons-material/Add';
+import CheckIcon from '@mui/icons-material/Check';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { Box, IconButton, TextField, Tooltip, Typography, styled } from '@mui/material';
+import { Box, CircularProgress, IconButton, TextField, Tooltip, Typography, styled } from '@mui/material';
 import debounce from 'lodash.debounce';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -36,6 +38,7 @@ const QuantityInput = styled(TextField)(({ theme }) => ({
     transformOrigin: 'center',
     '&.MuiInputLabel-shrink': {
       transform: 'translate(-50%, -9px) scale(0.75)',
+      maxWidth: 'calc(133% - 16px)',
     },
   },
   '& .MuiOutlinedInput-notchedOutline legend': {
@@ -139,6 +142,10 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   const [localQuantityFoil, setLocalQuantityFoil] = useState(quantityFoil);
   const [inputValueReg, setInputValueReg] = useState(quantityReg.toString());
   const [inputValueFoil, setInputValueFoil] = useState(quantityFoil.toString());
+  const [isLoadingReg, setIsLoadingReg] = useState(false);
+  const [isLoadingFoil, setIsLoadingFoil] = useState(false);
+  const [showSuccessReg, setShowSuccessReg] = useState(false);
+  const [showSuccessFoil, setShowSuccessFoil] = useState(false);
   const [updateCollection] = useUpdateCollectionMutation();
   const { enqueueSnackbar } = useSnackbar();
   const updatePromiseRef = React.useRef<{ abort: () => void } | null>(null);
@@ -172,6 +179,15 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         updatePromiseRef.current.abort();
       }
 
+      // Set loading state
+      if (changedType === 'regular') {
+        setIsLoadingReg(true);
+        setShowSuccessReg(false);
+      } else {
+        setIsLoadingFoil(true);
+        setShowSuccessFoil(false);
+      }
+
       try {
         const promise = updateCollection({
           mode: 'set',
@@ -190,16 +206,32 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         const result = await promise.unwrap();
 
         if (result.success) {
-          const quantity = changedType === 'regular' ? newQuantityReg : newQuantityFoil;
-          const message =
-            changedType === 'regular'
-              ? `${cardName} has been set to ${quantity}`
-              : `${cardName} (Foil) has been set to ${quantity}`;
-          enqueueSnackbar(message, { variant: 'success' });
+          // Set success state - persists until page navigation
+          if (changedType === 'regular') {
+            setIsLoadingReg(false);
+            setShowSuccessReg(true);
+          } else {
+            setIsLoadingFoil(false);
+            setShowSuccessFoil(true);
+          }
+
+          // Success is now shown inline with checkmark icon
         } else {
+          // Clear loading state on error
+          if (changedType === 'regular') {
+            setIsLoadingReg(false);
+          } else {
+            setIsLoadingFoil(false);
+          }
           enqueueSnackbar(`Failed to update ${cardName}`, { variant: 'error' });
         }
       } catch (error: any) {
+        // Clear loading state on error
+        if (changedType === 'regular') {
+          setIsLoadingReg(false);
+        } else {
+          setIsLoadingFoil(false);
+        }
         // Don't show error for aborted requests
         if (error.name !== 'AbortError' && error.message !== 'Aborted') {
           enqueueSnackbar(`Error updating ${cardName}`, { variant: 'error' });
@@ -315,11 +347,11 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   const foilHasError = !canBeFoil && localQuantityFoil > 0;
 
   return (
-    <Box 
-      display="flex" 
-      gap={1} 
-      justifyContent="center" 
-      sx={{ 
+    <Box
+      display="flex"
+      gap={1}
+      justifyContent="center"
+      sx={{
         mt: 0.5,
         flexDirection: 'row',
         // Use container query to stack vertically when card is narrow
@@ -329,8 +361,14 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         },
       }}
     >
-      <Tooltip 
-        title={!canBeNonFoil ? (regularHasError ? "This card doesn't come in non-foil. You can only reduce the quantity." : "This card doesn't come in non-foil.") : ""}
+      <Tooltip
+        title={
+          !canBeNonFoil
+            ? regularHasError
+              ? "This card doesn't come in non-foil. You can only reduce the quantity."
+              : "This card doesn't come in non-foil."
+            : ''
+        }
         placement="top"
         disableHoverListener={canBeNonFoil}
         disableFocusListener={canBeNonFoil}
@@ -350,39 +388,51 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           >
             <RemoveIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
           </LeftButton>
-        <QuantityInput
-          type="number"
-          value={inputValueReg}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('regular', e)}
-          onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('regular', e)}
-          onFocus={handleInputFocus}
-          onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
-          inputProps={{ min: 0 }}
-          variant="outlined"
-          size="small"
-          label="Regular"
-          InputLabelProps={{ shrink: true }}
-          disabled={readOnly || !canBeNonFoil}
-          error={regularHasError}
-        />
-        <RightButton
-          size="small"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleIncrement('regular', e);
-          }}
-          tabIndex={-1}
-          disableFocusRipple
-          disabled={readOnly || !canBeNonFoil}
-          $error={regularHasError}
-        >
-          <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
-        </RightButton>
+          <QuantityInput
+            type="number"
+            value={inputValueReg}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('regular', e)}
+            onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('regular', e)}
+            onFocus={handleInputFocus}
+            onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
+            inputProps={{ min: 0 }}
+            variant="outlined"
+            size="small"
+            label={
+              <Box display="flex" alignItems="center" gap={0.25}>
+                Regular
+                {isLoadingReg && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
+                {showSuccessReg && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
+              </Box>
+            }
+            InputLabelProps={{ shrink: true }}
+            disabled={readOnly || !canBeNonFoil}
+            error={regularHasError}
+          />
+          <RightButton
+            size="small"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleIncrement('regular', e);
+            }}
+            tabIndex={-1}
+            disableFocusRipple
+            disabled={readOnly || !canBeNonFoil}
+            $error={regularHasError}
+          >
+            <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
+          </RightButton>
         </QuantityContainer>
       </Tooltip>
 
-      <Tooltip 
-        title={!canBeFoil ? (foilHasError ? "This card doesn't come in foil. You can only reduce the quantity." : "This card doesn't come in foil.") : ""}
+      <Tooltip
+        title={
+          !canBeFoil
+            ? foilHasError
+              ? "This card doesn't come in foil. You can only reduce the quantity."
+              : "This card doesn't come in foil."
+            : ''
+        }
         placement="top"
         disableHoverListener={canBeFoil}
         disableFocusListener={canBeFoil}
@@ -402,34 +452,40 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           >
             <RemoveIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
           </LeftButton>
-        <QuantityInput
-          type="number"
-          value={inputValueFoil}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('foil', e)}
-          onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('foil', e)}
-          onFocus={handleInputFocus}
-          onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
-          inputProps={{ min: 0 }}
-          variant="outlined"
-          size="small"
-          label="Foils"
-          InputLabelProps={{ shrink: true }}
-          disabled={readOnly || !canBeFoil}
-          error={foilHasError}
-        />
-        <RightButton
-          size="small"
-          onMouseDown={(e) => {
-            e.preventDefault();
-            handleIncrement('foil', e);
-          }}
-          tabIndex={-1}
-          disableFocusRipple
-          disabled={readOnly || !canBeFoil}
-          $error={foilHasError}
-        >
-          <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
-        </RightButton>
+          <QuantityInput
+            type="number"
+            value={inputValueFoil}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('foil', e)}
+            onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('foil', e)}
+            onFocus={handleInputFocus}
+            onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
+            inputProps={{ min: 0 }}
+            variant="outlined"
+            size="small"
+            label={
+              <Box display="flex" alignItems="center" gap={0.25}>
+                Foils
+                {isLoadingFoil && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
+                {showSuccessFoil && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
+              </Box>
+            }
+            InputLabelProps={{ shrink: true }}
+            disabled={readOnly || !canBeFoil}
+            error={foilHasError}
+          />
+          <RightButton
+            size="small"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleIncrement('foil', e);
+            }}
+            tabIndex={-1}
+            disableFocusRipple
+            disabled={readOnly || !canBeFoil}
+            $error={foilHasError}
+          >
+            <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
+          </RightButton>
         </QuantityContainer>
       </Tooltip>
     </Box>

@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-24',
+      version: '0.129.0',
+      changes: ['Added inline save indicators to quantity selectors showing progress and completion'],
+    },
+    {
+      date: '2025-09-24',
       version: '0.128.1',
       changes: ['Fixed card selector flickering when adding specific cards to goals'],
     },

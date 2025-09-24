@@ -1,12 +1,22 @@
 'use client';
 
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Box, Skeleton, Typography, Popover, IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
-import React, { useState, MouseEvent } from 'react';
+import {
+  Box,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Popover,
+  Skeleton,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
+import React, { MouseEvent, useState } from 'react';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
@@ -114,7 +124,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   if (!prices) {
     return (
-      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}
+      <Typography
+        variant="subtitle1"
+        fontWeight="medium"
+        textAlign={centered ? 'center' : 'inherit'}
         sx={{
           fontSize: '1rem',
           '@container card (max-width: 250px)': {
@@ -135,7 +148,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   if (!normalPriceData && !foilPriceData) {
     return (
-      <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}
+      <Typography
+        variant="subtitle1"
+        fontWeight="medium"
+        textAlign={centered ? 'center' : 'inherit'}
         sx={{
           fontSize: '1rem',
           '@container card (max-width: 250px)': {
@@ -263,21 +279,17 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
     if (normalPriceWithType?.isFallback) {
       content.push(
-        `The ${requestedPriceTypeLabel.toLowerCase()} price is not available. Showing ${getPriceTypeLabel(normalPriceWithType.type).toLowerCase()} price instead.`
+        `${requestedPriceTypeLabel} price is not available. Showing ${getPriceTypeLabel(normalPriceWithType.type).toLowerCase()} price instead.`,
       );
     } else if (!normalPriceWithType && foilPrice && !isFoilOnlyCard) {
       content.push(
-        `No ${requestedPriceTypeLabel.toLowerCase()} price is available for the regular version. Showing foil price instead.`
+        `No ${requestedPriceTypeLabel.toLowerCase()} price is available for the regular version. Showing foil price instead.`,
       );
     }
 
     return (
       <Box sx={{ p: 2, maxWidth: 300, position: 'relative' }}>
-        <IconButton
-          size="small"
-          onClick={handleClose}
-          sx={{ position: 'absolute', right: 8, top: 8 }}
-        >
+        <IconButton size="small" onClick={handleClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
           <CloseIcon fontSize="small" />
         </IconButton>
         <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5, pr: 3 }}>
@@ -379,25 +391,25 @@ const CardPrice: React.FC<CardPriceProps> = ({
             >
               {formatPrice(normalPrice)} ({formatPrice(foilPrice)} foil)
             </Typography>
-              {isFallback && (
-                <IconButton
-                  size="small"
-                  onClick={handleInfoClick}
-                  sx={{
-                    ml: 0.25,
-                    padding: 0,
-                    color: 'action.active',
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                      color: 'primary.main',
-                    }
-                  }}
-                >
-                  <InfoOutlinedIcon sx={{ fontSize: '1rem' }} />
-                </IconButton>
-              )}
-            </Box>
+            {isFallback && (
+              <IconButton
+                size="small"
+                onClick={handleInfoClick}
+                sx={{
+                  ml: 0.25,
+                  padding: 0,
+                  color: 'action.active',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: 'primary.main',
+                  },
+                }}
+              >
+                <InfoOutlinedIcon sx={{ fontSize: '1rem' }} />
+              </IconButton>
+            )}
           </Box>
+        </Box>
         <Popover
           open={open}
           anchorEl={anchorEl}
@@ -474,25 +486,25 @@ const CardPrice: React.FC<CardPriceProps> = ({
             >
               {formatPrice(normalPrice)}
             </Typography>
-              {isFallback && (
-                <IconButton
-                  size="small"
-                  onClick={handleInfoClick}
-                  sx={{
-                    ml: 0.25,
-                    padding: 0,
-                    color: 'action.active',
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                      color: 'primary.main',
-                    }
-                  }}
-                >
-                  <InfoOutlinedIcon sx={{ fontSize: '1rem' }} />
-                </IconButton>
-              )}
-            </Box>
+            {isFallback && (
+              <IconButton
+                size="small"
+                onClick={handleInfoClick}
+                sx={{
+                  ml: 0.25,
+                  padding: 0,
+                  color: 'action.active',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: 'primary.main',
+                  },
+                }}
+              >
+                <InfoOutlinedIcon sx={{ fontSize: '1rem' }} />
+              </IconButton>
+            )}
           </Box>
+        </Box>
         <Popover
           open={open}
           anchorEl={anchorEl}
@@ -546,39 +558,41 @@ const CardPrice: React.FC<CardPriceProps> = ({
       <>
         <Box sx={containerStyle}>
           <Box sx={flexContainerStyle}>
-            <Typography variant="subtitle1" fontWeight="medium"
+            <Typography
+              variant="subtitle1"
+              fontWeight="medium"
+              sx={{
+                fontSize: '1rem',
+                '@container card (max-width: 250px)': {
+                  fontSize: '0.875rem',
+                },
+                '@container card (max-width: 200px)': {
+                  fontSize: '0.75rem',
+                },
+              }}
+            >
+              {formatPrice(foilPrice)} foil
+            </Typography>
+            {/* Only show the info icon if this is NOT a foil-only card */}
+            {!isFoilOnlyCard && (
+              <IconButton
+                size="small"
+                onClick={handleInfoClick}
                 sx={{
-                  fontSize: '1rem',
-                  '@container card (max-width: 250px)': {
-                    fontSize: '0.875rem',
-                  },
-                  '@container card (max-width: 200px)': {
-                    fontSize: '0.75rem',
+                  ml: 0.25,
+                  padding: 0,
+                  color: 'action.active',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: 'primary.main',
                   },
                 }}
               >
-                {formatPrice(foilPrice)} foil
-              </Typography>
-              {/* Only show the info icon if this is NOT a foil-only card */}
-              {!isFoilOnlyCard && (
-                <IconButton
-                  size="small"
-                  onClick={handleInfoClick}
-                  sx={{
-                    ml: 0.25,
-                    padding: 0,
-                    color: 'action.active',
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                      color: 'primary.main',
-                    }
-                  }}
-                >
-                  <InfoOutlinedIcon sx={{ fontSize: '1rem' }} />
-                </IconButton>
-              )}
-            </Box>
+                <InfoOutlinedIcon sx={{ fontSize: '1rem' }} />
+              </IconButton>
+            )}
           </Box>
+        </Box>
         <Popover
           open={open}
           anchorEl={anchorEl}
@@ -628,7 +642,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   // No prices available
   return (
-    <Typography variant="subtitle1" fontWeight="medium" textAlign={centered ? 'center' : 'inherit'}
+    <Typography
+      variant="subtitle1"
+      fontWeight="medium"
+      textAlign={centered ? 'center' : 'inherit'}
       sx={{
         fontSize: '1rem',
         '@container card (max-width: 250px)': {

@@ -45,7 +45,6 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 
 - set column in table needs to be wider on mobile
 - Audit subsets with collection goals -- data and appearance.
-- Improve card quantity update messages
 - search needs to clear when entering a set page
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues
 
