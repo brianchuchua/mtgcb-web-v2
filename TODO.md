@@ -1,11 +1,5 @@
 # TODOs
 
-I've found over time that maintaining my action items for code in external tools is overkill and burdensome.
-
-Best to keep them in the codebase, especially since I'm a team of one.
-
-Currently, I am either knocking out items in this list or moving them to TODO-organized.md, which will eventually replace this file.
-
 ## Real Current Action Items
 
 - Remove "Showing" from "Showing 1-24 of blah cards" at 1024x768 or smaller -- actually the entire rendering sucks at this resolution, fix it
@@ -25,10 +19,6 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 - A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.
 - A supporter badge of some sort would be great.
 - Detecting if someone is a patron and linking their accounts.
-
-### Migration Path 🔁
-
-- need to make sure createdAt is ported over from legacy field
 
 ## Other Action Items Before Launch
 
@@ -200,7 +190,6 @@ set and number, and the current parsing concatenates them into a single number w
 ## Known Bugs
 
 - Minor: When logging out of a page that requires authentication, redirectTo is set to the page you were on during logout.
-- Minor: Mana doesn't render properly in table view for Kozilek, Compleated
 
 ## UX Thoughts
 

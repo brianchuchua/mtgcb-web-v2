@@ -1218,14 +1218,15 @@ function formatManaSymbols(manaCost: string | null | undefined): React.ReactNode
           aria-label={`Half ${getSymbolName(color)}`}
         />,
       );
-    } else if (symbol.includes('/p')) {
+    } else if (symbol.toLowerCase().includes('/p')) {
       // Phyrexian mana like {W/P} or {C/P}
       const color = symbol.split('/')[0].toLowerCase();
-      // For colorless phyrexian, we use ms-cp
+      // Special case: {C/P} should use ms-h instead of ms-cp (which doesn't exist)
+      const className = color === 'c' ? 'ms-h' : `ms-${color}p`;
       parts.push(
         <i
           key={`${symbol}-${startIndex}`}
-          className={`ms ms-${color}p ms-cost ms-1x`}
+          className={`ms ${className} ms-cost ms-1x`}
           style={{ margin: '1px' }}
           aria-label={getSymbolName(symbol)}
         />,

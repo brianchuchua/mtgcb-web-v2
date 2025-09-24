@@ -38,6 +38,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Bugs
 
+- Most Valuable Card is adding up all their values, not just a single copy
 - ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from
 - Hide duplicate printings doesn't do anything with goals -- maybe just hide it from the front-end.
 
