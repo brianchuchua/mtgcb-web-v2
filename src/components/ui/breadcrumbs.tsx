@@ -30,17 +30,58 @@ export default function Breadcrumbs({ items, autoGenerate = false, sx = {}, incl
   }
 
   return (
-    <Box sx={{ mb: 2, ...sx }} data-testid="breadcrumbs">
-      <MuiBreadcrumbs separator=">" aria-label="breadcrumbs">
+    <Box
+      sx={{
+        mb: 2,
+        overflow: 'hidden',
+        ...sx
+      }}
+      data-testid="breadcrumbs"
+    >
+      <MuiBreadcrumbs
+        separator=">"
+        aria-label="breadcrumbs"
+        sx={{
+          '.MuiBreadcrumbs-ol': {
+            flexWrap: 'nowrap',
+            alignItems: 'center',
+          },
+          '.MuiBreadcrumbs-separator': {
+            marginLeft: '8px',
+            marginRight: '8px',
+          },
+        }}
+      >
         {breadcrumbs.map((crumb, index) => {
           const isLast = index === breadcrumbs.length - 1;
 
           return isLast ? (
-            <Typography color="text.primary" key={crumb.label}>
+            <Typography
+              color="text.primary"
+              key={crumb.label}
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '300px',
+              }}
+            >
               {crumb.label}
             </Typography>
           ) : (
-            <MuiLink component={Link} href={crumb.href || '#'} key={crumb.label} underline="hover" color="inherit">
+            <MuiLink
+              component={Link}
+              href={crumb.href || '#'}
+              key={crumb.label}
+              underline="hover"
+              color="inherit"
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '200px',
+              }}
+            >
               {crumb.label}
             </MuiLink>
           );

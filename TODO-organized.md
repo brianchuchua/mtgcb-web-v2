@@ -47,6 +47,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## 📋 Pre-Release Required
 
+### Scaling
+
+- Scale API and Web to two dynos
+
 ### Core Features
 
 - Audit old app functionality
@@ -108,6 +112,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Ping johnny on Discord once card locations are released. :)
 - Announce on social media and discord
 - Announce to patrons
+- Start up the podcast again
 
 ### Project: Data Cleanup
 
@@ -164,6 +169,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Scryfall treats double-sided tokens as two separate cards, one for each side. This is a problem for collectors, who just want to see one entry for the dual token in their collection. It's a disconnect with how TCGPlayer handles them too.
 - I'll probably create corrected entries and deprecate the old ones. This is a recent problem since WotC started making all new tokens double-sided.
 
+#### Adding cards to collection at buy time
+
+- When a person is buying cards, have the site offer to record the cards right there
+
 ### Stats Page
 
 - A dedicated collection stats page and enhancements for set-specific stat pages, a little pie chart icon in the set view probably will expand a region to show stats for that set.
@@ -187,9 +196,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Consistent error and info message styles
 - Link to collection needs to be consistent. Underlined or not, which parts, etc.
 - Form and alignment consistency
+- Audit for scenarios where the app may render "1 cards" or "1 sets".
 
 ### Tech Debt
 
+- Create staging environments for both API and Web
 - Audit database schema for unused fields
 - Audit API for unused endpoints
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
@@ -295,6 +306,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### System Messages
 
 - Would be nice to have a system for site-wide messages, like "Scheduled Maintenance on DATE from TIME to TIME" or "New Feature: XYZ"
+
+### Other Ideas
+
+- Consider alternate-mobile-filter.png as a design idea for mobile (search bar at the top, Filters button that opens a menu with filters -- need to vibe check current implementation first)
 
 ## MTG CB Tech Stack
 

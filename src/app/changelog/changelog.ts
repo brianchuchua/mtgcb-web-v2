@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-23',
+      version: '0.126.1',
+      changes: ['Fixed breadcrumb navigation consistency across collection pages'],
+    },
+    {
+      date: '2025-09-23',
       version: '0.126.0',
       changes: ['Added "Parent" link on subset pages to quickly navigate to parent set'],
     },

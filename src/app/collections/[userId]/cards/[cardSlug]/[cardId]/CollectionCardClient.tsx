@@ -181,8 +181,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Collections', href: getCollectionUrl({ userId }) },
-            { label: username, href: getCollectionUrl({ userId }) },
+            { label: 'Collection', href: getCollectionUrl({ userId }) },
             { label: 'Cards', href: getCollectionUrl({ userId, contentType: 'cards' }) },
           ]}
         />
@@ -201,7 +200,6 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Collections', href: getCollectionUrl({ userId }) },
             { label: hasInvalidShareLink ? 'Invalid share link' : 'Private user' },
           ]}
         />
@@ -222,8 +220,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Collections', href: getCollectionUrl({ userId }) },
-            { label: username, href: getCollectionUrl({ userId }) },
+            { label: 'Collection', href: getCollectionUrl({ userId }) },
             { label: 'Cards', href: getCollectionUrl({ userId, contentType: 'cards' }) },
             { label: 'Card not found' },
           ]}
@@ -242,8 +239,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Collections', href: getCollectionUrl({ userId }) },
-          { label: username, href: getCollectionUrl({ userId }) },
+          { label: 'Collection', href: getCollectionUrl({ userId }) },
           { label: 'Cards', href: getCollectionUrl({ userId, contentType: 'cards' }) },
           { label: cardName },
         ]}

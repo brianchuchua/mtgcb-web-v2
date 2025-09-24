@@ -63,12 +63,6 @@ Now:
 
 ## Other Action Items Before Launch
 
-### Organizational
-
-- Prioritize, organize, and cull TODOs in this document
-- More social media presence and clean-up
-- Podcast?
-
 ### Importers and Exporters
 
 - Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
@@ -80,33 +74,18 @@ Now:
 ### Uncategorized
 
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
-- Setting to change going mythic to plain green progress bars
 - Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
-- Brainstorm patron cosmetic perks
 
 ## UX Action Items
 
+- rendering of quantity picker in table view sometimes has a top line misaligned by 1px
 - weird flicker with specific cards to include or exclude in goal forms
 - Audit subsets with collection goals -- data and appearance.
 - Evaluate default sort order on a set page, especially subset groups
-- Render "Subset" instead of Set and Subset Group instead of Set where relevant.
-- Consider an easier-to-use card quantity filter, add stat filter works, but users may be used to the easier one (I did this in the legacy new page)
-- Add title tags to all set and card links
-- Consider alternate-mobile-filter.png as a design idea (search bar at the top, Filters button that opens a menu with filters)
-- 1 cards instead of 1 card
-- enhancement -- when a person goes to buy the cards, have the site offer to record the cards right there
-- what good are breadcrumbs actually doing on the browse page? like home > browse, the home page is useless
-- See if still happening: On mobile, the hover over card name is doing the whole row, not just the card name
-- UX - Make the tab indexes only go to the quantity fields
 - Maybe: Improve rendering of reg and foil quantity when not logged in grid view
-- UX - Why do the pop-ups not dismiss if the screen isn't active?
-- Consider breadcrumbs for collection pages, maybe just the subpages since the main collection page is the root
 - Improve card quantity update messages
-- Breadcrumbs in collection set view
 - search needs to clear when entering a set page
-- (A subset of link) in the header for subsets -- or actually do breadcrumbs
-- Make default number of cards per page a multiple of 5 and 4.
 - Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues
 - Add a note to Cost to complete that it's based on the cheapest printing of a card, which may differ from the one being shown.

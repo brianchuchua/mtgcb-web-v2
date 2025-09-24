@@ -324,6 +324,13 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   if (isSetLoading) {
     return (
       <Box>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Collection', href: getCollectionUrl({ userId }) },
+            { label: 'Sets', href: getCollectionUrl({ userId, contentType: 'sets' }) },
+          ]}
+        />
         <Box sx={{ fontWeight: 'bold', fontSize: '1.5rem', mb: 2 }}></Box>
       </Box>
     );
@@ -336,6 +343,14 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
     return (
       <Box>
+        <Breadcrumbs
+          items={[
+            { label: 'Home', href: '/' },
+            { label: 'Collection', href: getCollectionUrl({ userId }) },
+            { label: 'Sets', href: getCollectionUrl({ userId, contentType: 'sets' }) },
+            { label: 'Set not found' },
+          ]}
+        />
         <InfoBanner
           title="Set not found or no cards found in it matching your criteria"
           message="The requested set might not exist, or there are no cards that match your current filter settings."
@@ -372,6 +387,15 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         />
       )}
       {!hasInvalidShareLink && <SharedCollectionBanner username={username || 'User'} userId={userId} />}
+
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Collection', href: getCollectionUrl({ userId }) },
+          { label: 'Sets', href: getCollectionUrl({ userId, contentType: 'sets' }) },
+          { label: setName || 'Loading...' },
+        ]}
+      />
 
       {/* Show CollectionHeader when viewing with a goal selected */}
       {selectedGoalId && collectionSummary && set && (
