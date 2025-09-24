@@ -10,27 +10,15 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 
 - Remove "Showing" from "Showing 1-24 of blah cards" at 1024x768 or smaller -- actually the entire rendering sucks at this resolution, fix it
 
-- i think price update jobs frequently don't finish, need to check logs -- i see, dyno restart, i need these things to auto-start on bootup, account for this, ensuring only one job of a type runs at a time, etc
-- I want a test suite of every goal type and filtering option that Claude runs through or mayne just a custom node script runs against test env or local creates and deletes goals
-- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local
 - considering: "Complete this set" buttons don't make sense with goals -- like complete this subgoal maybe? buy missing cards in other contexts? rename and consider.
 - Need these equivalent buttons on the set pages too.
 - subset data clean-up has to be the next phase of mtg cb, data fixes, 100% parity and accuracy with English cards and adding art series cards, image quality fixes, collector number fixes, Ae/apostrophe fixes, whitespace trimming, etc, release date/set sorting issues, etc
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
-- repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal
-- make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
 
 - big: need to audit buy missing cards for goal buttons, macro scale and set scale -- can't just click it for a goal with 30000 cards. can't do the prefetching for like an hour and then pop up the modal, need to be smarter and break it into chunks ahead of time. buy missing cards for this goal -- should just not have this button if it's a large number of cards, see basic land goals
   -- related ux: goal header inside of a set page needs ux work -- buy button is awkward near progress bar
-- considering: when viewing sets with a collection goal on, should add a note that the total cards are those actually collected in the set, maybe
-
-maybe instead of a pop-up when cards are updated, status updating in the labe
 
 ## Remaining Major Feature Work Before 1.0
-
-### MTG CB Data Importer
-
-- Needs to work for MTG CB v3 flawlessly
 
 ### Patron Support Page 🔁
 
@@ -52,19 +40,14 @@ maybe instead of a pop-up when cards are updated, status updating in the labe
 
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
 - Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
-- Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
 
 ## UX Action Items
 
-- set column in table needs to be wider
-- weird flicker with specific cards to include or exclude in goal forms
+- set column in table needs to be wider on mobile
 - Audit subsets with collection goals -- data and appearance.
-- Maybe: Improve rendering of reg and foil quantity when not logged in grid view
 - Improve card quantity update messages
 - search needs to clear when entering a set page
-- Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues
-- error state of quantity selectors not affecting button properly in goal editing or creation form
 
 ## Tech Debt
 

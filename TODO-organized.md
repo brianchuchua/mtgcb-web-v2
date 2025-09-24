@@ -32,6 +32,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Add a migration verification script to mtgcb-importer that checks user counts and collection counts match between old and new databases, accounting for those removed due to a 0 quantity count or for cards or users that no longer exist
 - Switch to Git Flow for the v1.0 release
 
+### mtgcb-importer
+
+- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute
+
 ### Bugs
 
 - ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from
@@ -68,6 +72,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Audit table field orders and their corresponding visibility filters
 
+### Testing
+
+- Repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal
+
 ### Patron Features / Patreon Integration
 
 #### The Reserved List
@@ -76,6 +84,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Other Patrons will be listed in a Hall of Fame just as usernames -- private by default, controlled with a setting
 - Mention Patreon on the home page and wherever else is appropriate
 - Mention that patrons get to vote on future features
+- Make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
 
 ### UX/Design
 
@@ -235,6 +244,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Consider GIN indexes for additional fields
 - More load testing
 - More index audits, organized analysis per API call / DB query
+
+#### Testing
+
+- I want a test suite of every goal type and filtering option that Claude runs through or maybe just a custom node script runs against test env or local creates and deletes goals
 
 #### Chores
 

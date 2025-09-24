@@ -111,6 +111,13 @@ const CardSelector: React.FC<CardSelectorProps> = ({
 
   const handleCardSelect = (_event: any, option: CardOption | null) => {
     if (option && !allSelectedCards.has(option.id)) {
+      // Add the card to cache immediately when selected
+      setCardInfoCache((prev) => {
+        const newCache = new Map(prev);
+        newCache.set(option.id, option.card);
+        return newCache;
+      });
+
       onChange({
         ...value,
         include: [...value.include, option.id],
@@ -283,7 +290,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       {isExclude && <Typography variant="inherit">NOT</Typography>}
                       <Typography variant="inherit">
-                        {cardInfo ? cardInfo.name : `Card ${cardId}`}
+                        {cardInfo ? cardInfo.name : 'Loading...'}
                         {cardInfo?.flavorName && ` (${cardInfo.flavorName})`}
                       </Typography>
                       {cardInfo && (

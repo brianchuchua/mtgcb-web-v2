@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-24',
+      version: '0.128.1',
+      changes: ['Fixed card selector flickering when adding specific cards to goals'],
+    },
+    {
       date: '2025-09-23',
       version: '0.128.0',
       changes: ['Improved grid view for shared collections by showing disabled quantity selectors instead of plain text'],
