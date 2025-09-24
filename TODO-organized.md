@@ -8,7 +8,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - [ ] v1.0 Release
 - [ ] Data Cleanup
-- [ ] Patrons vote on the next feature
+- [ ] Patrons vote on the next feature candidates and I make a selection
 
 ## 🔄 In Progress
 
@@ -23,6 +23,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Need another sql.raw audit
 - Must backup DDLs of all databases before release, Drizzle introspect is a secondary backup -- probably store in the API repo in a reference folder
+- Important: Audit input field lengths for all API calls and make front-end enforce them too
 
 ### Migration
 
@@ -58,6 +59,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Sonarcube
 
 - Need to detect and remove dead code from my goal refactorings using sonarcube -- it's becoming a bit of a vibe coding issue
+
+### UX
+
+- Audit table field orders and their corresponding visibility filters
 
 ### Patron Features / Patreon Integration
 
@@ -114,7 +119,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Clean up MTG CB collector number -- it's really just a card release date order / wubrg / alphabetical (for tokens) tiebreaker in many contexts. Its intent is to help sorting in a binder where a collector number is not available or unhelpful, especially for subset groups, like sorting every FNM promo that ever existed in order of release date. Also add this number to the FAQ.
 
-#### Images
+#### Old Images Update
 
 - Scryfall has a field to track if card images are good. I know I have some early images from their initial scans where I haven't updated them since. Add a field to track this myself and clean them all up.
 
@@ -175,12 +180,22 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Maybe a better 100% completion progress bar animation? I'm only 90% happy with it.
 
+#### UX Consistency Pass
+
+- Money value consistency -- success and warning colors
+- Consistent header, body, and breadcrumb styles
+- Consistent error and info message styles
+- Link to collection needs to be consistent. Underlined or not, which parts, etc.
+- Form and alignment consistency
+
 ### Tech Debt
 
 - Audit database schema for unused fields
 - Audit API for unused endpoints
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - Find deprecated uses of PaperProps and Grid
+- Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
+- Remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
 
 #### Code Style
 
@@ -205,12 +220,18 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Performance
 
 - Audit API response times and database response times (visible in Sentry)
-- Audit Lighthouse performance
+- Audit Lighthouse performance, with an eye on layout shift
 - Consider GIN indexes for additional fields
+- More load testing
+- More index audits, organized analysis per API call / DB query
 
 #### Chores
 
 - Clean up old Cloudflare settings (unused subdomains, etc)
+
+#### Image File Format
+
+- I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
 
 ### Performance Optimizations
 

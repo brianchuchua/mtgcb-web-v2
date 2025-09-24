@@ -134,6 +134,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
                   display: 'inline',
                   '&:hover': {
                     textDecoration: 'underline',
+                    textDecorationColor: 'primary.main',
                     color: 'primary.main',
                   },
                 }}
@@ -168,9 +169,22 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
                 mt: 2,
               }}
             >
-              <Typography variant="h5" fontWeight="500" sx={{ color: 'primary.main', mb: 1 }}>
-                {subsetWithCollectionData.name}
-              </Typography>
+              <Link
+                component={NextLink}
+                href={userId ? getCollectionSetUrl(userId, subsetWithCollectionData.slug, goalId) : `/browse/sets/${subsetWithCollectionData.slug}`}
+                sx={(theme) => ({
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                    textDecorationColor: theme.palette.primary.main,
+                  },
+                })}
+              >
+                <Typography variant="h5" fontWeight="500" sx={{ color: 'primary.main', mb: 1 }}>
+                  {subsetWithCollectionData.name}
+                </Typography>
+              </Link>
               
               {subsetWithCollectionData.code && (
                 <Box sx={{ mb: 2 }}>
@@ -220,9 +234,22 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
                 mt: 2,
               }}
             >
-              <Typography variant="h5" fontWeight="500" sx={{ color: 'primary.main', mb: 1 }}>
-                {subset.name}
-              </Typography>
+              <Link
+                component={NextLink}
+                href={userId ? getCollectionSetUrl(userId, subset.slug, goalId) : `/browse/sets/${subset.slug}`}
+                sx={(theme) => ({
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  '&:hover': {
+                    textDecoration: 'underline',
+                    textDecorationColor: theme.palette.primary.main,
+                  },
+                })}
+              >
+                <Typography variant="h5" fontWeight="500" sx={{ color: 'primary.main', mb: 1 }}>
+                  {subset.name}
+                </Typography>
+              </Link>
               
               <Typography variant="body1" color="text.secondary">
                 {formatSetCategoryAndType(subset)}

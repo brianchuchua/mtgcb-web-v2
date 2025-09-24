@@ -3,12 +3,12 @@
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { Box, Button, Typography } from '@mui/material';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Confetti from 'react-confetti';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetSetsQuery } from '@/api/browse/browseApi';
+import { useGetSetByIdQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { useMassUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
 import { SearchDescription } from '@/components/browse/SearchDescription';
@@ -114,6 +114,13 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   );
 
   const set = setsData?.data?.sets?.[0];
+  const pathname = usePathname();
+
+  const { data: parentSetData } = useGetSetByIdQuery(set?.parentSetId || '', {
+    skip: !set?.parentSetId || isWaitingForGoalSync,
+  });
+
+  const parentSet = parentSetData?.data?.set;
 
   const { data: subsetsData, isLoading: isSubsetsLoading } = useGetSetsQuery(
     {
@@ -504,6 +511,10 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         hideContentTypeToggle={true}
         subsets={subsets}
         onSubsetSelect={handleSubsetSelect}
+        parentSet={parentSet}
+        currentPath={pathname}
+        userId={String(userId)}
+        goalId={selectedGoalId ? String(selectedGoalId) : undefined}
         additionalAction={
           <>
             {isOwnCollection && browseController.view === 'cards' && !selectedGoalId && (

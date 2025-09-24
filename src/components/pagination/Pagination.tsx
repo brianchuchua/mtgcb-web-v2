@@ -27,6 +27,7 @@ import { styled } from '@mui/material/styles';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CardSettingsPanel, { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
+import ParentDropdown from './ParentDropdown';
 import SubsetDropdown from './SubsetDropdown';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 
@@ -47,6 +48,10 @@ const Pagination: React.FC<PaginationProps> = ({
   settingGroups,
   subsets = [],
   onSubsetSelect,
+  parentSet,
+  currentPath,
+  userId,
+  goalId,
   additionalAction,
   hideViewModeToggle = false,
   customItemName,
@@ -150,6 +155,10 @@ const Pagination: React.FC<PaginationProps> = ({
                       customSettingGroups={settingGroups}
                       subsets={subsets}
                       onSubsetSelect={onSubsetSelect}
+                      parentSet={parentSet}
+                      currentPath={currentPath}
+                      userId={userId}
+                      goalId={goalId}
                       customItemName={customItemName}
                       hideSettingsPanel={hideSettingsPanel}
                     />
@@ -209,6 +218,10 @@ const Pagination: React.FC<PaginationProps> = ({
               customSettingGroups={settingGroups}
               subsets={subsets}
               onSubsetSelect={onSubsetSelect}
+              parentSet={parentSet}
+              currentPath={currentPath}
+              userId={userId}
+              goalId={goalId}
               customItemName={customItemName}
               hideSettingsPanel={hideSettingsPanel}
             />
@@ -241,6 +254,10 @@ export interface PaginationProps {
   hideContentTypeToggle?: boolean;
   subsets?: any[];
   onSubsetSelect?: (subsetId: string) => void;
+  parentSet?: any;
+  currentPath?: string;
+  userId?: string;
+  goalId?: string;
   additionalAction?: React.ReactNode;
   hideViewModeToggle?: boolean;
   customItemName?: string;
@@ -435,6 +452,10 @@ interface PageSizeControlProps {
   customSettingGroups?: CardSettingGroup[];
   subsets?: any[];
   onSubsetSelect?: (subsetId: string) => void;
+  parentSet?: any;
+  currentPath?: string;
+  userId?: string;
+  goalId?: string;
   customItemName?: string;
   hideSettingsPanel?: boolean;
 }
@@ -448,6 +469,10 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
   customSettingGroups,
   subsets = [],
   onSubsetSelect,
+  parentSet,
+  currentPath,
+  userId,
+  goalId,
   customItemName,
   hideSettingsPanel = false,
 }) => {
@@ -482,6 +507,10 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
           ))}
         </Select>
       </FormControl>
+
+      {parentSet && currentPath && (
+        <ParentDropdown parentSet={parentSet} currentPath={currentPath} userId={userId} goalId={goalId} />
+      )}
 
       {subsets.length > 0 && onSubsetSelect && (
         <SubsetDropdown subsets={subsets} onSubsetSelect={onSubsetSelect} />

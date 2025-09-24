@@ -1,7 +1,7 @@
 import { CardApiParams, CardSearchData, SetApiParams } from './types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
-import { SetsSearchResult } from '@/types/sets';
+import { Set, SetsSearchResult } from '@/types/sets';
 
 export const browseApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -96,6 +96,15 @@ export const browseApi = mtgcbApi.injectEndpoints({
       keepUnusedDataFor: 3600, // 1 hour - aggressive caching since sets rarely change
       providesTags: ['Sets'],
     }),
+
+    getSetById: builder.query<ApiResponse<{ set: Set }>, string>({
+      query: (id) => ({
+        url: `/sets/${id}`,
+        method: 'GET',
+      }),
+      keepUnusedDataFor: 3600, // 1 hour - aggressive caching since sets rarely change
+      providesTags: (result, error, id) => [{ type: 'Sets', id }],
+    }),
   }),
   overrideExisting: false,
 });
@@ -108,6 +117,7 @@ export const {
   useLazyGetSetsQuery,
   useGetSetTypesQuery,
   useGetSetsNavigationQuery,
+  useGetSetByIdQuery,
   usePrefetch, // TODO: Rename -- this can get cards or sets
   endpoints,
 } = browseApi;

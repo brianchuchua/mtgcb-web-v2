@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-23',
+      version: '0.126.0',
+      changes: ['Added "Parent" link on subset pages to quickly navigate to parent set'],
+    },
+    {
       date: '2025-09-22',
       version: '0.125.4',
       changes: ['Fixed tooltip positioning for edited dates on Goals and Locations pages'],

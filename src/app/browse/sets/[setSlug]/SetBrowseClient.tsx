@@ -2,10 +2,11 @@
 
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { Box, Button, Typography } from '@mui/material';
+import { usePathname } from 'next/navigation';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SubsetSection from './SubsetSection';
-import { useGetSetsQuery } from '@/api/browse/browseApi';
+import { useGetSetByIdQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
@@ -52,6 +53,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   });
 
   const set = setsData?.data?.sets?.[0];
+  const pathname = usePathname();
 
   const { data: subsetsData, isLoading: isSubsetsLoading } = useGetSetsQuery(
     {
@@ -62,6 +64,12 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
       skip: !set?.id,
     },
   );
+
+  const { data: parentSetData } = useGetSetByIdQuery(set?.parentSetId || '', {
+    skip: !set?.parentSetId,
+  });
+
+  const parentSet = parentSetData?.data?.set;
 
   // Set the filter and view when set data loads
   useEffect(() => {
@@ -253,6 +261,8 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
         hideContentTypeToggle={true}
         subsets={subsets}
         onSubsetSelect={handleSubsetSelect}
+        parentSet={parentSet}
+        currentPath={pathname}
       />
       <SearchDescription forceView="cards" />
 

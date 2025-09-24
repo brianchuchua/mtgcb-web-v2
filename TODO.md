@@ -21,7 +21,6 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 - make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
 
 - ux: consider a change to header styles for collection headers similar to the home page
-- ux: info icon not aligned well next to prices, behaves differently than the info icon for goals, probably needs negative margin
 - ux: one printing of each unique card / every printing of each unique card is confusing when the quantity is more than one (goals page)
 
 - big: need to audit buy missing cards for goal buttons, macro scale and set scale -- can't just click it for a goal with 30000 cards. can't do the prefetching for like an hour and then pop up the modal, need to be smarter and break it into chunks ahead of time. buy missing cards for this goal -- should just not have this button if it's a large number of cards, see basic land goals
@@ -56,7 +55,6 @@ Now:
 
 ### Migration Path 🔁
 
-- need to clean up out of date schemas and generate the final database locally
 - need to make sure createdAt is ported over from legacy field
 
 ### Performance 🔁
@@ -75,13 +73,6 @@ Now:
 
 - Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
 
-### UX
-
-- Consistent header, body, and breadcrumb styles
-- Consistent error and info message styles
-- Clearly label collection values as estimates
-- Home page looks bad on tablet -- tablet may want to hide the sidenav by default maybe
-
 ### Before Open-Sourcing
 
 - remove dangerous claude code permissions from my repos since i wouldn't want other devs to be surprised by claude code having full bash powers
@@ -89,39 +80,24 @@ Now:
 ### Uncategorized
 
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
-- numberOfCardsInMagic in API coming back isn't always right, see http://local.mtgcb.com:3000/collections/1337/surprise-slivers?goalId=16&includeSets=1056
 - Setting to change going mythic to plain green progress bars
-- Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
-- Remove deprecated collection cards api call as well, since it's folded into browse cards now, remove from postman and update postman too
 - Handle canBeNonFoil and canBeFoil after verifying my importer is good with this data -- in collection pages and edit cards page
 - Data import clean-up / new mtgcb-importer section for new app (including bad data detector)
-- Important: Audit input field lengths for all API calls and make front-end enforce them too
 - Brainstorm patron cosmetic perks
 
 ## UX Action Items
 
 - weird flicker with specific cards to include or exclude in goal forms
 - Audit subsets with collection goals -- data and appearance.
-- Link to collection needs to be consistent. Underlined or not, which parts, etc.
-- Improve height of skeleton loader for collectionheader
-- Header and breadcrumb and form and alignment consistency
-- Audit style of info messages and errors
 - Evaluate default sort order on a set page, especially subset groups
 - Render "Subset" instead of Set and Subset Group instead of Set where relevant.
 - Consider an easier-to-use card quantity filter, add stat filter works, but users may be used to the easier one (I did this in the legacy new page)
-- Header consistency
-- Add link from child set to parent set
 - Add title tags to all set and card links
-- Audit API failure rendering in every page
-- Confirm functionality of back and forward browser buttons
-- See if I can prevent the entire card grid from reloading when the price type is changed
-- Audit table field orders and their corresponding visibility filters
 - Consider alternate-mobile-filter.png as a design idea (search bar at the top, Filters button that opens a menu with filters)
 - 1 cards instead of 1 card
 - enhancement -- when a person goes to buy the cards, have the site offer to record the cards right there
 - what good are breadcrumbs actually doing on the browse page? like home > browse, the home page is useless
 - See if still happening: On mobile, the hover over card name is doing the whole row, not just the card name
-- Alternating table row colors, I feel like the bright ones are too bright
 - UX - Make the tab indexes only go to the quantity fields
 - Maybe: Improve rendering of reg and foil quantity when not logged in grid view
 - UX - Why do the pop-ups not dismiss if the screen isn't active?
@@ -131,20 +107,14 @@ Now:
 - search needs to clear when entering a set page
 - (A subset of link) in the header for subsets -- or actually do breadcrumbs
 - Make default number of cards per page a multiple of 5 and 4.
-- Header consistency on pages, make a shared component for text headers -- centered vs not, Goals vs Add/Remove Cards for example.
-- Money value consistency -- success and warning colors
 - Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues
 - Add a note to Cost to complete that it's based on the cheapest printing of a card, which may differ from the one being shown.
-- Inconsistent h1 styles (set page, goal vs non-goal context)
 - error state of quantity selectors not affecting button properly in goal editing or creation form
-- improve loading states, http://local.mtgcb.com:3000/collections/1337?goalId=14&oneResultPerCardName=true&contentType=cards and switch to "all except alpha" goal -- the transition is jarring
 - improve rendering of quantities of another person's collection, maybe just hide left/right buttons and disable, still need to show bad data indicators
-- detect old card images, track when they were updated and their quality, scryfall has a value for this too
 
 ## Bugs
 
-- Moderate: Draft cube calculation when track subsets with sets in on is wrong, shows a money value, but the correct answer is still "you have all the cards", see khans of tarkir -- it's incorrectly counting non main set cards as missing just in terms of the value
 - See if still present: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - Matching cards by their pure name for collection goals doesn't work well with tokens, because they have the same name but are physically distinct in terms of type lines and power and toughness and color identity
 
@@ -152,7 +122,6 @@ Now:
 
 ### Uncategorized
 
-- I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
 - Audit consistency of naming of fields returned by API for totalCount and values.
 - Need a full postman library of my API calls, these should live with api docs
 - Need a fallback if both canBeFoil and canBeNonFoil are false, treat them both as true probably
@@ -195,12 +164,6 @@ set and number, and the current parsing concatenates them into a single number w
 - Collection value tracking over time (this can be super deep, increase of individual values over time vs increase of adding cards to collection, tracking purchase prices and profits, etc.)
 - Card ratings and comments
 - Fluff: A set icon game where set icons fall toward the bottom of the screen and you have to shoot them by typing the set name, give hints as they get closer to the bottom
-
-## Roadmap
-
-- Release: v1.0 to production
-- Data Fixes: Add all missing cards (art series too) and clean up existing data and subsets and set codes
-- Have Patrons vote on the next one
 
 ## Future Enhancements to Existing Features
 
@@ -316,8 +279,6 @@ set and number, and the current parsing concatenates them into a single number w
 - Allow user to tap a card row to add that card to their collection in table view
 - Some users would like result numbers listed, to help binder placement
 - Some users express that when selecting a number input, they want the entire number highlighted so it's easy to replace
-- Make a button on mobile to open filters side menu
-- Need to search by flavorName too
 - Evaluate if custom image sizes cause performance issues that can be avoided
 
 ## Patron Requests
