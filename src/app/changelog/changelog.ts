@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-23',
+      version: '0.126.2',
+      changes: ['Fixed quantity selector border alignment in collection table view'],
+    },
+    {
+      date: '2025-09-23',
       version: '0.126.1',
       changes: ['Fixed breadcrumb navigation consistency across collection pages'],
     },

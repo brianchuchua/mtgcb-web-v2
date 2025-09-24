@@ -284,13 +284,16 @@ export const useCardTableColumns = (
 
 // Table-specific styled components for editable quantity
 const TableQuantityContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  display: 'inline-flex',
+  alignItems: 'stretch',
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: '4px',
+  overflow: 'hidden', // Clip children to container bounds
   '&:focus-within': {
-    '& button': {
-      borderColor: theme.palette.primary.main,
-    },
+    borderColor: theme.palette.primary.main,
+  },
+  '&.error': {
+    borderColor: theme.palette.error.main,
   },
 }));
 
@@ -300,38 +303,25 @@ const TableQuantityInput = styled(TextField)(({ theme }) => ({
     width: '30px',
     textAlign: 'center',
     fontSize: '0.75rem',
-    height: '20px',
+    height: '22px', // Adjusted for no border
   },
   '& .MuiOutlinedInput-root': {
     height: '24px',
     borderRadius: 0,
     '& fieldset': {
-      borderLeft: 'none',
-      borderRight: 'none',
-      borderColor: theme.palette.divider,
-      transition: 'border-color 0.2s',
+      border: 'none', // Remove all borders since container has them
     },
     '&:hover fieldset': {
-      borderColor: theme.palette.divider,
+      border: 'none',
     },
     '&.Mui-focused fieldset': {
-      borderColor: theme.palette.primary.main,
-      borderWidth: 1,
+      border: 'none',
     },
     '&.Mui-disabled fieldset': {
-      borderColor: theme.palette.divider,
+      border: 'none',
     },
     '&.Mui-error fieldset': {
-      borderColor: theme.palette.error.main,
-    },
-    '&.Mui-error:hover fieldset': {
-      borderColor: theme.palette.error.main,
-    },
-    '&.Mui-error.Mui-focused fieldset': {
-      borderColor: theme.palette.error.main,
-    },
-    '&.Mui-error.Mui-disabled fieldset': {
-      borderColor: theme.palette.error.main,
+      border: 'none',
     },
   },
   '& input[type="number"]::-webkit-inner-spin-button, & input[type="number"]::-webkit-outer-spin-button': {
@@ -343,21 +333,15 @@ const TableQuantityInput = styled(TextField)(({ theme }) => ({
   },
 }));
 
-const TableQuantityButton = styled(IconButton, {
-  shouldForwardProp: (prop) => prop !== '$error',
-})<{ $error?: boolean }>(({ theme, $error }) => ({
+const TableQuantityButton = styled(IconButton)(({ theme }) => ({
   padding: '2px',
   width: '24px',
   height: '24px',
   borderRadius: 0,
-  border: `1px solid ${$error ? theme.palette.error.main : theme.palette.divider}`,
-  transition: 'border-color 0.2s, background-color 0.2s',
+  border: 'none', // No individual borders
+  transition: 'background-color 0.2s',
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
-    borderColor: $error ? theme.palette.error.main : theme.palette.divider,
-  },
-  '&.Mui-disabled': {
-    borderColor: $error ? theme.palette.error.main : theme.palette.divider,
   },
   '& .MuiSvgIcon-root': {
     fontSize: '0.875rem',
@@ -365,15 +349,11 @@ const TableQuantityButton = styled(IconButton, {
 }));
 
 const TableLeftButton = styled(TableQuantityButton)(({ theme }) => ({
-  borderTopLeftRadius: '4px',
-  borderBottomLeftRadius: '4px',
-  borderRight: 'none',
+  // No divider border
 }));
 
 const TableRightButton = styled(TableQuantityButton)(({ theme }) => ({
-  borderTopRightRadius: '4px',
-  borderBottomRightRadius: '4px',
-  borderLeft: 'none',
+  // No divider border
 }));
 
 // Inline editable quantity component for table cells
@@ -566,7 +546,7 @@ const InlineEditableQuantity: React.FC<{
       disableFocusListener={!isDisabled}
       disableTouchListener={!isDisabled}
     >
-      <TableQuantityContainer>
+      <TableQuantityContainer className={hasError ? 'error' : ''}>
         <TableLeftButton
           size="small"
           onMouseDown={(e) => {
@@ -576,7 +556,6 @@ const InlineEditableQuantity: React.FC<{
           disabled={localQuantity === 0}
           tabIndex={-1}
           disableFocusRipple
-          $error={hasError}
         >
           <RemoveIcon />
         </TableLeftButton>
@@ -602,7 +581,6 @@ const InlineEditableQuantity: React.FC<{
           tabIndex={-1}
           disableFocusRipple
           disabled={isDisabled}
-          $error={hasError}
         >
           <AddIcon />
         </TableRightButton>

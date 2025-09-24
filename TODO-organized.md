@@ -321,10 +321,12 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### mtgcb-jobs
 
 - mtgcb-jobs should alert me as to new scryfall cards
+- remove claude settings file from repo, rm --cached and add to gitignore
 
 ### mtgcb-importer
 
 - mtgcb-importer should be able to audit bad or missing card data
+- remove claude settings file from repo, rm --cached and add to gitignore
 
 ## 📝 Reference
 

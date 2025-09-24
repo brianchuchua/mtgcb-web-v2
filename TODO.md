@@ -55,10 +55,6 @@ maybe instead of a pop-up when cards are updated, status updating in the labe
 
 - Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
 
-### Before Open-Sourcing
-
-- remove dangerous claude code permissions from my repos since i wouldn't want other devs to be surprised by claude code having full bash powers
-
 ### Uncategorized
 
 - Audit default values of card fields, set fields, and everything else on the page, for grid and table views. Some may have changed since a refactor.
@@ -67,7 +63,7 @@ maybe instead of a pop-up when cards are updated, status updating in the labe
 
 ## UX Action Items
 
-- rendering of quantity picker in table view sometimes has a top line misaligned by 1px
+- set column in table needs to be wider
 - weird flicker with specific cards to include or exclude in goal forms
 - Audit subsets with collection goals -- data and appearance.
 - Evaluate default sort order on a set page, especially subset groups
