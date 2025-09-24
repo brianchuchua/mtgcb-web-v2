@@ -12,31 +12,34 @@ interface SearchCriteriaDescription {
 
 const RARITY_NAMES: Record<string, string> = {
   '2': 'Common',
-  '3': 'Uncommon', 
+  '3': 'Uncommon',
   '4': 'Rare',
   '5': 'Mythic',
   '6': 'Special',
 };
 
 const MTG_COLOR_NAMES: Record<string, string> = {
-  'W': 'White',
-  'U': 'Blue',
-  'B': 'Black',
-  'R': 'Red',
-  'G': 'Green',
+  W: 'White',
+  U: 'Blue',
+  B: 'Black',
+  R: 'Red',
+  G: 'Green',
 };
 
-export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, onePrintingPerPureName?: boolean, isForGoal: boolean = true, isSetPage?: boolean): string {
+export function formatSearchCriteria(
+  searchCriteria: SearchCriteriaDescription,
+  onePrintingPerPureName?: boolean,
+  isForGoal: boolean = true,
+  isSetPage?: boolean,
+): string {
   const { conditions } = searchCriteria;
   const parts: string[] = [];
   const typeParts: string[] = [];
   const colorPart: string[] = [];
   const attributeParts: string[] = [];
-  
+
   // Check if we only have specific card IDs
-  const hasOnlyCardIds = conditions.id && Object.keys(conditions).filter(
-    key => key !== 'id'
-  ).length === 0;
+  const hasOnlyCardIds = conditions.id && Object.keys(conditions).filter((key) => key !== 'id').length === 0;
 
   // Types - collect them separately for better formatting
   if (conditions.type) {
@@ -53,7 +56,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         typeParts.push(cleanTypes.join(' '));
       }
     }
-    
+
     if (conditions.type.NOT && conditions.type.NOT.length > 0) {
       const excludedTypes = conditions.type.NOT.map((t: string) => `non-${t.replace(/"/g, '')}`);
       typeParts.push(...excludedTypes);
@@ -85,7 +88,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
   if (conditions.rarityNumeric) {
     const rarities: string[] = [];
     const excludedRarities: string[] = [];
-    
+
     if (conditions.rarityNumeric.OR) {
       conditions.rarityNumeric.OR.forEach((r: string) => {
         const match = r.match(/^=(\d+)$/);
@@ -95,7 +98,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         }
       });
     }
-    
+
     if (conditions.rarityNumeric.AND) {
       conditions.rarityNumeric.AND.forEach((r: string) => {
         const match = r.match(/^!=(\d+)$/);
@@ -105,11 +108,11 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         }
       });
     }
-    
+
     if (rarities.length > 0) {
       rarityPart.push(rarities.join('/'));
     }
-    
+
     if (excludedRarities.length > 0) {
       rarityPart.push(`non-${excludedRarities.join('/non-')}`);
     }
@@ -133,7 +136,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
       const setCount = conditions.setId.OR.length;
       setsPart = `from specific set${setCount > 1 ? 's' : ''}`;
     }
-    
+
     if (conditions.setId.AND && conditions.setId.AND.length > 0) {
       // Count excluded sets
       const excludedCount = conditions.setId.AND.filter((s: string) => s.startsWith('!=')).length;
@@ -147,11 +150,11 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
   if (conditions.setCategory) {
     const setCategoryParts: string[] = [];
     const categoryNames: Record<string, string> = {
-      'normal': 'normal',
-      'sealed': 'sealed',
-      'special': 'special'
+      normal: 'normal',
+      sealed: 'sealed',
+      special: 'special',
     };
-    
+
     if (typeof conditions.setCategory === 'string') {
       const categoryName = categoryNames[conditions.setCategory] || conditions.setCategory;
       setCategoryParts.push(`from ${categoryName} category`);
@@ -177,7 +180,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         setCategoryParts.push(`not from ${names.join('/')} categories`);
       }
     }
-    
+
     if (setCategoryParts.length > 0) {
       attributeParts.push(...setCategoryParts);
     }
@@ -186,7 +189,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
   // Set Types
   if (conditions.setType) {
     const setTypeParts: string[] = [];
-    
+
     if (typeof conditions.setType === 'string') {
       setTypeParts.push(`from ${conditions.setType} sets`);
     } else if (Array.isArray(conditions.setType)) {
@@ -208,17 +211,17 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         setTypeParts.push(`not from ${conditions.setType.NOT.join('/')} sets`);
       }
     }
-    
+
     if (setTypeParts.length > 0) {
       attributeParts.push(...setTypeParts);
     }
   }
-  
+
   // Specific cards
   if (conditions.id) {
     const includedCards = conditions.id.OR?.length || 0;
     const excludedCards = conditions.id.AND?.filter((id: string) => id.startsWith('!=')).length || 0;
-    
+
     const cardParts: string[] = [];
     if (includedCards > 0) {
       cardParts.push(`including ${includedCards} specific card${includedCards > 1 ? 's' : ''}`);
@@ -226,16 +229,16 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     if (excludedCards > 0) {
       cardParts.push(`excluding ${excludedCards} specific card${excludedCards > 1 ? 's' : ''}`);
     }
-    
+
     if (cardParts.length > 0) {
       attributeParts.push(`(${cardParts.join(' and ')})`);
     }
   }
-  
+
   // One result per card name (hide duplicate printings) - but not if we only have card IDs
   if (!hasOnlyCardIds && onePrintingPerPureName !== undefined) {
     if (onePrintingPerPureName) {
-      attributeParts.push(`(one printing of each card)`);
+      attributeParts.push(`(any printing of each card)`);
     } else {
       attributeParts.push(`(every printing of each card)`);
     }
@@ -243,27 +246,27 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
 
   // Stats
   const statConditions: string[] = [];
-  
+
   if (conditions.convertedManaCost?.AND) {
     const manaConditions = conditions.convertedManaCost.AND.map((c: string) => `MV ${c}`);
     statConditions.push(...manaConditions);
   }
-  
+
   if (conditions.powerNumeric?.AND) {
     const powerConditions = conditions.powerNumeric.AND.map((c: string) => `Power ${c}`);
     statConditions.push(...powerConditions);
   }
-  
+
   if (conditions.toughnessNumeric?.AND) {
     const toughnessConditions = conditions.toughnessNumeric.AND.map((c: string) => `Toughness ${c}`);
     statConditions.push(...toughnessConditions);
   }
-  
+
   if (conditions.loyaltyNumeric?.AND) {
     const loyaltyConditions = conditions.loyaltyNumeric.AND.map((c: string) => `Loyalty ${c}`);
     statConditions.push(...loyaltyConditions);
   }
-  
+
   // Price filters
   if (conditions.market?.AND) {
     const marketConditions = conditions.market.AND.map((c: string) => {
@@ -275,7 +278,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     });
     statConditions.push(...marketConditions);
   }
-  
+
   if (conditions.low?.AND) {
     const lowConditions = conditions.low.AND.map((c: string) => {
       const match = c.match(/^([<>=!]+)(.+)$/);
@@ -286,7 +289,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     });
     statConditions.push(...lowConditions);
   }
-  
+
   if (conditions.average?.AND) {
     const avgConditions = conditions.average.AND.map((c: string) => {
       const match = c.match(/^([<>=!]+)(.+)$/);
@@ -297,7 +300,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     });
     statConditions.push(...avgConditions);
   }
-  
+
   if (conditions.high?.AND) {
     const highConditions = conditions.high.AND.map((c: string) => {
       const match = c.match(/^([<>=!]+)(.+)$/);
@@ -308,7 +311,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     });
     statConditions.push(...highConditions);
   }
-  
+
   if (conditions.foil?.AND) {
     const foilConditions = conditions.foil.AND.map((c: string) => {
       const match = c.match(/^([<>=!]+)(.+)$/);
@@ -319,10 +322,10 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     });
     statConditions.push(...foilConditions);
   }
-  
+
   // Quantity filters - extract them separately to display at the beginning
   let quantityText: string | null = null;
-  
+
   if (conditions.quantityAll?.AND) {
     // If we have total quantity, use that (like goals do with targetQuantityAll)
     conditions.quantityAll.AND.forEach((c: string) => {
@@ -341,7 +344,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
     // Check for separate regular and foil quantities
     let regPart: string | null = null;
     let foilPart: string | null = null;
-    
+
     if (conditions.quantityReg?.AND) {
       conditions.quantityReg.AND.forEach((c: string) => {
         const match = c.match(/^([<>=!]+)(.+)$/);
@@ -356,7 +359,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         }
       });
     }
-    
+
     if (conditions.quantityFoil?.AND) {
       conditions.quantityFoil.AND.forEach((c: string) => {
         const match = c.match(/^([<>=!]+)(.+)$/);
@@ -371,7 +374,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         }
       });
     }
-    
+
     if (regPart && foilPart) {
       quantityText = `${regPart} and ${foilPart}`;
     } else if (regPart) {
@@ -380,14 +383,14 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
       quantityText = foilPart;
     }
   }
-  
+
   if (statConditions.length > 0) {
     attributeParts.push(`(${statConditions.join(', ')})`);
   }
 
   // Build the final description
   const mainParts: string[] = [];
-  
+
   // For search descriptions (not goals), we'll structure it differently
   if (!isForGoal) {
     // If we have quantity filters, format like goals do
@@ -399,7 +402,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         if (colorPart.length > 0) cardDescParts.push(...colorPart);
         if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
         if (typeParts.length > 0) cardDescParts.push(...typeParts);
-        
+
         if (cardDescParts.length > 0) {
           mainParts.push(`cards: ${quantityText} of ${cardDescParts.join(' ')} named "${conditions.name}"`);
         } else {
@@ -411,7 +414,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         if (colorPart.length > 0) cardDescParts.push(...colorPart);
         if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
         if (typeParts.length > 0) cardDescParts.push(...typeParts);
-        
+
         if (cardDescParts.length > 0) {
           mainParts.push(`cards: ${quantityText} of ${cardDescParts.join(' ')}`);
         } else {
@@ -427,7 +430,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         if (colorPart.length > 0) cardDescParts.push(...colorPart);
         if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
         if (typeParts.length > 0) cardDescParts.push(...typeParts);
-        
+
         if (cardDescParts.length > 0) {
           mainParts.push(`cards: ${cardDescParts.join(' ')} named "${conditions.name}"`);
         } else {
@@ -439,7 +442,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
         if (colorPart.length > 0) cardDescParts.push(...colorPart);
         if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
         if (typeParts.length > 0) cardDescParts.push(...typeParts);
-        
+
         if (cardDescParts.length > 0) {
           mainParts.push(`cards: ${cardDescParts.join(' ')}`);
         }
@@ -460,13 +463,13 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
       if (colorPart.length > 0) cardDescParts.push(...colorPart);
       if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
       if (typeParts.length > 0) cardDescParts.push(...typeParts);
-      
+
       if (cardDescParts.length > 0) {
         mainParts.push(cardDescParts.join(' '));
       }
     }
   }
-  
+
   // Add other attributes (these apply whether or not we have a name)
   if (attributeParts.length > 0) {
     mainParts.push(...attributeParts);
@@ -476,7 +479,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
   if (hasOnlyCardIds) {
     const includedCards = conditions.id.OR?.length || 0;
     const excludedCards = conditions.id.AND?.filter((id: string) => id.startsWith('!=')).length || 0;
-    
+
     if (isForGoal) {
       // For goals, use the original format without forcing "cards" at the end
       if (includedCards > 0 && excludedCards === 0) {
@@ -497,7 +500,7 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
       }
     }
   }
-  
+
   // If no criteria specified except possibly sets
   if (mainParts.length === 0) {
     // Check if we only have set filters
@@ -513,16 +516,16 @@ export function formatSearchCriteria(searchCriteria: SearchCriteriaDescription, 
 
   // Join all parts
   let result = mainParts.join(' ');
-  
+
   // Add sets part at the end if present
   if (setsPart) {
     result = `${result} ${setsPart}`;
   }
-  
+
   if (setsExcludePart) {
     result = `${result} ${setsExcludePart}`;
   }
-  
+
   return result;
 }
 
@@ -530,10 +533,10 @@ export function formatGoalDescription(
   searchCriteria: SearchCriteriaDescription,
   targetQuantityReg: number | null,
   targetQuantityFoil: number | null,
-  targetQuantityAll: number | null
+  targetQuantityAll: number | null,
 ): string {
   const criteriaText = formatSearchCriteria(searchCriteria);
-  
+
   // Determine quantity text
   let quantityText = '';
   if (targetQuantityAll) {

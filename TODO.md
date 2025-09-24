@@ -9,6 +9,7 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 ## Real Current Action Items
 
 - Remove "Showing" from "Showing 1-24 of blah cards" at 1024x768 or smaller -- actually the entire rendering sucks at this resolution, fix it
+
 - i think price update jobs frequently don't finish, need to check logs -- i see, dyno restart, i need these things to auto-start on bootup, account for this, ensuring only one job of a type runs at a time, etc
 - I want a test suite of every goal type and filtering option that Claude runs through or mayne just a custom node script runs against test env or local creates and deletes goals
 - importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local
@@ -19,9 +20,6 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
 - repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal
 - make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
-
-- ux: consider a change to header styles for collection headers similar to the home page
-- ux: one printing of each unique card / every printing of each unique card is confusing when the quantity is more than one (goals page)
 
 - big: need to audit buy missing cards for goal buttons, macro scale and set scale -- can't just click it for a goal with 30000 cards. can't do the prefetching for like an hour and then pop up the modal, need to be smarter and break it into chunks ahead of time. buy missing cards for this goal -- should just not have this button if it's a large number of cards, see basic land goals
   -- related ux: goal header inside of a set page needs ux work -- buy button is awkward near progress bar

@@ -24,8 +24,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CardApiParams } from '@/api/browse/types';
 import { useGetSetTypesQuery } from '@/api/browse/browseApi';
+import { CardApiParams } from '@/api/browse/types';
 import { useGetCardTypesQuery } from '@/api/cards/cardsApi';
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
@@ -132,7 +132,6 @@ export function GoalSearchForm({
   const [cardTypeOptions, setCardTypeOptions] = useState<AutocompleteOption[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<AutocompleteOption[]>([]);
 
-
   // Rarity state
   const [selectedRarities, setSelectedRarities] = useState<AutocompleteOption[]>([]);
 
@@ -171,7 +170,7 @@ export function GoalSearchForm({
 
   // Use RTK Query hook for sets data
   const { data: setsResponse } = useGetAllSetsQuery();
-  
+
   // Process sets data when it arrives
   useEffect(() => {
     if (setsResponse?.data?.sets) {
@@ -538,7 +537,19 @@ export function GoalSearchForm({
     }
 
     return conditions;
-  }, [name, oracleText, artist, colorState, selectedTypes, selectedRarities, selectedSets, selectedSetTypes, selectedSetCategories, statConditions, cardFilter]);
+  }, [
+    name,
+    oracleText,
+    artist,
+    colorState,
+    selectedTypes,
+    selectedRarities,
+    selectedSets,
+    selectedSetTypes,
+    selectedSetCategories,
+    statConditions,
+    cardFilter,
+  ]);
 
   // Initialize color state when searchConditions change (only once)
   useEffect(() => {
@@ -837,12 +848,12 @@ export function GoalSearchForm({
                   Giant Spider has been printed in over 20 different sets (Alpha, Beta, 4th Edition, etc.).
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 0.5 }}>
-                  • <strong>One printing:</strong> Having any version of Giant Spider counts as 1 towards your goal --
-                  you only need one copy of any Giant Spider.
+                  • <strong>Any printing:</strong> Having any version of Giant Spider counts as 1 towards your goal --
+                  you only need one copy of any Giant Spider for that card to be considered collected across all sets.
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 1 }}>
                   • <strong>Every printing:</strong> Each different set's Giant Spider counts separately -- you'll need
-                  a copy of each printing of Giant Spider.
+                  a copy of each printing of Giant Spider, one for each set it was printed in.
                 </Typography>
                 <Typography variant="body2">
                   <em>(Note: Specific cards you include or exclude will always override this setting.)</em>
@@ -869,8 +880,8 @@ export function GoalSearchForm({
           fullWidth
           size="small"
         >
-          <ToggleButton value="one">One printing of each unique card</ToggleButton>
-          <ToggleButton value="every">Every printing of each unique card</ToggleButton>
+          <ToggleButton value="one">Any printing of each card</ToggleButton>
+          <ToggleButton value="every">Every printing of each card</ToggleButton>
         </ToggleButtonGroup>
       </Paper>
 
