@@ -383,7 +383,7 @@ const CardItemComponent = ({
             justifyContent: 'flex-start',
           }}
         >
-          {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && isOwnCollection && (
+          {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && (
             <Box sx={{ mb: 1 }}>
               <EditableCardQuantity
                 cardId={parseInt(id)}
@@ -392,6 +392,7 @@ const CardItemComponent = ({
                 quantityFoil={quantityFoil || 0}
                 canBeFoil={canBeFoil}
                 canBeNonFoil={canBeNonFoil}
+                readOnly={!isOwnCollection}
               />
             </Box>
           )}
@@ -557,44 +558,6 @@ const CardItemComponent = ({
             </Box>
           )}
 
-          {quantityIsVisible && (quantityReg !== undefined || quantityFoil !== undefined) && !isOwnCollection && (
-            <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center', gap: 1 }}>
-              {quantityReg !== undefined && (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 'medium',
-                    fontSize: '0.875rem',
-                    '@container card (max-width: 250px)': {
-                      fontSize: '0.8125rem',
-                    },
-                    '@container card (max-width: 200px)': {
-                      fontSize: '0.75rem',
-                    },
-                  }}
-                >
-                  {quantityReg}x Regular
-                </Typography>
-              )}
-              {quantityFoil !== undefined && (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontWeight: 'medium',
-                    fontSize: '0.875rem',
-                    '@container card (max-width: 250px)': {
-                      fontSize: '0.8125rem',
-                    },
-                    '@container card (max-width: 200px)': {
-                      fontSize: '0.75rem',
-                    },
-                  }}
-                >
-                  {quantityFoil}x Foil
-                </Typography>
-              )}
-            </Box>
-          )}
         </CardContent>
       )}
 

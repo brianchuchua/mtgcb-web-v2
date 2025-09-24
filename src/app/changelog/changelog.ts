@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-23',
+      version: '0.128.0',
+      changes: ['Improved grid view for shared collections by showing disabled quantity selectors instead of plain text'],
+    },
+    {
+      date: '2025-09-23',
       version: '0.127.0',
       changes: ['Improved location features by hiding "Add card to location" button when no locations exist'],
     },

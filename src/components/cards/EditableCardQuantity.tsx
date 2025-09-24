@@ -123,6 +123,7 @@ interface EditableCardQuantityProps {
   quantityFoil: number;
   canBeNonFoil?: boolean;
   canBeFoil?: boolean;
+  readOnly?: boolean;
 }
 
 export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
@@ -132,6 +133,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   quantityFoil,
   canBeNonFoil = true,
   canBeFoil = true,
+  readOnly = false,
 }) => {
   const [localQuantityReg, setLocalQuantityReg] = useState(quantityReg);
   const [localQuantityFoil, setLocalQuantityFoil] = useState(quantityFoil);
@@ -341,13 +343,13 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
               e.preventDefault();
               handleDecrement('regular', e);
             }}
-            disabled={localQuantityReg === 0}
+            disabled={readOnly || localQuantityReg === 0}
             tabIndex={-1}
             disableFocusRipple
             $error={regularHasError}
           >
-          <RemoveIcon />
-        </LeftButton>
+            <RemoveIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
+          </LeftButton>
         <QuantityInput
           type="number"
           value={inputValueReg}
@@ -360,7 +362,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           size="small"
           label="Regular"
           InputLabelProps={{ shrink: true }}
-          disabled={!canBeNonFoil}
+          disabled={readOnly || !canBeNonFoil}
           error={regularHasError}
         />
         <RightButton
@@ -371,11 +373,11 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           }}
           tabIndex={-1}
           disableFocusRipple
-          disabled={!canBeNonFoil}
+          disabled={readOnly || !canBeNonFoil}
           $error={regularHasError}
         >
-          <AddIcon />
-          </RightButton>
+          <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
+        </RightButton>
         </QuantityContainer>
       </Tooltip>
 
@@ -393,13 +395,13 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
               e.preventDefault();
               handleDecrement('foil', e);
             }}
-            disabled={localQuantityFoil === 0}
+            disabled={readOnly || localQuantityFoil === 0}
             tabIndex={-1}
             disableFocusRipple
             $error={foilHasError}
           >
-          <RemoveIcon />
-        </LeftButton>
+            <RemoveIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
+          </LeftButton>
         <QuantityInput
           type="number"
           value={inputValueFoil}
@@ -412,7 +414,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           size="small"
           label="Foils"
           InputLabelProps={{ shrink: true }}
-          disabled={!canBeFoil}
+          disabled={readOnly || !canBeFoil}
           error={foilHasError}
         />
         <RightButton
@@ -423,11 +425,11 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           }}
           tabIndex={-1}
           disableFocusRipple
-          disabled={!canBeFoil}
+          disabled={readOnly || !canBeFoil}
           $error={foilHasError}
         >
-          <AddIcon />
-          </RightButton>
+          <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
+        </RightButton>
         </QuantityContainer>
       </Tooltip>
     </Box>
