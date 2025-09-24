@@ -33,6 +33,7 @@ interface CardTableProps {
   };
   isOwnCollection?: boolean;
   goalId?: string;
+  hasLocations?: boolean;
 }
 
 const CardTable: React.FC<CardTableProps> = ({
@@ -47,6 +48,7 @@ const CardTable: React.FC<CardTableProps> = ({
   cardDisplaySettings,
   isOwnCollection = false,
   goalId,
+  hasLocations = false,
 }) => {
   // Merge table settings with card display settings
   // For locations, prioritize tableSettings over cardDisplaySettings
@@ -56,9 +58,9 @@ const CardTable: React.FC<CardTableProps> = ({
     locationsIsVisible: tableSettings.locationsIsVisible ?? cardDisplaySettings?.locationsIsVisible,
   };
 
-  const tableColumns = useCardTableColumns({ priceType, displaySettings: mergedDisplaySettings }, sortBy, isOwnCollection);
+  const tableColumns = useCardTableColumns({ priceType, displaySettings: mergedDisplaySettings }, sortBy, isOwnCollection, hasLocations);
 
-  const renderCardRow = useCardRowRenderer(priceType, mergedDisplaySettings, onCardClick, isOwnCollection, goalId);
+  const renderCardRow = useCardRowRenderer(priceType, mergedDisplaySettings, onCardClick, isOwnCollection, goalId, hasLocations);
 
   const getRowProps = (item: any) => {
     // Check if item exists and goal progress is visible and if the goal is not fully met

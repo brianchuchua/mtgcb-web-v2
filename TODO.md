@@ -66,13 +66,11 @@ maybe instead of a pop-up when cards are updated, status updating in the labe
 - set column in table needs to be wider
 - weird flicker with specific cards to include or exclude in goal forms
 - Audit subsets with collection goals -- data and appearance.
-- Evaluate default sort order on a set page, especially subset groups
 - Maybe: Improve rendering of reg and foil quantity when not logged in grid view
 - Improve card quantity update messages
 - search needs to clear when entering a set page
 - Improve loading experience for mouse over images, spinner shows too much, maybe better to show nothing until the image is loaded
 - When multiple copies of a card exists, but they only want to see one per card name, make it clear that there are options -- API can return all of them, or enough of their data for the front-end to do something smart, I've seen access while debugging other issues
-- Add a note to Cost to complete that it's based on the cheapest printing of a card, which may differ from the one being shown.
 - error state of quantity selectors not affecting button properly in goal editing or creation form
 - improve rendering of quantities of another person's collection, maybe just hide left/right buttons and disable, still need to show bad data indicators
 

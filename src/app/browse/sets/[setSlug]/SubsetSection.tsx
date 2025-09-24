@@ -13,6 +13,7 @@ import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
+import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
@@ -32,6 +33,12 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
 ) {
   const [isActive, setIsActive] = useState(false);
   const setPriceType = useSetPriceType();
+
+  // Fetch user locations for the "Add card to location" button
+  const { data: locationsResponse } = useGetLocationHierarchyQuery(undefined, {
+    skip: !isOwnCollection,
+  });
+  const hasLocations = (locationsResponse?.data || []).length > 0;
 
   // Use independent controller that doesn't interfere with main set
   const browseController = useIndependentBrowseController({
@@ -277,8 +284,8 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
             <ErrorBanner type={browseController.view} />
           ) : (
             <>
-              {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} goalId={goalId ? goalId.toString() : undefined} />}
-              {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} goalId={goalId ? goalId.toString() : undefined} />}
+              {isCardGridView && <CardGrid {...cardsProps} isOwnCollection={isOwnCollection} goalId={goalId ? goalId.toString() : undefined} hasLocations={hasLocations} />}
+              {isCardTableView && <CardTable {...cardsProps} isOwnCollection={isOwnCollection} goalId={goalId ? goalId.toString() : undefined} hasLocations={hasLocations} />}
             </>
           )}
 

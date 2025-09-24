@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import FormHelperText from '@mui/material/FormHelperText';
+import Alert from '@mui/material/Alert';
 import { useSnackbar } from 'notistack';
 import { CreateLocationRequest, LocationHierarchy } from '@/api/locations/types';
 import { useCreateLocationMutation, useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
@@ -87,9 +88,20 @@ export default function CreateLocationForm() {
       <Typography variant="h6" component="h2" gutterBottom>
         Add New Location
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         Create a storage location for your Magic: The Gathering cards
       </Typography>
+
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 0.5 }}>
+          Recommendation: Use locations sparingly!
+        </Typography>
+        <Typography variant="body2">
+          If you store cards in a binder for that set, it's not worth recording that location explicitly – it's
+          self-evident. Locations work best when they actually help you find cards, like when they're in a specific
+          deckbox or filing cabinet. Don't give yourself a ton of busywork.
+        </Typography>
+      </Alert>
 
       <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
         <Stack spacing={3}>

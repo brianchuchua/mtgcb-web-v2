@@ -19,6 +19,7 @@ interface CardLocationTableCellProps {
     quantityFoil: number;
   }[];
   isOwnCollection?: boolean;
+  hasLocations?: boolean;
 }
 
 export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
@@ -31,6 +32,7 @@ export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
   canBeNonFoil = true,
   locations,
   isOwnCollection = false,
+  hasLocations = false,
 }) => {
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
 
@@ -58,7 +60,7 @@ export const CardLocationTableCell: React.FC<CardLocationTableCellProps> = ({
           isOwnCollection={isOwnCollection}
         />
       ) : (
-        isOwnCollection ? (
+        isOwnCollection && hasLocations ? (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Chip
               label="Add Card to Location"

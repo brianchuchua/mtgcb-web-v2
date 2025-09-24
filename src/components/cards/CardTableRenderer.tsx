@@ -46,6 +46,7 @@ export const useCardTableColumns = (
   { priceType, displaySettings }: CardTableRendererProps,
   currentSortBy: string,
   isOwnCollection?: boolean,
+  hasLocations?: boolean,
 ): TableColumn<CardItemProps>[] => {
   // Tooltip components
   const ReleaseDateTooltip = () => (
@@ -272,8 +273,10 @@ export const useCardTableColumns = (
     }
 
     if (column.id === 'locations') {
-      // Show locations column when enabled in settings
-      return displaySettings.locationsIsVisible ?? false;
+      // Show locations column when enabled in settings AND user has locations
+      // Hide the column if user has no locations, even if they enabled it in settings
+      const userWantsLocations = displaySettings.locationsIsVisible ?? false;
+      return userWantsLocations && (hasLocations ?? true); // Default to true if hasLocations not provided (backwards compatibility)
     }
 
     return true;
@@ -795,6 +798,7 @@ export const useCardRowRenderer = (
   onCardClick?: (cardId: string, cardName?: string) => void,
   isOwnCollection?: boolean,
   goalId?: string,
+  hasLocations?: boolean,
 ) => {
   const { showCardPreview, hideCardPreview } = useCardPreviewEffect([]);
   const pathname = usePathname();
@@ -969,8 +973,9 @@ export const useCardRowRenderer = (
       }
     }
 
-    // Locations Cell
-    if (displaySettings.locationsIsVisible) {
+    // Locations Cell - only render if column is visible AND user has locations
+    // This must match the column filtering logic to prevent header/cell mismatch
+    if (displaySettings.locationsIsVisible && (hasLocations ?? true)) {
       cells.push(
         <CardLocationTableCell
           key="locations"
@@ -983,6 +988,7 @@ export const useCardRowRenderer = (
           canBeNonFoil={card.canBeNonFoil}
           locations={card.locations}
           isOwnCollection={isOwnCollection}
+          hasLocations={hasLocations}
         />,
       );
     }

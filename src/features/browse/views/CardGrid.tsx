@@ -27,6 +27,7 @@ interface CardGridProps {
   priceType: PriceType;
   isOwnCollection?: boolean;
   goalId?: string;
+  hasLocations?: boolean;
 }
 
 const CardGridComponent: React.FC<CardGridProps> = ({
@@ -38,6 +39,7 @@ const CardGridComponent: React.FC<CardGridProps> = ({
   priceType,
   isOwnCollection = false,
   goalId,
+  hasLocations = false,
 }) => {
   // Memoize the render function to prevent unnecessary re-renders
   const renderItem = useCallback(
@@ -49,9 +51,10 @@ const CardGridComponent: React.FC<CardGridProps> = ({
         onClick={onCardClick}
         isOwnCollection={isOwnCollection}
         goalId={goalId}
+        hasLocations={hasLocations}
       />
     ),
-    [cardDisplaySettings, priceType, onCardClick, isOwnCollection, goalId]
+    [cardDisplaySettings, priceType, onCardClick, isOwnCollection, goalId, hasLocations]
   );
   
   return (

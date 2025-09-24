@@ -4,6 +4,7 @@ import { Box, CircularProgress } from '@mui/material';
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { CollectionSetSummary } from '@/api/collections/types';
+import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisplay';
@@ -32,6 +33,12 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
   const isOwnCollection = user?.userId === userId;
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
+
+  // Fetch user locations for the "Add card to location" button
+  const { data: locationsResponse } = useGetLocationHierarchyQuery(undefined, {
+    skip: !isOwnCollection,
+  });
+  const hasLocations = (locationsResponse?.data || []).length > 0;
   
   // Check if we have a share token but got a privacy error (403)
   const hasInvalidShareLink = shareToken && isViewingSharedCollection(userId) && 
@@ -181,8 +188,8 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
       {/* Show cards view for collections */}
       {view === 'cards' && cardsProps && 'items' in cardsProps && (
         <>
-          {viewMode === 'grid' && <CardGrid {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
-          {viewMode === 'table' && <CardTable {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} />}
+          {viewMode === 'grid' && <CardGrid {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} hasLocations={hasLocations} />}
+          {viewMode === 'table' && <CardTable {...(cardsProps as CardsProps)} isOwnCollection={isOwnCollection} goalId={selectedGoalId ? selectedGoalId.toString() : undefined} hasLocations={hasLocations} />}
         </>
       )}
 

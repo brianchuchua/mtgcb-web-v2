@@ -99,6 +99,7 @@ export interface CardItemProps {
   goalId?: string;
   imageLinksToTCGPlayer?: boolean; // New prop to enable TCGPlayer link on image
   directPriceToTCGPlayer?: boolean; // If true, clicking price goes directly to TCGPlayer (no menu)
+  hasLocations?: boolean; // Whether the user has any locations created
 }
 
 /**
@@ -152,6 +153,7 @@ const CardItemComponent = ({
   goalId,
   imageLinksToTCGPlayer = false,
   directPriceToTCGPlayer = false,
+  hasLocations = false,
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -532,7 +534,7 @@ const CardItemComponent = ({
                   isOwnCollection={isOwnCollection}
                 />
               ) : (
-                isOwnCollection && (quantityReg || quantityFoil) ? (
+                isOwnCollection && (quantityReg || quantityFoil) && hasLocations ? (
                   <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Chip
                       label="Add card to location"

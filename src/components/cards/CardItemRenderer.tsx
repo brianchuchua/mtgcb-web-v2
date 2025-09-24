@@ -17,6 +17,7 @@ export interface CardItemRendererProps {
   onClick?: (cardId: string, cardName?: string) => void;
   isOwnCollection?: boolean;
   goalId?: string;
+  hasLocations?: boolean;
 }
 
 const CardItemRenderer = ({
@@ -30,6 +31,7 @@ const CardItemRenderer = ({
   onClick,
   isOwnCollection = false,
   goalId,
+  hasLocations = false,
 }: CardItemRendererProps) => {
   const handleCardClick = () => {
     if (onClick) {
@@ -45,6 +47,7 @@ const CardItemRenderer = ({
       priceType={priceType}
       isOwnCollection={isOwnCollection}
       goalId={goalId}
+      hasLocations={hasLocations}
     />
   );
 };
