@@ -33,14 +33,6 @@ Currently, I am either knocking out items in this list or moving them to TODO-or
 
 maybe instead of a pop-up when cards are updated, status updating in the labe
 
-## Recent Actions
-
-## Current Action Items (kinda disorganized now)
-
-Mostly ready:
-
-Now:
-
 ## Remaining Major Feature Work Before 1.0
 
 ### MTG CB Data Importer
@@ -56,10 +48,6 @@ Now:
 ### Migration Path 🔁
 
 - need to make sure createdAt is ported over from legacy field
-
-### Performance 🔁
-
-- Index audit and API measurement
 
 ## Other Action Items Before Launch
 
@@ -94,7 +82,6 @@ Now:
 
 ## Bugs
 
-- See if still present: Page count is not being respected if it starts in the url (do this bug later, refactor and merge first after verifying functionality)
 - Matching cards by their pure name for collection goals doesn't work well with tokens, because they have the same name but are physically distinct in terms of type lines and power and toughness and color identity
 
 ## Tech Debt
