@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-25',
+      version: '0.130.3',
+      changes: [
+        'Updated set purchase button text for better clarity',
+      ],
+    },
+    {
+      date: '2025-09-25',
       version: '0.130.2',
       changes: [
         'Improved pagination layout on Goals and Locations pages - bottom pagination now only shows on mobile',

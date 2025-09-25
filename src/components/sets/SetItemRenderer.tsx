@@ -336,14 +336,14 @@ const CostToPurchaseSection: React.FC<CostToPurchaseSectionProps> = ({
           />
         }
         >
-          Complete this set
+          Buy this set
         </Button>
       </Box>
 
       <Collapse in={expanded} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
         <Box sx={{ width: '100%', maxWidth: '350px', mx: 'auto', mt: 1 }}>
           <Typography variant="subtitle2" color="textSecondary" component="h3" sx={{ mb: 1, textAlign: 'center' }}>
-            Cost to complete:
+            Cost to buy:
           </Typography>
           <CostToCompleteRow
           label="All cards"

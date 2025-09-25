@@ -375,7 +375,7 @@ const CostToPurchaseSection: React.FC<{
           />
         }
       >
-          Complete this set
+          Buy missing cards
         </Button>
       </Box>
 
