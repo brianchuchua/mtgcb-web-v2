@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-24',
+      version: '0.129.3',
+      changes: ['Fixed set name column width in card tables for better readability on mobile devices'],
+    },
+    {
+      date: '2025-09-24',
       version: '0.129.2',
       changes: ['Fixed table view to hide "Add card to location" button for cards with no quantity'],
     },
