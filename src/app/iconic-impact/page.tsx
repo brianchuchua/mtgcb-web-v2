@@ -114,6 +114,17 @@ const GameInput = memo(function GameInput({ onAnswer, disabled, placeholder }: G
       disabled={disabled}
       placeholder={placeholder}
       inputRef={inputRef}
+      type="search"
+      autoComplete="off"
+      slotProps={{
+        htmlInput: {
+          spellCheck: 'false',
+          autoCapitalize: 'off',
+          autoCorrect: 'off',
+          inputMode: 'search',
+          enterKeyHint: 'search',
+        },
+      }}
     />
   );
 });
@@ -846,6 +857,9 @@ export default function IconicImpactPage() {
         <Typography variant="body2" color="text.secondary">
           Iconic Impact is a fan-made educational game for learning Magic: The Gathering set icons. Magic: The Gathering
           is a trademark of Wizards of the Coast.
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          This game is best played with a physical keyboard.
         </Typography>
       </Box>
 

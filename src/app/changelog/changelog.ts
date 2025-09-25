@@ -12,6 +12,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-24',
+      version: '0.129.7',
+      changes: [
+        'Improved Iconic Impact game text input to disable autocorrect for better typing experience',
+        'Added note that Iconic Impact game works best with a physical keyboard',
+      ],
+    },
+    {
+      date: '2025-09-24',
       version: '0.129.6',
       changes: ['Fixed Goals menu item to show as active when on create or edit goal pages'],
     },
