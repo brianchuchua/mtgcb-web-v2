@@ -53,6 +53,12 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## 📋 Pre-Release Required
 
+### Testing
+
+- Repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal
+- Top-down testing of every page and feature
+- Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
+
 ### Scaling
 
 - Scale API and Web to two dynos
@@ -61,6 +67,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Audit old app functionality
 - costs to complete buttons should also be on the set page
+- UX: Verify that every search tool trims whitespace
 
 ### Data Improvements
 
@@ -74,11 +81,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Audit table field orders and their corresponding visibility filters
 
-### Testing
-
-- Repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal
-
 ### Patron Features / Patreon Integration
+
+- A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.
+- A supporter badge of some sort would be great.
+- Detecting if someone is a patron and linking their accounts.
 
 #### The Reserved List
 
@@ -128,9 +135,16 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Project: Data Cleanup
 
+- After release, adding all remaining missing cards and fixing data issues, including:
+- Adding Art Series cards
+- Need to add cardFaces data and come up with a plan to render the backside of cards
+- Sorting of collectorNumberNumeric when the original collector number is like "A25-223"
+- canBeFoil and canBeNonFoil data cleanup and interaction with etched foils, see Mountain (674) from Secret Lair and compare to tcgplayer data -- see also Culling the Weak and rainbow foils
+- Ae/apostrophe fixes, etc
+
 #### Subset Splitting
 
-- Needs to be done as before. Audit current and any missing from the established pattern.
+- Needs to be done as before. Audit current and any missing from the established pattern (basically audit subset groups that have cards in them directly and sets that should be subsets)
 
 #### MTG CB Collector Number
 
@@ -150,6 +164,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Feature Enhancements
 
+#### Artist Enhancements
+
+- Link artist name in table view to search for that artist
+
 #### Card Format Legality
 
 - Would be nice to warn users if cards aren't tournament legal, even though this is a collecting site and not a deckbuilding site.
@@ -168,6 +186,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Make it easier to exclude tokens (isToken card field perhaps?)
 - Sharing and duplicating collection goals
 - "Save this search as a collection goal"
+- Showing number of cards in excess of a goal
+- Showing goal criteria in the collection header, maybe in an i icon
 
 #### Default Collection Goals
 
@@ -186,6 +206,14 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Adding cards to collection at buy time
 
 - When a person is buying cards, have the site offer to record the cards right there
+
+#### Scryfall Syntax Support for Searches
+
+- Patron request: Scryfall syntax support for searches
+
+#### Card Locations
+
+- Mass updating of card locations -- this goes against my advice of using locations sparingly, though.
 
 ### Stats Page
 
@@ -214,7 +242,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
-- Create staging environments for both API and Web
+- Create staging environments for both API and Web -- if needed. (Local dev is pretty comfortable now and lines up with prod.)
 - Audit database schema for unused fields
 - Audit API for unused endpoints
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
@@ -225,6 +253,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Need a full postman library of my API calls, these should live with api docs
 - CI/CD pipeline
 - Rate limiting for API calls
+- Look into fastify multipart for uploads -- am I missing anything by not using it?
+- Audit USE_OPTIMIZED_GOAL_PROGRESS and other now-unused .env variables
 
 #### Code Style
 
@@ -234,6 +264,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Open Sourcing
 
 - Open source the repo and put github links in the footer
+- Make development easy with docker images for database spin-up, etc.
 
 #### Caching
 
@@ -268,13 +299,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - I think my Scryfall images are PNGs but have the JPG extension? Super old tech debt from early alpha days.
 
 ### Performance Optimizations
-
-### Data Improvements
-
-- After release, adding all remaining missing cards and fixing data issues, including:
-- Adding Art Series cards
-- Need to add cardFaces data and come up with a plan to render the backside of cards
-- Sorting of collectorNumberNumeric when the original collector number is like "A25-223"
 
 ## 🎯 Future Features
 
@@ -339,7 +363,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 #### Patron Features
 
-- Weather effects? Custom themes? Confetti customization?
+- Weather effects? Custom themes? Confetti customization with mana symbols?
 - What other additional cosmetics?
 - Based on a funny conversation we had, extreme progress bar styles
 - Must only be cosmetic -- never want to paywall features

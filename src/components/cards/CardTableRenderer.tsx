@@ -161,8 +161,8 @@ export const useCardTableColumns = (
       id: 'releasedAt', // This renders as a set name, but sorts by release date
       label: 'Set',
       width: {
-        xs: '120px',
-        sm: '150px',
+        xs: '200px',
+        sm: '200px',
         md: '200px',
         default: '250px',
       },
