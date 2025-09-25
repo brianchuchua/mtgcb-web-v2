@@ -133,23 +133,25 @@ export default function LocationsClient() {
             <Box sx={{ mt: { xs: 2, sm: 0 } }}>
               <LocationsList locations={locations} />
             </Box>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              pageSize={pageSize}
-              pageSizeOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
-              totalItems={totalLocations}
-              viewMode="grid"
-              onPageChange={onPageChange}
-              onPageSizeChange={onPageSizeChange}
-              onViewModeChange={() => {}}
-              position="bottom"
-              contentType="cards"
-              customItemName="locations"
-              hideViewModeToggle
-              hideSearchButton
-              hideSettingsPanel
-            />
+            <Box sx={{ display: { xs: 'block', sm: 'none' }, mt: 4 }}>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                pageSize={pageSize}
+                pageSizeOptions={[1, 2, 3, 4, 5, 6, 7, 8, 9]}
+                totalItems={totalLocations}
+                viewMode="grid"
+                onPageChange={onPageChange}
+                onPageSizeChange={onPageSizeChange}
+                onViewModeChange={() => {}}
+                position="bottom"
+                contentType="cards"
+                customItemName="locations"
+                hideViewModeToggle
+                hideSearchButton
+                hideSettingsPanel
+              />
+            </Box>
           </>
         )
       )}

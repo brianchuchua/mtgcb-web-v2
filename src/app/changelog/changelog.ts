@@ -12,6 +12,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-25',
+      version: '0.130.2',
+      changes: [
+        'Improved pagination layout on Goals and Locations pages - bottom pagination now only shows on mobile',
+        'Adjusted spacing between content and pagination controls for better visual hierarchy',
+      ],
+    },
+    {
+      date: '2025-09-25',
       version: '0.130.1',
       changes: [
         'Fixed spacing between sets grid and pagination controls for better visual consistency',

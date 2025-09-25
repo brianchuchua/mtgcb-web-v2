@@ -159,7 +159,9 @@ export function GoalsClient() {
               />
             ))}
           </Box>
-          <Pagination {...paginationProps} position="bottom" />
+          <Box sx={{ display: { xs: 'block', sm: 'none' }, mt: 4 }}>
+            <Pagination {...paginationProps} position="bottom" />
+          </Box>
         </>
       )}
 

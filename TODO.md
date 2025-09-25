@@ -15,7 +15,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- I see a stutter when scrolling on tablet or mobile view when looking at a long list of sets, appears to happen when hitting the view set / complete this set buttons, maybe a skeleton loading issue changing size. Maybe I can reproduce on desktop.
+- once deployed, test new bottom pagination, make sure distance is good on most pages
+
 - considering: "Complete this set" buttons don't make sense with goals -- like complete this subgoal maybe? buy missing cards in other contexts? rename and consider.
 - Add buttons for completing sets on the actual set pages.
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
