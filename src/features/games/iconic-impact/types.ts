@@ -117,6 +117,7 @@ export interface GameStateData {
   scheduledStateChange?: { state: GameState; time: number };
   waveState: WaveState;
   allAvailableSets: SetData[]; // Store all sets for wave generation
+  lastFrameTime: number; // For delta time calculation
 }
 
 export interface GameEngine {

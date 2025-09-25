@@ -21,10 +21,10 @@ export function createIcon(
   };
 }
 
-export function updateIconPosition(icon: Icon, gameHeight: number, groundHeight: number): Icon {
+export function updateIconPosition(icon: Icon, gameHeight: number, groundHeight: number, deltaTime: number): Icon {
   if (icon.destroyed || icon.failed) return icon;
 
-  const newY = icon.y + icon.speed;
+  const newY = icon.y + (icon.speed * deltaTime);
   const progress = calculateProgress(newY, gameHeight, groundHeight);
   const hintLevel = calculateHintLevel(progress);
 
@@ -59,18 +59,20 @@ export function markIconFailed(icon: Icon): Icon {
   };
 }
 
-export function updateIconAnimation(icon: Icon): Icon {
+export function updateIconAnimation(icon: Icon, deltaTime: number): Icon {
   if (icon.animationTimer === undefined || icon.animationTimer <= 0) {
     return icon;
   }
 
-  const newTimer = icon.animationTimer - 1;
-  const radiusIncrement = icon.failed ? 0.25 : 1; // Failure expands slower
+  const newTimer = icon.animationTimer - (deltaTime * 1000); // Convert to milliseconds
+  // Both animations expand at same speed (60 px/s)
+  // Failure animation will reach a larger final size due to longer duration
+  const radiusIncrement = 60 * deltaTime; // pixels per second for both
   const newRadius = (icon.animationRadius || 0) + radiusIncrement;
 
   return {
     ...icon,
-    animationTimer: newTimer,
+    animationTimer: Math.max(0, newTimer),
     animationRadius: newRadius,
   };
 }

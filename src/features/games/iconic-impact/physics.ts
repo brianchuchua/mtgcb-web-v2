@@ -6,17 +6,17 @@ import { triggerGameOver } from './systems/input';
 import { shouldSpawnIcon, selectRandomSet, generateIconPosition, createNewIcon, preloadImage, getIconUrl } from './systems/spawn';
 import { updateIcons, addIcon, decrementLives, updateLastSpawnTime, clearCompletedSets, cacheImage } from './state';
 
-export function updateGamePhysics(state: GameStateData, config: GameConfig): GameStateData {
+export function updateGamePhysics(state: GameStateData, config: GameConfig, deltaTime: number): GameStateData {
   let newState = state;
 
   // Update icon positions and animations
-  newState = updateIconPhysics(newState);
+  newState = updateIconPhysics(newState, deltaTime);
 
   // Check collisions
   newState = checkIconCollisions(newState, config);
 
   // Remove expired animations
-  newState = removeExpiredIcons(newState);
+  newState = removeExpiredIcons(newState, deltaTime);
 
   // Check spawning
   newState = handleIconSpawning(newState, config);
@@ -24,13 +24,13 @@ export function updateGamePhysics(state: GameStateData, config: GameConfig): Gam
   return newState;
 }
 
-function updateIconPhysics(state: GameStateData): GameStateData {
+function updateIconPhysics(state: GameStateData, deltaTime: number): GameStateData {
   const updatedIcons = state.icons.map(icon => {
     // Update animation timers first
-    let updatedIcon = updateIconAnimation(icon);
+    let updatedIcon = updateIconAnimation(icon, deltaTime);
 
     // Then update position if not destroyed/failed
-    updatedIcon = updateIconPosition(updatedIcon, GAME_HEIGHT, GROUND_HEIGHT);
+    updatedIcon = updateIconPosition(updatedIcon, GAME_HEIGHT, GROUND_HEIGHT, deltaTime);
 
     return updatedIcon;
   });
@@ -82,7 +82,7 @@ function checkIconCollisions(state: GameStateData, config: GameConfig): GameStat
   return newState;
 }
 
-function removeExpiredIcons(state: GameStateData): GameStateData {
+function removeExpiredIcons(state: GameStateData, deltaTime: number): GameStateData {
   const activeIcons = state.icons.filter(icon => !isIconExpired(icon));
   return updateIcons(state, activeIcons);
 }

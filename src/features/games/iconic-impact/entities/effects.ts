@@ -20,9 +20,10 @@ export function updateTitleIcon(
   icon: TitleIcon,
   gameWidth: number,
   availableSets: Array<{ code: string }>,
-  existingIcons: TitleIcon[]
+  existingIcons: TitleIcon[],
+  deltaTime: number
 ): TitleIcon {
-  const newY = icon.y + icon.speed;
+  const newY = icon.y + (icon.speed * deltaTime);
 
   // If icon falls off screen, respawn at top
   if (newY > GAME_HEIGHT) {

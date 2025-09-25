@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-24',
+      version: '0.129.5',
+      changes: [
+        'Fixed Iconic Impact game speed to run consistently on all devices regardless of screen refresh rate -- if only we still had turbo buttons on our PCs',
+      ],
+    },
+    {
+      date: '2025-09-24',
       version: '0.129.4',
       changes: ['Improved layout on tablet devices for better usability'],
     },
@@ -43,7 +50,9 @@ const changelogData: ChangelogData = {
     {
       date: '2025-09-23',
       version: '0.128.0',
-      changes: ['Improved grid view for shared collections by showing disabled quantity selectors instead of plain text'],
+      changes: [
+        'Improved grid view for shared collections by showing disabled quantity selectors instead of plain text',
+      ],
     },
     {
       date: '2025-09-23',

@@ -7,7 +7,7 @@ import { createTitleIcon, updateTitleIcon, renderTitleIcon } from '../entities/e
 import { getRandomInRange } from '../utils/math';
 import { updateTitleIcons, cacheImage } from '../state';
 
-export function renderTitleScreen(state: GameStateData, config: GameConfig): GameStateData {
+export function renderTitleScreen(state: GameStateData, config: GameConfig, deltaTime: number): GameStateData {
   const ctx = config.canvas.getContext('2d');
   if (!ctx) return state;
 
@@ -19,7 +19,7 @@ export function renderTitleScreen(state: GameStateData, config: GameConfig): Gam
   }
 
   // Update and render title icons
-  newState = updateAndRenderTitleIcons(newState, config, ctx);
+  newState = updateAndRenderTitleIcons(newState, config, ctx, deltaTime);
 
   // Draw overlay and text
   drawTitleOverlay(ctx, config.width);
@@ -56,13 +56,14 @@ function initializeTitleIcons(state: GameStateData, config: GameConfig): GameSta
 function updateAndRenderTitleIcons(
   state: GameStateData,
   config: GameConfig,
-  ctx: CanvasRenderingContext2D
+  ctx: CanvasRenderingContext2D,
+  deltaTime: number
 ): GameStateData {
   clearCanvas(ctx, config.width, GAME_HEIGHT);
   drawGradientBackground(ctx, config.width, GAME_HEIGHT, '#1a1a1a', '#0d0d0d');
 
   const updatedIcons = state.titleIcons.map(icon => {
-    const updated = updateTitleIcon(icon, config.width, config.sets, state.titleIcons);
+    const updated = updateTitleIcon(icon, config.width, config.sets, state.titleIcons, deltaTime);
 
     // Preload new image if needed
     if (!state.imageCache.has(updated.iconUrl)) {

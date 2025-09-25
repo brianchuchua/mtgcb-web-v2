@@ -35,6 +35,11 @@ export function createGameEngine(config: GameConfig): GameEngine {
   function gameLoop(): void {
     if (isDestroyed) return;
 
+    // Calculate delta time
+    const currentTime = performance.now();
+    const deltaTime = Math.min((currentTime - state.lastFrameTime) / 1000, 0.1); // Cap at 100ms to prevent large jumps
+    state.lastFrameTime = currentTime;
+
     // Check for scheduled state changes
     if (state.scheduledStateChange && Date.now() >= state.scheduledStateChange.time) {
       state = updateGameState(state, state.scheduledStateChange.state);
@@ -44,10 +49,10 @@ export function createGameEngine(config: GameConfig): GameEngine {
     // Update and render based on current state
     switch (state.state) {
       case 'idle':
-        state = renderTitleScreen(state, config);
+        state = renderTitleScreen(state, config, deltaTime);
         break;
       case 'playing':
-        state = renderGameplayScreen(state, config);
+        state = renderGameplayScreen(state, config, deltaTime);
         break;
       case 'paused':
         state = renderPauseScreen(state, config);

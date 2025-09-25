@@ -24,6 +24,7 @@ export function createInitialState(sets: SetData[]): GameStateData {
       waveStartScore: 0,
     },
     allAvailableSets: sets,
+    lastFrameTime: performance.now(),
   };
 }
 
@@ -40,6 +41,7 @@ export function resetGameState(state: GameStateData): GameStateData {
     blockSpawning: false,
     titleIcons: [],
     iconIdCounter: 0,
+    lastFrameTime: performance.now(),
   };
 }
 
