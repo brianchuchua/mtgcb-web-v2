@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-25',
+      version: '0.132.0',
+      changes: [
+        'Added purchase buttons to individual set pages for easy buying of missing cards or complete sets',
+      ],
+    },
+    {
+      date: '2025-09-25',
       version: '0.131.1',
       changes: [
         'Fixed spacing above bottom pagination on mobile browse and collection pages',

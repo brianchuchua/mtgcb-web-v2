@@ -25,6 +25,7 @@ import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
 import { SetNavigationButtons } from '@/components/sets/SetNavigationButtons';
+import { SetPageBuyButton } from '@/components/sets/SetPageBuyButton';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useShareTokenContext } from '@/contexts/ShareTokenContext';
 import { CardsProps } from '@/features/browse/types/browseController';
@@ -532,6 +533,14 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                   maxWidth="400px"
                 />
               </Box>
+
+              <SetPageBuyButton
+                set={set}
+                costToComplete={set.costToComplete}
+                includeSubsetsInSets={includeSubsetsInSets}
+                userId={userId}
+                isCollection={true}
+              />
             </>
           )}
         </Box>

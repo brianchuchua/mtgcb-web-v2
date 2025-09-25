@@ -7,18 +7,21 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SubsetSection from './SubsetSection';
 import { useGetSetByIdQuery, useGetSetsQuery } from '@/api/browse/browseApi';
+import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
 import { SetNavigationButtons } from '@/components/sets/SetNavigationButtons';
+import { SetPageBuyButton } from '@/components/sets/SetPageBuyButton';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
+import { useSetPriceType } from '@/hooks/useSetPriceType';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
-import { resetSearch, selectCardSearchParams, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
+import { resetSearch, selectCardSearchParams, selectIncludeSubsetsInSets, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
 import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
@@ -29,6 +32,7 @@ interface SetBrowseClientProps {
 
 export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   const dispatch = useDispatch();
+  const setPriceType = useSetPriceType();
 
   // Use browse controller with proper configuration
   const browseController = useBrowseController({
@@ -42,6 +46,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   // Get current search parameters to pass to subsets
   const cardSearchParams = useSelector(selectCardSearchParams);
   const currentSetsFilter = useSelector(selectSets);
+  const currentIncludeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
   const {
     data: setsData,
@@ -50,10 +55,23 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   } = useGetSetsQuery({
     limit: 1,
     slug: setSlug,
+    priceType: setPriceType,
+    includeSubsetsInSets: currentIncludeSubsetsInSets,
   });
 
   const set = setsData?.data?.sets?.[0];
   const pathname = usePathname();
+
+  // Fetch cost to complete data for non-collection browse
+  const { data: costToCompleteData } = useGetCostToCompleteQuery(
+    {
+      priceType: setPriceType,
+      includeSubsetsInSets: currentIncludeSubsetsInSets,
+    },
+    {
+      skip: !set?.id || isSetLoading,
+    }
+  );
 
   const { data: subsetsData, isLoading: isSubsetsLoading } = useGetSetsQuery(
     {
@@ -254,6 +272,15 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
         <Typography variant="body1" color="text.secondary">
           {set?.cardCount ? `${set.cardCount} cards` : 'N/A'}
         </Typography>
+
+        {set && costToCompleteData?.data && (
+          <SetPageBuyButton
+            set={set}
+            costToComplete={costToCompleteData.data.sets.find(s => s.id === set.id)?.costToComplete}
+            includeSubsetsInSets={currentIncludeSubsetsInSets}
+            isCollection={false}
+          />
+        )}
       </Box>
 
       <Pagination
