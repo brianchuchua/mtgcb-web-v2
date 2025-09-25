@@ -1,20 +1,11 @@
 'use client';
 
+import { Box, Button, Card, CardContent, CircularProgress, Typography, keyframes, styled, Collapse } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Collapse,
-  Typography,
-  keyframes,
-  styled,
-} from '@mui/material';
 import { isDraft } from '@reduxjs/toolkit';
 import Link from 'next/link';
 import React from 'react';
+import { useCostsToCompleteExpanded, useSetProgressBarStyle } from '@/contexts/DisplaySettingsContext';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { CostToComplete } from '@/api/sets/types';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
@@ -23,7 +14,6 @@ import { SetCategoryAndType, SetItemSettings } from '@/components/sets/SetItemRe
 import TCGPlayerGoalMassImportButton from '@/components/tcgplayer/TCGPlayerGoalMassImportButton';
 import TCGPlayerMassImportButton from '@/components/tcgplayer/TCGPlayerMassImportButton';
 import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
-import { useCostsToCompleteExpanded, useSetProgressBarStyle } from '@/contexts/DisplaySettingsContext';
 import { Set } from '@/types/sets';
 import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder';
 import capitalize from '@/utils/capitalize';
@@ -152,7 +142,7 @@ const SetIconDisplay: React.FC<{
   };
 
   const rarity = collectionData ? getRarityByPercentage(percentageCollected) : 'common';
-
+  
   // Use less spacing when linear progress bar is selected or when there's no collection data
   const useCompactSpacing = !collectionData || progressBarStyle === 'linear';
 
@@ -223,16 +213,14 @@ const SetIconDisplay: React.FC<{
                 />
               </>
             )}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: useCompactSpacing ? 'auto' : 130,
-                height: useCompactSpacing ? 'auto' : 130,
-                py: useCompactSpacing ? 0.5 : 0,
-              }}
-            >
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              width: useCompactSpacing ? 'auto' : 130, 
+              height: useCompactSpacing ? 'auto' : 130,
+              py: useCompactSpacing ? 0.5 : 0,
+            }}>
               <SetIcon code={set.code} size="5x" fixedWidth rarity={rarity} />
             </Box>
           </Box>
@@ -287,11 +275,11 @@ const CollectionInfoSection: React.FC<{
             ({collectionData.totalCardsCollectedInSet} total cards)
           </Typography>
           <Box sx={{ mt: 1, mb: 1 }}>
-            <CollectionProgressBar
-              percentage={collectionData.percentageCollected}
+            <CollectionProgressBar 
+              percentage={collectionData.percentageCollected} 
               height={20}
               showLabel={true}
-              labelFormat="long"
+              labelFormat='long'
             />
           </Box>
         </>
@@ -336,13 +324,7 @@ const CostToPurchaseSection: React.FC<{
         alignItems: 'center',
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 1,
-          minHeight: 32, // Ensure consistent height to prevent layout shift
-        }}
-      >
+      <Box sx={{ display: 'flex', gap: 1 }}>
         <Button
           component={Link}
           href={userId ? getCollectionSetUrl(userId, set?.slug || '', goalId) : `/browse/sets/${set?.slug}`}
@@ -369,30 +351,30 @@ const CostToPurchaseSection: React.FC<{
           onClick={handleExpandClick}
           variant="outlined"
           size="small"
-          sx={{
-            textTransform: 'none',
-            color: 'text.secondary',
-            borderColor: 'divider',
-            fontSize: '0.813rem',
-            py: 0.25,
-            px: 1.5,
-            opacity: 0.8,
-            '&:hover': {
-              backgroundColor: 'action.hover',
-              borderColor: 'text.disabled',
-              opacity: 1,
-            },
-          }}
-          endIcon={
-            <ExpandMore
-              sx={{
-                transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.3s',
-                fontSize: '1rem',
-              }}
-            />
-          }
-        >
+        sx={{
+          textTransform: 'none',
+          color: 'text.secondary',
+          borderColor: 'divider',
+          fontSize: '0.813rem',
+          py: 0.25,
+          px: 1.5,
+          opacity: 0.8,
+          '&:hover': {
+            backgroundColor: 'action.hover',
+            borderColor: 'text.disabled',
+            opacity: 1,
+          },
+        }}
+        endIcon={
+          <ExpandMore
+            sx={{
+              transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s',
+              fontSize: '1rem',
+            }}
+          />
+        }
+      >
           Complete this set
         </Button>
       </Box>
@@ -474,29 +456,29 @@ const CostToPurchaseSection: React.FC<{
             </>
           )}
 
-          {set?.sealedProductUrl && (
-            <Box
+        {set?.sealedProductUrl && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              mt: 1.5,
+            }}
+          >
+            <Button
+              variant="outlined"
+              href={generateTCGPlayerSealedProductLink(set.sealedProductUrl, set.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+              size="small"
               sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                mt: 1.5,
+                textTransform: 'none',
+                py: 0.5,
               }}
             >
-              <Button
-                variant="outlined"
-                href={generateTCGPlayerSealedProductLink(set.sealedProductUrl, set.name)}
-                target="_blank"
-                rel="noopener noreferrer"
-                size="small"
-                sx={{
-                  textTransform: 'none',
-                  py: 0.5,
-                }}
-              >
-                Buy this set sealed
-              </Button>
-            </Box>
-          )}
+              Buy this set sealed
+            </Button>
+          </Box>
+        )}
 
           {goalId && userId && (
             <Box
