@@ -14,8 +14,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On
 
-- Test mobile, fix issues (feels almost done, just one more pass on a device)
-- Test tablet, fix issues (feels almost done, just one more pass on a device)
 - considering: "Complete this set" buttons don't make sense with goals -- like complete this subgoal maybe? buy missing cards in other contexts? rename and consider.
 - Add buttons for completing sets on the actual set pages.
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data

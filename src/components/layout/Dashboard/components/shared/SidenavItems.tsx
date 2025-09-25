@@ -96,6 +96,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
     const isOnCollectionPage =
       pathname?.startsWith('/collections/edit-cards') ||
       pathname === '/goals' ||
+      pathname?.startsWith('/goals/') ||
       pathname?.startsWith('/locations') ||
       pathname === '/export' ||
       pathname === '/import' ||
@@ -203,6 +204,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                     selected={
                       pathname?.startsWith('/collections/edit-cards') ||
                       pathname === '/goals' ||
+                      pathname?.startsWith('/goals/') ||
                       pathname?.startsWith('/locations') ||
                       pathname === '/export' ||
                       pathname === '/import' ||
@@ -244,7 +246,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                     <ListItemButton
                       component={Link}
                       href="/goals"
-                      selected={pathname === '/goals'}
+                      selected={pathname === '/goals' || pathname?.startsWith('/goals/')}
                       onClick={handleClick}
                       sx={{ pl: 4 }}
                     >

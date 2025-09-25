@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-24',
+      version: '0.129.6',
+      changes: ['Fixed Goals menu item to show as active when on create or edit goal pages'],
+    },
+    {
+      date: '2025-09-24',
       version: '0.129.5',
       changes: [
         'Fixed Iconic Impact game speed to run consistently on all devices regardless of screen refresh rate -- if only we still had turbo buttons on our PCs',
