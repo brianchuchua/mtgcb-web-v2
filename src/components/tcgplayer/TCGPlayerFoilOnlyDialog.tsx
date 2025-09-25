@@ -94,12 +94,13 @@ const TCGPlayerFoilOnlyDialog: React.FC<TCGPlayerFoilOnlyDialogProps> = ({ open,
 
         <Typography
           variant="caption"
-          color="text.secondary"
           sx={{
             display: 'block',
             textAlign: 'center',
             mt: 3,
             fontStyle: 'italic',
+            color: 'warning.main',
+            fontWeight: 'medium',
           }}
         >
           Don't forget: Under "Item Options" in TCGPlayer, choose "Foil" for the printing.

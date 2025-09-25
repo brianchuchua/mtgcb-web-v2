@@ -10,5 +10,7 @@ export const isSafariBrowser = (): boolean => {
 };
 
 export const getFormTarget = (): string => {
-  return isSafariBrowser() ? '_self' : '_blank';
+  // Always use _blank to open in new tab
+  // This preserves state and allows multiple purchases
+  return '_blank';
 };

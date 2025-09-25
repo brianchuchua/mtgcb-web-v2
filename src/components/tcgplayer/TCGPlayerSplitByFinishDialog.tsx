@@ -90,9 +90,11 @@ const TCGPlayerSplitByFinishDialog: React.FC<TCGPlayerSplitByFinishDialogProps> 
             Your goal includes both regular and foil cards. It's easiest to import these into TCGPlayer by grouping
             foils and regulars separately.
           </Typography>
-          <Typography variant="body2" color="textSecondary">
-            Click the appropriate button below to import each type of card. For foil cards, after importing, under "Item
-            Options" in TCGPlayer, make sure only "Foil" is checked for the printing.
+          <Typography variant="body2">
+            Click the appropriate button below to import each type of card.{' '}
+            <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
+              For foil cards, after importing, under "Item Options" in TCGPlayer, make sure only "Foil" is checked.
+            </Box>
           </Typography>
         </InfoBox>
 
@@ -129,12 +131,13 @@ const TCGPlayerSplitByFinishDialog: React.FC<TCGPlayerSplitByFinishDialogProps> 
 
         <Typography
           variant="caption"
-          color="text.secondary"
           sx={{
             display: 'block',
             textAlign: 'center',
             mt: 3,
             fontStyle: 'italic',
+            color: 'warning.main',
+            fontWeight: 'medium',
           }}
         >
           Important: For foil cards, under "Item Options" in TCGPlayer, choose only "Foil" for the printing.

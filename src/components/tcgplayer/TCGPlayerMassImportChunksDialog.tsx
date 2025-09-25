@@ -37,7 +37,7 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
   open,
   onClose,
   cards,
-  chunkSize = 1000,
+  chunkSize = 500,
   isFoilOnly = false,
 }) => {
   const { submitToTCGPlayer } = useTCGPlayer();
@@ -90,7 +90,7 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
       <StyledDialogContent>
         <InfoBox>
           <Typography variant="body2" color="textSecondary" paragraph>
-            TCGPlayer's mass entry feature has issues dealing with over 1000 cards at once. To prevent crashes, we've
+            TCGPlayer's mass entry feature has issues dealing with over 500 cards at once. To prevent crashes, we've
             split your {totalCards} cards into {totalChunks} separate entries.
           </Typography>
           <Typography variant="body2" color="textSecondary">
@@ -98,9 +98,12 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
             batches by clicking multiple buttons.
           </Typography>
           {isFoilOnly && (
-            <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-              <strong>Important:</strong> These are foil cards. After importing each batch, under "Item Options" 
-              in TCGPlayer, choose "Foil" for the printing.
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              <strong>Important:</strong>{' '}
+              <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
+                These are foil cards. After importing each batch, under "Item Options"
+                in TCGPlayer, choose "Foil" for the printing.
+              </Box>
             </Typography>
           )}
         </InfoBox>
@@ -160,12 +163,13 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
         {isFoilOnly && (
           <Typography
             variant="caption"
-            color="text.secondary"
             sx={{
               display: 'block',
               textAlign: 'center',
               mt: 2,
               fontStyle: 'italic',
+              color: 'warning.main',
+              fontWeight: 'medium',
             }}
           >
             Don't forget: Under "Item Options" in TCGPlayer, choose "Foil" for the printing.

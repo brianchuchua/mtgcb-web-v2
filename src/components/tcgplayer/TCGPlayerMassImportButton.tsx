@@ -99,11 +99,11 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
       }));
 
       // Check if we need to chunk the cards
-      if (cardsWithQuantity.length > 1000) {
+      if (cardsWithQuantity.length > 500) {
         setCardsForChunking(cardsWithQuantity);
         setShowChunksDialog(true);
       } else {
-        // Submit immediately for 1000 or fewer cards
+        // Submit immediately for 500 or fewer cards
         const importString = formatMassImportString(cards, count, isDraftCube);
         const formTarget = getFormTarget();
         submitToTCGPlayer(importString, formTarget);

@@ -48,7 +48,7 @@ const TCGPlayerSplitByFinishChunksDialog: React.FC<TCGPlayerSplitByFinishChunksD
   onClose,
   regularCards,
   foilCards,
-  chunkSize = 1000,
+  chunkSize = 500,
 }) => {
   const { submitToTCGPlayer } = useTCGPlayer();
   const [submittedChunks, setSubmittedChunks] = useState<Set<string>>(new Set());
@@ -111,12 +111,15 @@ const TCGPlayerSplitByFinishChunksDialog: React.FC<TCGPlayerSplitByFinishChunksD
             foils and regulars separately.
           </Typography>
           <Typography variant="body2" color="textSecondary" paragraph>
-            Additionally, TCGPlayer has issues with over 1000 cards at once, so we've split large imports into batches.
+            Additionally, TCGPlayer has issues with over 500 cards at once, so we've split large imports into batches.
             Each button opens a new TCGPlayer tab.
           </Typography>
-          <Typography variant="body2" color="textSecondary">
-            <strong>Important:</strong> After importing the foil cards into TCGPlayer, you must mark them as foils.
-            Under "Item Options" in TCGPlayer, make sure only "Foil" is checked.
+          <Typography variant="body2">
+            <strong>Important:</strong>{' '}
+            <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
+              After importing the foil cards into TCGPlayer, you must mark them as foils.
+              Under "Item Options" in TCGPlayer, make sure only "Foil" is checked.
+            </Box>
           </Typography>
         </InfoBox>
 
