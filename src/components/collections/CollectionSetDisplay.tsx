@@ -1,5 +1,6 @@
 'use client';
 
+import { Box } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CollectionSetItemRenderer } from './CollectionSetItemRenderer';
@@ -71,34 +72,36 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
 
   if (viewMode === 'grid') {
     return (
-      <VirtualizedRowGallery
-        key="browse-collection-set-gallery"
-        items={displaySets}
-        renderItem={(set) => {
-          const collectionSet = collectionData?.collectionSets.get(set.id);
-          const costToComplete = collectionSet?.costToComplete;
-          const cardCountIncludingSubsets = collectionSet?.cardCountIncludingSubsets;
+      <Box sx={{ pb: 4 }}>
+        <VirtualizedRowGallery
+          key="browse-collection-set-gallery"
+          items={displaySets}
+          renderItem={(set) => {
+            const collectionSet = collectionData?.collectionSets.get(set.id);
+            const costToComplete = collectionSet?.costToComplete;
+            const cardCountIncludingSubsets = collectionSet?.cardCountIncludingSubsets;
 
-          return (
-            <CollectionSetItemRenderer
-              set={set}
-              settings={displaySettings.grid}
-              costToComplete={costToComplete}
-              includeSubsetsInSets={includeSubsetsInSets}
-              cardCountIncludingSubsets={cardCountIncludingSubsets?.toString()}
-              collectionData={collectionSet}
-              userId={collectionData?.userId}
-              goalId={goalId}
-            />
-          );
-        }}
-        isLoading={isLoading}
-        columnsPerRow={displaySettings.grid.setsPerRow !== undefined ? displaySettings.grid.setsPerRow : 4}
-        galleryWidth={100}
-        horizontalPadding={0}
-        emptyMessage="No sets found"
-        computeItemKey={(index) => displaySets[index]?.id || index}
-      />
+            return (
+              <CollectionSetItemRenderer
+                set={set}
+                settings={displaySettings.grid}
+                costToComplete={costToComplete}
+                includeSubsetsInSets={includeSubsetsInSets}
+                cardCountIncludingSubsets={cardCountIncludingSubsets?.toString()}
+                collectionData={collectionSet}
+                userId={collectionData?.userId}
+                goalId={goalId}
+              />
+            );
+          }}
+          isLoading={isLoading}
+          columnsPerRow={displaySettings.grid.setsPerRow !== undefined ? displaySettings.grid.setsPerRow : 4}
+          galleryWidth={100}
+          horizontalPadding={0}
+          emptyMessage="No sets found"
+          computeItemKey={(index) => displaySets[index]?.id || index}
+        />
+      </Box>
     );
   }
 

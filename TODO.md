@@ -6,14 +6,16 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## Roadmap
 
+- [ ] Prepare last items for v1.0 Release
 - [ ] v1.0 Release
-- [ ] Data Cleanup
-- [ ] Patrons vote on the next feature candidates and I make a selection
+- [ ] Data Cleanup Project
+- [ ] Patrons vote on the next feature candidates and I make a selection (I can ask the wider community first too)
 
 ## 🔄 In Progress
 
-### Currently Looking At or Working On
+### Currently Looking At or Working On or Just Noticed
 
+- I see a stutter when scrolling on tablet or mobile view when looking at a long list of sets, appears to happen when hitting the view set / complete this set buttons, maybe a skeleton loading issue changing size. Maybe I can reproduce on desktop.
 - considering: "Complete this set" buttons don't make sense with goals -- like complete this subgoal maybe? buy missing cards in other contexts? rename and consider.
 - Add buttons for completing sets on the actual set pages.
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
@@ -25,15 +27,15 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## 🚨 Critical / Blocking Issues
 
-- Need another sql.raw audit
-- Must backup DDLs of all databases before release, Drizzle introspect is a secondary backup -- probably store in the API repo in a reference folder
+- Need another sql.raw audit, there's a document of the last one
+- Must backup DDLs of all databases before release, Drizzle introspect is a secondary backup -- probably store in the API repo in a reference folder, create a process
 - Important: Audit input field lengths for all API calls and make front-end enforce them too
 
 ### Migration
 
 - Need a message for migration downtime in v2 as well
 - Test migration end-to-end one more time
-- Add a migration verification script to mtgcb-importer that checks user counts and collection counts match between old and new databases, accounting for those removed due to a 0 quantity count or for cards or users that no longer exist
+- Add a migration verification script to mtgcb-importer that checks user counts and collection counts match between old and new databases, accounting for those removed due to a 0 quantity count or for cards or users that no longer exist, locally of course
 - Switch to Git Flow for the v1.0 release
 
 ### mtgcb-importer
@@ -98,10 +100,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Mention Patreon on the home page and wherever else is appropriate
 - Mention that patrons get to vote on future features
 - Make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
-
-### UX/Design
-
-- Consider bottom pagination controls that scroll to top when clicked
 
 ### Testing & Quality
 
@@ -289,6 +287,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Consider GIN indexes for additional fields
 - More load testing
 - More index audits, organized analysis per API call / DB query
+- Consider moving more read operations to the follower database
 
 #### Testing
 

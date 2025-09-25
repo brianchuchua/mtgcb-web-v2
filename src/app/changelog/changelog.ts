@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-25',
+      version: '0.130.0',
+      changes: [
+        'Added pagination controls at the bottom of browse and collection pages for easier navigation',
+        'Fixed spacing between sets list and bottom pagination on collection pages',
+      ],
+    },
+    {
       date: '2025-09-24',
       version: '0.129.7',
       changes: [

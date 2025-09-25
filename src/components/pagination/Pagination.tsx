@@ -296,6 +296,13 @@ const Pagination: React.FC<PaginationProps> = ({
         </TopPaginationLayout>
       ) : (
         <BottomPaginationLayout>
+          <NavigationControls
+            currentPage={localCurrentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            isLoading={isLoading}
+            isSmallScreen={false}
+          />
           <BackToTopButton onClick={scrollToTop} isLoading={isLoading} />
         </BottomPaginationLayout>
       )}
@@ -756,7 +763,7 @@ const BottomPaginationLayout = styled(Box)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: theme.spacing(1),
+  gap: theme.spacing(2),
   width: '100%',
   marginTop: theme.spacing(4),
 }));
