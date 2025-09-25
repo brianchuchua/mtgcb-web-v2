@@ -72,10 +72,9 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
 
   if (viewMode === 'grid') {
     return (
-      <Box sx={{ pb: 4 }}>
-        <VirtualizedRowGallery
-          key="browse-collection-set-gallery"
-          items={displaySets}
+      <VirtualizedRowGallery
+        key="browse-collection-set-gallery"
+        items={displaySets}
           renderItem={(set) => {
             const collectionSet = collectionData?.collectionSets.get(set.id);
             const costToComplete = collectionSet?.costToComplete;
@@ -100,8 +99,7 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
           horizontalPadding={0}
           emptyMessage="No sets found"
           computeItemKey={(index) => displaySets[index]?.id || index}
-        />
-      </Box>
+      />
     );
   }
 

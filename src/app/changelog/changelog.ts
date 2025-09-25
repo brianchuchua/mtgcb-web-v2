@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-25',
+      version: '0.130.1',
+      changes: [
+        'Fixed spacing between sets grid and pagination controls for better visual consistency',
+      ],
+    },
+    {
+      date: '2025-09-25',
       version: '0.130.0',
       changes: [
         'Added pagination controls at the bottom of browse and collection pages for easier navigation',

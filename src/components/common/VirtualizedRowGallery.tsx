@@ -145,10 +145,10 @@ const VirtualizedRowGallery = <T,>({
           itemContent={rowContent}
           increaseViewportBy={600}
           computeItemKey={(index) => rows[index].id}
-          // Remove the default item wrapper styles that might interfere
+          // Add proper spacing between rows that Virtuoso can measure
           components={{
             Item: ({ children, item, context, ...props }) => (
-              <div {...props} style={{ ...props.style, paddingBottom: 0 }}>
+              <div {...props} style={{ ...props.style, paddingBottom: 16 }}>
                 {children}
               </div>
             ),
@@ -193,11 +193,9 @@ const RowContainer = styled(Box, {
   gridTemplateColumns: `repeat(${columnsPerRow}, minmax(0, 1fr))`,
   gap: theme.spacing(2),
   width: '100%',
-  // Add margin bottom to create space between rows
-  marginBottom: theme.spacing(2),
   // Make all items in a row the same height
   gridAutoRows: '1fr',
-  
+
   // Force single column on mobile
   [theme.breakpoints.down('sm')]: {
     gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
