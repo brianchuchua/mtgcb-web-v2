@@ -15,10 +15,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- once deployed, test new bottom pagination, make sure distance is good on most pages
-  - browse and collection table view for sets and cards, too close to bottom
-- once deployed, test buying goal stuff on safari
-
 - Add buttons for completing sets on the actual set pages.
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
 - Audit subsets with collection goals -- data and appearance.

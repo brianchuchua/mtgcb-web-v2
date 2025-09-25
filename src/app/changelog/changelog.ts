@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-25',
+      version: '0.131.1',
+      changes: [
+        'Fixed spacing above bottom pagination on mobile browse and collection pages',
+      ],
+    },
+    {
+      date: '2025-09-25',
       version: '0.131.0',
       changes: [
         'Improved purchase experience for large collection goals with faster loading and better progress tracking',

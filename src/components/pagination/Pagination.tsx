@@ -766,6 +766,9 @@ const BottomPaginationLayout = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   width: '100%',
   marginTop: 0,
+  [theme.breakpoints.down('sm')]: {
+    paddingTop: theme.spacing(3),
+  },
 }));
 
 const SearchButtonContainer = styled(Box)(({ theme }) => ({
