@@ -46,7 +46,7 @@ const AuthenticatedHomePageClient = dynamic(() => import('./AuthenticatedHomePag
 export default function HomePageClient() {
   const router = useRouter();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -283,7 +283,7 @@ const FeaturesSection: React.FC = () => {
 
       <Grid container spacing={isMobile ? 2 : 4}>
         {features.map((feature, index) => (
-          <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid key={index} size={{ xs: 12, sm: 6, lg: 4 }}>
             <FeatureCard>
               <CardContent>
                 <Stack spacing={2}>
@@ -311,12 +311,12 @@ const FeaturesSection: React.FC = () => {
 };
 
 const BenefitsSection: React.FC<BenefitsSectionProps> = ({ theme }) => {
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <Grid container spacing={6} alignItems="center">
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <Typography variant={isMobile ? 'h6' : 'h5'} fontWeight="bold" gutterBottom>
             Why Choose MTG CB?
           </Typography>
@@ -334,7 +334,7 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({ theme }) => {
             ))}
           </Stack>
         </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <StatsGrid />
         </Grid>
       </Grid>

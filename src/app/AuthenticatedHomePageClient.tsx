@@ -36,7 +36,7 @@ export default function AuthenticatedHomePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
   const { user } = useAuth();
   const { settings } = useDisplaySettings();
   const [isNewUser] = useState(() => searchParams.get('new') === 'true');
@@ -114,7 +114,7 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ user, stats, isMobile, 
           </Typography>
         </Box>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <Card sx={{ height: '100%' }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h4" fontWeight="bold" color="success.main">
@@ -130,7 +130,7 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ user, stats, isMobile, 
               </CardContent>
             </Card>
           </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <Card sx={{ height: '100%' }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h4" fontWeight="bold" color="primary.main">
@@ -142,7 +142,7 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ user, stats, isMobile, 
               </CardContent>
             </Card>
           </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <Card sx={{ height: '100%' }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h4" fontWeight="bold" color="primary.main">
@@ -154,7 +154,7 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ user, stats, isMobile, 
               </CardContent>
             </Card>
           </Grid>
-          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
             <Card sx={{ height: '100%' }}>
               <CardContent sx={{ textAlign: 'center' }}>
                 <Typography variant="h4" fontWeight="bold" color="primary.main">
@@ -179,7 +179,7 @@ const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({ router, isM
         Quick Actions
       </Typography>
       <Grid container spacing={3}>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <ActionCard onClick={() => router.push(`/collections/${userId}`)}>
             <LibraryIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" fontWeight="bold" gutterBottom>
@@ -190,7 +190,7 @@ const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({ router, isM
             </Typography>
           </ActionCard>
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <ActionCard onClick={() => router.push('/collections/edit-cards')}>
             <IsoIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" fontWeight="bold" gutterBottom>
@@ -201,7 +201,7 @@ const ActionButtonsSection: React.FC<ActionButtonsSectionProps> = ({ router, isM
             </Typography>
           </ActionCard>
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <ActionCard onClick={() => router.push('/browse')}>
             <DashboardIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" fontWeight="bold" gutterBottom>
@@ -289,7 +289,7 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
       </Typography>
       <Grid container spacing={3}>
         {stats.trophyCard && (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <TrophyCard
               onClick={() => {
                 if (!stats.trophyCard) return;
@@ -351,7 +351,7 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
         )}
 
         {stats.mostCollectedCard && (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <MostCollectedCard
               onClick={() => {
                 if (!stats.mostCollectedCard) return;
@@ -406,7 +406,7 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
         )}
 
         {stats.leastValuableMythic && (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
             <LeastValuableCard
               onClick={() => {
                 if (!stats.leastValuableMythic) return;
@@ -464,7 +464,7 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
           </Grid>
         )}
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <StatsCard>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -529,7 +529,7 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
           </StatsCard>
         </Grid>
 
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, lg: 6 }}>
           <StatsCard>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -610,7 +610,7 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
       </Typography>
       <Grid container spacing={3}>
         {stats.quickWins.closestSetByCost && (
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, lg: 6 }}>
             <QuickWinCard>
               <CardContent>
                 <Stack spacing={2}>
@@ -663,7 +663,7 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
         )}
 
         {stats.quickWins.secondClosestSetByCost && (
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, lg: 6 }}>
             <QuickWinCard>
               <CardContent>
                 <Stack spacing={2}>
@@ -744,7 +744,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
               { width: '35%', label: 'Unique Printings Collected' },
               { width: '25%', label: 'of All Magic Cards Collected' },
             ].map((item, i) => (
-              <Grid key={i} size={{ xs: 12, sm: 6, md: 3 }}>
+              <Grid key={i} size={{ xs: 12, sm: 6, lg: 3 }}>
                 <Card sx={{ height: '100%' }}>
                   <CardContent sx={{ textAlign: 'center' }}>
                     <Typography variant="h4" fontWeight="bold" color="primary.main">
@@ -766,7 +766,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
           Quick Actions
         </Typography>
         <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             <ActionCard onClick={() => router.push(`/collections/${user?.userId}`)}>
               <LibraryIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
               <Typography variant="h6" fontWeight="bold" gutterBottom>
@@ -777,7 +777,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
               </Typography>
             </ActionCard>
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             <ActionCard onClick={() => router.push('/collections/edit-cards')}>
               <IsoIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
               <Typography variant="h6" fontWeight="bold" gutterBottom>
@@ -788,7 +788,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
               </Typography>
             </ActionCard>
           </Grid>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             <ActionCard onClick={() => router.push('/browse')}>
               <DashboardIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
               <Typography variant="h6" fontWeight="bold" gutterBottom>
@@ -814,7 +814,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
           ].map((item, i) => {
             const CardComponent = item.Component;
             return (
-              <Grid key={i} size={{ xs: 12, sm: 6, md: 4 }}>
+              <Grid key={i} size={{ xs: 12, sm: 6, lg: 4 }}>
                 <CardComponent sx={{ height: '100%' }}>
                   <CardContent sx={{ p: 2 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
@@ -836,7 +836,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
               </Grid>
             );
           })}
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, lg: 6 }}>
             <StatsCard>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -848,7 +848,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
               </CardContent>
             </StatsCard>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, lg: 6 }}>
             <StatsCard>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -869,7 +869,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
         </Typography>
         <Grid container spacing={3}>
           {['Closest Set to Complete', 'Second Closest Set to Complete'].map((title, i) => (
-            <Grid key={i} size={{ xs: 12, md: 6 }}>
+            <Grid key={i} size={{ xs: 12, lg: 6 }}>
               <QuickWinCard>
                 <CardContent>
                   <Stack spacing={2}>

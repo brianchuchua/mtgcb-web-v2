@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-24',
+      version: '0.129.4',
+      changes: ['Improved layout on tablet devices for better usability'],
+    },
+    {
+      date: '2025-09-24',
       version: '0.129.3',
       changes: ['Fixed set name column width in card tables for better readability on mobile devices'],
     },

@@ -60,7 +60,9 @@ const Pagination: React.FC<PaginationProps> = ({
 }) => {
   const theme = useTheme();
   const [localCurrentPage, setLocalCurrentPage] = useState(currentPage);
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery('(max-width:899px)');
+  const isTablet = useMediaQuery('(min-width:900px) and (max-width:1199px)');
+  const isSmallScreen = isMobile || isTablet;
   const isOnBottom = position === 'bottom';
 
   useEffect(() => {
@@ -119,7 +121,72 @@ const Pagination: React.FC<PaginationProps> = ({
               </Box>
             )}
 
-            {isSmallScreen && (
+            {isTablet && (
+              <>
+                <TabletControlsRow>
+                  <PaginationControlsGroup>
+                    <NavigationControls
+                      currentPage={localCurrentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                      isLoading={isLoading}
+                      isSmallScreen={isSmallScreen}
+                    />
+
+                    <MobileInfoRow>
+                      {!isLoading && (
+                        <ItemRangeDisplay
+                          startItem={startItem}
+                          endItem={endItem}
+                          totalItems={totalItems}
+                          contentType={contentType}
+                          isSmallScreen={true}
+                          customItemName={customItemName}
+                        />
+                      )}
+                    </MobileInfoRow>
+                  </PaginationControlsGroup>
+
+                  {(!hideViewModeToggle || additionalAction) && (
+                    <TabletViewToggleGroup>
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                        {!hideViewModeToggle && (
+                          <ViewModeToggle
+                            viewMode={viewMode}
+                            onViewModeChange={onViewModeChange}
+                            isSmallScreen={false}
+                            isLoading={isLoading}
+                            isInitialLoading={isInitialLoading}
+                          />
+                        )}
+                        {additionalAction}
+                      </Stack>
+                    </TabletViewToggleGroup>
+                  )}
+
+                  <RightControlsGroup>
+                    <PageSizeControl
+                      pageSize={pageSize}
+                      onPageSizeChange={onPageSizeChange}
+                      pageSizeOptions={pageSizeOptions}
+                      viewMode={viewMode}
+                      contentType={contentType}
+                      customSettingGroups={settingGroups}
+                      subsets={subsets}
+                      onSubsetSelect={onSubsetSelect}
+                      parentSet={parentSet}
+                      currentPath={currentPath}
+                      userId={userId}
+                      goalId={goalId}
+                      customItemName={customItemName}
+                      hideSettingsPanel={hideSettingsPanel}
+                    />
+                  </RightControlsGroup>
+                </TabletControlsRow>
+              </>
+            )}
+
+            {isMobile && (
               <>
                 <MobileControlsRow>
                   <PaginationControlsGroup>
@@ -164,7 +231,7 @@ const Pagination: React.FC<PaginationProps> = ({
                     />
                   </RightControlsGroup>
                 </MobileControlsRow>
-                
+
                 {(!hideViewModeToggle || additionalAction) && (
                   <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}>
                     <Stack direction="row" spacing={0.5} alignItems="center">
@@ -201,7 +268,7 @@ const Pagination: React.FC<PaginationProps> = ({
               </ViewToggleContainer>
             )}
 
-            {isSmallScreen && !hideSearchButton && <MobileSearchButton />}
+            {isMobile && !hideSearchButton && <MobileSearchButton />}
           </CenterSection>
 
           <RightSection
@@ -477,7 +544,7 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
   hideSettingsPanel = false,
 }) => {
   const cardSettingGroups = customSettingGroups || useCardSettingGroups(viewMode);
-  const isSmallScreen = useMediaQuery('(max-width:899px)');
+  const isSmallScreen = useMediaQuery('(max-width:1199px)');
   const labelId = `${contentType}-per-page-label`;
 
   const handlePageSizeChange = useCallback(
@@ -663,7 +730,7 @@ NavigationControls.displayName = 'NavigationControls';
 const PaginationContainer = styled(Box)(({ theme }) => ({
   margin: `${theme.spacing(2)} auto`,
 
-  [theme.breakpoints.down('md')]: {
+  '@media (max-width: 1199px)': {
     width: '98%',
   },
   [theme.breakpoints.down('sm')]: {
@@ -678,7 +745,7 @@ const TopPaginationLayout = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   width: '100%',
-  [theme.breakpoints.down('md')]: {
+  '@media (max-width: 1199px)': {
     flexDirection: 'column',
     alignItems: 'center',
   },
@@ -704,7 +771,7 @@ const LeftSection = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   minWidth: '240px',
   justifyContent: 'flex-start',
-  [theme.breakpoints.down('md')]: {
+  '@media (max-width: 1199px)': {
     width: '100%',
     order: 1,
     justifyContent: 'center',
@@ -717,7 +784,7 @@ const CenterSection = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   flex: 1,
-  [theme.breakpoints.down('md')]: {
+  '@media (max-width: 1199px)': {
     width: '100%',
     order: 3,
     marginTop: theme.spacing(1),
@@ -729,7 +796,7 @@ const RightSection = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'flex-end',
   minWidth: '240px',
-  [theme.breakpoints.down('md')]: {
+  '@media (max-width: 1199px)': {
     width: '100%',
     order: 2,
     justifyContent: 'center',
@@ -750,7 +817,7 @@ const ItemRangeInfo = styled(Box)(() => ({
 const PageSizeSelector = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  [theme.breakpoints.down('md')]: {
+  '@media (max-width: 1199px)': {
     justifyContent: 'center',
   },
 }));
@@ -794,7 +861,7 @@ const ViewToggleContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   marginTop: theme.spacing(1.5),
-  [theme.breakpoints.down('md')]: {
+  '@media (max-width: 1199px)': {
     marginTop: theme.spacing(1),
   },
 }));
@@ -818,6 +885,21 @@ const RightControlsGroup = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-end',
+}));
+
+const TabletControlsRow = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  flexDirection: 'row',
+  width: '100%',
+  gap: theme.spacing(2),
+}));
+
+const TabletViewToggleGroup = styled(Box)(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  flex: '0 0 auto',
 }));
 
 export default Pagination;
