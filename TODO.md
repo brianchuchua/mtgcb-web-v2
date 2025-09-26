@@ -15,16 +15,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- If a goal is just normal printings, probably want to warn them to uncheck foil on the tcgplayer page.
-- major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
-- Audit subsets with collection goals -- data and appearance.
-
 ### Blocked/Waiting
 
 ## 🚨 Critical / Blocking Issues
 
 - Need another sql.raw audit, there's a document of the last one
-- Must backup DDLs of all databases before release, Drizzle introspect is a secondary backup -- probably store in the API repo in a reference folder, create a process
 - Important: Audit input field lengths for all API calls and make front-end enforce them too
 
 ### Migration
@@ -36,12 +31,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### mtgcb-importer
 
-- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute
+- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets
 
 ### Bugs
-
-- ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from
-- Hide duplicate printings doesn't do anything with goals -- maybe just hide it from the front-end.
 
 ### mtgcb-jobs
 
@@ -255,6 +247,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Rate limiting for API calls
 - Look into fastify multipart for uploads -- am I missing anything by not using it?
 - Audit USE_OPTIMIZED_GOAL_PROGRESS and other now-unused .env variables
+- ESLint: Failed to load config "eslint-plugin-react-compiler" to extend from during build
 
 #### Code Style
 

@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-25',
+      version: '0.132.4',
+      changes: [
+        'Hide duplicate printings option is now hidden when a collection goal is selected',
+      ],
+    },
+    {
+      date: '2025-09-25',
       version: '0.132.3',
       changes: [
         'Fixed missing TCGPlayer foil warnings for large collection goal purchases',

@@ -24,6 +24,7 @@ interface CardSearchFieldsProps {
   isCollectionPage: boolean;
   isCollectionSetPage: boolean;
   statResetTrigger?: number;
+  selectedGoalId?: number | null;
 }
 
 const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
@@ -41,6 +42,7 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
   isCollectionPage,
   isCollectionSetPage,
   statResetTrigger,
+  selectedGoalId,
 }) => {
 
   return (
@@ -59,12 +61,14 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
       <ColorSelector />
       <RaritySelector />
       {!isSetPage && <SetSelector />}
-      <ToggleSwitch
-        checked={reduxOneResultPerCardName}
-        onChange={handleOneResultPerCardNameChange}
-        name="oneResultPerCardName"
-        label="Hide duplicate printings"
-      />
+      {!selectedGoalId && (
+        <ToggleSwitch
+          checked={reduxOneResultPerCardName}
+          onChange={handleOneResultPerCardNameChange}
+          name="oneResultPerCardName"
+          label="Hide duplicate printings"
+        />
+      )}
       {isCollectionSetPage && (
         <ToggleSwitch
           checked={reduxIncludeSubsetsInSet}

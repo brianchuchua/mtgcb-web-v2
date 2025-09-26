@@ -16,6 +16,7 @@ import {
   selectIncludeSubsetsInSets,
   selectOneResultPerCardName,
   selectOracleText,
+  selectSelectedGoalId,
   selectSetCode,
   selectSetSearchName,
   selectShowSubsets,
@@ -53,6 +54,7 @@ const BrowseSearchForm: React.FC = () => {
   const reduxIncludeSubsetsInSet = useSelector(selectIncludeSubsetsInSets);
   const reduxSortBy = useSelector(selectSortBy) || 'releasedAt';
   const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
+  const selectedGoalId = useSelector(selectSelectedGoalId);
 
   const { pathname, isSetPage, isCollectionPage, isCollectionSetPage, userId } = useBrowseUrlContext();
 
@@ -182,6 +184,7 @@ const BrowseSearchForm: React.FC = () => {
               isCollectionPage={isCollectionPage}
               isCollectionSetPage={isCollectionSetPage}
               statResetTrigger={statResetTrigger}
+              selectedGoalId={selectedGoalId}
             />
           ) : (
             <SetSearchFields
