@@ -15,7 +15,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- Pretty significant bug: http://local.mtgcb.com:3000/collections/1337/marvels-spider-man?oneResultPerCardName=true&goalId=68
+- repeat all current load tests
 - If a goal is just normal printings, probably want to warn them to uncheck foil on the tcgplayer page.
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
 - Audit subsets with collection goals -- data and appearance.

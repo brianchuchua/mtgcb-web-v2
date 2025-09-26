@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-25',
+      version: '0.132.1',
+      changes: [
+        'Fixed how some goals count progress toward completion for better accuracy',
+      ],
+    },
+    {
+      date: '2025-09-25',
       version: '0.132.0',
       changes: [
         'Added purchase buttons to individual set pages for easy buying of missing cards or complete sets',
