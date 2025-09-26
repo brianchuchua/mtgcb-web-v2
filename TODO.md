@@ -15,7 +15,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- repeat all current load tests
 - If a goal is just normal printings, probably want to warn them to uncheck foil on the tcgplayer page.
 - major data issue: audit show subsets and subset data, probably need to check parentSetId that aren't assigned yet -- i think there's subset technical debt with the data
 - Audit subsets with collection goals -- data and appearance.
@@ -283,7 +282,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Audit API response times and database response times (visible in Sentry)
 - Audit Lighthouse performance, with an eye on layout shift
 - Consider GIN indexes for additional fields
-- More load testing
+- More load testing, standardize a specific account with specific goals
 - More index audits, organized analysis per API call / DB query
 - Consider moving more read operations to the follower database
 

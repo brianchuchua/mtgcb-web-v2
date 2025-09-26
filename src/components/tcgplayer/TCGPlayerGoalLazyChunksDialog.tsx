@@ -96,6 +96,7 @@ const TCGPlayerGoalLazyChunksDialog: React.FC<TCGPlayerGoalLazyChunksDialogProps
   const totalChunks = Math.ceil(totalCount / CHUNK_SIZE);
   const needsSplitByFinish = hasRegularNeeds && hasFoilNeeds;
 
+
   // Initialize chunk states
   const initializeChunks = useCallback(() => {
     const chunks: Record<string, ChunkState> = {};
@@ -316,10 +317,28 @@ const TCGPlayerGoalLazyChunksDialog: React.FC<TCGPlayerGoalLazyChunksDialogProps
 
         <StyledDialogContent>
           <InfoBox>
-            <Typography variant="body2" color="textSecondary">
+            <Typography variant="body2" color="textSecondary" paragraph>
               We've split your {totalCount.toLocaleString()} cards into {totalChunks} manageable chunks.
               Click each chunk to open it in TCGPlayer.
             </Typography>
+            {hasFoilNeeds && !hasRegularNeeds && (
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                <strong>Important:</strong>{' '}
+                <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
+                  These are foil cards. After importing each batch, under "Item Options"
+                  in TCGPlayer, make sure only "Foil" is checked.
+                </Box>
+              </Typography>
+            )}
+            {hasRegularNeeds && !hasFoilNeeds && (
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                <strong>Important:</strong>{' '}
+                <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
+                  These are normal (non-foil) cards. After importing each batch, under "Item Options"
+                  in TCGPlayer, make sure "Foil" is unchecked.
+                </Box>
+              </Typography>
+            )}
           </InfoBox>
 
           <Stack spacing={1}>
@@ -421,8 +440,9 @@ const TCGPlayerGoalLazyChunksDialog: React.FC<TCGPlayerGoalLazyChunksDialogProps
           <Typography variant="body2">
             <strong>Important:</strong>{' '}
             <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
-              For foil cards, after importing, under "Item Options" in TCGPlayer,
-              make sure only "Foil" is checked.
+              After importing, check the correct finish under "Item Options" in TCGPlayer:
+              For foil cards, make sure only "Foil" is checked.
+              For normal cards, make sure "Foil" is unchecked.
             </Box>
           </Typography>
         </InfoBox>

@@ -13,6 +13,7 @@ interface TCGPlayerMassImportChunksDialogProps {
   cards: CardWithQuantity[];
   chunkSize?: number;
   isFoilOnly?: boolean;
+  isNormalOnly?: boolean;
 }
 
 const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
@@ -39,6 +40,7 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
   cards,
   chunkSize = 500,
   isFoilOnly = false,
+  isNormalOnly = false,
 }) => {
   const { submitToTCGPlayer } = useTCGPlayer();
   const [submittedChunks, setSubmittedChunks] = useState<Set<number>>(new Set());
@@ -103,6 +105,15 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
               <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
                 These are foil cards. After importing each batch, under "Item Options"
                 in TCGPlayer, choose "Foil" for the printing.
+              </Box>
+            </Typography>
+          )}
+          {isNormalOnly && (
+            <Typography variant="body2" sx={{ mt: 2 }}>
+              <strong>Important:</strong>{' '}
+              <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
+                These are normal (non-foil) cards. After importing each batch, under "Item Options"
+                in TCGPlayer, make sure "Foil" is unchecked.
               </Box>
             </Typography>
           )}
@@ -173,6 +184,21 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
             }}
           >
             Don't forget: Under "Item Options" in TCGPlayer, choose "Foil" for the printing.
+          </Typography>
+        )}
+        {isNormalOnly && (
+          <Typography
+            variant="caption"
+            sx={{
+              display: 'block',
+              textAlign: 'center',
+              mt: 2,
+              fontStyle: 'italic',
+              color: 'warning.main',
+              fontWeight: 'medium',
+            }}
+          >
+            Don't forget: Under "Item Options" in TCGPlayer, make sure "Foil" is unchecked for normal cards.
           </Typography>
         )}
       </StyledDialogContent>

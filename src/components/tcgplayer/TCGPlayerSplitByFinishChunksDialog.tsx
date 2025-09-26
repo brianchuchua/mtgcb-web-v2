@@ -117,8 +117,9 @@ const TCGPlayerSplitByFinishChunksDialog: React.FC<TCGPlayerSplitByFinishChunksD
           <Typography variant="body2">
             <strong>Important:</strong>{' '}
             <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
-              After importing the foil cards into TCGPlayer, you must mark them as foils.
-              Under "Item Options" in TCGPlayer, make sure only "Foil" is checked.
+              After importing, check the correct finish under "Item Options" in TCGPlayer:
+              For foil cards, make sure only "Foil" is checked.
+              For normal cards, make sure "Foil" is unchecked.
             </Box>
           </Typography>
         </InfoBox>

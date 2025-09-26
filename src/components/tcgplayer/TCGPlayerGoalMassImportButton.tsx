@@ -14,6 +14,7 @@ import TCGPlayerMassImportChunksDialog from './TCGPlayerMassImportChunksDialog';
 import TCGPlayerSplitByFinishDialog from './TCGPlayerSplitByFinishDialog';
 import TCGPlayerSplitByFinishChunksDialog from './TCGPlayerSplitByFinishChunksDialog';
 import TCGPlayerFoilOnlyDialog from './TCGPlayerFoilOnlyDialog';
+import TCGPlayerNormalOnlyDialog from './TCGPlayerNormalOnlyDialog';
 import TCGPlayerGoalLazyChunksDialog from './TCGPlayerGoalLazyChunksDialog';
 
 interface TCGPlayerGoalMassImportButtonProps extends Omit<ButtonProps, 'onClick'> {
@@ -37,12 +38,15 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
   const [isLoading, setIsLoading] = useState(false);
   const [showChunksDialog, setShowChunksDialog] = useState(false);
   const [cardsForChunking, setCardsForChunking] = useState<CardWithQuantity[]>([]);
+  const [isNormalOnlyChunks, setIsNormalOnlyChunks] = useState(false);
   const [showSplitByFinishDialog, setShowSplitByFinishDialog] = useState(false);
   const [showSplitByFinishChunksDialog, setShowSplitByFinishChunksDialog] = useState(false);
   const [regularCardsForSplit, setRegularCardsForSplit] = useState<CardWithQuantity[]>([]);
   const [foilCardsForSplit, setFoilCardsForSplit] = useState<CardWithQuantity[]>([]);
   const [showFoilOnlyDialog, setShowFoilOnlyDialog] = useState(false);
   const [isFoilOnlyImport, setIsFoilOnlyImport] = useState(false);
+  const [showNormalOnlyDialog, setShowNormalOnlyDialog] = useState(false);
+  const [normalCardsForDialog, setNormalCardsForDialog] = useState<CardWithQuantity[]>([]);
   const [showLazyChunksDialog, setShowLazyChunksDialog] = useState(false);
   const [lazyChunksConfig, setLazyChunksConfig] = useState<{
     initialCards: CardWithQuantity[];
@@ -259,7 +263,8 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
       // If we have both regular and foil needs, we need to split them
       const needsSplitByFinish = hasRegularNeeds && hasFoilNeeds;
       const isFoilOnly = hasFoilNeeds && !hasRegularNeeds;
-      
+      const isNormalOnly = hasRegularNeeds && !hasFoilNeeds;
+
       // Combine all cards if we're not splitting by finish
       if (!needsSplitByFinish) {
         cardsNeededForGoal.push(...regularCardsNeeded, ...foilCardsNeeded);
@@ -328,13 +333,26 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
             setFoilCardsForSplit(cardsNeededForGoal);
             setShowFoilOnlyDialog(true);
           }
-        } else {
-          // Regular cards only or "any" type cards
+        } else if (isNormalOnly) {
+          // Normal-only import
           if (cardsNeededForGoal.length > 500) {
+            // For large normal-only orders, use chunks dialog with normal flag
             setCardsForChunking(cardsNeededForGoal);
+            setIsNormalOnlyChunks(true);
             setShowChunksDialog(true);
           } else {
-            // Submit immediately for 500 or fewer cards
+            // For small normal-only orders, show the normal reminder dialog
+            setNormalCardsForDialog(cardsNeededForGoal);
+            setShowNormalOnlyDialog(true);
+          }
+        } else {
+          // "Any" type cards (goalAllNeeded) - no warning needed since any printing is fine
+          if (cardsNeededForGoal.length > 500) {
+            setCardsForChunking(cardsNeededForGoal);
+            setIsNormalOnlyChunks(false); // No warning for "any" type
+            setShowChunksDialog(true);
+          } else {
+            // Submit immediately for 500 or fewer "any" cards - no warning needed
             const importString = formatMassImportString(cardsNeededForGoal, 1, false);
             const formTarget = getFormTarget();
             submitToTCGPlayer(importString, formTarget);
@@ -370,9 +388,11 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
         onClose={() => {
           setShowChunksDialog(false);
           setIsFoilOnlyImport(false);
+          setIsNormalOnlyChunks(false);
         }}
         cards={cardsForChunking}
         isFoilOnly={isFoilOnlyImport}
+        isNormalOnly={isNormalOnlyChunks}
       />
       
       <TCGPlayerSplitByFinishDialog
@@ -393,6 +413,12 @@ const TCGPlayerGoalMassImportButton: React.FC<TCGPlayerGoalMassImportButtonProps
         open={showFoilOnlyDialog}
         onClose={() => setShowFoilOnlyDialog(false)}
         foilCards={foilCardsForSplit}
+      />
+
+      <TCGPlayerNormalOnlyDialog
+        open={showNormalOnlyDialog}
+        onClose={() => setShowNormalOnlyDialog(false)}
+        normalCards={normalCardsForDialog}
       />
 
       {lazyChunksConfig && (

@@ -94,6 +94,7 @@ const TCGPlayerSplitByFinishDialog: React.FC<TCGPlayerSplitByFinishDialogProps> 
             Click the appropriate button below to import each type of card.{' '}
             <Box component="span" sx={{ color: 'warning.main', fontWeight: 'medium' }}>
               For foil cards, after importing, under "Item Options" in TCGPlayer, make sure only "Foil" is checked.
+              For normal cards, make sure "Foil" is unchecked.
             </Box>
           </Typography>
         </InfoBox>
@@ -140,7 +141,7 @@ const TCGPlayerSplitByFinishDialog: React.FC<TCGPlayerSplitByFinishDialogProps> 
             fontWeight: 'medium',
           }}
         >
-          Important: For foil cards, under "Item Options" in TCGPlayer, choose only "Foil" for the printing.
+          Important: For foil cards, check "Foil" in TCGPlayer. For normal cards, uncheck "Foil".
         </Typography>
       </StyledDialogContent>
 

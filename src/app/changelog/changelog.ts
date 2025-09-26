@@ -12,6 +12,20 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-25',
+      version: '0.132.3',
+      changes: [
+        'Fixed missing TCGPlayer foil warnings for large collection goal purchases',
+      ],
+    },
+    {
+      date: '2025-09-25',
+      version: '0.132.2',
+      changes: [
+        'Added reminders to uncheck the foil option on TCGPlayer when bulk buying normal cards for collection goals',
+      ],
+    },
+    {
+      date: '2025-09-25',
       version: '0.132.1',
       changes: [
         'Fixed how some goals count progress toward completion for better accuracy',
