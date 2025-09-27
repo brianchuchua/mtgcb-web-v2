@@ -196,7 +196,7 @@ export const JumpToSetsMenu = () => {
       </Tooltip>
 
       <Popper open={open} anchorEl={anchorRef.current} placement="bottom-end" style={{ zIndex: 1300 }} disablePortal>
-        <Paper sx={{ width: 300, mt: 1.5 }}>
+        <Paper elevation={1} sx={{ width: 300, mt: 1.5, border: 1, borderColor: 'divider' }}>
           <Box sx={{ p: 2 }}>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
               Jump to Set
@@ -235,6 +235,7 @@ export const JumpToSetsMenu = () => {
                 <SetOption key={option.id} option={option} state={{ ...props, ...state }} />
               )}
               noOptionsText={inputValue.length === 0 ? 'Type to search...' : 'No sets found'}
+              PaperComponent={(props) => <Paper {...props} elevation={1} sx={{ border: 1, borderColor: 'divider' }} />}
               sx={{
                 '& .MuiAutocomplete-listbox': {
                   maxHeight: 400,
