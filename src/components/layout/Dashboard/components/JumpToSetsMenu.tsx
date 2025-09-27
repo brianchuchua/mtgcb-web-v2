@@ -16,7 +16,7 @@ import {
   Typography,
   createFilterOptions,
 } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import { useAuth } from '@/hooks/useAuth';
@@ -56,6 +56,7 @@ SetOption.displayName = 'SetOption';
 
 export const JumpToSetsMenu = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [selectedSet, setSelectedSet] = useState<Set | null>(null);
@@ -119,6 +120,12 @@ export const JumpToSetsMenu = () => {
 
   const hasMoreResults = filteredSets.length > resultLimit;
 
+  // Extract userId from collection paths
+  const getUserIdFromPath = useCallback((): string | null => {
+    const match = pathname.match(/\/collections\/([^/]+)/);
+    return match ? match[1] : null;
+  }, [pathname]);
+
   const handleToggle = useCallback(() => {
     setOpen((prev) => !prev);
     if (!open) {
@@ -138,12 +145,16 @@ export const JumpToSetsMenu = () => {
     (_event: any, value: Set | null) => {
       if (value) {
         let targetUrl: string;
+        const collectionUserId = getUserIdFromPath();
 
-        if (isAuthenticated && user?.userId) {
-          // Always navigate to user's collection if logged in
+        if (collectionUserId) {
+          // If on a collection page, jump to that collection's set
+          targetUrl = `/collections/${collectionUserId}/${value.slug}`;
+        } else if (isAuthenticated && user?.userId) {
+          // If logged in but not on a collection page, jump to own collection
           targetUrl = `/collections/${user.userId}/${value.slug}`;
         } else {
-          // Navigate to browse if not logged in
+          // If not logged in and not on a collection page, jump to browse
           targetUrl = `/browse/sets/${value.slug}`;
         }
 
@@ -151,7 +162,7 @@ export const JumpToSetsMenu = () => {
         handleClose();
       }
     },
-    [isAuthenticated, user, router, handleClose],
+    [isAuthenticated, user, router, handleClose, getUserIdFromPath],
   );
 
   const getOptionLabel = useCallback((option: Set) => {

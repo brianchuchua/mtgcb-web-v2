@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-27',
+      version: '0.133.2',
+      changes: [
+        'Fixed Jump to Set navigation to respect current collection context',
+      ],
+    },
+    {
+      date: '2025-09-27',
       version: '0.133.1',
       changes: [
         'Fixed styling and visual appearance of Jump to Set dropdown menu',
