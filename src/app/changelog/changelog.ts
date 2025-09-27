@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-27',
+      version: '0.133.0',
+      changes: [
+        'Added "Jump to Set" quick navigation in header for fast access to any set',
+      ],
+    },
+    {
       date: '2025-09-25',
       version: '0.132.4',
       changes: [

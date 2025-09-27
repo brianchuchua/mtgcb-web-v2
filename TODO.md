@@ -15,6 +15,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
+- Patron request: support for reserve list cards (include or exclude them in searches and goals)
+
 ### Blocked/Waiting
 
 ## 🚨 Critical / Blocking Issues
@@ -33,17 +35,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets
 
-### Bugs
-
 ### mtgcb-jobs
 
 - Enable jobs on restart and make them resilient to heroku dyno restarts - database table to track progress of jobs?
 
-### Data Issues
-
 ### Performance Issues
-
-- Look into re-rendering when editing quantities in table view -- seems like a lot of re-renders, test on mobile
 
 ## 📋 Pre-Release Required
 
@@ -101,8 +97,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - In-code TODO audit
 
-### Data Cleanup
-
 ## 🚀 Release Checklist
 
 ### Migration Steps
@@ -139,7 +133,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 #### MTG CB Collector Number
 
-- Clean up MTG CB collector number -- it's really just a card release date order / wubrg / alphabetical (for tokens) tiebreaker in many contexts. Its intent is to help sorting in a binder where a collector number is not available or unhelpful, especially for subset groups, like sorting every FNM promo that ever existed in order of release date. Also add this number to the FAQ.
+- Clean up MTG CB collector number -- it's really just a card release date order / wubrg / alphabetical (for tokens) tiebreaker in many contexts. Its intent is to help sorting in a binder where a collector number is not available or unhelpful, especially for subset groups, like sorting every FNM promo that ever existed in order of release date. Also add this number to the FAQ. Make collector number canonically what was printed (or not printed) on the card if I can. Scryfall may muddy this data.
 
 #### Old Images Update
 
@@ -401,6 +395,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ## 📝 Reference
 
 ### Architectural Decisions
+
+- Staying on standard-0 postgres in Heroku for now, upgrading to standard-2 made no performance difference.
 
 ### Known Limitations
 
