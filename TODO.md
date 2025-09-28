@@ -15,7 +15,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- I don't like the image flickering when using the jump to set from one set to another.
+- home page i want no borders by the purple background
 - Patron request: support for reserve list cards (include or exclude them in searches and goals)
 - I maybe should do Redis still
 

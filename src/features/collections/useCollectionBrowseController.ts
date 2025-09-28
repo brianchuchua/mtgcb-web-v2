@@ -8,6 +8,7 @@ import { selectViewContentType, selectSets, selectSelectedGoalId } from '@/redux
 interface UseCollectionBrowseControllerProps {
   userId: number;
   isSetSpecificPage?: boolean; // True when on /collections/[userId]/[setSlug]
+  skipCardsUntilReady?: boolean; // Skip fetching cards until ready
 }
 
 export interface CollectionBrowseController extends BrowseControllerResult {
@@ -17,6 +18,7 @@ export interface CollectionBrowseController extends BrowseControllerResult {
 export const useCollectionBrowseController = ({
   userId,
   isSetSpecificPage = false,
+  skipCardsUntilReady = false,
 }: UseCollectionBrowseControllerProps): CollectionBrowseController => {
   const reduxView = useSelector(selectViewContentType);
   // On set-specific pages, always use 'cards' view
@@ -34,13 +36,13 @@ export const useCollectionBrowseController = ({
   // Use collection-specific display settings
   const collectionDisplaySettings = useCollectionDisplaySettings({ viewMode, view: currentView });
   
-  const browseController = useBrowseController({ 
+  const browseController = useBrowseController({
     skipCostToComplete: true,
     userId,
     // Only wait for set filter on set-specific pages when viewing cards
     waitForSetFilter: isSetSpecificPage && currentView === 'cards',
-    // Skip until goalId is synced from URL
-    skipCardsUntilReady: isWaitingForGoalSync && currentView === 'cards',
+    // Skip until goalId is synced from URL or until set is ready
+    skipCardsUntilReady: (isWaitingForGoalSync && currentView === 'cards') || skipCardsUntilReady,
     waitForInitialLoad: isWaitingForGoalSync
   });
 

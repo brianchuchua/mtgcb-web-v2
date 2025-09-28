@@ -60,11 +60,17 @@ interface CollectionSetClientProps {
 export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId, setSlug }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
+  const [isSetReady, setIsSetReady] = useState(false);
 
   // Sync goalId from URL to Redux on mount
   useInitialUrlSync({ syncView: false, syncGoalId: true });
 
-  const browseController = useCollectionBrowseController({ userId, isSetSpecificPage: true });
+  const browseController = useCollectionBrowseController({
+    userId,
+    isSetSpecificPage: true,
+    // Skip cards until we have the correct set filter applied
+    skipCardsUntilReady: !isSetReady
+  });
   const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
   const setPriceType = useSetPriceType();
@@ -148,6 +154,19 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     set?.percentageCollected || 0
   );
 
+  // Clear filter immediately when setSlug changes
+  useEffect(() => {
+    setIsSetReady(false);
+    dispatch(setSets({ include: [], exclude: [] }));
+  }, [setSlug, dispatch]);
+
+  // Clean up filter when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(setSets({ include: [], exclude: [] }));
+    };
+  }, [dispatch]);
+
   useEffect(() => {
     // Always set view to cards for this page
     dispatch(setViewContentType('cards'));
@@ -161,6 +180,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       };
 
       dispatch(setSets(setFilter));
+      // Mark that we have the correct filter now
+      setIsSetReady(true);
     }
   }, [dispatch, setsData, isSuccess, setSlug]);
 

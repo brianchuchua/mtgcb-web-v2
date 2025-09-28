@@ -1,6 +1,6 @@
 {
   "name": "mtgcb-web-v2",
-  "version": "0.133.2",
+  "version": "0.133.3",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
