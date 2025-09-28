@@ -128,6 +128,13 @@ export function formatSearchCriteria(
     attributeParts.push(`by artist "${conditions.artist}"`);
   }
 
+  // Reserved List
+  if (conditions.isReserved === true) {
+    attributeParts.push(`(Reserved List only)`);
+  } else if (conditions.isReserved === false) {
+    attributeParts.push(`(excluding Reserved List)`);
+  }
+
   // Sets - handle separately to place at the end (skip if on a set page for search descriptions)
   let setsPart = '';
   let setsExcludePart = '';

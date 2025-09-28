@@ -152,6 +152,7 @@ export interface CardApiParams {
   includeChildLocations?: boolean;
   includeLocations?: boolean;
   includeBadDataOnly?: boolean;
+  isReserved?: boolean;
 }
 
 export interface SetApiParams {

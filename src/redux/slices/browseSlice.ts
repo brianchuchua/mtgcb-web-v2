@@ -188,6 +188,14 @@ export const browseSlice = createSlice({
         state.cardsSearchParams.includeBadDataOnly = action.payload;
       }
     },
+    setIsReserved: (state, action: PayloadAction<boolean | undefined>) => {
+      // Cards-specific field
+      if (action.payload === undefined) {
+        delete state.cardsSearchParams.isReserved;
+      } else {
+        state.cardsSearchParams.isReserved = action.payload;
+      }
+    },
     setSortBy: (state, action: PayloadAction<SortByOption>) => {
       // Apply to current view type
       const searchParams = state.viewContentType === 'cards' ? state.cardsSearchParams : state.setsSearchParams;
@@ -500,6 +508,7 @@ export const {
   setCompletionStatus,
   setOneResultPerCardName,
   setIncludeBadDataOnly,
+  setIsReserved,
   setSortBy,
   setSortOrder,
   setPagination,
@@ -558,6 +567,7 @@ export const selectSets = (state: RootState) => state.browse.cardsSearchParams.s
 export const selectStats = (state: RootState) => state.browse.cardsSearchParams.stats;
 export const selectOneResultPerCardName = (state: RootState) => state.browse.cardsSearchParams.oneResultPerCardName;
 export const selectIncludeBadDataOnly = (state: RootState) => state.browse.cardsSearchParams.includeBadDataOnly;
+export const selectIsReserved = (state: RootState) => state.browse.cardsSearchParams.isReserved;
 export const selectCardSortBy = (state: RootState) => state.browse.cardsSearchParams.sortBy;
 export const selectCardSortOrder = (state: RootState) => state.browse.cardsSearchParams.sortOrder;
 export const selectCardCurrentPage = (state: RootState) => state.browse.cardsSearchParams.currentPage || 1;

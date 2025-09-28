@@ -8,6 +8,7 @@ import { useDashboardContext } from '@/components/layout/Dashboard/context/Dashb
 import GoalCompletionSelector from '@/features/browse/GoalCompletionSelector';
 import GoalSelector from '@/features/browse/GoalSelector';
 import LocationSelector from '@/features/browse/LocationSelector';
+import AdvancedFilters from '@/features/browse/AdvancedFilters';
 import { useViewModeToggle } from '@/hooks/useViewModeToggle';
 import {
   resetSearch,
@@ -207,6 +208,8 @@ const BrowseSearchForm: React.FC = () => {
             onSortOrderChange={handleSortOrderChange}
             sortOptions={getSortOptions()}
           />
+
+          {contentType === 'cards' && <AdvancedFilters resetTrigger={statResetTrigger} />}
         </Stack>
       </Form>
     </FormWrapper>

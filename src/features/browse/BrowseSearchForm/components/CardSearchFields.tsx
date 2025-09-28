@@ -8,6 +8,7 @@ import RaritySelector from '@/features/browse/RaritySelector';
 import SetSelector from '@/features/browse/SetSelector';
 import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
+import AdvancedFilters from '@/features/browse/AdvancedFilters';
 
 interface CardSearchFieldsProps {
   localCardName: string;

@@ -12,45 +12,38 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-27',
+      version: '0.134.0',
+      changes: ['Reserved List cards can now be included or excluded in goals and searches'],
+    },
+    {
+      date: '2025-09-27',
       version: '0.133.3',
-      changes: [
-        'Fixed cards from previous set briefly appearing when navigating between collection sets',
-      ],
+      changes: ['Fixed cards from previous set briefly appearing when navigating between collection sets'],
     },
     {
       date: '2025-09-27',
       version: '0.133.2',
-      changes: [
-        'Fixed Jump to Set navigation to respect current collection context',
-      ],
+      changes: ['Fixed Jump to Set navigation to respect current collection context'],
     },
     {
       date: '2025-09-27',
       version: '0.133.1',
-      changes: [
-        'Fixed styling and visual appearance of Jump to Set dropdown menu',
-      ],
+      changes: ['Fixed styling and visual appearance of Jump to Set dropdown menu'],
     },
     {
       date: '2025-09-27',
       version: '0.133.0',
-      changes: [
-        'Added "Jump to Set" quick navigation in header for fast access to any set',
-      ],
+      changes: ['Added "Jump to Set" quick navigation in header for fast access to any set'],
     },
     {
       date: '2025-09-25',
       version: '0.132.4',
-      changes: [
-        'Hide duplicate printings option is now hidden when a collection goal is selected',
-      ],
+      changes: ['Hide duplicate printings option is now hidden when a collection goal is selected'],
     },
     {
       date: '2025-09-25',
       version: '0.132.3',
-      changes: [
-        'Fixed missing TCGPlayer foil warnings for large collection goal purchases',
-      ],
+      changes: ['Fixed missing TCGPlayer foil warnings for large collection goal purchases'],
     },
     {
       date: '2025-09-25',
@@ -62,23 +55,17 @@ const changelogData: ChangelogData = {
     {
       date: '2025-09-25',
       version: '0.132.1',
-      changes: [
-        'Fixed how some goals count progress toward completion for better accuracy',
-      ],
+      changes: ['Fixed how some goals count progress toward completion for better accuracy'],
     },
     {
       date: '2025-09-25',
       version: '0.132.0',
-      changes: [
-        'Added purchase buttons to individual set pages for easy buying of missing cards or complete sets',
-      ],
+      changes: ['Added purchase buttons to individual set pages for easy buying of missing cards or complete sets'],
     },
     {
       date: '2025-09-25',
       version: '0.131.1',
-      changes: [
-        'Fixed spacing above bottom pagination on mobile browse and collection pages',
-      ],
+      changes: ['Fixed spacing above bottom pagination on mobile browse and collection pages'],
     },
     {
       date: '2025-09-25',
@@ -90,9 +77,7 @@ const changelogData: ChangelogData = {
     {
       date: '2025-09-25',
       version: '0.130.3',
-      changes: [
-        'Updated set purchase button text for better clarity',
-      ],
+      changes: ['Updated set purchase button text for better clarity'],
     },
     {
       date: '2025-09-25',
@@ -105,9 +90,7 @@ const changelogData: ChangelogData = {
     {
       date: '2025-09-25',
       version: '0.130.1',
-      changes: [
-        'Fixed spacing between sets grid and pagination controls for better visual consistency',
-      ],
+      changes: ['Fixed spacing between sets grid and pagination controls for better visual consistency'],
     },
     {
       date: '2025-09-25',

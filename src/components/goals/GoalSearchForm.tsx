@@ -150,6 +150,9 @@ export function GoalSearchForm({
   // Card filter state
   const [cardFilter, setCardFilter] = useState<CardFilter>({ include: [], exclude: [] });
 
+  // Reserved list state
+  const [isReserved, setIsReserved] = useState<boolean | undefined>(searchConditions.isReserved);
+
   // Fetch data for dropdowns
   const { data: cardTypesData } = useGetCardTypesQuery();
   const { data: setTypesData } = useGetSetTypesQuery();
@@ -357,6 +360,11 @@ export function GoalSearchForm({
     }
   }, [isInitialized, searchConditions.setCategory]);
 
+  // Update isReserved when searchConditions changes
+  useEffect(() => {
+    setIsReserved(searchConditions.isReserved);
+  }, [searchConditions.isReserved]);
+
   // Parse initial stat conditions (only once)
   useEffect(() => {
     if (!isInitialized) {
@@ -536,6 +544,11 @@ export function GoalSearchForm({
       }
     }
 
+    // Add isReserved filter if specified
+    if (isReserved !== undefined) {
+      conditions.isReserved = isReserved;
+    }
+
     return conditions;
   }, [
     name,
@@ -549,6 +562,7 @@ export function GoalSearchForm({
     selectedSetCategories,
     statConditions,
     cardFilter,
+    isReserved,
   ]);
 
   // Initialize color state when searchConditions change (only once)
@@ -830,6 +844,54 @@ export function GoalSearchForm({
         label="Specific Cards (to include or exclude)"
         placeholder="Search for cards to include or exclude"
       />
+
+      {/* Reserved List Filter */}
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+          <Typography variant="subtitle2">Reserved List</Typography>
+          <Tooltip
+            title={
+              <Box>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  The Reserved List is a set of cards that will never be reprinted by Wizards of the Coast.
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 0.5 }}>
+                  • <strong>Include all cards:</strong> No filter applied, show all cards regardless of Reserved List
+                  status
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 0.5 }}>
+                  • <strong>Reserved List only:</strong> Show only cards that are on the Reserved List
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>Exclude Reserved List:</strong> Hide all Reserved List cards from results
+                </Typography>
+              </Box>
+            }
+            placement="left"
+            arrow
+          >
+            <IconButton size="small" sx={{ padding: 0.5 }}>
+              <InfoOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        <ToggleButtonGroup
+          value={isReserved === undefined ? 'all' : isReserved ? 'reserved' : 'exclude'}
+          exclusive
+          onChange={(_, value) => {
+            if (value !== null) {
+              setIsReserved(value === 'all' ? undefined : value === 'reserved' ? true : false);
+            }
+          }}
+          fullWidth
+          size="small"
+        >
+          <ToggleButton value="all">Include all cards</ToggleButton>
+          <ToggleButton value="reserved">Reserved List only</ToggleButton>
+          <ToggleButton value="exclude">Exclude Reserved List</ToggleButton>
+        </ToggleButtonGroup>
+      </Paper>
 
       {/* Printing Options */}
       <Paper variant="outlined" sx={{ p: 2 }}>

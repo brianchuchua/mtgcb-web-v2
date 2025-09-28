@@ -52,6 +52,11 @@ export const buildApiParamsFromSearchParams = (
       apiParams.includeBadDataOnly = searchParams.includeBadDataOnly;
     }
 
+    // Add isReserved parameter
+    if (searchParams.isReserved !== undefined) {
+      apiParams.isReserved = searchParams.isReserved;
+    }
+
     // Add color filtering
     if (searchParams.colors) {
       if (searchParams.colors.includeColorless) {

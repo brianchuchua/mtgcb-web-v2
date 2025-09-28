@@ -94,6 +94,7 @@ export interface BrowseSearchParams {
   selectedLocationId?: number | null;
   includeChildLocations?: boolean;
   includeBadDataOnly?: boolean;
+  isReserved?: boolean;
 }
 
 export interface BrowsePagination {
