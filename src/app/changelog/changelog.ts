@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-28',
+      version: '0.135.0',
+      changes: ['Added ability to mass edit card locations from search results'],
+    },
+    {
       date: '2025-09-27',
       version: '0.134.1',
       changes: [

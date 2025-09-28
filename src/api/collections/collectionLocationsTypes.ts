@@ -59,3 +59,30 @@ export interface LocationCard {
   foilPrice: number;
   imageUrl: string;
 }
+
+export interface MassUpdateLocationRequest {
+  mode: 'set' | 'increment' | 'remove';
+  cardIds: number[];
+  locationId?: number;
+  quantityReg?: number;
+  quantityFoil?: number;
+}
+
+export interface MassUpdateLocationResponse {
+  processed: number;
+  successful: number;
+  failed: number;
+  operations: {
+    created: number;
+    updated: number;
+    removed: number;
+  };
+  errors?: Array<{
+    cardId: number;
+    reason: string;
+  }>;
+  warnings?: Array<{
+    cardId: number;
+    message: string;
+  }>;
+}

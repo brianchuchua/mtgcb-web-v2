@@ -17,11 +17,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 #### Card Location Mass Updates
 
-- I've considered these before, but per-search and per-set mass updates of card locations doesn't really make sense. Maybe just a selection mode with checkboxes and then a bulk edit action?
-
-  - I'm going to support this for the current search, with the ability to select/deselect specific items. Probably integrates into the existing mass update, will need to ask api how the current one works and copy the pattern. Or make an interface that paginates through the 500 card chunks.
-
-- oh, add not legal in any format filter if it's easy
+- Need to add selection/deselection.
+- Need to add to set pages.
 
 ### Blocked/Waiting
 
@@ -66,7 +63,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Data Improvements
 
-- Audit isDraftable field for sets
+- Audit isDraftable field for sets (probably just normal sets where isDraftable is false)
 
 ### Sonarcube
 
@@ -299,7 +296,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 #### Deck Building / Completion
 
-- Almost added a slim version of this before release, but basic deck completion didn't feel like enough, and there's a tie-in to format legality too. This feature should probably be bigger that I originally thought.
+- Almost added a slim version of this before release, but basic deck completion didn't feel like enough, and there's a tie-in to format legality too. This feature should probably be bigger that I originally thought. Keep in mind cards that have non-standard backs, like collector's edition, but may be still legal in commander, and bans too, how to update this.
 
 #### Saved Searches
 

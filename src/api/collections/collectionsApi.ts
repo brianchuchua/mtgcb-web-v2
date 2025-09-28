@@ -11,6 +11,8 @@ import {
   CardLocationAssociation,
   CardLocationsResponse,
   LocationCardsResponse,
+  MassUpdateLocationRequest,
+  MassUpdateLocationResponse,
 } from './collectionLocationsTypes';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
@@ -265,7 +267,34 @@ const collectionsApi = mtgcbApi.injectEndpoints({
       }),
       providesTags: (_result, _error, { locationId }) => [{ type: 'Location', id: locationId }],
     }),
-    
+
+    massUpdateLocations: builder.mutation<ApiResponse<MassUpdateLocationResponse>, MassUpdateLocationRequest>({
+      query: (body) => ({
+        url: '/collection/locations/mass-update',
+        method: 'POST',
+        body,
+      }),
+      async onQueryStarted(arg, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            if (userId) {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Location',
+                  { type: 'Cards', id: `user-${userId}` },
+                ]),
+              );
+            }
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
+    }),
+
     nukeCollection: builder.mutation<ApiResponse<{ userId: number; deletedCount: number; message: string }>, void>({
       query: () => ({
         url: '/collection/nuke',
@@ -309,6 +338,7 @@ export const {
   useGetCardLocationsQuery,
   useLazyGetCardLocationsQuery,
   useGetLocationCardsQuery,
+  useMassUpdateLocationsMutation,
   useNukeCollectionMutation,
 } = collectionsApi;
 export const { endpoints: collectionsEndpoints } = collectionsApi;
