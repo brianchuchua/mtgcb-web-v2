@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Typography, Divider, Chip, Link } from '@mui/material';
+import { Box, Typography, Divider, Chip, Link, Tooltip, IconButton } from '@mui/material';
 import React from 'react';
 import NextLink from 'next/link';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SetIcon from '@/components/sets/SetIcon';
 import { formatManaCost } from '@/utils/manaFormatter';
 import capitalize from '@/utils/capitalize';
@@ -27,6 +28,7 @@ interface CardDetailsSectionProps {
     artist?: string;
     canBeNonFoil?: boolean;
     canBeFoil?: boolean;
+    isReserved?: boolean;
   };
   userId?: number; // Optional for browse mode
   isCollectionView?: boolean;
@@ -177,16 +179,36 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
                 {card.setName}
               </Link>
             </Box>
-            <Typography 
-              variant="body2" 
-              color="text.secondary"
-              sx={{ 
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
                 width: { xs: '100%', sm: 'auto' },
                 pl: { xs: 3, sm: 0 }
               }}
             >
-              #{card.collectorNumber} • {capitalize(card.rarity || 'Unknown')}
-            </Typography>
+              <Typography variant="body2" color="text.secondary">
+                #{card.collectorNumber} • {capitalize(card.rarity || 'Unknown')}
+              </Typography>
+              {card.isReserved && (
+                <>
+                  <Typography variant="body2" color="text.secondary">•</Typography>
+                  <Typography variant="body2" color="warning.main" fontWeight="500">
+                    Reserved List
+                  </Typography>
+                  <Tooltip
+                    title="This card is on the Reserved List, a list of cards that Wizards of the Coast has promised never to reprint in a functionally identical form. This makes these cards particularly scarce and sometimes valuable."
+                    placement="top"
+                    arrow
+                  >
+                    <IconButton size="small" sx={{ padding: 0, ml: 0 }}>
+                      <InfoOutlinedIcon sx={{ fontSize: '1rem', color: 'text.secondary' }} />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
+            </Box>
           </Box>
 
           {/* Available Printings */}

@@ -17,11 +17,21 @@ export const formatManaCost = (manaCost: string | null | undefined): React.React
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   let match;
+  const matches: Array<{ symbol: string; startIndex: number; fullMatch: string }> = [];
 
-  // Find all mana symbols and convert them to spans with appropriate classes
+  // Collect all matches first
   while ((match = symbolRegex.exec(manaCost)) !== null) {
-    const [fullMatch, symbol] = match;
-    const startIndex = match.index;
+    matches.push({
+      symbol: match[1],
+      startIndex: match.index,
+      fullMatch: match[0],
+    });
+  }
+
+  // Process matches
+  matches.forEach((matchData, index) => {
+    const { symbol, startIndex, fullMatch } = matchData;
+    const isLastSymbol = index === matches.length - 1;
 
     // Add any text before the current symbol
     if (startIndex > lastIndex) {
@@ -35,11 +45,12 @@ export const formatManaCost = (manaCost: string | null | undefined): React.React
         key={`${symbol}-${startIndex}`}
         className={`ms ms-${symbol.toLowerCase()} ms-cost`}
         aria-label={getSymbolName(symbol)}
+        style={{ marginRight: isLastSymbol ? 0 : '0.25rem' }}
       />,
     );
 
     lastIndex = startIndex + fullMatch.length;
-  }
+  });
 
   // Add any remaining text
   if (lastIndex < manaCost.length) {

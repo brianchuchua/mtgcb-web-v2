@@ -63,6 +63,7 @@ const selectFields: Array<keyof CardModel | string> = [
   'oracleText',
   'flavorText',
   'pureName',
+  'isReserved',
 ];
 
 const otherPrintingsSelectFields: Array<keyof CardModel | string> = [

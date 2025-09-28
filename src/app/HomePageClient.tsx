@@ -69,6 +69,11 @@ export default function HomePageClient() {
           theme.palette.mode === 'dark'
             ? 'linear-gradient(to bottom, #121212, #1e1e1e)'
             : 'linear-gradient(to bottom, #ffffff, #f5f5f5)',
+        // Full bleed for entire page - extend further up and to sides
+        mx: { xs: -3, sm: -3, md: -4 },
+        mt: { xs: -1, sm: -2, md: -2 },  // Negative margin to counteract Main padding
+        mb: { xs: -3, sm: -3, md: -4 },
+        width: { xs: 'calc(100% + 48px)', sm: 'calc(100% + 48px)', md: 'calc(100% + 64px)' },
       }}
     >
       <Box
@@ -80,6 +85,9 @@ export default function HomePageClient() {
           color: 'white',
           position: 'relative',
           overflow: 'hidden',
+          // No horizontal margin needed since parent already handles full bleed
+          mt: { xs: '-16px', sm: 0, md: 0 },  // Force 16px upward on mobile to close the gap
+          pt: { xs: '16px', sm: 2, md: 2 },
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -116,6 +124,7 @@ export default function HomePageClient() {
             theme.palette.mode === 'dark'
               ? alpha(theme.palette.background.paper, 0.3)
               : alpha(theme.palette.grey[100], 0.5),
+          // Sections already inherit full width from parent
         }}
       >
         <FeaturesSection />
@@ -131,6 +140,7 @@ export default function HomePageClient() {
             theme.palette.mode === 'dark'
               ? alpha(theme.palette.background.paper, 0.3)
               : alpha(theme.palette.grey[100], 0.5),
+          // Sections already inherit full width from parent
         }}
       >
         <CTASection isMobile={isMobile} router={router} />

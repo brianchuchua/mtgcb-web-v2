@@ -15,8 +15,13 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- home page i want no borders by the purple background
-- I maybe should do Redis still
+#### Card Location Mass Updates
+
+- I've considered these before, but per-search and per-set mass updates of card locations doesn't really make sense. Maybe just a selection mode with checkboxes and then a bulk edit action?
+
+  - I'm going to support this for the current search, with the ability to select/deselect specific items. Probably integrates into the existing mass update, will need to ask api how the current one works and copy the pattern. Or make an interface that paginates through the 500 card chunks.
+
+- oh, add not legal in any format filter if it's easy
 
 ### Blocked/Waiting
 
@@ -57,7 +62,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Core Features
 
 - Audit old app functionality
-- costs to complete buttons should also be on the set page
 - UX: Verify that every search tool trims whitespace
 
 ### Data Improvements
@@ -321,6 +325,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Card Comments and Ratings
 
 - Allow users to comment on cards and rate them by format
+
+### Automated Trade Binder
+
+- Cards in excess of specific quantities (4x) or in excess of collection goals could be automatically added to a trade binder
 
 ### Nice-to-Have Enhancements
 

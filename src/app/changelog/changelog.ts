@@ -12,6 +12,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-27',
+      version: '0.134.1',
+      changes: [
+        'Improved spacing between mana symbols on card detail pages for better readability',
+        'Extended home page backgrounds to full viewport width for better visual impact',
+        'Added Reserved List indicator with info tooltip on card detail pages',
+      ],
+    },
+    {
+      date: '2025-09-27',
       version: '0.134.0',
       changes: ['Reserved List cards can now be included or excluded in goals and searches'],
     },
