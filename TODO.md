@@ -43,7 +43,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Testing
 
-- Repeat perf tests for both types of major goals, worried about some maybe doing in-memory work check the cheap normal cards goal
 - Top-down testing of every page and feature
 - Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
 
@@ -53,16 +52,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Core Features
 
-- Audit old app functionality
 - UX: Verify that every search tool trims whitespace
 
-### Data Improvements
+### Sonarqube
 
-- Audit isDraftable field for sets (probably just normal sets where isDraftable is false)
-
-### Sonarcube
-
-- Need to detect and remove dead code from my goal refactorings using sonarcube -- it's becoming a bit of a vibe coding issue
+- Integrate Sonarqube and fix all critical issues
 
 ### UX
 
@@ -84,15 +78,12 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Testing & Quality
 
-- Test Heroku pipeline for using a backup to restore service.
+- Test Heroku pipeline for using a backup to restore service -- would be nice to automate a backup away from Heroku too, although their system is very robust.
+-
 
-### Analytics
+### Podcast
 
-- Google Analytics integration
-
-### Documentation
-
-- In-code TODO audit
+- At least link to the old ones, I'll probably start it back up after release
 
 ## 🚀 Release Checklist
 
@@ -251,6 +242,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Refactor vibe-coded files to my clean code style (SetItemRenderer.tsx and browse/page.tsx are fair examples)
 - All quantity selectors should be using the same component, QuantitySelector.tsx
+- In-code TODO audit
+
+### Sonarcube
+
+- Need to detect and remove dead code from my goal refactorings using sonarcube -- it's becoming a bit of a vibe coding issue
 
 #### Open Sourcing
 

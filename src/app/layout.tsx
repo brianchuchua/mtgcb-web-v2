@@ -1,6 +1,7 @@
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import type { Metadata } from 'next';
 import { Roboto } from 'next/font/google';
 import { ReactNode } from 'react';
@@ -19,6 +20,9 @@ const roboto = Roboto({
   display: 'swap',
   variable: '--font-roboto',
 });
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const ENABLE_GA = process.env.NEXT_PUBLIC_ENABLE_GA === 'true';
 
 export const metadata: Metadata = {
   title: 'MTG Collection Builder',
@@ -56,6 +60,7 @@ export default function RootLayout({
             </StoreProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
+        {ENABLE_GA && GA_ID && <GoogleAnalytics gaId={GA_ID} />}
       </body>
     </html>
   );
