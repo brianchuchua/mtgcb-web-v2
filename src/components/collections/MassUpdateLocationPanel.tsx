@@ -223,7 +223,7 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
       if (quantityReg === 0 && quantityFoil === 0) {
         return `Will assign ${cardCount} card${cardCount !== 1 ? 's' : ''} to "${locationName}" with no quantity tracking`;
       }
-      return `Will assign ${cardCount} card${cardCount !== 1 ? 's' : ''} to "${locationName}" and set quantities to ${quantityReg} reg${quantityFoil > 0 ? `, ${quantityFoil} foil` : ''}`;
+      return `Will assign ${cardCount} card${cardCount !== 1 ? 's' : ''} to "${locationName}" and set quantities to ${quantityReg} regular${quantityFoil > 0 ? `, ${quantityFoil} foil` : ''}`;
     } else if (uiMode === 'change') {
       if (!locationId) {
         return `Select a location to assign ${cardCount} card${cardCount !== 1 ? 's' : ''}`;
@@ -234,9 +234,9 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
 
       const parts: string[] = [];
       if (quantityReg > 0) {
-        parts.push(`+${quantityReg} reg`);
+        parts.push(`+${quantityReg} regular`);
       } else if (quantityReg < 0) {
-        parts.push(`${quantityReg} reg`);
+        parts.push(`${quantityReg} regular`);
       }
 
       if (quantityFoil > 0) {
@@ -282,7 +282,7 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
     <Collapse in={isOpen}>
       <StyledPaper elevation={0}>
         <Typography variant="subtitle1" fontWeight="500" sx={{ textAlign: 'center', mb: 0.5 }}>
-          Manage Locations for {cardCount} Card{cardCount !== 1 ? 's' : ''}
+          Mass Edit Locations for {cardCount} Card{cardCount !== 1 ? 's' : ''} on this Page
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center', display: 'block', mb: 1.5 }}>
           Impacts cards in the current search page with quantity {'>'} 0
@@ -298,7 +298,7 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
                 label={
                   <Box>
                     <Typography component="span" variant="body2">
-                      Assign & set qty
+                      Assign and set quantity
                     </Typography>
                   </Box>
                 }
@@ -310,13 +310,23 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
                 label={
                   <Box>
                     <Typography component="span" variant="body2">
-                      Assign & adjust qty
+                      Assign and edit quantity
                     </Typography>
                   </Box>
                 }
                 sx={{ mr: 2 }}
               />
-              <FormControlLabel value="remove_all" control={<Radio size="small" />} label="Remove from all" />
+              <FormControlLabel
+                value="remove_all"
+                control={<Radio size="small" />}
+                label={
+                  <Box>
+                    <Typography component="span" variant="body2">
+                      Remove from all locations
+                    </Typography>
+                  </Box>
+                }
+              />
             </RadioGroup>
           </FormControl>
 

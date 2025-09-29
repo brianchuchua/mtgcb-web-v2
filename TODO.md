@@ -15,11 +15,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-#### Card Location Mass Updates
-
-- Need to add selection/deselection.
-- Need to add to set pages.
-
 ### Blocked/Waiting
 
 ## 🚨 Critical / Blocking Issues
@@ -167,6 +162,13 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Card Image Size
 
 - Assess if I should reduce the image size. It doesn't matter much on my end in terms of cost, more thinking about user bandwidth. I personally love big high res images.
+
+#### Card Location Mass Updates
+
+- Need to add selection/deselection ability -- probably to the main mass updater too.
+- Need to add to set pages.
+- need to maybe make a tools menu and mass update and locations are both in it
+- May need to combine mass update location and mass update quantity into one panel with two tabs
 
 #### Custom Collection Goals
 

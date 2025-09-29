@@ -340,14 +340,14 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
         additionalAction={
           isOwnCollection && (
             <Stack direction="row" spacing={0.5}>
+              {view === 'cards' && hasLocations && ownedVisibleCardIds.length > 0 && (
+                <MassUpdateLocationButton onClick={handleMassUpdateLocationToggle} isOpen={isMassUpdateLocationOpen} />
+              )}
               <ShareCollectionButton
                 userId={userId.toString()}
                 username={username || user?.username || 'User'}
                 isPublic={user?.isPublic || false}
               />
-              {view === 'cards' && hasLocations && ownedVisibleCardIds.length > 0 && (
-                <MassUpdateLocationButton onClick={handleMassUpdateLocationToggle} isOpen={isMassUpdateLocationOpen} />
-              )}
             </Stack>
           )
         }
