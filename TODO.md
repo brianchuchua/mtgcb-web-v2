@@ -15,6 +15,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
+- Grok how /goals calculates progress
+
 ### Blocked/Waiting
 
 ## 🚨 Critical / Blocking Issues
@@ -24,10 +26,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Migration
 
-- Need a message for migration downtime in v2 as well
+- Need a message for migration downtime in v2 as well -- and a plan to put this app into maintenance mode
 - Test migration end-to-end one more time
 - Add a migration verification script to mtgcb-importer that checks user counts and collection counts match between old and new databases, accounting for those removed due to a 0 quantity count or for cards or users that no longer exist, locally of course
-- Switch to Git Flow for the v1.0 release
 
 ### mtgcb-importer
 
@@ -48,7 +49,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Scaling
 
-- Scale API and Web to two dynos
+- Scale API and Web to two dynos (mostly for rolling restarts)
 
 ### Core Features
 
@@ -58,13 +59,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Integrate Sonarqube and fix all critical issues
 
-### UX
-
-- Audit table field orders and their corresponding visibility filters
-
 ### Patron Features / Patreon Integration
 
-- A page thanking patrons for their support, listing them, and showing the benefits they get. Maybe a link to a Discord channel for patrons.
+- A page thanking patrons for their support, listing them (anonymous by default), and showing the benefits they get. Maybe a link to a Discord channel for patrons.
 - A supporter badge of some sort would be great.
 - Detecting if someone is a patron and linking their accounts.
 
@@ -75,11 +72,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Mention Patreon on the home page and wherever else is appropriate
 - Mention that patrons get to vote on future features
 - Make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
-
-### Testing & Quality
-
-- Test Heroku pipeline for using a backup to restore service -- would be nice to automate a backup away from Heroku too, although their system is very robust.
--
 
 ### Podcast
 

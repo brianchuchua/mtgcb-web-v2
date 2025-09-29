@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-09-29',
+      version: '0.135.1',
+      changes: ['Fixed goal purchase button to correctly show cards when only foils are needed'],
+    },
+    {
       date: '2025-09-28',
       version: '0.135.0',
       changes: ['Added ability to mass edit card locations from search results'],
