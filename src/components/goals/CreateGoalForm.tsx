@@ -8,13 +8,14 @@ import {
   Dialog,
   DialogContent,
   Divider,
+  FormControlLabel,
   IconButton,
   LinearProgress,
+  Switch,
   TextField,
   Typography,
   styled,
 } from '@mui/material';
-import { Button } from '@/components/ui/button';
 import { useSnackbar } from 'notistack';
 import { useCallback, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -22,6 +23,7 @@ import { GoalSearchForm } from './GoalSearchForm';
 import { CardApiParams } from '@/api/browse/types';
 import { useCreateGoalMutation } from '@/api/goals/goalsApi';
 import { CreateGoalRequest, Goal } from '@/api/goals/types';
+import { Button } from '@/components/ui/button';
 import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
 import { useSetNames } from '@/utils/goals/useSetNames';
 
@@ -46,6 +48,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
     Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>
   >({});
   const [onePrintingPerPureName, setOnePrintingPerPureName] = useState(true);
+  const [flexibleFinishes, setFlexibleFinishes] = useState(false);
 
   const handleSearchConditionsChange = useCallback(
     (conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>) => {
@@ -90,6 +93,9 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
       } else {
         if (data.targetQuantityReg) request.targetQuantityReg = data.targetQuantityReg;
         if (data.targetQuantityFoil) request.targetQuantityFoil = data.targetQuantityFoil;
+        if (data.targetQuantityReg && data.targetQuantityFoil) {
+          request.flexibleFinishes = flexibleFinishes;
+        }
       }
 
       const response = await createGoal(request).unwrap();
@@ -128,8 +134,8 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
             Compiling Goal
           </Typography>
           <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
-            Your goal is undergoing a one-time compilation to optimize performance.
-            This may take 5-10 seconds for complex search criteria.
+            Your goal is undergoing a one-time compilation to optimize performance. This may take 5-10 seconds for
+            complex search criteria.
           </Typography>
           <LinearProgress sx={{ width: '100%', maxWidth: 300 }} />
         </DialogContent>
@@ -137,398 +143,422 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <Controller
-          name="name"
-          control={control}
-          rules={{ required: 'Goal name is required', maxLength: { value: 255, message: 'Name too long' } }}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Goal Name"
-              fullWidth
-              error={!!errors.name}
-              helperText={errors.name?.message}
-              autoFocus
-              disabled={isLoading}
-            />
-          )}
-        />
-
-        <Controller
-          name="description"
-          control={control}
-          rules={{ maxLength: { value: 1000, message: 'Description too long' } }}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Description (optional)"
-              fullWidth
-              multiline
-              rows={2}
-              error={!!errors.description}
-              helperText={errors.description?.message}
-              disabled={isLoading}
-              slotProps={{
-                htmlInput: {
-                  spellCheck: 'true',
-                  autoCapitalize: 'sentences',
-                },
-              }}
-            />
-          )}
-        />
-
-        <Divider />
-
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Search Criteria
-          </Typography>
-          <Typography variant="body2" color="text.secondary" paragraph>
-            Define which cards this goal applies to. Leave fields empty to include all cards.
-          </Typography>
-
-          <GoalSearchForm 
-            searchConditions={searchConditions} 
-            onChange={handleSearchConditionsChange}
-            onePrintingPerPureName={onePrintingPerPureName}
-            onOnePrintingPerPureNameChange={setOnePrintingPerPureName}
+          <Controller
+            name="name"
+            control={control}
+            rules={{ required: 'Goal name is required', maxLength: { value: 255, message: 'Name too long' } }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Goal Name"
+                fullWidth
+                error={!!errors.name}
+                helperText={errors.name?.message}
+                autoFocus
+                disabled={isLoading}
+              />
+            )}
           />
-        </Box>
 
-        <Divider />
+          <Controller
+            name="description"
+            control={control}
+            rules={{ maxLength: { value: 1000, message: 'Description too long' } }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Description (optional)"
+                fullWidth
+                multiline
+                rows={2}
+                error={!!errors.description}
+                helperText={errors.description?.message}
+                disabled={isLoading}
+                slotProps={{
+                  htmlInput: {
+                    spellCheck: 'true',
+                    autoCapitalize: 'sentences',
+                  },
+                }}
+              />
+            )}
+          />
 
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Goal Quantities
-          </Typography>
-          <Box 
-            sx={{ 
-              mb: 2,
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 1
-            }}
-          >
-            <Chip
-              label="Any Type"
-              onClick={() => setQuantityMode('all')}
-              color={quantityMode === 'all' ? 'primary' : 'default'}
-              disabled={isLoading}
-            />
-            <Chip
-              label="Separate Regular/Foil"
-              onClick={() => setQuantityMode('separate')}
-              color={quantityMode === 'separate' ? 'primary' : 'default'}
-              disabled={isLoading}
+          <Divider />
+
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Search Criteria
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              Define which cards this goal applies to. Leave fields empty to include all cards.
+            </Typography>
+
+            <GoalSearchForm
+              searchConditions={searchConditions}
+              onChange={handleSearchConditionsChange}
+              onePrintingPerPureName={onePrintingPerPureName}
+              onOnePrintingPerPureNameChange={setOnePrintingPerPureName}
             />
           </Box>
 
-          {quantityMode === 'separate' ? (
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                flexDirection: { xs: 'column', sm: 'row' },
-                gap: 3, 
-                justifyContent: 'center',
-                alignItems: { xs: 'center', sm: 'flex-start' }
+          <Divider />
+
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Goal Quantities
+            </Typography>
+            <Box
+              sx={{
+                mb: 2,
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 1,
               }}
             >
-              <Controller
-                name="targetQuantityReg"
-                control={control}
-                rules={{
-                  validate: (value) => {
-                    if (quantityMode !== 'separate') return true;
-                    if (value !== undefined && value !== null && value < 0) return 'Cannot be negative';
-                    const foilValue = getValues('targetQuantityFoil');
-                    const regValue = value || 0;
-                    const foilVal = foilValue || 0;
-                    if (regValue === 0 && foilVal === 0) {
-                      return 'At least one quantity is required';
-                    }
-                    return true;
-                  },
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
-                      Regular Cards
-                    </Typography>
-                    <QuantityContainer>
-                      <QuantityLeftButton
-                        size="small"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          e.currentTarget.blur();
-                          const currentVal = value || 0;
-                          const newValue = Math.max(0, currentVal - 1);
-                          onChange(newValue);
-                        }}
-                        disabled={!value || value === 0 || isLoading}
-                        tabIndex={-1}
-                        disableFocusRipple
-                        error={!!errors.targetQuantityReg}
-                      >
-                        <RemoveIcon />
-                      </QuantityLeftButton>
-                      <QuantityInput
-                        type="number"
-                        value={Number(value) === 0 ? '' : (value ?? '')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val === '') {
-                            onChange(0);
-                          } else {
-                            const num = parseInt(val);
-                            onChange(isNaN(num) ? 0 : num);
-                          }
-                        }}
-                        onFocus={(e) => e.target.select()}
-                        inputProps={{ min: 0 }}
-                        variant="outlined"
-                        size="small"
-                        error={!!errors.targetQuantityReg}
-                        disabled={isLoading}
-                      />
-                      <QuantityRightButton
-                        size="small"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          e.currentTarget.blur();
-                          onChange((value || 0) + 1);
-                        }}
-                        tabIndex={-1}
-                        disableFocusRipple
-                        error={!!errors.targetQuantityReg}
-                        disabled={isLoading}
-                      >
-                        <AddIcon />
-                      </QuantityRightButton>
-                    </QuantityContainer>
-                    {errors.targetQuantityReg && (
-                      <Typography
-                        variant="caption"
-                        color="error"
-                        sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
-                      >
-                        {errors.targetQuantityReg.message}
-                      </Typography>
-                    )}
-                  </Box>
-                )}
+              <Chip
+                label="Any Type"
+                onClick={() => setQuantityMode('all')}
+                color={quantityMode === 'all' ? 'primary' : 'default'}
+                disabled={isLoading}
               />
-              <Controller
-                name="targetQuantityFoil"
-                control={control}
-                rules={{
-                  validate: (value: any) => {
-                    if (!value && value !== 0) return true;
-                    const numValue = Number(value);
-                    if (isNaN(numValue) || numValue < 0) return 'Cannot be negative';
-                    return true;
-                  },
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
-                      Foil Cards
-                    </Typography>
-                    <QuantityContainer>
-                      <QuantityLeftButton
-                        size="small"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          e.currentTarget.blur();
-                          const currentVal = value || 0;
-                          const newValue = Math.max(0, currentVal - 1);
-                          onChange(newValue);
-                        }}
-                        disabled={!value || value === 0 || isLoading}
-                        tabIndex={-1}
-                        disableFocusRipple
-                        error={!!errors.targetQuantityFoil}
-                      >
-                        <RemoveIcon />
-                      </QuantityLeftButton>
-                      <QuantityInput
-                        type="number"
-                        value={Number(value) === 0 ? '' : (value ?? '')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val === '') {
-                            onChange(0);
-                          } else {
-                            const num = parseInt(val);
-                            onChange(isNaN(num) ? 0 : num);
-                          }
-                        }}
-                        onFocus={(e) => e.target.select()}
-                        inputProps={{ min: 0 }}
-                        variant="outlined"
-                        size="small"
-                        error={!!errors.targetQuantityFoil}
-                        disabled={isLoading}
-                      />
-                      <QuantityRightButton
-                        size="small"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          e.currentTarget.blur();
-                          onChange((value || 0) + 1);
-                        }}
-                        tabIndex={-1}
-                        disableFocusRipple
-                        error={!!errors.targetQuantityFoil}
-                        disabled={isLoading}
-                      >
-                        <AddIcon />
-                      </QuantityRightButton>
-                    </QuantityContainer>
-                    {errors.targetQuantityFoil && (
-                      <Typography
-                        variant="caption"
-                        color="error"
-                        sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
-                      >
-                        {errors.targetQuantityFoil.message}
-                      </Typography>
-                    )}
-                  </Box>
-                )}
+              <Chip
+                label="Separate Regular/Foil"
+                onClick={() => setQuantityMode('separate')}
+                color={quantityMode === 'separate' ? 'primary' : 'default'}
+                disabled={isLoading}
               />
             </Box>
-          ) : (
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Controller
-                name="targetQuantityAll"
-                control={control}
-                rules={{
-                  validate: (value: any) => {
-                    if (quantityMode !== 'all') return true;
-                    if (!value && value !== 0) {
-                      return 'Quantity is required';
-                    }
-                    const numValue = Number(value);
-                    if (isNaN(numValue) || numValue < 1) return 'Must be at least 1';
-                    return true;
-                  },
-                }}
-                render={({ field: { onChange, value } }) => (
-                  <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
-                      Any Type (Regular or Foil)
-                    </Typography>
-                    <QuantityContainer>
-                      <QuantityLeftButton
-                        size="small"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          e.currentTarget.blur();
-                          const currentVal = value || 0;
-                          const newValue = Math.max(0, currentVal - 1);
-                          onChange(newValue);
-                        }}
-                        disabled={!value || value === 0 || isLoading}
-                        tabIndex={-1}
-                        disableFocusRipple
-                        error={!!errors.targetQuantityAll}
-                      >
-                        <RemoveIcon />
-                      </QuantityLeftButton>
-                      <QuantityInput
-                        type="number"
-                        value={Number(value) === 0 ? '' : (value ?? '')}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (val === '') {
-                            onChange(0);
-                          } else {
-                            const num = parseInt(val);
-                            onChange(isNaN(num) ? 0 : num);
-                          }
-                        }}
-                        onFocus={(e) => e.target.select()}
-                        inputProps={{ min: 0 }}
-                        variant="outlined"
-                        size="small"
-                        error={!!errors.targetQuantityAll}
-                        disabled={isLoading}
-                      />
-                      <QuantityRightButton
-                        size="small"
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          e.currentTarget.blur();
-                          onChange((value || 0) + 1);
-                        }}
-                        tabIndex={-1}
-                        disableFocusRipple
-                        error={!!errors.targetQuantityAll}
-                        disabled={isLoading}
-                      >
-                        <AddIcon />
-                      </QuantityRightButton>
-                    </QuantityContainer>
-                    {errors.targetQuantityAll && (
-                      <Typography
-                        variant="caption"
-                        color="error"
-                        sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
-                      >
-                        {errors.targetQuantityAll.message}
-                      </Typography>
+
+            {quantityMode === 'separate' ? (
+              <>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: 3,
+                    justifyContent: 'center',
+                    alignItems: { xs: 'center', sm: 'flex-start' },
+                  }}
+                >
+                  <Controller
+                    name="targetQuantityReg"
+                    control={control}
+                    rules={{
+                      validate: (value) => {
+                        if (quantityMode !== 'separate') return true;
+                        if (value !== undefined && value !== null && value < 0) return 'Cannot be negative';
+                        const foilValue = getValues('targetQuantityFoil');
+                        const regValue = value || 0;
+                        const foilVal = foilValue || 0;
+                        if (regValue === 0 && foilVal === 0) {
+                          return 'At least one quantity is required';
+                        }
+                        return true;
+                      },
+                    }}
+                    render={({ field: { onChange, value } }) => (
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                          Regular Cards
+                        </Typography>
+                        <QuantityContainer>
+                          <QuantityLeftButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              const currentVal = value || 0;
+                              const newValue = Math.max(0, currentVal - 1);
+                              onChange(newValue);
+                            }}
+                            disabled={!value || value === 0 || isLoading}
+                            tabIndex={-1}
+                            disableFocusRipple
+                            error={!!errors.targetQuantityReg}
+                          >
+                            <RemoveIcon />
+                          </QuantityLeftButton>
+                          <QuantityInput
+                            type="number"
+                            value={Number(value) === 0 ? '' : (value ?? '')}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === '') {
+                                onChange(0);
+                              } else {
+                                const num = parseInt(val);
+                                onChange(isNaN(num) ? 0 : num);
+                              }
+                            }}
+                            onFocus={(e) => e.target.select()}
+                            inputProps={{ min: 0 }}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.targetQuantityReg}
+                            disabled={isLoading}
+                          />
+                          <QuantityRightButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange((value || 0) + 1);
+                            }}
+                            tabIndex={-1}
+                            disableFocusRipple
+                            error={!!errors.targetQuantityReg}
+                            disabled={isLoading}
+                          >
+                            <AddIcon />
+                          </QuantityRightButton>
+                        </QuantityContainer>
+                        {errors.targetQuantityReg && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
+                          >
+                            {errors.targetQuantityReg.message}
+                          </Typography>
+                        )}
+                      </Box>
                     )}
+                  />
+                  <Controller
+                    name="targetQuantityFoil"
+                    control={control}
+                    rules={{
+                      validate: (value: any) => {
+                        if (!value && value !== 0) return true;
+                        const numValue = Number(value);
+                        if (isNaN(numValue) || numValue < 0) return 'Cannot be negative';
+                        return true;
+                      },
+                    }}
+                    render={({ field: { onChange, value } }) => (
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                          Foil Cards
+                        </Typography>
+                        <QuantityContainer>
+                          <QuantityLeftButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              const currentVal = value || 0;
+                              const newValue = Math.max(0, currentVal - 1);
+                              onChange(newValue);
+                            }}
+                            disabled={!value || value === 0 || isLoading}
+                            tabIndex={-1}
+                            disableFocusRipple
+                            error={!!errors.targetQuantityFoil}
+                          >
+                            <RemoveIcon />
+                          </QuantityLeftButton>
+                          <QuantityInput
+                            type="number"
+                            value={Number(value) === 0 ? '' : (value ?? '')}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === '') {
+                                onChange(0);
+                              } else {
+                                const num = parseInt(val);
+                                onChange(isNaN(num) ? 0 : num);
+                              }
+                            }}
+                            onFocus={(e) => e.target.select()}
+                            inputProps={{ min: 0 }}
+                            variant="outlined"
+                            size="small"
+                            error={!!errors.targetQuantityFoil}
+                            disabled={isLoading}
+                          />
+                          <QuantityRightButton
+                            size="small"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              e.currentTarget.blur();
+                              onChange((value || 0) + 1);
+                            }}
+                            tabIndex={-1}
+                            disableFocusRipple
+                            error={!!errors.targetQuantityFoil}
+                            disabled={isLoading}
+                          >
+                            <AddIcon />
+                          </QuantityRightButton>
+                        </QuantityContainer>
+                        {errors.targetQuantityFoil && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
+                          >
+                            {errors.targetQuantityFoil.message}
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
+                  />
+                </Box>
+                {!!(watch('targetQuantityReg') && watch('targetQuantityFoil')) && (
+                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={flexibleFinishes}
+                          onChange={(e) => setFlexibleFinishes(e.target.checked)}
+                          disabled={isLoading}
+                        />
+                      }
+                      label={
+                        <Box>
+                          <Typography variant="body2">Flexible Finishes</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            If toggled, includes cards even if they were ONLY printed in regular OR foil.
+                          </Typography>
+                        </Box>
+                      }
+                    />
                   </Box>
                 )}
-              />
-            </Box>
-          )}
-        </Box>
+              </>
+            ) : (
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Controller
+                  name="targetQuantityAll"
+                  control={control}
+                  rules={{
+                    validate: (value: any) => {
+                      if (quantityMode !== 'all') return true;
+                      if (!value && value !== 0) {
+                        return 'Quantity is required';
+                      }
+                      const numValue = Number(value);
+                      if (isNaN(numValue) || numValue < 1) return 'Must be at least 1';
+                      return true;
+                    },
+                  }}
+                  render={({ field: { onChange, value } }) => (
+                    <Box>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+                        Any Type (Regular or Foil)
+                      </Typography>
+                      <QuantityContainer>
+                        <QuantityLeftButton
+                          size="small"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.currentTarget.blur();
+                            const currentVal = value || 0;
+                            const newValue = Math.max(0, currentVal - 1);
+                            onChange(newValue);
+                          }}
+                          disabled={!value || value === 0 || isLoading}
+                          tabIndex={-1}
+                          disableFocusRipple
+                          error={!!errors.targetQuantityAll}
+                        >
+                          <RemoveIcon />
+                        </QuantityLeftButton>
+                        <QuantityInput
+                          type="number"
+                          value={Number(value) === 0 ? '' : (value ?? '')}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === '') {
+                              onChange(0);
+                            } else {
+                              const num = parseInt(val);
+                              onChange(isNaN(num) ? 0 : num);
+                            }
+                          }}
+                          onFocus={(e) => e.target.select()}
+                          inputProps={{ min: 0 }}
+                          variant="outlined"
+                          size="small"
+                          error={!!errors.targetQuantityAll}
+                          disabled={isLoading}
+                        />
+                        <QuantityRightButton
+                          size="small"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.currentTarget.blur();
+                            onChange((value || 0) + 1);
+                          }}
+                          tabIndex={-1}
+                          disableFocusRipple
+                          error={!!errors.targetQuantityAll}
+                          disabled={isLoading}
+                        >
+                          <AddIcon />
+                        </QuantityRightButton>
+                      </QuantityContainer>
+                      {errors.targetQuantityAll && (
+                        <Typography
+                          variant="caption"
+                          color="error"
+                          sx={{ display: 'block', mt: 0.5, textAlign: 'center' }}
+                        >
+                          {errors.targetQuantityAll.message}
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
+                />
+              </Box>
+            )}
+          </Box>
 
-        <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Goal Summary
-          </Typography>
-          <GoalPreview
-            searchConditions={searchConditions}
-            quantityMode={quantityMode}
-            targetQuantityReg={watch('targetQuantityReg')}
-            targetQuantityFoil={watch('targetQuantityFoil')}
-            targetQuantityAll={watch('targetQuantityAll')}
-            onePrintingPerPureName={onePrintingPerPureName}
-          />
-        </Box>
-
-        {isSubmitted && Object.keys(errors).length > 0 && (
-          <Alert severity="error">
-            <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 1 }}>
-              Please fix the following errors:
+          <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Goal Summary
             </Typography>
-            {errors.name && (
-              <Typography variant="body2">• Goal name: {errors.name.message}</Typography>
-            )}
-            {errors.description && (
-              <Typography variant="body2">• Description: {errors.description.message}</Typography>
-            )}
-            {errors.targetQuantityReg && (
-              <Typography variant="body2">• Regular quantity: {errors.targetQuantityReg.message}</Typography>
-            )}
-            {errors.targetQuantityFoil && (
-              <Typography variant="body2">• Foil quantity: {errors.targetQuantityFoil.message}</Typography>
-            )}
-            {errors.targetQuantityAll && (
-              <Typography variant="body2">• Quantity: {errors.targetQuantityAll.message}</Typography>
-            )}
-          </Alert>
-        )}
+            <GoalPreview
+              searchConditions={searchConditions}
+              quantityMode={quantityMode}
+              targetQuantityReg={watch('targetQuantityReg')}
+              targetQuantityFoil={watch('targetQuantityFoil')}
+              targetQuantityAll={watch('targetQuantityAll')}
+              onePrintingPerPureName={onePrintingPerPureName}
+              flexibleFinishes={flexibleFinishes}
+            />
+          </Box>
 
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button onClick={onClose} disabled={isLoading}>Cancel</Button>
-          <Button type="submit" variant="contained" isSubmitting={isLoading}>
-            {isLoading ? 'Creating Goal...' : 'Create Goal'}
-          </Button>
-        </Box>
+          {isSubmitted && Object.keys(errors).length > 0 && (
+            <Alert severity="error">
+              <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 1 }}>
+                Please fix the following errors:
+              </Typography>
+              {errors.name && <Typography variant="body2">• Goal name: {errors.name.message}</Typography>}
+              {errors.description && (
+                <Typography variant="body2">• Description: {errors.description.message}</Typography>
+              )}
+              {errors.targetQuantityReg && (
+                <Typography variant="body2">• Regular quantity: {errors.targetQuantityReg.message}</Typography>
+              )}
+              {errors.targetQuantityFoil && (
+                <Typography variant="body2">• Foil quantity: {errors.targetQuantityFoil.message}</Typography>
+              )}
+              {errors.targetQuantityAll && (
+                <Typography variant="body2">• Quantity: {errors.targetQuantityAll.message}</Typography>
+              )}
+            </Alert>
+          )}
+
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+            <Button onClick={onClose} disabled={isLoading}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" isSubmitting={isLoading}>
+              {isLoading ? 'Creating Goal...' : 'Create Goal'}
+            </Button>
+          </Box>
         </Box>
       </form>
     </>
@@ -622,6 +652,7 @@ function GoalPreview({
   targetQuantityFoil,
   targetQuantityAll,
   onePrintingPerPureName,
+  flexibleFinishes,
 }: {
   searchConditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>;
   quantityMode: 'separate' | 'all';
@@ -629,6 +660,7 @@ function GoalPreview({
   targetQuantityFoil?: number;
   targetQuantityAll?: number;
   onePrintingPerPureName: boolean;
+  flexibleFinishes: boolean;
 }) {
   const { includedSetIds, excludedSetIds } = useMemo(() => {
     const included = searchConditions.setId?.OR || [];
@@ -656,11 +688,14 @@ function GoalPreview({
   const { setNames } = useSetNames(allSetIds);
 
   const description = useMemo(() => {
-    const criteriaText = formatSearchCriteria({
-      conditions: searchConditions,
-      sort: undefined,
-      order: undefined,
-    }, onePrintingPerPureName);
+    const criteriaText = formatSearchCriteria(
+      {
+        conditions: searchConditions,
+        sort: undefined,
+        order: undefined,
+      },
+      onePrintingPerPureName,
+    );
 
     let quantityText = '';
     if (quantityMode === 'all' && targetQuantityAll) {
@@ -680,6 +715,14 @@ function GoalPreview({
     }
 
     let finalText = `${quantityText} ${criteriaText}`;
+
+    if (quantityMode === 'separate' && targetQuantityReg && targetQuantityFoil) {
+      if (flexibleFinishes) {
+        finalText += ' (flexible finishes)';
+      } else {
+        finalText += ' (only cards printed as both normal and foil)';
+      }
+    }
 
     if (includedSetIds && includedSetIds.length > 0 && Object.keys(setNames).length > 0) {
       const setNamesList = includedSetIds
@@ -716,6 +759,7 @@ function GoalPreview({
     includedSetIds,
     excludedSetIds,
     onePrintingPerPureName,
+    flexibleFinishes,
   ]);
 
   return (

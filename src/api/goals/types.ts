@@ -26,6 +26,7 @@ export interface Goal {
   updatedAt: string;
   progress?: GoalProgress;
   onePrintingPerPureName: boolean;
+  flexibleFinishes?: boolean;
 }
 
 export interface CreateGoalRequest {
@@ -40,6 +41,7 @@ export interface CreateGoalRequest {
   targetQuantityFoil?: number;
   targetQuantityAll?: number;
   onePrintingPerPureName?: boolean;
+  flexibleFinishes?: boolean;
 }
 
 export interface GetGoalsParams {
@@ -70,4 +72,5 @@ export interface UpdateGoalRequest {
   targetQuantityAll?: number | null;
   isActive?: boolean;
   onePrintingPerPureName?: boolean;
+  flexibleFinishes?: boolean;
 }

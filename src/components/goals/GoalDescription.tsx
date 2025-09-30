@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import { Typography, TypographyProps } from '@mui/material';
+import { useMemo } from 'react';
 import { Goal } from '@/api/goals/types';
 import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
 import { useSetNames } from '@/utils/goals/useSetNames';
@@ -14,7 +14,7 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
     const conditions = goal.searchCriteria.conditions;
     const included = conditions.setId?.OR || [];
     const excluded: string[] = [];
-    
+
     if (conditions.setId?.AND) {
       conditions.setId.AND.forEach((condition: string) => {
         if (condition.startsWith('!=')) {
@@ -22,10 +22,10 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
         }
       });
     }
-    
-    return { 
+
+    return {
       includedSetIds: included.length > 0 ? included : undefined,
-      excludedSetIds: excluded.length > 0 ? excluded : undefined
+      excludedSetIds: excluded.length > 0 ? excluded : undefined,
     };
   }, [goal.searchCriteria.conditions]);
 
@@ -34,12 +34,12 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
     const ids = [...(includedSetIds || []), ...(excludedSetIds || [])];
     return ids.length > 0 ? ids : undefined;
   }, [includedSetIds, excludedSetIds]);
-  
+
   const { setNames } = useSetNames(allSetIds);
 
   const description = useMemo(() => {
     const criteriaText = formatSearchCriteria(goal.searchCriteria, goal.onePrintingPerPureName, true);
-    
+
     // Determine quantity text
     let quantityText = '';
     if (goal.targetQuantityAll) {
@@ -56,7 +56,7 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
 
     // Build the final text, handling special cases
     let finalText = '';
-    
+
     // Check if we need to add "of" or other prepositions
     if (criteriaText.startsWith('every card') || criteriaText.startsWith('card named')) {
       // Don't add "of" for these cases
@@ -65,26 +65,34 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
       // For other cases, use "of"
       finalText = `${quantityText} of ${criteriaText}`;
     }
-    
+
+    if (goal.targetQuantityReg && goal.targetQuantityFoil) {
+      if (goal.flexibleFinishes) {
+        finalText += ' (flexible finishes)';
+      } else {
+        finalText += ' (only cards printed as both normal and foil)';
+      }
+    }
+
     if (includedSetIds && includedSetIds.length > 0 && Object.keys(setNames).length > 0) {
       const setNamesList = includedSetIds
         .map((id: string) => setNames[id])
         .filter(Boolean)
         .join(', ');
-      
+
       if (setNamesList) {
         // Replace "from specific set(s)" with the actual set names
         finalText = finalText.replace(/from specific sets?/, `from ${setNamesList}`);
       }
     }
-    
+
     // Replace "excluding X sets" with actual excluded set names
     if (excludedSetIds && excludedSetIds.length > 0 && Object.keys(setNames).length > 0) {
       const excludedSetNamesList = excludedSetIds
         .map((id: string) => setNames[id])
         .filter(Boolean)
         .join(', ');
-      
+
       if (excludedSetNamesList) {
         const excludedCount = excludedSetIds.length;
         const pattern = `excluding ${excludedCount} set${excludedCount > 1 ? 's' : ''}`;
@@ -95,9 +103,5 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
     return finalText;
   }, [goal, setNames, includedSetIds, excludedSetIds]);
 
-  return (
-    <Typography {...typographyProps}>
-      {description}
-    </Typography>
-  );
+  return <Typography {...typographyProps}>{description}</Typography>;
 }

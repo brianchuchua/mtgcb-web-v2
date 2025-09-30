@@ -9,13 +9,13 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - [ ] Prepare last items for v1.0 Release
 - [ ] v1.0 Release
 - [ ] Data Cleanup Project
-- [ ] Patrons vote on the next feature candidates and I make a selection (I can ask the wider community first too)
+- [ ] I get feedback from the MTG CB community and Patrons vote on the next feature candidates and I make a selection
 
 ## 🔄 In Progress
 
 ### Currently Looking At or Working On or Just Noticed
 
-- Grok how /goals calculates progress
+-- perf test this flexible finish stuff once done, repeat load tests in general for goals, including a flexible printing goal as a new case
 
 ### Blocked/Waiting
 
@@ -76,6 +76,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Podcast
 
 - At least link to the old ones, I'll probably start it back up after release
+  y
 
 ## 🚀 Release Checklist
 
@@ -136,7 +137,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Card Format Legality
 
 - Would be nice to warn users if cards aren't tournament legal, even though this is a collecting site and not a deckbuilding site.
-- Would also be nice to just show format legality while I'm at it -- and do allow filtering by it. I will have to stay on top of changes as they happen however, so mtgcb-jobs will need to be on top of this, detecting changes in scryfall data updating the database along with alerting me.
+- Would also be nice to just show format legality while I'm at it -- and do allow filtering by it. I will have to stay on top of changes as they happen however, so mtgcb-jobs will need to be on top of this, detecting changes in scryfall data updating the database along with alerting me. Probably a daily check-in and diff.
 
 #### Card Images for multifaced cards
 
@@ -160,6 +161,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - "Save this search as a collection goal"
 - Showing number of cards in excess of a goal
 - Showing goal criteria in the collection header, maybe in an i icon
+- Patron request: "Would it be possible to use locations as collection filters for goals? For example I could have a goal for MH3, but point to my MH3 binder location, that way my 4x SLD Kaalia of the Vast, in that binder, could be counted for my MH3 goal while potentially not being counted for some other goal."
 
 #### Default Collection Goals
 
@@ -233,6 +235,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Code Style
 
 - Refactor vibe-coded files to my clean code style (SetItemRenderer.tsx and browse/page.tsx are fair examples)
+- - Be sure to have a full test suite of goals and their results before and after refactoring
 - All quantity selectors should be using the same component, QuantitySelector.tsx
 - In-code TODO audit
 
@@ -300,6 +303,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - For folks that collect unopened boxes and packs and decks
 - Related: When adding a sealed product to a collection, can add it in an "opened" state and automatically add all the cards inside to the collection
+
+#### Set Blocks
+
+- Group sets into blocks for browsing and collection goals
+- Intelligent selection of whether to include tokens and promos or not
 
 #### Financial History Tracking
 

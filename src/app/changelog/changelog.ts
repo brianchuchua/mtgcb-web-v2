@@ -12,6 +12,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-29',
+      version: '0.136.0',
+      changes: [
+        'Added flexible finishes option for goals that need both regular and foil cards',
+        'Improved purchase flow for goals by fixing chunking logic and showing card counts',
+      ],
+    },
+    {
+      date: '2025-09-29',
       version: '0.135.1',
       changes: ['Fixed goal purchase button to correctly show cards when only foils are needed'],
     },
