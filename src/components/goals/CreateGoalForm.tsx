@@ -419,7 +419,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                         <Box>
                           <Typography variant="body2">Flexible Finishes</Typography>
                           <Typography variant="caption" color="text.secondary">
-                            If toggled, includes cards even if they were ONLY printed in regular OR foil.
+                            If toggled, includes cards even if they were ONLY printed in EITHER regular OR foil.
                           </Typography>
                         </Box>
                       }
