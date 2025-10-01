@@ -97,6 +97,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Bug Reports
 
 - Discord: When switching to viewing 400 cards at once, it crashed their Firefox browser.
+- Discord: Share links didn't work until they were recreated, possible sync issue.
 
 ### Communication
 
