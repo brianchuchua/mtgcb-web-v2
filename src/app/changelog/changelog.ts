@@ -12,6 +12,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-09-30',
+      version: '0.138.0',
+      changes: [
+        'Fixed dates displaying incorrectly for users in different timezones',
+        'Added automatic whitespace trimming to all form text inputs',
+      ],
+    },
+    {
+      date: '2025-09-30',
       version: '0.137.0',
       changes: ['Added closest normal set to statistics on home page'],
     },

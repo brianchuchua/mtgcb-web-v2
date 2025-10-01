@@ -14,6 +14,7 @@ import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
+import { trimFormData } from '@/utils/form/trimFormData';
 
 interface ForgotPasswordFormInputs {
   username: string;
@@ -56,10 +57,11 @@ export default function ForgotPasswordPage() {
       }
 
       const token = await executeRecaptcha('forgotPassword');
+      const trimmedData = trimFormData(data);
 
       const result = await forgotPassword({
-        username: data.username,
-        email: data.email,
+        username: trimmedData.username,
+        email: trimmedData.email,
         recaptchaToken: token,
       }).unwrap();
 

@@ -27,6 +27,7 @@ import { useUpdateGoalMutation } from '@/api/goals/goalsApi';
 import { Goal, UpdateGoalRequest } from '@/api/goals/types';
 import { Button } from '@/components/ui/button';
 import { useDeleteGoal } from '@/hooks/goals/useDeleteGoal';
+import { trimFormData } from '@/utils/form/trimFormData';
 import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
 import { useSetNames } from '@/utils/goals/useSetNames';
 
@@ -118,6 +119,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
     if (!goal) return;
 
     try {
+      const trimmedData = trimFormData(data);
       const searchCriteria = {
         conditions: searchConditions,
         sort: goal.searchCriteria.sort,
@@ -125,10 +127,10 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
       };
 
       const request: any = {
-        name: data.name,
-        description: data.description || undefined,
+        name: trimmedData.name,
+        description: trimmedData.description || undefined,
         searchCriteria,
-        isActive: data.isActive,
+        isActive: trimmedData.isActive,
         onePrintingPerPureName,
       };
 

@@ -13,6 +13,7 @@ import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
+import { trimFormData } from '@/utils/form/trimFormData';
 
 interface SignUpFormInputs {
   username: string;
@@ -59,12 +60,13 @@ export default function SignUpPage() {
       }
 
       const token = await executeRecaptcha('signup');
+      const trimmedData = trimFormData(data);
 
       // First attempt signup
       const signupResult = await signUp({
-        username: data.username,
-        email: data.email,
-        password: data.password,
+        username: trimmedData.username,
+        email: trimmedData.email,
+        password: trimmedData.password,
         recaptchaToken: token,
       }).unwrap();
 
@@ -79,8 +81,8 @@ export default function SignUpPage() {
       // If signup succeeds, attempt login
       const loginToken = await executeRecaptcha('login');
       const loginResult = await login({
-        username: data.username,
-        password: data.password,
+        username: trimmedData.username,
+        password: trimmedData.password,
         recaptchaToken: loginToken,
       }).unwrap();
 

@@ -15,7 +15,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
--- perf test this flexible finish stuff once done, repeat load tests in general for goals, including a flexible printing goal as a new case
+- medidate on how any printing mode works with setIds specified in goals, variants should count
+- Render dates to local time zone.
+
+-- perf test this flexible finish stuff once done, repeat load tests in general for goals, including a flexible printing goal as a new case, do this on tuesday before working on anything else
 
 ### Blocked/Waiting
 
@@ -51,10 +54,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Scale API and Web to two dynos (mostly for rolling restarts)
 
-### Core Features
-
-- UX: Verify that every search tool trims whitespace
-
 ### Sonarqube
 
 - Integrate Sonarqube and fix all critical issues
@@ -64,6 +63,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - A page thanking patrons for their support, listing them (anonymous by default), and showing the benefits they get. Maybe a link to a Discord channel for patrons.
 - A supporter badge of some sort would be great.
 - Detecting if someone is a patron and linking their accounts.
+- I think they should get a confetti button. On-demand confetti. I kinda want one.
 
 #### The Reserved List
 
@@ -93,6 +93,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Announce to patrons
 
 ## 📦 Post-Release
+
+### Bug Reports
+
+- Discord: When switching to viewing 400 cards at once, it crashed their Firefox browser.
 
 ### Communication
 
@@ -176,6 +180,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Scryfall treats double-sided tokens as two separate cards, one for each side. This is a problem for collectors, who just want to see one entry for the dual token in their collection. It's a disconnect with how TCGPlayer handles them too.
 - I'll probably create corrected entries and deprecate the old ones. This is a recent problem since WotC started making all new tokens double-sided.
+- Huh, can probably use Claude for Chrome to automate spreadsheeting this stuff.
 
 #### Adding cards to collection at buy time
 
@@ -188,6 +193,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Card Locations
 
 - Mass updating of card locations -- this goes against my advice of using locations sparingly, though.
+
+### Home Page Customization
+
+- Choosing which charts show up on the home page.
 
 ### Stats Page
 

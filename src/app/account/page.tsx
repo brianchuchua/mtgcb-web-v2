@@ -38,6 +38,7 @@ import { Button } from '@/components/ui/button';
 import { usePriceType, useProgressBarStyle, useSetIconStyle } from '@/contexts/DisplaySettingsContext';
 import { useAuth } from '@/hooks/useAuth';
 import { PriceType } from '@/types/pricing';
+import { trimFormData } from '@/utils/form/trimFormData';
 
 interface ProfileFormData {
   username: string;
@@ -104,7 +105,8 @@ function ProfileContent() {
 
   const onProfileSubmit = async (data: ProfileFormData) => {
     try {
-      const result = await updateUser(data).unwrap();
+      const trimmedData = trimFormData(data);
+      const result = await updateUser(trimmedData).unwrap();
 
       if (!result.success) {
         if (result.error?.code === 'USERNAME_TAKEN') {

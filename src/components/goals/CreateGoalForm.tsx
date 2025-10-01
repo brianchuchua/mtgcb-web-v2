@@ -24,6 +24,7 @@ import { CardApiParams } from '@/api/browse/types';
 import { useCreateGoalMutation } from '@/api/goals/goalsApi';
 import { CreateGoalRequest, Goal } from '@/api/goals/types';
 import { Button } from '@/components/ui/button';
+import { trimFormData } from '@/utils/form/trimFormData';
 import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
 import { useSetNames } from '@/utils/goals/useSetNames';
 
@@ -75,6 +76,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
 
   const onSubmit = async (data: FormValues) => {
     try {
+      const trimmedData = trimFormData(data);
       const searchCriteria = {
         conditions: searchConditions,
         sort: undefined,
@@ -82,8 +84,8 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
       };
 
       const request: CreateGoalRequest = {
-        name: data.name,
-        description: data.description || undefined,
+        name: trimmedData.name,
+        description: trimmedData.description || undefined,
         searchCriteria,
         onePrintingPerPureName,
       };

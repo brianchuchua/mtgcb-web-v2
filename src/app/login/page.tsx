@@ -13,6 +13,7 @@ import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
+import { trimFormData } from '@/utils/form/trimFormData';
 
 interface LoginFormInputs {
   username: string;
@@ -59,9 +60,10 @@ export default function LoginPage() {
       }
 
       const token = await executeRecaptcha('login');
+      const trimmedData = trimFormData(data);
 
       const result = await login({
-        ...data,
+        ...trimmedData,
         recaptchaToken: token,
       }).unwrap();
 
