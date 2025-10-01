@@ -306,14 +306,16 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box sx={{ 
-                    width: 120, 
-                    flexShrink: 0,
-                    position: 'relative',
-                    height: 167,
-                    bgcolor: 'action.hover',
-                    borderRadius: 1,
-                  }}>
+                  <Box
+                    sx={{
+                      width: 120,
+                      flexShrink: 0,
+                      position: 'relative',
+                      height: 167,
+                      bgcolor: 'action.hover',
+                      borderRadius: 1,
+                    }}
+                  >
                     <img
                       src={`https://r2.mtgcollectionbuilder.com/cards/images/normal/${stats.trophyCard.cardId}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`}
                       alt={stats.trophyCard.name}
@@ -365,14 +367,16 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
                   Most Collected
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box sx={{ 
-                    width: 120, 
-                    flexShrink: 0,
-                    position: 'relative',
-                    height: 167,
-                    bgcolor: 'action.hover',
-                    borderRadius: 1,
-                  }}>
+                  <Box
+                    sx={{
+                      width: 120,
+                      flexShrink: 0,
+                      position: 'relative',
+                      height: 167,
+                      bgcolor: 'action.hover',
+                      borderRadius: 1,
+                    }}
+                  >
                     <img
                       src={`https://r2.mtgcollectionbuilder.com/cards/images/normal/${stats.mostCollectedCard.cardId}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`}
                       alt={stats.mostCollectedCard.name}
@@ -420,14 +424,16 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
                   Least Valuable Mythic
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Box sx={{ 
-                    width: 120, 
-                    flexShrink: 0,
-                    position: 'relative',
-                    height: 167,
-                    bgcolor: 'action.hover',
-                    borderRadius: 1,
-                  }}>
+                  <Box
+                    sx={{
+                      width: 120,
+                      flexShrink: 0,
+                      position: 'relative',
+                      height: 167,
+                      bgcolor: 'action.hover',
+                      borderRadius: 1,
+                    }}
+                  >
                     <img
                       src={`https://r2.mtgcollectionbuilder.com/cards/images/normal/${stats.leastValuableMythic.cardId}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`}
                       alt={stats.leastValuableMythic.name}
@@ -668,7 +674,7 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
               <CardContent>
                 <Stack spacing={2}>
                   <Typography variant="h6" fontWeight="bold">
-                    Second Closest Set to Complete
+                    Closest Normal Set to Complete
                   </Typography>
                   <Box>
                     <Typography variant="body1" fontWeight="bold">
@@ -760,7 +766,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
           </Grid>
         </Stack>
       </Container>
-      
+
       <Container maxWidth="lg" sx={{ mb: 4 }}>
         <Typography variant="h5" fontWeight="bold" gutterBottom>
           Quick Actions
@@ -801,7 +807,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
           </Grid>
         </Grid>
       </Container>
-      
+
       <Container maxWidth="lg" sx={{ mb: 4 }}>
         <Typography variant="h5" fontWeight="bold" gutterBottom>
           Collection Statistics
@@ -862,7 +868,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
           </Grid>
         </Grid>
       </Container>
-      
+
       <Container maxWidth="lg">
         <Typography variant="h5" fontWeight="bold" gutterBottom>
           Quick Wins
@@ -910,7 +916,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
           ))}
         </Grid>
       </Container>
-      
+
       <Container maxWidth="lg" sx={{ mt: 1, textAlign: 'center' }}>
         <Typography variant="caption" color="text.secondary">
           (Statistics update hourly)
