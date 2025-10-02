@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-02',
+      version: '0.141.0',
+      changes: ['Added guidance for foil column values in custom CSV import'],
+    },
+    {
+      date: '2025-10-02',
       version: '0.140.0',
       changes: ['Added chunked import with progress bar to prevent timeouts on large collections'],
     },

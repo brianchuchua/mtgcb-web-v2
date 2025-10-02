@@ -135,7 +135,7 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
 
   if (error) {
     let errorMessage = 'Failed to preview CSV file. Please check that your file is properly formatted.';
-    
+
     // Handle different error structures
     const errorData = (error as any)?.data;
     if (errorData) {
@@ -143,16 +143,13 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
         errorMessage = errorData;
       } else if (errorData.message) {
         // Handle {message, code} structure
-        errorMessage = typeof errorData.message === 'string' 
-          ? errorData.message 
-          : errorData.message.message || errorMessage;
+        errorMessage =
+          typeof errorData.message === 'string' ? errorData.message : errorData.message.message || errorMessage;
       } else if (errorData.error) {
-        errorMessage = typeof errorData.error === 'string'
-          ? errorData.error
-          : errorData.error.message || errorMessage;
+        errorMessage = typeof errorData.error === 'string' ? errorData.error : errorData.error.message || errorMessage;
       }
     }
-    
+
     return (
       <Alert severity="error" sx={{ mb: 3 }}>
         <Typography variant="body2">
@@ -174,10 +171,16 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
         </Typography>
         <Typography variant="body2" paragraph>
           For best accuracy, include a <strong>Scryfall ID</strong> or <strong>TCGPlayer ID</strong> column. Without
-          these identifiers, the import will attempt to match cards by name and set, which may be less accurate.
+          these identifiers, the import will attempt to match cards by name and set and collector number, which may be
+          less accurate.
+        </Typography>
+        <Typography variant="body2" paragraph>
+          Required: At least one identifier (or Card Name + Set info) and a quantity field.
         </Typography>
         <Typography variant="body2">
-          Required: At least one identifier (or Card Name + Set info) and a quantity field.
+          <strong>Foil column:</strong> The following values are recognized as foil (case-insensitive):{' '}
+          <code>true</code>, <code>1</code>, <code>foil</code>, <code>yes</code>. All other values, including blank, are
+          treated as non-foil.
         </Typography>
       </Alert>
 
@@ -242,7 +245,7 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
                         value={currentMapping}
                         onChange={(e) => handleMappingChange(header, e.target.value)}
                         displayEmpty
-                        label={currentMapping !== '' ? "Maps to" : ""}
+                        label={currentMapping !== '' ? 'Maps to' : ''}
                       >
                         <MenuItem value="">
                           <em>Don't import</em>
