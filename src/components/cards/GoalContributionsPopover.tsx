@@ -21,6 +21,7 @@ interface GoalContributionsPopoverProps {
   transformOriginHorizontal?: 'left' | 'center' | 'right';
   justifyContent?: 'flex-start' | 'center' | 'flex-end';
   marginTop?: number;
+  finishType?: 'regular' | 'foil' | 'all';
 }
 
 export function GoalContributionsPopover({
@@ -33,6 +34,7 @@ export function GoalContributionsPopover({
   transformOriginHorizontal = 'left',
   justifyContent = 'flex-start',
   marginTop,
+  finishType = 'all',
 }: GoalContributionsPopoverProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -62,15 +64,20 @@ export function GoalContributionsPopover({
           Contributions from other sets:
         </Typography>
         <Box sx={{ maxHeight: 300, overflowY: 'auto', pr: 1 }}>
-          {contributingVersions.map((version, index) => (
-            <Box key={`${version.cardId}-${index}`} sx={{ mb: 0.5 }}>
-              <Typography variant="body2">
-                {version.setName || `Set ${version.setId}`}:{version.quantityReg > 0 && ` ${version.quantityReg} regular`}
-                {version.quantityReg > 0 && version.quantityFoil > 0 && ','}
-                {version.quantityFoil > 0 && ` ${version.quantityFoil} foil`}
-              </Typography>
-            </Box>
-          ))}
+          {contributingVersions.map((version, index) => {
+            const showRegular = (finishType === 'all' || finishType === 'regular') && version.quantityReg > 0;
+            const showFoil = (finishType === 'all' || finishType === 'foil') && version.quantityFoil > 0;
+
+            return (
+              <Box key={`${version.cardId}-${index}`} sx={{ mb: 0.5 }}>
+                <Typography variant="body2">
+                  {version.setName || `Set ${version.setId}`}:{showRegular && ` ${version.quantityReg} regular`}
+                  {showRegular && showFoil && ','}
+                  {showFoil && ` ${version.quantityFoil} foil`}
+                </Typography>
+              </Box>
+            );
+          })}
         </Box>
       </Box>
     );

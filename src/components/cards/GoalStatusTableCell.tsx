@@ -73,9 +73,21 @@ export function GoalStatusTableCell({ card, goalType }: GoalStatusTableCellProps
   // Filter out self-contributions (same card ID)
   const otherContributingVersions = goalContributingVersions?.filter((version) => version.cardId !== card.id) || [];
 
+  // Filter by finish type based on goalType
+  const filteredContributingVersions = otherContributingVersions.filter((version) => {
+    if (goalType === 'regular') {
+      return version.quantityReg > 0;
+    }
+    if (goalType === 'foil') {
+      return version.quantityFoil > 0;
+    }
+    // For 'all' type, show all versions
+    return true;
+  });
+
   // Show asterisk logic:
   // - For both "Goal met!" and "Need X": show when there are contributing versions from OTHER cards
-  const showAsterisk = otherContributingVersions.length > 0;
+  const showAsterisk = filteredContributingVersions.length > 0;
 
   const hasContributingVersions = showAsterisk;
   const showMessage = message !== '\u00A0';
@@ -84,10 +96,11 @@ export function GoalStatusTableCell({ card, goalType }: GoalStatusTableCellProps
   if (hasContributingVersions && showMessage) {
     return (
       <GoalContributionsPopover
-        contributingVersions={otherContributingVersions}
+        contributingVersions={filteredContributingVersions}
         isGoalMet={isGoalMet}
         justifyContent="center"
         marginTop={0.5}
+        finishType={goalType}
       >
         <Typography
           variant="caption"

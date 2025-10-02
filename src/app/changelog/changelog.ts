@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-01',
+      version: '0.139.1',
+      changes: ['Fixed goal contributions popup to only show relevant finish types in table view'],
+    },
+    {
+      date: '2025-10-01',
       version: '0.139.0',
       changes: ['Added option to count cards from all sets when using a goal for collecting cards from specific sets'],
     },

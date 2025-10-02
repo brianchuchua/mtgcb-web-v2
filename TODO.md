@@ -15,12 +15,13 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
+-- need to split the contributions from other sets modal for split regular/foil goals, shouldn't show contribution toward normals from a foil printing
 -- once the testing framework is solid, let's refactor and unify the goal code under /cards/search, /sets/search, and /goals
 
 - goal setid format doesn't render in the front-end unless it's in the or array, have claude compare these
 - goals with inclusions and exclusions may not work, for setIds
 - include format name in export - maybe username too
-- look into possible cors issue -- looks like a timeout/perf issue, need to check my importers and exporters carefully
+- look into possible cors issue -- looks like a timeout/perf issue, need to check my importers and exporters carefully -- yeah it's just a performance timeout for some formats. I probably need to chunk the import for large operations.
   -- perf test this flexible finish stuff once done, repeat load tests in general for goals, including a flexible printing goal as a new case, do this on tuesday before working on anything else
 
 ### Blocked/Waiting
@@ -169,6 +170,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Showing number of cards in excess of a goal
 - Showing goal criteria in the collection header, maybe in an i icon
 - Patron request: "Would it be possible to use locations as collection filters for goals? For example I could have a goal for MH3, but point to my MH3 binder location, that way my 4x SLD Kaalia of the Vast, in that binder, could be counted for my MH3 goal while potentially not being counted for some other goal."
+- Allow users to specify goals as granular as "collect every foil etched + regular".
 
 #### Default Collection Goals
 
