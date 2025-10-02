@@ -561,8 +561,14 @@ const CardPrice: React.FC<CardPriceProps> = ({
             <Typography
               variant="subtitle1"
               fontWeight="medium"
+              onClick={handlePriceClick}
               sx={{
                 fontSize: '1rem',
+                cursor: 'pointer',
+                color: 'primary.main',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
                 '@container card (max-width: 250px)': {
                   fontSize: '0.875rem',
                 },

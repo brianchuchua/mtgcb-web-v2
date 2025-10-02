@@ -15,8 +15,13 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
--- need to split the contributions from other sets modal for split regular/foil goals, shouldn't show contribution toward normals from a foil printing
--- once the testing framework is solid, let's refactor and unify the goal code under /cards/search, /sets/search, and /goals
+-- do i need a gin index on purename too?
+
+- importer bug for darksteel colossus, audit the logic
+- bad pure names apparently, need to look at my logic for updating these -- fixed already locally and in prod and in importer
+  -- goals page loading every time is annoying users, definitely need to do at least a client-side cache, maybe remember previous results and then update them? invalidate cache but don't load until the page is up, instead of preloading?
+  -- need to split the contributions from other sets modal for split regular/foil goals, shouldn't show contribution toward normals from a foil printing
+  -- once the testing framework is solid, let's refactor and unify the goal code under /cards/search, /sets/search, and /goals
 
 - goal setid format doesn't render in the front-end unless it's in the or array, have claude compare these
 - goals with inclusions and exclusions may not work, for setIds
@@ -39,7 +44,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### mtgcb-importer
 
-- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets
+- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets -- i want a post-migration verification too to test locally
 
 ### mtgcb-jobs
 
@@ -201,7 +206,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Home Page Customization
 
-- Choosing which charts show up on the home page.
+- Choosing which charts show up on the home page. Goals vs sets for quick wins or both.
 
 ### Stats Page
 

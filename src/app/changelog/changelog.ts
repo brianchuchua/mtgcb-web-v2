@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-02',
+      version: '0.139.2',
+      changes: ['Fixed foil-only prices not being clickable like other prices'],
+    },
+    {
       date: '2025-10-01',
       version: '0.139.1',
       changes: ['Fixed goal contributions popup to only show relevant finish types in table view'],
