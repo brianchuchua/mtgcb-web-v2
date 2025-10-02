@@ -74,6 +74,10 @@ export function GoalDescription({ goal, ...typographyProps }: GoalDescriptionPro
       }
     }
 
+    if (goal.onePrintingPerPureName && goal.includeSetsOutsideGoal) {
+      finalText += ' (counting cards from all sets)';
+    }
+
     if (includedSetIds && includedSetIds.length > 0 && Object.keys(setNames).length > 0) {
       const setNamesList = includedSetIds
         .map((id: string) => setNames[id])

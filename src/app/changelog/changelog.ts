@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-01',
+      version: '0.139.0',
+      changes: ['Added option to count cards from all sets when using a goal for collecting cards from specific sets'],
+    },
+    {
       date: '2025-09-30',
       version: '0.138.0',
       changes: [

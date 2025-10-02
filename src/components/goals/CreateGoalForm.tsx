@@ -50,6 +50,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
   >({});
   const [onePrintingPerPureName, setOnePrintingPerPureName] = useState(true);
   const [flexibleFinishes, setFlexibleFinishes] = useState(false);
+  const [includeSetsOutsideGoal, setIncludeSetsOutsideGoal] = useState(false);
 
   const handleSearchConditionsChange = useCallback(
     (conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>) => {
@@ -83,11 +84,17 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
         order: undefined,
       };
 
+      const hasSetIdFilter = searchConditions.setId && (
+        (searchConditions.setId.OR && searchConditions.setId.OR.length > 0) ||
+        (searchConditions.setId.AND && searchConditions.setId.AND.length > 0)
+      );
+
       const request: CreateGoalRequest = {
         name: trimmedData.name,
         description: trimmedData.description || undefined,
         searchCriteria,
         onePrintingPerPureName,
+        includeSetsOutsideGoal: onePrintingPerPureName && includeSetsOutsideGoal && hasSetIdFilter ? true : false,
       };
 
       if (quantityMode === 'all') {
@@ -201,6 +208,8 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
               onChange={handleSearchConditionsChange}
               onePrintingPerPureName={onePrintingPerPureName}
               onOnePrintingPerPureNameChange={setOnePrintingPerPureName}
+              includeSetsOutsideGoal={includeSetsOutsideGoal}
+              onIncludeSetsOutsideGoalChange={setIncludeSetsOutsideGoal}
             />
           </Box>
 
@@ -529,6 +538,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
               targetQuantityAll={watch('targetQuantityAll')}
               onePrintingPerPureName={onePrintingPerPureName}
               flexibleFinishes={flexibleFinishes}
+              includeSetsOutsideGoal={includeSetsOutsideGoal}
             />
           </Box>
 
@@ -655,6 +665,7 @@ function GoalPreview({
   targetQuantityAll,
   onePrintingPerPureName,
   flexibleFinishes,
+  includeSetsOutsideGoal,
 }: {
   searchConditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>;
   quantityMode: 'separate' | 'all';
@@ -663,6 +674,7 @@ function GoalPreview({
   targetQuantityAll?: number;
   onePrintingPerPureName: boolean;
   flexibleFinishes: boolean;
+  includeSetsOutsideGoal: boolean;
 }) {
   const { includedSetIds, excludedSetIds } = useMemo(() => {
     const included = searchConditions.setId?.OR || [];
@@ -726,6 +738,10 @@ function GoalPreview({
       }
     }
 
+    if (onePrintingPerPureName && includeSetsOutsideGoal) {
+      finalText += ' (counting cards from all sets)';
+    }
+
     if (includedSetIds && includedSetIds.length > 0 && Object.keys(setNames).length > 0) {
       const setNamesList = includedSetIds
         .map((id: string) => setNames[id])
@@ -762,6 +778,7 @@ function GoalPreview({
     excludedSetIds,
     onePrintingPerPureName,
     flexibleFinishes,
+    includeSetsOutsideGoal,
   ]);
 
   return (

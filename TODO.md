@@ -8,17 +8,20 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - [ ] Prepare last items for v1.0 Release
 - [ ] v1.0 Release
-- [ ] Data Cleanup Project
+- [ ] Data Cleanup Project (and weekly tech debt days)
 - [ ] I get feedback from the MTG CB community and Patrons vote on the next feature candidates and I make a selection
 
 ## 🔄 In Progress
 
 ### Currently Looking At or Working On or Just Noticed
 
-- medidate on how any printing mode works with setIds specified in goals, variants should count
-- Render dates to local time zone.
+-- once the testing framework is solid, let's refactor and unify the goal code under /cards/search, /sets/search, and /goals
 
--- perf test this flexible finish stuff once done, repeat load tests in general for goals, including a flexible printing goal as a new case, do this on tuesday before working on anything else
+- goal setid format doesn't render in the front-end unless it's in the or array, have claude compare these
+- goals with inclusions and exclusions may not work, for setIds
+- include format name in export - maybe username too
+- look into possible cors issue -- looks like a timeout/perf issue, need to check my importers and exporters carefully
+  -- perf test this flexible finish stuff once done, repeat load tests in general for goals, including a flexible printing goal as a new case, do this on tuesday before working on anything else
 
 ### Blocked/Waiting
 
@@ -76,7 +79,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Podcast
 
 - At least link to the old ones, I'll probably start it back up after release
-  y
 
 ## 🚀 Release Checklist
 
@@ -227,9 +229,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
+- Goal code is very fragmented, would be nice to refactor it into a more coherent whole
 - Create staging environments for both API and Web -- if needed. (Local dev is pretty comfortable now and lines up with prod.)
 - Audit database schema for unused fields
 - Audit API for unused endpoints
+- Document API endpoints with examples -- at least to help Claude out
 - Switch from Google reCAPTCHA to Cloudflare Turnstile
 - Find deprecated uses of PaperProps and Grid
 - Remove deprecated collection summary api call, since it's folded into browse sets now, remove from postman and update postman too
@@ -245,7 +249,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Code Style
 
 - Refactor vibe-coded files to my clean code style (SetItemRenderer.tsx and browse/page.tsx are fair examples)
-- - Be sure to have a full test suite of goals and their results before and after refactoring
+- - Be sure to have a full test suite of goals and their results before and after refactoring, multiple types with multiple sort options
 - All quantity selectors should be using the same component, QuantitySelector.tsx
 - In-code TODO audit
 

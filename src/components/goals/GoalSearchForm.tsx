@@ -38,6 +38,8 @@ interface GoalSearchFormProps {
   onChange: (conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>) => void;
   onePrintingPerPureName: boolean;
   onOnePrintingPerPureNameChange: (value: boolean) => void;
+  includeSetsOutsideGoal?: boolean;
+  onIncludeSetsOutsideGoalChange?: (value: boolean) => void;
 }
 
 interface SimpleOption {
@@ -104,10 +106,13 @@ export function GoalSearchForm({
   onChange,
   onePrintingPerPureName,
   onOnePrintingPerPureNameChange,
+  includeSetsOutsideGoal,
+  onIncludeSetsOutsideGoalChange,
 }: GoalSearchFormProps) {
   // Initialize state from searchConditions
   const [isInitialized, setIsInitialized] = useState(false);
   const [isColorInitialized, setIsColorInitialized] = useState(false);
+  const [previousSelectedSetsLength, setPreviousSelectedSetsLength] = useState(0);
 
   // Local states for all search fields
   const [name, setName] = useState(searchConditions.name || '');
@@ -609,6 +614,23 @@ export function GoalSearchForm({
     }
   }, [isInitialized, buildConditions, onChange]); // Include onChange in dependencies
 
+  // Reset includeSetsOutsideGoal when sets are removed
+  useEffect(() => {
+    if (isInitialized && onIncludeSetsOutsideGoalChange) {
+      if (selectedSets.length === 0 && previousSelectedSetsLength > 0 && includeSetsOutsideGoal) {
+        // Sets were removed, reset the option
+        onIncludeSetsOutsideGoalChange(false);
+      }
+      setPreviousSelectedSetsLength(selectedSets.length);
+    }
+  }, [
+    selectedSets.length,
+    isInitialized,
+    onIncludeSetsOutsideGoalChange,
+    includeSetsOutsideGoal,
+    previousSelectedSetsLength,
+  ]);
+
   // Build type options from API data
   useEffect(() => {
     if (cardTypesData) {
@@ -936,7 +958,11 @@ export function GoalSearchForm({
           exclusive
           onChange={(_, value) => {
             if (value !== null) {
-              onOnePrintingPerPureNameChange(value === 'one');
+              const newValue = value === 'one';
+              onOnePrintingPerPureNameChange(newValue);
+              if (!newValue && includeSetsOutsideGoal && onIncludeSetsOutsideGoalChange) {
+                onIncludeSetsOutsideGoalChange(false);
+              }
             }
           }}
           fullWidth
@@ -945,6 +971,27 @@ export function GoalSearchForm({
           <ToggleButton value="one">Any printing of each card</ToggleButton>
           <ToggleButton value="every">Every printing of each card</ToggleButton>
         </ToggleButtonGroup>
+
+        {onePrintingPerPureName && onIncludeSetsOutsideGoalChange && selectedSets.length > 0 && (
+          <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={includeSetsOutsideGoal || false}
+                  onChange={(e) => onIncludeSetsOutsideGoalChange(e.target.checked)}
+                />
+              }
+              label={
+                <Box>
+                  <Typography variant="body2">Count cards from all sets</Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Count cards from any set in your collection toward this goal, not sets that are part of the goal.
+                  </Typography>
+                </Box>
+              }
+            />
+          </Box>
+        )}
       </Paper>
 
       {/* Stat Conditions */}
