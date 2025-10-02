@@ -985,7 +985,8 @@ export function GoalSearchForm({
                 <Box>
                   <Typography variant="body2">Count cards from all sets</Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Count cards from any set in your collection toward this goal, not sets that are part of the goal.
+                    Count cards from any set in your collection toward this goal, not just sets that are part of the
+                    goal.
                   </Typography>
                 </Box>
               }
