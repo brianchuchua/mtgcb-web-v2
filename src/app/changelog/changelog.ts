@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-02',
+      version: '0.140.0',
+      changes: ['Added chunked import with progress bar to prevent timeouts on large collections'],
+    },
+    {
+      date: '2025-10-02',
       version: '0.139.2',
       changes: ['Fixed foil-only prices not being clickable like other prices'],
     },

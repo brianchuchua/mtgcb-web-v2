@@ -43,9 +43,11 @@ import {
 import { styled } from '@mui/material/styles';
 import React, { useRef, useState } from 'react';
 import { CustomCSVMapper } from './CustomCSVMapper';
+import { ImportProgress } from './components/ImportProgress';
 import { useGetImportFormatsQuery, useImportCollectionMutation } from '@/api/import/importApi';
 import type { ImportError, ImportResult } from '@/api/import/types';
 import { Link as NextLink } from '@/components/ui/link';
+import { useChunkedImport } from '@/hooks/useChunkedImport';
 
 const InfoBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -72,7 +74,7 @@ const IMPORT_FORMAT_NOTES: Record<string, string> = {
     "TCGPlayer App exports files as .txt format. You'll need to rename the file extension from .txt to .csv before importing.",
   deckbox: "When exporting from Deckbox, make sure to select 'Scryfall ID' and 'TcgPlayer ID' as additional fields.",
   moxfield:
-    "Moxfield doesn't use unique identifiers like Scryfall ID or TCGPlayer ID, so the import takes about a minute to process 20,000 cards, with an accuracy rate of about 98%. Most failures are due to differences in the edition code or how cards are grouped in different sets.",
+    "Moxfield doesn't use unique identifiers like Scryfall ID or TCGPlayer ID, so the import takes takes a bit longer than the other formats, with an accuracy rate of about 94%. Most failures are due to differences in the edition code, how cards are grouped in different sets, or ambiguities with how Rainbow Foils are labeled in the export.",
   // Add more format notes here as needed
 };
 
@@ -95,6 +97,7 @@ export const ImportClient: React.FC = () => {
 
   const { data: formats, isLoading: formatsLoading, error: formatsError } = useGetImportFormatsQuery();
   const [importCollection, { isLoading: importing }] = useImportCollectionMutation();
+  const { progress, isImporting, runChunkedImport, reset } = useChunkedImport(importCollection);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -135,8 +138,9 @@ export const ImportClient: React.FC = () => {
 
     try {
       const csvData = await selectedFile.text();
-      const response = await importCollection({
-        csvData,
+
+      // Run chunked import
+      const finalProgress = await runChunkedImport(csvData, {
         filename: selectedFile.name,
         fieldMappings: selectedFormat === 'custom' ? customFieldMappings : undefined,
         query: {
@@ -144,12 +148,20 @@ export const ImportClient: React.FC = () => {
           updateMode,
           dryRun,
         },
-      }).unwrap();
+      });
 
-      if (response.data) {
-        setImportResult(response.data);
-        setLastImportWasDryRun(dryRun);
-      }
+      // Convert progress to ImportResult for display
+      setImportResult({
+        totalRows: finalProgress.totalRows,
+        successfulRows: finalProgress.successfulRows,
+        failedRows: finalProgress.failedRows,
+        created: finalProgress.created,
+        updated: finalProgress.updated,
+        deleted: finalProgress.deleted,
+        partialSuccess: finalProgress.failedRows > 0 && finalProgress.successfulRows > 0,
+        errors: finalProgress.errors,
+      });
+      setLastImportWasDryRun(dryRun);
     } catch (error) {
       console.error('Import failed:', error);
     }
@@ -449,173 +461,190 @@ export const ImportClient: React.FC = () => {
                         <Button
                           variant="outlined"
                           onClick={() => handleImportClick(true)}
-                          disabled={importing || (selectedFormat === 'custom' && !isCustomMappingValid)}
+                          disabled={isImporting || (selectedFormat === 'custom' && !isCustomMappingValid)}
                         >
                           Preview (Dry Run)
                         </Button>
                         <Button
                           variant="contained"
                           onClick={() => handleImportClick(false)}
-                          disabled={importing || (selectedFormat === 'custom' && !isCustomMappingValid)}
-                          startIcon={importing ? <CircularProgress size={20} /> : null}
+                          disabled={isImporting || (selectedFormat === 'custom' && !isCustomMappingValid)}
+                          startIcon={isImporting ? <CircularProgress size={20} /> : null}
                         >
-                          {importing ? 'Importing...' : 'Import Collection'}
+                          {isImporting ? 'Importing...' : 'Import Collection'}
                         </Button>
                       </>
                     )}
                   </Stack>
                 )}
 
+                {/* Show progress while importing */}
+                {isImporting && (
+                  <Box sx={{ mt: 3 }}>
+                    <ImportProgress
+                      currentChunk={progress.currentChunk}
+                      totalChunks={progress.totalChunks}
+                      processedRows={progress.processedRows}
+                      totalRows={progress.totalRows}
+                      successfulRows={progress.successfulRows}
+                      failedRows={progress.failedRows}
+                    />
+                  </Box>
+                )}
+
                 {importResult && (
                   <Box sx={{ mt: 4 }}>
-                      <Alert
-                        severity={
-                          importResult.failedRows === 0 ? 'success' : importResult.partialSuccess ? 'warning' : 'error'
-                        }
-                        sx={{ mb: 3 }}
-                      >
-                        {lastImportWasDryRun ? (
-                          importResult.failedRows === 0 ? (
-                            <>Dry run successful: All {importResult.totalRows} rows would be imported. No changes have been made to your collection.</>
-                          ) : importResult.partialSuccess ? (
-                            <>
-                              Dry run partially successful: {importResult.successfulRows} of {importResult.totalRows} rows
-                              would be imported. No changes have been made to your collection.
-                            </>
-                          ) : (
-                            <>Dry run failed: All {importResult.totalRows} rows would fail to import. No changes have been made to your collection.</>
-                          )
+                    <Alert
+                      severity={
+                        importResult.failedRows === 0 ? 'success' : importResult.partialSuccess ? 'warning' : 'error'
+                      }
+                      sx={{ mb: 3 }}
+                    >
+                      {lastImportWasDryRun ? (
+                        importResult.failedRows === 0 ? (
+                          <>
+                            Dry run successful: All {importResult.totalRows} rows would be imported. No changes have
+                            been made to your collection.
+                          </>
+                        ) : importResult.partialSuccess ? (
+                          <>
+                            Dry run partially successful: {importResult.successfulRows} of {importResult.totalRows} rows
+                            would be imported. No changes have been made to your collection.
+                          </>
                         ) : (
-                          importResult.failedRows === 0 ? (
-                            <>Successfully imported all {importResult.totalRows} rows</>
-                          ) : importResult.partialSuccess ? (
-                            <>
-                              Partially successful: {importResult.successfulRows} of {importResult.totalRows} rows
-                              imported
-                            </>
-                          ) : (
-                            <>Import failed: All {importResult.totalRows} rows failed</>
-                          )
-                        )}
-                      </Alert>
-
-                      <TableContainer component={Paper} variant="outlined">
-                        <Table size="small">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>Metric</TableCell>
-                              <TableCell align="right">Count</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            <TableRow>
-                              <TableCell>Total Rows</TableCell>
-                              <TableCell align="right">{importResult.totalRows}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <Box display="flex" alignItems="center" gap={1}>
-                                  <CheckCircleIcon color="success" fontSize="small" />
-                                  Successful
-                                </Box>
-                              </TableCell>
-                              <TableCell align="right">{importResult.successfulRows}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <Box display="flex" alignItems="center" gap={1}>
-                                  <ErrorIcon color="error" fontSize="small" />
-                                  Failed
-                                </Box>
-                              </TableCell>
-                              <TableCell align="right">{importResult.failedRows}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>Created</TableCell>
-                              <TableCell align="right">
-                                <Chip label={importResult.created} size="small" color="success" />
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>Updated</TableCell>
-                              <TableCell align="right">
-                                <Chip label={importResult.updated} size="small" color="primary" />
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>Deleted</TableCell>
-                              <TableCell align="right">
-                                <Chip label={importResult.deleted} size="small" color="warning" />
-                              </TableCell>
-                            </TableRow>
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-
-                      {importResult.errors.length > 0 && (
-                        <Box sx={{ mt: 3 }}>
-                          <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography variant="h6">Errors ({importResult.errors.length})</Typography>
-                            <Stack direction="row" spacing={1}>
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                startIcon={<FileDownloadIcon />}
-                                onClick={handleDownloadErrors}
-                              >
-                                Download Errors
-                              </Button>
-                              <IconButton size="small" onClick={() => setShowErrors(!showErrors)}>
-                                {showErrors ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                              </IconButton>
-                            </Stack>
-                          </Box>
-
-                          <Collapse in={showErrors}>
-                            <TableContainer component={Paper} variant="outlined" sx={{ mt: 2, maxHeight: 400 }}>
-                              <Table size="small" stickyHeader>
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell>Row</TableCell>
-                                    <TableCell>Field</TableCell>
-                                    <TableCell>Value</TableCell>
-                                    <TableCell>Error</TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {importResult.errors.map((error, index) => (
-                                    <TableRow key={index}>
-                                      <TableCell>{error.row}</TableCell>
-                                      <TableCell>{error.field}</TableCell>
-                                      <TableCell>{error.value}</TableCell>
-                                      <TableCell>{error.message}</TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </TableContainer>
-                          </Collapse>
-                        </Box>
+                          <>
+                            Dry run failed: All {importResult.totalRows} rows would fail to import. No changes have been
+                            made to your collection.
+                          </>
+                        )
+                      ) : importResult.failedRows === 0 ? (
+                        <>Successfully imported all {importResult.totalRows} rows</>
+                      ) : importResult.partialSuccess ? (
+                        <>
+                          Partially successful: {importResult.successfulRows} of {importResult.totalRows} rows imported
+                        </>
+                      ) : (
+                        <>Import failed: All {importResult.totalRows} rows failed</>
                       )}
+                    </Alert>
 
-                      <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
-                        <Button
-                          variant="outlined"
-                          onClick={() => {
-                            setSelectedFile(null);
-                            setSelectedFileContent('');
-                            setImportResult(null);
-                            setHasCustomMappingError(false);
-                            if (fileInputRef.current) {
-                              fileInputRef.current.value = '';
-                            }
-                          }}
-                        >
-                          Import Another File
-                        </Button>
-                      </Stack>
-                    </Box>
-                  )}
+                    <TableContainer component={Paper} variant="outlined">
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Metric</TableCell>
+                            <TableCell align="right">Count</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell>Total Rows</TableCell>
+                            <TableCell align="right">{importResult.totalRows}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>
+                              <Box display="flex" alignItems="center" gap={1}>
+                                <CheckCircleIcon color="success" fontSize="small" />
+                                Successful
+                              </Box>
+                            </TableCell>
+                            <TableCell align="right">{importResult.successfulRows}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>
+                              <Box display="flex" alignItems="center" gap={1}>
+                                <ErrorIcon color="error" fontSize="small" />
+                                Failed
+                              </Box>
+                            </TableCell>
+                            <TableCell align="right">{importResult.failedRows}</TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Created</TableCell>
+                            <TableCell align="right">
+                              <Chip label={importResult.created} size="small" color="success" />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Updated</TableCell>
+                            <TableCell align="right">
+                              <Chip label={importResult.updated} size="small" color="primary" />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Deleted</TableCell>
+                            <TableCell align="right">
+                              <Chip label={importResult.deleted} size="small" color="warning" />
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+
+                    {importResult.errors.length > 0 && (
+                      <Box sx={{ mt: 3 }}>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="h6">Errors ({importResult.errors.length})</Typography>
+                          <Stack direction="row" spacing={1}>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              startIcon={<FileDownloadIcon />}
+                              onClick={handleDownloadErrors}
+                            >
+                              Download Errors
+                            </Button>
+                            <IconButton size="small" onClick={() => setShowErrors(!showErrors)}>
+                              {showErrors ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            </IconButton>
+                          </Stack>
+                        </Box>
+
+                        <Collapse in={showErrors}>
+                          <TableContainer component={Paper} variant="outlined" sx={{ mt: 2, maxHeight: 400 }}>
+                            <Table size="small" stickyHeader>
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>Row</TableCell>
+                                  <TableCell>Field</TableCell>
+                                  <TableCell>Value</TableCell>
+                                  <TableCell>Error</TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {importResult.errors.map((error, index) => (
+                                  <TableRow key={index}>
+                                    <TableCell>{error.row}</TableCell>
+                                    <TableCell>{error.field}</TableCell>
+                                    <TableCell>{error.value}</TableCell>
+                                    <TableCell>{error.message}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+                        </Collapse>
+                      </Box>
+                    )}
+
+                    <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => {
+                          setSelectedFile(null);
+                          setSelectedFileContent('');
+                          setImportResult(null);
+                          setHasCustomMappingError(false);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = '';
+                          }
+                        }}
+                      >
+                        Import Another File
+                      </Button>
+                    </Stack>
+                  </Box>
+                )}
               </>
             )}
           </>
