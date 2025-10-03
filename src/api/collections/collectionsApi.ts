@@ -315,6 +315,7 @@ const collectionsApi = mtgcbApi.injectEndpoints({
                   { type: 'Goals', id: `user-${userId}` },
                   'Goals',
                   'Location',
+                  'Statistics',
                 ]),
               );
             } else {

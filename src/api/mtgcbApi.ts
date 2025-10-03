@@ -36,7 +36,7 @@ export const mtgcbApi = createApi({
     
     return baseQuery(modifiedArgs, api, extraOptions);
   },
-  tagTypes: ['Auth', 'Cards', 'Sets', 'SetTypes', 'CostToComplete', 'Collection', 'Goals', 'Location', 'ShareLink'],
+  tagTypes: ['Auth', 'Cards', 'Sets', 'SetTypes', 'CostToComplete', 'Collection', 'Goals', 'Location', 'ShareLink', 'Statistics'],
   endpoints: () => ({}),
 });
 

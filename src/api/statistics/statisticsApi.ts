@@ -19,7 +19,7 @@ export const statisticsApi = mtgcbApi.injectEndpoints({
       // and don't invalidate on collection changes. Users can manually refresh
       // the page to get updated statistics after making collection changes.
       keepUnusedDataFor: 3600, // 1 hour
-      // providesTags: ['Collection'], // Intentionally removed to prevent auto-invalidation
+      providesTags: ['Statistics'],
     }),
   }),
 });
