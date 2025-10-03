@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-02',
+      version: '0.141.1',
+      changes: ['Fixed import page state not clearing when switching between formats or uploading different files'],
+    },
+    {
+      date: '2025-10-02',
       version: '0.141.0',
       changes: ['Added guidance for foil column values in custom CSV import'],
     },

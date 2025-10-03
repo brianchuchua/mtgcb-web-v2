@@ -162,6 +162,15 @@ export const ImportClient: React.FC = () => {
         errors: finalProgress.errors,
       });
       setLastImportWasDryRun(dryRun);
+
+      // Clear file after successful real import to ensure clean state
+      if (!dryRun) {
+        setSelectedFile(null);
+        setSelectedFileContent('');
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
     } catch (error) {
       console.error('Import failed:', error);
     }

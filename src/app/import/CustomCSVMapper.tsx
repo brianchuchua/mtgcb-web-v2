@@ -67,6 +67,12 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+  // Reset state when CSV data changes (e.g., new file uploaded)
+  useEffect(() => {
+    setHasLoadedSuggestions(false);
+    setMappings({});
+  }, [csvData]);
+
   useEffect(() => {
     if (csvData) {
       previewCSV({ csvData, rowLimit: 5 });
