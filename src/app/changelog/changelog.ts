@@ -12,13 +12,23 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-05',
+      version: '0.143.0',
+      changes: [
+        'Added mass update feature to collection search pages for bulk quantity changes by rarity -- was previously only in the set page',
+        'Moved mass edit buttons for quantities and locations to a new sub-menu',
+      ],
+    },
+    {
+      date: '2025-10-05',
       version: '0.142.1',
       changes: ['Fixed info icons to use click instead of hover for better mobile support'],
     },
     {
       date: '2025-10-05',
       version: '0.142.0',
-      changes: ['Added instant goal loading with smart caching - goals now load immediately from cache while refreshing in background, prioritizing uncached goals first'],
+      changes: [
+        'Added instant goal loading with smart caching - goals now load immediately from cache while refreshing in background, prioritizing uncached goals first',
+      ],
     },
     {
       date: '2025-10-02',

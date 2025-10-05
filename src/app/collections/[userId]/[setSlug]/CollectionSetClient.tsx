@@ -1,7 +1,10 @@
 'use client';
 
+import AutoFixHigh from '@mui/icons-material/AutoFixHigh';
+import LocationOn from '@mui/icons-material/LocationOn';
+import MoreVert from '@mui/icons-material/MoreVert';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useSnackbar } from 'notistack';
@@ -9,16 +12,16 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Confetti from 'react-confetti';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetSetByIdQuery, useGetSetsQuery } from '@/api/browse/browseApi';
-import { useMassUpdateCollectionMutation } from '@/api/collections/collectionsApi';
+import { useMassUpdateCollectionMutation, useMassUpdateLocationsMutation } from '@/api/collections/collectionsApi';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
-import MassUpdateButton from '@/components/collections/MassUpdateButton';
 import MassUpdateConfirmDialog from '@/components/collections/MassUpdateConfirmDialog';
 import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
+import MassUpdateLocationPanel, { MassUpdateLocationFormData } from '@/components/collections/MassUpdateLocationPanel';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
 import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
 import { Pagination } from '@/components/pagination';
@@ -91,11 +94,19 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     isViewingSharedCollection(userId) &&
     browseController.error?.data?.error?.code === 'COLLECTION_PRIVATE';
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const isMenuOpen = Boolean(menuAnchorEl);
+
   // Mass Update state
   const [isMassUpdateOpen, setIsMassUpdateOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [massUpdateFormData, setMassUpdateFormData] = useState<MassUpdateFormData | null>(null);
   const [massUpdateCollection, { isLoading: isMassUpdateLoading }] = useMassUpdateCollectionMutation();
+
+  // Mass Update Location state
+  const [isMassUpdateLocationOpen, setIsMassUpdateLocationOpen] = useState(false);
+  const [massUpdateLocations, { isLoading: isMassUpdateLocationLoading }] = useMassUpdateLocationsMutation();
 
   // Get current search parameters to pass to subsets
   const cardSearchParams = useSelector(selectCardSearchParams);
@@ -250,9 +261,19 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     }, 100);
   }, []);
 
+  // Menu handlers
+  const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  }, []);
+
+  const handleMenuClose = useCallback(() => {
+    setMenuAnchorEl(null);
+  }, []);
+
   // Mass Update handlers
   const handleMassUpdateToggle = useCallback(() => {
     setIsMassUpdateOpen(!isMassUpdateOpen);
+    setMenuAnchorEl(null);
   }, [isMassUpdateOpen]);
 
   const handleMassUpdateSubmit = useCallback((formData: MassUpdateFormData) => {
@@ -343,6 +364,164 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const handleCancelConfirm = useCallback(() => {
     setShowConfirmDialog(false);
     setMassUpdateFormData(null);
+  }, []);
+
+  // Get visible card IDs for mass location update - only cards they own
+  const ownedVisibleCardIds = React.useMemo(() => {
+    if (browseController.view === 'cards' && browseController.cardsProps && 'items' in browseController.cardsProps) {
+      return browseController.cardsProps.items
+        .filter((card) => (card.quantityReg && card.quantityReg > 0) || (card.quantityFoil && card.quantityFoil > 0))
+        .map((card) => parseInt(card.id));
+    }
+    return [];
+  }, [browseController.view, browseController.cardsProps]);
+
+  // Mass Update Location handlers
+  const handleMassUpdateLocationToggle = useCallback(() => {
+    setIsMassUpdateLocationOpen(!isMassUpdateLocationOpen);
+    setMenuAnchorEl(null);
+  }, [isMassUpdateLocationOpen]);
+
+  const handleMassUpdateLocationSubmit = useCallback(
+    async (formData: MassUpdateLocationFormData) => {
+      if (!ownedVisibleCardIds.length) {
+        enqueueSnackbar('No owned cards available to update', { variant: 'error' });
+        return;
+      }
+
+      try {
+        const response = await massUpdateLocations({
+          mode: formData.mode,
+          cardIds: ownedVisibleCardIds,
+          locationId: formData.locationId,
+          quantityReg: formData.quantityReg,
+          quantityFoil: formData.quantityFoil,
+        }).unwrap();
+
+        if (response.success && response.data) {
+          const { successful, failed, operations, errors, warnings } = response.data;
+
+          if (successful === 0 && failed > 0) {
+            // Group errors by reason
+            const errorGroups: Record<string, number> = {};
+            if (errors) {
+              errors.forEach((error) => {
+                errorGroups[error.reason] = (errorGroups[error.reason] || 0) + 1;
+              });
+            }
+
+            // Get the most common error reason for display
+            const errorReasons = Object.keys(errorGroups);
+            const primaryReason = errorReasons.length > 0 ? errorReasons[0] : null;
+
+            let friendlyReason = '';
+            if (primaryReason) {
+              friendlyReason = primaryReason.toLowerCase();
+              if (friendlyReason.includes('not found') || friendlyReason.includes('not in collection')) {
+                friendlyReason = 'Cards not in collection';
+              } else if (friendlyReason.includes('foil')) {
+                friendlyReason = 'No foil version exists';
+              } else if (friendlyReason.includes('regular')) {
+                friendlyReason = 'No regular version exists';
+              } else {
+                friendlyReason = primaryReason;
+              }
+            }
+
+            const skipMessage = friendlyReason
+              ? `${failed} card${failed !== 1 ? 's' : ''} skipped (${friendlyReason})`
+              : `${failed} card${failed !== 1 ? 's' : ''} skipped`;
+
+            enqueueSnackbar(skipMessage, {
+              variant: 'error',
+            });
+          } else if (successful > 0) {
+            let message;
+
+            // Match the single card dialog success messages
+            if (formData.mode === 'remove') {
+              message = 'Locations cleared successfully';
+            } else if (formData.mode === 'set' && operations.created > operations.updated) {
+              message = 'Cards added to location successfully';
+            } else if (formData.mode === 'increment' || operations.updated > operations.created) {
+              message = 'Location quantities updated successfully';
+            } else {
+              message = `Successfully updated ${successful} card${successful !== 1 ? 's' : ''}`;
+            }
+
+            // Count unique cards that had quantities capped
+            let cappedCardsCount = 0;
+            if (warnings && warnings.length > 0) {
+              const cappedCardIds = new Set<number>();
+              warnings.forEach((warning) => {
+                if (warning.message.includes('capped')) {
+                  cappedCardIds.add(warning.cardId);
+                }
+              });
+              cappedCardsCount = cappedCardIds.size;
+            }
+
+            if (failed > 0 || cappedCardsCount > 0) {
+              const messageParts = [message];
+
+              if (failed > 0) {
+                // Group errors by reason for the warning message
+                const errorGroups: Record<string, number> = {};
+                if (errors) {
+                  errors.forEach((error) => {
+                    errorGroups[error.reason] = (errorGroups[error.reason] || 0) + 1;
+                  });
+                }
+
+                // Get the primary skip reason
+                const errorReasons = Object.keys(errorGroups);
+                const primaryReason = errorReasons.length > 0 ? errorReasons[0] : null;
+
+                let friendlyReason = '';
+                if (primaryReason) {
+                  const reason = primaryReason.toLowerCase();
+                  if (reason.includes('not found') || reason.includes('not in collection')) {
+                    friendlyReason = 'Cards not in collection';
+                  } else if (reason.includes('foil')) {
+                    friendlyReason = 'No foil version exists';
+                  } else if (reason.includes('regular')) {
+                    friendlyReason = 'No regular version exists';
+                  } else {
+                    friendlyReason = primaryReason;
+                  }
+                }
+
+                messageParts.push(
+                  `${failed} card${failed !== 1 ? 's' : ''} skipped${friendlyReason ? ` (${friendlyReason})` : ''}`,
+                );
+              }
+
+              if (cappedCardsCount > 0) {
+                messageParts.push(
+                  `${cappedCardsCount} card${cappedCardsCount !== 1 ? 's' : ''} had quantities capped at maximum owned and unassigned to other locations`,
+                );
+              }
+
+              const finalMessage = messageParts.join('. ');
+              enqueueSnackbar(finalMessage, { variant: 'warning', autoHideDuration: 8000 });
+            } else {
+              enqueueSnackbar(message, { variant: 'success' });
+            }
+          }
+
+          setIsMassUpdateLocationOpen(false);
+        }
+      } catch (error: any) {
+        enqueueSnackbar(error?.data?.error?.message || 'Failed to update card locations', {
+          variant: 'error',
+        });
+      }
+    },
+    [ownedVisibleCardIds, massUpdateLocations, enqueueSnackbar],
+  );
+
+  const handleMassUpdateLocationCancel = useCallback(() => {
+    setIsMassUpdateLocationOpen(false);
   }, []);
 
   const isCardGridView = browseController.view === 'cards' && browseController.viewMode === 'grid';
@@ -577,15 +756,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         userId={String(userId)}
         goalId={selectedGoalId ? String(selectedGoalId) : undefined}
         additionalAction={
-          <>
-            {isOwnCollection && browseController.view === 'cards' && !selectedGoalId && (
-              <MassUpdateButton
-                onClick={handleMassUpdateToggle}
-                isOpen={isMassUpdateOpen}
-                disabled={isMassUpdateLoading}
-              />
-            )}
-            {isOwnCollection && (
+          isOwnCollection && (
+            <Stack direction="row" spacing={0.5}>
               <ShareCollectionButton
                 userId={userId.toString()}
                 username={username || user?.username || 'User'}
@@ -593,20 +765,82 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                 collectionName={set?.name}
                 setSlug={setSlug}
               />
-            )}
-          </>
+              {browseController.view === 'cards' && !selectedGoalId && (
+                <>
+                  <Tooltip title="More actions">
+                    <IconButton
+                      size="small"
+                      onClick={handleMenuOpen}
+                      disabled={isMassUpdateLoading}
+                      sx={{
+                        border: 1,
+                        borderColor: (theme) => theme.palette.mode === 'dark'
+                          ? 'rgba(144, 202, 249, 0.5)'
+                          : 'rgba(25, 118, 210, 0.5)',
+                        borderRadius: 1,
+                        color: 'primary.main',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          backgroundColor: 'action.hover',
+                        },
+                      }}
+                    >
+                      <MoreVert />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    anchorEl={menuAnchorEl}
+                    open={isMenuOpen}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                  >
+                    <MenuItem onClick={handleMassUpdateToggle}>
+                      <ListItemIcon>
+                        <AutoFixHigh fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText>Mass Update</ListItemText>
+                    </MenuItem>
+                    {hasLocations && ownedVisibleCardIds.length > 0 && (
+                      <MenuItem onClick={handleMassUpdateLocationToggle}>
+                        <ListItemIcon>
+                          <LocationOn fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Locations</ListItemText>
+                      </MenuItem>
+                    )}
+                  </Menu>
+                </>
+              )}
+            </Stack>
+          )
         }
       />
       <SearchDescription forceView="cards" />
 
       {/* Mass Update Panel */}
       {isOwnCollection && browseController.view === 'cards' && !selectedGoalId && (
-        <MassUpdatePanel
-          isOpen={isMassUpdateOpen}
-          onSubmit={handleMassUpdateSubmit}
-          onCancel={handleMassUpdateCancel}
-          isLoading={isMassUpdateLoading}
-        />
+        <>
+          <MassUpdatePanel
+            isOpen={isMassUpdateOpen}
+            onSubmit={handleMassUpdateSubmit}
+            onCancel={handleMassUpdateCancel}
+            isLoading={isMassUpdateLoading}
+          />
+          <MassUpdateLocationPanel
+            isOpen={isMassUpdateLocationOpen}
+            onSubmit={handleMassUpdateLocationSubmit}
+            onCancel={handleMassUpdateLocationCancel}
+            isLoading={isMassUpdateLocationLoading}
+            cardCount={ownedVisibleCardIds.length}
+          />
+        </>
       )}
 
       {browseController.error ? (

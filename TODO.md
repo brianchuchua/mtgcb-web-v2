@@ -15,14 +15,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- make sure people can't edit collections with shared key, probably not, just paranoid
+- possible table rendering issues for unmet goals, maybe the stripes aren't performant, scroll feels bad, test after a restart
 - support mass entry at top level of search, make submenu that puts mass location update there too
-- make the reserved list icon button work on mobile and audit all icon buttons for hover vs click mode
-  -- need to test all import formats again, new folder clearly labeled with test data
-  -- once the testing framework is solid, let's refactor and unify the goal code under /cards/search, /sets/search, and /goals
-- goal testing system, clear organized test cases, including creating the goals via the api, adapting to results changing over time, etc.
-- goal setid format doesn't render in the front-end unless it's in the or array, have claude compare these
-- goals with inclusions and exclusions may not work, for setIds
+- ux: share and ... menu are bigger than grid/table
+- need to test all import formats again, new folder clearly labeled with test data
+
 - more load tests in general, have claude check on what could be problematic
   -- perf test this flexible finish stuff once done, repeat load tests in general for goals, including a flexible printing goal as a new case, do this on tuesday before working on anything else
 
@@ -238,7 +235,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
-- Goal code is very fragmented, would be nice to refactor it into a more coherent whole
+- goal setid format doesn't render in the front-end unless it's in the OR array, have claude compare these -- only an issue if goals are created outside the front-end constraints, ran into this creating test goals programmatically
+- goal testing system, clear organized test cases, including creating the goals via the api, adapting to results changing over time, etc.
+- Goal code is very fragmented, would be nice to refactor it into a more coherent whole (/goals, /cards/search, /sets/search) -- after a good test bench is setup beforehand
 - Create staging environments for both API and Web -- if needed. (Local dev is pretty comfortable now and lines up with prod.)
 - Audit database schema for unused fields
 - Audit API for unused endpoints

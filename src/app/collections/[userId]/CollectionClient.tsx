@@ -1,17 +1,21 @@
 'use client';
 
-import { Box, CircularProgress, Stack } from '@mui/material';
+import AutoFixHigh from '@mui/icons-material/AutoFixHigh';
+import LocationOn from '@mui/icons-material/LocationOn';
+import MoreVert from '@mui/icons-material/MoreVert';
+import { Box, CircularProgress, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useMassUpdateLocationsMutation } from '@/api/collections/collectionsApi';
+import { useMassUpdateLocationsMutation, useMassEntryCollectionMutation } from '@/api/collections/collectionsApi';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisplay';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
-import MassUpdateLocationButton from '@/components/collections/MassUpdateLocationButton';
+import MassEntryPanel, { MassEntryFormData } from '@/components/collections/MassEntryPanel';
+import MassEntryConfirmDialog from '@/components/collections/MassEntryConfirmDialog';
 import MassUpdateLocationPanel, { MassUpdateLocationFormData } from '@/components/collections/MassUpdateLocationPanel';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
 import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
@@ -39,6 +43,16 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
   const { enqueueSnackbar } = useSnackbar();
 
+  // Menu state
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const isMenuOpen = Boolean(menuAnchorEl);
+
+  // Mass Update state
+  const [isMassUpdateOpen, setIsMassUpdateOpen] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [massUpdateFormData, setMassUpdateFormData] = useState<MassEntryFormData | null>(null);
+  const [massEntryCollection, { isLoading: isMassEntryLoading }] = useMassEntryCollectionMutation();
+
   // Mass Update Location state
   const [isMassUpdateLocationOpen, setIsMassUpdateLocationOpen] = useState(false);
   const [massUpdateLocations, { isLoading: isMassUpdateLocationLoading }] = useMassUpdateLocationsMutation();
@@ -53,6 +67,14 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
   const hasInvalidShareLink =
     shareToken && isViewingSharedCollection(userId) && error?.data?.error?.code === 'COLLECTION_PRIVATE';
 
+  // Get visible card IDs for mass updates - all visible cards
+  const visibleCardIds = useMemo(() => {
+    if (view === 'cards' && cardsProps && 'items' in cardsProps) {
+      return cardsProps.items.map((card) => parseInt(card.id));
+    }
+    return [];
+  }, [view, cardsProps]);
+
   // Get visible card IDs for mass location update - only cards they own
   const ownedVisibleCardIds = useMemo(() => {
     if (view === 'cards' && cardsProps && 'items' in cardsProps) {
@@ -63,9 +85,96 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
     return [];
   }, [view, cardsProps]);
 
+  // Menu handlers
+  const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchorEl(event.currentTarget);
+  }, []);
+
+  const handleMenuClose = useCallback(() => {
+    setMenuAnchorEl(null);
+  }, []);
+
+  // Mass Update handlers
+  const handleMassUpdateToggle = useCallback(() => {
+    setIsMassUpdateOpen(!isMassUpdateOpen);
+    setMenuAnchorEl(null);
+  }, [isMassUpdateOpen]);
+
+  const handleMassUpdateSubmit = useCallback((formData: MassEntryFormData) => {
+    setMassUpdateFormData(formData);
+    setShowConfirmDialog(true);
+  }, []);
+
+  const handleMassUpdateCancel = useCallback(() => {
+    setIsMassUpdateOpen(false);
+  }, []);
+
+  const handleConfirmMassUpdate = useCallback(
+    async () => {
+      if (!massUpdateFormData || !visibleCardIds.length) {
+        enqueueSnackbar('No cards available to update', { variant: 'error' });
+        return;
+      }
+
+      try {
+        const response = await massEntryCollection({
+          mode: massUpdateFormData.mode,
+          cardIds: visibleCardIds,
+          updates: [
+            {
+              rarity: massUpdateFormData.rarity,
+              quantityReg: massUpdateFormData.quantityReg,
+              quantityFoil: massUpdateFormData.quantityFoil,
+            },
+          ],
+        }).unwrap();
+
+        if (response.success && response.data) {
+          const { updatedCards, totalSkipped } = response.data;
+
+          if (updatedCards === 0 && totalSkipped) {
+            const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
+            enqueueSnackbar(`${totalSkippedCount} card${totalSkippedCount !== 1 ? 's' : ''} skipped due to foil constraints`, {
+              variant: 'error',
+            });
+          } else if (updatedCards > 0) {
+            let message = `Successfully updated ${updatedCards} card${updatedCards !== 1 ? 's' : ''}`;
+
+            if (totalSkipped) {
+              const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
+              if (totalSkippedCount > 0) {
+                message += `. ${totalSkippedCount} card${totalSkippedCount !== 1 ? 's' : ''} skipped due to foil constraints`;
+                enqueueSnackbar(message, { variant: 'warning', autoHideDuration: 6000 });
+              } else {
+                enqueueSnackbar(message, { variant: 'success' });
+              }
+            } else {
+              enqueueSnackbar(message, { variant: 'success' });
+            }
+          }
+
+          setIsMassUpdateOpen(false);
+          setShowConfirmDialog(false);
+          setMassUpdateFormData(null);
+        }
+      } catch (error: any) {
+        enqueueSnackbar(error?.data?.error?.message || 'Failed to mass update collection', {
+          variant: 'error',
+        });
+      }
+    },
+    [massUpdateFormData, visibleCardIds, massEntryCollection, enqueueSnackbar],
+  );
+
+  const handleCancelConfirm = useCallback(() => {
+    setShowConfirmDialog(false);
+    setMassUpdateFormData(null);
+  }, []);
+
   // Mass Update Location handlers
   const handleMassUpdateLocationToggle = useCallback(() => {
     setIsMassUpdateLocationOpen(!isMassUpdateLocationOpen);
+    setMenuAnchorEl(null);
   }, [isMassUpdateLocationOpen]);
 
   const handleMassUpdateLocationSubmit = useCallback(
@@ -340,26 +449,96 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
         additionalAction={
           isOwnCollection && (
             <Stack direction="row" spacing={0.5}>
-              {view === 'cards' && hasLocations && ownedVisibleCardIds.length > 0 && (
-                <MassUpdateLocationButton onClick={handleMassUpdateLocationToggle} isOpen={isMassUpdateLocationOpen} />
-              )}
               <ShareCollectionButton
                 userId={userId.toString()}
                 username={username || user?.username || 'User'}
                 isPublic={user?.isPublic || false}
               />
+              {view === 'cards' && (visibleCardIds.length > 0 || (hasLocations && ownedVisibleCardIds.length > 0)) && (
+                <>
+                  <Tooltip title="More actions">
+                    <IconButton
+                      size="small"
+                      onClick={handleMenuOpen}
+                      sx={{
+                        border: 1,
+                        borderColor: (theme) => theme.palette.mode === 'dark'
+                          ? 'rgba(144, 202, 249, 0.5)'
+                          : 'rgba(25, 118, 210, 0.5)',
+                        borderRadius: 1,
+                        color: 'primary.main',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          backgroundColor: 'action.hover',
+                        },
+                      }}
+                    >
+                      <MoreVert />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    anchorEl={menuAnchorEl}
+                    open={isMenuOpen}
+                    onClose={handleMenuClose}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                  >
+                    {visibleCardIds.length > 0 && (
+                      <MenuItem onClick={handleMassUpdateToggle}>
+                        <ListItemIcon>
+                          <AutoFixHigh fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Mass Update</ListItemText>
+                      </MenuItem>
+                    )}
+                    {hasLocations && ownedVisibleCardIds.length > 0 && (
+                      <MenuItem onClick={handleMassUpdateLocationToggle}>
+                        <ListItemIcon>
+                          <LocationOn fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Locations</ListItemText>
+                      </MenuItem>
+                    )}
+                  </Menu>
+                </>
+              )}
             </Stack>
           )
         }
       />
       {view === 'cards' && (
-        <MassUpdateLocationPanel
-          isOpen={isMassUpdateLocationOpen}
-          onSubmit={handleMassUpdateLocationSubmit}
-          onCancel={handleMassUpdateLocationCancel}
-          isLoading={isMassUpdateLocationLoading}
-          cardCount={ownedVisibleCardIds.length}
-        />
+        <>
+          <MassEntryPanel
+            isOpen={isMassUpdateOpen}
+            onSubmit={handleMassUpdateSubmit}
+            onCancel={handleMassUpdateCancel}
+            isLoading={isMassEntryLoading}
+            cardCount={visibleCardIds.length}
+          />
+          {massUpdateFormData && (
+            <MassEntryConfirmDialog
+              open={showConfirmDialog}
+              onConfirm={handleConfirmMassUpdate}
+              onCancel={handleCancelConfirm}
+              formData={massUpdateFormData}
+              cardCount={visibleCardIds.length}
+              isLoading={isMassEntryLoading}
+            />
+          )}
+          <MassUpdateLocationPanel
+            isOpen={isMassUpdateLocationOpen}
+            onSubmit={handleMassUpdateLocationSubmit}
+            onCancel={handleMassUpdateLocationCancel}
+            isLoading={isMassUpdateLocationLoading}
+            cardCount={ownedVisibleCardIds.length}
+          />
+        </>
       )}
       <SearchDescription />
 

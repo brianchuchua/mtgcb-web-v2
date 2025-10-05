@@ -1,6 +1,8 @@
 import {
   CollectionMassUpdateRequest,
   CollectionMassUpdateResponse,
+  CollectionMassEntryRequest,
+  CollectionMassEntryResponse,
   CollectionUpdateRequest,
   CollectionUpdateResponse,
 } from './types';
@@ -111,6 +113,37 @@ const collectionsApi = mtgcbApi.injectEndpoints({
     massUpdateCollection: builder.mutation<CollectionMassUpdateResponse, CollectionMassUpdateRequest>({
       query: (body) => ({
         url: '/collection/mass-update',
+        method: 'POST',
+        body,
+      }),
+      async onQueryStarted(arg, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            if (userId) {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  { type: 'Cards', id: `user-${userId}` },
+                  { type: 'Sets', id: `user-${userId}` },
+                  { type: 'Goals', id: `user-${userId}` },
+                  'Goals',
+                ]),
+              );
+            } else {
+              dispatch(mtgcbApi.util.invalidateTags(['Collection']));
+            }
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
+    }),
+    massEntryCollection: builder.mutation<CollectionMassEntryResponse, CollectionMassEntryRequest>({
+      query: (body) => ({
+        url: '/collection/mass-entry',
         method: 'POST',
         body,
       }),
@@ -333,6 +366,7 @@ const collectionsApi = mtgcbApi.injectEndpoints({
 export const {
   useUpdateCollectionMutation,
   useMassUpdateCollectionMutation,
+  useMassEntryCollectionMutation,
   useAssociateCardLocationMutation,
   useUpdateCardLocationMutation,
   useRemoveCardLocationMutation,

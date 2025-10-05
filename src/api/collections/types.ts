@@ -93,3 +93,35 @@ export interface CollectionMassUpdateData {
 }
 
 export type CollectionMassUpdateResponse = ApiResponse<CollectionMassUpdateData>;
+
+export interface CollectionMassEntryRequest {
+  mode: 'set' | 'increment';
+  cardIds: number[];
+  updates: Array<{
+    rarity: 'common' | 'uncommon' | 'rare' | 'mythic' | 'all';
+    quantityReg: number;
+    quantityFoil: number;
+  }>;
+}
+
+export interface CollectionMassEntryData {
+  totalCardsProvided: number;
+  updatedCards: number;
+  updates: Array<{
+    rarity: string;
+    cardsMatched: number;
+    cardsUpdated: number;
+    quantityReg: number;
+    quantityFoil: number;
+    skippedDueToConstraints?: {
+      cannotBeFoil: number;
+      cannotBeNonFoil: number;
+    };
+  }>;
+  totalSkipped?: {
+    cannotBeFoil: number;
+    cannotBeNonFoil: number;
+  };
+}
+
+export type CollectionMassEntryResponse = ApiResponse<CollectionMassEntryData>;
