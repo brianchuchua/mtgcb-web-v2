@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  Popover,
   Stack,
   Tooltip,
   Typography,
@@ -71,6 +72,7 @@ function EditLocationDialog({
   const { enqueueSnackbar } = useSnackbar();
   const [quantityReg, setQuantityReg] = useState(location.quantityReg);
   const [quantityFoil, setQuantityFoil] = useState(location.quantityFoil);
+  const [infoAnchorEl, setInfoAnchorEl] = useState<HTMLElement | null>(null);
   const [updateCardLocation, { isLoading }] = useUpdateCardLocationMutation();
 
   // Update state when location prop changes
@@ -171,11 +173,21 @@ function EditLocationDialog({
               <Typography variant="body2" color="text.secondary">
                 Quantities (optional)
               </Typography>
-              <Tooltip title="You can track card locations without specifying quantities. Leave these fields at 0 if you only want to track which location has the card.">
-                <IconButton size="small" sx={{ ml: 0.5 }}>
-                  <InfoOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
+              <IconButton
+                size="small"
+                onClick={(e) => setInfoAnchorEl(e.currentTarget)}
+                sx={{
+                  ml: 0.5,
+                  padding: 0,
+                  color: 'action.disabled',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: 'primary.main',
+                  },
+                }}
+              >
+                <InfoOutlinedIcon fontSize="small" />
+              </IconButton>
             </Box>
             <DualQuantitySelector
               regularValue={quantityReg}
@@ -268,6 +280,26 @@ function EditLocationDialog({
           Save
         </Button>
       </DialogActions>
+
+      <Popover
+        open={Boolean(infoAnchorEl)}
+        anchorEl={infoAnchorEl}
+        onClose={() => setInfoAnchorEl(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" component="div">
+            You can track card locations without specifying quantities. Leave these fields at 0 if you only want to track which location has the card.
+          </Typography>
+        </Box>
+      </Popover>
     </Dialog>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography, Divider, Chip, Link, Tooltip, IconButton } from '@mui/material';
+import { Box, Typography, Divider, Chip, Link, IconButton, Popover } from '@mui/material';
 import React from 'react';
 import NextLink from 'next/link';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -53,17 +53,27 @@ const formatPowerToughness = (power: string | null, toughness: string | null) =>
   return null;
 };
 
-export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({ 
-  card, 
-  userId, 
-  isCollectionView = false 
+export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
+  card,
+  userId,
+  isCollectionView = false
 }) => {
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+
+  const handleInfoClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleInfoClose = () => {
+    setAnchorEl(null);
+  };
+
   // Determine the base URL for links
   const baseUrl = isCollectionView && userId ? getCollectionUrl({ userId }) : '/browse';
-  const artistSearchUrl = isCollectionView && userId 
+  const artistSearchUrl = isCollectionView && userId
     ? `${getCollectionUrl({ userId, contentType: 'cards' })}&artist=${encodeURIComponent(card.artist || '')}`
     : `/browse?contentType=cards&artist=${encodeURIComponent(card.artist || '')}`;
-  const setUrl = isCollectionView && userId 
+  const setUrl = isCollectionView && userId
     ? getCollectionSetUrl(userId, card.setSlug || '')
     : `/browse/sets/${card.setSlug}`;
 
@@ -197,15 +207,21 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
                   <Typography variant="body2" color="warning.main" fontWeight="500">
                     Reserved List
                   </Typography>
-                  <Tooltip
-                    title="This card is on the Reserved List, a list of cards that Wizards of the Coast has promised never to reprint in a functionally identical form. This makes these cards particularly scarce and sometimes valuable."
-                    placement="top"
-                    arrow
+                  <IconButton
+                    size="small"
+                    onClick={handleInfoClick}
+                    sx={{
+                      padding: 0,
+                      ml: 0,
+                      color: 'text.secondary',
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                        color: 'primary.main',
+                      },
+                    }}
                   >
-                    <IconButton size="small" sx={{ padding: 0, ml: 0 }}>
-                      <InfoOutlinedIcon sx={{ fontSize: '1rem', color: 'text.secondary' }} />
-                    </IconButton>
-                  </Tooltip>
+                    <InfoOutlinedIcon sx={{ fontSize: '1rem' }} />
+                  </IconButton>
                 </>
               )}
             </Box>
@@ -239,6 +255,26 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
           </Box>
         )}
       </Box>
+
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleInfoClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" component="div">
+            This card is on the Reserved List, a list of cards that Wizards of the Coast has promised never to reprint in a functionally identical form. This makes these cards particularly scarce and sometimes valuable.
+          </Typography>
+        </Box>
+      </Popover>
     </>
   );
 };

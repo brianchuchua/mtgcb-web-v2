@@ -4,7 +4,9 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Box,
   CircularProgress,
+  IconButton,
   Paper,
+  Popover,
   Table,
   TableBody,
   TableCell,
@@ -12,7 +14,6 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
@@ -67,6 +68,8 @@ const VirtualizedTable = <T,>({
   getRowProps,
 }: VirtualizedTableProps<T>) => {
   const theme = useTheme();
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const [activeTooltip, setActiveTooltip] = React.useState<string | null>(null);
 
   // Theme and responsive setup
   const isXs = useMediaQuery(theme.breakpoints.down('sm'));
@@ -96,6 +99,18 @@ const VirtualizedTable = <T,>({
     if (onSortChange) {
       onSortChange(columnId);
     }
+  };
+
+  // Handle info icon click
+  const handleInfoClick = (event: React.MouseEvent<HTMLElement>, columnId: string) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+    setActiveTooltip(columnId);
+  };
+
+  const handleInfoClose = () => {
+    setAnchorEl(null);
+    setActiveTooltip(null);
   };
 
   // Empty state rendering
@@ -213,17 +228,21 @@ const VirtualizedTable = <T,>({
                 >
                   {column.label}
                   {column.tooltip && column.hasInfoIcon && (
-                    <Tooltip title={column.tooltip} placement="top">
-                      <InfoOutlinedIcon
-                        color="disabled"
-                        sx={{
-                          cursor: 'help',
-                          fontSize: '0.875rem',
-                          ml: 0.5,
-                          verticalAlign: 'middle',
-                        }}
-                      />
-                    </Tooltip>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => handleInfoClick(e, column.id)}
+                      sx={{
+                        ml: 0.5,
+                        padding: 0,
+                        color: 'action.disabled',
+                        '&:hover': {
+                          backgroundColor: 'transparent',
+                          color: 'primary.main',
+                        },
+                      }}
+                    >
+                      <InfoOutlinedIcon sx={{ fontSize: '0.875rem' }} />
+                    </IconButton>
                   )}
                 </TableSortLabel>
               ) : (
@@ -237,6 +256,8 @@ const VirtualizedTable = <T,>({
   };
 
   const tableOpacity = isLoading ? 0.6 : 1;
+
+  const activeColumn = columns.find((col) => col.id === activeTooltip);
 
   return (
     <Box sx={{ position: 'relative', mt: 2 }}>
@@ -275,6 +296,26 @@ const VirtualizedTable = <T,>({
         totalCount={items.length}
         overscan={50}
       />
+
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleInfoClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" component="div">
+            {activeColumn?.tooltip}
+          </Typography>
+        </Box>
+      </Popover>
     </Box>
   );
 };

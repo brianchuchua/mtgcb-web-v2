@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-05',
+      version: '0.142.1',
+      changes: ['Fixed info icons to use click instead of hover for better mobile support'],
+    },
+    {
+      date: '2025-10-05',
       version: '0.142.0',
       changes: ['Added instant goal loading with smart caching - goals now load immediately from cache while refreshing in background, prioritizing uncached goals first'],
     },

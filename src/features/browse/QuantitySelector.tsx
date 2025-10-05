@@ -8,8 +8,9 @@ import {
   styled,
   Chip,
   FormControlLabel,
+  IconButton,
+  Popover,
   Switch,
-  Tooltip,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
@@ -54,6 +55,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
   const includeBadDataOnly = useSelector(selectIncludeBadDataOnly) ?? false;
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const [expanded, setExpanded] = useState(false);
+  const [infoAnchorEl, setInfoAnchorEl] = useState<HTMLElement | null>(null);
 
   // Parse current stat filters to determine selected values and custom filters
   const parseQuantityFilter = (quantityType: QuantityType): { selected: QuantityOption; hasCustomFilter: boolean } => {
@@ -243,18 +245,46 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Typography variant="body2">Show Bad Data</Typography>
-                  <Tooltip
-                    title="Shows cards that were input that aren't possible to own, like foil printings of cards that don't come in foil"
-                    placement="top"
+                  <IconButton
+                    size="small"
+                    onClick={(e) => setInfoAnchorEl(e.currentTarget)}
+                    sx={{
+                      padding: 0,
+                      color: 'text.secondary',
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                        color: 'primary.main',
+                      },
+                    }}
                   >
-                    <InfoOutlinedIcon sx={{ fontSize: '1rem', color: 'text.secondary', cursor: 'help' }} />
-                  </Tooltip>
+                    <InfoOutlinedIcon sx={{ fontSize: '1rem' }} />
+                  </IconButton>
                 </Box>
               }
             />
           </Box>
         )}
       </Collapse>
+
+      <Popover
+        open={Boolean(infoAnchorEl)}
+        anchorEl={infoAnchorEl}
+        onClose={() => setInfoAnchorEl(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" component="div">
+            Shows cards that were input that aren&apos;t possible to own, like foil printings of cards that don&apos;t come in foil
+          </Typography>
+        </Box>
+      </Popover>
     </OutlinedBox>
   );
 };

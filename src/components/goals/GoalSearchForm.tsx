@@ -14,6 +14,7 @@ import {
   InputAdornment,
   MenuItem,
   Paper,
+  Popover,
   Select,
   Stack,
   Switch,
@@ -113,6 +114,9 @@ export function GoalSearchForm({
   const [isInitialized, setIsInitialized] = useState(false);
   const [isColorInitialized, setIsColorInitialized] = useState(false);
   const [previousSelectedSetsLength, setPreviousSelectedSetsLength] = useState(0);
+  const [oracleInfoAnchorEl, setOracleInfoAnchorEl] = useState<HTMLElement | null>(null);
+  const [reservedListInfoAnchorEl, setReservedListInfoAnchorEl] = useState<HTMLElement | null>(null);
+  const [printingsInfoAnchorEl, setPrintingsInfoAnchorEl] = useState<HTMLElement | null>(null);
 
   // Local states for all search fields
   const [name, setName] = useState(searchConditions.name || '');
@@ -723,9 +727,20 @@ export function GoalSearchForm({
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <Tooltip title="Search for text that appears in the card's rules box" placement="right">
-                <InfoOutlinedIcon color="disabled" sx={{ cursor: 'help' }} />
-              </Tooltip>
+              <IconButton
+                size="small"
+                onClick={(e) => setOracleInfoAnchorEl(e.currentTarget)}
+                sx={{
+                  padding: 0,
+                  color: 'action.disabled',
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                    color: 'primary.main',
+                  },
+                }}
+              >
+                <InfoOutlinedIcon />
+              </IconButton>
             </InputAdornment>
           ),
         }}
@@ -871,31 +886,20 @@ export function GoalSearchForm({
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
           <Typography variant="subtitle2">Reserved List</Typography>
-          <Tooltip
-            title={
-              <Box>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  The Reserved List is a set of cards that will never be reprinted by Wizards of the Coast.
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 0.5 }}>
-                  • <strong>Include all cards:</strong> No filter applied, show all cards regardless of Reserved List
-                  status
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 0.5 }}>
-                  • <strong>Reserved List only:</strong> Show only cards that are on the Reserved List
-                </Typography>
-                <Typography variant="body2">
-                  • <strong>Exclude Reserved List:</strong> Hide all Reserved List cards from results
-                </Typography>
-              </Box>
-            }
-            placement="left"
-            arrow
+          <IconButton
+            size="small"
+            onClick={(e) => setReservedListInfoAnchorEl(e.currentTarget)}
+            sx={{
+              padding: 0.5,
+              color: 'action.disabled',
+              '&:hover': {
+                backgroundColor: 'transparent',
+                color: 'primary.main',
+              },
+            }}
           >
-            <IconButton size="small" sx={{ padding: 0.5 }}>
-              <InfoOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+            <InfoOutlinedIcon fontSize="small" />
+          </IconButton>
         </Box>
 
         <ToggleButtonGroup
@@ -919,38 +923,20 @@ export function GoalSearchForm({
       <Paper variant="outlined" sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
           <Typography variant="subtitle2">Card Printings</Typography>
-          <Tooltip
-            title={
-              <Box>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  This setting controls how multiple printings of the same card are counted.
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1, fontWeight: 'bold' }}>
-                  Example: Giant Spider
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Giant Spider has been printed in over 20 different sets (Alpha, Beta, 4th Edition, etc.).
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 0.5 }}>
-                  • <strong>Any printing:</strong> Having any version of Giant Spider counts as 1 towards your goal --
-                  you only need one copy of any Giant Spider for that card to be considered collected across all sets.
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  • <strong>Every printing:</strong> Each different set's Giant Spider counts separately -- you'll need
-                  a copy of each printing of Giant Spider, one for each set it was printed in.
-                </Typography>
-                <Typography variant="body2">
-                  <em>(Note: Specific cards you include or exclude will always override this setting.)</em>
-                </Typography>
-              </Box>
-            }
-            placement="left"
-            arrow
+          <IconButton
+            size="small"
+            onClick={(e) => setPrintingsInfoAnchorEl(e.currentTarget)}
+            sx={{
+              padding: 0.5,
+              color: 'action.disabled',
+              '&:hover': {
+                backgroundColor: 'transparent',
+                color: 'primary.main',
+              },
+            }}
           >
-            <IconButton size="small" sx={{ padding: 0.5 }}>
-              <InfoOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+            <InfoOutlinedIcon fontSize="small" />
+          </IconButton>
         </Box>
 
         <ToggleButtonGroup
@@ -1089,6 +1075,90 @@ export function GoalSearchForm({
           </Box>
         </Stack>
       )}
+
+      <Popover
+        open={Boolean(oracleInfoAnchorEl)}
+        anchorEl={oracleInfoAnchorEl}
+        onClose={() => setOracleInfoAnchorEl(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" component="div">
+            Search for text that appears in the card&apos;s rules box
+          </Typography>
+        </Box>
+      </Popover>
+
+      <Popover
+        open={Boolean(reservedListInfoAnchorEl)}
+        anchorEl={reservedListInfoAnchorEl}
+        onClose={() => setReservedListInfoAnchorEl(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" component="div" sx={{ mb: 1 }}>
+            The Reserved List is a set of cards that will never be reprinted by Wizards of the Coast.
+          </Typography>
+          <Typography variant="body2" component="div" sx={{ mb: 0.5 }}>
+            • <strong>Include all cards:</strong> No filter applied, show all cards regardless of Reserved List status
+          </Typography>
+          <Typography variant="body2" component="div" sx={{ mb: 0.5 }}>
+            • <strong>Reserved List only:</strong> Show only cards that are on the Reserved List
+          </Typography>
+          <Typography variant="body2" component="div">
+            • <strong>Exclude Reserved List:</strong> Hide all Reserved List cards from results
+          </Typography>
+        </Box>
+      </Popover>
+
+      <Popover
+        open={Boolean(printingsInfoAnchorEl)}
+        anchorEl={printingsInfoAnchorEl}
+        onClose={() => setPrintingsInfoAnchorEl(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 350 }}>
+          <Typography variant="body2" component="div" sx={{ mb: 1 }}>
+            This setting controls how multiple printings of the same card are counted.
+          </Typography>
+          <Typography variant="body2" component="div" sx={{ mb: 1, fontWeight: 'bold' }}>
+            Example: Giant Spider
+          </Typography>
+          <Typography variant="body2" component="div" sx={{ mb: 1 }}>
+            Giant Spider has been printed in over 20 different sets (Alpha, Beta, 4th Edition, etc.).
+          </Typography>
+          <Typography variant="body2" component="div" sx={{ mb: 0.5 }}>
+            • <strong>Any printing:</strong> Having any version of Giant Spider counts as 1 towards your goal -- you only need one copy of any Giant Spider for that card to be considered collected across all sets.
+          </Typography>
+          <Typography variant="body2" component="div" sx={{ mb: 1 }}>
+            • <strong>Every printing:</strong> Each different set&apos;s Giant Spider counts separately -- you&apos;ll need a copy of each printing of Giant Spider, one for each set it was printed in.
+          </Typography>
+          <Typography variant="body2" component="div">
+            <em>(Note: Specific cards you include or exclude will always override this setting.)</em>
+          </Typography>
+        </Box>
+      </Popover>
     </Box>
   );
 }

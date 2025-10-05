@@ -43,6 +43,57 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 - Defensive programming with null checks
 - MUI styled components for styling
 
+### Info Icons (Click Behavior Only)
+
+All info icons must use **click behavior with Popovers**, not hover tooltips, for mobile compatibility:
+
+```tsx
+// 1. Add state for the popover anchor
+const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+// 2. Use IconButton with onClick (NOT Tooltip with hover)
+<IconButton
+  size="small"
+  onClick={(e) => setAnchorEl(e.currentTarget)}
+  sx={{
+    padding: 0,
+    color: 'action.disabled',
+    '&:hover': {
+      backgroundColor: 'transparent',
+      color: 'primary.main',
+    },
+  }}
+>
+  <InfoOutlinedIcon fontSize="small" />
+</IconButton>
+
+// 3. Add Popover at component level (NOT nested in other components)
+<Popover
+  open={Boolean(anchorEl)}
+  anchorEl={anchorEl}
+  onClose={() => setAnchorEl(null)}
+  anchorOrigin={{
+    vertical: 'bottom',
+    horizontal: 'center',
+  }}
+  transformOrigin={{
+    vertical: 'top',
+    horizontal: 'center',
+  }}
+>
+  <Box sx={{ p: 2, maxWidth: 300 }}>
+    <Typography variant="body2" component="div">
+      Info text here
+    </Typography>
+  </Box>
+</Popover>
+```
+
+**Key requirements:**
+- NEVER use `<Tooltip>` for info icons (not mobile-friendly)
+- ALWAYS use `component="div"` on Typography to avoid hydration errors
+- Place Popover at the same level as main component return (not inside Dialogs/nested components)
+
 ## Project Structure
 
 ```

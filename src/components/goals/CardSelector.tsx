@@ -11,6 +11,7 @@ import {
   CircularProgress,
   IconButton,
   InputAdornment,
+  Popover,
   Stack,
   TextField,
   Tooltip,
@@ -57,6 +58,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
   const [searchInput, setSearchInput] = useState('');
   const [selectedCard, setSelectedCard] = useState<CardOption | null>(null);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
+  const [infoAnchorEl, setInfoAnchorEl] = useState<HTMLElement | null>(null);
   const { user } = useAuth();
   const priceType = usePriceType();
   const [triggerGetCards, { data: searchResponse, isFetching: isSearching }] = useLazyGetCardsQuery();
@@ -227,9 +229,21 @@ const CardSelector: React.FC<CardSelectorProps> = ({
               ...params.InputProps,
               startAdornment: (
                 <InputAdornment position="start">
-                  <Tooltip title="After adding cards, tap on them to toggle between including or excluding them from your goal">
-                    <InfoOutlinedIcon color="disabled" sx={{ cursor: 'help', ml: '5px' }} />
-                  </Tooltip>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => setInfoAnchorEl(e.currentTarget)}
+                    sx={{
+                      padding: 0,
+                      ml: '5px',
+                      color: 'action.disabled',
+                      '&:hover': {
+                        backgroundColor: 'transparent',
+                        color: 'primary.main',
+                      },
+                    }}
+                  >
+                    <InfoOutlinedIcon />
+                  </IconButton>
                 </InputAdornment>
               ),
               endAdornment: (
@@ -346,6 +360,26 @@ const CardSelector: React.FC<CardSelectorProps> = ({
           })}
         </Box>
       )}
+
+      <Popover
+        open={Boolean(infoAnchorEl)}
+        anchorEl={infoAnchorEl}
+        onClose={() => setInfoAnchorEl(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" component="div">
+            After adding cards, tap on them to toggle between including or excluding them from your goal
+          </Typography>
+        </Box>
+      </Popover>
     </Box>
   );
 };
