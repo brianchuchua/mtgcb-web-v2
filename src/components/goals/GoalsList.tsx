@@ -31,9 +31,10 @@ import { getCollectionUrl } from '@/utils/collectionUrls';
 interface GoalsListProps {
   goals: Goal[];
   userId: number;
+  hydratingGoalId: number | null;
 }
 
-export function GoalsList({ goals, userId }: GoalsListProps) {
+export function GoalsList({ goals, userId, hydratingGoalId }: GoalsListProps) {
   const { user } = useAuth();
   const router = useRouter();
   const {
@@ -155,9 +156,14 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                           <Typography variant="caption" color="text.secondary">
                             Progress
                           </Typography>
-                          <Typography variant="caption" color="text.primary" fontWeight="medium">
-                            {goal.progress.collectedCards} / {goal.progress.totalCards} cards
-                          </Typography>
+                          <Box display="flex" alignItems="center" gap={0.5}>
+                            {hydratingGoalId === goal.id && (
+                              <CircularProgress size={12} thickness={5} />
+                            )}
+                            <Typography variant="caption" color="text.primary" fontWeight="medium">
+                              {goal.progress.collectedCards} / {goal.progress.totalCards} cards
+                            </Typography>
+                          </Box>
                         </Box>
                         <CollectionProgressBar
                           percentage={goal.progress.percentageCollected}
@@ -215,12 +221,14 @@ export function GoalsList({ goals, userId }: GoalsListProps) {
                   ) : (
                     <Box>
                       <Stack spacing={0.5}>
-                        {/* Progress header with loading spinner */}
+                        {/* Progress header with loading spinner - only show spinner if actively hydrating */}
                         <Box display="flex" justifyContent="space-between" alignItems="center">
                           <Typography variant="caption" color="text.secondary">
                             Progress
                           </Typography>
-                          <CircularProgress size={12} thickness={5} />
+                          {hydratingGoalId === goal.id && (
+                            <CircularProgress size={12} thickness={5} />
+                          )}
                         </Box>
                         {/* Placeholder for progress bar - same height as real one */}
                         <Box sx={{ height: 20, bgcolor: 'action.hover', borderRadius: 1 }} />

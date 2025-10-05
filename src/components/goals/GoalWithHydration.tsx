@@ -18,7 +18,9 @@ export function GoalWithHydration({ goal, userId, priceType, delay, onHydrated }
       setShouldFetch(true);
     }, delay);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [delay]);
 
   const { data, isSuccess } = useGetGoalQuery(
@@ -30,6 +32,7 @@ export function GoalWithHydration({ goal, userId, priceType, delay, onHydrated }
     },
     {
       skip: !shouldFetch,
+      refetchOnMountOrArgChange: true, // Always refetch, don't use RTK Query cache
     }
   );
 

@@ -8,25 +8,22 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - [ ] Prepare last items for v1.0 Release
 - [ ] v1.0 Release
-- [ ] Data Cleanup Project (and weekly tech debt days)
+- [ ] Data Cleanup Project (and weekly tech debt days, "Tech Debt Tuesdays")
 - [ ] I get feedback from the MTG CB community and Patrons vote on the next feature candidates and I make a selection
 
 ## 🔄 In Progress
 
 ### Currently Looking At or Working On or Just Noticed
 
--- do i need a gin index on purename too?
-
-- importer bug for darksteel colossus, audit the logic
-- bad pure names apparently, need to look at my logic for updating these -- fixed already locally and in prod and in importer
-  -- goals page loading every time is annoying users, definitely need to do at least a client-side cache, maybe remember previous results and then update them? invalidate cache but don't load until the page is up, instead of preloading?
-  -- need to split the contributions from other sets modal for split regular/foil goals, shouldn't show contribution toward normals from a foil printing
+- make sure people can't edit collections with shared key, probably not, just paranoid
+- support mass entry at top level of search, make submenu that puts mass location update there too
+- make the reserved list icon button work on mobile and audit all icon buttons for hover vs click mode
+  -- need to test all import formats again, new folder clearly labeled with test data
   -- once the testing framework is solid, let's refactor and unify the goal code under /cards/search, /sets/search, and /goals
-
+- goal testing system, clear organized test cases, including creating the goals via the api, adapting to results changing over time, etc.
 - goal setid format doesn't render in the front-end unless it's in the or array, have claude compare these
 - goals with inclusions and exclusions may not work, for setIds
-- include format name in export - maybe username too
-- look into possible cors issue -- looks like a timeout/perf issue, need to check my importers and exporters carefully -- yeah it's just a performance timeout for some formats. I probably need to chunk the import for large operations.
+- more load tests in general, have claude check on what could be problematic
   -- perf test this flexible finish stuff once done, repeat load tests in general for goals, including a flexible printing goal as a new case, do this on tuesday before working on anything else
 
 ### Blocked/Waiting
@@ -45,6 +42,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### mtgcb-importer
 
 - importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets -- i want a post-migration verification too to test locally
+- enhance to show progress bar for image downloads
 
 ### mtgcb-jobs
 
@@ -56,7 +54,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Testing
 
-- Top-down testing of every page and feature
+- Top-down testing of every page and feature, this should be the last item
 - Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
 
 ### Scaling
@@ -118,8 +116,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Adding Art Series cards
 - Need to add cardFaces data and come up with a plan to render the backside of cards
 - Sorting of collectorNumberNumeric when the original collector number is like "A25-223"
+- General collector number clean-up vs mtg cb collector number, importer implications, etc
 - canBeFoil and canBeNonFoil data cleanup and interaction with etched foils, see Mountain (674) from Secret Lair and compare to tcgplayer data -- see also Culling the Weak and rainbow foils
 - Ae/apostrophe fixes, etc
+- Look at set codes, Scryfall consistency, importer implications, and what's printed on the cards
+- periodic scryfall data syncs for when they fix data, but with a boolean value to tag cards or sets that shouldn't be overwritten because I've manually fixed them or scryfall is wrong
 
 #### Subset Splitting
 
@@ -224,6 +225,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - The padding with bottom pagination isn't consistent on grid vs table views on mobile. Needs restructuring. It's fine.
 - Maybe a better 100% completion progress bar animation? I'm only 90% happy with it.
+- Consider string trimming in BrowseSearchForm
 
 #### UX Consistency Pass
 
@@ -272,8 +274,9 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Caching
 
 - Statistics calculations, while now using the follower database, should be run by mtgcb-jobs, not the api, and their results should be stored in a statistics table, not in-memory in an application, at least not until cached.
-- Should seriously consider a Redis caching layer
+- Should seriously consider a Redis caching layer, especially for collection goals, with appropriate cache invalidation
 - Should probably cache the API call needed for Iconic Impact
+-
 
 #### Observability
 
@@ -368,6 +371,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Importers and Exporters
 
 - Allowing import/export of locations and goals
+- Include format name in export - maybe username too
+- Handle ripplefoil and rainbowfoil in the Scryfall promo_types and how for some cards Scryfall inaccurately lists them as coming in foil and nonfoil when they really mean "nonfoil and whatever is in promo_types", but it's not consistent. See https://api.scryfall.com/cards/6be6ebf1-4e4c-4c6f-ace1-3fed55fe5c69?format=json&pretty=true and its corresponding TCGPlayer entries.
 
 #### Missing Price Report
 

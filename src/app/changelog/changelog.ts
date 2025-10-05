@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-05',
+      version: '0.142.0',
+      changes: ['Added instant goal loading with smart caching - goals now load immediately from cache while refreshing in background, prioritizing uncached goals first'],
+    },
+    {
       date: '2025-10-02',
       version: '0.141.1',
       changes: ['Fixed import page state not clearing when switching between formats or uploading different files'],
