@@ -15,9 +15,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- possible table rendering issues for unmet goals, maybe the stripes aren't performant, scroll feels bad, test after a restart
-- support mass entry at top level of search, make submenu that puts mass location update there too
-- ux: share and ... menu are bigger than grid/table
 - need to test all import formats again, new folder clearly labeled with test data
 
 - more load tests in general, have claude check on what could be problematic
@@ -223,6 +220,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - The padding with bottom pagination isn't consistent on grid vs table views on mobile. Needs restructuring. It's fine.
 - Maybe a better 100% completion progress bar animation? I'm only 90% happy with it.
 - Consider string trimming in BrowseSearchForm
+- Share and ... menu are bigger than grid/table
+- Locations and mass update open at the same time, should have more padding
 
 #### UX Consistency Pass
 

@@ -338,8 +338,6 @@ const StyledTableRow = styled(TableRow, {
       rgba(255, 152, 0, 0.05) 20px
     )`,
     backgroundSize: '28.28px 28.28px',
-    backgroundPosition: '0 0',
-    backgroundAttachment: 'fixed',
     '&:hover': {
       opacity: 1,
     },

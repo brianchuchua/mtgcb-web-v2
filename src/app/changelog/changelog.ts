@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-05',
+      version: '0.143.1',
+      changes: ['Fixed table view scroll performance when viewing collections with goals selected'],
+    },
+    {
+      date: '2025-10-05',
       version: '0.143.0',
       changes: [
         'Added mass update feature to collection search pages for bulk quantity changes by rarity -- was previously only in the set page',
