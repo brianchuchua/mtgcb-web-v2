@@ -47,6 +47,7 @@ const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(({
           startAdornment: <InputAdornment position="start">{adornmentWithTestId}</InputAdornment>,
         },
         htmlInput: {
+          maxLength: 2000,
           spellCheck: 'false',
           autoCapitalize: 'off',
           autoCorrect: 'off',

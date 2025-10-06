@@ -94,6 +94,29 @@ const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 - ALWAYS use `component="div"` on Typography to avoid hydration errors
 - Place Popover at the same level as main component return (not inside Dialogs/nested components)
 
+### Field Length Validation (REQUIRED)
+
+All text input fields **MUST** enforce API character limits using HTML `maxLength` attribute:
+
+```tsx
+<TextField
+  {...register('fieldName', {
+    maxLength: { value: LIMIT, message: 'Error message' }
+  })}
+  slotProps={{
+    htmlInput: {
+      maxLength: LIMIT,  // REQUIRED - prevents typing beyond limit
+    },
+  }}
+/>
+```
+
+**Common Limits:**
+- Short text (username, email, location/goal names): 255
+- Long text (descriptions): 1000
+- Search fields (card name, oracle text, artist): 2000
+- File uploads (CSV import): 30MB
+
 ## Project Structure
 
 ```

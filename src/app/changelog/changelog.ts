@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-05',
+      version: '0.143.2',
+      changes: ['Added character limits to all form inputs to prevent exceeding API limits'],
+    },
+    {
+      date: '2025-10-05',
       version: '0.143.1',
       changes: ['Fixed table view scroll performance when viewing collections with goals selected'],
     },

@@ -122,6 +122,11 @@ export default function CreateLocationForm() {
             error={!!errors.name}
             helperText={errors.name?.message}
             placeholder="e.g., Blue Binder, Trade Box, Deck Storage"
+            slotProps={{
+              htmlInput: {
+                maxLength: 255,
+              },
+            }}
           />
 
           <TextField
@@ -140,6 +145,7 @@ export default function CreateLocationForm() {
             placeholder="Add any notes about this location..."
             slotProps={{
               htmlInput: {
+                maxLength: 1000,
                 spellCheck: 'true',
                 autoCapitalize: 'sentences',
               },

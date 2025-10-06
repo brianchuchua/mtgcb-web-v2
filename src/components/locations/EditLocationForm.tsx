@@ -166,6 +166,11 @@ export default function EditLocationForm({ location, onDeleteStart }: EditLocati
             })}
             error={!!errors.name}
             helperText={errors.name?.message}
+            slotProps={{
+              htmlInput: {
+                maxLength: 255,
+              },
+            }}
           />
 
           <TextField
@@ -183,6 +188,7 @@ export default function EditLocationForm({ location, onDeleteStart }: EditLocati
             helperText={errors.description?.message}
             slotProps={{
               htmlInput: {
+                maxLength: 1000,
                 spellCheck: 'true',
                 autoCapitalize: 'sentences',
               },

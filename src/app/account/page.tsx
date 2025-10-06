@@ -213,6 +213,7 @@ function ProfileContent() {
               helperText={profileErrors.username?.message}
               slotProps={{
                 htmlInput: {
+                  maxLength: 255,
                   spellCheck: 'false',
                   autoCapitalize: 'off',
                   autoCorrect: 'off',
@@ -241,6 +242,7 @@ function ProfileContent() {
               helperText={profileErrors.email?.message}
               slotProps={{
                 htmlInput: {
+                  maxLength: 255,
                   spellCheck: 'false',
                   autoCapitalize: 'off',
                 },
@@ -283,6 +285,11 @@ function ProfileContent() {
               type="password"
               error={!!passwordErrors.password}
               helperText={passwordErrors.password?.message}
+              slotProps={{
+                htmlInput: {
+                  maxLength: 255,
+                },
+              }}
             />
 
             <TextField
@@ -296,6 +303,11 @@ function ProfileContent() {
               type="password"
               error={!!passwordErrors.confirmPassword}
               helperText={passwordErrors.confirmPassword?.message}
+              slotProps={{
+                htmlInput: {
+                  maxLength: 255,
+                },
+              }}
             />
 
             <ButtonWrapper>

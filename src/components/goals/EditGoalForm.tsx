@@ -215,6 +215,11 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                 error={!!errors.name}
                 helperText={errors.name?.message}
                 disabled={isLoading}
+                slotProps={{
+                  htmlInput: {
+                    maxLength: 255,
+                  },
+                }}
               />
             )}
           />
@@ -235,6 +240,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                 disabled={isLoading}
                 slotProps={{
                   htmlInput: {
+                    maxLength: 1000,
                     spellCheck: 'true',
                     autoCapitalize: 'sentences',
                   },

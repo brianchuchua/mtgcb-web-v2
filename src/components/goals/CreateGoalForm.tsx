@@ -165,6 +165,11 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                 helperText={errors.name?.message}
                 autoFocus
                 disabled={isLoading}
+                slotProps={{
+                  htmlInput: {
+                    maxLength: 255,
+                  },
+                }}
               />
             )}
           />
@@ -185,6 +190,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
                 disabled={isLoading}
                 slotProps={{
                   htmlInput: {
+                    maxLength: 1000,
                     spellCheck: 'true',
                     autoCapitalize: 'sentences',
                   },

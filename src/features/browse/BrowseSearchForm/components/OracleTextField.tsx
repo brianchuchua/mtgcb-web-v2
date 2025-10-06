@@ -52,6 +52,7 @@ const OracleTextField: React.FC<OracleTextFieldProps> = ({ value, onChange }) =>
         }}
         slotProps={{
           htmlInput: {
+            maxLength: 2000,
             spellCheck: 'false',
             autoCapitalize: 'off',
             autoCorrect: 'off',
