@@ -32,7 +32,6 @@ export function GoalWithHydration({ goal, userId, priceType, delay, onHydrated }
     },
     {
       skip: !shouldFetch,
-      refetchOnMountOrArgChange: true, // Always refetch, don't use RTK Query cache
     }
   );
 

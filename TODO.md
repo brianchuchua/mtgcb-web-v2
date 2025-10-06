@@ -15,17 +15,11 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- need to test all import formats again, new folder clearly labeled with test data
-
-- more load tests in general, have claude check on what could be problematic
-  -- perf test this flexible finish stuff once done, repeat load tests in general for goals, including a flexible printing goal as a new case, do this on tuesday before working on anything else
-
 ### Blocked/Waiting
 
 ## 🚨 Critical / Blocking Issues
 
 - Need another sql.raw audit, there's a document of the last one
-- Important: Audit input field lengths for all API calls and make front-end enforce them too
 
 ### Migration
 
@@ -36,7 +30,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### mtgcb-importer
 
 - importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets -- i want a post-migration verification too to test locally
-- enhance to show progress bar for image downloads
 
 ### mtgcb-jobs
 
@@ -49,7 +42,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Testing
 
 - Top-down testing of every page and feature, this should be the last item
-- Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt
+- Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt (so probably test all imports and exports)
 
 ### Scaling
 
@@ -74,10 +67,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Mention that patrons get to vote on future features
 - Make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
 
-### Podcast
-
-- At least link to the old ones, I'll probably start it back up after release
-
 ## 🚀 Release Checklist
 
 ### Migration Steps
@@ -93,6 +82,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Announce to patrons
 
 ## 📦 Post-Release
+
+### Podcast
+
+- At least link to the old ones, I'll probably start it back up after release
 
 ### Bug Reports
 
@@ -171,6 +164,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Showing goal criteria in the collection header, maybe in an i icon
 - Patron request: "Would it be possible to use locations as collection filters for goals? For example I could have a goal for MH3, but point to my MH3 binder location, that way my 4x SLD Kaalia of the Vast, in that binder, could be counted for my MH3 goal while potentially not being counted for some other goal."
 - Allow users to specify goals as granular as "collect every foil etched + regular".
+- Consider allowing users to choose to go back to the goals page after creating a goal, rather than the goal details page. Perhaps even go to create a new goal. Checkbox maybe, near the create goal button.
 
 #### Default Collection Goals
 
@@ -234,6 +228,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
+- need to test all import formats again, new folder clearly labeled with test data
 - goal setid format doesn't render in the front-end unless it's in the OR array, have claude compare these -- only an issue if goals are created outside the front-end constraints, ran into this creating test goals programmatically
 - goal testing system, clear organized test cases, including creating the goals via the api, adapting to results changing over time, etc.
 - Goal code is very fragmented, would be nice to refactor it into a more coherent whole (/goals, /cards/search, /sets/search) -- after a good test bench is setup beforehand
@@ -417,6 +412,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### mtgcb-importer
 
+- enhance to show progress bar for image downloads
 - mtgcb-importer should be able to audit bad or missing card data
 - remove claude settings file from repo, rm --cached and add to gitignore
 

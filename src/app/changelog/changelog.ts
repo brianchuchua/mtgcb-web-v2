@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-05',
+      version: '0.143.3',
+      changes: [
+        'Goals now cache for 60 seconds in the main goals page (you can always hard-refresh to force a reload)',
+      ],
+    },
+    {
+      date: '2025-10-05',
       version: '0.143.2',
       changes: ['Added character limits to all form inputs to prevent exceeding API limits'],
     },

@@ -49,7 +49,6 @@ export function GoalsClient() {
 
   const { data: listData, isLoading: isListLoading, error: listError } = useGetUserGoalsQuery(listQueryArgs, {
     skip: !user?.userId,
-    refetchOnMountOrArgChange: true, // Always refetch on mount
   });
 
   // Server list is source of truth - hydrate each goal from cache if available
