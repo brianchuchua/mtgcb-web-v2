@@ -214,8 +214,7 @@ export const PatreonSection = () => {
               color="primary"
               component="a"
               href="https://www.patreon.com/mtgcollectionbuilder"
-              target="_blank"
-              rel="noopener noreferrer"
+              {...({ target: '_blank', rel: 'noopener noreferrer' } as any)}
             >
               Join Patreon
             </Button>
@@ -415,8 +414,7 @@ export const PatreonSection = () => {
                 color="primary"
                 component="a"
                 href="https://www.patreon.com/mtgcollectionbuilder"
-                target="_blank"
-                rel="noopener noreferrer"
+                {...({ target: '_blank', rel: 'noopener noreferrer' } as any)}
               >
                 Join Patreon
               </Button>
