@@ -1,5 +1,6 @@
 import {
   Alert,
+  Autocomplete,
   Box,
   CircularProgress,
   Dialog,
@@ -8,14 +9,20 @@ import {
   DialogContentText,
   DialogTitle,
   FormControlLabel,
-  Switch,
+  MenuItem,
   Button as MuiButton,
+  Switch,
+  TextField,
   Typography,
+  debounce,
 } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useLazyGetCardsQuery } from '@/api/browse/browseApi';
+import { CardModel } from '@/api/browse/types';
 import { useDisconnectPatreonMutation, useGetPatreonStatusQuery } from '@/api/patreon/patreonApi';
 import { useUpdateUserMutation } from '@/api/user/userApi';
+import { CustomCard } from '@/components/patrons/CustomCard';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -26,6 +33,18 @@ export const PatreonSection = () => {
   const [updateUser, { isLoading: isUpdatingSupporterToggle }] = useUpdateUserMutation();
   const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
+
+  // Card selector state (for mythic supporters)
+  const [selectedColor, setSelectedColor] = useState<string>(user?.patreonCardColor || 'white');
+  const [searchCards, { data: cardsData }] = useLazyGetCardsQuery();
+  const [cardSearchInput, setCardSearchInput] = useState('');
+  const [debouncedSearchInput, setDebouncedSearchInput] = useState('');
+  const [selectedCard, setSelectedCard] = useState<CardModel | null>(null);
+  const [cardOptions, setCardOptions] = useState<CardModel[]>([]);
+  const [isLoadingInitialCard, setIsLoadingInitialCard] = useState(false);
+
+  // Debounce search input
+  const debouncedSetSearchInput = useMemo(() => debounce((value: string) => setDebouncedSearchInput(value), 300), []);
 
   const handleConnectPatreon = () => {
     const apiBaseUrl = process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL;
@@ -65,6 +84,104 @@ export const PatreonSection = () => {
     }
   };
 
+  // Search for cards when debounced input changes
+  useEffect(() => {
+    if (debouncedSearchInput.length >= 2) {
+      searchCards({
+        name: debouncedSearchInput,
+        limit: 50,
+        sortBy: 'name',
+        sortDirection: 'asc',
+      });
+    }
+  }, [debouncedSearchInput, searchCards]);
+
+  // Update card options when search results arrive
+  useEffect(() => {
+    if (cardsData?.data?.cards) {
+      setCardOptions(cardsData.data.cards);
+    }
+  }, [cardsData]);
+
+  // Sync selected color when user data loads
+  useEffect(() => {
+    if (user?.patreonCardColor) {
+      setSelectedColor(user.patreonCardColor);
+    }
+  }, [user?.patreonCardColor]);
+
+  // Load the user's existing card selection on mount
+  useEffect(() => {
+    if (!user?.patreonCardId || selectedCard || isLoadingInitialCard) {
+      return;
+    }
+
+    const loadExistingCard = async () => {
+      setIsLoadingInitialCard(true);
+      try {
+        const result = await searchCards({
+          id: String(user.patreonCardId),
+          limit: 1,
+        });
+
+        if (result.data?.data?.cards && result.data.data.cards.length > 0) {
+          setSelectedCard(result.data.data.cards[0]);
+          setCardSearchInput(result.data.data.cards[0].name);
+        }
+      } catch (error) {
+        console.error('Failed to load existing card selection:', error);
+      } finally {
+        setIsLoadingInitialCard(false);
+      }
+    };
+
+    loadExistingCard();
+  }, [user?.patreonCardId, searchCards]);
+
+  const handleSaveCustomCard = async () => {
+    if (!selectedCard) {
+      enqueueSnackbar('Please select a card', { variant: 'warning' });
+      return;
+    }
+
+    try {
+      const result = await updateUser({
+        patreonCardId: selectedCard.id,
+        patreonCardColor: selectedColor as 'white' | 'blue' | 'black' | 'red' | 'green' | 'gold' | 'colorless',
+      }).unwrap();
+
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Failed to save custom card');
+      }
+
+      enqueueSnackbar('Custom card saved successfully!', { variant: 'success' });
+    } catch (error: any) {
+      const message = error.data?.error?.message || 'Failed to save custom card';
+      enqueueSnackbar(message, { variant: 'error' });
+    }
+  };
+
+  const handleDeleteCustomCard = async () => {
+    try {
+      const result = await updateUser({
+        patreonCardId: null,
+        patreonCardColor: null,
+      }).unwrap();
+
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Failed to delete custom card');
+      }
+
+      setSelectedCard(null);
+      setCardSearchInput('');
+      setSelectedColor('white');
+      enqueueSnackbar('Custom card deleted successfully!', { variant: 'success' });
+    } catch (error: any) {
+      const message = error.data?.error?.message || 'Failed to delete custom card';
+      enqueueSnackbar(message, { variant: 'error' });
+    }
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -89,11 +206,23 @@ export const PatreonSection = () => {
         // Not Linked State
         <Box>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Link your Patreon account to show off your support!
+            Support MTG Collection Builder on Patreon to help keep the site ad-free for everyone!
           </Typography>
-          <Button variant="contained" onClick={handleConnectPatreon} sx={{ mt: 1 }}>
-            Connect with Patreon
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              component="a"
+              href="https://www.patreon.com/mtgcollectionbuilder"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Join Patreon
+            </Button>
+            <Button variant="outlined" onClick={handleConnectPatreon}>
+              Link Existing Account
+            </Button>
+          </Box>
         </Box>
       ) : (
         // Linked State
@@ -138,6 +267,14 @@ export const PatreonSection = () => {
             </Box>
           )}
 
+          {/* Never Been a Supporter Message */}
+          {!currentTier && !highestTier && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              Your Patreon account is linked! Join as a supporter to unlock rewards at specific tiers and help keep MTG
+              Collection Builder ad-free for everyone.
+            </Alert>
+          )}
+
           {/* Former Patron Message */}
           {!currentTier && highestTier && (
             <Alert severity="info" sx={{ mb: 2 }}>
@@ -145,26 +282,145 @@ export const PatreonSection = () => {
             </Alert>
           )}
 
-          {/* Supporter Display Toggle */}
-          <Box sx={{ mt: 3, mb: 2 }}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={user?.showAsPatreonSupporter || false}
-                  onChange={(e) => handleToggleSupporterDisplay(e.target.checked)}
-                  disabled={isUpdatingSupporterToggle}
-                />
-              }
-              label="Show me on the supporters page"
-            />
-            <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 0.5 }}>
-              When enabled, your username will be listed on the supporters page showing the highest tier
-              you&apos;ve ever contributed to.
-            </Typography>
-          </Box>
+          {/* Supporter Display Toggle - Only show if user has ever been a supporter */}
+          {highestTier && (
+            <Box sx={{ mt: 3, mb: 2 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={user?.showAsPatreonSupporter || false}
+                    onChange={(e) => handleToggleSupporterDisplay(e.target.checked)}
+                    disabled={isUpdatingSupporterToggle}
+                  />
+                }
+                label="Show me on the supporters page"
+              />
+              <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 0.5 }}>
+                When enabled, your username will be listed on the supporters page showing the highest tier you&apos;ve
+                ever contributed to.
+              </Typography>
+            </Box>
+          )}
+
+          {/* Custom Card Selector (Mythic Supporters Only) */}
+          {highestTier?.slug === 'mythic' && (
+            <Box sx={{ mt: 3, mb: 2, p: 2, backgroundColor: 'action.hover', borderRadius: 1 }}>
+              <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 2 }}>
+                Mythic Supporter Custom Card
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                For ever being a Mythic supporter, you can select a custom card to represent you on the supporters page!
+              </Typography>
+
+              {/* Color Selection */}
+              <TextField
+                select
+                fullWidth
+                label="Card Frame Color"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                sx={{ mb: 2 }}
+              >
+                <MenuItem value="white">White</MenuItem>
+                <MenuItem value="blue">Blue</MenuItem>
+                <MenuItem value="black">Black</MenuItem>
+                <MenuItem value="red">Red</MenuItem>
+                <MenuItem value="green">Green</MenuItem>
+                <MenuItem value="gold">Gold (Multicolor)</MenuItem>
+                <MenuItem value="colorless">Colorless</MenuItem>
+              </TextField>
+
+              {/* Card Search */}
+              <Autocomplete
+                fullWidth
+                options={cardOptions}
+                getOptionLabel={(option) => option.name}
+                inputValue={cardSearchInput}
+                onInputChange={(event, newInputValue, reason) => {
+                  setCardSearchInput(newInputValue);
+                  // Only trigger debounced search if the user is typing, not when selecting from dropdown
+                  if (reason === 'input') {
+                    debouncedSetSearchInput(newInputValue);
+                  }
+                }}
+                onChange={(event, newValue) => {
+                  setSelectedCard(newValue);
+                }}
+                value={selectedCard}
+                noOptionsText={cardSearchInput.length < 2 ? 'Start typing to search...' : 'No cards found'}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Card Art"
+                    placeholder="Type card name..."
+                    helperText="Search for any Magic card by name"
+                    InputLabelProps={{ shrink: true }}
+                  />
+                )}
+                renderOption={(props, option) => (
+                  <li {...props} key={option.id}>
+                    <Box>
+                      <Typography variant="body2">{option.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {option.setName}
+                      </Typography>
+                    </Box>
+                  </li>
+                )}
+                sx={{ mb: 2 }}
+              />
+
+              {/* Card Preview */}
+              {selectedCard && user && (
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    Preview:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      p: 2,
+                      backgroundColor: 'background.paper',
+                      borderRadius: 1,
+                    }}
+                  >
+                    <CustomCard
+                      username={user.username}
+                      cardId={selectedCard.id}
+                      color={selectedColor as 'white' | 'blue' | 'black' | 'red' | 'green' | 'gold' | 'colorless'}
+                    />
+                  </Box>
+                </Box>
+              )}
+
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button variant="outlined" onClick={handleSaveCustomCard} disabled={!selectedCard}>
+                  Save Custom Card
+                </Button>
+                {user?.patreonCardId && (
+                  <Button variant="outlined" color="error" onClick={handleDeleteCustomCard}>
+                    Delete Custom Card
+                  </Button>
+                )}
+              </Box>
+            </Box>
+          )}
 
           {/* Action Buttons */}
           <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+            {!currentTier && !highestTier && (
+              <Button
+                variant="contained"
+                color="primary"
+                component="a"
+                href="https://www.patreon.com/mtgcollectionbuilder"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Join Patreon
+              </Button>
+            )}
             <Button variant="outlined" onClick={handleResyncPatreon}>
               Re-sync with Patreon
             </Button>
@@ -174,7 +430,7 @@ export const PatreonSection = () => {
               onClick={() => setDisconnectDialogOpen(true)}
               disabled={isDisconnecting}
             >
-              Disconnect
+              Disconnect from Patreon
             </Button>
           </Box>
         </Box>

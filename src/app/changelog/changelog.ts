@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-07',
+      version: '0.145.0',
+      changes: [
+        'Current and past Mythic Rare Patreon supporters can now create custom cards with any Magic card art and color frame to represent themselves on the Patrons page',
+      ],
+    },
+    {
       date: '2025-10-06',
       version: '0.144.0',
       changes: [

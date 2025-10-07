@@ -26,4 +26,11 @@ export interface PatreonSupporter {
   username: string;
   currentTier: PatreonTier | null;
   highestTier: PatreonTier;
+  // Custom card for mythic supporters
+  customCard?: {
+    cardId: string;
+    color: 'white' | 'blue' | 'black' | 'red' | 'green' | 'gold' | 'colorless';
+  } | null;
 }
+
+export type CardColor = 'white' | 'blue' | 'black' | 'red' | 'green' | 'gold' | 'colorless';

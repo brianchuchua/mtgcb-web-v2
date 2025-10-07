@@ -25,6 +25,8 @@ export interface UserData {
   email: string;
   isPublic: boolean;
   showAsPatreonSupporter?: boolean;
+  patreonCardId?: string | null;
+  patreonCardColor?: 'white' | 'blue' | 'black' | 'red' | 'green' | 'gold' | 'colorless' | null;
 }
 
 export interface ForgotPasswordRequest {

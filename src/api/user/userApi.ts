@@ -12,6 +12,8 @@ interface UpdateUserRequest {
   currentPassword?: string;
   isPublic?: boolean;
   showAsPatreonSupporter?: boolean;
+  patreonCardId?: string | null;
+  patreonCardColor?: 'white' | 'blue' | 'black' | 'red' | 'green' | 'gold' | 'colorless' | null;
 }
 
 export const userApi = mtgcbApi.injectEndpoints({
@@ -24,8 +26,8 @@ export const userApi = mtgcbApi.injectEndpoints({
       }),
       invalidatesTags: (result, error, arg) => {
         const tags: Array<'Auth' | 'PatreonSupporters'> = ['Auth'];
-        // If updating showAsPatreonSupporter, also invalidate the supporters list
-        if (arg.showAsPatreonSupporter !== undefined) {
+        // If updating showAsPatreonSupporter or card selection, also invalidate the supporters list
+        if (arg.showAsPatreonSupporter !== undefined || arg.patreonCardId !== undefined || arg.patreonCardColor !== undefined) {
           tags.push('PatreonSupporters');
         }
         return tags;

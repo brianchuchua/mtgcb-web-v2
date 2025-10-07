@@ -21,6 +21,7 @@ import {
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { useGetPatreonStatusQuery, useGetPatreonSupportersQuery } from '@/api/patreon/patreonApi';
+import { CustomCard } from '@/components/patrons/CustomCard';
 import { useAuth } from '@/hooks/useAuth';
 
 const ContactCard = styled(Paper)(({ theme }) => ({
@@ -99,7 +100,7 @@ export default function PatronsPage() {
             Patrons
           </Typography>
           <Typography variant="h6" color="text.secondary">
-            Support MTG Collection Builder and get exclusive perks!
+            Support MTG Collection Builder and help keep the site ad-free!
           </Typography>
         </Box>
 
@@ -134,7 +135,7 @@ export default function PatronsPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Become a Patron
+                    Become a Patron on Patreon
                   </ContactButton>
                 </Stack>
               </CardContent>
@@ -212,6 +213,31 @@ export default function PatronsPage() {
 
         <Divider sx={{ my: 5 }} />
 
+        {/* Philosophy Section */}
+        <Box sx={{ mb: 5 }}>
+          <Paper elevation={0} sx={{ p: 4, backgroundColor: 'action.hover' }}>
+            <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+              Why Patreon?
+            </Typography>
+            <Typography variant="body1" color="text.secondary" paragraph>
+              Patreon allows me to offset the cost of not showing ads to any of my users. I used to run Google Ads until
+              I realized how much it detracted from the experience, especially for users on older devices. Anyone who's
+              been to a gaming wiki knows how obstrusive ads can be. Do I <strong>really</strong> need to see two
+              simultaneous video ads for toothpaste while reading a Mass Effect 2 guide?
+            </Typography>
+            <Typography variant="body1" color="text.secondary" paragraph>
+              I also personally use Patreon to support other creators, and I love the idea of a platform that allows
+              fans to directly fund projects that they like. I think the best value patrons get is a direct line to me
+              in our Discord community, especially since patrons get a very strong say in the next features I work on.
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Whether you're a patron or not, thank you for being here!
+            </Typography>
+          </Paper>
+        </Box>
+
+        <Divider sx={{ my: 5 }} />
+
         {/* Tier Benefits */}
         <Box sx={{ mb: 5 }}>
           <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 600, textAlign: 'center', mb: 4 }}>
@@ -244,7 +270,6 @@ export default function PatronsPage() {
                   <Typography variant="body2">• Personalized thank you email</Typography>
                   <Typography variant="body2">• Access to MTG CB Discord</Typography>
                   <Typography variant="body2">• Access to polls</Typography>
-                  <Typography variant="body2">• Patreon-only news</Typography>
                 </Stack>
               </Paper>
             </Grid>
@@ -392,17 +417,72 @@ export default function PatronsPage() {
                       Mythic Rare Supporters
                     </Typography>
                   </Box>
-                  <Paper elevation={0} sx={{ p: 2 }}>
-                    <Stack direction="row" flexWrap="wrap" gap={2}>
-                      {supporters
-                        .filter((s) => s.highestTier.slug === 'mythic')
-                        .map((supporter) => (
-                          <Typography key={supporter.username} variant="body1" fontWeight={500}>
-                            {supporter.username}
-                          </Typography>
-                        ))}
-                    </Stack>
-                  </Paper>
+
+                  {/* The Reserved List - Mythic supporters with custom cards */}
+                  <Box sx={{ mb: 3 }}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="h6" fontWeight={600} sx={{ mb: 0.5 }}>
+                        The Reserved List
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Mythic Rare supporters using their perk to represent themselves with a custom card
+                      </Typography>
+                    </Box>
+                    {supporters.filter((s) => s.highestTier.slug === 'mythic' && s.customCard).length > 0 ? (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center' }}>
+                        {supporters
+                          .filter((s) => s.highestTier.slug === 'mythic' && s.customCard)
+                          .map((supporter) => (
+                            <CustomCard
+                              key={supporter.username}
+                              username={supporter.username}
+                              cardId={supporter.customCard!.cardId}
+                              color={supporter.customCard!.color}
+                            />
+                          ))}
+                      </Box>
+                    ) : (
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          p: 4,
+                          backgroundColor: 'action.hover',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <Typography sx={{ fontSize: 48, mb: 2 }}>✨</Typography>
+                        <Typography variant="h6" fontWeight={600} gutterBottom>
+                          No Custom Cards Yet
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Mythic Rare supporters who have ever supported at this tier can select a custom card art and
+                          frame color to represent themselves.
+                        </Typography>
+                      </Paper>
+                    )}
+                  </Box>
+
+                  {/* Mythic supporters without custom cards */}
+                  {supporters.filter((s) => s.highestTier.slug === 'mythic' && !s.customCard).length > 0 && (
+                    <Box>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="h6" fontWeight={600}>
+                          Equally-As-Cool Mythic Supporters
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                        {supporters
+                          .filter((s) => s.highestTier.slug === 'mythic' && !s.customCard)
+                          .map((supporter) => (
+                            <Paper key={supporter.username} elevation={0} sx={{ p: 2 }}>
+                              <Typography variant="body1" fontWeight={500}>
+                                {supporter.username}
+                              </Typography>
+                            </Paper>
+                          ))}
+                      </Box>
+                    </Box>
+                  )}
                 </Box>
               )}
 
@@ -415,17 +495,17 @@ export default function PatronsPage() {
                       Rare Supporters
                     </Typography>
                   </Box>
-                  <Paper elevation={0} sx={{ p: 2 }}>
-                    <Stack direction="row" flexWrap="wrap" gap={2}>
-                      {supporters
-                        .filter((s) => s.highestTier.slug === 'rare')
-                        .map((supporter) => (
-                          <Typography key={supporter.username} variant="body1" fontWeight={500}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                    {supporters
+                      .filter((s) => s.highestTier.slug === 'rare')
+                      .map((supporter) => (
+                        <Paper key={supporter.username} elevation={0} sx={{ p: 2 }}>
+                          <Typography variant="body1" fontWeight={500}>
                             {supporter.username}
                           </Typography>
-                        ))}
-                    </Stack>
-                  </Paper>
+                        </Paper>
+                      ))}
+                  </Box>
                 </Box>
               )}
 
@@ -438,17 +518,17 @@ export default function PatronsPage() {
                       Uncommon Supporters
                     </Typography>
                   </Box>
-                  <Paper elevation={0} sx={{ p: 2 }}>
-                    <Stack direction="row" flexWrap="wrap" gap={2}>
-                      {supporters
-                        .filter((s) => s.highestTier.slug === 'uncommon')
-                        .map((supporter) => (
-                          <Typography key={supporter.username} variant="body1" fontWeight={500}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                    {supporters
+                      .filter((s) => s.highestTier.slug === 'uncommon')
+                      .map((supporter) => (
+                        <Paper key={supporter.username} elevation={0} sx={{ p: 2 }}>
+                          <Typography variant="body1" fontWeight={500}>
                             {supporter.username}
                           </Typography>
-                        ))}
-                    </Stack>
-                  </Paper>
+                        </Paper>
+                      ))}
+                  </Box>
                 </Box>
               )}
 
@@ -461,17 +541,17 @@ export default function PatronsPage() {
                       Common Supporters
                     </Typography>
                   </Box>
-                  <Paper elevation={0} sx={{ p: 2 }}>
-                    <Stack direction="row" flexWrap="wrap" gap={2}>
-                      {supporters
-                        .filter((s) => s.highestTier.slug === 'common')
-                        .map((supporter) => (
-                          <Typography key={supporter.username} variant="body1" fontWeight={500}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                    {supporters
+                      .filter((s) => s.highestTier.slug === 'common')
+                      .map((supporter) => (
+                        <Paper key={supporter.username} elevation={0} sx={{ p: 2 }}>
+                          <Typography variant="body1" fontWeight={500}>
                             {supporter.username}
                           </Typography>
-                        ))}
-                    </Stack>
-                  </Paper>
+                        </Paper>
+                      ))}
+                  </Box>
                 </Box>
               )}
             </Stack>

@@ -16,8 +16,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Currently Looking At or Working On or Just Noticed
 
 - People miss that you can negate the pills in the autocompletewithnegation. To make that more visible, maybe show something like ✔️/🚫 when you hover over an entry.
-- working on patreon integration
-- still seeing two success messages, maybe just locally
 
 #### Great Feedback From Andy (process/do/defer)
 
@@ -111,23 +109,6 @@ Thanks for the feedback! I'll look at all these items in higher detail soon, but
 
 - Integrate Sonarqube and fix all critical issues
 
-### Patron Features / Patreon Integration
-
-- A page thanking patrons for their support, listing them (anonymous by default), and showing the benefits they get. Maybe a link to a Discord channel for patrons.
-- A supporter badge of some sort would be great.
-- Detecting if someone is a patron and linking their accounts.
-- I think they should get a confetti button. On-demand confetti. I kinda want one.
-- I should audit the Patreon page description and tiers and make sure everything's good.
-- We're going to have the patreon list be opt-in, so users link their accounts and set it up. Then optionally design their card if they want. Should have a clear message on the list of patrons that if they don't see themselves there, to link their account and set it up.
-
-#### The Reserved List
-
-- Immortal/Reserved List tier patrons will get the ability to customize a card to represent their collection in a hall of fame.
-- Other Patrons will be listed in a Hall of Fame just as usernames -- private by default, controlled with a setting
-- Mention Patreon on the home page and wherever else is appropriate
-- Mention that patrons get to vote on future features
-- Make patrons page, perhaps renamed to support the site, which lists why, and then lists supporters at different tiers, consider privacy
-
 ## 🚀 Release Checklist
 
 ### Migration Steps
@@ -140,7 +121,7 @@ Thanks for the feedback! I'll look at all these items in higher detail soon, but
 
 - Ping johnny on Discord once card locations are released. :)
 - Announce on social media and discord
-- Announce to patrons
+- Announce to patrons (and update patreon description as needed)
 
 ## 📦 Post-Release
 

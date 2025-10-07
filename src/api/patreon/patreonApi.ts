@@ -17,7 +17,7 @@ export const patreonApi = mtgcbApi.injectEndpoints({
         url: 'patreon/disconnect',
         method: 'DELETE',
       }),
-      invalidatesTags: ['Patreon', 'Auth'],
+      invalidatesTags: ['Patreon', 'Auth', 'PatreonSupporters'],
     }),
   }),
   overrideExisting: false,
