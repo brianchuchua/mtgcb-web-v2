@@ -6,6 +6,7 @@ import {
   ColorFilter,
   ColorMatchType,
   CompletionStatusFilter,
+  LayoutFilter,
   RarityFilter,
   SetCategoryFilter,
   SetFilter,
@@ -118,6 +119,14 @@ export const browseSlice = createSlice({
         delete state.cardsSearchParams.types;
       } else {
         state.cardsSearchParams.types = action.payload;
+      }
+    },
+    setLayouts: (state, action: PayloadAction<LayoutFilter>) => {
+      // Cards-specific field
+      if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
+        delete state.cardsSearchParams.layouts;
+      } else {
+        state.cardsSearchParams.layouts = action.payload;
       }
     },
     setRarities: (state, action: PayloadAction<RarityFilter>) => {
@@ -498,6 +507,7 @@ export const {
   setArtist,
   setColors,
   setTypes,
+  setLayouts,
   setRarities,
   setSets,
   setStats,
@@ -562,6 +572,7 @@ export const selectOracleText = (state: RootState) => state.browse.cardsSearchPa
 export const selectArtist = (state: RootState) => state.browse.cardsSearchParams.artist;
 export const selectColors = (state: RootState) => state.browse.cardsSearchParams.colors;
 export const selectTypes = (state: RootState) => state.browse.cardsSearchParams.types;
+export const selectLayouts = (state: RootState) => state.browse.cardsSearchParams.layouts;
 export const selectRarities = (state: RootState) => state.browse.cardsSearchParams.rarities;
 export const selectSets = (state: RootState) => state.browse.cardsSearchParams.sets;
 export const selectStats = (state: RootState) => state.browse.cardsSearchParams.stats;

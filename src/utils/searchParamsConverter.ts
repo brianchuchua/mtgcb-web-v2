@@ -100,6 +100,19 @@ export const buildApiParamsFromSearchParams = (
       }
     }
 
+    // Add layout filtering - using OR for includes (since a card can only have one layout)
+    if (searchParams.layouts) {
+      const includeLayouts = searchParams.layouts.include;
+      const excludeLayouts = searchParams.layouts.exclude;
+
+      if (includeLayouts.length > 0 || excludeLayouts.length > 0) {
+        apiParams.layout = {
+          ...(includeLayouts.length > 0 && { OR: includeLayouts }),
+          ...(excludeLayouts.length > 0 && { NOT: excludeLayouts }),
+        };
+      }
+    }
+
     // Add rarity filtering - using OR for includes (since a card can only have one rarity)
     if (searchParams.rarities) {
       const includeRarities = searchParams.rarities.include;

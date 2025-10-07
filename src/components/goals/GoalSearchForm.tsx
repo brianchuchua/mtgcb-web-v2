@@ -27,7 +27,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useGetSetTypesQuery } from '@/api/browse/browseApi';
 import { CardApiParams } from '@/api/browse/types';
-import { useGetCardTypesQuery } from '@/api/cards/cardsApi';
+import { useGetCardLayoutsQuery, useGetCardTypesQuery } from '@/api/cards/cardsApi';
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
 import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
@@ -141,6 +141,10 @@ export function GoalSearchForm({
   const [cardTypeOptions, setCardTypeOptions] = useState<AutocompleteOption[]>([]);
   const [selectedTypes, setSelectedTypes] = useState<AutocompleteOption[]>([]);
 
+  // Layout state
+  const [layoutOptions, setLayoutOptions] = useState<AutocompleteOption[]>([]);
+  const [selectedLayouts, setSelectedLayouts] = useState<AutocompleteOption[]>([]);
+
   // Rarity state
   const [selectedRarities, setSelectedRarities] = useState<AutocompleteOption[]>([]);
 
@@ -164,7 +168,16 @@ export function GoalSearchForm({
 
   // Fetch data for dropdowns
   const { data: cardTypesData } = useGetCardTypesQuery();
+  const { data: cardLayoutsData } = useGetCardLayoutsQuery();
   const { data: setTypesData } = useGetSetTypesQuery();
+
+  // Helper to format layout names for display
+  const formatLayoutName = (layout: string): string => {
+    return layout
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 
   // Helper to convert simple options to autocomplete options
   const toAutocompleteOptions = (
@@ -235,6 +248,29 @@ export function GoalSearchForm({
       setSelectedTypes(selected);
     }
   }, [isInitialized, searchConditions.type, cardTypeOptions]);
+
+  // Initialize selected layouts when layoutOptions are loaded
+  useEffect(() => {
+    if (!isInitialized && searchConditions.layout && layoutOptions.length > 0) {
+      const selected: AutocompleteOption[] = [];
+
+      searchConditions.layout.OR?.forEach((layout: string) => {
+        const option = layoutOptions.find((opt) => opt.value === layout);
+        if (option) {
+          selected.push({ ...option, exclude: false });
+        }
+      });
+
+      searchConditions.layout.NOT?.forEach((layout: string) => {
+        const option = layoutOptions.find((opt) => opt.value === layout);
+        if (option) {
+          selected.push({ ...option, exclude: true });
+        }
+      });
+
+      setSelectedLayouts(selected);
+    }
+  }, [isInitialized, searchConditions.layout, layoutOptions]);
 
   // Parse initial rarity conditions (only once)
   useEffect(() => {
@@ -448,6 +484,19 @@ export function GoalSearchForm({
       }
     }
 
+    // Layouts
+    const layoutInclude = selectedLayouts.filter((l) => !l.exclude);
+    const layoutExclude = selectedLayouts.filter((l) => l.exclude);
+    if (layoutInclude.length > 0 || layoutExclude.length > 0) {
+      conditions.layout = {};
+      if (layoutInclude.length > 0) {
+        conditions.layout.OR = layoutInclude.map((l) => l.value);
+      }
+      if (layoutExclude.length > 0) {
+        conditions.layout.NOT = layoutExclude.map((l) => l.value);
+      }
+    }
+
     // Rarities
     const rarityInclude = selectedRarities.filter((r) => !r.exclude);
     const rarityExclude = selectedRarities.filter((r) => r.exclude);
@@ -565,6 +614,7 @@ export function GoalSearchForm({
     artist,
     colorState,
     selectedTypes,
+    selectedLayouts,
     selectedRarities,
     selectedSets,
     selectedSetTypes,
@@ -605,10 +655,10 @@ export function GoalSearchForm({
 
   // Mark as initialized once all data is loaded
   useEffect(() => {
-    if (cardTypeOptions.length > 0 && setOptions.length > 0 && setTypeOptions.length > 0 && !isInitialized) {
+    if (cardTypeOptions.length > 0 && layoutOptions.length > 0 && setOptions.length > 0 && setTypeOptions.length > 0 && !isInitialized) {
       setIsInitialized(true);
     }
-  }, [cardTypeOptions.length, setOptions.length, setTypeOptions.length, isInitialized]);
+  }, [cardTypeOptions.length, layoutOptions.length, setOptions.length, setTypeOptions.length, isInitialized]);
 
   // Update parent whenever conditions change (but skip during initialization)
   useEffect(() => {
@@ -661,6 +711,19 @@ export function GoalSearchForm({
       setCardTypeOptions(options);
     }
   }, [cardTypesData]);
+
+  // Build layout options from API data
+  useEffect(() => {
+    if (cardLayoutsData) {
+      const options = cardLayoutsData.layouts.map((layout) => ({
+        category: 'Layouts',
+        label: formatLayoutName(layout),
+        value: `"${layout}"`,
+        exclude: false,
+      }));
+      setLayoutOptions(options);
+    }
+  }, [cardLayoutsData]);
 
   const handleColorToggle = (color: string) => {
     if (color === 'C') {
@@ -840,6 +903,14 @@ export function GoalSearchForm({
         options={cardTypeOptions}
         selectedOptions={selectedTypes}
         setSelectedOptionsRemotely={setSelectedTypes}
+      />
+
+      {/* Layout Selector */}
+      <AutocompleteWithNegation
+        label="Card Layouts"
+        options={layoutOptions}
+        selectedOptions={selectedLayouts}
+        setSelectedOptionsRemotely={setSelectedLayouts}
       />
 
       {/* Rarity Selector */}

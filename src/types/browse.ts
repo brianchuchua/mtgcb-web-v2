@@ -11,6 +11,11 @@ export interface TypeFilter {
   exclude: string[];
 }
 
+export interface LayoutFilter {
+  include: string[];
+  exclude: string[];
+}
+
 export interface RarityFilter {
   include: string[];
   exclude: string[];
@@ -75,6 +80,7 @@ export interface BrowseSearchParams {
   artist?: string;
   colors?: ColorFilter;
   types?: TypeFilter;
+  layouts?: LayoutFilter;
   rarities?: RarityFilter;
   sets?: SetFilter;
   stats?: StatFilters;

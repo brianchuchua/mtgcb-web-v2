@@ -9,3 +9,7 @@ export interface CardTypes {
   creatureTypes: string[];
   planarTypes: string[];
 }
+
+export interface CardLayouts {
+  layouts: string[];
+}

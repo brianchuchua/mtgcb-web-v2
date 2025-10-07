@@ -10,6 +10,7 @@ import {
   setCardSearchName,
   setCardSearchParams,
   setColors,
+  setLayouts,
   setOneResultPerCardName,
   setOracleText,
   setRarities,
@@ -23,7 +24,7 @@ import {
   setTypes,
   setViewContentType,
 } from '@/redux/slices/browseSlice';
-import { ColorFilter, RarityFilter, SetFilter, TypeFilter } from '@/types/browse';
+import { ColorFilter, LayoutFilter, RarityFilter, SetFilter, TypeFilter } from '@/types/browse';
 
 export function useInitializeBrowseFromUrl() {
   const urlSearchParams = useSearchParams();
@@ -122,6 +123,8 @@ export function useInitializeBrowseFromUrl() {
       const colorMatchType = urlSearchParams.get('colorMatchType');
       const includeTypes = urlSearchParams.get('includeTypes');
       const excludeTypes = urlSearchParams.get('excludeTypes');
+      const includeLayouts = urlSearchParams.get('includeLayouts');
+      const excludeLayouts = urlSearchParams.get('excludeLayouts');
       const includeRarities = urlSearchParams.get('includeRarities');
       const excludeRarities = urlSearchParams.get('excludeRarities');
       const includeSets = urlSearchParams.get('includeSets');
@@ -152,6 +155,15 @@ export function useInitializeBrowseFromUrl() {
           exclude: excludeTypes ? excludeTypes.split('|') : [],
         };
         dispatch(setTypes(typeFilter));
+      }
+
+      // Process layouts
+      if (includeLayouts || excludeLayouts) {
+        const layoutFilter: LayoutFilter = {
+          include: includeLayouts ? includeLayouts.split('|') : [],
+          exclude: excludeLayouts ? excludeLayouts.split('|') : [],
+        };
+        dispatch(setLayouts(layoutFilter));
       }
 
       // Process rarities

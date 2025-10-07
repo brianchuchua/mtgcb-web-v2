@@ -12,6 +12,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-07',
+      version: '0.146.0',
+      changes: [
+        'Added card layout filter to browse page and goals - search by layout types like split, transform, adventure, and more',
+        'Added visual checkmark to included filter options for better clarity',
+      ],
+    },
+    {
+      date: '2025-10-07',
       version: '0.145.0',
       changes: [
         'Current and past Mythic Rare Patreon supporters can now create custom cards with any Magic card art and color frame to represent themselves on the Patrons page',

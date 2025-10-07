@@ -104,6 +104,17 @@ export const useSearchFromUrl = () => {
       };
     }
 
+    // Add layout filtering
+    const includeLayouts = searchParams.get('includeLayouts');
+    const excludeLayouts = searchParams.get('excludeLayouts');
+
+    if (includeLayouts || excludeLayouts) {
+      apiParams.layout = {
+        ...(includeLayouts && { OR: includeLayouts.split('|') }),
+        ...(excludeLayouts && { NOT: excludeLayouts.split('|') }),
+      };
+    }
+
     const stats = searchParams.get('stats');
     if (stats) {
       // Parse stats parameter: convertedManaCost=gte4|gte3,power=gte2

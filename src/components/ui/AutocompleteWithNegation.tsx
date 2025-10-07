@@ -57,7 +57,7 @@ const AutocompleteWithNegation = ({
               <Chip
                 {...props}
                 key={`${option.value}-${option.exclude}`}
-                label={`${option.exclude ? 'NOT ' : ''}${option.label}`}
+                label={`${option.exclude ? 'NOT ' : '✓ '}${option.label}`}
                 color={option.exclude ? 'error' : 'default'}
                 onClick={(e) => handleChipClick(e, option, index)}
                 sx={{ cursor: 'pointer' }}

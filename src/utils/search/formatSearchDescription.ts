@@ -110,6 +110,7 @@ export function formatSearchDescription(
       ...(apiParams.artist && { artist: apiParams.artist }),
       ...(apiParams.colors_array && { colors_array: apiParams.colors_array }),
       ...(apiParams.type && { type: apiParams.type }),
+      ...(apiParams.layout && { layout: apiParams.layout }),
       ...(apiParams.rarityNumeric && { rarityNumeric: apiParams.rarityNumeric }),
       ...(apiParams.setId && { setId: apiParams.setId }),
       ...(apiParams.convertedManaCost && { convertedManaCost: apiParams.convertedManaCost }),

@@ -41,6 +41,14 @@ export function formatSearchCriteria(
   // Check if we only have specific card IDs
   const hasOnlyCardIds = conditions.id && Object.keys(conditions).filter((key) => key !== 'id').length === 0;
 
+  // Helper to format layout names for display
+  const formatLayoutName = (layout: string): string => {
+    return layout
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   // Types - collect them separately for better formatting
   if (conditions.type) {
     if (conditions.type.AND && conditions.type.AND.length > 0) {
@@ -60,6 +68,28 @@ export function formatSearchCriteria(
     if (conditions.type.NOT && conditions.type.NOT.length > 0) {
       const excludedTypes = conditions.type.NOT.map((t: string) => `non-${t.replace(/"/g, '')}`);
       typeParts.push(...excludedTypes);
+    }
+  }
+
+  // Layouts
+  const layoutParts: string[] = [];
+  if (conditions.layout) {
+    if (conditions.layout.OR && conditions.layout.OR.length > 0) {
+      const layoutNames = conditions.layout.OR.map((l: string) => formatLayoutName(l.replace(/"/g, '')));
+      if (layoutNames.length === 1) {
+        layoutParts.push(`${layoutNames[0]} layout`);
+      } else {
+        layoutParts.push(`${layoutNames.join('/')} layouts`);
+      }
+    }
+
+    if (conditions.layout.NOT && conditions.layout.NOT.length > 0) {
+      const excludedLayouts = conditions.layout.NOT.map((l: string) => formatLayoutName(l.replace(/"/g, '')));
+      if (excludedLayouts.length === 1) {
+        layoutParts.push(`non-${excludedLayouts[0]} layout`);
+      } else {
+        layoutParts.push(`non-${excludedLayouts.join('/non-')} layouts`);
+      }
     }
   }
 
@@ -404,11 +434,12 @@ export function formatSearchCriteria(
     if (quantityText) {
       // Start with quantity
       if (conditions.name) {
-        // If we have a name, include it along with colors/rarity/types
+        // If we have a name, include it along with colors/rarity/types/layouts
         const cardDescParts: string[] = [];
         if (colorPart.length > 0) cardDescParts.push(...colorPart);
         if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
         if (typeParts.length > 0) cardDescParts.push(...typeParts);
+        if (layoutParts.length > 0) cardDescParts.push(...layoutParts);
 
         if (cardDescParts.length > 0) {
           mainParts.push(`cards: ${quantityText} of ${cardDescParts.join(' ')} named "${conditions.name}"`);
@@ -416,11 +447,12 @@ export function formatSearchCriteria(
           mainParts.push(`cards: ${quantityText} matching "${conditions.name}"`);
         }
       } else {
-        // Otherwise, compose: cards: [quantity] of [color] [rarity] [type]
+        // Otherwise, compose: cards: [quantity] of [color] [rarity] [type] [layout]
         const cardDescParts: string[] = [];
         if (colorPart.length > 0) cardDescParts.push(...colorPart);
         if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
         if (typeParts.length > 0) cardDescParts.push(...typeParts);
+        if (layoutParts.length > 0) cardDescParts.push(...layoutParts);
 
         if (cardDescParts.length > 0) {
           mainParts.push(`cards: ${quantityText} of ${cardDescParts.join(' ')}`);
@@ -432,11 +464,12 @@ export function formatSearchCriteria(
     } else {
       // No quantity filter, original logic
       if (conditions.name) {
-        // If we have a name, include it along with colors/rarity/types
+        // If we have a name, include it along with colors/rarity/types/layouts
         const cardDescParts: string[] = [];
         if (colorPart.length > 0) cardDescParts.push(...colorPart);
         if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
         if (typeParts.length > 0) cardDescParts.push(...typeParts);
+        if (layoutParts.length > 0) cardDescParts.push(...layoutParts);
 
         if (cardDescParts.length > 0) {
           mainParts.push(`cards: ${cardDescParts.join(' ')} named "${conditions.name}"`);
@@ -444,11 +477,12 @@ export function formatSearchCriteria(
           mainParts.push(`cards matching "${conditions.name}"`);
         }
       } else {
-        // Otherwise, compose: cards: [color] [rarity] [type]
+        // Otherwise, compose: cards: [color] [rarity] [type] [layout]
         const cardDescParts: string[] = [];
         if (colorPart.length > 0) cardDescParts.push(...colorPart);
         if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
         if (typeParts.length > 0) cardDescParts.push(...typeParts);
+        if (layoutParts.length > 0) cardDescParts.push(...layoutParts);
 
         if (cardDescParts.length > 0) {
           mainParts.push(`cards: ${cardDescParts.join(' ')}`);
@@ -465,11 +499,12 @@ export function formatSearchCriteria(
         mainParts.push(`card named "${conditions.name}"`);
       }
     } else {
-      // Otherwise, compose: [color] [rarity] [type]
+      // Otherwise, compose: [color] [rarity] [type] [layout]
       const cardDescParts: string[] = [];
       if (colorPart.length > 0) cardDescParts.push(...colorPart);
       if (rarityPart.length > 0) cardDescParts.push(...rarityPart);
       if (typeParts.length > 0) cardDescParts.push(...typeParts);
+      if (layoutParts.length > 0) cardDescParts.push(...layoutParts);
 
       if (cardDescParts.length > 0) {
         mainParts.push(cardDescParts.join(' '));

@@ -3,6 +3,7 @@ import SearchField from './SearchField';
 import OracleTextField from './OracleTextField';
 import ToggleSwitch from './ToggleSwitch';
 import ColorSelector from '@/features/browse/ColorSelector';
+import LayoutSelector from '@/features/browse/LayoutSelector';
 import QuantitySelector from '@/features/browse/QuantitySelector';
 import RaritySelector from '@/features/browse/RaritySelector';
 import SetSelector from '@/features/browse/SetSelector';
@@ -59,6 +60,7 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
       <OracleTextField value={localOracleText} onChange={handleOracleChange} />
       <SearchField label="Artist" value={localArtist} onChange={handleArtistChange} placeholder="Search by artist name" />
       <TypeSelector />
+      <LayoutSelector />
       <ColorSelector />
       <RaritySelector />
       {!isSetPage && <SetSelector />}

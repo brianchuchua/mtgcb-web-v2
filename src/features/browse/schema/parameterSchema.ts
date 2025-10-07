@@ -268,6 +268,19 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       exclude: [],
     },
   },
+  layouts: {
+    type: 'inclusionExclusion',
+    mode: 'cards',
+    urlParams: {
+      include: 'includeLayouts',
+      exclude: 'excludeLayouts',
+    },
+    separator: '|',
+    defaultValue: {
+      include: [],
+      exclude: [],
+    },
+  },
   rarities: {
     type: 'inclusionExclusion',
     mode: 'cards',

@@ -15,7 +15,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- People miss that you can negate the pills in the autocompletewithnegation. To make that more visible, maybe show something like ✔️/🚫 when you hover over an entry.
+- ux issues on mobile with the customcard and patreon button
 
 #### Great Feedback From Andy (process/do/defer)
 
@@ -103,7 +103,7 @@ Thanks for the feedback! I'll look at all these items in higher detail soon, but
 
 ### Scaling
 
-- Scale API and Web to two dynos (mostly for rolling restarts)
+- Scale API and Web to two dynos (mostly for rolling restarts) (do this before testing)
 
 ### Sonarqube
 
@@ -151,6 +151,8 @@ Thanks for the feedback! I'll look at all these items in higher detail soon, but
 - Ae/apostrophe fixes, etc
 - Look at set codes, Scryfall consistency, importer implications, and what's printed on the cards
 - periodic scryfall data syncs for when they fix data, but with a boolean value to tag cards or sets that shouldn't be overwritten because I've manually fixed them or scryfall is wrong
+- About 900 cards are missing layout data, every field needs an audit
+- Scryfall's token layout is helpful, but some users would not want to include tip cards and other misc cards
 
 #### Subset Splitting
 
@@ -232,6 +234,10 @@ Thanks for the feedback! I'll look at all these items in higher detail soon, but
 
 - Patron request: Scryfall syntax support for searches
 
+#### Search
+
+- Allow specifying AND/OR for some filters, like layout and type -- not hard, just an enhancement to autocompletewithnegation
+
 #### Card Locations
 
 - Mass updating of card locations -- this goes against my advice of using locations sparingly, though.
@@ -255,6 +261,7 @@ Thanks for the feedback! I'll look at all these items in higher detail soon, but
 
 ### UX/Design
 
+- On the supporters page, probably need to make images not load until they're in the viewport
 - The padding with bottom pagination isn't consistent on grid vs table views on mobile. Needs restructuring. It's fine.
 - Maybe a better 100% completion progress bar animation? I'm only 90% happy with it.
 - Consider string trimming in BrowseSearchForm

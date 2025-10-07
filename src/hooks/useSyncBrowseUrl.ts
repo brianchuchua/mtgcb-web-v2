@@ -71,6 +71,15 @@ export const useSyncBrowseUrl = () => {
       }
     }
 
+    if (searchParams.layouts) {
+      if (searchParams.layouts.include.length > 0) {
+        params.set('includeLayouts', searchParams.layouts.include.join('|'));
+      }
+      if (searchParams.layouts.exclude.length > 0) {
+        params.set('excludeLayouts', searchParams.layouts.exclude.join('|'));
+      }
+    }
+
     if (searchParams.stats) {
       // Format each stat group as: attribute=condition1|condition2
       const statParams = Object.entries(searchParams.stats)

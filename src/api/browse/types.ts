@@ -120,6 +120,10 @@ export interface CardApiParams {
     AND?: string[];
     NOT?: string[];
   };
+  layout?: {
+    OR?: string[];
+    NOT?: string[];
+  };
   rarityNumeric?: {
     OR?: string[];
     AND?: string[];
