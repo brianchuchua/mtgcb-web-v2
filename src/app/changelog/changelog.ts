@@ -11,6 +11,15 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-06',
+      version: '0.144.0',
+      changes: [
+        'Added Patreon integration - link your Patreon account in account settings',
+        'Added new Patrons page showing supporter tiers and public supporters list',
+        'Supporters can choose to display their name publicly on the Patrons page',
+      ],
+    },
+    {
       date: '2025-10-05',
       version: '0.143.3',
       changes: [

@@ -15,17 +15,76 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
+- People miss that you can negate the pills in the autocompletewithnegation. To make that more visible, maybe show something like ✔️/🚫 when you hover over an entry.
+- working on patreon integration
+- still seeing two success messages, maybe just locally
+
+#### Great Feedback From Andy (process/do/defer)
+
+Here's some more feedback. 😜
+
+--
+Add a "Token" entry in Card Types to filter for cards that are or are not tokens.
+
+--
+It's difficult to filter for cards that are not in your collection.
+
+• Quantity (Regular) = 0
+👍 Shows all Regular cards that are not in your collection.
+👎 Shows all Foil cards in your collection, even if they don't have a Regular version.
+
+• Quantity (Foil) = 0
+👍 Shows all Foil cards that are not in your collection.
+👎 Shows all Regular cards in your collection, even if they don't have a Foil version.
+
+Suggestion: Use checkboxes—one for Regular and one for Foil (and potentially more for other types/variants if you go that route). If a type is unchecked, the filters are not applied to that type. For example:
+• 🟩 Regular
+• ✅ Foil
+• Quantity = 0
+would show Foil cards that are not in your collection, regardless of the quantity or availability of Regular cards.
+
+--
+Prices
+
+a. I assume that Price (Market) is for non-foils since Price (Foil) is also an option. If that's not the case, please clarify.
+
+b. How are Low/Average/High prices different from Market/Foil prices?
+
+c. There's no way to filter for cards with "N/A" prices (e.g., Silver Drake - CardZ Magazine Promos #13). Perhaps make Price = 0 accomplish that.
+
+--
+Sort by multiple attributes. One scenario I'd like would be to first sort by Name ASC, then sort cards of the same name by Release Date DESC.
+
+--
+If I enable "Show Bad Data", two of the foil cards that I own are displayed, claiming that they do not come in foil. Foil prices are shown.
+• Snapping Drake - Tenth Edition #110
+• Spiketail Hatchling - Tenth Edition #111
+
+--
+Dropdowns need a border or a contrasting background color. (See image.)
+
+##### My Initial Thoughts on Andy's Feedback
+
+Thanks for the feedback! I'll look at all these items in higher detail soon, but some quick responses for now.
+
+1. I've got this as an action item. Biggest blocker is just making sure I get this data into the database. For now, searching for Token in the card name is like a quick hack, for search and goals, but doesn't work in all cases.
+2. I'll play around with this and feel it out to grok it. Probably another hidden feature, but it's possible that "add stat filters" and combining queries for total quantities and finish-specific quantities may accomplish what you want, or maybe not! I'll poke at it.
+3. Yeah, TCGPlayer doesn't have market/low/average/high for foils made available to me. Foils just use a "foil" price. Good point that I just use TCGPlayer price types without describing them. I'll look at better filtering.
+4. I can implement this.
+5. Ironically, there's going to be "bad data" as in the data I get from TCGPlayer or Scryfall don't agree with each other. 😂 -- I'll have to investigate each of these as they come up.
+6. They do indeed!
+
 ### Blocked/Waiting
 
-## 🚨 Critical / Blocking Issues
+- fix broken unit tests
 
-- Need another sql.raw audit, there's a document of the last one
+## 🚨 Critical / Blocking Issues
 
 ### Migration
 
 - Need a message for migration downtime in v2 as well -- and a plan to put this app into maintenance mode
-- Test migration end-to-end one more time
 - Add a migration verification script to mtgcb-importer that checks user counts and collection counts match between old and new databases, accounting for those removed due to a 0 quantity count or for cards or users that no longer exist, locally of course
+- Test migration end-to-end one more time, audit any envs i need to edit
 
 ### mtgcb-importer
 
@@ -58,6 +117,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - A supporter badge of some sort would be great.
 - Detecting if someone is a patron and linking their accounts.
 - I think they should get a confetti button. On-demand confetti. I kinda want one.
+- I should audit the Patreon page description and tiers and make sure everything's good.
+- We're going to have the patreon list be opt-in, so users link their accounts and set it up. Then optionally design their card if they want. Should have a clear message on the list of patrons that if they don't see themselves there, to link their account and set it up.
 
 #### The Reserved List
 
@@ -96,6 +157,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Start up the podcast again
 - YouTube channel? Draft streaming as a way to encourage collectors to transition to limited players?
+- Communicate projects and start setting up patron voting for next features
 
 ### Project: Data Cleanup
 
@@ -203,6 +265,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - "Your color pie" -- pie chart of colors in your collection
 - Most collected creature type, etc. I have ideas in Notion.
 - Easy to implement, but caching and performance will be the biggest factors.
+  []
 
 ### TCGPlayer Integration
 
@@ -216,6 +279,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Consider string trimming in BrowseSearchForm
 - Share and ... menu are bigger than grid/table
 - Locations and mass update open at the same time, should have more padding
+- Loading state overhaul, see goals page -> go to goal, back button, go to a different goal that isn't cached -- it's a complex web of empty states, loading states, fetching states, and cached states. useCardData has a pattern for clearing card data, but headers and pagination also need something similar, and you have to watch out for "no cards found" flashing when you really do have cards but they're just loading. I like how sets page -> set page -> back button -> another set page works
+- loading skeleton for goal header isn't the right size
 
 #### UX Consistency Pass
 
@@ -359,7 +424,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 #### Card Scanning
 
-- I built a super rough prototype of this.
+- I built a super rough prototype of this. Not really a great fit for a web app though.
 
 #### Importers and Exporters
 
@@ -409,6 +474,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Grok what to do about card prices of cancelled cards like Crusade
 - Auto-fix missing tcgplayerIds from scryfall data
 - remove claude settings file from repo, rm --cached and add to gitignore
+- If I ever run into perf isues with jobs recompiling goals, I can always have them only recompile on-demand[]
 
 ### mtgcb-importer
 

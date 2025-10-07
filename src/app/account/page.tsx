@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -30,6 +30,7 @@ import { useDeleteAccountMutation } from '@/api/auth/authApi';
 import { useUpdateUserMutation } from '@/api/user/userApi';
 import { AccessSummary } from '@/components/account/AccessSummary';
 import { DeleteAccountDialog } from '@/components/account/DeleteAccountDialog';
+import { PatreonSection } from '@/components/account/PatreonSection';
 import { ShareLinkManager } from '@/components/account/ShareLinkManager';
 import { withAuth } from '@/components/auth/withAuth';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
@@ -54,6 +55,7 @@ function ProfileContent() {
   const { user, isLoading } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [updateUser] = useUpdateUserMutation();
   const [deleteAccount, { isLoading: isDeletingAccount }] = useDeleteAccountMutation();
   const [hasProfileChanges, setHasProfileChanges] = useState(false);
@@ -63,6 +65,7 @@ function ProfileContent() {
   const [progressBarStyle, setProgressBarStyle] = useProgressBarStyle();
   const [setIconStyle, setSetIconStyle] = useSetIconStyle();
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
+  const [hasHandledOAuthCallback, setHasHandledOAuthCallback] = useState(false);
 
   const {
     register: registerProfile,
@@ -95,6 +98,29 @@ function ProfileContent() {
     const hasChanges = profileValues.username !== user?.username || profileValues.email !== user?.email;
     setHasProfileChanges(hasChanges);
   }, [profileValues.username, profileValues.email, user]);
+
+  // Handle Patreon OAuth callback
+  useEffect(() => {
+    if (hasHandledOAuthCallback) return;
+
+    const patreonStatus = searchParams.get('patreon');
+    const error = searchParams.get('error');
+
+    if (patreonStatus === 'linked') {
+      setHasHandledOAuthCallback(true);
+      enqueueSnackbar('Patreon account linked successfully!', { variant: 'success' });
+      router.replace('/account');
+    } else if (error) {
+      setHasHandledOAuthCallback(true);
+      const errorMessages: Record<string, string> = {
+        invalid_state: 'Session expired. Please try linking again.',
+        not_patron: 'You must be an active patron to link your account.',
+      };
+      const message = errorMessages[error] || `Unable to link Patreon account: ${error}`;
+      enqueueSnackbar(message, { variant: 'error' });
+      router.replace('/account');
+    }
+  }, [searchParams, router, enqueueSnackbar, hasHandledOAuthCallback]);
 
   // Check if password form is valid and matching
   const isPasswordFormValid =
@@ -528,18 +554,12 @@ function ProfileContent() {
           </CardContent>
         </Paper>
 
-        <Paper variant="outlined">
+        <Paper variant="outlined" id="patreon">
           <CardHeader>
             <Typography variant="h6">Patreon</Typography>
           </CardHeader>
           <CardContent>
-            <Typography>
-              This section is in progress. :)
-              <br />
-              <br />
-              Immortal/Reserved List tier patrons will get the ability to customize a card to represent their collection
-              in a hall of fame.
-            </Typography>
+            <PatreonSection />
           </CardContent>
         </Paper>
 

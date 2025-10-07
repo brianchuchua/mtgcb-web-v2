@@ -482,11 +482,11 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
             </Collapse>
 
             <ListItem disablePadding>
-              <ListItemButton disabled>
+              <ListItemButton component={Link} href="/patrons" selected={pathname === '/patrons'} onClick={handleClick}>
                 <ListItemIcon>
                   <FavoriteIcon />
                 </ListItemIcon>
-                <ListItemText primary="Patrons (In Development)" />
+                <ListItemText primary="Patrons" />
               </ListItemButton>
             </ListItem>
           </List>

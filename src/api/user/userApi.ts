@@ -11,6 +11,7 @@ interface UpdateUserRequest {
   password?: string;
   currentPassword?: string;
   isPublic?: boolean;
+  showAsPatreonSupporter?: boolean;
 }
 
 export const userApi = mtgcbApi.injectEndpoints({
@@ -21,7 +22,14 @@ export const userApi = mtgcbApi.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: ['Auth'],
+      invalidatesTags: (result, error, arg) => {
+        const tags: Array<'Auth' | 'PatreonSupporters'> = ['Auth'];
+        // If updating showAsPatreonSupporter, also invalidate the supporters list
+        if (arg.showAsPatreonSupporter !== undefined) {
+          tags.push('PatreonSupporters');
+        }
+        return tags;
+      },
     }),
   }),
 });

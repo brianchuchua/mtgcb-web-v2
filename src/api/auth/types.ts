@@ -24,6 +24,7 @@ export interface UserData {
   username: string;
   email: string;
   isPublic: boolean;
+  showAsPatreonSupporter?: boolean;
 }
 
 export interface ForgotPasswordRequest {
