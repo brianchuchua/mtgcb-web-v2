@@ -135,7 +135,7 @@ export default function PatronsPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Become a Patron on Patreon
+                    Join our Patreon
                   </ContactButton>
                 </Stack>
               </CardContent>

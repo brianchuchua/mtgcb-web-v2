@@ -40,6 +40,23 @@ const faqData: FAQData = {
       category: 'pricing',
     },
     {
+      question: 'What are market, low, average, high, and foil prices? ',
+      answer: `
+        <p>These are all price types provided by TCGPlayer.</p>
+        
+        <ul>
+          <li><strong>Market</strong> is a fair selling price based on recent sales of the card.</li>
+          <li><strong>Low</strong> is the lowest listing price currently available on TCGPlayer.</li>
+          <li><strong>Average</strong> is the average listing price currently available on TCGPlayer.</li>
+          <li><strong>High</strong> is the highest listing price currently available on TCGPlayer.</li>
+          <li><strong>Foil</strong> is the price of a foil version of the card, if available. (There isn't a market, low, average, or high price for foils.)</li>
+        </ul>
+
+        <p>You can choose which price type to use for your collection in your account settings. I personally recommend Market price.</p>
+      `,
+      category: 'pricing',
+    },
+    {
       question: 'Why is this card or set missing?',
       answer: `
         <p>It's probably on my TODO list to add. I'm pretty good about adding new cards before or on 

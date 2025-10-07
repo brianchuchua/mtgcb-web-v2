@@ -208,13 +208,18 @@ export const PatreonSection = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Support MTG Collection Builder on Patreon to help keep the site ad-free for everyone!
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mt: 2 }}>
             <Button
               variant="contained"
-              color="primary"
               component="a"
               href="https://www.patreon.com/mtgcollectionbuilder"
               {...({ target: '_blank', rel: 'noopener noreferrer' } as any)}
+              sx={{
+                backgroundColor: '#FF424D',
+                '&:hover': {
+                  backgroundColor: '#E0353E',
+                },
+              }}
             >
               Join Patreon
             </Button>
@@ -366,6 +371,11 @@ export const PatreonSection = () => {
                     </Box>
                   </li>
                 )}
+                slotProps={{
+                  paper: {
+                    elevation: 1,
+                  },
+                }}
                 sx={{ mb: 2 }}
               />
 
@@ -379,7 +389,7 @@ export const PatreonSection = () => {
                     sx={{
                       display: 'flex',
                       justifyContent: 'center',
-                      p: 2,
+                      p: { xs: 0, sm: 2 },
                       backgroundColor: 'background.paper',
                       borderRadius: 1,
                     }}
@@ -393,7 +403,7 @@ export const PatreonSection = () => {
                 </Box>
               )}
 
-              <Box sx={{ display: 'flex', gap: 2 }}>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2 }}>
                 <Button variant="outlined" onClick={handleSaveCustomCard} disabled={!selectedCard}>
                   Save Custom Card
                 </Button>
@@ -407,14 +417,19 @@ export const PatreonSection = () => {
           )}
 
           {/* Action Buttons */}
-          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, mt: 2 }}>
             {!currentTier && !highestTier && (
               <Button
                 variant="contained"
-                color="primary"
                 component="a"
                 href="https://www.patreon.com/mtgcollectionbuilder"
                 {...({ target: '_blank', rel: 'noopener noreferrer' } as any)}
+                sx={{
+                  backgroundColor: '#FF424D',
+                  '&:hover': {
+                    backgroundColor: '#E0353E',
+                  },
+                }}
               >
                 Join Patreon
               </Button>

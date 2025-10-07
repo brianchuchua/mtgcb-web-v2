@@ -80,6 +80,11 @@ const AutocompleteWithNegation = ({
           margin: '2px',
         },
       }}
+      slotProps={{
+        paper: {
+          elevation: 1,
+        },
+      }}
     />
   );
 };

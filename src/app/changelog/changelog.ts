@@ -12,6 +12,16 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-07',
+      version: '0.146.1',
+      changes: [
+        'Improved dropdown styling consistency across autocomplete components',
+        'Improved mobile layout for account settings page with better spacing',
+        'Improved mobile layout for Patreon section buttons',
+        'Updated Join Patreon button to use Patreon brand colors',
+      ],
+    },
+    {
+      date: '2025-10-07',
       version: '0.146.0',
       changes: [
         'Added card layout filter to browse page and goals - search by layout types like split, transform, adventure, and more',

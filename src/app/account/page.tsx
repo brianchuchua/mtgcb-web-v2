@@ -212,7 +212,7 @@ function ProfileContent() {
   }
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" sx={{ px: 0 }}>
       <Typography variant="h4" component="h1" sx={{ mb: 4, textAlign: 'center' }}>
         Account Settings
       </Typography>

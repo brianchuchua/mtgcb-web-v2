@@ -15,62 +15,18 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- ux issues on mobile with the customcard and patreon button
+- consider adding escape hatch to canBeFoil/canBeNonFoil
 
-#### Great Feedback From Andy (process/do/defer)
-
-Here's some more feedback. 😜
-
---
-Add a "Token" entry in Card Types to filter for cards that are or are not tokens.
-
---
-It's difficult to filter for cards that are not in your collection.
-
-• Quantity (Regular) = 0
-👍 Shows all Regular cards that are not in your collection.
-👎 Shows all Foil cards in your collection, even if they don't have a Regular version.
-
-• Quantity (Foil) = 0
-👍 Shows all Foil cards that are not in your collection.
-👎 Shows all Regular cards in your collection, even if they don't have a Foil version.
-
-Suggestion: Use checkboxes—one for Regular and one for Foil (and potentially more for other types/variants if you go that route). If a type is unchecked, the filters are not applied to that type. For example:
-• 🟩 Regular
-• ✅ Foil
-• Quantity = 0
-would show Foil cards that are not in your collection, regardless of the quantity or availability of Regular cards.
-
---
-Prices
-
-a. I assume that Price (Market) is for non-foils since Price (Foil) is also an option. If that's not the case, please clarify.
-
-b. How are Low/Average/High prices different from Market/Foil prices?
-
-c. There's no way to filter for cards with "N/A" prices (e.g., Silver Drake - CardZ Magazine Promos #13). Perhaps make Price = 0 accomplish that.
-
---
-Sort by multiple attributes. One scenario I'd like would be to first sort by Name ASC, then sort cards of the same name by Release Date DESC.
-
---
-If I enable "Show Bad Data", two of the foil cards that I own are displayed, claiming that they do not come in foil. Foil prices are shown.
-• Snapping Drake - Tenth Edition #110
-• Spiketail Hatchling - Tenth Edition #111
-
---
-Dropdowns need a border or a contrasting background color. (See image.)
-
-##### My Initial Thoughts on Andy's Feedback
+##### Higher Detail Look At Andy's Items
 
 Thanks for the feedback! I'll look at all these items in higher detail soon, but some quick responses for now.
 
-1. I've got this as an action item. Biggest blocker is just making sure I get this data into the database. For now, searching for Token in the card name is like a quick hack, for search and goals, but doesn't work in all cases.
-2. I'll play around with this and feel it out to grok it. Probably another hidden feature, but it's possible that "add stat filters" and combining queries for total quantities and finish-specific quantities may accomplish what you want, or maybe not! I'll poke at it.
-3. Yeah, TCGPlayer doesn't have market/low/average/high for foils made available to me. Foils just use a "foil" price. Good point that I just use TCGPlayer price types without describing them. I'll look at better filtering.
-4. I can implement this.
-5. Ironically, there's going to be "bad data" as in the data I get from TCGPlayer or Scryfall don't agree with each other. 😂 -- I'll have to investigate each of these as they come up.
-6. They do indeed!
+1. I just added support for card layouts, which is what Scryfall uses to label Tokens, Double-Sided Tokens, and more. I don't think this is perfect since they lump every type of token together, and some folks would just want the real tokens, like creature tokens -- so I think the feature is best used combining filters, like the following screenshot.
+2. Playing around with it, I think it's just different expectations. To me, selecting "show me all cards with 0 regular quantity" does literally that, and vice versa, ignoring any other factors. If I want to see cards where I have 0 of either regular or foil, I just use the "All Cards" filter set to 0x. I can understand some users wanting include/exclude cards based on whether they canBeFoil or canBeNonFoil attributes. I'll add these as a future enhancement.
+3. I added this information to the FAQ. I'll improve searching for cards missing prices as a future enhancement.
+4. Sorting by multiple attributes has been captured as a future feature.
+5. Well my mind is blown -- apparently in Tenth Edition, some foils were physically distinguishable from non-foils since they _ommitted the remidner text_. See the attached screenshot. So Scryfall treats them as separate entries -- but TCGPlayer treats them as the same -- usually it's the other way around. It's a mess and will be handled as part of my data clean-up project. I'm so torn on the feature to tell users which cards come in foil or not (despite it being requested a lot) since there are mistakes in the data either from Scryfall or TCGPlayer. I may just add an escape hatch so a user can still override it and explain that MTG CB could be wrong.
+6. Looks like just some of my dropdowns had the wrong background color. This has been fixed.
 
 ### Blocked/Waiting
 
@@ -153,6 +109,7 @@ Thanks for the feedback! I'll look at all these items in higher detail soon, but
 - periodic scryfall data syncs for when they fix data, but with a boolean value to tag cards or sets that shouldn't be overwritten because I've manually fixed them or scryfall is wrong
 - About 900 cards are missing layout data, every field needs an audit
 - Scryfall's token layout is helpful, but some users would not want to include tip cards and other misc cards
+- Apparently in Tenth Edition, some foils were physically distinguishable from non-foils since they _ommitted the remidner text_. So Scryfall treats them as separate entries -- but TCGPlayer treats them as the same. Need to identify and handle these.
 
 #### Subset Splitting
 
@@ -237,6 +194,9 @@ Thanks for the feedback! I'll look at all these items in higher detail soon, but
 #### Search
 
 - Allow specifying AND/OR for some filters, like layout and type -- not hard, just an enhancement to autocompletewithnegation
+- Allow sorting by multiple attributes
+- Allow searching by cards with N/A / missing prices.
+- I can understand some users wanting include/exclude cards based on whether they canBeFoil or canBeNonFoil attributes. I'll add these as a future enhancement.
 
 #### Card Locations
 
