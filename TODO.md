@@ -85,7 +85,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - periodic scryfall data syncs for when they fix data, but with a boolean value to tag cards or sets that shouldn't be overwritten because I've manually fixed them or scryfall is wrong
 - About 900 cards are missing layout data, every field needs an audit
 - Scryfall's token layout is helpful, but some users would not want to include tip cards and other misc cards
-- Apparently in Tenth Edition, some foils were physically distinguishable from non-foils since they _ommitted the remidner text_. So Scryfall treats them as separate entries -- but TCGPlayer treats them as the same. Need to identify and handle these.
+- Apparently in Tenth Edition, some foils were physically distinguishable from non-foils since they _omitted the remidner text_. So Scryfall treats them as separate entries -- but TCGPlayer treats them as the same. Need to identify and handle these.
 
 #### Subset Splitting
 
@@ -218,6 +218,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
+- api has thousands of unit tests, web has almost none -- original idea was to focus on e2e front-end tests with a headless browser, and I have a few working prototypes. But for now, manual testing is fine.
 - need to test all import formats again, new folder clearly labeled with test data (exports were tested)
 - goal setid format doesn't render in the front-end unless it's in the OR array, have claude compare these -- only an issue if goals are created outside the front-end constraints, ran into this creating test goals programmatically
 - goal testing system, clear organized test cases, including creating the goals via the api, adapting to results changing over time, etc.
