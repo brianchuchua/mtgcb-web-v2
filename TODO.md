@@ -27,7 +27,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### mtgcb-importer
 
-- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets -- i want a post-migration verification too to test locally
+- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets -- i want a post-migration verification too to test locally <-- work on this next, plan this out with intention
 
 ### Performance Issues
 
@@ -35,7 +35,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Testing
 
-- Top-down testing of every page and feature, this should be the last item
+- Top-down testing of every page and feature, this should be the last item -- prepare a build that removes the beta banner as the v1.0 release candidate
 
 ### Scaling
 
