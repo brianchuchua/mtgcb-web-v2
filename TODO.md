@@ -7,7 +7,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ## Roadmap
 
 - [ ] Prepare last items for v1.0 Release
-- [ ] v1.0 Release
+- [ ] v1.0 Release (firefighting bugs and ux issues)
 - [ ] Data Cleanup Project (and weekly tech debt days, "Tech Debt Tuesdays")
 - [ ] I get feedback from the MTG CB community and Patrons vote on the next feature candidates and I make a selection
 
@@ -29,10 +29,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets -- i want a post-migration verification too to test locally
 
-### mtgcb-jobs
-
-- Enable jobs on restart and make them resilient to heroku dyno restarts - database table to track progress of jobs?
-
 ### Performance Issues
 
 ## 📋 Pre-Release Required
@@ -40,15 +36,10 @@ Best to keep them in the codebase, especially since I'm a team of one.
 ### Testing
 
 - Top-down testing of every page and feature, this should be the last item
-- Audit all export fields to ensure they actually get exported, like multiverseId in Archidekt (so probably test all imports and exports)
 
 ### Scaling
 
 - Scale API and Web to two dynos (mostly for rolling restarts) (do this before testing)
-
-### Sonarqube
-
-- Integrate Sonarqube and fix all critical issues
 
 ## 🚀 Release Checklist
 
@@ -227,7 +218,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
-- need to test all import formats again, new folder clearly labeled with test data
+- need to test all import formats again, new folder clearly labeled with test data (exports were tested)
 - goal setid format doesn't render in the front-end unless it's in the OR array, have claude compare these -- only an issue if goals are created outside the front-end constraints, ran into this creating test goals programmatically
 - goal testing system, clear organized test cases, including creating the goals via the api, adapting to results changing over time, etc.
 - Goal code is very fragmented, would be nice to refactor it into a more coherent whole (/goals, /cards/search, /sets/search) -- after a good test bench is setup beforehand
