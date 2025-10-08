@@ -15,22 +15,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Currently Looking At or Working On or Just Noticed
 
-- consider adding escape hatch to canBeFoil/canBeNonFoil
-
-##### Higher Detail Look At Andy's Items
-
-Thanks for the feedback! I'll look at all these items in higher detail soon, but some quick responses for now.
-
-1. I just added support for card layouts, which is what Scryfall uses to label Tokens, Double-Sided Tokens, and more. I don't think this is perfect since they lump every type of token together, and some folks would just want the real tokens, like creature tokens -- so I think the feature is best used combining filters, like the following screenshot.
-2. Playing around with it, I think it's just different expectations. To me, selecting "show me all cards with 0 regular quantity" does literally that, and vice versa, ignoring any other factors. If I want to see cards where I have 0 of either regular or foil, I just use the "All Cards" filter set to 0x. I can understand some users wanting include/exclude cards based on whether they canBeFoil or canBeNonFoil attributes. I'll add these as a future enhancement.
-3. I added this information to the FAQ. I'll improve searching for cards missing prices as a future enhancement.
-4. Sorting by multiple attributes has been captured as a future feature.
-5. Well my mind is blown -- apparently in Tenth Edition, some foils were physically distinguishable from non-foils since they _ommitted the remidner text_. See the attached screenshot. So Scryfall treats them as separate entries -- but TCGPlayer treats them as the same -- usually it's the other way around. It's a mess and will be handled as part of my data clean-up project. I'm so torn on the feature to tell users which cards come in foil or not (despite it being requested a lot) since there are mistakes in the data either from Scryfall or TCGPlayer. I may just add an escape hatch so a user can still override it and explain that MTG CB could be wrong.
-6. Looks like just some of my dropdowns had the wrong background color. This has been fixed.
-
 ### Blocked/Waiting
-
-- fix broken unit tests
 
 ## 🚨 Critical / Blocking Issues
 
@@ -195,6 +180,7 @@ Thanks for the feedback! I'll look at all these items in higher detail soon, but
 
 - Allow specifying AND/OR for some filters, like layout and type -- not hard, just an enhancement to autocompletewithnegation
 - Allow sorting by multiple attributes
+- Do a better job of filtering tokens than Scryfall's token layout.
 - Allow searching by cards with N/A / missing prices.
 - I can understand some users wanting include/exclude cards based on whether they canBeFoil or canBeNonFoil attributes. I'll add these as a future enhancement.
 

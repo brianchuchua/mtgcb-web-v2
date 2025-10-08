@@ -4,7 +4,22 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { Box, CircularProgress, IconButton, TableCell, TextField, Tooltip, Typography } from '@mui/material';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  TableCell,
+  TextField,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import debounce from 'lodash.debounce';
 import Link from 'next/link';
@@ -375,6 +390,9 @@ const InlineEditableQuantity: React.FC<{
   const [inputValue, setInputValue] = useState(quantity.toString());
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [overrideNonFoil, setOverrideNonFoil] = useState(false);
+  const [overrideFoil, setOverrideFoil] = useState(false);
+  const [showOverrideDialog, setShowOverrideDialog] = useState(false);
   const [updateCollection] = useUpdateCollectionMutation();
   const { enqueueSnackbar } = useSnackbar();
   const updatePromiseRef = useRef<{ abort: () => void } | null>(null);
@@ -382,7 +400,8 @@ const InlineEditableQuantity: React.FC<{
   const editingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Determine if this quantity selector should be disabled
-  const isDisabled = quantityType === 'regular' ? !canBeNonFoil : !canBeFoil;
+  const canEdit = quantityType === 'regular' ? canBeNonFoil || overrideNonFoil : canBeFoil || overrideFoil;
+  const isDisabled = !canEdit;
 
   // Determine if this selector has an error (disabled but non-zero quantity)
   const hasError = isDisabled && localQuantity > 0;
@@ -543,23 +562,46 @@ const InlineEditableQuantity: React.FC<{
     debouncedUpdate(newQuantity);
   };
 
+  const handleDisabledFieldClick = () => {
+    setShowOverrideDialog(true);
+  };
+
+  const handleOverrideConfirm = () => {
+    if (quantityType === 'regular') {
+      setOverrideNonFoil(true);
+    } else {
+      setOverrideFoil(true);
+    }
+    setShowOverrideDialog(false);
+  };
+
+  const handleOverrideCancel = () => {
+    setShowOverrideDialog(false);
+  };
+
   // Determine tooltip message
   const tooltipMessage = isDisabled
     ? hasError
-      ? `This card doesn't come in ${quantityType === 'regular' ? 'non-foil' : 'foil'}. You can only reduce the quantity.`
-      : `This card doesn't come in ${quantityType === 'regular' ? 'non-foil' : 'foil'}.`
+      ? `This card doesn't come in ${quantityType === 'regular' ? 'non-foil' : 'foil'}. You can only reduce the quantity. (Click to override.)`
+      : `This card doesn't come in ${quantityType === 'regular' ? 'non-foil' : 'foil'}. (Click to override.)`
     : '';
 
   return (
-    <Tooltip
-      title={tooltipMessage}
-      placement="top"
-      disableHoverListener={!isDisabled}
-      disableFocusListener={!isDisabled}
-      disableTouchListener={!isDisabled}
-    >
-      <Box position="relative" display="inline-flex">
-        <TableQuantityContainer className={hasError ? 'error' : ''}>
+    <Box position="relative" display="inline-flex">
+      <TableQuantityContainer
+        className={hasError ? 'error' : ''}
+        onClick={(e) => {
+          if (isDisabled) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDisabledFieldClick();
+          }
+        }}
+        sx={{
+          cursor: isDisabled ? 'pointer' : undefined,
+        }}
+      >
+        <Box component="span" sx={{ display: 'inline-flex' }}>
           <TableLeftButton
             size="small"
             onMouseDown={(e) => {
@@ -572,33 +614,81 @@ const InlineEditableQuantity: React.FC<{
           >
             <RemoveIcon />
           </TableLeftButton>
-          <TableQuantityInput
-            type="number"
-            value={inputValue}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
-            onFocus={handleInputFocus}
-            onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
-            inputProps={{ min: 0 }}
-            variant="outlined"
-            size="small"
-            disabled={isDisabled}
-            error={hasError}
-          />
-          <TableRightButton
-            size="small"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleIncrement(e);
+        </Box>
+        <Box
+            sx={{
+              position: 'relative',
+              display: 'flex',
+              flex: 1,
             }}
-            tabIndex={-1}
-            disableFocusRipple
-            disabled={isDisabled}
           >
-            <AddIcon />
-          </TableRightButton>
-        </TableQuantityContainer>
-        {isLoading && (
+            <TableQuantityInput
+              type="number"
+              value={inputValue}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
+              onFocus={handleInputFocus}
+              onClick={(e) => {
+                if (!isDisabled) {
+                  (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
+                }
+              }}
+              inputProps={{ min: 0 }}
+              variant="outlined"
+              size="small"
+              disabled={isDisabled}
+              error={hasError}
+            />
+            {isDisabled && (
+              <Box
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDisabledFieldClick();
+                }}
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  cursor: 'pointer',
+                  zIndex: 1,
+                }}
+              />
+            )}
+          </Box>
+        <Tooltip
+          title={tooltipMessage}
+          placement="top"
+          disableHoverListener={!isDisabled}
+          disableFocusListener={!isDisabled}
+          disableTouchListener={!isDisabled}
+        >
+          <Box component="span" sx={{ display: 'inline-flex' }}>
+            <TableRightButton
+              size="small"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                if (isDisabled) {
+                  handleDisabledFieldClick();
+                } else {
+                  handleIncrement(e);
+                }
+              }}
+              tabIndex={-1}
+              disableFocusRipple
+              disabled={isDisabled}
+              sx={{
+                cursor: isDisabled ? 'pointer' : undefined,
+              }}
+            >
+              <AddIcon />
+            </TableRightButton>
+          </Box>
+        </Tooltip>
+      </TableQuantityContainer>
+      {isLoading && (
           <CircularProgress
             size={10}
             thickness={5}
@@ -623,8 +713,42 @@ const InlineEditableQuantity: React.FC<{
             }}
           />
         )}
+
+        <Dialog
+          open={showOverrideDialog}
+          onClose={handleOverrideCancel}
+          aria-labelledby="override-dialog-title"
+          aria-describedby="override-dialog-description"
+        >
+          <DialogTitle id="override-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <WarningAmberIcon color="warning" />
+            Enable {quantityType === 'regular' ? 'Non-Foil' : 'Foil'} Quantity?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="override-dialog-description" component="div">
+              <Typography variant="body2" gutterBottom>
+                According to our data, this card doesn&apos;t come in {quantityType === 'regular' ? 'non-foil' : 'foil'}{' '}
+                finish.
+              </Typography>
+              <Typography variant="body2" gutterBottom>
+                However, this data can sometimes be incorrect or incomplete. If you have this card in{' '}
+                {quantityType === 'regular' ? 'non-foil' : 'foil'} finish, you can override this restriction.
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 500, mt: 2 }}>
+                Would you like to enable this field anyway?
+              </Typography>
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleOverrideCancel} color="inherit">
+              Cancel
+            </Button>
+            <Button onClick={handleOverrideConfirm} variant="contained" color="primary" autoFocus>
+              Enable Field
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
-    </Tooltip>
   );
 };
 

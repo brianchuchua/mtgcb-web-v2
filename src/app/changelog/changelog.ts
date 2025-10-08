@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-07',
+      version: '0.147.0',
+      changes: [
+        'Added ability to override finish restrictions when card data is incorrect - click disabled foil/non-foil quantity fields to enable editing if you have cards in that finish',
+      ],
+    },
+    {
+      date: '2025-10-07',
       version: '0.146.1',
       changes: [
         'Improved dropdown styling consistency across autocomplete components',

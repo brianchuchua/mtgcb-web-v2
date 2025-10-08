@@ -4,7 +4,22 @@ import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { Box, CircularProgress, IconButton, TextField, Tooltip, Typography, styled } from '@mui/material';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+  styled,
+} from '@mui/material';
 import debounce from 'lodash.debounce';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -146,6 +161,10 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   const [isLoadingFoil, setIsLoadingFoil] = useState(false);
   const [showSuccessReg, setShowSuccessReg] = useState(false);
   const [showSuccessFoil, setShowSuccessFoil] = useState(false);
+  const [overrideNonFoil, setOverrideNonFoil] = useState(false);
+  const [overrideFoil, setOverrideFoil] = useState(false);
+  const [showOverrideDialog, setShowOverrideDialog] = useState(false);
+  const [overrideDialogType, setOverrideDialogType] = useState<'regular' | 'foil'>('regular');
   const [updateCollection] = useUpdateCollectionMutation();
   const { enqueueSnackbar } = useSnackbar();
   const updatePromiseRef = React.useRef<{ abort: () => void } | null>(null);
@@ -342,9 +361,29 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
     event.currentTarget.select();
   };
 
-  // Determine error states
-  const regularHasError = !canBeNonFoil && localQuantityReg > 0;
-  const foilHasError = !canBeFoil && localQuantityFoil > 0;
+  const handleDisabledFieldClick = (type: 'regular' | 'foil') => {
+    setOverrideDialogType(type);
+    setShowOverrideDialog(true);
+  };
+
+  const handleOverrideConfirm = () => {
+    if (overrideDialogType === 'regular') {
+      setOverrideNonFoil(true);
+    } else {
+      setOverrideFoil(true);
+    }
+    setShowOverrideDialog(false);
+  };
+
+  const handleOverrideCancel = () => {
+    setShowOverrideDialog(false);
+  };
+
+  // Determine error states and disabled states
+  const regularHasError = !canBeNonFoil && !overrideNonFoil && localQuantityReg > 0;
+  const foilHasError = !canBeFoil && !overrideFoil && localQuantityFoil > 0;
+  const isRegularDisabled = readOnly || (!canBeNonFoil && !overrideNonFoil);
+  const isFoilDisabled = readOnly || (!canBeFoil && !overrideFoil);
 
   return (
     <Box
@@ -361,20 +400,19 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         },
       }}
     >
-      <Tooltip
-        title={
-          !canBeNonFoil
-            ? regularHasError
-              ? "This card doesn't come in non-foil. You can only reduce the quantity."
-              : "This card doesn't come in non-foil."
-            : ''
-        }
-        placement="top"
-        disableHoverListener={canBeNonFoil}
-        disableFocusListener={canBeNonFoil}
-        disableTouchListener={canBeNonFoil}
+      <QuantityContainer
+        onClick={(e) => {
+          if (isRegularDisabled && !readOnly && !canBeNonFoil && !overrideNonFoil) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDisabledFieldClick('regular');
+          }
+        }}
+        sx={{
+          cursor: isRegularDisabled && !readOnly && !canBeNonFoil && !overrideNonFoil ? 'pointer' : undefined,
+        }}
       >
-        <QuantityContainer>
+        <Box component="span" sx={{ display: 'inline-flex' }}>
           <LeftButton
             size="small"
             onMouseDown={(e) => {
@@ -388,57 +426,109 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           >
             <RemoveIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
           </LeftButton>
-          <QuantityInput
-            type="number"
-            value={inputValueReg}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('regular', e)}
-            onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('regular', e)}
-            onFocus={handleInputFocus}
-            onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
-            inputProps={{ min: 0 }}
-            variant="outlined"
-            size="small"
-            label={
-              <Box display="flex" alignItems="center" gap={0.25}>
-                Regular
-                {isLoadingReg && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
-                {showSuccessReg && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
-              </Box>
-            }
-            InputLabelProps={{ shrink: true }}
-            disabled={readOnly || !canBeNonFoil}
-            error={regularHasError}
-          />
-          <RightButton
-            size="small"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleIncrement('regular', e);
-            }}
-            tabIndex={-1}
-            disableFocusRipple
-            disabled={readOnly || !canBeNonFoil}
-            $error={regularHasError}
-          >
-            <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
-          </RightButton>
-        </QuantityContainer>
-      </Tooltip>
+        </Box>
+        <Box
+          sx={{
+            position: 'relative',
+            display: 'flex',
+            flex: 1,
+          }}
+        >
+            <QuantityInput
+              type="number"
+              value={inputValueReg}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('regular', e)}
+              onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('regular', e)}
+              onFocus={handleInputFocus}
+              onClick={(e) => {
+                if (!isRegularDisabled) {
+                  (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
+                }
+              }}
+              inputProps={{ min: 0 }}
+              variant="outlined"
+              size="small"
+              label={
+                <Box display="flex" alignItems="center" gap={0.25}>
+                  Regular
+                  {isLoadingReg && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
+                  {showSuccessReg && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
+                </Box>
+              }
+              InputLabelProps={{ shrink: true }}
+              disabled={isRegularDisabled}
+              error={regularHasError}
+            />
+            {isRegularDisabled && !readOnly && !canBeNonFoil && !overrideNonFoil && (
+              <Box
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDisabledFieldClick('regular');
+                }}
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  cursor: 'pointer',
+                  zIndex: 1,
+                }}
+              />
+            )}
+          </Box>
+        <Tooltip
+          title={
+            !canBeNonFoil && !overrideNonFoil
+              ? regularHasError
+                ? "This card doesn't come in non-foil. You can only reduce the quantity. (Click to override.)"
+                : "This card doesn't come in non-foil. (Click to override.)"
+              : ''
+          }
+          placement="top"
+          disableHoverListener={canBeNonFoil || overrideNonFoil}
+          disableFocusListener={canBeNonFoil || overrideNonFoil}
+          disableTouchListener={canBeNonFoil || overrideNonFoil}
+        >
+          <Box component="span" sx={{ display: 'inline-flex' }}>
+            <RightButton
+              size="small"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                if (isRegularDisabled && !readOnly && !canBeNonFoil && !overrideNonFoil) {
+                  handleDisabledFieldClick('regular');
+                } else {
+                  handleIncrement('regular', e);
+                }
+              }}
+              tabIndex={-1}
+              disableFocusRipple
+              disabled={isRegularDisabled}
+              $error={regularHasError}
+              sx={{
+                cursor: isRegularDisabled && !readOnly && !canBeNonFoil && !overrideNonFoil ? 'pointer' : undefined,
+              }}
+            >
+              <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
+            </RightButton>
+          </Box>
+        </Tooltip>
+      </QuantityContainer>
 
-      <Tooltip
-        title={
-          !canBeFoil
-            ? foilHasError
-              ? "This card doesn't come in foil. You can only reduce the quantity."
-              : "This card doesn't come in foil."
-            : ''
-        }
-        placement="top"
-        disableHoverListener={canBeFoil}
-        disableFocusListener={canBeFoil}
-        disableTouchListener={canBeFoil}
+      <QuantityContainer
+        onClick={(e) => {
+          if (isFoilDisabled && !readOnly && !canBeFoil && !overrideFoil) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDisabledFieldClick('foil');
+          }
+        }}
+        sx={{
+          cursor: isFoilDisabled && !readOnly && !canBeFoil && !overrideFoil ? 'pointer' : undefined,
+        }}
       >
-        <QuantityContainer>
+        <Box component="span" sx={{ display: 'inline-flex' }}>
           <LeftButton
             size="small"
             onMouseDown={(e) => {
@@ -452,42 +542,130 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           >
             <RemoveIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
           </LeftButton>
-          <QuantityInput
-            type="number"
-            value={inputValueFoil}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('foil', e)}
-            onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('foil', e)}
-            onFocus={handleInputFocus}
-            onClick={(e) => (e.currentTarget.querySelector('input') as HTMLInputElement)?.select()}
-            inputProps={{ min: 0 }}
-            variant="outlined"
-            size="small"
-            label={
-              <Box display="flex" alignItems="center" gap={0.25}>
-                Foils
-                {isLoadingFoil && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
-                {showSuccessFoil && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
-              </Box>
-            }
-            InputLabelProps={{ shrink: true }}
-            disabled={readOnly || !canBeFoil}
-            error={foilHasError}
-          />
-          <RightButton
-            size="small"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              handleIncrement('foil', e);
-            }}
-            tabIndex={-1}
-            disableFocusRipple
-            disabled={readOnly || !canBeFoil}
-            $error={foilHasError}
-          >
-            <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
-          </RightButton>
-        </QuantityContainer>
-      </Tooltip>
+        </Box>
+        <Box
+          sx={{
+            position: 'relative',
+            display: 'flex',
+            flex: 1,
+          }}
+        >
+            <QuantityInput
+              type="number"
+              value={inputValueFoil}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('foil', e)}
+              onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('foil', e)}
+              onFocus={handleInputFocus}
+              onClick={(e) => {
+                if (!isFoilDisabled) {
+                  (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
+                }
+              }}
+              inputProps={{ min: 0 }}
+              variant="outlined"
+              size="small"
+              label={
+                <Box display="flex" alignItems="center" gap={0.25}>
+                  Foils
+                  {isLoadingFoil && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
+                  {showSuccessFoil && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
+                </Box>
+              }
+              InputLabelProps={{ shrink: true }}
+              disabled={isFoilDisabled}
+              error={foilHasError}
+            />
+            {isFoilDisabled && !readOnly && !canBeFoil && !overrideFoil && (
+              <Box
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDisabledFieldClick('foil');
+                }}
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  cursor: 'pointer',
+                  zIndex: 1,
+                }}
+              />
+            )}
+          </Box>
+        <Tooltip
+          title={
+            !canBeFoil && !overrideFoil
+              ? foilHasError
+                ? "This card doesn't come in foil. You can only reduce the quantity. (Click to override.)"
+                : "This card doesn't come in foil. (Click to override.)"
+              : ''
+          }
+          placement="top"
+          disableHoverListener={canBeFoil || overrideFoil}
+          disableFocusListener={canBeFoil || overrideFoil}
+          disableTouchListener={canBeFoil || overrideFoil}
+        >
+          <Box component="span" sx={{ display: 'inline-flex' }}>
+            <RightButton
+              size="small"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                if (isFoilDisabled && !readOnly && !canBeFoil && !overrideFoil) {
+                  handleDisabledFieldClick('foil');
+                } else {
+                  handleIncrement('foil', e);
+                }
+              }}
+              tabIndex={-1}
+              disableFocusRipple
+              disabled={isFoilDisabled}
+              $error={foilHasError}
+              sx={{
+                cursor: isFoilDisabled && !readOnly && !canBeFoil && !overrideFoil ? 'pointer' : undefined,
+              }}
+            >
+              <AddIcon sx={{ visibility: readOnly ? 'hidden' : 'visible' }} />
+            </RightButton>
+          </Box>
+        </Tooltip>
+      </QuantityContainer>
+
+      <Dialog
+        open={showOverrideDialog}
+        onClose={handleOverrideCancel}
+        aria-labelledby="override-dialog-title"
+        aria-describedby="override-dialog-description"
+      >
+        <DialogTitle id="override-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <WarningAmberIcon color="warning" />
+          Enable {overrideDialogType === 'regular' ? 'Non-Foil' : 'Foil'} Quantity?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="override-dialog-description" component="div">
+            <Typography variant="body2" gutterBottom>
+              According to our data, this card doesn&apos;t come in{' '}
+              {overrideDialogType === 'regular' ? 'non-foil' : 'foil'} finish.
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              However, this data can sometimes be incorrect or incomplete. If you have this card in{' '}
+              {overrideDialogType === 'regular' ? 'non-foil' : 'foil'} finish, you can override this restriction.
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 500, mt: 2 }}>
+              Would you like to enable this field anyway?
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleOverrideCancel} color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={handleOverrideConfirm} variant="contained" color="primary" autoFocus>
+            Enable Field
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
