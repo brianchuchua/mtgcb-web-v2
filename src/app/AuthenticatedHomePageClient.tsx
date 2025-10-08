@@ -621,7 +621,7 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
               <CardContent>
                 <Stack spacing={2}>
                   <Typography variant="h6" fontWeight="bold">
-                    Closest Set to Complete
+                    Cheapest Set to Complete
                   </Typography>
                   <Box>
                     <Typography variant="body1" fontWeight="bold">
@@ -674,7 +674,7 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
               <CardContent>
                 <Stack spacing={2}>
                   <Typography variant="h6" fontWeight="bold">
-                    Closest Normal Set to Complete
+                    Cheapest Normal Set to Complete
                   </Typography>
                   <Box>
                     <Typography variant="body1" fontWeight="bold">
@@ -874,7 +874,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
           Quick Wins
         </Typography>
         <Grid container spacing={3}>
-          {['Closest Set to Complete', 'Second Closest Set to Complete'].map((title, i) => (
+          {['Cheapest Set to Complete', 'Cheapest Normal Set to Complete'].map((title, i) => (
             <Grid key={i} size={{ xs: 12, lg: 6 }}>
               <QuickWinCard>
                 <CardContent>
