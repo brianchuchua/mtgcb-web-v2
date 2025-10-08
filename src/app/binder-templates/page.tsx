@@ -86,7 +86,7 @@ export default function BinderTemplatesPage() {
             The binders used are the{' '}
             <Typography
               component="a"
-              href="http://www.amazon.com/gp/product/B000A6V0JO/"
+              href="https://www.amazon.com/gp/product/B000A6V0JO/"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: 'primary.main', textDecoration: 'none' }}
@@ -101,7 +101,7 @@ export default function BinderTemplatesPage() {
             For sleeve pages, I use the{' '}
             <Typography
               component="a"
-              href="http://www.amazon.com/gp/product/B00095M5DQ/"
+              href="https://www.amazon.com/gp/product/B00095M5DQ/"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ color: 'primary.main', textDecoration: 'none' }}

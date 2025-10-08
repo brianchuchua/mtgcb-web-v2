@@ -218,6 +218,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
+- client.query in api is safe since it's based off my env variable, but I could make it a little cleaner -- same for mtgcb-jobs
 - api has thousands of unit tests, web has almost none -- original idea was to focus on e2e front-end tests with a headless browser, and I have a few working prototypes. But for now, manual testing is fine.
 - need to test all import formats again, new folder clearly labeled with test data (exports were tested)
 - goal setid format doesn't render in the front-end unless it's in the OR array, have claude compare these -- only an issue if goals are created outside the front-end constraints, ran into this creating test goals programmatically
