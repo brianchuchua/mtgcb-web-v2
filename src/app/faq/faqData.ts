@@ -79,10 +79,10 @@ const faqData: FAQData = {
 
         <p>You can choose which TCGPlayer price to use in your settings:</p>
         <ul>
-          <li><strong>Market Price</strong> (default) - Current market average</li>
-          <li><strong>Low Price</strong> - Recent low sales</li>
-          <li><strong>Average Price</strong> - Historical average</li>
-          <li><strong>High Price</strong> - Recent high sales</li>
+          <li><strong>Market Price</strong> (default)</li>
+          <li><strong>Low Price</strong></li>
+          <li><strong>Average Price</strong></li>
+          <li><strong>High Price</strong></li>
         </ul>
 
         <p><strong>What if a card has no price data?</strong></p>
