@@ -127,6 +127,10 @@ export const ImportClient: React.FC = () => {
       handleImport(true);
     } else {
       setPendingDryRun(false);
+      // Clear previous dry run results when starting real import
+      if (lastImportWasDryRun) {
+        setImportResult(null);
+      }
       setConfirmDialogOpen(true);
     }
   };
@@ -637,6 +641,17 @@ export const ImportClient: React.FC = () => {
                     )}
 
                     <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
+                      {lastImportWasDryRun && importResult.successfulRows > 0 && (
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleImportClick(false)}
+                          disabled={isImporting}
+                          startIcon={isImporting ? <CircularProgress size={20} /> : null}
+                        >
+                          {isImporting ? 'Importing...' : 'Proceed with Real Import'}
+                        </Button>
+                      )}
                       <Button
                         variant="outlined"
                         onClick={() => {

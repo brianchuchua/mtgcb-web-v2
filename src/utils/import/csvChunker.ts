@@ -31,10 +31,71 @@ export interface ChunkResult {
 }
 
 /**
+ * Split CSV into logical lines, respecting quoted fields that span multiple lines
+ *
+ * This is critical for proper CSV chunking. Without quote-awareness, multi-line
+ * fields (like Oracle Text with newlines) would be split across chunk boundaries,
+ * causing parse errors.
+ *
+ * @param csvContent - Full CSV string
+ * @returns Array of complete CSV records (logical lines)
+ */
+function splitCsvIntoLogicalLines(csvContent: string): string[] {
+  const lines: string[] = [];
+  let currentLine = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < csvContent.length; i++) {
+    const char = csvContent[i];
+    const nextChar = csvContent[i + 1];
+
+    // Handle quote characters
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        // Escaped quote ("") - add both and skip next
+        currentLine += '""';
+        i++;
+      } else {
+        // Toggle quote state
+        inQuotes = !inQuotes;
+        currentLine += char;
+      }
+    }
+    // Handle newlines (only end line when NOT in quotes)
+    else if (char === '\n' && !inQuotes) {
+      // End of logical line
+      if (currentLine.trim().length > 0) {
+        lines.push(currentLine);
+      }
+      currentLine = '';
+    }
+    // Handle carriage returns
+    else if (char === '\r') {
+      // Skip carriage returns (we normalize to just \n)
+      // But add to currentLine if we're in quotes
+      if (inQuotes) {
+        currentLine += char;
+      }
+    }
+    // Regular characters
+    else {
+      currentLine += char;
+    }
+  }
+
+  // Add final line if not empty
+  if (currentLine.trim().length > 0) {
+    lines.push(currentLine);
+  }
+
+  return lines;
+}
+
+/**
  * Split CSV into chunks
  *
  * Algorithm:
- * 1. Split by newlines
+ * 1. Split into LOGICAL lines (respecting quotes)
  * 2. Extract header (first non-empty line)
  * 3. Filter out empty lines
  * 4. Chunk data rows
@@ -44,11 +105,8 @@ export interface ChunkResult {
  * @returns ChunkResult with array of chunks
  */
 export const splitCsvIntoChunks = (csvContent: string): ChunkResult => {
-  // Normalize line endings
-  const normalized = csvContent.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-
-  // Split into lines
-  const allLines = normalized.split('\n');
+  // Split into logical lines (quote-aware)
+  const allLines = splitCsvIntoLogicalLines(csvContent);
 
   // Find header (first non-empty line)
   const headerIndex = allLines.findIndex((line) => line.trim().length > 0);

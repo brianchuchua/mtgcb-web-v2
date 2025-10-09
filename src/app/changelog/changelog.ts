@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-08',
+      version: '0.147.1',
+      changes: [
+        'Added button to proceed with real import after completing a dry run preview',
+        'Fixed import errors that could occur with certain file formats',
+      ],
+    },
+    {
       date: '2025-10-07',
       version: '0.147.0',
       changes: [
