@@ -42,12 +42,14 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { CustomCSVMapper } from './CustomCSVMapper';
 import { ImportProgress } from './components/ImportProgress';
 import { useGetImportFormatsQuery, useImportCollectionMutation } from '@/api/import/importApi';
 import type { ImportError, ImportResult } from '@/api/import/types';
 import { Link as NextLink } from '@/components/ui/link';
 import { useChunkedImport } from '@/hooks/useChunkedImport';
+import { mtgcbApi } from '@/api/mtgcbApi';
 
 const InfoBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -79,6 +81,7 @@ const IMPORT_FORMAT_NOTES: Record<string, string> = {
 };
 
 export const ImportClient: React.FC = () => {
+  const dispatch = useDispatch();
   const [selectedFormat, setSelectedFormat] = useState('mtgcb');
   const [updateMode, setUpdateMode] = useState<'replace' | 'merge'>('replace');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -166,6 +169,11 @@ export const ImportClient: React.FC = () => {
         errors: finalProgress.errors,
       });
       setLastImportWasDryRun(dryRun);
+
+      // Invalidate statistics cache after successful real import
+      if (!dryRun && finalProgress.successfulRows > 0) {
+        dispatch(mtgcbApi.util.invalidateTags(['Statistics']));
+      }
 
       // Clear file after successful real import to ensure clean state
       if (!dryRun) {
@@ -571,24 +579,6 @@ export const ImportClient: React.FC = () => {
                               </Box>
                             </TableCell>
                             <TableCell align="right">{importResult.failedRows}</TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Created</TableCell>
-                            <TableCell align="right">
-                              <Chip label={importResult.created} size="small" color="success" />
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Updated</TableCell>
-                            <TableCell align="right">
-                              <Chip label={importResult.updated} size="small" color="primary" />
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Deleted</TableCell>
-                            <TableCell align="right">
-                              <Chip label={importResult.deleted} size="small" color="warning" />
-                            </TableCell>
                           </TableRow>
                         </TableBody>
                       </Table>

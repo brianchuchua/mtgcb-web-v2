@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-09',
+      version: '0.147.2',
+      changes: [
+        'Simplified import results display to show only total, successful, and failed row counts',
+        'Fixed home page statistics to refresh automatically after importing collections',
+      ],
+    },
+    {
       date: '2025-10-08',
       version: '0.147.1',
       changes: [
