@@ -43,7 +43,7 @@ const faqData: FAQData = {
       question: 'What are market, low, average, high, and foil prices? ',
       answer: `
         <p>These are all price types provided by TCGPlayer.</p>
-        
+
         <ul>
           <li><strong>Market</strong> is a fair selling price based on recent sales of the card.</li>
           <li><strong>Low</strong> is the lowest listing price currently available on TCGPlayer.</li>
@@ -53,6 +53,43 @@ const faqData: FAQData = {
         </ul>
 
         <p>You can choose which price type to use for your collection in your account settings. I personally recommend Market price.</p>
+      `,
+      category: 'pricing',
+    },
+    {
+      question: 'How is my collection value calculated?',
+      answer: `
+        <p>Your collection value is calculated by adding up the current value of every card you own, based on pricing data from TCGPlayer that is updated every 24 hours. We use your preferred price type for the calculation, which defaults to Market price. You can change this setting in the Account page.</p>
+
+        <p><strong>The formula is simple:</strong></p>
+
+        <p>For each card in your collection, we multiply the quantity you own by the card's current price, then sum everything together.</p>
+
+        <pre style="background: rgba(0, 0, 0, 0.05); padding: 12px; border-radius: 4px; overflow-x: auto; border: 1px solid rgba(0, 0, 0, 0.1);">Collection Value = Σ (Regular Quantity × Regular Price) + (Foil Quantity × Foil Price)</pre>
+
+        <p><strong>Example:</strong></p>
+        <ul>
+          <li>You own 1 Black Lotus worth $5,000 → contributes $5,000</li>
+          <li>You own 4 regular Lightning Bolts at $0.50 each → contributes $2.00</li>
+          <li>You own 1 foil Lightning Bolt at $2.00 → contributes $2.00</li>
+          <li><strong>Total Collection Value: $5,004.00</strong></li>
+        </ul>
+
+        <p><strong>Price types:</strong></p>
+
+        <p>You can choose which TCGPlayer price to use in your settings:</p>
+        <ul>
+          <li><strong>Market Price</strong> (default) - Current market average</li>
+          <li><strong>Low Price</strong> - Recent low sales</li>
+          <li><strong>Average Price</strong> - Historical average</li>
+          <li><strong>High Price</strong> - Recent high sales</li>
+        </ul>
+
+        <p><strong>What if a card has no price data?</strong></p>
+
+        <p>We automatically fall back through available prices: Market → Low → Average → High → Foil → $0.00. This ensures every card gets a fair valuation. There are some cards entirely missing price data, either due to low volume or an issue with its connection to TCGPlayer (sometimes vendors make typos and the price becomes too high), so be sure to double-check everything (perhaps with a spreadsheet export) before making any financial decisions.</p>
+
+        <p><strong>Note:</strong> Your collection value includes <em>all</em> cards you own, regardless of what you're currently viewing or searching for. When viewing a specific goal, you'll see a separate "Goal Value" that shows only cards within that goal.</p>
       `,
       category: 'pricing',
     },
