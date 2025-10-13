@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { GoalsList } from '@/components/goals/GoalsList';
 import { GoalWithHydration } from '@/components/goals/GoalWithHydration';
@@ -37,6 +37,7 @@ export function GoalsClient() {
   const [priorityOrder, setPriorityOrder] = useState<number[]>([]);
   const [initialGoalIds, setInitialGoalIds] = useState<string>('');
   const [hydrationSessionKey, setHydrationSessionKey] = useState<number>(0);
+  const initializedRef = useRef(false);
 
   // Always fetch all goals without progress data (lightweight query)
   const listQueryArgs = {
@@ -86,7 +87,8 @@ export function GoalsClient() {
     const currentGoalIds = visibleGoals.map(g => g.id).join(',');
 
     // Only recalculate if the set of goal IDs has changed (page change or list change)
-    if (currentGoalIds === initialGoalIds && delayMap.size > 0) {
+    // Use ref to prevent infinite loop with empty goal lists
+    if (initializedRef.current && currentGoalIds === initialGoalIds) {
       return;
     }
 
@@ -118,7 +120,8 @@ export function GoalsClient() {
     setInitialGoalIds(currentGoalIds);
     setCurrentlyHydratingIndex(0);
     setHydrationSessionKey(prev => prev + 1); // Force remount of all GoalWithHydration components
-  }, [currentPage, visibleGoals, initialGoalIds, delayMap.size]);
+    initializedRef.current = true; // Mark as initialized
+  }, [currentPage, visibleGoals, initialGoalIds]);
 
   // Handle hydration callback
   const handleGoalHydrated = useCallback((goal: Goal) => {
