@@ -408,6 +408,17 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
         ? cardsProps.goalSummary
         : null;
 
+  // Detect if we have stale goal data (wrong goal loaded)
+  const hasStaleGoalData = Boolean(
+    selectedGoalId &&
+    view === 'cards' &&
+    cardsProps &&
+    'items' in cardsProps &&
+    cardsProps.items.length > 0 &&
+    goalSummary &&
+    goalSummary.goalId !== selectedGoalId
+  );
+
   // Show loading state for initial load
   if (
     isLoading &&
@@ -436,8 +447,8 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
           totalCardsCollected={collectionSummary?.totalCardsCollected || 0}
           percentageCollected={collectionSummary?.percentageCollected || 0}
           totalValue={collectionSummary?.totalValue || 0}
-          isLoading={isLoading && !collectionSummary}
-          goalSummary={goalSummary || undefined}
+          isLoading={(isLoading && !collectionSummary) || hasStaleGoalData}
+          goalSummary={hasStaleGoalData ? undefined : goalSummary || undefined}
           view={view}
           selectedGoalId={selectedGoalId}
           includeSubsetsInSets={includeSubsetsInSets}
@@ -564,24 +575,32 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
       )}
 
       {/* Show cards view for collections */}
-      {view === 'cards' && cardsProps && 'items' in cardsProps && (
+      {view === 'cards' && (
         <>
-          {viewMode === 'grid' && (
-            <CardGrid
-              {...(cardsProps as CardsProps)}
-              isOwnCollection={isOwnCollection}
-              goalId={selectedGoalId ? selectedGoalId.toString() : undefined}
-              hasLocations={hasLocations}
-            />
-          )}
-          {viewMode === 'table' && (
-            <CardTable
-              {...(cardsProps as CardsProps)}
-              isOwnCollection={isOwnCollection}
-              goalId={selectedGoalId ? selectedGoalId.toString() : undefined}
-              hasLocations={hasLocations}
-            />
-          )}
+          {hasStaleGoalData ? (
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+              <CircularProgress />
+            </Box>
+          ) : cardsProps && 'items' in cardsProps ? (
+            <>
+              {viewMode === 'grid' && (
+                <CardGrid
+                  {...(cardsProps as CardsProps)}
+                  isOwnCollection={isOwnCollection}
+                  goalId={selectedGoalId ? selectedGoalId.toString() : undefined}
+                  hasLocations={hasLocations}
+                />
+              )}
+              {viewMode === 'table' && (
+                <CardTable
+                  {...(cardsProps as CardsProps)}
+                  isOwnCollection={isOwnCollection}
+                  goalId={selectedGoalId ? selectedGoalId.toString() : undefined}
+                  hasLocations={hasLocations}
+                />
+              )}
+            </>
+          ) : null}
         </>
       )}
 

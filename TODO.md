@@ -13,33 +13,17 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ## 🔄 In Progress
 
-### Currently Looking At or Working On or Just Noticed
-
-### Blocked/Waiting
-
-## 🚨 Critical / Blocking Issues
-
 ### Migration
 
-- Need a message for migration downtime in v2 as well -- and a plan to put this app into maintenance mode
-- Add a migration verification script to mtgcb-importer that checks user counts and collection counts match between old and new databases, accounting for those removed due to a 0 quantity count or for cards or users that no longer exist, locally of course
-- Test migration end-to-end one more time, audit any envs i need to edit
-
-### mtgcb-importer
-
-- importer needs to be ready for v3 -- still want a spreadsheet, edit, import workflow, token workflow, subset handling, it's close to some of this, ideally one-button click to push to prod what's in local -- or generate the sql for me to inspect and execute, test this with some missing cards and sets -- i want a post-migration verification too to test locally <-- work on this next, plan this out with intention
-
-### Performance Issues
-
-## 📋 Pre-Release Required
-
-### Testing
-
-- Top-down testing of every page and feature, this should be the last item -- prepare a build that removes the beta banner as the v1.0 release candidate
+- Test migration end-to-end one more time, audit any envs i need to edit -- and run the new verification
 
 ### Scaling
 
-- Scale API and Web to two dynos (mostly for rolling restarts) (do this before testing)
+- Scale API and Web to two dynos (mostly for rolling restarts) (do this before testing) -- and grok any issues that could arise. I'm fine with my in-memory caches getting duplicated, but want to make sure I'm not doing any locking in-memory, say for which goals are being compiled.
+
+### Testing
+
+- Top-down testing of every page and feature (from new user state, each page, then with data, each page), this should be the last item -- prepare a build that removes the beta banner as the v1.0 release candidate
 
 ## 🚀 Release Checklist
 
@@ -74,6 +58,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Project: Data Cleanup
 
+- When importing missing tcgplayerIds, I should also have been bringing in missing tcgplayer names and tcgplayer set codes. I'll need to do a full rescan of this.
 - After release, adding all remaining missing cards and fixing data issues, including:
 - Adding Art Series cards
 - Need to add cardFaces data and come up with a plan to render the backside of cards
@@ -86,6 +71,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - About 900 cards are missing layout data, every field needs an audit
 - Scryfall's token layout is helpful, but some users would not want to include tip cards and other misc cards
 - Apparently in Tenth Edition, some foils were physically distinguishable from non-foils since they _omitted the remidner text_. So Scryfall treats them as separate entries -- but TCGPlayer treats them as the same. Need to identify and handle these.
+- Some images were placeholders that never got updated. Should add a "isGoodImage" boolean field and clean these up using mtgcb-importer and some mass updates/checking.
 
 #### Subset Splitting
 
@@ -174,6 +160,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Do a better job of filtering tokens than Scryfall's token layout.
 - Allow searching by cards with N/A / missing prices.
 - I can understand some users wanting include/exclude cards based on whether they canBeFoil or canBeNonFoil attributes. I'll add these as a future enhancement.
+- It'd be neat to allow browsing artists.
 
 #### Card Locations
 
@@ -218,6 +205,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
+- color and color arrays and identity fields in cards table have confusing tech debt that needs to be analyzed -- what's being used, the data formats, etc. Even the naming conventions are inconsistent.
 - client.query in api is safe since it's based off my env variable, but I could make it a little cleaner -- same for mtgcb-jobs
 - api has thousands of unit tests, web has almost none -- original idea was to focus on e2e front-end tests with a headless browser, and I have a few working prototypes. But for now, manual testing is fine.
 - need to test all import formats again, new folder clearly labeled with test data (exports were tested)

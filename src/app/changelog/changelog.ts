@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-13',
+      version: '0.147.4',
+      changes: ['Fixed stale goal information briefly appearing when navigating between different collection goals'],
+    },
+    {
+      date: '2025-10-13',
       version: '0.147.3',
       changes: ['Fixed loading issue on goals page on first load'],
     },
