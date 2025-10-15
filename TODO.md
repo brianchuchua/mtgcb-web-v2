@@ -4,26 +4,56 @@ I've found over time that maintaining my action items for code in external tools
 
 Best to keep them in the codebase, especially since I'm a team of one.
 
+## Post-Release Feedback and Issues
+
+### Bug Reports
+
+- [JUMP][BUG] I think? The jump only seems to work when I'm on "Collection".. if on manage collection I get Invalid user id.. I then click collection and all my collection shows up..
+- < > arrows may still be going to the unexpected set
+- Possible bug (set table view): Looking at a goal, sorting by set doesnt seem to sort by set? If I press on set, it appears to sort by card number ascending, but only that (doesnt flip to DESC on a second click or anything)
+
+### Internal Feedback
+
+#### Will Do
+
+- I want emails when users register.
+
+#### Might Do
+
+- I want logs when users do important things.
+
+### External Feedback
+
+#### Will Do
+
+- Adding to the add cards page a log of recently added cards, like the old site had. (It only showed one though)
+
+#### Might Do
+
+- Add the classic table color-coding for cards by quantity
+- Add a light theme
+- Allow users to have a "save all" mode instead of auto-saving every change
+- Increase pagination limit beyond 500
+- Examine easier interfaces than the negation pills in dropdowns. People miss the old multiselects. A simple vs advanced mode.
+
+#### Not Immediately Actionable
+
+- Mobile isn't as friendly as desktop. (Agreed!)
+
 ## Roadmap
 
-- [ ] Prepare last items for v1.0 Release
-- [ ] v1.0 Release (firefighting bugs and ux issues)
+- [x] Prepare last items for v1.0 Release
+- [x] v1.0 Release (firefighting bugs and ux issues)
 - [ ] Data Cleanup Project (and weekly tech debt days, "Tech Debt Tuesdays")
 - [ ] I get feedback from the MTG CB community and Patrons vote on the next feature candidates and I make a selection
 
 ## 🔄 In Progress
 
-### Migration
-
-- Test migration end-to-end one more time, audit any envs i need to edit -- and run the new verification
-
-### Scaling
-
-- Scale API and Web to two dynos (mostly for rolling restarts) (do this before testing) -- and grok any issues that could arise. I'm fine with my in-memory caches getting duplicated, but want to make sure I'm not doing any locking in-memory, say for which goals are being compiled.
+- Site is live! I want to enable emails when new users register.
+- I don't think Google Analytics is working.
+- Make sure that NEXT_PUBLIC_LOCAL_API_BASE_URL doesn't cause issues with www vs apex domain.
 
 ### Testing
-
-- Top-down testing of every page and feature (from new user state, each page, then with data, each page), this should be the last item -- prepare a build that removes the beta banner as the v1.0 release candidate
 
 ## 🚀 Release Checklist
 
@@ -35,7 +65,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Communication
 
-- Ping johnny on Discord once card locations are released. :)
 - Announce on social media and discord
 - Announce to patrons (and update patreon description as needed)
 
@@ -54,10 +83,15 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Start up the podcast again
 - YouTube channel? Draft streaming as a way to encourage collectors to transition to limited players?
-- Communicate projects and start setting up patron voting for next features
+- Communicate projects and start setting up patron voting for next features -- add a roadmap page?
+
+### Scaling and Redis Integration
+
+- Scale API and Web to two dynos (mostly for rolling restarts) after switching NodeCache to redis cache. See multi-dyno-scaling-analysis.md in the API project.
 
 ### Project: Data Cleanup
 
+- Should do Redis/multiple dynos first.
 - When importing missing tcgplayerIds, I should also have been bringing in missing tcgplayer names and tcgplayer set codes. I'll need to do a full rescan of this.
 - After release, adding all remaining missing cards and fixing data issues, including:
 - Adding Art Series cards
@@ -121,6 +155,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 #### Custom Collection Goals
 
+- Allow goals to be frozen in time so they don't change as cards are added to Magic or prices change
 - Make it easier to exclude tokens (isToken card field perhaps?)
 - Sharing and duplicating collection goals
 - "Save this search as a collection goal"
@@ -185,6 +220,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### UX/Design
 
+- May want a delete button in the location modal if it's too hard to press the x on mobile
 - On the supporters page, probably need to make images not load until they're in the viewport
 - The padding with bottom pagination isn't consistent on grid vs table views on mobile. Needs restructuring. It's fine.
 - Maybe a better 100% completion progress bar animation? I'm only 90% happy with it.
@@ -205,6 +241,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
+- There's an old mtgcb.com redirect.
 - color and color arrays and identity fields in cards table have confusing tech debt that needs to be analyzed -- what's being used, the data formats, etc. Even the naming conventions are inconsistent.
 - client.query in api is safe since it's based off my env variable, but I could make it a little cleaner -- same for mtgcb-jobs
 - api has thousands of unit tests, web has almost none -- original idea was to focus on e2e front-end tests with a headless browser, and I have a few working prototypes. But for now, manual testing is fine.

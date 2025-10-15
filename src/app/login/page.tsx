@@ -142,6 +142,15 @@ export default function LoginPage() {
             }}
           />
 
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: 'block', mt: 1 }}
+            data-testid="case-sensitive-note"
+          >
+            Note: Usernames and passwords are case-sensitive.
+          </Typography>
+
           <Box>
             <FormHelperText error={Boolean(errors.root)} data-testid="form-error">
               {errors.root?.message}
@@ -191,12 +200,7 @@ export default function LoginPage() {
             </Button>
           </Box>
 
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            align="center"
-            sx={{ mt: 2, mb: 1, display: 'block' }}
-          >
+          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2, mb: 1, display: 'block' }}>
             By logging in, you agree to our{' '}
             <Link href="/terms-and-privacy" data-testid="terms-privacy-link">
               Terms and Privacy

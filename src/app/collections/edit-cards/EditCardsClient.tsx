@@ -314,10 +314,6 @@ const EditCardsClient: React.FC = () => {
 
         {selectedCard && (
           <>
-            <CardDisplaySection>
-              <CardDisplay selectedCard={selectedCard} handleCardClick={handleCardClick} priceType={priceType} />
-            </CardDisplaySection>
-
             <QuantityEditorSection>
               <QuantityEditor
                 quantityRegular={quantityRegular}
@@ -333,6 +329,10 @@ const EditCardsClient: React.FC = () => {
                 canBeFoil={selectedCard.card.canBeFoil}
               />
             </QuantityEditorSection>
+
+            <CardDisplaySection>
+              <CardDisplay selectedCard={selectedCard} handleCardClick={handleCardClick} priceType={priceType} />
+            </CardDisplaySection>
           </>
         )}
       </ContentWrapper>

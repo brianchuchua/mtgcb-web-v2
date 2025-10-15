@@ -12,6 +12,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-15',
+      version: '1.0.1',
+      changes: [
+        'Improved Add or Remove Cards page by moving form controls above the card image for easier access',
+        'Added helpful notes to login and password recovery forms clarifying that usernames, emails, and passwords are case-sensitive',
+        'Improved Jump to Set menu to prioritize main sets over variant and subset releases in search results',
+      ],
+    },
+    {
+      date: '2025-10-15',
       version: '1.0.0',
       changes: [
         'Officially released the new MTG CB! 🎉',

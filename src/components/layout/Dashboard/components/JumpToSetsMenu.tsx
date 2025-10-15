@@ -86,6 +86,13 @@ export const JumpToSetsMenu = () => {
         if (aCodeMatch && !bCodeMatch) return -1;
         if (!aCodeMatch && bCodeMatch) return 1;
 
+        // Then prioritize main sets (parentSetId === null) over subsets
+        const aIsMainSet = a.parentSetId === null;
+        const bIsMainSet = b.parentSetId === null;
+
+        if (aIsMainSet && !bIsMainSet) return -1;
+        if (!aIsMainSet && bIsMainSet) return 1;
+
         // Then sort by release date (newest first)
         const dateA = a.releasedAt ? new Date(a.releasedAt).getTime() : 0;
         const dateB = b.releasedAt ? new Date(b.releasedAt).getTime() : 0;
@@ -93,8 +100,16 @@ export const JumpToSetsMenu = () => {
       });
     }
 
-    // Default sort by release date (newest first)
+    // Default sort: main sets first, then by release date (newest first)
     return sets.sort((a, b) => {
+      // Prioritize main sets (parentSetId === null) over subsets
+      const aIsMainSet = a.parentSetId === null;
+      const bIsMainSet = b.parentSetId === null;
+
+      if (aIsMainSet && !bIsMainSet) return -1;
+      if (!aIsMainSet && bIsMainSet) return 1;
+
+      // Then sort by release date (newest first)
       const dateA = a.releasedAt ? new Date(a.releasedAt).getTime() : 0;
       const dateB = b.releasedAt ? new Date(b.releasedAt).getTime() : 0;
       return dateB - dateA;

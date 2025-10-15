@@ -14,3 +14,7 @@ Dependencies:
 ## OpenGraph Preview Testing
 
 - http://local.mtgcb.com:3000/test-og (for local testing)
+
+## Gotchas
+
+- When updating an .env value in Heroku, you have to trigger a new build -- Next.js bakes env values at build time, not runtime.
