@@ -93,15 +93,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
 
   // Define static messages here
   const messages: SessionMessage[] = [
-    {
-      id: 'beta-environment-warning',
-      severity: 'warning',
-      title: 'Beta Test Environment',
-      message:
-        'This is a beta test environment. Data is periodically wiped and changes will not be saved permanently. Do not make real updates to your collection here. Just play around and feel free to share feedback.',
-      dismissable: true,
-      displayType: 'both', // Show as both banner and modal
-    },
+    // Add future session messages here
   ];
 
   return (

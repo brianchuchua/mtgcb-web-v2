@@ -11,10 +11,18 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-15',
+      version: '1.0.0',
+      changes: [
+        'Officially released the new MTG CB! 🎉',
+        'Special thanks to my Patrons for helping with testing and feedback during the beta.',
+      ],
+    },
+    {
       date: '2025-10-14',
       version: '0.147.6',
       changes: [
-        'Added info icons to Quick Win cards on home page explaining that results only show sets you\'ve started collecting',
+        "Added info icons to Quick Win cards on home page explaining that results only show sets you've started collecting",
         'Fixed home statistics to refresh automatically when collection is updated',
       ],
     },
