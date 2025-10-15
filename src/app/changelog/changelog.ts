@@ -11,6 +11,19 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-14',
+      version: '0.147.6',
+      changes: [
+        'Added info icons to Quick Win cards on home page explaining that results only show sets you\'ve started collecting',
+        'Fixed home statistics to refresh automatically when collection is updated',
+      ],
+    },
+    {
+      date: '2025-10-14',
+      version: '0.147.5',
+      changes: ['Improved accuracy of goal cost to complete calculations in some corner cases'],
+    },
+    {
       date: '2025-10-13',
       version: '0.147.4',
       changes: ['Fixed stale goal information briefly appearing when navigating between different collection goals'],

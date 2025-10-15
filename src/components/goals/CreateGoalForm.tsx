@@ -84,10 +84,10 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
         order: undefined,
       };
 
-      const hasSetIdFilter = searchConditions.setId && (
-        (searchConditions.setId.OR && searchConditions.setId.OR.length > 0) ||
-        (searchConditions.setId.AND && searchConditions.setId.AND.length > 0)
-      );
+      const hasSetIdFilter =
+        searchConditions.setId &&
+        ((searchConditions.setId.OR && searchConditions.setId.OR.length > 0) ||
+          (searchConditions.setId.AND && searchConditions.setId.AND.length > 0));
 
       const request: CreateGoalRequest = {
         name: trimmedData.name,
@@ -206,7 +206,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
               Search Criteria
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
-              Define which cards this goal applies to. Leave fields empty to include all cards.
+              Define which cards this goal applies to. Leave fields empty to not have them apply to the goal.
             </Typography>
 
             <GoalSearchForm

@@ -47,10 +47,11 @@ const collectionsApi = mtgcbApi.injectEndpoints({
                     { type: 'Sets', id: `user-${userId}` },
                     { type: 'Goals', id: `user-${userId}` },
                     'Goals',
+                    'Statistics',
                   ]),
                 );
               } else {
-                dispatch(mtgcbApi.util.invalidateTags(['Collection']));
+                dispatch(mtgcbApi.util.invalidateTags(['Collection', 'Statistics']));
               }
             }
           } catch {
@@ -101,6 +102,7 @@ const collectionsApi = mtgcbApi.injectEndpoints({
                 { type: 'Sets', id: `user-${userId}` },
                 { type: 'Goals', id: `user-${userId}` },
                 'Goals',
+                'Statistics',
               ]),
             );
           }
@@ -130,10 +132,11 @@ const collectionsApi = mtgcbApi.injectEndpoints({
                   { type: 'Sets', id: `user-${userId}` },
                   { type: 'Goals', id: `user-${userId}` },
                   'Goals',
+                  'Statistics',
                 ]),
               );
             } else {
-              dispatch(mtgcbApi.util.invalidateTags(['Collection']));
+              dispatch(mtgcbApi.util.invalidateTags(['Collection', 'Statistics']));
             }
           }
         } catch {
@@ -161,10 +164,11 @@ const collectionsApi = mtgcbApi.injectEndpoints({
                   { type: 'Sets', id: `user-${userId}` },
                   { type: 'Goals', id: `user-${userId}` },
                   'Goals',
+                  'Statistics',
                 ]),
               );
             } else {
-              dispatch(mtgcbApi.util.invalidateTags(['Collection']));
+              dispatch(mtgcbApi.util.invalidateTags(['Collection', 'Statistics']));
             }
           }
         } catch {

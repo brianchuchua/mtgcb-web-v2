@@ -3,6 +3,7 @@
 import {
   AutoAwesome,
   Dashboard as DashboardIcon,
+  InfoOutlined as InfoOutlinedIcon,
   Iso as IsoIcon,
   ImportContacts as LibraryIcon,
 } from '@mui/icons-material';
@@ -15,7 +16,9 @@ import {
   CircularProgress,
   Container,
   Grid2 as Grid,
+  IconButton,
   Paper,
+  Popover,
   Skeleton,
   Stack,
   Typography,
@@ -92,7 +95,7 @@ export default function AuthenticatedHomePageClient() {
       <QuickWinsSection stats={stats} router={router} isMobile={isMobile} userId={user?.userId || 0} />
       <Container maxWidth="lg" sx={{ mt: 1, textAlign: 'center' }}>
         <Typography variant="caption" color="text.secondary">
-          (Statistics update hourly)
+          (Statistics update hourly or when you update your collection)
         </Typography>
       </Container>
     </Box>
@@ -605,6 +608,9 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
 };
 
 const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMobile, userId }) => {
+  const [anchorEl1, setAnchorEl1] = useState<HTMLElement | null>(null);
+  const [anchorEl2, setAnchorEl2] = useState<HTMLElement | null>(null);
+
   if (!stats.quickWins.closestSetByCost && !stats.quickWins.secondClosestSetByCost) {
     return null;
   }
@@ -620,9 +626,25 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
             <QuickWinCard>
               <CardContent>
                 <Stack spacing={2}>
-                  <Typography variant="h6" fontWeight="bold">
-                    Cheapest Set to Complete
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="h6" fontWeight="bold">
+                      Cheapest Set to Complete
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => setAnchorEl1(e.currentTarget)}
+                      sx={{
+                        padding: 0,
+                        color: 'action.disabled',
+                        '&:hover': {
+                          backgroundColor: 'transparent',
+                          color: 'primary.main',
+                        },
+                      }}
+                    >
+                      <InfoOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
                   <Box>
                     <Typography variant="body1" fontWeight="bold">
                       {stats.quickWins.closestSetByCost.name}
@@ -673,9 +695,25 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
             <QuickWinCard>
               <CardContent>
                 <Stack spacing={2}>
-                  <Typography variant="h6" fontWeight="bold">
-                    Cheapest Normal Set to Complete
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="h6" fontWeight="bold">
+                      Cheapest Normal Set to Complete
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => setAnchorEl2(e.currentTarget)}
+                      sx={{
+                        padding: 0,
+                        color: 'action.disabled',
+                        '&:hover': {
+                          backgroundColor: 'transparent',
+                          color: 'primary.main',
+                        },
+                      }}
+                    >
+                      <InfoOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
                   <Box>
                     <Typography variant="body1" fontWeight="bold">
                       {stats.quickWins.secondClosestSetByCost.name}
@@ -723,6 +761,46 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
           </Grid>
         )}
       </Grid>
+
+      <Popover
+        open={Boolean(anchorEl1)}
+        anchorEl={anchorEl1}
+        onClose={() => setAnchorEl1(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" component="div">
+            (For sets you have at least one card in.)
+          </Typography>
+        </Box>
+      </Popover>
+
+      <Popover
+        open={Boolean(anchorEl2)}
+        anchorEl={anchorEl2}
+        onClose={() => setAnchorEl2(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" component="div">
+            (For sets you have at least one card in.)
+          </Typography>
+        </Box>
+      </Popover>
     </Container>
   );
 };
@@ -919,7 +997,7 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
 
       <Container maxWidth="lg" sx={{ mt: 1, textAlign: 'center' }}>
         <Typography variant="caption" color="text.secondary">
-          (Statistics update hourly)
+          (Statistics update hourly or when you update your collection)
         </Typography>
       </Container>
     </Box>

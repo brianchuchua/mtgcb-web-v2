@@ -15,10 +15,7 @@ export const statisticsApi = mtgcbApi.injectEndpoints({
         method: 'GET',
         params: { priceType },
       }),
-      // Note: This endpoint is computationally heavy, so we cache for 1 hour
-      // and don't invalidate on collection changes. Users can manually refresh
-      // the page to get updated statistics after making collection changes.
-      keepUnusedDataFor: 3600, // 1 hour
+      keepUnusedDataFor: 3600, // Cache for 1 hour when unmounted
       providesTags: ['Statistics'],
     }),
   }),

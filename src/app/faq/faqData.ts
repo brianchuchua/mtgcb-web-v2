@@ -94,6 +94,15 @@ const faqData: FAQData = {
       category: 'pricing',
     },
     {
+      question: 'Why has my collection value changed since the new version?',
+      answer: `
+        <p>The new version of the site uses market prices by default instead of low prices, which is a more accurate representation of your collection's value. This change may cause your collection value to increase or decrease depending on the cards you own.</p>
+
+        <p>You can change your preferred price type in your account settings if you'd like to revert to using low prices or try average or high prices instead.</p>
+      `,
+      category: 'pricing',
+    },
+    {
       question: 'Why is this card or set missing?',
       answer: `
         <p>It's probably on my TODO list to add. I'm pretty good about adding new cards before or on 
@@ -104,6 +113,10 @@ const faqData: FAQData = {
         on its status.</p>
       `,
       category: 'data',
+    },
+    {
+      question: "Why isn't it working when I try to buy missing cards?",
+      answer: `Pop-up blockers can interfere with the "Add to Cart" button functionality, especially on mobile devices. Just allow pop-ups when it asks and then retry once or twice.`,
     },
     {
       question: 'Who are you?',
