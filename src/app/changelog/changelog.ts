@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-15',
+      version: '1.0.2',
+      changes: [
+        'Fixed Jump to Set menu not working correctly when used from the Add or Remove Cards page',
+      ],
+    },
+    {
+      date: '2025-10-15',
       version: '1.0.1',
       changes: [
         'Improved Add or Remove Cards page by moving form controls above the card image for easier access',

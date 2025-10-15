@@ -891,6 +891,7 @@ const CardWrapper = styled(Box)(({ theme }) => ({
   position: 'relative',
   minHeight: 0, // Important for flex children
   width: '100%',
+  marginTop: theme.spacing(2),
 }));
 
 interface SimpleCardImageProps {

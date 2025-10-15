@@ -8,7 +8,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Bug Reports
 
-- [JUMP][BUG] I think? The jump only seems to work when I'm on "Collection".. if on manage collection I get Invalid user id.. I then click collection and all my collection shows up..
 - < > arrows may still be going to the unexpected set
 - Possible bug (set table view): Looking at a goal, sorting by set doesnt seem to sort by set? If I press on set, it appears to sort by card number ascending, but only that (doesnt flip to DESC on a second click or anything)
 
@@ -16,6 +15,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 #### Will Do
 
+- Redirect from patreon goes to account, not account#patreon
 - I want emails when users register.
 
 #### Might Do
@@ -34,7 +34,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 - Add a light theme
 - Allow users to have a "save all" mode instead of auto-saving every change
 - Increase pagination limit beyond 500
-- Examine easier interfaces than the negation pills in dropdowns. People miss the old multiselects. A simple vs advanced mode.
+- Examine easier interfaces than the negation pills in dropdowns. People miss the old multiselects. A simple vs advanced mode, maybe literally just that, where the sidenav has a classic mode and the new mode. "Reflecting on your feedback, I'm kinda picturing the sidenav having two modes "Simple" or "Classic" and "Advanced". It'd default to advanced, but I don't see why not I can't just have a fascimile of the old site's style there as an option. I'll toy around with that."
 
 #### Not Immediately Actionable
 
@@ -51,7 +51,6 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 - Site is live! I want to enable emails when new users register.
 - I don't think Google Analytics is working.
-- Make sure that NEXT_PUBLIC_LOCAL_API_BASE_URL doesn't cause issues with www vs apex domain.
 
 ### Testing
 
@@ -241,6 +240,7 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Tech Debt
 
+- NEXT_PUBLIC_LOCAL_API_BASE_URL may be unused.
 - There's an old mtgcb.com redirect.
 - color and color arrays and identity fields in cards table have confusing tech debt that needs to be analyzed -- what's being used, the data formats, etc. Even the naming conventions are inconsistent.
 - client.query in api is safe since it's based off my env variable, but I could make it a little cleaner -- same for mtgcb-jobs

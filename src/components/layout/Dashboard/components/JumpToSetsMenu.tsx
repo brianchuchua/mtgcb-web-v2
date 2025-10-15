@@ -138,7 +138,14 @@ export const JumpToSetsMenu = () => {
   // Extract userId from collection paths
   const getUserIdFromPath = useCallback((): string | null => {
     const match = pathname.match(/\/collections\/([^/]+)/);
-    return match ? match[1] : null;
+    const potentialUserId = match ? match[1] : null;
+
+    // Exclude special collection routes that are not userIds
+    if (potentialUserId === 'edit-cards') {
+      return null;
+    }
+
+    return potentialUserId;
   }, [pathname]);
 
   const handleToggle = useCallback(() => {
