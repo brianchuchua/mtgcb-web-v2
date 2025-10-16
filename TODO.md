@@ -8,13 +8,21 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 ### Bug Reports
 
+- Legal: The affiliate text can be interpreted in multiple ways. Fix it.
+- Check with Sentry.io
 - < > arrows may still be going to the unexpected set
 - Possible bug (set table view): Looking at a goal, sorting by set doesnt seem to sort by set? If I press on set, it appears to sort by card number ascending, but only that (doesnt flip to DESC on a second click or anything)
+
+### Data Issue Reports
+
+- Phyrexian language praetors are not counting towards my collection goal for "1x of Legendary Creature (any printing of each card). Might be because of not having a card description in the data for them. For the ones from the secret lair
 
 ### Internal Feedback
 
 #### Will Do
 
+- I should tell the user on the password reset pages that they can reach out to me if they are stuck.
+- Should redirect from preview.mtgcollectionbuilder.com
 - Redirect from patreon goes to account, not account#patreon
 - I want emails when users register.
 
@@ -27,14 +35,19 @@ Best to keep them in the codebase, especially since I'm a team of one.
 #### Will Do
 
 - Adding to the add cards page a log of recently added cards, like the old site had. (It only showed one though)
+- Add/remove cards page doesn't take into account the canBeFoil behavior. See Be'lakor, the Dark Master [Warhammer 40,000] and make the defaults better. Don't forget the escape hatch.
+- Adding a destination location to the edit cards page.
 
 #### Might Do
 
 - Add the classic table color-coding for cards by quantity
-- Add a light theme
+- Add a light theme -- maybe?
+- Allow bumping of font sizes.
 - Allow users to have a "save all" mode instead of auto-saving every change
 - Increase pagination limit beyond 500
 - Examine easier interfaces than the negation pills in dropdowns. People miss the old multiselects. A simple vs advanced mode, maybe literally just that, where the sidenav has a classic mode and the new mode. "Reflecting on your feedback, I'm kinda picturing the sidenav having two modes "Simple" or "Classic" and "Advanced". It'd default to advanced, but I don't see why not I can't just have a fascimile of the old site's style there as an option. I'll toy around with that."
+- Feature request: can we add a grouping for signed cards? or graded ones?
+- Feature request: One other thing related to the add or remove cards search function: it would be nice if I could ignore commas and apostrophes like I can in scryfall.
 
 #### Not Immediately Actionable
 
@@ -380,7 +393,8 @@ Best to keep them in the codebase, especially since I'm a team of one.
 
 #### Importers and Exporters
 
-- Allowing import/export of locations and goals
+- Allowing import/export of locations and goals (+1 request)
+- Add an option to download a csv of all of the ambiguity import error options. That way a person could remove all of the incorrect options and upload a corrected list.
 - Include format name in export - maybe username too
 - Handle ripplefoil and rainbowfoil in the Scryfall promo_types and how for some cards Scryfall inaccurately lists them as coming in foil and nonfoil when they really mean "nonfoil and whatever is in promo_types", but it's not consistent. See https://api.scryfall.com/cards/6be6ebf1-4e4c-4c6f-ace1-3fed55fe5c69?format=json&pretty=true and its corresponding TCGPlayer entries.
 

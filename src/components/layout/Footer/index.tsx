@@ -39,7 +39,8 @@ const Footer = () => {
             Magic the Gathering and all related properties are copyright Wizards of the Coast. All rights reserved.
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            This site is not affiliated with any third-party services.
+            Card prices are estimates provided by affiliates. Absolutely no guarantee is made for any price or
+            collection value estimates. See the FAQ for more details.
           </Typography>
         </FooterContent>
       </Container>
