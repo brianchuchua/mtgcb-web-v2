@@ -11,7 +11,6 @@ import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Confetti from 'react-confetti';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetSetByIdQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { useMassUpdateCollectionMutation, useMassUpdateLocationsMutation } from '@/api/collections/collectionsApi';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
@@ -39,19 +38,15 @@ import { useAuth } from '@/hooks/useAuth';
 import { useConfetti } from '@/hooks/useConfetti';
 import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
+import { useSetPageFilter } from '@/hooks/useSetPageFilter';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
-import { clearSpecificSearchField } from '@/hooks/useSearchStateSync';
 import {
   resetSearch,
   selectCardSearchParams,
   selectIncludeSubsetsInSets,
   selectSelectedGoalId,
-  selectSets,
   setSelectedGoalId,
-  setSets,
-  setViewContentType,
 } from '@/redux/slices/browseSlice';
-import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
 import { getCollectionUrl } from '@/utils/collectionUrls';
 import { formatISODate } from '@/utils/dateUtils';
@@ -67,20 +62,50 @@ interface CollectionSetClientProps {
 export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId, setSlug }) => {
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
-  const [isSetReady, setIsSetReady] = useState(false);
 
   // Sync goalId from URL to Redux on mount
   useInitialUrlSync({ syncView: false, syncGoalId: true });
+
+  const setPriceType = useSetPriceType();
+  const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const subsetToggleRefs = useRef<Record<string, () => void>>({});
+
+  // Get current search parameters and preferences
+  const cardSearchParams = useSelector(selectCardSearchParams);
+  const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
+  const selectedGoalId = useSelector(selectSelectedGoalId);
+
+  // Check if we're waiting for goalId to sync from URL
+  const goalIdParam = searchParams?.get('goalId');
+  const hasGoalInUrl = goalIdParam !== null;
+  const goalIdFromUrl = goalIdParam ? parseInt(goalIdParam) : null;
+  const isWaitingForGoalSync = hasGoalInUrl && !isNaN(goalIdFromUrl!) && goalIdFromUrl !== selectedGoalId;
+
+  // Fetch set data and manage set filter
+  const {
+    set,
+    subsets,
+    parentSet,
+    isSetLoading,
+    isSubsetsLoading,
+    isReady,
+    isSuccess,
+  } = useSetPageFilter({
+    setSlug,
+    priceType: setPriceType,
+    includeSubsetsInSets,
+    userId: userId,
+    goalId: selectedGoalId || null,
+    skipQueries: isWaitingForGoalSync,
+  });
 
   const browseController = useCollectionBrowseController({
     userId,
     isSetSpecificPage: true,
     // Skip cards until we have the correct set filter applied
-    skipCardsUntilReady: !isSetReady
+    skipCardsUntilReady: !isReady
   });
-  const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const subsetToggleRefs = useRef<Record<string, () => void>>({});
-  const setPriceType = useSetPriceType();
+
   const { user } = useAuth();
   const { shareToken, isViewingSharedCollection } = useShareTokenContext();
   const isOwnCollection = user?.userId === userId;
@@ -112,122 +137,13 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const [isMassUpdateLocationOpen, setIsMassUpdateLocationOpen] = useState(false);
   const [massUpdateLocations, { isLoading: isMassUpdateLocationLoading }] = useMassUpdateLocationsMutation();
 
-  // Get current search parameters to pass to subsets
-  const cardSearchParams = useSelector(selectCardSearchParams);
-  const currentSetsFilter = useSelector(selectSets);
-  const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
-  const selectedGoalId = useSelector(selectSelectedGoalId);
-
-  // Check if we're waiting for goalId to sync from URL
-  const goalIdParam = searchParams?.get('goalId');
-  const hasGoalInUrl = goalIdParam !== null;
-  const goalIdFromUrl = goalIdParam ? parseInt(goalIdParam) : null;
-  const isWaitingForGoalSync = hasGoalInUrl && !isNaN(goalIdFromUrl!) && goalIdFromUrl !== selectedGoalId;
-
-  const {
-    data: setsData,
-    isSuccess,
-    isLoading: isSetLoading,
-  } = useGetSetsQuery(
-    {
-      limit: 1,
-      slug: setSlug,
-      userId: userId,
-      priceType: setPriceType,
-      includeSubsetsInSets,
-      goalId: selectedGoalId || undefined,
-    },
-    {
-      skip: isWaitingForGoalSync,
-    },
-  );
-
-  const set = setsData?.data?.sets?.[0];
   const pathname = usePathname();
-
-  const { data: parentSetData } = useGetSetByIdQuery(set?.parentSetId || '', {
-    skip: !set?.parentSetId || isWaitingForGoalSync,
-  });
-
-  const parentSet = parentSetData?.data?.set;
-
-  const { data: subsetsData, isLoading: isSubsetsLoading } = useGetSetsQuery(
-    {
-      parentSetId: set?.id,
-      limit: 100,
-      userId: userId,
-      priceType: setPriceType,
-      goalId: selectedGoalId || undefined,
-    },
-    {
-      skip: !set?.id || isWaitingForGoalSync,
-    },
-  );
 
   const { showConfetti, recycleConfetti, handleConfettiComplete } = useConfetti(
     isSetLoading || isSubsetsLoading,
     set?.percentageCollected || 0
   );
 
-  // Clear filter immediately when setSlug changes
-  useEffect(() => {
-    setIsSetReady(false);
-    dispatch(setSets({ include: [], exclude: [] }));
-    // Clear sets filter from sessionStorage since this is page context, not user input
-    clearSpecificSearchField('cards', 'sets');
-  }, [setSlug, dispatch]);
-
-  // Clean up filter when component unmounts
-  useEffect(() => {
-    return () => {
-      dispatch(setSets({ include: [], exclude: [] }));
-      // Clear sets filter from sessionStorage on unmount
-      clearSpecificSearchField('cards', 'sets');
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
-    // Always set view to cards for this page
-    dispatch(setViewContentType('cards'));
-
-    if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
-      const set = setsData.data.sets[0];
-
-      const setFilter: SetFilter = {
-        include: [set.id],
-        exclude: [],
-      };
-
-      dispatch(setSets(setFilter));
-      // Mark that we have the correct filter now
-      setIsSetReady(true);
-
-      // Clear sets filter from sessionStorage since this is page context, not user input
-      clearSpecificSearchField('cards', 'sets');
-    }
-  }, [dispatch, setsData, isSuccess, setSlug]);
-
-  // Re-apply set filter if it gets cleared (e.g., by reset search)
-  useEffect(() => {
-    if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
-      const set = setsData.data.sets[0];
-      const expectedSetId = set.id;
-
-      // Check if current sets filter doesn't include this set
-      const hasCorrectSetFilter =
-        currentSetsFilter && currentSetsFilter.include && currentSetsFilter.include.includes(expectedSetId);
-
-      if (!hasCorrectSetFilter) {
-        const setFilter: SetFilter = {
-          include: [expectedSetId],
-          exclude: [],
-        };
-        dispatch(setSets(setFilter));
-      }
-    }
-  }, [dispatch, setsData, isSuccess, currentSetsFilter]);
-
-  const subsets = subsetsData?.data?.sets || [];
   const setName = isSetLoading ? '' : set?.name || 'Set not found';
 
   const { previousSet, nextSet, handleSetNavigation } = useSetNavigation({
