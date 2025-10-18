@@ -3,10 +3,9 @@
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { Box, Button, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import SubsetSection from './SubsetSection';
-import { useGetSetByIdQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { Pagination } from '@/components/pagination';
@@ -16,14 +15,13 @@ import { SetNavigationButtons } from '@/components/sets/SetNavigationButtons';
 import { SetPageBuyButton } from '@/components/sets/SetPageBuyButton';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
+import { useSetPageFilter } from '@/hooks/useSetPageFilter';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
-import { clearSpecificSearchField } from '@/hooks/useSearchStateSync';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
-import { resetSearch, selectCardSearchParams, selectIncludeSubsetsInSets, selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
-import { SetFilter } from '@/types/browse';
+import { resetSearch, selectCardSearchParams, selectIncludeSubsetsInSets } from '@/redux/slices/browseSlice';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
 
@@ -49,21 +47,23 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
 
   // Get current search parameters to pass to subsets
   const cardSearchParams = useSelector(selectCardSearchParams);
-  const currentSetsFilter = useSelector(selectSets);
   const currentIncludeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
+  // Use consolidated hook for set filter management
   const {
-    data: setsData,
+    set,
+    subsets,
+    parentSet,
+    isSetLoading,
+    isSubsetsLoading,
+    isReady,
     isSuccess,
-    isLoading: isSetLoading,
-  } = useGetSetsQuery({
-    limit: 1,
-    slug: setSlug,
+  } = useSetPageFilter({
+    setSlug,
     priceType: setPriceType,
     includeSubsetsInSets: currentIncludeSubsetsInSets,
   });
 
-  const set = setsData?.data?.sets?.[0];
   const pathname = usePathname();
 
   // Fetch cost to complete data for non-collection browse
@@ -77,72 +77,6 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
     }
   );
 
-  const { data: subsetsData, isLoading: isSubsetsLoading } = useGetSetsQuery(
-    {
-      parentSetId: set?.id,
-      limit: 100,
-    },
-    {
-      skip: !set?.id,
-    },
-  );
-
-  const { data: parentSetData } = useGetSetByIdQuery(set?.parentSetId || '', {
-    skip: !set?.parentSetId,
-  });
-
-  const parentSet = parentSetData?.data?.set;
-
-  // Clean up filter when component unmounts
-  useEffect(() => {
-    return () => {
-      dispatch(setSets({ include: [], exclude: [] }));
-      // Clear sets filter from sessionStorage on unmount
-      clearSpecificSearchField('cards', 'sets');
-    };
-  }, [dispatch]);
-
-  // Set the filter and view when set data loads
-  useEffect(() => {
-    // Always set view to cards for this page
-    dispatch(setViewContentType('cards'));
-
-    if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
-      const set = setsData.data.sets[0];
-
-      const setFilter: SetFilter = {
-        include: [set.id],
-        exclude: [],
-      };
-
-      dispatch(setSets(setFilter));
-
-      // Clear sets filter from sessionStorage since this is page context, not user input
-      clearSpecificSearchField('cards', 'sets');
-    }
-  }, [dispatch, setsData, isSuccess]);
-
-  // Re-apply set filter if it gets cleared (e.g., by reset search)
-  useEffect(() => {
-    if (isSuccess && setsData?.data?.sets && setsData.data.sets.length > 0) {
-      const set = setsData.data.sets[0];
-      const expectedSetId = set.id;
-
-      // Check if current sets filter doesn't include this set
-      const hasCorrectSetFilter =
-        currentSetsFilter && currentSetsFilter.include && currentSetsFilter.include.includes(expectedSetId);
-
-      if (!hasCorrectSetFilter) {
-        const setFilter: SetFilter = {
-          include: [expectedSetId],
-          exclude: [],
-        };
-        dispatch(setSets(setFilter));
-      }
-    }
-  }, [dispatch, setsData, isSuccess, currentSetsFilter]);
-
-  const subsets = subsetsData?.data?.sets || [];
   const setName = isSetLoading ? '' : set?.name || 'Set not found';
 
   const { previousSet, nextSet, handleSetNavigation } = useSetNavigation({
