@@ -8,6 +8,7 @@ import { useSetsPageSize } from '@/hooks/useSetsPageSize';
 import { usePreferredCardViewMode, usePreferredSetViewMode } from '@/contexts/DisplaySettingsContext';
 import { useBrowsePreferencesReady } from '@/hooks/useBrowsePreferences';
 import { loadSearchState, saveSearchState } from '@/hooks/useSearchStateSync';
+import { isSetSpecificPage } from '@/utils/routeHelpers';
 import {
   resetAllSearches,
   selectCardSearchParams,
@@ -62,11 +63,8 @@ export function useBrowseStateSync() {
       return;
     }
 
-    // Check if we're on a set-specific page (collection or browse)
-    const isSetSpecificPage = /^\/collections\/\d+\/[^\/]+$/.test(pathname) || /^\/browse\/sets\/[^\/]+$/.test(pathname);
-    
     // On set-specific pages, always default to cards view
-    const initialView = isSetSpecificPage ? 'cards' : (search.get('contentType') === 'cards' ? 'cards' : 'sets');
+    const initialView = isSetSpecificPage(pathname) ? 'cards' : (search.get('contentType') === 'cards' ? 'cards' : 'sets');
     
     dispatch(setViewContentType(initialView));
 
@@ -257,12 +255,9 @@ export function useBrowseStateSync() {
     if (!hasInit.current || viewType === prevView.current) return;
 
     const params = new URLSearchParams(search);
-    
-    // Check if we're on a set-specific page (collection or browse)
-    const isSetSpecificPage = /^\/collections\/\d+\/[^\/]+$/.test(pathname) || /^\/browse\/sets\/[^\/]+$/.test(pathname);
-    
+
     // Only add contentType if we're not on a set-specific page
-    if (!isSetSpecificPage) {
+    if (!isSetSpecificPage(pathname)) {
       params.set('contentType', viewType);
     }
 
@@ -280,15 +275,13 @@ export function useBrowseStateSync() {
 
     const sync = debounce(() => {
       const state = viewType === 'cards' ? cardState : setState;
-      
-      // Check if we're on a set-specific page (collection or browse)
-      const isSetSpecificPage = /^\/collections\/\d+\/[^\/]+$/.test(pathname) || /^\/browse\/sets\/[^\/]+$/.test(pathname);
-      
+      const setSpecificPage = isSetSpecificPage(pathname);
+
       // Pass context about the page type to convertStateToUrlParams
-      const params = convertStateToUrlParams(state, viewType, isSetSpecificPage);
-      
+      const params = convertStateToUrlParams(state, viewType, setSpecificPage);
+
       // Only add contentType if we're not on a set-specific page
-      if (!isSetSpecificPage) {
+      if (!setSpecificPage) {
         params.set('contentType', viewType);
       }
 
