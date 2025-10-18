@@ -45,9 +45,6 @@ export function useBrowseStateSync() {
   const [setsPageSize, , setsPageSizeReady] = useSetsPageSize();
   const preferencesReady = useBrowsePreferencesReady();
 
-  // Track if we need to update Redux state with localStorage values
-  const hasLoadedFromLocalStorage = useRef(false);
-
   const hasInit = useRef(false);
   const prevView = useRef(viewType);
   const lastUrlPushed = useRef<string | undefined>(undefined);
@@ -152,9 +149,6 @@ export function useBrowseStateSync() {
 
     prevView.current = initialView;
     hasInit.current = true;
-
-    // Mark that we've already loaded from localStorage during initialization
-    hasLoadedFromLocalStorage.current = true;
   }, [dispatch, search, cardsPageSize, setsPageSize, cardsPageSizeReady, setsPageSizeReady, preferencesReady, pathname]);
 
   /** ------------------------------------------------------------------
