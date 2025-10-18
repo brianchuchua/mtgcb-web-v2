@@ -27,6 +27,9 @@ import { SetFilter } from '@/types/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
 
+// Allow time for CSS animation to complete before scrolling
+const SUBSET_EXPANSION_DELAY_MS = 100;
+
 interface SetBrowseClientProps {
   setSlug: string;
 }
@@ -160,7 +163,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 100);
+    }, SUBSET_EXPANSION_DELAY_MS);
   }, []);
 
   const isCardGridView = browseController.view === 'cards' && browseController.viewMode === 'grid';

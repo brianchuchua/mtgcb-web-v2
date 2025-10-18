@@ -24,6 +24,9 @@ import {
 } from '@/redux/slices/browseSlice';
 import { BrowsePagination } from '@/types/browse';
 
+// Balance between responsiveness and avoiding URL spam during rapid typing
+const DEBOUNCE_URL_SYNC_MS = 100;
+
 export function useBrowseStateSync() {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -286,12 +289,12 @@ export function useBrowseStateSync() {
       }
 
       const url = params.toString() ? `${pathname}?${params}` : pathname;
-      
+
       if (url !== lastUrlPushed.current) {
         lastUrlPushed.current = url;
         router.replace(url, { scroll: false });
       }
-    }, 100);
+    }, DEBOUNCE_URL_SYNC_MS);
 
     sync();
     return sync.cancel;

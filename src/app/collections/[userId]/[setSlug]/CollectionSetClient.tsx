@@ -56,6 +56,9 @@ import capitalize from '@/utils/capitalize';
 import { getCollectionUrl } from '@/utils/collectionUrls';
 import { formatISODate } from '@/utils/dateUtils';
 
+// Allow time for CSS animation to complete before scrolling
+const SUBSET_EXPANSION_DELAY_MS = 100;
+
 interface CollectionSetClientProps {
   userId: number;
   setSlug: string;
@@ -266,7 +269,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 100);
+    }, SUBSET_EXPANSION_DELAY_MS);
   }, []);
 
   // Menu handlers
