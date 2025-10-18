@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import AutocompleteWithNegation, { Option } from '@/components/ui/AutocompleteWithNegation';
-import { selectRarities, setRarities } from '@/redux/slices/browseSlice';
+import { selectRarities, setRarities } from '@/redux/slices/browse';
 
 const RARITY_MAP = [
   { name: 'Common', value: 2 },

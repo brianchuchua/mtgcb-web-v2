@@ -23,7 +23,7 @@ import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { usePreferredCardViewMode } from '@/contexts/DisplaySettingsContext';
 import { usePriceType } from '@/hooks/usePriceType';
-import { selectSortBy, selectSortOrder, setSortBy, setSortOrder, selectShowGoals } from '@/redux/slices/browseSlice';
+import { selectSortBy, selectSortOrder, setSortBy, setSortOrder, selectShowGoals } from '@/redux/slices/browse';
 import { SortByOption } from '@/types/browse';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';

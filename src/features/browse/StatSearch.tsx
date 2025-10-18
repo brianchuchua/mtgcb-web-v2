@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { usePriceType } from '@/hooks/usePriceType';
-import { selectStats, setStats } from '@/redux/slices/browseSlice';
+import { selectStats, setStats } from '@/redux/slices/browse';
 import { StatCondition, StatFilters } from '@/types/browse';
 import { PriceType } from '@/types/pricing';
 

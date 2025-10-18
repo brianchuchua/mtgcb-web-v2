@@ -21,7 +21,7 @@ import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
-import { resetSearch, selectCardSearchParams, selectIncludeSubsetsInSets } from '@/redux/slices/browseSlice';
+import { resetSearch, selectCardSearchParams, selectIncludeSubsetsInSets } from '@/redux/slices/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
 

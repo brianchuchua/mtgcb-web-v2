@@ -1,7 +1,7 @@
 import { useLayoutEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
-import { setViewContentType, setSelectedGoalId } from '@/redux/slices/browseSlice';
+import { setViewContentType, setSelectedGoalId } from '@/redux/slices/browse';
 
 /**
  * Hook to synchronize URL parameters with Redux state on initial mount.

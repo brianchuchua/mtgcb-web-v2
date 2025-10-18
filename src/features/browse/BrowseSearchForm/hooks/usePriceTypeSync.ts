@@ -4,7 +4,7 @@ import { useSnackbar } from 'notistack';
 import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { usePriceType } from '@/hooks/usePriceType';
-import { selectSortBy, selectViewContentType, setSortBy } from '@/redux/slices/browseSlice';
+import { selectSortBy, selectViewContentType, setSortBy } from '@/redux/slices/browse';
 import { SortByOption } from '@/types/browse';
 import { PriceType } from '@/types/pricing';
 

@@ -16,7 +16,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useDispatch, useSelector } from 'react-redux';
-import { setStats, selectStats, setIncludeBadDataOnly, selectIncludeBadDataOnly, selectSelectedGoalId } from '@/redux/slices/browseSlice';
+import { setStats, selectStats, setIncludeBadDataOnly, selectIncludeBadDataOnly, selectSelectedGoalId } from '@/redux/slices/browse';
 import { StatFilters } from '@/types/browse';
 import OutlinedBox from '@/components/ui/OutlinedBox';
 

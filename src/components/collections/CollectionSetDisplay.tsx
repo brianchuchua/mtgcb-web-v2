@@ -15,7 +15,7 @@ import {
   selectSortOrder,
   setSortBy,
   setSortOrder,
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 import { SortByOption } from '@/types/browse';
 import { Set } from '@/types/sets';
 

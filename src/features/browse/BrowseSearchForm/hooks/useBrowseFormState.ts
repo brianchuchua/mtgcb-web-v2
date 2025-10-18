@@ -12,7 +12,7 @@ import {
   setOracleText,
   setSetCode,
   setSetSearchName,
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 
 export const useBrowseFormState = () => {
   const dispatch = useDispatch();

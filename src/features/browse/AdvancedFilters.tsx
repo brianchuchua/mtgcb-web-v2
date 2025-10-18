@@ -6,7 +6,7 @@ import { Box, Collapse, FormControl, InputLabel, ToggleButton, ToggleButtonGroup
 import { styled } from '@mui/material/styles';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectIsReserved, setIsReserved } from '@/redux/slices/browseSlice';
+import { selectIsReserved, setIsReserved } from '@/redux/slices/browse';
 
 interface AdvancedFiltersProps {
   resetTrigger?: number;

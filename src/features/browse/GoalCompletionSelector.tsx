@@ -3,7 +3,7 @@
 import { ToggleButton, ToggleButtonGroup, styled } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectSelectedGoalId, selectShowGoals, setShowGoals } from '@/redux/slices/browseSlice';
+import { selectSelectedGoalId, selectShowGoals, setShowGoals } from '@/redux/slices/browse';
 import OutlinedBox from '@/components/ui/OutlinedBox';
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({

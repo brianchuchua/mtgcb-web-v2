@@ -4,7 +4,7 @@ import { IconButton, MenuItem, Select } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectColors, setColors } from '@/redux/slices/browseSlice';
+import { selectColors, setColors } from '@/redux/slices/browse';
 import { ColorMatchType, MTG_COLORS, MtgColor } from '@/types/browse';
 import OutlinedBox from '@/components/ui/OutlinedBox';
 

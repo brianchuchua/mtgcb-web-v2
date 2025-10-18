@@ -3,7 +3,7 @@ import { BrowseControllerResult } from '@/features/browse/types';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { useCollectionDisplaySettings } from '@/features/collections/hooks/useCollectionDisplaySettings';
 import { useViewMode } from '@/features/browse/hooks';
-import { selectViewContentType, selectSets, selectSelectedGoalId } from '@/redux/slices/browseSlice';
+import { selectViewContentType, selectSets, selectSelectedGoalId } from '@/redux/slices/browse';
 
 interface UseCollectionBrowseControllerProps {
   userId: number;

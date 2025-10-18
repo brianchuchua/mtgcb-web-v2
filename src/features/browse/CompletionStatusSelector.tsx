@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import AutocompleteWithNegation, { Option } from '@/components/ui/AutocompleteWithNegation';
-import { selectCompletionStatus, setCompletionStatus } from '@/redux/slices/browseSlice';
+import { selectCompletionStatus, setCompletionStatus } from '@/redux/slices/browse';
 
 const COMPLETION_STATUS_MAP = [
   { name: 'Complete (100%)', value: 'complete' },

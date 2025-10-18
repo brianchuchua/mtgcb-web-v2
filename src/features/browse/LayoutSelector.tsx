@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetCardLayoutsQuery } from '@/api/cards/cardsApi';
 import AutocompleteWithNegation, { Option } from '@/components/ui/AutocompleteWithNegation';
-import { selectLayouts, setLayouts } from '@/redux/slices/browseSlice';
+import { selectLayouts, setLayouts } from '@/redux/slices/browse';
 
 // Helper function to format layout names for display
 const formatLayoutName = (layout: string): string => {

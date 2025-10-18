@@ -2,7 +2,7 @@
 
 import { useDispatch, useSelector } from 'react-redux';
 import AutocompleteWithNegation, { Option } from '@/components/ui/AutocompleteWithNegation';
-import { selectSetCategories, setSetCategories } from '@/redux/slices/browseSlice';
+import { selectSetCategories, setSetCategories } from '@/redux/slices/browse';
 
 const CATEGORY_MAP = [
   { name: 'Normal', value: 'normal' },

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetGoalQuery } from '@/api/goals/goalsApi';
-import { setViewContentType, setOneResultPerCardName, selectSelectedGoalId } from '@/redux/slices/browseSlice';
+import { setViewContentType, setOneResultPerCardName, selectSelectedGoalId } from '@/redux/slices/browse';
 import { useAuth } from '@/hooks/useAuth';
 
 export const useViewModeToggle = () => {

@@ -6,7 +6,7 @@ import {
   selectViewContentType,
   setSortBy, 
   setSortOrder 
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 import { SortByOption } from '@/types/browse';
 
 /**

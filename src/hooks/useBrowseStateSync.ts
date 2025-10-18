@@ -21,7 +21,7 @@ import {
   setSetSearchParams,
   setSets,
   setViewContentType,
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 import { BrowsePagination } from '@/types/browse';
 
 // Balance between responsiveness and avoiding URL spam during rapid typing

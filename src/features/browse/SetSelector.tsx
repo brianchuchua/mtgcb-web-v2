@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import AutocompleteWithNegation, { Option } from '@/components/ui/AutocompleteWithNegation';
-import { selectSets, setSets } from '@/redux/slices/browseSlice';
+import { selectSets, setSets } from '@/redux/slices/browse';
 
 const SetSelector = () => {
   const dispatch = useDispatch();

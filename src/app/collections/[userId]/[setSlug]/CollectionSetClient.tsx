@@ -46,7 +46,7 @@ import {
   selectIncludeSubsetsInSets,
   selectSelectedGoalId,
   setSelectedGoalId,
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 import capitalize from '@/utils/capitalize';
 import { getCollectionUrl } from '@/utils/collectionUrls';
 import { formatISODate } from '@/utils/dateUtils';

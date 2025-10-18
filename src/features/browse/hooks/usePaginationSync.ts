@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useBrowseStateSync } from '@/hooks/useBrowseStateSync';
 import { useCardsPageSize } from '@/hooks/useCardsPageSize';
 import { useSetsPageSize } from '@/hooks/useSetsPageSize';
-import { selectViewContentType } from '@/redux/slices/browseSlice';
+import { selectViewContentType } from '@/redux/slices/browse';
 
 /**
  * Manages pagination state with localStorage persistence

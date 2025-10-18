@@ -38,7 +38,7 @@ import {
   setShowSubsets,
   setSortBy,
   setSortOrder,
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 import { SortByOption, SortOrderOption } from '@/types/browse';
 import CardSearchFields from './components/CardSearchFields';
 import ContentTypeToggle from './components/ContentTypeToggle';

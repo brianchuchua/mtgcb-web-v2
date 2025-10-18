@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
-import { selectSelectedGoalId, selectShowGoals, selectSelectedLocationId, selectIncludeChildLocations } from '@/redux/slices/browseSlice';
+import { selectSelectedGoalId, selectShowGoals, selectSelectedLocationId, selectIncludeChildLocations } from '@/redux/slices/browse';
 import { usePriceType } from '@/hooks/usePriceType';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';

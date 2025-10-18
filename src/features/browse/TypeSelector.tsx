@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetCardTypesQuery } from '@/api/cards/cardsApi';
 import AutocompleteWithNegation, { Option } from '@/components/ui/AutocompleteWithNegation';
-import { selectTypes, setTypes } from '@/redux/slices/browseSlice';
+import { selectTypes, setTypes } from '@/redux/slices/browse';
 
 const TypeSelector = () => {
   const dispatch = useDispatch();

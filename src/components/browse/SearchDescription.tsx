@@ -13,7 +13,7 @@ import {
   selectShowGoals,
   selectSelectedLocationId,
   selectIncludeChildLocations
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 import { formatSearchDescription } from '@/utils/search/formatSearchDescription';
 
 interface SearchDescriptionProps extends Omit<TypographyProps, 'children'> {

@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { Goal } from '@/api/goals/types';
-import { selectSelectedGoalId, setSelectedGoalId, setOneResultPerCardName, resetSearch } from '@/redux/slices/browseSlice';
+import { selectSelectedGoalId, setSelectedGoalId, setOneResultPerCardName, resetSearch } from '@/redux/slices/browse';
 import { useAuth } from '@/hooks/useAuth';
 
 interface GoalSelectorProps {

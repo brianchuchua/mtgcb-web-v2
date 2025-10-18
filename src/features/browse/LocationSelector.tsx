@@ -27,7 +27,7 @@ import {
   selectSelectedLocationId,
   setIncludeChildLocations,
   setSelectedLocationId,
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 
 interface LocationSelectorProps {
   userId: number;

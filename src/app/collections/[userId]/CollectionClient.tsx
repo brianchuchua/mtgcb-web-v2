@@ -26,7 +26,7 @@ import { CardsProps, SetsProps } from '@/features/browse/types';
 import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
-import { selectIncludeSubsetsInSets, selectSelectedGoalId } from '@/redux/slices/browseSlice';
+import { selectIncludeSubsetsInSets, selectSelectedGoalId } from '@/redux/slices/browse';
 
 interface CollectionClientProps {
   userId: number;

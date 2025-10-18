@@ -23,7 +23,7 @@ import {
   setStats,
   setTypes,
   setViewContentType,
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 import { ColorFilter, LayoutFilter, RarityFilter, SetFilter, TypeFilter } from '@/types/browse';
 
 export function useInitializeBrowseFromUrl() {

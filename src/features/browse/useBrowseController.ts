@@ -47,7 +47,7 @@ import {
   selectSetSearchParams,
   selectSets,
   selectViewContentType,
-} from '@/redux/slices/browseSlice';
+} from '@/redux/slices/browse';
 
 interface UseBrowseControllerOptions {
   skipCostToComplete?: boolean;

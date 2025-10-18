@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetSetByIdQuery, useGetSetsQuery } from '@/api/browse/browseApi';
 import { clearSpecificSearchField } from '@/hooks/useSearchStateSync';
-import { selectSets, setSets, setViewContentType } from '@/redux/slices/browseSlice';
+import { selectSets, setSets, setViewContentType } from '@/redux/slices/browse';
 import { SetFilter } from '@/types/browse';
 
 /**

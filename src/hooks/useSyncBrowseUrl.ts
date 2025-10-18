@@ -2,7 +2,7 @@ import debounce from 'lodash.debounce';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { selectSearchParams, selectViewContentType } from '@/redux/slices/browseSlice';
+import { selectSearchParams, selectViewContentType } from '@/redux/slices/browse';
 import { BrowsePagination } from '@/types/browse';
 
 export const useSyncBrowseUrl = () => {

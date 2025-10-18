@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
 import { mapApiSetsToSetItems } from '@/features/browse/mappers';
-import { selectSelectedGoalId, selectShowGoals } from '@/redux/slices/browseSlice';
+import { selectSelectedGoalId, selectShowGoals } from '@/redux/slices/browse';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import { Set } from '@/types/sets';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
