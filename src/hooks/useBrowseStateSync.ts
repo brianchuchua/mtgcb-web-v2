@@ -27,6 +27,121 @@ import { BrowsePagination } from '@/types/browse';
 // Balance between responsiveness and avoiding URL spam during rapid typing
 const DEBOUNCE_URL_SYNC_MS = 100;
 
+/**
+ * Syncs Redux state from either URL params or sessionStorage
+ * Used for both initial load and URL changes
+ *
+ * @param search - URL search params to parse
+ * @param dispatch - Redux dispatch function
+ * @param cardsPageSize - Page size for cards from localStorage
+ * @param setsPageSize - Page size for sets from localStorage
+ * @param options - Control sync behavior differences
+ * @param options.resetBeforeSync - If true, calls resetAllSearches() before parsing URL (URL changes only)
+ * @param options.forcePageOne - If true, always sets currentPage to 1 (initialization only)
+ */
+function syncReduxFromUrlOrSession(
+  search: URLSearchParams,
+  dispatch: any,
+  cardsPageSize: number,
+  setsPageSize: number,
+  options: {
+    resetBeforeSync: boolean;
+    forcePageOne: boolean;
+  }
+): void {
+  // Check if we have any search parameters in the URL (excluding contentType)
+  const hasSearchParams = Array.from(search.entries()).some(
+    ([key]) => key !== 'contentType'
+  );
+
+  if (!hasSearchParams) {
+    // No URL params - try to restore from sessionStorage
+    const cardsSessionState = loadSearchState('cards');
+    const setsSessionState = loadSearchState('sets');
+
+    if (cardsSessionState && Object.keys(cardsSessionState).length > 0) {
+      // Restore cards search state from sessionStorage
+      dispatch(
+        setCardSearchParams({
+          ...cardsSessionState,
+          currentPage: 1,
+          pageSize: cardsPageSize,
+        }),
+      );
+    } else {
+      // No session state - reset to defaults (which includes preferences from localStorage)
+      dispatch(resetAllSearches());
+      dispatch(setCardPagination({ pageSize: cardsPageSize }));
+    }
+
+    if (setsSessionState && Object.keys(setsSessionState).length > 0) {
+      // Restore sets search state from sessionStorage
+      dispatch(
+        setSetSearchParams({
+          ...setsSessionState,
+          currentPage: 1,
+          pageSize: setsPageSize,
+        }),
+      );
+    } else {
+      // No session state - reset to defaults (which includes preferences from localStorage)
+      dispatch(setSetPagination({ pageSize: setsPageSize }));
+    }
+  } else {
+    // Reset first if needed (URL changes reset to ensure clean state, init doesn't)
+    if (options.resetBeforeSync) {
+      dispatch(resetAllSearches());
+    }
+
+    // Parse the URL state and update Redux
+    const cardsUrlState = parseUrlToState(search, 'cards');
+    const setsUrlState = parseUrlToState(search, 'sets');
+
+    // Update cards state if there are card-specific params
+    if (Object.keys(cardsUrlState).length > 0) {
+      dispatch(
+        setCardSearchParams({
+          ...cardsUrlState,
+          ...(options.forcePageOne ? { currentPage: 1 } : {}),
+          pageSize: cardsPageSize,
+        }),
+      );
+    } else {
+      // Even if no card params, still need to set pagination from localStorage
+      const pagination: any = { pageSize: cardsPageSize };
+      if (options.forcePageOne) {
+        pagination.currentPage = 1;
+      }
+      dispatch(setCardPagination(pagination));
+    }
+
+    // Clear sets filter if not in URL (prevents persistence from set-specific pages)
+    const hasIncludeSets = search.has('includeSets');
+    const hasExcludeSets = search.has('excludeSets');
+    if (!hasIncludeSets && !hasExcludeSets && !cardsUrlState.sets) {
+      dispatch(setSets({ include: [], exclude: [] }));
+    }
+
+    // Update sets state if there are set-specific params
+    if (Object.keys(setsUrlState).length > 0) {
+      dispatch(
+        setSetSearchParams({
+          ...setsUrlState,
+          ...(options.forcePageOne ? { currentPage: 1 } : {}),
+          pageSize: setsPageSize,
+        }),
+      );
+    } else {
+      // Even if no set params, still need to set pagination from localStorage
+      const pagination: any = { pageSize: setsPageSize };
+      if (options.forcePageOne) {
+        pagination.currentPage = 1;
+      }
+      dispatch(setSetPagination(pagination));
+    }
+  }
+}
+
 export function useBrowseStateSync() {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -68,84 +183,11 @@ export function useBrowseStateSync() {
     
     dispatch(setViewContentType(initialView));
 
-    // Parse URL state but override pagination with localStorage values
-    const cardsUrlState = parseUrlToState(search, 'cards');
-    const setsUrlState = parseUrlToState(search, 'sets');
-
-    // Check if we have any search parameters in the URL (excluding contentType)
-    const hasSearchParams = Array.from(search.entries()).some(
-      ([key]) => key !== 'contentType'
-    );
-
-    if (!hasSearchParams) {
-      // No URL params - try to restore from sessionStorage
-      const cardsSessionState = loadSearchState('cards');
-      const setsSessionState = loadSearchState('sets');
-
-      if (cardsSessionState && Object.keys(cardsSessionState).length > 0) {
-        // Restore cards search state from sessionStorage
-        dispatch(
-          setCardSearchParams({
-            ...cardsSessionState,
-            currentPage: 1,
-            pageSize: cardsPageSize,
-          }),
-        );
-      } else {
-        // No session state - reset to defaults (which includes preferences from localStorage)
-        dispatch(resetAllSearches());
-        dispatch(setCardPagination({ pageSize: cardsPageSize }));
-      }
-
-      if (setsSessionState && Object.keys(setsSessionState).length > 0) {
-        // Restore sets search state from sessionStorage
-        dispatch(
-          setSetSearchParams({
-            ...setsSessionState,
-            currentPage: 1,
-            pageSize: setsPageSize,
-          }),
-        );
-      } else {
-        // No session state - reset to defaults (which includes preferences from localStorage)
-        dispatch(setSetPagination({ pageSize: setsPageSize }));
-      }
-    } else {
-      // Initialize with localStorage values for page size
-      // Only update fields that are present in the URL, preserving Redux defaults
-      if (Object.keys(cardsUrlState).length > 0) {
-        dispatch(
-          setCardSearchParams({
-            ...cardsUrlState,
-            currentPage: 1,
-            pageSize: cardsPageSize,
-          }),
-        );
-      } else {
-        // Just update pagination from localStorage
-        dispatch(setCardPagination({ currentPage: 1, pageSize: cardsPageSize }));
-      }
-      
-      // Clear sets filter if not in URL (prevents persistence from set-specific pages)
-      const hasIncludeSets = search.has('includeSets');
-      const hasExcludeSets = search.has('excludeSets');
-      if (!hasIncludeSets && !hasExcludeSets && !cardsUrlState.sets) {
-        dispatch(setSets({ include: [], exclude: [] }));
-      }
-
-      if (Object.keys(setsUrlState).length > 0) {
-        dispatch(
-          setSetSearchParams({
-            ...setsUrlState,
-            currentPage: 1,
-            pageSize: setsPageSize,
-          }),
-        );
-      } else {
-        // Just update pagination from localStorage, preserve all other defaults
-        dispatch(setSetPagination({ currentPage: 1, pageSize: setsPageSize }));
-      }
-    }
+    // Sync Redux from URL or sessionStorage (initialization)
+    syncReduxFromUrlOrSession(search, dispatch, cardsPageSize, setsPageSize, {
+      resetBeforeSync: false,  // Don't reset on init, preserve Redux defaults
+      forcePageOne: true,       // Always start at page 1 on init
+    });
 
     prevView.current = initialView;
     hasInit.current = true;
@@ -162,85 +204,11 @@ export function useBrowseStateSync() {
     // Skip if URL hasn't changed
     if (currentSearchString === prevSearchParamsString.current) return;
 
-    // Check if search params have been cleared (URL has no params or only contentType)
-    const hasSearchParams = Array.from(search.entries()).some(
-      ([key]) => key !== 'contentType'
-    );
-
-    if (!hasSearchParams) {
-      // No URL params - try to restore from sessionStorage
-      const cardsSessionState = loadSearchState('cards');
-      const setsSessionState = loadSearchState('sets');
-
-      if (cardsSessionState && Object.keys(cardsSessionState).length > 0) {
-        // Restore cards search state from sessionStorage
-        dispatch(
-          setCardSearchParams({
-            ...cardsSessionState,
-            currentPage: 1,
-            pageSize: cardsPageSize,
-          }),
-        );
-      } else {
-        // No session state - reset to defaults (which includes preferences from localStorage)
-        dispatch(resetAllSearches());
-        dispatch(setCardPagination({ pageSize: cardsPageSize }));
-      }
-
-      if (setsSessionState && Object.keys(setsSessionState).length > 0) {
-        // Restore sets search state from sessionStorage
-        dispatch(
-          setSetSearchParams({
-            ...setsSessionState,
-            currentPage: 1,
-            pageSize: setsPageSize,
-          }),
-        );
-      } else {
-        // No session state - reset to defaults (which includes preferences from localStorage)
-        dispatch(setSetPagination({ pageSize: setsPageSize }));
-      }
-    } else {
-      // Always reset first to ensure clean state
-      dispatch(resetAllSearches());
-      
-      // Parse the new URL state and update Redux
-      const cardsUrlState = parseUrlToState(search, 'cards');
-      const setsUrlState = parseUrlToState(search, 'sets');
-
-      // Update cards state if there are card-specific params
-      if (Object.keys(cardsUrlState).length > 0) {
-        dispatch(
-          setCardSearchParams({
-            ...cardsUrlState,
-            pageSize: cardsPageSize,
-          }),
-        );
-      } else {
-        // Even if no card params, still need to set pagination from localStorage
-        dispatch(setCardPagination({ pageSize: cardsPageSize }));
-      }
-      
-      // Clear sets filter if not in URL (prevents persistence from set-specific pages)
-      const hasIncludeSets = search.has('includeSets');
-      const hasExcludeSets = search.has('excludeSets');
-      if (!hasIncludeSets && !hasExcludeSets && !cardsUrlState.sets) {
-        dispatch(setSets({ include: [], exclude: [] }));
-      }
-
-      // Update sets state if there are set-specific params
-      if (Object.keys(setsUrlState).length > 0) {
-        dispatch(
-          setSetSearchParams({
-            ...setsUrlState,
-            pageSize: setsPageSize,
-          }),
-        );
-      } else {
-        // Even if no set params, still need to set pagination from localStorage
-        dispatch(setSetPagination({ pageSize: setsPageSize }));
-      }
-    }
+    // Sync Redux from URL or sessionStorage (URL changes)
+    syncReduxFromUrlOrSession(search, dispatch, cardsPageSize, setsPageSize, {
+      resetBeforeSync: true,   // Reset to ensure clean state
+      forcePageOne: false,     // Respect page number from URL
+    });
 
     prevSearchParamsString.current = currentSearchString;
   }, [search, dispatch, cardsPageSize, setsPageSize]);
