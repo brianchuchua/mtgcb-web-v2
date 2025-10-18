@@ -40,6 +40,7 @@ import { useConfetti } from '@/hooks/useConfetti';
 import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
+import { clearSpecificSearchField } from '@/hooks/useSearchStateSync';
 import {
   resetSearch,
   selectCardSearchParams,
@@ -169,12 +170,16 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   useEffect(() => {
     setIsSetReady(false);
     dispatch(setSets({ include: [], exclude: [] }));
+    // Clear sets filter from sessionStorage since this is page context, not user input
+    clearSpecificSearchField('cards', 'sets');
   }, [setSlug, dispatch]);
 
   // Clean up filter when component unmounts
   useEffect(() => {
     return () => {
       dispatch(setSets({ include: [], exclude: [] }));
+      // Clear sets filter from sessionStorage on unmount
+      clearSpecificSearchField('cards', 'sets');
     };
   }, [dispatch]);
 
@@ -193,6 +198,9 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       dispatch(setSets(setFilter));
       // Mark that we have the correct filter now
       setIsSetReady(true);
+
+      // Clear sets filter from sessionStorage since this is page context, not user input
+      clearSpecificSearchField('cards', 'sets');
     }
   }, [dispatch, setsData, isSuccess, setSlug]);
 

@@ -17,6 +17,8 @@ import {
   StatFilters,
   TypeFilter,
 } from '@/types/browse';
+import { getCardsPreferences, getSetsPreferences } from './browsePreferences';
+import { clearSearchState } from '@/hooks/useSearchStateSync';
 
 // Type for resetSearch options
 interface ResetSearchOptions {
@@ -25,6 +27,10 @@ interface ResetSearchOptions {
 }
 
 // Initialize with default pagination values for both card and set views
+// User preferences are loaded from localStorage
+const cardsPrefs = getCardsPreferences();
+const setsPrefs = getSetsPreferences();
+
 const initialState: {
   cardsSearchParams: BrowseSearchParams;
   setsSearchParams: BrowseSearchParams;
@@ -33,20 +39,26 @@ const initialState: {
   cardsSearchParams: {
     // Default pagination for cards
     currentPage: 1,
-    pageSize: 20,
-    viewMode: 'grid',
-    sortBy: 'releasedAt',
-    sortOrder: 'asc', // Cards default to ascending (oldest first)
+    pageSize: 20, // Will be overridden by localStorage in useBrowseStateSync
+    viewMode: 'grid', // Will be overridden by DisplaySettingsContext
+
+    // User preferences from localStorage
+    sortBy: cardsPrefs.sortBy,
+    sortOrder: cardsPrefs.sortOrder,
+    // Only set oneResultPerCardName if it's true (undefined otherwise)
+    ...(cardsPrefs.oneResultPerCardName ? { oneResultPerCardName: true } : {}),
   },
   setsSearchParams: {
     // Default pagination for sets
     currentPage: 1,
-    pageSize: 20,
-    viewMode: 'grid',
-    showSubsets: true,
-    includeSubsetsInSets: false,
-    sortBy: 'releasedAt',
-    sortOrder: 'desc',
+    pageSize: 20, // Will be overridden by localStorage in useBrowseStateSync
+    viewMode: 'grid', // Will be overridden by DisplaySettingsContext
+
+    // User preferences from localStorage
+    showSubsets: setsPrefs.showSubsets,
+    includeSubsetsInSets: setsPrefs.includeSubsetsInSets,
+    sortBy: setsPrefs.sortBy,
+    sortOrder: setsPrefs.sortOrder,
   },
   viewContentType: 'sets', // Default to sets view
 };
@@ -327,8 +339,8 @@ export const browseSlice = createSlice({
     resetSearch: (state, action: PayloadAction<ResetSearchOptions | undefined>) => {
       const preserveGoal = action.payload?.preserveGoal || false;
       const preserveLocation = action.payload?.preserveLocation || false;
-      
-      // Reset the current view type's search params but preserve pagination
+
+      // Preserve pagination
       const pagination =
         state.viewContentType === 'cards'
           ? {
@@ -342,68 +354,88 @@ export const browseSlice = createSlice({
               viewMode: state.setsSearchParams.viewMode || 'grid',
             };
 
-      // Store current values that might need to be preserved
-      const currentGoalId = state.viewContentType === 'cards' 
-        ? state.cardsSearchParams.selectedGoalId 
+      // Store current goal/location to optionally preserve
+      const currentGoalId = state.viewContentType === 'cards'
+        ? state.cardsSearchParams.selectedGoalId
         : state.setsSearchParams.selectedGoalId;
-      const currentLocationId = state.viewContentType === 'cards' 
-        ? state.cardsSearchParams.selectedLocationId 
+      const currentLocationId = state.viewContentType === 'cards'
+        ? state.cardsSearchParams.selectedLocationId
         : state.setsSearchParams.selectedLocationId;
-      const currentSortBy = state.setsSearchParams.sortBy;
-      const currentSortOrder = state.setsSearchParams.sortOrder;
 
       if (state.viewContentType === 'cards') {
+        // Get user preferences from localStorage
+        const prefs = getCardsPreferences();
+
         state.cardsSearchParams = {
           currentPage: pagination.currentPage,
           pageSize: pagination.pageSize,
           viewMode: pagination.viewMode,
-          // Restore default values for cards
-          sortBy: preserveGoal && state.cardsSearchParams.sortBy ? state.cardsSearchParams.sortBy : 'releasedAt',
-          sortOrder: preserveGoal && state.cardsSearchParams.sortOrder ? state.cardsSearchParams.sortOrder : 'asc',
+
+          // Restore user preferences (NOT hard-coded defaults!)
+          sortBy: prefs.sortBy,
+          sortOrder: prefs.sortOrder,
+          // Only set oneResultPerCardName if it's true (undefined otherwise)
+          ...(prefs.oneResultPerCardName ? { oneResultPerCardName: true } : {}),
+
+          // Note: Search fields (name, oracleText, artist, colors, types, etc.)
+          // are intentionally NOT set here - they remain undefined (cleared)
         };
-        // Preserve goal if requested
+
+        // Preserve goal/location if requested
         if (preserveGoal && currentGoalId !== undefined) {
           state.cardsSearchParams.selectedGoalId = currentGoalId;
         }
-        // Preserve location if requested
         if (preserveLocation && currentLocationId !== undefined) {
           state.cardsSearchParams.selectedLocationId = currentLocationId;
         }
       } else {
+        // Get user preferences from localStorage
+        const prefs = getSetsPreferences();
+
         state.setsSearchParams = {
           currentPage: pagination.currentPage,
           pageSize: pagination.pageSize,
           viewMode: pagination.viewMode,
-          // Restore default values for sets
-          showSubsets: true,
-          includeSubsetsInSets: false,
-          sortBy: preserveGoal && currentSortBy ? currentSortBy : 'releasedAt',
-          sortOrder: preserveGoal && currentSortOrder ? currentSortOrder : 'desc',
+
+          // Restore user preferences (NOT hard-coded defaults!)
+          showSubsets: prefs.showSubsets,
+          includeSubsetsInSets: prefs.includeSubsetsInSets,
+          sortBy: prefs.sortBy,
+          sortOrder: prefs.sortOrder,
+
+          // Note: Search fields (name, code, setCategories, setTypes, etc.)
+          // are intentionally NOT set here - they remain undefined (cleared)
         };
-        // Preserve goal if requested
+
+        // Preserve goal/location if requested
         if (preserveGoal && currentGoalId !== undefined) {
           state.setsSearchParams.selectedGoalId = currentGoalId;
         }
-        // Preserve location if requested
         if (preserveLocation && currentLocationId !== undefined) {
           state.setsSearchParams.selectedLocationId = currentLocationId;
         }
       }
-      
-      // Only clear selected goal if not preserving it
+
+      // Clear goal/location if not preserving
       if (!preserveGoal) {
         delete state.cardsSearchParams.selectedGoalId;
         delete state.setsSearchParams.selectedGoalId;
       }
-      
-      // Only clear selected location if not preserving it
+
       if (!preserveLocation) {
         delete state.cardsSearchParams.selectedLocationId;
         delete state.setsSearchParams.selectedLocationId;
       }
+
+      // Clear sessionStorage search state
+      clearSearchState(state.viewContentType);
     },
     resetAllSearches: (state) => {
-      // Reset both cards and sets search params but preserve pagination
+      // Get user preferences from localStorage
+      const cardsPrefs = getCardsPreferences();
+      const setsPrefs = getSetsPreferences();
+
+      // Preserve pagination
       const cardsPagination = {
         currentPage: state.cardsSearchParams.currentPage || 1,
         pageSize: state.cardsSearchParams.pageSize || 20,
@@ -417,24 +449,25 @@ export const browseSlice = createSlice({
       };
 
       state.cardsSearchParams = {
-        currentPage: cardsPagination.currentPage,
-        pageSize: cardsPagination.pageSize,
-        viewMode: cardsPagination.viewMode,
-        // Restore default values for cards
-        sortBy: 'releasedAt',
-        sortOrder: 'asc',
+        ...cardsPagination,
+        // Restore user preferences
+        sortBy: cardsPrefs.sortBy,
+        sortOrder: cardsPrefs.sortOrder,
+        ...(cardsPrefs.oneResultPerCardName ? { oneResultPerCardName: true } : {}),
       };
 
       state.setsSearchParams = {
-        currentPage: setsPagination.currentPage,
-        pageSize: setsPagination.pageSize,
-        viewMode: setsPagination.viewMode,
-        // Restore default values for sets
-        showSubsets: true,
-        includeSubsetsInSets: false,
-        sortBy: 'releasedAt',
-        sortOrder: 'desc',
+        ...setsPagination,
+        // Restore user preferences
+        showSubsets: setsPrefs.showSubsets,
+        includeSubsetsInSets: setsPrefs.includeSubsetsInSets,
+        sortBy: setsPrefs.sortBy,
+        sortOrder: setsPrefs.sortOrder,
       };
+
+      // Clear sessionStorage for both views
+      clearSearchState('cards');
+      clearSearchState('sets');
     },
     setViewContentType: (state, action: PayloadAction<'cards' | 'sets'>) => {
       // Skip action if it would reapply the same value

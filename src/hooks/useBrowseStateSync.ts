@@ -6,6 +6,8 @@ import { convertStateToUrlParams, parseUrlToState } from '@/features/browse/sche
 import { useCardsPageSize } from '@/hooks/useCardsPageSize';
 import { useSetsPageSize } from '@/hooks/useSetsPageSize';
 import { usePreferredCardViewMode, usePreferredSetViewMode } from '@/contexts/DisplaySettingsContext';
+import { useBrowsePreferencesReady } from '@/hooks/useBrowsePreferences';
+import { loadSearchState, saveSearchState } from '@/hooks/useSearchStateSync';
 import {
   resetAllSearches,
   selectCardSearchParams,
@@ -37,7 +39,7 @@ export function useBrowseStateSync() {
 
   const [cardsPageSize, , cardsPageSizeReady] = useCardsPageSize();
   const [setsPageSize, , setsPageSizeReady] = useSetsPageSize();
-  
+  const preferencesReady = useBrowsePreferencesReady();
 
   // Track if we need to update Redux state with localStorage values
   const hasLoadedFromLocalStorage = useRef(false);
@@ -54,9 +56,9 @@ export function useBrowseStateSync() {
    * ------------------------------------------------------------------ */
   useEffect(() => {
     if (hasInit.current) return;
-    
-    // Wait for localStorage values to be ready
-    if (!cardsPageSizeReady || !setsPageSizeReady) {
+
+    // Wait for localStorage values to be ready (including preferences)
+    if (!cardsPageSizeReady || !setsPageSizeReady || !preferencesReady) {
       return;
     }
 
@@ -78,11 +80,38 @@ export function useBrowseStateSync() {
     );
 
     if (!hasSearchParams) {
-      // No search params in URL - reset to defaults
-      dispatch(resetAllSearches());
-      // Then update pagination from localStorage
-      dispatch(setCardPagination({ pageSize: cardsPageSize }));
-      dispatch(setSetPagination({ pageSize: setsPageSize }));
+      // No URL params - try to restore from sessionStorage
+      const cardsSessionState = loadSearchState('cards');
+      const setsSessionState = loadSearchState('sets');
+
+      if (cardsSessionState && Object.keys(cardsSessionState).length > 0) {
+        // Restore cards search state from sessionStorage
+        dispatch(
+          setCardSearchParams({
+            ...cardsSessionState,
+            currentPage: 1,
+            pageSize: cardsPageSize,
+          }),
+        );
+      } else {
+        // No session state - reset to defaults (which includes preferences from localStorage)
+        dispatch(resetAllSearches());
+        dispatch(setCardPagination({ pageSize: cardsPageSize }));
+      }
+
+      if (setsSessionState && Object.keys(setsSessionState).length > 0) {
+        // Restore sets search state from sessionStorage
+        dispatch(
+          setSetSearchParams({
+            ...setsSessionState,
+            currentPage: 1,
+            pageSize: setsPageSize,
+          }),
+        );
+      } else {
+        // No session state - reset to defaults (which includes preferences from localStorage)
+        dispatch(setSetPagination({ pageSize: setsPageSize }));
+      }
     } else {
       // Initialize with localStorage values for page size
       // Only update fields that are present in the URL, preserving Redux defaults
@@ -125,7 +154,7 @@ export function useBrowseStateSync() {
 
     // Mark that we've already loaded from localStorage during initialization
     hasLoadedFromLocalStorage.current = true;
-  }, [dispatch, search, cardsPageSize, setsPageSize, cardsPageSizeReady, setsPageSizeReady, pathname]);
+  }, [dispatch, search, cardsPageSize, setsPageSize, cardsPageSizeReady, setsPageSizeReady, preferencesReady, pathname]);
 
   /** ------------------------------------------------------------------
    *  Handle URL changes after initialization
@@ -144,11 +173,38 @@ export function useBrowseStateSync() {
     );
 
     if (!hasSearchParams) {
-      // No search params in URL - reset to defaults
-      dispatch(resetAllSearches());
-      // Update pagination from localStorage
-      dispatch(setCardPagination({ pageSize: cardsPageSize }));
-      dispatch(setSetPagination({ pageSize: setsPageSize }));
+      // No URL params - try to restore from sessionStorage
+      const cardsSessionState = loadSearchState('cards');
+      const setsSessionState = loadSearchState('sets');
+
+      if (cardsSessionState && Object.keys(cardsSessionState).length > 0) {
+        // Restore cards search state from sessionStorage
+        dispatch(
+          setCardSearchParams({
+            ...cardsSessionState,
+            currentPage: 1,
+            pageSize: cardsPageSize,
+          }),
+        );
+      } else {
+        // No session state - reset to defaults (which includes preferences from localStorage)
+        dispatch(resetAllSearches());
+        dispatch(setCardPagination({ pageSize: cardsPageSize }));
+      }
+
+      if (setsSessionState && Object.keys(setsSessionState).length > 0) {
+        // Restore sets search state from sessionStorage
+        dispatch(
+          setSetSearchParams({
+            ...setsSessionState,
+            currentPage: 1,
+            pageSize: setsPageSize,
+          }),
+        );
+      } else {
+        // No session state - reset to defaults (which includes preferences from localStorage)
+        dispatch(setSetPagination({ pageSize: setsPageSize }));
+      }
     } else {
       // Always reset first to ensure clean state
       dispatch(resetAllSearches());
@@ -271,6 +327,16 @@ export function useBrowseStateSync() {
   }, [viewType, cardState, setState, dispatch]);
 
 
+  /** ------------------------------------------------------------------
+   *  Sync search state to sessionStorage (for F5 refresh restore)
+   * ------------------------------------------------------------------ */
+  useEffect(() => {
+    if (!hasInit.current) return;
+
+    // Save current search state to sessionStorage
+    saveSearchState(viewType, viewType === 'cards' ? cardState : setState);
+  }, [viewType, cardState, setState]);
+
   const updatePagination = useCallback(
     (update: Partial<BrowsePagination>) => dispatch(setPagination(update)),
     [dispatch],
@@ -281,8 +347,8 @@ export function useBrowseStateSync() {
   const pageSize = viewType === 'cards' ? cardsPageSize : setsPageSize;
 
   // Don't return valid pagination until we've initialized with localStorage values
-  const isReady = hasInit.current && cardsPageSizeReady && setsPageSizeReady;
-  
+  const isReady = hasInit.current && cardsPageSizeReady && setsPageSizeReady && preferencesReady;
+
   return {
     pagination: {
       currentPage: activeState.currentPage ?? 1,

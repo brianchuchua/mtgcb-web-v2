@@ -17,6 +17,7 @@ import { SetPageBuyButton } from '@/components/sets/SetPageBuyButton';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
+import { clearSpecificSearchField } from '@/hooks/useSearchStateSync';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
@@ -89,6 +90,15 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
 
   const parentSet = parentSetData?.data?.set;
 
+  // Clean up filter when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(setSets({ include: [], exclude: [] }));
+      // Clear sets filter from sessionStorage on unmount
+      clearSpecificSearchField('cards', 'sets');
+    };
+  }, [dispatch]);
+
   // Set the filter and view when set data loads
   useEffect(() => {
     // Always set view to cards for this page
@@ -103,6 +113,9 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
       };
 
       dispatch(setSets(setFilter));
+
+      // Clear sets filter from sessionStorage since this is page context, not user input
+      clearSpecificSearchField('cards', 'sets');
     }
   }, [dispatch, setsData, isSuccess]);
 

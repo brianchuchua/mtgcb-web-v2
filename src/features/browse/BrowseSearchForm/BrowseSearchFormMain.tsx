@@ -11,6 +11,15 @@ import LocationSelector from '@/features/browse/LocationSelector';
 import AdvancedFilters from '@/features/browse/AdvancedFilters';
 import { useViewModeToggle } from '@/hooks/useViewModeToggle';
 import {
+  usePreferredCardsSortBy,
+  usePreferredCardsSortOrder,
+  usePreferredSetsSortBy,
+  usePreferredSetsSortOrder,
+  usePreferredOneResultPerCardName,
+  usePreferredShowSubsets,
+  usePreferredIncludeSubsetsInSets,
+} from '@/hooks/useBrowsePreferences';
+import {
   resetSearch,
   selectArtist,
   selectCardSearchName,
@@ -58,6 +67,15 @@ const BrowseSearchForm: React.FC = () => {
   const selectedGoalId = useSelector(selectSelectedGoalId);
 
   const { pathname, isSetPage, isCollectionPage, isCollectionSetPage, userId } = useBrowseUrlContext();
+
+  // localStorage hooks for persisting user preferences
+  const [, setPreferredCardsSortBy] = usePreferredCardsSortBy();
+  const [, setPreferredCardsSortOrder] = usePreferredCardsSortOrder();
+  const [, setPreferredSetsSortBy] = usePreferredSetsSortBy();
+  const [, setPreferredSetsSortOrder] = usePreferredSetsSortOrder();
+  const [, setPreferredOnePerCard] = usePreferredOneResultPerCardName();
+  const [, setPreferredShowSubsets] = usePreferredShowSubsets();
+  const [, setPreferredIncludeSubsets] = usePreferredIncludeSubsetsInSets();
 
   const {
     localCardName,
@@ -107,25 +125,46 @@ const BrowseSearchForm: React.FC = () => {
   };
 
   const handleOneResultPerCardNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setOneResultPerCardName(e.target.checked));
+    const checked = e.target.checked;
+    dispatch(setOneResultPerCardName(checked));
+    setPreferredOnePerCard(checked); // Save to localStorage
   };
 
   const handleShowSubsetsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setShowSubsets(e.target.checked));
+    const checked = e.target.checked;
+    dispatch(setShowSubsets(checked));
+    setPreferredShowSubsets(checked); // Save to localStorage
   };
 
   const handleIncludeSubsetsInSetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setIncludeSubsetsInSet(e.target.checked));
+    const checked = e.target.checked;
+    dispatch(setIncludeSubsetsInSet(checked));
+    setPreferredIncludeSubsets(checked); // Save to localStorage
   };
 
   const handleSortByChange = (e: SelectChangeEvent<SortByOption>) => {
     const newSortBy = e.target.value as SortByOption;
     dispatch(setSortBy(newSortBy));
     handlePriceSortChange(newSortBy);
+
+    // Save to localStorage based on current view
+    if (contentType === 'cards') {
+      setPreferredCardsSortBy(newSortBy);
+    } else {
+      setPreferredSetsSortBy(newSortBy);
+    }
   };
 
   const handleSortOrderChange = (e: SelectChangeEvent<SortOrderOption>) => {
-    dispatch(setSortOrder(e.target.value as SortOrderOption));
+    const newSortOrder = e.target.value as SortOrderOption;
+    dispatch(setSortOrder(newSortOrder));
+
+    // Save to localStorage based on current view
+    if (contentType === 'cards') {
+      setPreferredCardsSortOrder(newSortOrder);
+    } else {
+      setPreferredSetsSortOrder(newSortOrder);
+    }
   };
 
   const handleResetSearch = () => {
