@@ -17,7 +17,8 @@ import {
   TypeFilter,
 } from '@/types/browse';
 import { getCardsPreferences, getSetsPreferences } from './preferences';
-import { clearSearchState } from '@/hooks/useSearchStateSync';
+import { clearSearchState, loadSearchState } from '@/hooks/useSearchStateSync';
+import { parseUrlToState } from '@/features/browse/schema/urlStateAdapters';
 
 // Type for resetSearch options
 interface ResetSearchOptions {
@@ -25,42 +26,116 @@ interface ResetSearchOptions {
   preserveLocation?: boolean;
 }
 
-// Initialize with default pagination values for both card and set views
-// User preferences are loaded from localStorage
-const cardsPrefs = getCardsPreferences();
-const setsPrefs = getSetsPreferences();
+/**
+ * Get default state structure with user preferences from localStorage
+ */
+function getDefaultState(): BrowseState {
+  const cardsPrefs = getCardsPreferences();
+  const setsPrefs = getSetsPreferences();
 
-const initialState: {
-  cardsSearchParams: BrowseSearchParams;
-  setsSearchParams: BrowseSearchParams;
-  viewContentType: 'cards' | 'sets';
-} = {
-  cardsSearchParams: {
-    // Default pagination for cards
-    currentPage: 1,
-    pageSize: 20, // Will be overridden by localStorage in useBrowseStateSync
-    viewMode: 'grid', // Will be overridden by DisplaySettingsContext
+  return {
+    cardsSearchParams: {
+      // Default pagination for cards
+      currentPage: 1,
+      pageSize: 20, // Will be overridden by localStorage in useBrowseStateSync
+      viewMode: 'grid', // Will be overridden by DisplaySettingsContext
 
-    // User preferences from localStorage
-    sortBy: cardsPrefs.sortBy,
-    sortOrder: cardsPrefs.sortOrder,
-    // Only set oneResultPerCardName if it's true (undefined otherwise)
-    ...(cardsPrefs.oneResultPerCardName ? { oneResultPerCardName: true } : {}),
-  },
-  setsSearchParams: {
-    // Default pagination for sets
-    currentPage: 1,
-    pageSize: 20, // Will be overridden by localStorage in useBrowseStateSync
-    viewMode: 'grid', // Will be overridden by DisplaySettingsContext
+      // User preferences from localStorage
+      sortBy: cardsPrefs.sortBy,
+      sortOrder: cardsPrefs.sortOrder,
+      // Only set oneResultPerCardName if it's true (undefined otherwise)
+      ...(cardsPrefs.oneResultPerCardName ? { oneResultPerCardName: true } : {}),
+    },
+    setsSearchParams: {
+      // Default pagination for sets
+      currentPage: 1,
+      pageSize: 20, // Will be overridden by localStorage in useBrowseStateSync
+      viewMode: 'grid', // Will be overridden by DisplaySettingsContext
 
-    // User preferences from localStorage
-    showSubsets: setsPrefs.showSubsets,
-    includeSubsetsInSets: setsPrefs.includeSubsetsInSets,
-    sortBy: setsPrefs.sortBy,
-    sortOrder: setsPrefs.sortOrder,
-  },
-  viewContentType: 'sets', // Default to sets view
-};
+      // User preferences from localStorage
+      showSubsets: setsPrefs.showSubsets,
+      includeSubsetsInSets: setsPrefs.includeSubsetsInSets,
+      sortBy: setsPrefs.sortBy,
+      sortOrder: setsPrefs.sortOrder,
+    },
+    viewContentType: 'sets', // Default to sets view
+  };
+}
+
+/**
+ * Initialize Redux state synchronously from URL or sessionStorage
+ *
+ * Priority hierarchy:
+ * 1. URL parameters (highest - for shared links)
+ * 2. sessionStorage (active search from F5 refresh)
+ * 3. localStorage preferences (sort, pageSize, etc.)
+ * 4. Hardcoded defaults
+ *
+ * This eliminates the "flash of empty state" by having correct values at T0
+ */
+function getInitialState(): BrowseState {
+  // SSR: Return defaults (no window available)
+  if (typeof window === 'undefined') {
+    return getDefaultState();
+  }
+
+  try {
+    const defaults = getDefaultState();
+
+    // Check if URL has search parameters (excluding contentType)
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasUrlSearchParams = Array.from(urlParams.entries())
+      .filter(([key]) => key !== 'contentType')
+      .length > 0;
+
+    if (hasUrlSearchParams) {
+      // URL has params - parse and merge (URL has highest priority)
+      console.log('[browseSlice] 🔗 Initializing from URL:', window.location.search);
+      const cardsFromUrl = parseUrlToState(urlParams, 'cards');
+      const setsFromUrl = parseUrlToState(urlParams, 'sets');
+
+      return {
+        ...defaults,
+        cardsSearchParams: {
+          ...defaults.cardsSearchParams,
+          ...cardsFromUrl,
+        },
+        setsSearchParams: {
+          ...defaults.setsSearchParams,
+          ...setsFromUrl,
+        },
+      };
+    } else {
+      // No URL params - try loading from sessionStorage
+      const cardsSession = loadSearchState('cards');
+      const setsSession = loadSearchState('sets');
+
+      if (cardsSession || setsSession) {
+        console.log('[browseSlice] 💾 Initializing from sessionStorage:', {
+          cards: cardsSession?.name || '(no cards search)',
+          sets: setsSession?.name || '(no sets search)',
+        });
+      }
+
+      return {
+        ...defaults,
+        cardsSearchParams: {
+          ...defaults.cardsSearchParams,
+          ...(cardsSession || {}),
+        },
+        setsSearchParams: {
+          ...defaults.setsSearchParams,
+          ...(setsSession || {}),
+        },
+      };
+    }
+  } catch (error) {
+    console.warn('[browseSlice] ⚠️  Failed to initialize from URL/sessionStorage:', error);
+    return getDefaultState();
+  }
+}
+
+const initialState = getInitialState();
 
 export const browseSlice = createSlice({
   name: 'browse',
@@ -464,9 +539,10 @@ export const browseSlice = createSlice({
         sortOrder: setsPrefs.sortOrder,
       };
 
-      // Clear sessionStorage for both views
-      clearSearchState('cards');
-      clearSearchState('sets');
+      // NOTE: Don't clear sessionStorage here - this action is used for URL changes
+      // SessionStorage should only be cleared by explicit user actions (resetSearch button)
+      // The empty Redux state will trigger our useSearchStateSessionSync to skip saving,
+      // which preserves existing sessionStorage for cross-view restoration
     },
     setViewContentType: (state, action: PayloadAction<'cards' | 'sets'>) => {
       // Skip action if it would reapply the same value

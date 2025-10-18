@@ -110,7 +110,9 @@ export interface BrowsePagination {
 }
 
 export interface BrowseState {
-  searchParams: BrowseSearchParams;
+  cardsSearchParams: BrowseSearchParams;
+  setsSearchParams: BrowseSearchParams;
+  viewContentType: 'cards' | 'sets';
 }
 
 export const MTG_COLORS = ['W', 'U', 'B', 'R', 'G'] as const;

@@ -428,14 +428,15 @@ describe('useBrowseStateSync', () => {
       // Clear previous calls
       saveSearchState.mockClear();
 
-      // Change search
+      // Change cards search - should save cards state (not sets, even though we're in sets view)
       const { setCardSearchParams } = require('@/redux/slices/browse');
       store.dispatch(setCardSearchParams({ name: 'dragon' }));
 
       await waitFor(() => {
+        // NEW BEHAVIOR: Changing cardSearchParams saves 'cards' state independently
         expect(saveSearchState).toHaveBeenCalledWith(
-          'sets', // Default view is 'sets'
-          expect.anything()
+          'cards', // Changed from 'sets' - saves the state that actually changed
+          expect.objectContaining({ name: 'dragon' })
         );
       });
     });

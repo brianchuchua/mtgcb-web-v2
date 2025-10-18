@@ -6,7 +6,7 @@
 import React, { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions, renderHook, RenderHookOptions } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import { configureStore, PreloadedState } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import rootReducer, { RootState } from '@/redux/rootReducer';
 import { mtgcbApi } from '@/api/mtgcbApi';
 
@@ -14,10 +14,10 @@ import { mtgcbApi } from '@/api/mtgcbApi';
  * Create a fresh Redux store for testing
  * Use this in beforeEach to ensure test isolation
  */
-export function createTestStore(preloadedState?: PreloadedState<RootState>) {
+export function createTestStore(preloadedState?: Partial<RootState>) {
   return configureStore({
     reducer: rootReducer,
-    preloadedState,
+    preloadedState: preloadedState as any,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false, // Disable for tests (Redux Toolkit middleware)
@@ -36,7 +36,7 @@ export function renderWithRedux(
     store = createTestStore(preloadedState),
     ...renderOptions
   }: {
-    preloadedState?: PreloadedState<RootState>;
+    preloadedState?: Partial<RootState>;
     store?: ReturnType<typeof createTestStore>;
   } & Omit<RenderOptions, 'wrapper'> = {}
 ) {
@@ -61,7 +61,7 @@ export function renderHookWithRedux<Result, Props>(
     store = createTestStore(preloadedState),
     ...renderOptions
   }: {
-    preloadedState?: PreloadedState<RootState>;
+    preloadedState?: Partial<RootState>;
     store?: ReturnType<typeof createTestStore>;
   } & Omit<RenderHookOptions<Props>, 'wrapper'> = {}
 ) {

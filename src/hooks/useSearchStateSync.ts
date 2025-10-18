@@ -88,8 +88,12 @@ export function loadSearchState(view: 'cards' | 'sets'): Partial<BrowseSearchPar
 
 /**
  * Save search state to sessionStorage
+ *
+ * @param view - The view being saved ('cards' or 'sets')
+ * @param searchParams - The search parameters to save
+ * @param activeView - The currently active view (only remove sessionStorage when clearing active view)
  */
-export function saveSearchState(view: 'cards' | 'sets', searchParams: BrowseSearchParams): void {
+export function saveSearchState(view: 'cards' | 'sets', searchParams: BrowseSearchParams, activeView?: 'cards' | 'sets'): void {
   if (typeof window === 'undefined') {
     return;
   }
@@ -98,12 +102,37 @@ export function saveSearchState(view: 'cards' | 'sets', searchParams: BrowseSear
     const key = `mtgcb_search_state_${view}`;
     const searchState = extractSearchState(searchParams);
 
-    // If search state is empty, remove from sessionStorage
+    // If search state is empty
     if (Object.keys(searchState).length === 0) {
-      sessionStorage.removeItem(key);
-    } else {
-      sessionStorage.setItem(key, JSON.stringify(searchState));
+      // Check if sessionStorage has existing data for this view
+      const existingData = sessionStorage.getItem(key);
+
+      if (existingData) {
+        // Only remove sessionStorage if we're clearing the ACTIVE view
+        // This prevents clearing inactive view's sessionStorage when switching views
+        if (activeView === view) {
+          console.log(`[saveSearchState] ❌ REMOVE ${view}:`, 'state cleared by user');
+          sessionStorage.removeItem(key);
+        } else {
+          console.log(`[saveSearchState] ⏭️  SKIP ${view}:`, 'inactive view, preserving sessionStorage');
+        }
+      } else {
+        // No existing data, state was always empty - skip
+        console.log(`[saveSearchState] ⏭️  SKIP ${view}:`, 'empty state (no existing data)');
+      }
+      return;
     }
+
+    console.log(`[saveSearchState] ✅ SAVE ${view}:`, { name: searchState.name });
+    sessionStorage.setItem(key, JSON.stringify(searchState));
+
+    // Log current sessionStorage state
+    const cardsStored = sessionStorage.getItem('mtgcb_search_state_cards');
+    const setsStored = sessionStorage.getItem('mtgcb_search_state_sets');
+    console.log('[saveSearchState] 📦 Storage:', {
+      cards: cardsStored ? JSON.parse(cardsStored).name || '(has data)' : null,
+      sets: setsStored ? JSON.parse(setsStored).name || '(has data)' : null,
+    });
   } catch (error) {
     console.warn('Failed to save search state to sessionStorage:', error);
   }
