@@ -42,6 +42,8 @@ import { useSetPageFilter } from '@/hooks/useSetPageFilter';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import {
   resetSearch,
+  clearSelectedGoal,
+  clearSelectedLocation,
   selectCardSearchParams,
   selectIncludeSubsetsInSets,
   selectSelectedGoalId,
@@ -473,7 +475,13 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   if (!set && !isSetLoading) {
     const handleResetSearch = () => {
-      dispatch(resetSearch());
+      // Clear goal and location explicitly before resetting search
+      // This ensures proper query invalidation (prevents double-click bug)
+      dispatch(clearSelectedGoal());
+      dispatch(clearSelectedLocation());
+
+      // Reset all other search fields
+      dispatch(resetSearch({ preserveGoal: false, preserveLocation: false }));
     };
 
     return (

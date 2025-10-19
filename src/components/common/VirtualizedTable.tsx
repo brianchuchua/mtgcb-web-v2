@@ -49,6 +49,7 @@ export interface VirtualizedTableProps<T> {
   sortOrder?: 'asc' | 'desc';
   onSortChange?: (columnId: string) => void;
   emptyMessage?: string;
+  emptyStateComponent?: React.ReactNode;
   computeItemKey?: (index: number) => string | number;
   tableWidth?: number;
   getRowProps?: (item: T) => { isIncomplete?: boolean };
@@ -63,6 +64,7 @@ const VirtualizedTable = <T,>({
   sortOrder = 'asc',
   onSortChange,
   emptyMessage = 'No items found',
+  emptyStateComponent,
   computeItemKey,
   tableWidth,
   getRowProps,
@@ -116,6 +118,9 @@ const VirtualizedTable = <T,>({
   // Empty state rendering
   const hasNoItems = !isLoading && (!items || items.length === 0);
   if (hasNoItems) {
+    if (emptyStateComponent) {
+      return <>{emptyStateComponent}</>;
+    }
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
         <Typography variant="h6">{emptyMessage}</Typography>

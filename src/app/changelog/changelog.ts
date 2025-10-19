@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-18',
+      version: '1.0.4',
+      changes: [
+        'Improved empty search results display with helpful message and reset button',
+      ],
+    },
+    {
+      date: '2025-10-18',
       version: '1.0.3',
       changes: [
         'Fixed preferences to persist across browser sessions - your Cards/Sets view toggle, sort options, hide duplicate printings, and subset display settings now remember your choices even after closing the browser',

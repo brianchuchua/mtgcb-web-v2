@@ -21,7 +21,7 @@ import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
-import { resetSearch, selectCardSearchParams, selectIncludeSubsetsInSets } from '@/redux/slices/browse';
+import { resetSearch, clearSelectedGoal, clearSelectedLocation, selectCardSearchParams, selectIncludeSubsetsInSets } from '@/redux/slices/browse';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
 
@@ -122,7 +122,13 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
 
   if (!set && !isSetLoading) {
     const handleResetSearch = () => {
-      dispatch(resetSearch());
+      // Clear goal and location explicitly before resetting search
+      // This ensures proper query invalidation (prevents double-click bug)
+      dispatch(clearSelectedGoal());
+      dispatch(clearSelectedLocation());
+
+      // Reset all other search fields
+      dispatch(resetSearch({ preserveGoal: false, preserveLocation: false }));
     };
 
     return (

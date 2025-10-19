@@ -14,6 +14,7 @@ export interface VirtualizedRowGalleryProps<T> {
   galleryWidth?: number;
   horizontalPadding?: number;
   emptyMessage?: string;
+  emptyStateComponent?: React.ReactNode;
   computeItemKey?: (index: number) => string | number;
   'data-testid'?: string;
 }
@@ -55,6 +56,7 @@ const VirtualizedRowGallery = <T,>({
   galleryWidth = 95,
   horizontalPadding = 0,
   emptyMessage = 'No items found',
+  emptyStateComponent,
   computeItemKey,
   'data-testid': dataTestId,
 }: VirtualizedRowGalleryProps<T>) => {
@@ -74,6 +76,9 @@ const VirtualizedRowGallery = <T,>({
 
   // Only show empty message when not loading and actually have no items
   if (!isLoading && items && items.length === 0) {
+    if (emptyStateComponent) {
+      return <>{emptyStateComponent}</>;
+    }
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
         <Typography variant="h6">{emptyMessage}</Typography>
@@ -133,11 +138,13 @@ const VirtualizedRowGallery = <T,>({
           <CircularProgress />
         </Box>
       ) : rows.length === 0 ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
-          <Typography variant="body1" color="text.secondary">
-            {emptyMessage}
-          </Typography>
-        </Box>
+        emptyStateComponent || (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+            <Typography variant="body1" color="text.secondary">
+              {emptyMessage}
+            </Typography>
+          </Box>
+        )
       ) : (
         <Virtuoso
           useWindowScroll
