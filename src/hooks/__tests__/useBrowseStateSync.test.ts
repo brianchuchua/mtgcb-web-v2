@@ -273,7 +273,7 @@ describe('useBrowseStateSync', () => {
 
       // sessionStorage has old search for cards view
       // Return null for cards since we want URL to win
-      loadSearchState.mockImplementation((viewType) => {
+      loadSearchState.mockImplementation((viewType: 'cards' | 'sets') => {
         if (viewType === 'cards') {
           return null; // No sessionStorage for cards, URL should be used
         }
