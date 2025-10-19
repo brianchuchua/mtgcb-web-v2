@@ -7,7 +7,7 @@ import { convertStateToUrlParams, parseUrlToState } from '@/features/browse/sche
 import { useCardsPageSize } from '@/hooks/useCardsPageSize';
 import { useSetsPageSize } from '@/hooks/useSetsPageSize';
 import { usePreferredCardViewMode, usePreferredSetViewMode } from '@/contexts/DisplaySettingsContext';
-import { useBrowsePreferencesReady } from '@/hooks/useBrowsePreferences';
+import { useBrowsePreferencesReady, usePreferredViewContentType } from '@/hooks/useBrowsePreferences';
 import { loadSearchState, saveSearchState } from '@/hooks/useSearchStateSync';
 import { isSetSpecificPage } from '@/utils/routeHelpers';
 import {
@@ -182,6 +182,7 @@ export function useBrowseStateSync() {
 
   const [cardsPageSize, , cardsPageSizeReady] = useCardsPageSize();
   const [setsPageSize, , setsPageSizeReady] = useSetsPageSize();
+  const [preferredViewContentType, setPreferredViewContentType] = usePreferredViewContentType();
   const preferencesReady = useBrowsePreferencesReady();
 
   const hasInit = useRef(false);
@@ -202,10 +203,38 @@ export function useBrowseStateSync() {
       return;
     }
 
-    // On set-specific pages, always default to cards view
-    const initialView = isSetSpecificPage(pathname) ? 'cards' : (search.get('contentType') === 'cards' ? 'cards' : 'sets');
-    
+    // Determine initial view with priority order:
+    // 1. Set-specific pages force 'cards' (don't save to preference)
+    // 2. URL param overrides preference (save to preference)
+    // 3. localStorage preference
+    // 4. Default to 'sets'
+
+    const setSpecificPage = isSetSpecificPage(pathname);
+    const contentTypeFromUrl = search.get('contentType');
+
+    let initialView: 'cards' | 'sets';
+    let shouldSavePreference = false;
+
+    if (setSpecificPage) {
+      // Set-specific pages always show cards (forced by page context)
+      initialView = 'cards';
+      shouldSavePreference = false; // Don't save forced context
+    } else if (contentTypeFromUrl === 'cards' || contentTypeFromUrl === 'sets') {
+      // URL param present - respect it and save to preference
+      initialView = contentTypeFromUrl;
+      shouldSavePreference = true;
+    } else {
+      // No URL param, not on set page - use localStorage preference
+      initialView = preferredViewContentType;
+      shouldSavePreference = false; // Already saved, don't re-save
+    }
+
     dispatch(setViewContentType(initialView));
+
+    // Save preference if URL param was used
+    if (shouldSavePreference && initialView !== preferredViewContentType) {
+      setPreferredViewContentType(initialView);
+    }
 
     // Sync Redux from URL or sessionStorage (initialization)
     syncReduxFromUrlOrSession(search, dispatch, cardsPageSize, setsPageSize, pathname, {
@@ -216,7 +245,7 @@ export function useBrowseStateSync() {
 
     prevView.current = initialView;
     hasInit.current = true;
-  }, [dispatch, search, cardsPageSize, setsPageSize, cardsPageSizeReady, setsPageSizeReady, preferencesReady, pathname]);
+  }, [dispatch, search, cardsPageSize, setsPageSize, cardsPageSizeReady, setsPageSizeReady, preferencesReady, pathname, preferredViewContentType, setPreferredViewContentType]);
 
   /** ------------------------------------------------------------------
    *  Handle URL changes after initialization
@@ -309,6 +338,21 @@ export function useBrowseStateSync() {
 
     prevView.current = viewType;
   }, [viewType, cardState, setState, pathname, router, dispatch, cardsPageSize, setsPageSize]);
+
+  /** ------------------------------------------------------------------
+   *  Save viewContentType preference to localStorage when it changes
+   * ------------------------------------------------------------------ */
+  useEffect(() => {
+    if (!hasInit.current) return;
+
+    // Only save if user explicitly changed view on a browse page
+    // Don't save if we're on a set-specific page (forced context)
+    const setSpecificPage = isSetSpecificPage(pathname);
+
+    if (!setSpecificPage && viewType !== preferredViewContentType) {
+      setPreferredViewContentType(viewType);
+    }
+  }, [viewType, pathname, preferredViewContentType, setPreferredViewContentType]);
 
   /** ------------------------------------------------------------------
    *  When *search state* changes, rewrite the URL (debounced)

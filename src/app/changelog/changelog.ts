@@ -11,11 +11,19 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-18',
+      version: '1.0.3',
+      changes: [
+        'Fixed preferences to persist across browser sessions - your Cards/Sets view toggle, sort options, hide duplicate printings, and subset display settings now remember your choices even after closing the browser',
+        'Search filters (name, colors, types, sets, etc.) continue to persist until you close the browser tab, allowing you to refresh the page or browse sets without losing your search',
+        'Reset Search button now clears search filters while preserving your preferred view settings',
+        'Moved Add or Remove Cards to the main navigation menu for easier access',
+      ],
+    },
+    {
       date: '2025-10-15',
       version: '1.0.2',
-      changes: [
-        'Fixed Jump to Set menu not working correctly when used from the Add or Remove Cards page',
-      ],
+      changes: ['Fixed Jump to Set menu not working correctly when used from the Add or Remove Cards page'],
     },
     {
       date: '2025-10-15',

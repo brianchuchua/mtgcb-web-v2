@@ -94,7 +94,6 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
   // Auto-open collection menu when on collection-related pages
   useEffect(() => {
     const isOnCollectionPage =
-      pathname?.startsWith('/collections/edit-cards') ||
       pathname === '/goals' ||
       pathname?.startsWith('/goals/') ||
       pathname?.startsWith('/locations') ||
@@ -200,9 +199,22 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
 
                 <ListItem disablePadding>
                   <ListItemButton
+                    component={Link}
+                    href="/collections/edit-cards"
+                    selected={pathname?.startsWith('/collections/edit-cards')}
+                    onClick={handleClick}
+                  >
+                    <ListItemIcon>
+                      <IsoIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Add or Remove Cards" />
+                  </ListItemButton>
+                </ListItem>
+
+                <ListItem disablePadding>
+                  <ListItemButton
                     onClick={() => setIsCollectionMenuOpen(!isCollectionMenuOpen)}
                     selected={
-                      pathname?.startsWith('/collections/edit-cards') ||
                       pathname === '/goals' ||
                       pathname?.startsWith('/goals/') ||
                       pathname?.startsWith('/locations') ||
@@ -228,20 +240,6 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
             {isAuthenticated && user?.userId && (
               <Collapse in={isCollectionMenuOpen} timeout="auto">
                 <List component="div" disablePadding>
-                  <ListItem disablePadding>
-                    <ListItemButton
-                      component={Link}
-                      href="/collections/edit-cards"
-                      selected={pathname?.startsWith('/collections/edit-cards')}
-                      onClick={handleClick}
-                      sx={{ pl: 4 }}
-                    >
-                      <ListItemIcon>
-                        <IsoIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Add or Remove Cards" />
-                    </ListItemButton>
-                  </ListItem>
                   <ListItem disablePadding>
                     <ListItemButton
                       component={Link}

@@ -25,6 +25,7 @@ jest.mock('@/contexts/DisplaySettingsContext', () => ({
 
 jest.mock('../useBrowsePreferences', () => ({
   useBrowsePreferencesReady: jest.fn(() => true), // All preferences loaded
+  usePreferredViewContentType: jest.fn(() => ['sets', jest.fn(), true]), // [value, setter, isReady]
 }));
 
 jest.mock('../useSearchStateSync', () => ({

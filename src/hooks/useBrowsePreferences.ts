@@ -67,6 +67,15 @@ export function usePreferredIncludeSubsetsInSets() {
   return [value, setValue, isReady] as const;
 }
 
+// View Content Type Preference (Global)
+export function usePreferredViewContentType() {
+  const [value, setValue, isReady] = useLocalStorage<'cards' | 'sets'>(
+    'mtgcb_preferred_view_content_type',
+    'sets'
+  );
+  return [value, setValue, isReady] as const;
+}
+
 /**
  * Helper to check if all preferences are loaded from localStorage
  */
@@ -78,6 +87,7 @@ export function useBrowsePreferencesReady() {
   const [, , onePerCardReady] = usePreferredOneResultPerCardName();
   const [, , showSubsetsReady] = usePreferredShowSubsets();
   const [, , includeSubsetsReady] = usePreferredIncludeSubsetsInSets();
+  const [, , viewContentTypeReady] = usePreferredViewContentType();
 
   return (
     cardsSortByReady &&
@@ -86,6 +96,7 @@ export function useBrowsePreferencesReady() {
     setsSortOrderReady &&
     onePerCardReady &&
     showSubsetsReady &&
-    includeSubsetsReady
+    includeSubsetsReady &&
+    viewContentTypeReady
   );
 }

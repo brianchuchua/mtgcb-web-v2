@@ -64,3 +64,11 @@ export function getSetsPreferences(): BrowsePreferences {
 export function getPreferencesForView(view: 'cards' | 'sets'): BrowsePreferences {
   return view === 'cards' ? getCardsPreferences() : getSetsPreferences();
 }
+
+/**
+ * Get preferred view content type from localStorage
+ * This is a global preference (not per-view like sort preferences)
+ */
+export function getViewContentTypePreference(): 'cards' | 'sets' {
+  return safeGetItem('mtgcb_preferred_view_content_type', 'sets') as 'cards' | 'sets';
+}
