@@ -44,19 +44,19 @@ const CardGridComponent: React.FC<CardGridProps> = ({
   // Memoize the render function to prevent unnecessary re-renders
   const renderItem = useCallback(
     (card: any) => (
-      <CardItemRenderer 
-        card={card} 
-        settings={cardDisplaySettings} 
-        priceType={priceType} 
+      <CardItemRenderer
+        card={card}
+        settings={cardDisplaySettings}
+        priceType={priceType}
         onClick={onCardClick}
         isOwnCollection={isOwnCollection}
         goalId={goalId}
         hasLocations={hasLocations}
       />
     ),
-    [cardDisplaySettings, priceType, onCardClick, isOwnCollection, goalId, hasLocations]
+    [cardDisplaySettings, priceType, onCardClick, isOwnCollection, goalId, hasLocations],
   );
-  
+
   return (
     <VirtualizedRowGallery
       key="browse-card-gallery"
@@ -66,7 +66,7 @@ const CardGridComponent: React.FC<CardGridProps> = ({
       columnsPerRow={gallerySettings.cardsPerRow}
       galleryWidth={100}
       horizontalPadding={gallerySettings.cardSizeMargin}
-      emptyMessage="No cards found"
+      emptyMessage="No cards found matching your search criteria."
       computeItemKey={(index) => {
         const item = items[index];
         if (!item) return index;

@@ -58,16 +58,30 @@ const CardTable: React.FC<CardTableProps> = ({
     locationsIsVisible: tableSettings.locationsIsVisible ?? cardDisplaySettings?.locationsIsVisible,
   };
 
-  const tableColumns = useCardTableColumns({ priceType, displaySettings: mergedDisplaySettings }, sortBy, isOwnCollection, hasLocations);
+  const tableColumns = useCardTableColumns(
+    { priceType, displaySettings: mergedDisplaySettings },
+    sortBy,
+    isOwnCollection,
+    hasLocations,
+  );
 
-  const renderCardRow = useCardRowRenderer(priceType, mergedDisplaySettings, onCardClick, isOwnCollection, goalId, hasLocations);
+  const renderCardRow = useCardRowRenderer(
+    priceType,
+    mergedDisplaySettings,
+    onCardClick,
+    isOwnCollection,
+    goalId,
+    hasLocations,
+  );
 
   const getRowProps = (item: any) => {
     // Check if item exists and goal progress is visible and if the goal is not fully met
-    const isIncomplete = item && cardDisplaySettings?.goalProgressIsVisible && 
+    const isIncomplete =
+      item &&
+      cardDisplaySettings?.goalProgressIsVisible &&
       (item.goalTargetQuantityReg || item.goalTargetQuantityFoil || item.goalTargetQuantityAll) &&
       item.goalFullyMet === false;
-    
+
     return { isIncomplete: !!isIncomplete };
   };
 
@@ -81,7 +95,7 @@ const CardTable: React.FC<CardTableProps> = ({
       sortBy={sortBy}
       sortOrder={sortOrder}
       onSortChange={onSort}
-      emptyMessage="No cards found"
+      emptyMessage="No cards found matching your search criteria."
       computeItemKey={(index) => items[index]?.id || index}
       getRowProps={getRowProps}
     />
