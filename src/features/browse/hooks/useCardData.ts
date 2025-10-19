@@ -34,6 +34,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
   const collectionSettings = useCollectionSettings();
 
   const apiArgs = useMemo(() => {
+
     const params = buildApiParamsFromSearchParams(searchParams, 'cards');
     const selectFields: Array<keyof CardModel> = [
       'name',
@@ -60,7 +61,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       'canBeFoil',
       'canBeNonFoil',
     ];
-    
+
     // Add quantity fields when userId is present
     if (userId) {
       selectFields.push('quantityReg', 'quantityFoil');
@@ -68,7 +69,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
         selectFields.push('locations');
       }
     }
-    
+
     // Add goal progress fields when goal is selected
     if (selectedGoalId && userId) {
       selectFields.push(
@@ -88,20 +89,20 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
         'goalContributingVersions'
       );
     }
-    
-    return {
+
+    const result = {
       ...params,
-      ...(userId && { 
-        userId, 
+      ...(userId && {
+        userId,
         priceType,
         includeLocations: cardDisplaySettings.locationsIsVisible || collectionSettings.tableLocationsIsVisible
       }),
-      ...(selectedGoalId && userId && { 
+      ...(selectedGoalId && userId && {
         goalId: selectedGoalId,
         showGoalProgress: true,
         ...(showGoals !== 'all' && { showGoals })
       }),
-      ...(selectedLocationId && userId && { 
+      ...(selectedLocationId && userId && {
         locationId: selectedLocationId,
         includeChildLocations
       }),
@@ -111,6 +112,8 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       sortDirection: params.sortDirection || ('asc' as const),
       select: selectFields,
     };
+
+    return result;
   }, [searchParams, pagination, userId, priceType, selectedGoalId, showGoals, selectedLocationId, includeChildLocations, cardDisplaySettings.locationsIsVisible, collectionSettings.tableLocationsIsVisible]);
 
   const queryConfig = {

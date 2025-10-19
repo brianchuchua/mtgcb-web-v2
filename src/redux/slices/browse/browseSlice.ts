@@ -90,7 +90,6 @@ function getInitialState(): BrowseState {
 
     if (hasUrlSearchParams) {
       // URL has params - parse and merge (URL has highest priority)
-      console.log('[browseSlice] 🔗 Initializing from URL:', window.location.search);
       const cardsFromUrl = parseUrlToState(urlParams, 'cards');
       const setsFromUrl = parseUrlToState(urlParams, 'sets');
 
@@ -109,13 +108,6 @@ function getInitialState(): BrowseState {
       // No URL params - try loading from sessionStorage
       const cardsSession = loadSearchState('cards');
       const setsSession = loadSearchState('sets');
-
-      if (cardsSession || setsSession) {
-        console.log('[browseSlice] 💾 Initializing from sessionStorage:', {
-          cards: cardsSession?.name || '(no cards search)',
-          sets: setsSession?.name || '(no sets search)',
-        });
-      }
 
       return {
         ...defaults,

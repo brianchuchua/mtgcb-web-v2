@@ -22,19 +22,21 @@ export function useSearchStateSessionSync(
   setState: BrowseSearchParams,
   isInitialized: boolean
 ): void {
-  // Save cards state whenever it changes (independent of active view)
+  // Save cards state ONLY when cards view is active
+  // This prevents overwriting sessionStorage with partial data from inactive view
   useEffect(() => {
     if (!isInitialized) return;
+    if (viewType !== 'cards') return; // Only save when cards is active view
 
-    console.log(`[useSearchStateSessionSync] 🔄 Cards changed:`, cardState.name || '(empty)');
     saveSearchState('cards', cardState, viewType);
   }, [cardState, isInitialized, viewType]);
 
-  // Save sets state whenever it changes (independent of active view)
+  // Save sets state ONLY when sets view is active
+  // This prevents overwriting sessionStorage with partial data from inactive view
   useEffect(() => {
     if (!isInitialized) return;
+    if (viewType !== 'sets') return; // Only save when sets is active view
 
-    console.log(`[useSearchStateSessionSync] 🔄 Sets changed:`, setState.name || '(empty)');
     saveSearchState('sets', setState, viewType);
   }, [setState, isInitialized, viewType]);
 }

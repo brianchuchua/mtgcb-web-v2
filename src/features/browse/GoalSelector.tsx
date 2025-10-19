@@ -41,22 +41,22 @@ const GoalSelector = ({ userId, alwaysShow = false }: GoalSelectorProps) => {
 
   const handleChange = (event: SelectChangeEvent<number | '' | 'create-new-goal'>) => {
     const value = event.target.value;
-    
+
     // Ignore the create new goal option
     if (value === 'create-new-goal') {
       return;
     }
-    
+
     const goalId = value === '' ? null : Number(value);
-    
+
     // Only reset search if the goal is actually changing
     if (goalId !== selectedGoalId) {
       // Reset all search filters but preserve both goal and location selections
       dispatch(resetSearch({ preserveGoal: true, preserveLocation: true }));
-      
+
       // Set the new goal ID
       dispatch(setSelectedGoalId(goalId));
-      
+
       // Only set oneResultPerCardName when a goal is selected
       if (goalId !== null) {
         const selectedGoal = activeGoals.find(goal => goal.id === goalId);

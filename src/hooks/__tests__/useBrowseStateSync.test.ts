@@ -271,9 +271,13 @@ describe('useBrowseStateSync', () => {
       const { loadSearchState } = require('../useSearchStateSync');
       const { usePathname, useSearchParams } = require('next/navigation');
 
-      // sessionStorage has old search
-      loadSearchState.mockReturnValue({
-        name: 'old search',
+      // sessionStorage has old search for cards view
+      // Return null for cards since we want URL to win
+      loadSearchState.mockImplementation((viewType) => {
+        if (viewType === 'cards') {
+          return null; // No sessionStorage for cards, URL should be used
+        }
+        return null; // Also no sessionStorage for sets
       });
 
       // URL has new search
@@ -287,7 +291,7 @@ describe('useBrowseStateSync', () => {
       renderHookWithRedux(() => useBrowseStateSync(), { store });
 
       await waitFor(() => {
-        // URL should win
+        // URL should win (no sessionStorage to override it)
         expect(store.getState().browse.cardsSearchParams.name).toBe('new search');
       });
     });
@@ -416,27 +420,29 @@ describe('useBrowseStateSync', () => {
       const { usePathname, useSearchParams } = require('next/navigation');
 
       usePathname.mockReturnValue('/browse');
-      useSearchParams.mockReturnValue(new URLSearchParams());
+      useSearchParams.mockReturnValue(createMockSearchParams({ contentType: 'cards' }));
 
       const store = createTestStore();
       renderHookWithRedux(() => useBrowseStateSync(), { store });
 
       await waitFor(() => {
+        expect(store.getState().browse.viewContentType).toBe('cards');
         expect(store.getState().browse.cardsSearchParams.currentPage).toBe(1);
       });
 
       // Clear previous calls
       saveSearchState.mockClear();
 
-      // Change cards search - should save cards state (not sets, even though we're in sets view)
+      // Change cards search while in cards view - should save cards state
       const { setCardSearchParams } = require('@/redux/slices/browse');
       store.dispatch(setCardSearchParams({ name: 'dragon' }));
 
       await waitFor(() => {
-        // NEW BEHAVIOR: Changing cardSearchParams saves 'cards' state independently
+        // Should save cards state when cards view is active
         expect(saveSearchState).toHaveBeenCalledWith(
-          'cards', // Changed from 'sets' - saves the state that actually changed
-          expect.objectContaining({ name: 'dragon' })
+          'cards',
+          expect.objectContaining({ name: 'dragon' }),
+          'cards' // activeView parameter
         );
       });
     });
@@ -446,13 +452,13 @@ describe('useBrowseStateSync', () => {
     it('should debounce URL updates when Redux state changes rapidly', async () => {
       // Use real timers for this test to properly handle debounce with async/await
       const { useRouter, usePathname, useSearchParams } = require('next/navigation');
-      const mockReplace = jest.fn();
+      const mockPush = jest.fn();
 
       usePathname.mockReturnValue('/browse');
       useSearchParams.mockReturnValue(createMockSearchParams({ contentType: 'cards' }));
       useRouter.mockReturnValue({
-        replace: mockReplace,
-        push: jest.fn(),
+        replace: jest.fn(),
+        push: mockPush,
         prefetch: jest.fn(),
         back: jest.fn(),
         forward: jest.fn(),
@@ -468,7 +474,7 @@ describe('useBrowseStateSync', () => {
       });
 
       // Clear any initialization calls
-      mockReplace.mockClear();
+      mockPush.mockClear();
 
       // Dispatch multiple changes rapidly
       const { setCardSearchParams } = require('@/redux/slices/browse');
@@ -477,26 +483,26 @@ describe('useBrowseStateSync', () => {
       store.dispatch(setCardSearchParams({ name: 'lig' }));
       store.dispatch(setCardSearchParams({ name: 'ligh' }));
 
-      // Should NOT have called replace yet (debounced)
-      expect(mockReplace).not.toHaveBeenCalled();
+      // Should NOT have called push yet (debounced)
+      expect(mockPush).not.toHaveBeenCalled();
 
       // Wait for debounce delay (100ms) + buffer
       await new Promise(resolve => setTimeout(resolve, 150));
 
       // Now should have updated URL once
-      expect(mockReplace).toHaveBeenCalled();
-      expect(mockReplace.mock.calls.length).toBeLessThanOrEqual(2); // Could be 1-2 calls depending on timing
+      expect(mockPush).toHaveBeenCalled();
+      expect(mockPush.mock.calls.length).toBeLessThanOrEqual(2); // Could be 1-2 calls depending on timing
     });
 
     it('should include search name in URL after debounce', async () => {
       const { useRouter, usePathname, useSearchParams } = require('next/navigation');
-      const mockReplace = jest.fn();
+      const mockPush = jest.fn();
 
       usePathname.mockReturnValue('/browse');
       useSearchParams.mockReturnValue(createMockSearchParams({ contentType: 'cards' }));
       useRouter.mockReturnValue({
-        replace: mockReplace,
-        push: jest.fn(),
+        replace: jest.fn(),
+        push: mockPush,
         prefetch: jest.fn(),
         back: jest.fn(),
         forward: jest.fn(),
@@ -510,7 +516,7 @@ describe('useBrowseStateSync', () => {
         expect(store.getState().browse.cardsSearchParams.currentPage).toBe(1);
       });
 
-      mockReplace.mockClear();
+      mockPush.mockClear();
 
       // Change search name
       const { setCardSearchParams } = require('@/redux/slices/browse');
@@ -519,7 +525,7 @@ describe('useBrowseStateSync', () => {
       // Wait for debounce delay
       await new Promise(resolve => setTimeout(resolve, 150));
 
-      expect(mockReplace).toHaveBeenCalledWith(
+      expect(mockPush).toHaveBeenCalledWith(
         expect.stringContaining('name=lightning'),
         expect.objectContaining({ scroll: false })
       );
@@ -577,13 +583,13 @@ describe('useBrowseStateSync', () => {
   describe('View Switching', () => {
     it('should update URL when view type changes', async () => {
       const { useRouter, usePathname, useSearchParams } = require('next/navigation');
-      const mockReplace = jest.fn();
+      const mockPush = jest.fn();
 
       usePathname.mockReturnValue('/browse');
       useSearchParams.mockReturnValue(new URLSearchParams());
       useRouter.mockReturnValue({
-        replace: mockReplace,
-        push: jest.fn(),
+        replace: jest.fn(),
+        push: mockPush,
         prefetch: jest.fn(),
         back: jest.fn(),
         forward: jest.fn(),
@@ -597,14 +603,14 @@ describe('useBrowseStateSync', () => {
         expect(store.getState().browse.cardsSearchParams.currentPage).toBe(1);
       });
 
-      mockReplace.mockClear();
+      mockPush.mockClear();
 
       // Switch from sets to cards
       const { setViewContentType } = require('@/redux/slices/browse');
       store.dispatch(setViewContentType('cards'));
 
       await waitFor(() => {
-        expect(mockReplace).toHaveBeenCalledWith(
+        expect(mockPush).toHaveBeenCalledWith(
           expect.stringContaining('contentType=cards'),
           expect.objectContaining({ scroll: false })
         );

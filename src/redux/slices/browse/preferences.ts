@@ -21,7 +21,10 @@ function safeGetItem(key: string, defaultValue: string): string {
     return defaultValue;
   }
   try {
-    return localStorage.getItem(key) || defaultValue;
+    const value = localStorage.getItem(key);
+    if (value === null) return defaultValue;
+    // Parse JSON value since useLocalStorage stores values as JSON
+    return JSON.parse(value) as string;
   } catch {
     return defaultValue;
   }
@@ -34,7 +37,8 @@ function safeGetBoolean(key: string, defaultValue: boolean): boolean {
   try {
     const value = localStorage.getItem(key);
     if (value === null) return defaultValue;
-    return value === 'true';
+    // Parse JSON value since useLocalStorage stores values as JSON
+    return JSON.parse(value) as boolean;
   } catch {
     return defaultValue;
   }

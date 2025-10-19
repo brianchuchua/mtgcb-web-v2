@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { BrowseControllerResult } from '@/features/browse/types';
 import { useBrowseController } from '@/features/browse/useBrowseController';
@@ -25,12 +26,27 @@ export const useCollectionBrowseController = ({
   const currentView = isSetSpecificPage ? 'cards' : (reduxView ?? 'sets');
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const { viewMode } = useViewMode(currentView);
-  
+
+  // Track previous Redux and URL goalIds to detect sync direction
+  const prevSelectedGoalIdRef = useRef(selectedGoalId);
+
   // Check if we're waiting for goalId from URL
   const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const hasGoalInUrl = searchParams?.get('goalId') !== null;
   const goalIdFromUrl = searchParams?.get('goalId') ? parseInt(searchParams.get('goalId')!) : null;
-  const isWaitingForGoalSync = hasGoalInUrl && goalIdFromUrl !== selectedGoalId;
+  const prevUrlGoalIdRef = useRef(goalIdFromUrl);
+
+  // Detect what changed
+  const reduxChanged = prevSelectedGoalIdRef.current !== selectedGoalId;
+  const urlChanged = prevUrlGoalIdRef.current !== goalIdFromUrl;
+
+  // Only wait when URL changed (external navigation) but Redux didn't (hasn't synced yet)
+  // Don't wait when Redux changed (user action) - URL will update async
+  const isWaitingForGoalSync = urlChanged && !reduxChanged && hasGoalInUrl && goalIdFromUrl !== selectedGoalId;
+
+  // Update refs for next render
+  prevSelectedGoalIdRef.current = selectedGoalId;
+  prevUrlGoalIdRef.current = goalIdFromUrl;
   
   
   // Use collection-specific display settings

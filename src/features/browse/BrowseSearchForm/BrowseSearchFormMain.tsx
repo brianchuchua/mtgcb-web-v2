@@ -38,6 +38,8 @@ import {
   setShowSubsets,
   setSortBy,
   setSortOrder,
+  clearSelectedGoal,
+  clearSelectedLocation,
 } from '@/redux/slices/browse';
 import { SortByOption, SortOrderOption } from '@/types/browse';
 import CardSearchFields from './components/CardSearchFields';
@@ -168,7 +170,15 @@ const BrowseSearchForm: React.FC = () => {
   };
 
   const handleResetSearch = () => {
-    dispatch(resetSearch());
+    // Clear goal and location explicitly before resetting search
+    // This ensures proper query invalidation (prevents double-click bug)
+    dispatch(clearSelectedGoal());
+
+    dispatch(clearSelectedLocation());
+
+    // Reset all other search fields
+    dispatch(resetSearch({ preserveGoal: false, preserveLocation: false }));
+
     setStatResetTrigger((prev) => prev + 1);
   };
 

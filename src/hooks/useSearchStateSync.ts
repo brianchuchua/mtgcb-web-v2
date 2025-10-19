@@ -24,8 +24,11 @@ const SEARCH_FIELDS: Array<keyof BrowseSearchParams> = [
   'completionStatus',
   'isReserved',
   'includeBadDataOnly',
+  'selectedGoalId',
+  'selectedLocationId',
+  'includeChildLocations',
+  'showGoals',
   // Note: NOT including sort, checkboxes, pagination (those are preferences in localStorage)
-  // Note: NOT including goal/location (those have special handling)
 ];
 
 interface SearchStateSyncOptions {

@@ -57,11 +57,9 @@ function syncReduxFromUrlOrSession(
   if (options.isNavigation) {
     const contentTypeFromUrl = search.get('contentType');
     if (contentTypeFromUrl === 'cards' || contentTypeFromUrl === 'sets') {
-      console.log('[syncReduxFromUrlOrSession] 📺 Setting view type from URL:', contentTypeFromUrl);
       dispatch(setViewContentType(contentTypeFromUrl));
     } else if (!isSetSpecificPage(pathname)) {
       // No contentType in URL and not on set page → default to sets
-      console.log('[syncReduxFromUrlOrSession] 📺 No contentType in URL, defaulting to sets');
       dispatch(setViewContentType('sets'));
     }
   }
@@ -76,13 +74,11 @@ function syncReduxFromUrlOrSession(
     if (options.isNavigation) {
       // User navigated to empty URL (e.g., back button) - respect the empty state
       // Don't restore from sessionStorage, clear the search instead
-      console.log('[syncReduxFromUrlOrSession] 🗑️  Empty URL (navigation) - clearing search state');
       dispatch(resetAllSearches());
       dispatch(setCardPagination({ pageSize: cardsPageSize }));
       dispatch(setSetPagination({ pageSize: setsPageSize }));
     } else {
       // Initial load with no URL params - try to restore from sessionStorage
-      console.log('[syncReduxFromUrlOrSession] 💾 No URL params (init) - trying sessionStorage');
       const cardsSessionState = loadSearchState('cards');
       const setsSessionState = loadSearchState('sets');
 
@@ -234,24 +230,15 @@ export function useBrowseStateSync() {
     // Skip if URL hasn't changed
     if (currentSearchString === prevSearchParamsString.current) return;
 
-    console.log('[useBrowseStateSync] 🔍 URL change detected:', {
-      prev: prevSearchParamsString.current,
-      current: currentSearchString,
-      lastPushed: lastUrlPushed.current,
-      currentUrl,
-    });
-
     // Skip sync if this URL change was initiated by us (Redux→URL sync)
     // This prevents feedback loops where URL→Redux→URL→Redux...
     if (lastUrlPushed.current === currentUrl) {
-      console.log('[useBrowseStateSync] ⏭️  Skip sync - we pushed this URL (Redux→URL)', currentUrl);
       prevSearchParamsString.current = currentSearchString;
       return;
     }
 
     // URL changed externally (user navigation, browser back/forward, shared link)
     // Sync Redux from URL
-    console.log('[useBrowseStateSync] 🔗 External URL change - syncing from URL');
     syncReduxFromUrlOrSession(search, dispatch, cardsPageSize, setsPageSize, pathname, {
       resetBeforeSync: true,   // Reset to ensure clean state
       forcePageOne: false,     // Respect page number from URL
@@ -277,39 +264,33 @@ export function useBrowseStateSync() {
       k => !metadataFields.includes(k)
     );
 
-    console.log('[useBrowseStateSync] 🔍 View changed to:', viewType, 'State keys:', Object.keys(state));
-    console.log('[useBrowseStateSync] 🔍 State without meta:', stateWithoutMeta);
-
     const hasSearchData = stateWithoutMeta.some(k => {
       const value = (state as any)[k];
       const hasData = value !== '' && value !== null && value !== undefined &&
              (!Array.isArray(value) || value.length > 0);
-      if (hasData) {
-        console.log('[useBrowseStateSync] 🔍 Found data in field:', k, '=', value);
-      }
       return hasData;
     });
 
-    console.log('[useBrowseStateSync] 🔍 Has search data?', hasSearchData);
+    // Always try to merge sessionStorage data with current Redux state
+    // This handles the case where URL has shared fields (like goalId) but sessionStorage
+    // has view-specific fields (like locationId for cards)
+    const sessionState = loadSearchState(viewType);
 
-    // If state is empty, try to restore from sessionStorage
-    if (!hasSearchData) {
-      const sessionState = loadSearchState(viewType);
-      console.log('[useBrowseStateSync] 🔍 Session state for', viewType, ':', sessionState);
-      if (sessionState && Object.keys(sessionState).length > 0) {
-        console.log('[useBrowseStateSync] 💾 View changed - restoring from sessionStorage:', sessionState);
+    if (sessionState && Object.keys(sessionState).length > 0) {
 
-        // Update Redux with sessionStorage data
-        const pageSize = viewType === 'cards' ? cardsPageSize : setsPageSize;
-        if (viewType === 'cards') {
-          dispatch(setCardSearchParams({ ...sessionState, currentPage: 1, pageSize }));
-        } else {
-          dispatch(setSetSearchParams({ ...sessionState, currentPage: 1, pageSize }));
-        }
+      // Merge: Redux state (from URL) + sessionStorage data
+      const pageSize = viewType === 'cards' ? cardsPageSize : setsPageSize;
+      const mergedState = { ...state, ...sessionState, currentPage: 1, pageSize };
 
-        // Use sessionStorage data to build URL
-        state = { ...sessionState, currentPage: 1, pageSize };
+      // Update Redux with merged data
+      if (viewType === 'cards') {
+        dispatch(setCardSearchParams(mergedState));
+      } else {
+        dispatch(setSetSearchParams(mergedState));
       }
+
+      // Use merged data to build URL
+      state = mergedState;
     }
 
     // Build URL from Redux state (or restored sessionStorage data)
@@ -323,7 +304,6 @@ export function useBrowseStateSync() {
 
     const url = params.toString() ? `${pathname}?${params}` : pathname;
 
-    console.log('[useBrowseStateSync] 📝 View type changed - updating URL:', url);
     lastUrlPushed.current = url;
     router.push(url, { scroll: false }); // Use push to create history entry
 

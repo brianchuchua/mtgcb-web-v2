@@ -68,7 +68,7 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
   const currentSetsFilter = useSelector(selectSets);
   
   // Determine if we should skip cards query
-  const shouldSkipCards = currentView !== 'cards' || 
+  const shouldSkipCards = currentView !== 'cards' ||
     (options?.skipCardsUntilReady ?? false) ||
     (options?.waitForSetFilter === true && (!currentSetsFilter?.include || currentSetsFilter.include.length === 0));
 
