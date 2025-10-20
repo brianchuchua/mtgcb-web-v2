@@ -40,7 +40,7 @@ const Footer = () => {
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             Card prices are estimates provided by affiliates. Absolutely no guarantee is made for any price or
-            collection value estimates. See the FAQ for more details.
+            collection value estimates or purchase recommendations. See the FAQ for more details.
           </Typography>
         </FooterContent>
       </Container>

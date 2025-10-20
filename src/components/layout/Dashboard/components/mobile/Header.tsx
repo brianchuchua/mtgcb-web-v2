@@ -12,6 +12,7 @@ import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { AccountMenu } from '@/components/layout/Dashboard/components/AccountMenu';
 import { JumpToSetsMenu } from '@/components/layout/Dashboard/components/JumpToSetsMenu';
+import { QuickSearch } from '@/components/layout/Dashboard/components/QuickSearch';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { getLatestRelease } from '@/app/changelog/changelog';
 
@@ -61,6 +62,7 @@ const Header = () => {
               </Tooltip>
             )}
           </Box>
+          <QuickSearch />
           <JumpToSetsMenu />
           <AccountMenu />
         </Toolbar>

@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-19',
+      version: '1.1.0',
+      changes: [
+        'Added Quick Search button in header for fast card name searches from anywhere in the app',
+      ],
+    },
+    {
       date: '2025-10-18',
       version: '1.0.4',
       changes: [
