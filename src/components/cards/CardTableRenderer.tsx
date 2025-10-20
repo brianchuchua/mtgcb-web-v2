@@ -435,13 +435,17 @@ const InlineEditableQuantity: React.FC<{
       setShowSuccess(false);
 
       try {
+        // Only send the quantity that actually changed to prevent race conditions
+        // when rapidly updating both regular and foil quantities
         const promise = updateCollection({
           mode: 'set',
           cards: [
             {
               cardId: parseInt(cardId),
-              quantityReg: quantityType === 'regular' ? newQuantity : otherQuantity,
-              quantityFoil: quantityType === 'foil' ? newQuantity : otherQuantity,
+              // Conditionally include only the field being updated
+              ...(quantityType === 'regular'
+                ? { quantityReg: newQuantity }
+                : { quantityFoil: newQuantity }),
             },
           ],
         });
@@ -465,7 +469,7 @@ const InlineEditableQuantity: React.FC<{
         }
       }
     }, 400),
-    [updateCollection, cardId, cardName, quantityType, otherQuantity, enqueueSnackbar, quantity],
+    [updateCollection, cardId, cardName, quantityType, enqueueSnackbar, quantity],
   );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

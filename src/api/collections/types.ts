@@ -46,8 +46,8 @@ export interface CollectionUpdateRequest {
   mode: 'set' | 'increment';
   cards: Array<{
     cardId: number;
-    quantityReg: number;
-    quantityFoil: number;
+    quantityReg?: number;
+    quantityFoil?: number;
   }>;
 }
 
