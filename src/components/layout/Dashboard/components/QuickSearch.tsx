@@ -105,6 +105,8 @@ export const QuickSearch = () => {
                 value={searchValue}
                 onChange={handleInputChange}
                 onBlur={handleClose}
+                type="search"
+                autoComplete="off"
                 slotProps={{
                   input: {
                     endAdornment: (
@@ -124,6 +126,11 @@ export const QuickSearch = () => {
                   },
                   htmlInput: {
                     maxLength: 2000,
+                    spellCheck: 'false',
+                    autoCapitalize: 'off',
+                    autoCorrect: 'off',
+                    inputMode: 'search',
+                    enterKeyHint: 'search',
                   },
                 }}
               />
