@@ -47,9 +47,9 @@ import { CustomCSVMapper } from './CustomCSVMapper';
 import { ImportProgress } from './components/ImportProgress';
 import { useGetImportFormatsQuery, useImportCollectionMutation } from '@/api/import/importApi';
 import type { ImportError, ImportResult } from '@/api/import/types';
+import { mtgcbApi } from '@/api/mtgcbApi';
 import { Link as NextLink } from '@/components/ui/link';
 import { useChunkedImport } from '@/hooks/useChunkedImport';
-import { mtgcbApi } from '@/api/mtgcbApi';
 
 const InfoBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -384,7 +384,9 @@ export const ImportClient: React.FC = () => {
                     <Alert severity="info">
                       <Typography variant="body2">
                         Please select a CSV file first to configure field mappings. It needs its first row to have
-                        column headers.
+                        column headers. <br /> <br />
+                        Common headers the importer will autodetect include: <br />
+                        Card Name, Set Name/Code, Quantity, Foil, Collector Number, TCGPlayer ID, Scryfall ID.
                       </Typography>
                     </Alert>
                   )

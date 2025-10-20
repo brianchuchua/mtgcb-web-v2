@@ -97,6 +97,9 @@ interface DisplaySettings {
 
   // Set icon style
   setIconStyle: 'mythic' | 'boring';
+
+  // Header quick links
+  showQuickEditIcon: boolean;
 }
 
 interface DisplaySettingsContextType {
@@ -200,6 +203,9 @@ const DEFAULT_SETTINGS: DisplaySettings = {
 
   // Set icon style
   setIconStyle: 'mythic',
+
+  // Header quick links
+  showQuickEditIcon: false,
 };
 
 const STORAGE_KEY = 'mtgcb-display-settings';
@@ -441,4 +447,9 @@ export function useProgressBarStyle(): ['mythic' | 'boring' | 'boring-green', (v
 export function useSetIconStyle(): ['mythic' | 'boring', (value: 'mythic' | 'boring') => void] {
   const { settings, updateSetting } = useDisplaySettings();
   return [settings.setIconStyle, (value) => updateSetting('setIconStyle', value)];
+}
+
+export function useShowQuickEditIcon(): [boolean, (value: boolean) => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.showQuickEditIcon, (value) => updateSetting('showQuickEditIcon', value)];
 }

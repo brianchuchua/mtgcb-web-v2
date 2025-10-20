@@ -36,7 +36,7 @@ import { withAuth } from '@/components/auth/withAuth';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import SetIcon from '@/components/sets/SetIcon';
 import { Button } from '@/components/ui/button';
-import { usePriceType, useProgressBarStyle, useSetIconStyle } from '@/contexts/DisplaySettingsContext';
+import { usePriceType, useProgressBarStyle, useSetIconStyle, useShowQuickEditIcon } from '@/contexts/DisplaySettingsContext';
 import { useAuth } from '@/hooks/useAuth';
 import { PriceType } from '@/types/pricing';
 import { trimFormData } from '@/utils/form/trimFormData';
@@ -64,6 +64,7 @@ function ProfileContent() {
   const [priceType, setPriceType] = usePriceType();
   const [progressBarStyle, setProgressBarStyle] = useProgressBarStyle();
   const [setIconStyle, setSetIconStyle] = useSetIconStyle();
+  const [showQuickEditIcon, setShowQuickEditIcon] = useShowQuickEditIcon();
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
   const [hasHandledOAuthCallback, setHasHandledOAuthCallback] = useState(false);
 
@@ -550,6 +551,31 @@ function ProfileContent() {
                   </Typography>
                 </Box>
               </Box>
+            </Box>
+          </CardContent>
+        </Paper>
+
+        <Paper variant="outlined">
+          <CardHeader>
+            <Typography variant="h6">Header Quick Links</Typography>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Choose which quick access icons appear in the header. This setting is saved on your device.
+            </Typography>
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={showQuickEditIcon}
+                    onChange={(e) => setShowQuickEditIcon(e.target.checked)}
+                  />
+                }
+                label="Show Add or Remove Cards icon"
+              />
+              <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 1 }}>
+                When enabled, a quick access icon appears in the header to jump directly to the Add or Remove Cards page.
+              </Typography>
             </Box>
           </CardContent>
         </Paper>

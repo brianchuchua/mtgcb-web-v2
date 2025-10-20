@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-20',
+      version: '1.2.0',
+      changes: [
+        'Added optional quick access icon in header for Add or Remove Cards page (disabled by default, enable in Account Settings)',
+      ],
+    },
+    {
+      date: '2025-10-20',
       version: '1.1.1',
       changes: [
         'Fixed a rare race condition when managing your collection in table view on slower connections',

@@ -1,5 +1,6 @@
 'use client';
 
+import IsoIcon from '@mui/icons-material/Iso';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import MenuIcon from '@mui/icons-material/Menu';
 import AppBar, { AppBarProps } from '@mui/material/AppBar';
@@ -15,10 +16,14 @@ import { JumpToSetsMenu } from '@/components/layout/Dashboard/components/JumpToS
 import { QuickSearch } from '@/components/layout/Dashboard/components/QuickSearch';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import { getLatestRelease } from '@/app/changelog/changelog';
+import { useShowQuickEditIcon } from '@/contexts/DisplaySettingsContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export const Header = () => {
   const { isDesktopOpen, setDesktopOpen, sidenavWidth } = useDashboardContext();
   const latestRelease = getLatestRelease();
+  const { isAuthenticated, user } = useAuth();
+  const [showQuickEditIcon] = useShowQuickEditIcon();
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -54,6 +59,19 @@ export const Header = () => {
               </Tooltip>
             )}
           </Box>
+          {isAuthenticated && user?.userId && showQuickEditIcon && (
+            <Tooltip title="Add or Remove Cards" arrow>
+              <IconButton
+                color="inherit"
+                component={Link}
+                href="/collections/edit-cards"
+                size="large"
+                sx={{ mr: 1 }}
+              >
+                <IsoIcon />
+              </IconButton>
+            </Tooltip>
+          )}
           <QuickSearch />
           <JumpToSetsMenu />
           <AccountMenu />
