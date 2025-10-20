@@ -42,7 +42,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
         console.error('Failed to parse dismissed banners', e);
       }
     }
-    
+
     // Load dismissed modals from sessionStorage
     const storedModals = sessionStorage.getItem(DISMISSED_MODALS_KEY);
     if (storedModals) {
@@ -53,7 +53,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
         console.error('Failed to parse dismissed modals', e);
       }
     }
-    
+
     setIsLoaded(true);
   }, []);
 
@@ -93,11 +93,19 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
 
   // Define static messages here
   const messages: SessionMessage[] = [
-    // Add future session messages here
+    {
+      id: 'aws-outage-2025-10-20',
+      severity: 'warning',
+      message: `There's a global AWS outage affecting MTG CB and thousands of other sites. Performance may be degraded until this third-party issue is fixed.`,
+      dismissable: true,
+      displayType: 'banner',
+    },
   ];
 
   return (
-    <SessionMessagesContext.Provider value={{ messages, dismissBanner, dismissModal, isBannerDismissed, isModalDismissed, isLoaded }}>
+    <SessionMessagesContext.Provider
+      value={{ messages, dismissBanner, dismissModal, isBannerDismissed, isModalDismissed, isLoaded }}
+    >
       {children}
     </SessionMessagesContext.Provider>
   );
