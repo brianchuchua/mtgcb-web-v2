@@ -147,6 +147,24 @@ export function clearSearchState(view: 'cards' | 'sets'): void {
 }
 
 /**
+ * Clear all search state from sessionStorage
+ * Use this when logging out or switching users to prevent
+ * user-specific data (goalId, locationId) from persisting
+ */
+export function clearAllSearchState(): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    sessionStorage.removeItem('mtgcb_search_state_cards');
+    sessionStorage.removeItem('mtgcb_search_state_sets');
+  } catch (error) {
+    console.warn('Failed to clear all search state from sessionStorage:', error);
+  }
+}
+
+/**
  * Clear a specific field from search state in sessionStorage
  * Useful for clearing contextual filters (like sets filter on set pages)
  */

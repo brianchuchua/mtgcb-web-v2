@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-21',
+      version: '1.3.1',
+      changes: [
+        'Fixed search filters persisting between different user accounts when logging in or out',
+      ],
+    },
+    {
       date: '2025-10-20',
       version: '1.3.0',
       changes: [

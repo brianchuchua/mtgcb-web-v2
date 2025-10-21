@@ -11,6 +11,7 @@ import {
 } from '@/api/auth/types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
+import { clearAllSearchState } from '@/hooks/useSearchStateSync';
 
 // Helper to get the current origin for local API calls
 const getLocalApiUrl = (path: string) => {
@@ -35,6 +36,15 @@ export const authApi = mtgcbApi.injectEndpoints({
         body: credentials,
       }),
       invalidatesTags: ['Auth'],
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Clear search state to prevent user-specific data (goalId, locationId) from persisting
+          clearAllSearchState();
+        } catch {
+          // Login failed, no need to clear state
+        }
+      },
     }),
     signUp: builder.mutation<ApiResponse<SignUpData>, SignUpRequest>({
       query: (data) => ({
@@ -54,6 +64,8 @@ export const authApi = mtgcbApi.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
+          // Clear search state to prevent user-specific data (goalId, locationId) from persisting
+          clearAllSearchState();
           dispatch(authApi.util.resetApiState());
         } catch {
           console.error('Logout failed or incomplete');
@@ -97,6 +109,8 @@ export const authApi = mtgcbApi.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
+          // Clear search state to prevent user-specific data (goalId, locationId) from persisting
+          clearAllSearchState();
           // Reset the entire API state after successful account deletion
           dispatch(authApi.util.resetApiState());
         } catch {
