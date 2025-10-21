@@ -49,7 +49,8 @@ export const QuickSearch = () => {
         return;
       }
 
-      const encodedSearch = encodeURIComponent(searchValue.trim());
+      // Encode search term and normalize spaces to + (prevents %20 → + flicker in URL)
+      const encodedSearch = encodeURIComponent(searchValue.trim()).replace(/%20/g, '+');
       let targetUrl: string;
       const collectionUserId = getUserIdFromPath();
 
@@ -63,6 +64,10 @@ export const QuickSearch = () => {
         // If not logged in and not on a collection page, search in browse
         targetUrl = `/browse?name=${encodedSearch}&contentType=cards`;
       }
+
+      // Signal to browse pages that this is a quick navigation event
+      // This triggers browse form state reset while preserving sticky behavior for normal browsing
+      sessionStorage.setItem('quickNavReset', 'true');
 
       router.push(targetUrl);
       handleClose();

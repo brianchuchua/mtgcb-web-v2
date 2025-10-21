@@ -34,6 +34,7 @@ import { CardsProps } from '@/features/browse/types/browseController';
 import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
+import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { useAuth } from '@/hooks/useAuth';
 import { useConfetti } from '@/hooks/useConfetti';
 import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
@@ -107,6 +108,9 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     // Skip cards until we have the correct set filter applied
     skipCardsUntilReady: !isReady
   });
+
+  // Reset browse form state when Quick Search or Jump to Set is used
+  useQuickNavReset();
 
   const { user } = useAuth();
   const { shareToken, isViewingSharedCollection } = useShareTokenContext();

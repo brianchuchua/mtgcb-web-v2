@@ -25,6 +25,7 @@ import { useShareTokenContext } from '@/contexts/ShareTokenContext';
 import { CardsProps, SetsProps } from '@/features/browse/types';
 import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
+import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { useAuth } from '@/hooks/useAuth';
 import { selectIncludeSubsetsInSets, selectSelectedGoalId } from '@/redux/slices/browse';
 
@@ -37,6 +38,9 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
 
   const { view, viewMode, error, paginationProps, setsProps, cardsProps } = useCollectionBrowseController({ userId });
   const { user } = useAuth();
+
+  // Reset browse form state when Quick Search or Jump to Set is used
+  useQuickNavReset();
   const { shareToken, isViewingSharedCollection } = useShareTokenContext();
   const isOwnCollection = user?.userId === userId;
   const selectedGoalId = useSelector(selectSelectedGoalId);

@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-20',
+      version: '1.2.1',
+      changes: [
+        'Changed Quick Search and Jump to Set to clear old filters and provide clean search results -- this just feels better for the quick action buttons at the top of the page. If you like the sticky behavior, just browse sets normally and your form will still remember the current search until you reset it.',
+      ],
+    },
+    {
+      date: '2025-10-20',
       version: '1.2.0',
       changes: [
         'Added optional quick access icon in header for Add or Remove Cards page (disabled by default, enable in Account Settings)',
@@ -20,23 +27,17 @@ const changelogData: ChangelogData = {
     {
       date: '2025-10-20',
       version: '1.1.1',
-      changes: [
-        'Fixed a rare race condition when managing your collection in table view on slower connections',
-      ],
+      changes: ['Fixed a rare race condition when managing your collection in table view on slower connections'],
     },
     {
       date: '2025-10-19',
       version: '1.1.0',
-      changes: [
-        'Added Quick Search button in header for fast card name searches from anywhere in the app',
-      ],
+      changes: ['Added Quick Search button in header for fast card name searches from anywhere in the app'],
     },
     {
       date: '2025-10-18',
       version: '1.0.4',
-      changes: [
-        'Improved empty search results display with helpful message and reset button',
-      ],
+      changes: ['Improved empty search results display with helpful message and reset button'],
     },
     {
       date: '2025-10-18',

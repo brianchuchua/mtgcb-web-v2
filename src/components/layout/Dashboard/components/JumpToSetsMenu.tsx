@@ -180,6 +180,10 @@ export const JumpToSetsMenu = () => {
           targetUrl = `/browse/sets/${value.slug}`;
         }
 
+        // Signal to browse pages that this is a quick navigation event
+        // This triggers browse form state reset while preserving sticky behavior for normal browsing
+        sessionStorage.setItem('quickNavReset', 'true');
+
         router.push(targetUrl);
         handleClose();
       }

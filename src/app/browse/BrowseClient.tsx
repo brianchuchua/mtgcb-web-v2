@@ -8,10 +8,14 @@ import SetDisplay, { SetDisplayProps } from '@/components/sets/SetDisplay';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
+import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 
 export default function BrowseClient() {
   const browseController = useBrowseController();
+
+  // Reset browse form state when Quick Search or Jump to Set is used
+  useQuickNavReset();
 
   const isCardGridView = browseController.view === 'cards' && browseController.viewMode === 'grid';
   const isCardTableView = browseController.view === 'cards' && browseController.viewMode === 'table';
