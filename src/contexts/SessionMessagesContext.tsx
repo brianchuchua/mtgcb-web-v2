@@ -92,15 +92,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
   );
 
   // Define static messages here
-  const messages: SessionMessage[] = [
-    {
-      id: 'aws-outage-2025-10-20',
-      severity: 'warning',
-      message: `There's a global AWS outage affecting MTG CB and thousands of other sites. Performance may be degraded until this third-party issue is fixed.`,
-      dismissable: true,
-      displayType: 'banner',
-    },
-  ];
+  const messages: SessionMessage[] = [];
 
   return (
     <SessionMessagesContext.Provider
