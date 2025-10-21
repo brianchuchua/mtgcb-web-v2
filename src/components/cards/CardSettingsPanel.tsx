@@ -155,8 +155,15 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({
 
           <Divider sx={{ mb: 2 }} />
 
-          <FormControl component="fieldset" sx={{ width: '100%' }}>
-            {settingGroups.map((settingGroup) => {
+          <Box
+            sx={{
+              maxHeight: 'calc(100vh - 200px)',
+              overflowY: 'auto',
+              overflowX: 'hidden',
+            }}
+          >
+            <FormControl component="fieldset" sx={{ width: '100%' }}>
+              {settingGroups.map((settingGroup) => {
               return (
                 <FormGroup key={settingGroup.label}>
                   <GroupHeader>
@@ -261,6 +268,7 @@ const CardSettingsPanel: React.FC<CardSettingsPanelProps> = ({
               );
             })}
           </FormControl>
+          </Box>
         </SettingsPanelContent>
       </Popover>
     </>

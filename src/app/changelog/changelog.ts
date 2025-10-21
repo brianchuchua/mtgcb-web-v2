@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-20',
+      version: '1.2.2',
+      changes: [
+        'Fixed settings menus to scroll properly on small screens instead of extending beyond the viewport',
+      ],
+    },
+    {
+      date: '2025-10-20',
       version: '1.2.1',
       changes: [
         'Changed Quick Search and Jump to Set to clear old filters and provide clean search results -- this just feels better for the quick action buttons at the top of the page. If you like the sticky behavior, just browse sets normally and your form will still remember the current search until you reset it.',

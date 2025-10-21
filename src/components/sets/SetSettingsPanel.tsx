@@ -75,7 +75,14 @@ export const SetSettingsPanel: React.FC<SetSettingsPanelProps> = ({ settingGroup
           {panelTitle}
         </Typography>
 
-        {settingGroups.map((group, groupIndex) => (
+        <Box
+          sx={{
+            maxHeight: 'calc(100vh - 200px)',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+          }}
+        >
+          {settingGroups.map((group, groupIndex) => (
           <React.Fragment key={group.label || `group-${groupIndex}`}>
             {/* Group heading */}
             {group.label && (
@@ -166,6 +173,7 @@ export const SetSettingsPanel: React.FC<SetSettingsPanelProps> = ({ settingGroup
             {groupIndex < settingGroups.length - 1 && <Divider sx={{ mt: 2 }} />}
           </React.Fragment>
         ))}
+        </Box>
       </Popover>
     </>
   );
