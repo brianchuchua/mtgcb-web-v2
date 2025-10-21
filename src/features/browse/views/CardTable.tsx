@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 import { useCardRowRenderer, useCardTableColumns } from '@/components/cards/CardTableRenderer';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import InfoBanner from '@/features/browse/views/InfoBanner';
+import { useRedGreenTableRows } from '@/contexts/DisplaySettingsContext';
 import { resetSearch, clearSelectedGoal, clearSelectedLocation } from '@/redux/slices/browse';
 import { PriceType } from '@/types/pricing';
 
@@ -56,6 +57,7 @@ const CardTable: React.FC<CardTableProps> = ({
   hasLocations = false,
 }) => {
   const dispatch = useDispatch();
+  const [redGreenTableRows] = useRedGreenTableRows();
 
   // Merge table settings with card display settings
   // For locations, prioritize tableSettings over cardDisplaySettings
@@ -89,7 +91,10 @@ const CardTable: React.FC<CardTableProps> = ({
       (item.goalTargetQuantityReg || item.goalTargetQuantityFoil || item.goalTargetQuantityAll) &&
       item.goalFullyMet === false;
 
-    return { isIncomplete: !!isIncomplete };
+    // Calculate total quantity for red/green row coloring
+    const totalQuantity = (item?.quantityReg || 0) + (item?.quantityFoil || 0);
+
+    return { isIncomplete: !!isIncomplete, totalQuantity };
   };
 
   const handleResetSearch = () => {
@@ -128,6 +133,7 @@ const CardTable: React.FC<CardTableProps> = ({
       emptyStateComponent={emptyStateComponent}
       computeItemKey={(index) => items[index]?.id || index}
       getRowProps={getRowProps}
+      useRedGreenRows={redGreenTableRows}
     />
   );
 };

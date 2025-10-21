@@ -16,7 +16,7 @@ import {
   TableSortLabel,
   Typography,
 } from '@mui/material';
-import { styled, useTheme } from '@mui/material/styles';
+import { alpha, styled, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import React from 'react';
 import { TableVirtuoso } from 'react-virtuoso';
@@ -52,7 +52,8 @@ export interface VirtualizedTableProps<T> {
   emptyStateComponent?: React.ReactNode;
   computeItemKey?: (index: number) => string | number;
   tableWidth?: number;
-  getRowProps?: (item: T) => { isIncomplete?: boolean };
+  getRowProps?: (item: T) => { isIncomplete?: boolean; totalQuantity?: number };
+  useRedGreenRows?: boolean;
 }
 
 const VirtualizedTable = <T,>({
@@ -68,6 +69,7 @@ const VirtualizedTable = <T,>({
   computeItemKey,
   tableWidth,
   getRowProps,
+  useRedGreenRows = false,
 }: VirtualizedTableProps<T>) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
@@ -151,7 +153,16 @@ const VirtualizedTable = <T,>({
     const dataIndex = props['data-index'];
     const isOddRow = dataIndex !== undefined ? parseInt(dataIndex, 10) % 2 === 1 : false;
 
-    return <StyledTableRow {...restProps} style={style} isIncomplete={rowProps.isIncomplete} isOddRow={isOddRow} />;
+    return (
+      <StyledTableRow
+        {...restProps}
+        style={style}
+        isIncomplete={rowProps.isIncomplete}
+        isOddRow={isOddRow}
+        totalQuantity={rowProps.totalQuantity}
+        useRedGreenRows={useRedGreenRows}
+      />
+    );
   };
 
   // Table virtualization components
@@ -326,27 +337,57 @@ const VirtualizedTable = <T,>({
 };
 
 const StyledTableRow = styled(TableRow, {
-  shouldForwardProp: (prop) => prop !== 'isIncomplete' && prop !== 'isOddRow',
-})<{ isIncomplete?: boolean; isOddRow?: boolean }>(({ theme, isIncomplete, isOddRow }) => ({
-  transition: 'background-color 0.2s ease, opacity 0.2s ease',
-  position: 'relative',
-  ...(isOddRow && {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-  }),
-  ...(isIncomplete && {
-    opacity: 0.85,
-    backgroundImage: `repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      rgba(255, 152, 0, 0.05) 10px,
-      rgba(255, 152, 0, 0.05) 20px
-    )`,
-    backgroundSize: '28.28px 28.28px',
-    '&:hover': {
-      opacity: 1,
-    },
-  }),
-}));
+  shouldForwardProp: (prop) =>
+    prop !== 'isIncomplete' && prop !== 'isOddRow' && prop !== 'totalQuantity' && prop !== 'useRedGreenRows',
+})<{ isIncomplete?: boolean; isOddRow?: boolean; totalQuantity?: number; useRedGreenRows?: boolean }>(({
+  theme,
+  isIncomplete,
+  isOddRow,
+  totalQuantity,
+  useRedGreenRows,
+}) => {
+  // Determine background color based on total quantity if red/green rows is enabled
+  // Using Material UI theme colors with alpha for a sophisticated, dark-mode-friendly appearance
+  // Matches the old site's color scheme: brighter green for 1-3, deeper/darker green for 4+
+  let quantityBackgroundColor = undefined;
+  if (useRedGreenRows && totalQuantity !== undefined) {
+    if (totalQuantity === 0) {
+      // Subtle red tint for no cards - uses error color
+      quantityBackgroundColor = alpha(theme.palette.error.main, 0.1);
+    } else if (totalQuantity >= 1 && totalQuantity <= 3) {
+      // Brighter green for few cards - higher opacity matches old site #bad3b0
+      quantityBackgroundColor = alpha(theme.palette.success.main, 0.15);
+    } else if (totalQuantity >= 4) {
+      // Deeper/darker green for many cards - lower opacity matches old site #c5deba
+      quantityBackgroundColor = alpha(theme.palette.success.main, 0.06);
+    }
+  }
+
+  return {
+    transition: 'background-color 0.2s ease, opacity 0.2s ease',
+    position: 'relative',
+    ...(quantityBackgroundColor && {
+      backgroundColor: quantityBackgroundColor,
+    }),
+    ...(!quantityBackgroundColor &&
+      isOddRow && {
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+      }),
+    ...(isIncomplete && {
+      opacity: 0.85,
+      backgroundImage: `repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 152, 0, 0.05) 10px,
+        rgba(255, 152, 0, 0.05) 20px
+      )`,
+      backgroundSize: '28.28px 28.28px',
+      '&:hover': {
+        opacity: 1,
+      },
+    }),
+  };
+});
 
 export default VirtualizedTable;

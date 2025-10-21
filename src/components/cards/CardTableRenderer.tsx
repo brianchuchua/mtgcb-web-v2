@@ -886,8 +886,19 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
         window.requestAnimationFrame(() => {
           const isCardPreviewVisible = hoverCardRef.current && hoverCardRef.current.style.display !== 'none';
           if (isCardPreviewVisible) {
-            const x = mousePositionRef.current.x + 50; // 50px to the right
-            const y = mousePositionRef.current.y - 35; // 35px above
+            // Card dimensions
+            const cardHeight = 416; // 299px * 1.393 ≈ 416px
+            const offset = 20; // Distance from cursor
+
+            // Check viewport space
+            const viewportHeight = window.innerHeight;
+            const spaceBelow = viewportHeight - mousePositionRef.current.y;
+            const shouldShowAbove = spaceBelow < cardHeight + offset + 20; // 20px buffer
+
+            const x = mousePositionRef.current.x - 150; // Center horizontally (299px / 2)
+            const y = shouldShowAbove
+              ? mousePositionRef.current.y - cardHeight - offset  // Above cursor
+              : mousePositionRef.current.y + offset;              // Below cursor
 
             hoverCardRef.current!.style.left = `${x}px`;
             hoverCardRef.current!.style.top = `${y}px`;
@@ -935,8 +946,20 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
 
       hoverCardRef.current.style.display = 'block';
 
-      const x = mousePositionRef.current.x + 50;
-      const y = mousePositionRef.current.y - 35;
+      // Card dimensions
+      const cardHeight = 416; // 299px * 1.393 ≈ 416px
+      const offset = 20; // Distance from cursor
+
+      // Check viewport space
+      const viewportHeight = window.innerHeight;
+      const spaceBelow = viewportHeight - mousePositionRef.current.y;
+      const shouldShowAbove = spaceBelow < cardHeight + offset + 20; // 20px buffer
+
+      const x = mousePositionRef.current.x - 150; // Center horizontally (299px / 2)
+      const y = shouldShowAbove
+        ? mousePositionRef.current.y - cardHeight - offset  // Above cursor
+        : mousePositionRef.current.y + offset;              // Below cursor
+
       hoverCardRef.current.style.left = `${x}px`;
       hoverCardRef.current.style.top = `${y}px`;
 
@@ -985,8 +1008,6 @@ export const useCardRowRenderer = (
         key="name"
         component="th"
         scope="row"
-        onMouseEnter={() => showCardPreview(card)}
-        onMouseLeave={hideCardPreview}
       >
         {userId ? (
           // In collection context, use onCardClick for proper routing
@@ -997,7 +1018,9 @@ export const useCardRowRenderer = (
                 onCardClick(card.id, card.name);
               }
             }}
-            style={{ cursor: 'pointer' }}
+            onMouseEnter={() => showCardPreview(card)}
+            onMouseLeave={hideCardPreview}
+            sx={{ cursor: 'pointer' }}
           >
             {card.name}
           </ClickableText>
@@ -1008,8 +1031,11 @@ export const useCardRowRenderer = (
             style={{
               color: 'inherit',
               textDecoration: 'none',
+              display: 'inline',
             }}
             onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
+            onMouseEnter={() => showCardPreview(card)}
+            onMouseLeave={hideCardPreview}
           >
             <ClickableText>{card.name}</ClickableText>
           </Link>
@@ -1468,6 +1494,7 @@ function getSymbolName(symbol: string): string {
 // Styled components
 const ClickableText = styled(Typography)(({ theme }) => ({
   fontWeight: 'medium',
+  display: 'inline',
   '&:hover': {
     textDecoration: 'underline',
   },

@@ -100,6 +100,9 @@ interface DisplaySettings {
 
   // Header quick links
   showQuickEditIcon: boolean;
+
+  // Classic Settings (legacy site behaviors)
+  redGreenTableRows: boolean;
 }
 
 interface DisplaySettingsContextType {
@@ -206,6 +209,9 @@ const DEFAULT_SETTINGS: DisplaySettings = {
 
   // Header quick links
   showQuickEditIcon: false,
+
+  // Classic Settings (legacy site behaviors)
+  redGreenTableRows: false,
 };
 
 const STORAGE_KEY = 'mtgcb-display-settings';
@@ -452,4 +458,9 @@ export function useSetIconStyle(): ['mythic' | 'boring', (value: 'mythic' | 'bor
 export function useShowQuickEditIcon(): [boolean, (value: boolean) => void] {
   const { settings, updateSetting } = useDisplaySettings();
   return [settings.showQuickEditIcon, (value) => updateSetting('showQuickEditIcon', value)];
+}
+
+export function useRedGreenTableRows(): [boolean, (value: boolean) => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.redGreenTableRows, (value) => updateSetting('redGreenTableRows', value)];
 }

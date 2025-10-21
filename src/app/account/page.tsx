@@ -36,7 +36,7 @@ import { withAuth } from '@/components/auth/withAuth';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import SetIcon from '@/components/sets/SetIcon';
 import { Button } from '@/components/ui/button';
-import { usePriceType, useProgressBarStyle, useSetIconStyle, useShowQuickEditIcon } from '@/contexts/DisplaySettingsContext';
+import { usePriceType, useProgressBarStyle, useRedGreenTableRows, useSetIconStyle, useShowQuickEditIcon } from '@/contexts/DisplaySettingsContext';
 import { useAuth } from '@/hooks/useAuth';
 import { PriceType } from '@/types/pricing';
 import { trimFormData } from '@/utils/form/trimFormData';
@@ -65,6 +65,7 @@ function ProfileContent() {
   const [progressBarStyle, setProgressBarStyle] = useProgressBarStyle();
   const [setIconStyle, setSetIconStyle] = useSetIconStyle();
   const [showQuickEditIcon, setShowQuickEditIcon] = useShowQuickEditIcon();
+  const [redGreenTableRows, setRedGreenTableRows] = useRedGreenTableRows();
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
   const [hasHandledOAuthCallback, setHasHandledOAuthCallback] = useState(false);
 
@@ -575,6 +576,31 @@ function ProfileContent() {
               />
               <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 1 }}>
                 When enabled, a quick access icon appears in the header to jump directly to the Add or Remove Cards page.
+              </Typography>
+            </Box>
+          </CardContent>
+        </Paper>
+
+        <Paper variant="outlined">
+          <CardHeader>
+            <Typography variant="h6">Classic Settings</Typography>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Behaviors from the legacy site that some users missed. These settings are saved on your device.
+            </Typography>
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={redGreenTableRows}
+                    onChange={(e) => setRedGreenTableRows(e.target.checked)}
+                  />
+                }
+                label="Red/Green Table Rows"
+              />
+              <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 1 }}>
+                When enabled, table rows are colored based on total card quantity: red for 0 cards, bright green for 1-3 cards, dark green for 4+ cards.
               </Typography>
             </Box>
           </CardContent>

@@ -12,6 +12,16 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-20',
+      version: '1.3.0',
+      changes: [
+        'Added Classic Settings section with Red/Green Table Rows option - table rows now color based on card quantity (red for none, bright green for 1-3, dark green for 4+)',
+        'Improved card preview in tables to only appear when hovering over card names, not entire cells',
+        'Card preview now appears below text and intelligently positions above when near bottom of screen',
+        'Fixed Custom CSV card imports that would fail in certain cases',
+      ],
+    },
+    {
+      date: '2025-10-20',
       version: '1.2.2',
       changes: [
         'Fixed settings menus to scroll properly on small screens instead of extending beyond the viewport',
