@@ -41,13 +41,12 @@ import {
 } from '@/features/browse/hooks';
 import { BrowseControllerResult, CardPayloadProps, SetPayloadProps } from '@/features/browse/types/browseController';
 import {
-  selectCardSearchParams,
   selectIncludeSubsetsInSets,
   selectSelectedGoalId,
-  selectSetSearchParams,
   selectSets,
   selectViewContentType,
 } from '@/redux/slices/browse';
+import { useCardSearchParams, useSetSearchParams } from '@/hooks/useBrowseSearchParams';
 
 interface UseBrowseControllerOptions {
   skipCostToComplete?: boolean;
@@ -61,8 +60,8 @@ interface UseBrowseControllerOptions {
 export function useBrowseController(options?: UseBrowseControllerOptions): BrowseControllerResult {
   const viewFromRedux = useSelector(selectViewContentType) ?? 'cards';
   const currentView = options?.forceView ?? viewFromRedux; // Use forced view if provided
-  const cardSearchParams = useSelector(selectCardSearchParams);
-  const setSearchParams = useSelector(selectSetSearchParams);
+  const cardSearchParams = useCardSearchParams();
+  const setSearchParams = useSetSearchParams();
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const currentSetsFilter = useSelector(selectSets);

@@ -1,13 +1,12 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  selectSortBy, 
-  selectSortOrder, 
+import {
   selectViewContentType,
-  setSortBy, 
-  setSortOrder 
+  setSortBy,
+  setSortOrder
 } from '@/redux/slices/browse';
 import { SortByOption } from '@/types/browse';
+import { useFilteredSortBy } from '@/hooks/useFilteredSortBy';
 
 /**
  * Manages sorting state for browse tables
@@ -16,8 +15,9 @@ import { SortByOption } from '@/types/browse';
 export function useSort() {
   const dispatch = useDispatch();
   const viewType = useSelector(selectViewContentType);
-  const sortBy = useSelector(selectSortBy) || 'releasedAt';
-  const sortOrder = useSelector(selectSortOrder) || (viewType === 'cards' ? 'asc' : 'desc');
+
+  // Use filtered sort values to prevent collection-only sorts in browse context
+  const { sortBy, sortOrder } = useFilteredSortBy();
 
   const handleSort = useCallback((columnId: string) => {
     if (!columnId) return;

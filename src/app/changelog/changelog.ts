@@ -12,10 +12,18 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-21',
-      version: '1.3.1',
+      version: '1.3.2',
       changes: [
-        'Fixed search filters persisting between different user accounts when logging in or out',
+        'Fixed collection-specific search filters appearing when browsing without a collection context',
+        'Fixed search description text incorrectly showing goal and location information outside of collection pages',
+        'Fixed sort dropdown showing invalid values when switching from collection to browse pages',
+        'Fixed an inconsistency with remembering which view (Cards/Sets) was last used in collection vs. browse contexts',
       ],
+    },
+    {
+      date: '2025-10-21',
+      version: '1.3.1',
+      changes: ['Fixed search filters persisting between different user accounts when logging in or out'],
     },
     {
       date: '2025-10-20',
@@ -30,9 +38,7 @@ const changelogData: ChangelogData = {
     {
       date: '2025-10-20',
       version: '1.2.2',
-      changes: [
-        'Fixed settings menus to scroll properly on small screens instead of extending beyond the viewport',
-      ],
+      changes: ['Fixed settings menus to scroll properly on small screens instead of extending beyond the viewport'],
     },
     {
       date: '2025-10-20',

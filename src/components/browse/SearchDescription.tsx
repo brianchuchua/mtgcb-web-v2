@@ -4,16 +4,16 @@ import { useMemo } from 'react';
 import { Typography, TypographyProps } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useSelector } from 'react-redux';
-import { 
-  selectCardSearchParams, 
-  selectSetSearchParams, 
-  selectViewContentType, 
+import {
+  selectViewContentType,
   selectOneResultPerCardName,
   selectSelectedGoalId,
   selectShowGoals,
   selectSelectedLocationId,
   selectIncludeChildLocations
 } from '@/redux/slices/browse';
+import { useCardSearchParams, useSetSearchParams } from '@/hooks/useBrowseSearchParams';
+import { useIsCollectionContext } from '@/hooks/useIsCollectionContext';
 import { formatSearchDescription } from '@/utils/search/formatSearchDescription';
 
 interface SearchDescriptionProps extends Omit<TypographyProps, 'children'> {
@@ -24,35 +24,45 @@ export function SearchDescription({ forceView, ...typographyProps }: SearchDescr
   const pathname = usePathname();
   const viewFromRedux = useSelector(selectViewContentType);
   const contentType = forceView ?? viewFromRedux;
-  const cardSearchParams = useSelector(selectCardSearchParams);
-  const setSearchParams = useSelector(selectSetSearchParams);
+  const cardSearchParams = useCardSearchParams();
+  const setSearchParams = useSetSearchParams();
   const oneResultPerCardName = useSelector(selectOneResultPerCardName);
-  const selectedGoalId = useSelector(selectSelectedGoalId);
+
+  // Get raw values from Redux
+  const rawSelectedGoalId = useSelector(selectSelectedGoalId);
+  const rawSelectedLocationId = useSelector(selectSelectedLocationId);
   const showGoals = useSelector(selectShowGoals);
-  const selectedLocationId = useSelector(selectSelectedLocationId);
   const includeChildLocations = useSelector(selectIncludeChildLocations);
-  
+
+  // Determine if we're in a collection context
+  const isCollection = useIsCollectionContext();
+
+  // Only show goal/location in description when in collection context
+  // This prevents showing "for goal X in location Y" when browsing without a userId
+  const displayGoalId = isCollection ? rawSelectedGoalId : null;
+  const displayLocationId = isCollection ? rawSelectedLocationId : null;
+
   // Determine if we're on a specific set page
   const isSetPage = useMemo(() => {
     return pathname?.includes('/browse/sets/') ||
       (pathname?.includes('/collections/') && pathname?.split('/').length > 3) ||
       false;
   }, [pathname]);
-  
+
   const searchParams = contentType === 'cards' ? cardSearchParams : setSearchParams;
-  
+
   const description = useMemo(() => {
     return formatSearchDescription(
-      searchParams, 
-      contentType, 
+      searchParams,
+      contentType,
       oneResultPerCardName,
-      selectedGoalId,
+      displayGoalId,          // Use filtered value
       showGoals,
-      selectedLocationId,
+      displayLocationId,      // Use filtered value
       includeChildLocations,
       isSetPage
     );
-  }, [searchParams, contentType, oneResultPerCardName, selectedGoalId, showGoals, selectedLocationId, includeChildLocations, isSetPage]);
+  }, [searchParams, contentType, oneResultPerCardName, displayGoalId, showGoals, displayLocationId, includeChildLocations, isSetPage]);
   
   return (
     <Typography 

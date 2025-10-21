@@ -19,6 +19,7 @@ import {
   usePreferredShowSubsets,
   usePreferredIncludeSubsetsInSets,
 } from '@/hooks/useBrowsePreferences';
+import { useFilteredSortBy } from '@/hooks/useFilteredSortBy';
 import {
   resetSearch,
   selectArtist,
@@ -30,8 +31,6 @@ import {
   selectSetCode,
   selectSetSearchName,
   selectShowSubsets,
-  selectSortBy,
-  selectSortOrder,
   selectViewContentType,
   setIncludeSubsetsInSet,
   setOneResultPerCardName,
@@ -64,9 +63,10 @@ const BrowseSearchForm: React.FC = () => {
   const reduxOneResultPerCardName = useSelector(selectOneResultPerCardName) || false;
   const reduxShowSubsets = useSelector(selectShowSubsets);
   const reduxIncludeSubsetsInSet = useSelector(selectIncludeSubsetsInSets);
-  const reduxSortBy = useSelector(selectSortBy) || 'releasedAt';
-  const reduxSortOrder = useSelector(selectSortOrder) || 'asc';
   const selectedGoalId = useSelector(selectSelectedGoalId);
+
+  // Use filtered sort values to prevent collection-only sorts in browse context
+  const { sortBy: reduxSortBy, sortOrder: reduxSortOrder } = useFilteredSortBy();
 
   const { pathname, isSetPage, isCollectionPage, isCollectionSetPage, userId } = useBrowseUrlContext();
 

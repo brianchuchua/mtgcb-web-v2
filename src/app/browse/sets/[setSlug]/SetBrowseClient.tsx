@@ -21,7 +21,8 @@ import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
-import { resetSearch, clearSelectedGoal, clearSelectedLocation, selectCardSearchParams, selectIncludeSubsetsInSets } from '@/redux/slices/browse';
+import { resetSearch, clearSelectedGoal, clearSelectedLocation, selectIncludeSubsetsInSets } from '@/redux/slices/browse';
+import { useCardSearchParams } from '@/hooks/useBrowseSearchParams';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
 
@@ -46,7 +47,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
 
   // Get current search parameters to pass to subsets
-  const cardSearchParams = useSelector(selectCardSearchParams);
+  const cardSearchParams = useCardSearchParams();
   const currentIncludeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
   // Use consolidated hook for set filter management

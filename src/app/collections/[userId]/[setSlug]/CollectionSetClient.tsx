@@ -45,11 +45,11 @@ import {
   resetSearch,
   clearSelectedGoal,
   clearSelectedLocation,
-  selectCardSearchParams,
   selectIncludeSubsetsInSets,
   selectSelectedGoalId,
   setSelectedGoalId,
 } from '@/redux/slices/browse';
+import { useCardSearchParams } from '@/hooks/useBrowseSearchParams';
 import capitalize from '@/utils/capitalize';
 import { getCollectionUrl } from '@/utils/collectionUrls';
 import { formatISODate } from '@/utils/dateUtils';
@@ -74,7 +74,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
 
   // Get current search parameters and preferences
-  const cardSearchParams = useSelector(selectCardSearchParams);
+  const cardSearchParams = useCardSearchParams();
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
   const selectedGoalId = useSelector(selectSelectedGoalId);
 

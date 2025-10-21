@@ -2,25 +2,34 @@ import { CardApiParams, CardSearchData, SetApiParams } from './types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 import { Set, SetsSearchResult } from '@/types/sets';
+import { filterCollectionParams } from '@/utils/collectionContextFilter';
 
 export const browseApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
     // TODO: Switch usage of this to getCards
     searchCards: builder.mutation<ApiResponse<CardSearchData>, CardApiParams>({
-      query: (body) => ({
-        url: '/cards/search',
-        method: 'POST',
-        body,
-      }),
+      query: (body) => {
+        // Filter out collection-specific params if userId is not present (safety net)
+        const safeBody = filterCollectionParams(body, Boolean(body.userId), 'cards');
+        return {
+          url: '/cards/search',
+          method: 'POST',
+          body: safeBody,
+        };
+      },
       invalidatesTags: (result) => (result?.success ? ['Cards'] : []),
     }),
 
     getCards: builder.query<ApiResponse<CardSearchData>, CardApiParams>({
-      query: (params) => ({
-        url: '/cards/search',
-        method: 'POST',
-        body: params,
-      }),
+      query: (params) => {
+        // Filter out collection-specific params if userId is not present (safety net)
+        const safeParams = filterCollectionParams(params, Boolean(params.userId), 'cards');
+        return {
+          url: '/cards/search',
+          method: 'POST',
+          body: safeParams,
+        };
+      },
       serializeQueryArgs: ({ queryArgs }) => {
         if (!queryArgs) return '';
 
@@ -42,11 +51,15 @@ export const browseApi = mtgcbApi.injectEndpoints({
     }),
 
     getSets: builder.query<ApiResponse<SetsSearchResult>, SetApiParams>({
-      query: (params) => ({
-        url: '/sets/search',
-        method: 'POST',
-        body: params,
-      }),
+      query: (params) => {
+        // Filter out collection-specific params if userId is not present (safety net)
+        const safeParams = filterCollectionParams(params, Boolean(params.userId), 'sets');
+        return {
+          url: '/sets/search',
+          method: 'POST',
+          body: safeParams,
+        };
+      },
       serializeQueryArgs: ({ queryArgs }) => {
         if (!queryArgs) return '';
 

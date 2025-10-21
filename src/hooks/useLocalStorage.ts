@@ -28,6 +28,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
 
   const hasHydrated = useRef(false);
   const [isReady, setIsReady] = useState(false);
+  const isUpdatingRef = useRef(false); // Track when this instance is updating
 
   const getInitialState = () => {
     if (typeof window === 'undefined' || !hasHydrated.current) {
@@ -56,6 +57,9 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
   useEffect(() => {
     // Create a custom handler that only responds to our custom events
     const handleStorageChange = (e: StorageEvent) => {
+      // Ignore events dispatched by this instance to prevent duplicate updates
+      if (isUpdatingRef.current) return;
+
       if (e.key === key && e.newValue) {
         try {
           setStoredValue(JSON.parse(e.newValue));
@@ -67,6 +71,9 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
 
     // Also listen for standard storage events (for changes in other tabs)
     const handleWindowStorageChange = (e: StorageEvent) => {
+      // Ignore events dispatched by this instance to prevent duplicate updates
+      if (isUpdatingRef.current) return;
+
       if (e.key === key && e.newValue !== null) {
         try {
           setStoredValue(JSON.parse(e.newValue));
@@ -101,8 +108,18 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
         const newValueStr = JSON.stringify(valueToStore);
         window.localStorage.setItem(key, newValueStr);
 
-        // Dispatch custom event to notify other components
-        window.dispatchEvent(createStorageEvent(key, newValueStr));
+        // Mark that this instance is updating to prevent circular event handling
+        isUpdatingRef.current = true;
+        try {
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(createStorageEvent(key, newValueStr));
+        } finally {
+          // Use setTimeout to clear the flag after event handlers have run
+          // This ensures event handlers from OTHER components can still process the event
+          setTimeout(() => {
+            isUpdatingRef.current = false;
+          }, 0);
+        }
       }
     } catch (error) {
       console.warn(`Error setting localStorage key "${key}":`, error);
