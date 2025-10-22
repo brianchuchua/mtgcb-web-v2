@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { Button, Tooltip, useMediaQuery } from '@mui/material';
 import { Share as ShareIcon } from '@mui/icons-material';
 import { ShareCollectionModal } from './ShareCollectionModal';
 
@@ -19,8 +19,9 @@ export const ShareCollectionButton = ({
   setSlug,
 }: ShareCollectionButtonProps) => {
   const [modalOpen, setModalOpen] = useState(false);
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery('(max-width:899px)');
+  const isTablet = useMediaQuery('(min-width:900px) and (max-width:1199px)');
+  const isSmallScreen = isMobile || isTablet;
 
   const handleClick = () => {
     setModalOpen(true);

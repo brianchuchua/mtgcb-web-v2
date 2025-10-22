@@ -6,6 +6,7 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import GridViewIcon from '@mui/icons-material/GridView';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import LastPageIcon from '@mui/icons-material/LastPage';
+import ManageSearchIcon from '@mui/icons-material/Sort';
 import SearchIcon from '@mui/icons-material/Search';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import {
@@ -13,6 +14,7 @@ import {
   Button,
   FormControl,
   IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
@@ -30,6 +32,8 @@ import { useDashboardContext } from '@/components/layout/Dashboard/context/Dashb
 import ParentDropdown from './ParentDropdown';
 import SubsetDropdown from './SubsetDropdown';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { SortByOption, SortOrderOption } from '@/types/browse';
 
 const Pagination: React.FC<PaginationProps> = ({
   currentPage,
@@ -57,13 +61,23 @@ const Pagination: React.FC<PaginationProps> = ({
   customItemName,
   hideSearchButton = false,
   hideSettingsPanel = false,
+  sortBy,
+  sortOrder,
+  onSortByChange,
+  onSortOrderChange,
+  sortOptions = [],
 }) => {
   const theme = useTheme();
   const [localCurrentPage, setLocalCurrentPage] = useState(currentPage);
+  const [showSortControls, setShowSortControls] = useLocalStorage('showPaginationSortControls', false);
   const isMobile = useMediaQuery('(max-width:899px)');
   const isTablet = useMediaQuery('(min-width:900px) and (max-width:1199px)');
   const isSmallScreen = isMobile || isTablet;
   const isOnBottom = position === 'bottom';
+
+  const handleToggleSortControls = useCallback(() => {
+    setShowSortControls((prev) => !prev);
+  }, [setShowSortControls]);
 
   useEffect(() => {
     setLocalCurrentPage(currentPage);
@@ -147,7 +161,7 @@ const Pagination: React.FC<PaginationProps> = ({
                     </MobileInfoRow>
                   </PaginationControlsGroup>
 
-                  {(!hideViewModeToggle || additionalAction) && (
+                  {(!hideViewModeToggle || additionalAction || sortOptions.length > 0) && (
                     <TabletViewToggleGroup>
                       <Stack direction="row" spacing={0.5} alignItems="center">
                         {!hideViewModeToggle && (
@@ -158,6 +172,28 @@ const Pagination: React.FC<PaginationProps> = ({
                             isLoading={isLoading}
                             isInitialLoading={isInitialLoading}
                           />
+                        )}
+                        {sortOptions.length > 0 && (
+                          <Tooltip title={showSortControls ? "Hide sort options" : "Show sort options"}>
+                            <IconButton
+                              size="small"
+                              onClick={handleToggleSortControls}
+                              sx={{
+                                border: 1,
+                                borderColor: (theme) => theme.palette.mode === 'dark'
+                                  ? 'rgba(144, 202, 249, 0.5)'
+                                  : 'rgba(25, 118, 210, 0.5)',
+                                borderRadius: 1,
+                                color: 'primary.main',
+                                '&:hover': {
+                                  borderColor: 'primary.main',
+                                  backgroundColor: 'action.hover',
+                                },
+                              }}
+                            >
+                              <ManageSearchIcon fontSize="small" color="primary" />
+                            </IconButton>
+                          </Tooltip>
                         )}
                         {additionalAction}
                       </Stack>
@@ -183,6 +219,20 @@ const Pagination: React.FC<PaginationProps> = ({
                     />
                   </RightControlsGroup>
                 </TabletControlsRow>
+
+                {showSortControls && (
+                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', width: '100%' }}>
+                    <Box sx={{ width: '100%', maxWidth: '320px' }}>
+                      <PaginationSortControls
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        onSortByChange={onSortByChange}
+                        onSortOrderChange={onSortOrderChange}
+                        sortOptions={sortOptions}
+                      />
+                    </Box>
+                  </Box>
+                )}
               </>
             )}
 
@@ -232,7 +282,7 @@ const Pagination: React.FC<PaginationProps> = ({
                   </RightControlsGroup>
                 </MobileControlsRow>
 
-                {(!hideViewModeToggle || additionalAction) && (
+                {(!hideViewModeToggle || additionalAction || sortOptions.length > 0) && (
                   <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}>
                     <Stack direction="row" spacing={0.5} alignItems="center">
                       {!hideViewModeToggle && (
@@ -244,14 +294,50 @@ const Pagination: React.FC<PaginationProps> = ({
                           isInitialLoading={isInitialLoading}
                         />
                       )}
+                      {sortOptions.length > 0 && (
+                        <Tooltip title={showSortControls ? "Hide sort options" : "Show sort options"}>
+                          <IconButton
+                            size="small"
+                            onClick={handleToggleSortControls}
+                            sx={{
+                              border: 1,
+                              borderColor: (theme) => theme.palette.mode === 'dark'
+                                ? 'rgba(144, 202, 249, 0.5)'
+                                : 'rgba(25, 118, 210, 0.5)',
+                              borderRadius: 1,
+                              color: 'primary.main',
+                              '&:hover': {
+                                borderColor: 'primary.main',
+                                backgroundColor: 'action.hover',
+                              },
+                            }}
+                          >
+                            <ManageSearchIcon fontSize="small" color="primary" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                       {additionalAction}
                     </Stack>
+                  </Box>
+                )}
+
+                {showSortControls && (
+                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', width: '100%' }}>
+                    <Box sx={{ width: '100%', maxWidth: '320px' }}>
+                      <PaginationSortControls
+                        sortBy={sortBy}
+                        sortOrder={sortOrder}
+                        onSortByChange={onSortByChange}
+                        onSortOrderChange={onSortOrderChange}
+                        sortOptions={sortOptions}
+                      />
+                    </Box>
                   </Box>
                 )}
               </>
             )}
 
-            {!isSmallScreen && (!hideViewModeToggle || additionalAction) && (
+            {!isSmallScreen && (!hideViewModeToggle || additionalAction || sortOptions.length > 0) && (
               <ViewToggleContainer>
                 <Stack direction="row" spacing={0.5} alignItems="center">
                   {!hideViewModeToggle && (
@@ -263,9 +349,35 @@ const Pagination: React.FC<PaginationProps> = ({
                       isInitialLoading={isInitialLoading}
                     />
                   )}
+                  {sortOptions.length > 0 && (
+                    <Tooltip title={showSortControls ? "Hide sort options" : "Show sort options"}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={handleToggleSortControls}
+                        startIcon={<ManageSearchIcon />}
+                      >
+                        Sort
+                      </Button>
+                    </Tooltip>
+                  )}
                   {additionalAction}
                 </Stack>
               </ViewToggleContainer>
+            )}
+
+            {!isSmallScreen && showSortControls && (
+              <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', width: '100%' }}>
+                <Box sx={{ width: '100%', maxWidth: '320px' }}>
+                  <PaginationSortControls
+                    sortBy={sortBy}
+                    sortOrder={sortOrder}
+                    onSortByChange={onSortByChange}
+                    onSortOrderChange={onSortOrderChange}
+                    sortOptions={sortOptions}
+                  />
+                </Box>
+              </Box>
             )}
 
             {isMobile && !hideSearchButton && <MobileSearchButton />}
@@ -337,6 +449,11 @@ export interface PaginationProps {
   customItemName?: string;
   hideSearchButton?: boolean;
   hideSettingsPanel?: boolean;
+  sortBy?: SortByOption;
+  sortOrder?: SortOrderOption;
+  onSortByChange?: (e: SelectChangeEvent<SortByOption>) => void;
+  onSortOrderChange?: (e: SelectChangeEvent<SortOrderOption>) => void;
+  sortOptions?: React.ReactNode[];
 }
 
 Pagination.displayName = 'Pagination';
@@ -516,6 +633,67 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
 };
 
 ViewModeToggle.displayName = 'ViewModeToggle';
+
+interface PaginationSortControlsProps {
+  sortBy?: SortByOption;
+  sortOrder?: SortOrderOption;
+  onSortByChange?: (e: SelectChangeEvent<SortByOption>) => void;
+  onSortOrderChange?: (e: SelectChangeEvent<SortOrderOption>) => void;
+  sortOptions: React.ReactNode[];
+}
+
+const PaginationSortControls: React.FC<PaginationSortControlsProps> = ({
+  sortBy,
+  sortOrder,
+  onSortByChange,
+  onSortOrderChange,
+  sortOptions,
+}) => {
+  if (!sortBy || !sortOrder || !onSortByChange || !onSortOrderChange || sortOptions.length === 0) {
+    return null;
+  }
+
+  return (
+    <Stack
+      direction="row"
+      spacing={1}
+      sx={{
+        width: '100%',
+      }}
+    >
+      <FormControl size="small" sx={{ flex: '1 1 65%' }}>
+        <InputLabel id="pagination-sort-by-label">Sort By</InputLabel>
+        <Select
+          labelId="pagination-sort-by-label"
+          value={sortBy}
+          label="Sort By"
+          onChange={onSortByChange}
+          startAdornment={
+            <InputAdornment position="start">
+              <ManageSearchIcon color="disabled" />
+            </InputAdornment>
+          }
+        >
+          {sortOptions}
+        </Select>
+      </FormControl>
+      <FormControl size="small" sx={{ flex: '1 1 35%' }}>
+        <InputLabel id="pagination-sort-order-label">Order</InputLabel>
+        <Select
+          labelId="pagination-sort-order-label"
+          value={sortOrder}
+          label="Order"
+          onChange={onSortOrderChange}
+        >
+          <MenuItem value="asc">ASC</MenuItem>
+          <MenuItem value="desc">DESC</MenuItem>
+        </Select>
+      </FormControl>
+    </Stack>
+  );
+};
+
+PaginationSortControls.displayName = 'PaginationSortControls';
 
 interface PageSizeControlProps {
   pageSize: number;

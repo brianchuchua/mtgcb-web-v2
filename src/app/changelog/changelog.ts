@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-21',
+      version: '1.3.3',
+      changes: [
+        'Added quick sort controls to pagination area - sort options were previously only at the bottom of the sidebar, now also available in the center of the page for easier access',
+      ],
+    },
+    {
+      date: '2025-10-21',
       version: '1.3.2',
       changes: [
         'Fixed collection-specific search filters appearing when browsing without a collection context',

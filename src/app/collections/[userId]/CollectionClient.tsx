@@ -3,7 +3,7 @@
 import AutoFixHigh from '@mui/icons-material/AutoFixHigh';
 import LocationOn from '@mui/icons-material/LocationOn';
 import MoreVert from '@mui/icons-material/MoreVert';
-import { Box, CircularProgress, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip } from '@mui/material';
+import { Box, Button, CircularProgress, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -472,24 +472,17 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
               {view === 'cards' && (visibleCardIds.length > 0 || (hasLocations && ownedVisibleCardIds.length > 0)) && (
                 <>
                   <Tooltip title="More actions">
-                    <IconButton
+                    <Button
                       size="small"
+                      variant="outlined"
                       onClick={handleMenuOpen}
                       sx={{
-                        border: 1,
-                        borderColor: (theme) => theme.palette.mode === 'dark'
-                          ? 'rgba(144, 202, 249, 0.5)'
-                          : 'rgba(25, 118, 210, 0.5)',
-                        borderRadius: 1,
-                        color: 'primary.main',
-                        '&:hover': {
-                          borderColor: 'primary.main',
-                          backgroundColor: 'action.hover',
-                        },
+                        minWidth: 'auto',
+                        px: 1,
                       }}
                     >
                       <MoreVert />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
                   <Menu
                     anchorEl={menuAnchorEl}

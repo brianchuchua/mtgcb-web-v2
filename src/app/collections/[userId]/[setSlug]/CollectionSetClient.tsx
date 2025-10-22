@@ -4,7 +4,7 @@ import AutoFixHigh from '@mui/icons-material/AutoFixHigh';
 import LocationOn from '@mui/icons-material/LocationOn';
 import MoreVert from '@mui/icons-material/MoreVert';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import { Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Button, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useSnackbar } from 'notistack';
@@ -707,25 +707,18 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               {browseController.view === 'cards' && !selectedGoalId && (
                 <>
                   <Tooltip title="More actions">
-                    <IconButton
+                    <Button
                       size="small"
+                      variant="outlined"
                       onClick={handleMenuOpen}
                       disabled={isMassUpdateLoading}
                       sx={{
-                        border: 1,
-                        borderColor: (theme) => theme.palette.mode === 'dark'
-                          ? 'rgba(144, 202, 249, 0.5)'
-                          : 'rgba(25, 118, 210, 0.5)',
-                        borderRadius: 1,
-                        color: 'primary.main',
-                        '&:hover': {
-                          borderColor: 'primary.main',
-                          backgroundColor: 'action.hover',
-                        },
+                        minWidth: 'auto',
+                        px: 1,
                       }}
                     >
                       <MoreVert />
-                    </IconButton>
+                    </Button>
                   </Tooltip>
                   <Menu
                     anchorEl={menuAnchorEl}

@@ -28,7 +28,9 @@
  * The presentational components never touch Redux or the network.  They just
  * take these props and render.
  */
-import { useSelector } from 'react-redux';
+import { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { SelectChangeEvent } from '@mui/material';
 import {
   useCardData,
   useCompilationHandler,
@@ -45,8 +47,20 @@ import {
   selectSelectedGoalId,
   selectSets,
   selectViewContentType,
+  setSortBy,
+  setSortOrder,
 } from '@/redux/slices/browse';
 import { useCardSearchParams, useSetSearchParams } from '@/hooks/useBrowseSearchParams';
+import { SortByOption, SortOrderOption } from '@/types/browse';
+import {
+  usePreferredCardsSortBy,
+  usePreferredCardsSortOrder,
+  usePreferredSetsSortBy,
+  usePreferredSetsSortOrder,
+} from '@/hooks/useBrowsePreferences';
+import { getCardSortOptions, getSetSortOptions } from '@/features/browse/BrowseSearchForm/utils/sortOptions';
+import { usePriceTypeSync } from '@/features/browse/BrowseSearchForm/hooks/usePriceTypeSync';
+import { useBrowseUrlContext } from '@/features/browse/BrowseSearchForm/hooks/useBrowseUrlContext';
 
 interface UseBrowseControllerOptions {
   skipCostToComplete?: boolean;
@@ -58,6 +72,7 @@ interface UseBrowseControllerOptions {
 }
 
 export function useBrowseController(options?: UseBrowseControllerOptions): BrowseControllerResult {
+  const dispatch = useDispatch();
   const viewFromRedux = useSelector(selectViewContentType) ?? 'cards';
   const currentView = options?.forceView ?? viewFromRedux; // Use forced view if provided
   const cardSearchParams = useCardSearchParams();
@@ -65,7 +80,19 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const currentSetsFilter = useSelector(selectSets);
-  
+
+  // URL context for determining if we're in collection view
+  const { isCollectionPage } = useBrowseUrlContext();
+
+  // localStorage hooks for persisting sort preferences
+  const [, setPreferredCardsSortBy] = usePreferredCardsSortBy();
+  const [, setPreferredCardsSortOrder] = usePreferredCardsSortOrder();
+  const [, setPreferredSetsSortBy] = usePreferredSetsSortBy();
+  const [, setPreferredSetsSortOrder] = usePreferredSetsSortOrder();
+
+  // Price type sync for price sort handling
+  const { isPriceMismatched, handlePriceSortChange } = usePriceTypeSync();
+
   // Determine if we should skip cards query
   const shouldSkipCards = currentView !== 'cards' ||
     (options?.skipCardsUntilReady ?? false) ||
@@ -76,6 +103,32 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
 
   // "grid / table" preference
   const { viewMode, changeViewMode } = useViewMode(currentView);
+
+  // Sort handlers with localStorage persistence
+  const handleSortByChange = useCallback((e: SelectChangeEvent<SortByOption>) => {
+    const newSortBy = e.target.value as SortByOption;
+    dispatch(setSortBy(newSortBy));
+    handlePriceSortChange(newSortBy);
+
+    // Save to localStorage based on current view
+    if (currentView === 'cards') {
+      setPreferredCardsSortBy(newSortBy);
+    } else {
+      setPreferredSetsSortBy(newSortBy);
+    }
+  }, [dispatch, currentView, setPreferredCardsSortBy, setPreferredSetsSortBy, handlePriceSortChange]);
+
+  const handleSortOrderChange = useCallback((e: SelectChangeEvent<SortOrderOption>) => {
+    const newSortOrder = e.target.value as SortOrderOption;
+    dispatch(setSortOrder(newSortOrder));
+
+    // Save to localStorage based on current view
+    if (currentView === 'cards') {
+      setPreferredCardsSortOrder(newSortOrder);
+    } else {
+      setPreferredSetsSortOrder(newSortOrder);
+    }
+  }, [dispatch, currentView, setPreferredCardsSortOrder, setPreferredSetsSortOrder]);
 
   // Data for whichever mode is active
   const cardData = useCardData({
@@ -118,6 +171,11 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
     isLoading: currentView === 'cards' ? cardData.isLoading : setData.isLoading,
   });
 
+  // Get sort options based on view type
+  const sortOptions = currentView === 'cards'
+    ? getCardSortOptions(isPriceMismatched, isCollectionPage)
+    : getSetSortOptions(isCollectionPage);
+
   return currentView === 'cards'
     ? buildCardPayload({
         currentView: currentView as 'cards' | 'sets',
@@ -133,6 +191,9 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
         selectedGoalId,
         userId: options?.userId,
         compilationHandler,
+        handleSortByChange,
+        handleSortOrderChange,
+        sortOptions,
       })
     : buildSetPayload({
         currentView: currentView as 'cards' | 'sets',
@@ -149,6 +210,9 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
         selectedGoalId,
         userId: options?.userId,
         compilationHandler,
+        handleSortByChange,
+        handleSortOrderChange,
+        sortOptions,
       });
 }
 
@@ -167,7 +231,15 @@ function buildCardPayload({
   selectedGoalId,
   userId,
   compilationHandler,
-}: CardPayloadProps & { compilationHandler: any }) {
+  handleSortByChange,
+  handleSortOrderChange,
+  sortOptions,
+}: CardPayloadProps & {
+  compilationHandler: any;
+  handleSortByChange: (e: SelectChangeEvent<SortByOption>) => void;
+  handleSortOrderChange: (e: SelectChangeEvent<SortOrderOption>) => void;
+  sortOptions: React.ReactNode[];
+}) {
   const isApiLoading = cardData.isLoading;
   const isInitialLoading = !initialLoadComplete && !cardData.items.length && !cardData.error;
 
@@ -189,6 +261,11 @@ function buildCardPayload({
       isInitialLoading,
       contentType: currentView,
       settingGroups: displaySettings.settingGroups,
+      sortBy: sorting.sortBy,
+      sortOrder: sorting.sortOrder,
+      onSortByChange: handleSortByChange,
+      onSortOrderChange: handleSortOrderChange,
+      sortOptions,
     },
 
     cardsProps: {
@@ -232,7 +309,15 @@ function buildSetPayload({
   initialLoadComplete,
   includeSubsetsInSets,
   compilationHandler,
-}: SetPayloadProps & { compilationHandler: any }) {
+  handleSortByChange,
+  handleSortOrderChange,
+  sortOptions,
+}: SetPayloadProps & {
+  compilationHandler: any;
+  handleSortByChange: (e: SelectChangeEvent<SortByOption>) => void;
+  handleSortOrderChange: (e: SelectChangeEvent<SortOrderOption>) => void;
+  sortOptions: React.ReactNode[];
+}) {
   const isApiLoading = setData.isLoading;
   const isInitialLoading = !initialLoadComplete && !setData.items.length && !setData.error;
 
@@ -254,6 +339,11 @@ function buildSetPayload({
       isInitialLoading,
       contentType: currentView,
       settingGroups: displaySettings.settingGroups,
+      sortBy: sorting.sortBy,
+      sortOrder: sorting.sortOrder,
+      onSortByChange: handleSortByChange,
+      onSortOrderChange: handleSortOrderChange,
+      sortOptions,
     },
 
     /* No cardsProps while in Set mode */
