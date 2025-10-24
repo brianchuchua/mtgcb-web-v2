@@ -11,6 +11,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-23',
+      version: '1.3.4',
+      changes: [
+        'Added ability to override disabled quantity fields on Add or Remove Cards page - click disabled fields to enable editing when card data is incorrect',
+        'Improved Add or Remove Cards page to automatically default to foil quantity when card is foil-only',
+      ],
+    },
+    {
       date: '2025-10-21',
       version: '1.3.3',
       changes: [

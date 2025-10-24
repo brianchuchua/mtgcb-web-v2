@@ -2,11 +2,17 @@
 
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
   Autocomplete,
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   IconButton,
   Paper,
@@ -199,9 +205,18 @@ const EditCardsClient: React.FC = () => {
       });
 
       if (editMode === 'increment' || editMode === 'decrement') {
-        setQuantityRegular(1);
-        setQuantityFoil(0);
+        // Smart defaults based on what the card can be
+        if (!selectedCard.card.canBeNonFoil && selectedCard.card.canBeFoil) {
+          // Foil-only card: default to 0 regular, 1 foil
+          setQuantityRegular(0);
+          setQuantityFoil(1);
+        } else {
+          // Most common case: can be non-foil, default to 1 regular, 0 foil
+          setQuantityRegular(1);
+          setQuantityFoil(0);
+        }
       } else {
+        // Set mode: use actual quantities
         setQuantityRegular(selectedCard.card.quantityReg || 0);
         setQuantityFoil(selectedCard.card.quantityFoil || 0);
       }
@@ -623,39 +638,68 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
   canBeNonFoil = true,
   canBeFoil = true,
 }) => {
-  // Determine error states based on edit mode
-  const regularHasError = !canBeNonFoil && (
+  // Override state
+  const [overrideNonFoil, setOverrideNonFoil] = useState(false);
+  const [overrideFoil, setOverrideFoil] = useState(false);
+  const [showOverrideDialog, setShowOverrideDialog] = useState(false);
+  const [overrideDialogType, setOverrideDialogType] = useState<'regular' | 'foil'>('regular');
+
+  // Determine error states based on edit mode and override state
+  const regularHasError = !canBeNonFoil && !overrideNonFoil && (
     (editMode === 'set' && quantityRegular > 0) ||
     (editMode === 'increment' && quantityRegular > 0) ||
     (editMode === 'decrement' && currentQuantities.regular > 0)
   );
-  
-  const foilHasError = !canBeFoil && (
+
+  const foilHasError = !canBeFoil && !overrideFoil && (
     (editMode === 'set' && quantityFoil > 0) ||
     (editMode === 'increment' && quantityFoil > 0) ||
     (editMode === 'decrement' && currentQuantities.foil > 0)
   );
 
+  // Determine disabled states - check override
+  const isRegularDisabled = !canBeNonFoil && !overrideNonFoil && editMode !== 'decrement';
+  const isFoilDisabled = !canBeFoil && !overrideFoil && editMode !== 'decrement';
+
   // Get contextual tooltip messages
-  const getTooltipMessage = (type: 'regular' | 'foil', hasError: boolean) => {
+  const getTooltipMessage = (type: 'regular' | 'foil', hasError: boolean, isDisabled: boolean) => {
     const cardType = type === 'regular' ? 'non-foil' : 'foil';
-    
-    if (type === 'regular' ? !canBeNonFoil : !canBeFoil) {
+    const canEdit = type === 'regular' ? (canBeNonFoil || overrideNonFoil) : (canBeFoil || overrideFoil);
+
+    if (!canEdit) {
       if (!hasError) {
-        return `This card doesn't come in ${cardType}.`;
+        return `This card doesn't come in ${cardType}. (Click to override.)`;
       }
-      
+
       switch (editMode) {
         case 'set':
-          return `This card doesn't come in ${cardType}. You can only set to 0.`;
+          return `This card doesn't come in ${cardType}. You can only set to 0. (Click to override.)`;
         case 'increment':
-          return `This card doesn't come in ${cardType}. You cannot add any.`;
+          return `This card doesn't come in ${cardType}. You cannot add any. (Click to override.)`;
         case 'decrement':
           return `This card doesn't come in ${cardType}. You can only remove existing cards.`;
       }
     }
-    
+
     return '';
+  };
+
+  const handleDisabledFieldClick = (type: 'regular' | 'foil') => {
+    setOverrideDialogType(type);
+    setShowOverrideDialog(true);
+  };
+
+  const handleOverrideConfirm = () => {
+    if (overrideDialogType === 'regular') {
+      setOverrideNonFoil(true);
+    } else {
+      setOverrideFoil(true);
+    }
+    setShowOverrideDialog(false);
+  };
+
+  const handleOverrideCancel = () => {
+    setShowOverrideDialog(false);
   };
 
   const getQuantityLabel = (type: 'Regular' | 'Foils', current: number, input: number) => {
@@ -690,21 +734,36 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
             {getQuantityLabel('Regular', currentQuantities.regular, quantityRegular)}
           </Typography>
           <Tooltip
-            title={getTooltipMessage('regular', regularHasError)}
+            title={getTooltipMessage('regular', regularHasError, isRegularDisabled)}
             placement="top"
-            disableHoverListener={!getTooltipMessage('regular', regularHasError)}
-            disableFocusListener={!getTooltipMessage('regular', regularHasError)}
-            disableTouchListener={!getTooltipMessage('regular', regularHasError)}
+            disableHoverListener={!getTooltipMessage('regular', regularHasError, isRegularDisabled)}
+            disableFocusListener={!getTooltipMessage('regular', regularHasError, isRegularDisabled)}
+            disableTouchListener={!getTooltipMessage('regular', regularHasError, isRegularDisabled)}
           >
-            <QuantityContainer>
+            <QuantityContainer
+              onClick={(e) => {
+                if (isRegularDisabled) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDisabledFieldClick('regular');
+                }
+              }}
+              sx={{
+                cursor: isRegularDisabled ? 'pointer' : undefined,
+              }}
+            >
               <QuantityLeftButton
                 size="small"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.currentTarget.blur();
-                  setQuantityRegular(Math.max(0, quantityRegular - 1));
+                  if (isRegularDisabled) {
+                    handleDisabledFieldClick('regular');
+                  } else {
+                    setQuantityRegular(Math.max(0, quantityRegular - 1));
+                  }
                 }}
-                disabled={quantityRegular === 0 || (editMode === 'increment' && !canBeNonFoil)}
+                disabled={quantityRegular === 0 || isRegularDisabled}
                 tabIndex={-1}
                 disableFocusRipple
                 $error={regularHasError}
@@ -716,16 +775,22 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
                 value={quantityRegular}
                 onChange={(e) => setQuantityRegular(Math.max(0, parseInt(e.target.value) || 0))}
                 inputProps={{ min: 0 }}
-                autoFocus
+                autoFocus={canBeNonFoil}
                 onFocus={(e) => e.target.select()}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     handleSave();
                   }
                 }}
+                onClick={(e) => {
+                  if (isRegularDisabled) {
+                    e.preventDefault();
+                    handleDisabledFieldClick('regular');
+                  }
+                }}
                 variant="outlined"
                 size="small"
-                disabled={!canBeNonFoil && editMode !== 'decrement'}
+                disabled={isRegularDisabled}
                 error={regularHasError}
               />
               <QuantityRightButton
@@ -733,12 +798,19 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.currentTarget.blur();
-                  setQuantityRegular(quantityRegular + 1);
+                  if (isRegularDisabled) {
+                    handleDisabledFieldClick('regular');
+                  } else {
+                    setQuantityRegular(quantityRegular + 1);
+                  }
                 }}
                 tabIndex={-1}
                 disableFocusRipple
-                disabled={!canBeNonFoil && editMode !== 'decrement'}
+                disabled={isRegularDisabled}
                 $error={regularHasError}
+                sx={{
+                  cursor: isRegularDisabled ? 'pointer' : undefined,
+                }}
               >
                 <AddIcon />
               </QuantityRightButton>
@@ -752,21 +824,36 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
             {getQuantityLabel('Foils', currentQuantities.foil, quantityFoil)}
           </Typography>
           <Tooltip
-            title={getTooltipMessage('foil', foilHasError)}
+            title={getTooltipMessage('foil', foilHasError, isFoilDisabled)}
             placement="top"
-            disableHoverListener={!getTooltipMessage('foil', foilHasError)}
-            disableFocusListener={!getTooltipMessage('foil', foilHasError)}
-            disableTouchListener={!getTooltipMessage('foil', foilHasError)}
+            disableHoverListener={!getTooltipMessage('foil', foilHasError, isFoilDisabled)}
+            disableFocusListener={!getTooltipMessage('foil', foilHasError, isFoilDisabled)}
+            disableTouchListener={!getTooltipMessage('foil', foilHasError, isFoilDisabled)}
           >
-            <QuantityContainer>
+            <QuantityContainer
+              onClick={(e) => {
+                if (isFoilDisabled) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDisabledFieldClick('foil');
+                }
+              }}
+              sx={{
+                cursor: isFoilDisabled ? 'pointer' : undefined,
+              }}
+            >
               <QuantityLeftButton
                 size="small"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.currentTarget.blur();
-                  setQuantityFoil(Math.max(0, quantityFoil - 1));
+                  if (isFoilDisabled) {
+                    handleDisabledFieldClick('foil');
+                  } else {
+                    setQuantityFoil(Math.max(0, quantityFoil - 1));
+                  }
                 }}
-                disabled={quantityFoil === 0 || (editMode === 'increment' && !canBeFoil)}
+                disabled={quantityFoil === 0 || isFoilDisabled}
                 tabIndex={-1}
                 disableFocusRipple
                 $error={foilHasError}
@@ -778,15 +865,22 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
                 value={quantityFoil}
                 onChange={(e) => setQuantityFoil(Math.max(0, parseInt(e.target.value) || 0))}
                 inputProps={{ min: 0 }}
+                autoFocus={!canBeNonFoil && canBeFoil}
                 onFocus={(e) => e.target.select()}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     handleSave();
                   }
                 }}
+                onClick={(e) => {
+                  if (isFoilDisabled) {
+                    e.preventDefault();
+                    handleDisabledFieldClick('foil');
+                  }
+                }}
                 variant="outlined"
                 size="small"
-                disabled={!canBeFoil && editMode !== 'decrement'}
+                disabled={isFoilDisabled}
                 error={foilHasError}
               />
               <QuantityRightButton
@@ -794,12 +888,19 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.currentTarget.blur();
-                  setQuantityFoil(quantityFoil + 1);
+                  if (isFoilDisabled) {
+                    handleDisabledFieldClick('foil');
+                  } else {
+                    setQuantityFoil(quantityFoil + 1);
+                  }
                 }}
                 tabIndex={-1}
                 disableFocusRipple
-                disabled={!canBeFoil && editMode !== 'decrement'}
+                disabled={isFoilDisabled}
                 $error={foilHasError}
+                sx={{
+                  cursor: isFoilDisabled ? 'pointer' : undefined,
+                }}
               >
                 <AddIcon />
               </QuantityRightButton>
@@ -837,6 +938,41 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
           </Button>
         </Stack>
       </Grid>
+
+      <Dialog
+        open={showOverrideDialog}
+        onClose={handleOverrideCancel}
+        aria-labelledby="override-dialog-title"
+        aria-describedby="override-dialog-description"
+      >
+        <DialogTitle id="override-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <WarningAmberIcon color="warning" />
+          Enable {overrideDialogType === 'regular' ? 'Non-Foil' : 'Foil'} Quantity?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="override-dialog-description" component="div">
+            <Typography variant="body2" gutterBottom>
+              According to our data, this card doesn&apos;t come in{' '}
+              {overrideDialogType === 'regular' ? 'non-foil' : 'foil'} finish.
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              However, this data can sometimes be incorrect or incomplete. If you have this card in{' '}
+              {overrideDialogType === 'regular' ? 'non-foil' : 'foil'} finish, you can override this restriction.
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 500, mt: 2 }}>
+              Would you like to enable this field anyway?
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleOverrideCancel} color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={handleOverrideConfirm} variant="contained" color="primary" autoFocus>
+            Enable Field
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Grid>
   );
 };
