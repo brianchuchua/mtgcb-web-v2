@@ -2,9 +2,9 @@
 
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { Button } from '@mui/material';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { useCardRowRenderer, useCardTableColumns } from '@/components/cards/CardTableRenderer';
+import { useCardRowRenderer, useCardTableColumns, extractCardCellValue } from '@/components/cards/CardTableRenderer';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import InfoBanner from '@/features/browse/views/InfoBanner';
 import { useRedGreenTableRows } from '@/contexts/DisplaySettingsContext';
@@ -107,6 +107,21 @@ const CardTable: React.FC<CardTableProps> = ({
     dispatch(resetSearch({ preserveGoal: false, preserveLocation: false }));
   };
 
+  // CSV Export handler
+  const handleExtractCellValue = useCallback(
+    (item: any, columnId: string) => {
+      return extractCardCellValue(item, columnId, priceType);
+    },
+    [priceType],
+  );
+
+  // Generate dynamic filename based on context
+  const generateFileName = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const context = isOwnCollection ? 'collection' : 'browse';
+    return `mtgcb-cards-${context}-${today}.csv`;
+  };
+
   const emptyStateComponent = (
     <InfoBanner
       title="No cards found matching your search criteria"
@@ -134,6 +149,9 @@ const CardTable: React.FC<CardTableProps> = ({
       computeItemKey={(index) => items[index]?.id || index}
       getRowProps={getRowProps}
       useRedGreenRows={redGreenTableRows}
+      exportable={true}
+      exportFileName={generateFileName()}
+      onExtractCellValue={handleExtractCellValue}
     />
   );
 };

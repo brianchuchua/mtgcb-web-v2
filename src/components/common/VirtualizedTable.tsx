@@ -1,12 +1,16 @@
 'use client';
 
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Box,
+  Button,
   CircularProgress,
   IconButton,
   Paper,
   Popover,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -18,8 +22,10 @@ import {
 } from '@mui/material';
 import { alpha, styled, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useSnackbar } from 'notistack';
 import React from 'react';
 import { TableVirtuoso } from 'react-virtuoso';
+import { useTableCsvExport } from '@/hooks/useTableCsvExport';
 
 export interface ResponsiveWidth {
   xs?: string;
@@ -54,6 +60,9 @@ export interface VirtualizedTableProps<T> {
   tableWidth?: number;
   getRowProps?: (item: T) => { isIncomplete?: boolean; totalQuantity?: number };
   useRedGreenRows?: boolean;
+  exportable?: boolean;
+  exportFileName?: string;
+  onExtractCellValue?: (item: T, columnId: string) => string | number | null | undefined;
 }
 
 const VirtualizedTable = <T,>({
@@ -70,10 +79,15 @@ const VirtualizedTable = <T,>({
   tableWidth,
   getRowProps,
   useRedGreenRows = false,
+  exportable = false,
+  exportFileName = 'export.csv',
+  onExtractCellValue,
 }: VirtualizedTableProps<T>) => {
   const theme = useTheme();
+  const { enqueueSnackbar } = useSnackbar();
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [activeTooltip, setActiveTooltip] = React.useState<string | null>(null);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Theme and responsive setup
   const isXs = useMediaQuery(theme.breakpoints.down('sm'));
@@ -115,6 +129,29 @@ const VirtualizedTable = <T,>({
   const handleInfoClose = () => {
     setAnchorEl(null);
     setActiveTooltip(null);
+  };
+
+  // CSV Export functionality
+  const { downloadCsv, copyCsvToClipboard } = useTableCsvExport({
+    items,
+    columns,
+    fileName: exportFileName,
+    extractCellValue: onExtractCellValue || (() => ''),
+  });
+
+  const handleDownloadCsv = () => {
+    downloadCsv();
+  };
+
+  const handleCopyCsv = async () => {
+    const success = await copyCsvToClipboard();
+    if (success) {
+      enqueueSnackbar('CSV copied to clipboard', { variant: 'success' });
+    } else {
+      enqueueSnackbar('Your browser may not support copying to clipboard. Try the CSV download instead.', {
+        variant: 'error',
+      });
+    }
   };
 
   // Empty state rendering
@@ -332,6 +369,38 @@ const VirtualizedTable = <T,>({
           </Typography>
         </Box>
       </Popover>
+
+      {exportable && onExtractCellValue && (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 1,
+            mt: 2,
+          }}
+        >
+          <Stack direction={isMobile ? 'column' : 'row'} spacing={1}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<ContentCopyIcon />}
+              onClick={handleCopyCsv}
+              disabled={!items || items.length === 0}
+            >
+              Copy Table to Clipboard
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<FileDownloadIcon />}
+              onClick={handleDownloadCsv}
+              disabled={!items || items.length === 0}
+            >
+              Download Table as CSV
+            </Button>
+          </Stack>
+        </Box>
+      )}
     </Box>
   );
 };

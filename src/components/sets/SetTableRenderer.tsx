@@ -226,3 +226,28 @@ const SetLinkText = styled(Typography)(({ theme }) => ({
   },
   cursor: 'pointer',
 }));
+
+// CSV Export extractor function
+export const extractSetCellValue = (
+  set: Set,
+  columnId: string,
+): string | number | null | undefined => {
+  switch (columnId) {
+    case 'code':
+      return set.code || '';
+    case 'name':
+      return set.name || '';
+    case 'cardCount':
+      return set.cardCount || '';
+    case 'releasedAt':
+      return formatISODate(set.releasedAt) || '';
+    case 'setType':
+      return formatSetType(set.setType) || '';
+    case 'category':
+      return set.category || '';
+    case 'isDraftable':
+      return set.isDraftable ? 'Yes' : 'No';
+    default:
+      return '';
+  }
+};

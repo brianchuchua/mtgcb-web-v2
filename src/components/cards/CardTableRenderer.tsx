@@ -1507,3 +1507,65 @@ const SetLinkText = styled(Typography)(({ theme }) => ({
   },
   cursor: 'pointer',
 }));
+
+// CSV Export extractor function
+export const extractCardCellValue = (
+  card: CardItemProps,
+  columnId: string,
+  priceType?: PriceType,
+): string | number | null | undefined => {
+  switch (columnId) {
+    case 'mtgcbCollectorNumber':
+      return card.mtgcbCollectorNumber || '';
+    case 'name':
+      return card.name || '';
+    case 'quantityReg':
+      return card.quantityReg ?? '';
+    case 'quantityFoil':
+      return card.quantityFoil ?? '';
+    case 'locations':
+      // Flatten locations array to readable string format
+      return (
+        card.locations
+          ?.map((loc: any) => `${loc.name} (R:${loc.quantityReg || 0} F:${loc.quantityFoil || 0})`)
+          .join('; ') || ''
+      );
+    case 'collectorNumber':
+      return card.collectorNumber || '';
+    case 'releasedAt':
+      // Export set name (even though column sorts by release date)
+      return card.setName || '';
+    case 'rarityNumeric':
+      return formatRarity(card.rarity) || '';
+    case 'type':
+      return card.type || '';
+    case 'artist':
+      return card.artist || '';
+    case 'convertedManaCost':
+      // Export raw mana cost string (e.g., {3}{W}{U})
+      return card.manaCost || '';
+    case 'powerNumeric':
+      return formatNumeric(card.powerNumeric) || '';
+    case 'toughnessNumeric':
+      return formatNumeric(card.toughnessNumeric) || '';
+    case 'loyaltyNumeric':
+      return formatNumeric(card.loyaltyNumeric) || '';
+    case 'market':
+    case 'low':
+    case 'average':
+    case 'high':
+    case 'foil':
+      // Handle price columns - export raw numeric values
+      if (priceType === columnId || columnId === 'foil') {
+        const priceData = preparePriceData(card);
+        if (columnId === 'foil' && priceData?.foil) {
+          return priceData.foil.market ?? '';
+        } else if (priceData?.normal) {
+          return (priceData.normal as any)[columnId] ?? '';
+        }
+      }
+      return '';
+    default:
+      return '';
+  }
+};

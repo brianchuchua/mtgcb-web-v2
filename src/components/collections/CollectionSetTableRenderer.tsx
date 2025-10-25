@@ -308,3 +308,37 @@ const SetLinkText = styled(Typography)(({ theme }) => ({
   },
   cursor: 'pointer',
 }));
+
+// CSV Export extractor function for collection sets
+export const extractCollectionSetCellValue = (
+  set: Set,
+  columnId: string,
+): string | number | null | undefined => {
+  switch (columnId) {
+    case 'code':
+      return set.code || '';
+    case 'name':
+      return set.name || '';
+    case 'percentageCollected':
+      return set.percentageCollected !== undefined ? `${set.percentageCollected}%` : '';
+    case 'totalValue':
+      return set.totalValue !== undefined ? set.totalValue.toFixed(2) : '';
+    case 'cardCount':
+      if (set.cardCount && set.uniquePrintingsCollectedInSet !== undefined) {
+        return `${set.uniquePrintingsCollectedInSet}/${set.cardCount}`;
+      }
+      return set.cardCount || '';
+    case 'costToComplete.oneOfEachCard':
+      return set.costToComplete?.oneOfEachCard !== undefined ? set.costToComplete.oneOfEachCard.toFixed(2) : '';
+    case 'releasedAt':
+      return formatISODate(set.releasedAt) || '';
+    case 'setType':
+      return formatSetType(set.setType) || '';
+    case 'category':
+      return set.category || '';
+    case 'isDraftable':
+      return set.isDraftable ? 'Yes' : 'No';
+    default:
+      return '';
+  }
+};

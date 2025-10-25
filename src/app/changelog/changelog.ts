@@ -11,6 +11,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-24',
+      version: '1.4.0',
+      changes: [
+        'Added table export feature - copy table data to clipboard or download as CSV from any card or set table',
+      ],
+    },
+    {
       date: '2025-10-23',
       version: '1.3.4',
       changes: [

@@ -1,11 +1,11 @@
 'use client';
 
 import { Box } from '@mui/material';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CollectionSetItemRenderer } from './CollectionSetItemRenderer';
 import { CollectionSetSummary } from '@/api/collections/types';
-import { useCollectionSetTableRenderers } from '@/components/collections/CollectionSetTableRenderer';
+import { useCollectionSetTableRenderers, extractCollectionSetCellValue } from '@/components/collections/CollectionSetTableRenderer';
 import VirtualizedRowGallery from '@/components/common/VirtualizedRowGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { SetDisplayProps } from '@/components/sets/SetDisplay';
@@ -70,6 +70,18 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
     }
   };
 
+  // CSV Export handler
+  const handleExtractCellValue = useCallback((item: any, columnId: string) => {
+    return extractCollectionSetCellValue(item, columnId);
+  }, []);
+
+  // Generate dynamic filename based on context
+  const generateFileName = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const userId = collectionData?.userId || 'user';
+    return `mtgcb-sets-collection-${userId}-${today}.csv`;
+  };
+
   if (viewMode === 'grid') {
     return (
       <VirtualizedRowGallery
@@ -117,6 +129,9 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
       onSortChange={handleSortChange}
       emptyMessage="No sets found"
       computeItemKey={(index) => displaySets[index]?.id || index}
+      exportable={true}
+      exportFileName={generateFileName()}
+      onExtractCellValue={handleExtractCellValue}
     />
   );
 };
