@@ -4,23 +4,35 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { Button, Divider, Paper, SelectChangeEvent, Stack, styled, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import CardSearchFields from './components/CardSearchFields';
+import ContentTypeToggle from './components/ContentTypeToggle';
+import MobileResultsButton from './components/MobileResultsButton';
+import SetSearchFields from './components/SetSearchFields';
+import SortControls from './components/SortControls';
+import { useBrowseFormState } from './hooks/useBrowseFormState';
+import { useBrowseUrlContext } from './hooks/useBrowseUrlContext';
+import { usePriceTypeSync } from './hooks/usePriceTypeSync';
+import { useSyncLocalState } from './hooks/useSyncLocalState';
+import { getCardSortOptions, getSetSortOptions } from './utils/sortOptions';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
+import AdvancedFilters from '@/features/browse/AdvancedFilters';
 import GoalCompletionSelector from '@/features/browse/GoalCompletionSelector';
 import GoalSelector from '@/features/browse/GoalSelector';
 import LocationSelector from '@/features/browse/LocationSelector';
-import AdvancedFilters from '@/features/browse/AdvancedFilters';
-import { useViewModeToggle } from '@/hooks/useViewModeToggle';
 import {
   usePreferredCardsSortBy,
   usePreferredCardsSortOrder,
+  usePreferredIncludeSubsetsInSets,
+  usePreferredOneResultPerCardName,
   usePreferredSetsSortBy,
   usePreferredSetsSortOrder,
-  usePreferredOneResultPerCardName,
   usePreferredShowSubsets,
-  usePreferredIncludeSubsetsInSets,
 } from '@/hooks/useBrowsePreferences';
 import { useFilteredSortBy } from '@/hooks/useFilteredSortBy';
+import { useViewModeToggle } from '@/hooks/useViewModeToggle';
 import {
+  clearSelectedGoal,
+  clearSelectedLocation,
   resetSearch,
   selectArtist,
   selectCardSearchName,
@@ -37,20 +49,8 @@ import {
   setShowSubsets,
   setSortBy,
   setSortOrder,
-  clearSelectedGoal,
-  clearSelectedLocation,
 } from '@/redux/slices/browse';
 import { SortByOption, SortOrderOption } from '@/types/browse';
-import CardSearchFields from './components/CardSearchFields';
-import ContentTypeToggle from './components/ContentTypeToggle';
-import MobileResultsButton from './components/MobileResultsButton';
-import SetSearchFields from './components/SetSearchFields';
-import SortControls from './components/SortControls';
-import { useBrowseFormState } from './hooks/useBrowseFormState';
-import { useBrowseUrlContext } from './hooks/useBrowseUrlContext';
-import { usePriceTypeSync } from './hooks/usePriceTypeSync';
-import { useSyncLocalState } from './hooks/useSyncLocalState';
-import { getCardSortOptions, getSetSortOptions } from './utils/sortOptions';
 
 const BrowseSearchForm: React.FC = () => {
   const dispatch = useDispatch();
@@ -201,7 +201,11 @@ const BrowseSearchForm: React.FC = () => {
           {isMobile && <MobileResultsButton onClick={handleSeeResults} />}
 
           {!isSetPage && (
-            <ContentTypeToggle contentType={contentType} onCardsClick={handleCardsClick} onSetsClick={handleSetsClick} />
+            <ContentTypeToggle
+              contentType={contentType}
+              onCardsClick={handleCardsClick}
+              onSetsClick={handleSetsClick}
+            />
           )}
 
           <Button variant="outlined" startIcon={<RestartAltIcon />} onClick={handleResetSearch}>

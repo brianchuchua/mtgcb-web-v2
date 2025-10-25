@@ -4,6 +4,7 @@ import OracleTextField from './OracleTextField';
 import ToggleSwitch from './ToggleSwitch';
 import ColorSelector from '@/features/browse/ColorSelector';
 import LayoutSelector from '@/features/browse/LayoutSelector';
+import OwnershipStatusSelector from '@/features/browse/OwnershipStatusSelector';
 import QuantitySelector from '@/features/browse/QuantitySelector';
 import RaritySelector from '@/features/browse/RaritySelector';
 import SetSelector from '@/features/browse/SetSelector';
@@ -57,6 +58,7 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
         inputTestId="card-name-field"
         iconTestId="card-name-search-icon"
       />
+      {isCollectionPage && <OwnershipStatusSelector />}
       <OracleTextField value={localOracleText} onChange={handleOracleChange} />
       <SearchField label="Artist" value={localArtist} onChange={handleArtistChange} placeholder="Search by artist name" />
       <TypeSelector />

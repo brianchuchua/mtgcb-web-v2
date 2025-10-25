@@ -64,7 +64,7 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
         userId,
         priceType: setPriceType,
         includeSubsetsInSets: includeSubsets,
-        ...(selectedGoalId && { 
+        ...(selectedGoalId && {
           goalId: selectedGoalId,
           ...(showGoals !== 'all' && { showGoals })
         }),

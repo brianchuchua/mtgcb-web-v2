@@ -12,6 +12,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-24',
+      version: '1.4.1',
+      changes: [
+        'Added quick ownership filter to easily show only owned cards or missing cards in your collection',
+      ],
+    },
+    {
+      date: '2025-10-24',
       version: '1.4.0',
       changes: [
         'Added table export feature - copy table data to clipboard or download as CSV from any card or set table',

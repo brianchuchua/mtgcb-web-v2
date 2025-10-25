@@ -44,9 +44,11 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
   // Fetch locations for the specified user
   // For own collection, don't pass userId (uses current user)
   // For other users' collections, pass their userId
-  const { data: locationsResponse, isLoading, error } = useGetLocationHierarchyQuery(
-    isOwnCollection ? undefined : { userId }
-  );
+  const {
+    data: locationsResponse,
+    isLoading,
+    error,
+  } = useGetLocationHierarchyQuery(isOwnCollection ? undefined : { userId });
   const locations = locationsResponse?.data || [];
 
   const handleChange = (event: SelectChangeEvent<number | '' | 'create-new-location'>) => {
@@ -181,7 +183,7 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
 
   return (
     <Box>
-      <FormControl fullWidth margin="dense">
+      <FormControl fullWidth margin="dense" sx={{ mt: 0 }}>
         <InputLabel id="location-selector-label" shrink>
           Location
         </InputLabel>

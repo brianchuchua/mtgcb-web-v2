@@ -2,6 +2,7 @@ import React from 'react';
 import SearchField from './SearchField';
 import ToggleSwitch from './ToggleSwitch';
 import CompletionStatusSelector from '@/features/browse/CompletionStatusSelector';
+import OwnershipStatusSelector from '@/features/browse/OwnershipStatusSelector';
 import SetCategorySelector from '@/features/browse/SetCategorySelector';
 import SetTypeSelector from '@/features/browse/SetTypeSelector';
 
@@ -43,6 +44,7 @@ const SetSearchFields: React.FC<SetSearchFieldsProps> = ({
         onChange={handleSetCodeChange}
         placeholder="Search by set code"
       />
+      {isCollectionPage && <OwnershipStatusSelector />}
       <SetCategorySelector />
       <SetTypeSelector />
       {isCollectionPage && <CompletionStatusSelector />}
