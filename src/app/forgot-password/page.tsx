@@ -187,6 +187,27 @@ export default function ForgotPasswordPage() {
             </Link>
           </Box>
 
+          <Box
+            sx={{
+              mt: 3,
+              mb: 2,
+              p: 2,
+              backgroundColor: 'action.hover',
+              borderRadius: 1,
+              borderLeft: 3,
+              borderColor: 'primary.main',
+            }}
+            data-testid="contact-help-note"
+          >
+            <Typography variant="body2" color="text.primary" align="center" component="div">
+              Forgot your exact username casing or which email you used? It happens!{' '}
+              <Link href="/contact" data-testid="contact-link">
+                Contact me
+              </Link>{' '}
+              and I can help you get access.
+            </Typography>
+          </Box>
+
           <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }} data-testid="recaptcha-text">
             This site is protected by reCAPTCHA and the Google{' '}
             <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-testid="privacy-link">
