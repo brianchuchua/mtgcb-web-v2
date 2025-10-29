@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-28',
+      version: '1.5.1',
+      changes: ['Fixed an issue where cards sorted by release date in goals would sometimes appear in unexpected positions'],
+    },
+    {
+      date: '2025-10-28',
       version: '1.5.0',
       changes: ['Added optional labeled navigation arrows for set pages in Classic Settings'],
     },
