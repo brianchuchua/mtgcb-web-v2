@@ -18,12 +18,14 @@ import { useState } from 'react';
 import { useGetLocationsQuery } from '@/api/locations/locationsApi';
 import LocationsList from '@/components/locations/LocationsList';
 import Pagination from '@/components/pagination/Pagination';
+import { usePriceType } from '@/contexts/DisplaySettingsContext';
 import { useLocationsPagination } from '@/hooks/locations/useLocationsPagination';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function LocationsClient() {
   const router = useRouter();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const [displayPriceType] = usePriceType();
   const { currentPage, pageSize, onPageChange, onPageSizeChange } = useLocationsPagination();
   const [infoDialogOpen, setInfoDialogOpen] = useState(false);
 
@@ -34,6 +36,8 @@ export default function LocationsClient() {
   } = useGetLocationsQuery(
     {
       includeCardCount: true,
+      includeValue: true,
+      priceType: displayPriceType.toLowerCase() as 'market' | 'low' | 'average' | 'high',
       limit: pageSize,
       offset: (currentPage - 1) * pageSize,
     },

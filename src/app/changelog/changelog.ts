@@ -11,6 +11,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-29',
+      version: '1.6.0',
+      changes: ['Added location value display showing the total value of cards stored at each location'],
+    },
+    {
       date: '2025-10-28',
       version: '1.5.1',
       changes: ['Fixed an issue where cards sorted by release date in goals would sometimes appear in unexpected positions'],

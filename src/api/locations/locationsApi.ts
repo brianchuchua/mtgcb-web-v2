@@ -13,6 +13,8 @@ import type {
 
 interface GetLocationsParams {
   includeCardCount?: boolean;
+  includeValue?: boolean;
+  priceType?: 'market' | 'low' | 'average' | 'high';
   limit?: number;
   offset?: number;
 }

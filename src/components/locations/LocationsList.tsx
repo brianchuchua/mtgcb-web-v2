@@ -102,41 +102,53 @@ export default function LocationsList({ locations }: LocationsListProps) {
                   </Typography>
                 )}
 
-                <Box
-                  sx={{ mt: 'auto', pt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}
-                >
-                  <Box>
-                    {'totalCards' in location && (
-                      <Typography variant="body2" color="text.secondary">
-                        {location.totalCards} {location.totalCards === 1 ? 'card' : 'cards'}
-                      </Typography>
-                    )}
-                  </Box>
-
-                  <Box sx={{ textAlign: 'right' }}>
-                    {location.updatedAt && location.updatedAt !== location.createdAt ? (
-                      <Tooltip title={`Created ${formatDate(location.createdAt)}`} placement="bottom-end">
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            Edited
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ cursor: 'help' }}>
-                            {formatDate(location.updatedAt)}
-                          </Typography>
-                        </Box>
-                      </Tooltip>
-                    ) : (
+                <Stack spacing={0.5} sx={{ mt: 'auto', pt: 1 }}>
+                  <Stack direction="row" spacing={2}>
+                    {'totalValue' in location && location.totalValue !== undefined && (
                       <Box>
                         <Typography variant="caption" color="text.secondary">
-                          Created
+                          Location Value
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {formatDate(location.createdAt)}
+                        <Typography variant="body2" color="success.main" fontWeight="medium">
+                          ${location.totalValue.toFixed(2)}
                         </Typography>
                       </Box>
                     )}
-                  </Box>
-                </Box>
+                    {'totalCards' in location && (
+                      <Box>
+                        <Typography variant="caption" color="text.secondary">
+                          Card Count
+                        </Typography>
+                        <Typography variant="body2" color="text.primary">
+                          {location.totalCards} {location.totalCards === 1 ? 'card' : 'cards'}
+                        </Typography>
+                      </Box>
+                    )}
+                    <Box sx={{ flex: 1, textAlign: 'right' }}>
+                      {location.updatedAt && location.updatedAt !== location.createdAt ? (
+                        <Tooltip title={`Created ${formatDate(location.createdAt)}`} placement="bottom-end">
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Edited
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" sx={{ cursor: 'help' }}>
+                              {formatDate(location.updatedAt)}
+                            </Typography>
+                          </Box>
+                        </Tooltip>
+                      ) : (
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            Created
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {formatDate(location.createdAt)}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Stack>
+                </Stack>
               </CardContent>
             </Card>
           </Grid>

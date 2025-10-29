@@ -9,6 +9,7 @@ export interface Location {
 
 export interface LocationWithCount extends Location {
   totalCards: number;
+  totalValue?: number;
 }
 
 export interface LocationHierarchy extends Location {
