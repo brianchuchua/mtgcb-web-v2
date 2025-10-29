@@ -6,6 +6,14 @@ import { CardWithQuantity } from '@/utils/tcgplayer/formatMassImportString';
 
 export type CountType = 'all' | 'mythic' | 'rare' | 'uncommon' | 'common' | 'draftcube';
 
+// Map rarity names to numeric values for API filtering
+const RARITY_NUMERIC_MAP: Record<string, number> = {
+  common: 2,
+  uncommon: 3,
+  rare: 4,
+  mythic: 5,
+};
+
 interface UseFetchCardsForMassImportProps {
   setId: string;
   countType: CountType;
@@ -72,7 +80,9 @@ export const useFetchCardsForMassImport = ({
             },
             // Add rarity filter for non-all and non-draftcube types
             ...(countType !== 'all' && countType !== 'draftcube' && {
-              rarity: countType,
+              rarityNumeric: {
+                OR: [`=${RARITY_NUMERIC_MAP[countType]}`],
+              },
             }),
             // Add userId, goalId, and priceType if provided
             ...(userId && { userId }),
