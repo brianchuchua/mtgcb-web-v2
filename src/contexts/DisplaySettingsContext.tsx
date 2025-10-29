@@ -103,6 +103,7 @@ interface DisplaySettings {
 
   // Classic Settings (legacy site behaviors)
   redGreenTableRows: boolean;
+  labeledNavigationArrows: boolean;
 }
 
 interface DisplaySettingsContextType {
@@ -212,6 +213,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
 
   // Classic Settings (legacy site behaviors)
   redGreenTableRows: false,
+  labeledNavigationArrows: false,
 };
 
 const STORAGE_KEY = 'mtgcb-display-settings';
@@ -463,4 +465,9 @@ export function useShowQuickEditIcon(): [boolean, (value: boolean) => void] {
 export function useRedGreenTableRows(): [boolean, (value: boolean) => void] {
   const { settings, updateSetting } = useDisplaySettings();
   return [settings.redGreenTableRows, (value) => updateSetting('redGreenTableRows', value)];
+}
+
+export function useLabeledNavigationArrows(): [boolean, (value: boolean) => void] {
+  const { settings, updateSetting } = useDisplaySettings();
+  return [settings.labeledNavigationArrows, (value) => updateSetting('labeledNavigationArrows', value)];
 }

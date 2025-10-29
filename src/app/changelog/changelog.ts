@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-28',
+      version: '1.5.0',
+      changes: ['Added optional labeled navigation arrows for set pages in Classic Settings'],
+    },
+    {
+      date: '2025-10-28',
       version: '1.4.2',
       changes: ['Improved accuracy of Buy missing cards purchase recommendations'],
     },
