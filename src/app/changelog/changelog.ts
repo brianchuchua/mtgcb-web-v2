@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-29',
+      version: '1.6.1',
+      changes: ['Fixed performance issue when updating card locations in bulk in set mode'],
+    },
+    {
+      date: '2025-10-29',
       version: '1.6.0',
       changes: ['Added location value display showing the total value of cards stored at each location'],
     },
