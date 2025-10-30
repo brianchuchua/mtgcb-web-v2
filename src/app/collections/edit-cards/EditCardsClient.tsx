@@ -13,9 +13,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   TextField,
   ToggleButton,
@@ -32,6 +36,8 @@ import { useGetCardsQuery, useLazyGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
+import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
+import { LocationHierarchy } from '@/api/locations/types';
 import CardPrice from '@/components/cards/CardPrice';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -51,6 +57,7 @@ const EditCardsClient: React.FC = () => {
   const [quantityFoil, setQuantityFoil] = useState(0);
   const [editMode, setEditMode] = useLocalStorage<EditMode>('editCardsMode', 'increment');
   const [currentQuantities, setCurrentQuantities] = useState({ regular: 0, foil: 0 });
+  const [selectedLocation, setSelectedLocation] = useState<number | null>(null);
   const priceType = usePriceType();
   const { user } = useAuth();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -142,6 +149,13 @@ const EditCardsClient: React.FC = () => {
     refetchOnFocus: false,
     refetchOnReconnect: false,
   });
+
+  const { data: locationsResponse } = useGetLocationHierarchyQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
+  const locations = locationsResponse?.data || [];
 
   const [updateCollection, { isLoading: isUpdating }] = useUpdateCollectionMutation();
 
@@ -253,6 +267,7 @@ const EditCardsClient: React.FC = () => {
             cardId: parseInt(selectedCard.id),
             quantityReg: editMode === 'decrement' ? -quantityRegular : quantityRegular,
             quantityFoil: editMode === 'decrement' ? -quantityFoil : quantityFoil,
+            ...(selectedLocation && editMode !== 'decrement' && { locationId: selectedLocation }),
           },
         ],
       };
@@ -291,7 +306,7 @@ const EditCardsClient: React.FC = () => {
       setCurrentQuantities({ regular: 0, foil: 0 });
       setInputValue('');
       setSearchInput('');
-      // Don't reset the selected set, keep it for convenience
+      // Don't reset the selected set or location, keep them for convenience
 
       // Focus back on search input
       searchInputRef.current?.focus();
@@ -342,6 +357,9 @@ const EditCardsClient: React.FC = () => {
                 isUpdating={isUpdating}
                 canBeNonFoil={selectedCard.card.canBeNonFoil}
                 canBeFoil={selectedCard.card.canBeFoil}
+                locations={locations}
+                selectedLocation={selectedLocation}
+                setSelectedLocation={setSelectedLocation}
               />
             </QuantityEditorSection>
 
@@ -623,6 +641,9 @@ interface QuantityEditorProps {
   isUpdating: boolean;
   canBeNonFoil?: boolean;
   canBeFoil?: boolean;
+  locations: LocationHierarchy[];
+  selectedLocation: number | null;
+  setSelectedLocation: (locationId: number | null) => void;
 }
 
 const QuantityEditor: React.FC<QuantityEditorProps> = ({
@@ -637,6 +658,9 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
   isUpdating,
   canBeNonFoil = true,
   canBeFoil = true,
+  locations,
+  selectedLocation,
+  setSelectedLocation,
 }) => {
   // Override state
   const [overrideNonFoil, setOverrideNonFoil] = useState(false);
@@ -725,6 +749,42 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
       return `${type} (${current} → ${input})`;
     }
   };
+
+  // Helper function to render location options with indentation
+  const renderLocationOptions = (locs: LocationHierarchy[], depth = 0): React.ReactNode[] => {
+    const options: React.ReactNode[] = [];
+
+    for (const loc of locs) {
+      const indent = '\u00A0\u00A0'.repeat(depth * 2); // Non-breaking spaces
+      const prefix = depth > 0 ? '└ ' : '';
+
+      options.push(
+        <MenuItem key={loc.id} value={loc.id}>
+          <Box sx={{ width: '100%' }}>
+            <Typography variant="body2">
+              {indent}{prefix}{loc.name}
+            </Typography>
+            {loc.description && (
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', pl: depth * 2 }}>
+                {loc.description}
+              </Typography>
+            )}
+          </Box>
+        </MenuItem>
+      );
+
+      if (loc.children.length > 0) {
+        options.push(...renderLocationOptions(loc.children, depth + 1));
+      }
+    }
+
+    return options;
+  };
+
+  // Show location picker only if:
+  // 1. User has at least one location
+  // 2. Mode is 'set' or 'increment' (not 'decrement')
+  const showLocationPicker = locations.length > 0 && editMode !== 'decrement';
 
   return (
     <Grid container spacing={2}>
@@ -908,6 +968,24 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
           </Tooltip>
         </Box>
       </Grid>
+      {showLocationPicker && (
+        <Grid item xs={12}>
+          <FormControl fullWidth size="small">
+            <InputLabel id="location-selector-label">Assign to Location (optional)</InputLabel>
+            <Select
+              labelId="location-selector-label"
+              value={selectedLocation || ''}
+              onChange={(e) => setSelectedLocation(e.target.value === '' ? null : Number(e.target.value))}
+              label="Assign to Location (optional)"
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {renderLocationOptions(locations)}
+            </Select>
+          </FormControl>
+        </Grid>
+      )}
       <Grid item xs={12}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>

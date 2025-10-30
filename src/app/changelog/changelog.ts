@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-29',
+      version: '1.7.0',
+      changes: ['Added ability to assign cards to locations directly from the Add or Remove Cards page'],
+    },
+    {
+      date: '2025-10-29',
       version: '1.6.2',
       changes: ['Added ability to override foil restrictions when assigning cards to locations'],
     },

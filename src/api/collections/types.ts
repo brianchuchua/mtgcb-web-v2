@@ -48,6 +48,7 @@ export interface CollectionUpdateRequest {
     cardId: number;
     quantityReg?: number;
     quantityFoil?: number;
+    locationId?: number;
   }>;
 }
 
@@ -56,6 +57,11 @@ export interface CollectionUpdateData {
     cardId: number;
     quantityReg: number;
     quantityFoil: number;
+    location?: {
+      locationId: number;
+      quantityReg: number;
+      quantityFoil: number;
+    } | null;
   }>;
 }
 
