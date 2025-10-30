@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { styled } from '@mui/material/styles';
 
 const StyledQuantityBox = styled(Box)(({ theme }) => ({
@@ -302,6 +303,10 @@ export interface DualQuantitySelectorProps {
     regular?: string;
     foil?: string;
   };
+  overrideNonFoil?: boolean;
+  overrideFoil?: boolean;
+  onOverrideNonFoil?: () => void;
+  onOverrideFoil?: () => void;
 }
 
 export const DualQuantitySelector: React.FC<DualQuantitySelectorProps> = ({
@@ -324,58 +329,164 @@ export const DualQuantitySelector: React.FC<DualQuantitySelectorProps> = ({
     regular: 'Regular',
     foil: 'Foils',
   },
+  overrideNonFoil = false,
+  overrideFoil = false,
+  onOverrideNonFoil,
+  onOverrideFoil,
 }) => {
+  const [showOverrideDialog, setShowOverrideDialog] = useState(false);
+  const [overrideDialogType, setOverrideDialogType] = useState<'regular' | 'foil'>('regular');
+
+  const handleDisabledFieldClick = (type: 'regular' | 'foil') => {
+    setOverrideDialogType(type);
+    setShowOverrideDialog(true);
+  };
+
+  const handleOverrideConfirm = () => {
+    if (overrideDialogType === 'regular') {
+      onOverrideNonFoil?.();
+    } else {
+      onOverrideFoil?.();
+    }
+    setShowOverrideDialog(false);
+  };
+
+  const handleOverrideCancel = () => {
+    setShowOverrideDialog(false);
+  };
+
+  // Determine if fields should be disabled (considering overrides)
+  const isRegularDisabled = !canBeNonFoil && !overrideNonFoil;
+  const isFoilDisabled = !canBeFoil && !overrideFoil;
+
   return (
-    <Box sx={{ 
-      display: 'flex', 
-      gap: 2, 
-      alignItems: 'flex-start',
-      flexDirection: { 
-        xs: 'column', // Stack vertically on mobile
-        sm: orientation === 'vertical' ? 'column' : 'row' // Use orientation prop on larger screens
-      },
-      '& > div': {
-        width: { xs: '100%', sm: 'auto' }, // Full width on mobile
-      },
-      '& .MuiBox-root': {
-        width: { xs: '100%', sm: 'auto' }, // Full width for quantity selector wrapper on mobile
-      },
-      '& > div > div:first-of-type': {
-        width: { xs: '100%', sm: '160px' }, // Full width for StyledQuantityBox on mobile
-      }
-    }}>
-      <QuantitySelector
-        value={regularValue}
-        onChange={onRegularChange}
-        onBlur={onBlur}
-        max={maxRegular}
-        disabled={!canBeNonFoil}
-        error={regularError || (!canBeNonFoil && regularValue > 0)}
-        helperText={
-          !canBeNonFoil && regularValue > 0
-            ? 'This card cannot be non-foil'
-            : regularHelperText
+    <>
+      <Box sx={{
+        display: 'flex',
+        gap: 2,
+        alignItems: 'flex-start',
+        flexDirection: {
+          xs: 'column', // Stack vertically on mobile
+          sm: orientation === 'vertical' ? 'column' : 'row' // Use orientation prop on larger screens
+        },
+        '& > div': {
+          width: { xs: '100%', sm: 'auto' }, // Full width on mobile
+        },
+        '& .MuiBox-root': {
+          width: { xs: '100%', sm: 'auto' }, // Full width for quantity selector wrapper on mobile
+        },
+        '& > div > div:first-of-type': {
+          width: { xs: '100%', sm: '160px' }, // Full width for StyledQuantityBox on mobile
         }
-        label={labels.regular}
-        tooltip={!canBeNonFoil ? 'This card can only be foil' : undefined}
-        size={size}
-      />
-      <QuantitySelector
-        value={foilValue}
-        onChange={onFoilChange}
-        onBlur={onBlur}
-        max={maxFoil}
-        disabled={!canBeFoil}
-        error={foilError || (!canBeFoil && foilValue > 0)}
-        helperText={
-          !canBeFoil && foilValue > 0
-            ? 'This card cannot be foil'
-            : foilHelperText
-        }
-        label={labels.foil}
-        tooltip={!canBeFoil ? 'This card cannot be foil' : undefined}
-        size={size}
-      />
-    </Box>
+      }}>
+        <Box sx={{ position: 'relative', display: 'flex' }}>
+          <QuantitySelector
+            value={regularValue}
+            onChange={onRegularChange}
+            onBlur={onBlur}
+            max={maxRegular}
+            disabled={isRegularDisabled}
+            error={regularError || (!canBeNonFoil && !overrideNonFoil && regularValue > 0)}
+            helperText={
+              !canBeNonFoil && !overrideNonFoil && regularValue > 0
+                ? 'This card cannot be non-foil'
+                : regularHelperText
+            }
+            label={labels.regular}
+            tooltip={!canBeNonFoil && !overrideNonFoil ? 'This card can only be foil. (Click to override.)' : undefined}
+            size={size}
+          />
+          {isRegularDisabled && onOverrideNonFoil && (
+            <Box
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDisabledFieldClick('regular');
+              }}
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                cursor: 'pointer',
+                zIndex: 1,
+              }}
+            />
+          )}
+        </Box>
+        <Box sx={{ position: 'relative', display: 'flex' }}>
+          <QuantitySelector
+            value={foilValue}
+            onChange={onFoilChange}
+            onBlur={onBlur}
+            max={maxFoil}
+            disabled={isFoilDisabled}
+            error={foilError || (!canBeFoil && !overrideFoil && foilValue > 0)}
+            helperText={
+              !canBeFoil && !overrideFoil && foilValue > 0
+                ? 'This card cannot be foil'
+                : foilHelperText
+            }
+            label={labels.foil}
+            tooltip={!canBeFoil && !overrideFoil ? 'This card cannot be foil. (Click to override.)' : undefined}
+            size={size}
+          />
+          {isFoilDisabled && onOverrideFoil && (
+            <Box
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDisabledFieldClick('foil');
+              }}
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                cursor: 'pointer',
+                zIndex: 1,
+              }}
+            />
+          )}
+        </Box>
+      </Box>
+
+      <Dialog
+        open={showOverrideDialog}
+        onClose={handleOverrideCancel}
+        aria-labelledby="override-dialog-title"
+        aria-describedby="override-dialog-description"
+      >
+        <DialogTitle id="override-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <WarningAmberIcon color="warning" />
+          Enable {overrideDialogType === 'regular' ? 'Non-Foil' : 'Foil'} Quantity?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="override-dialog-description" component="div">
+            <Typography variant="body2" gutterBottom>
+              According to our data, this card doesn&apos;t come in{' '}
+              {overrideDialogType === 'regular' ? 'non-foil' : 'foil'} finish.
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              However, this data can sometimes be incorrect or incomplete. If you have this card in{' '}
+              {overrideDialogType === 'regular' ? 'non-foil' : 'foil'} finish, you can override this restriction.
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 500, mt: 2 }}>
+              Would you like to enable this field anyway?
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleOverrideCancel} color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={handleOverrideConfirm} variant="contained" color="primary" autoFocus>
+            Enable Field
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };

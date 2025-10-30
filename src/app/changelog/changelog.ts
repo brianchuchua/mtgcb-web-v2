@@ -12,6 +12,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-10-29',
+      version: '1.6.2',
+      changes: ['Added ability to override foil restrictions when assigning cards to locations'],
+    },
+    {
+      date: '2025-10-29',
       version: '1.6.1',
       changes: ['Fixed performance issue when updating card locations in bulk in set mode'],
     },

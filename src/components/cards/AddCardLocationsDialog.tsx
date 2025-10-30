@@ -65,6 +65,8 @@ export default function AddCardLocationsDialog({
   const [quantityFoil, setQuantityFoil] = useState<number>(0);
   const [isUpdating, setIsUpdating] = useState(false);
   const [infoAnchorEl, setInfoAnchorEl] = useState<HTMLElement | null>(null);
+  const [overrideNonFoil, setOverrideNonFoil] = useState(false);
+  const [overrideFoil, setOverrideFoil] = useState(false);
 
   // Helper function to render location options with indentation
   const renderLocationOptions = (locs: LocationHierarchy[], depth = 0): React.ReactNode[] => {
@@ -140,8 +142,8 @@ export default function AddCardLocationsDialog({
   const hasValidationError =
     regExceedsAvailable ||
     foilExceedsAvailable ||
-    (!canBeNonFoil && quantityReg > 0) ||
-    (!canBeFoil && quantityFoil > 0);
+    (!canBeNonFoil && !overrideNonFoil && quantityReg > 0) ||
+    (!canBeFoil && !overrideFoil && quantityFoil > 0);
 
   const handleSave = async () => {
     if (!selectedLocationId) {
@@ -159,12 +161,12 @@ export default function AddCardLocationsDialog({
       return;
     }
 
-    if (!canBeNonFoil && quantityReg > 0) {
+    if (!canBeNonFoil && !overrideNonFoil && quantityReg > 0) {
       enqueueSnackbar('This card cannot be non-foil', { variant: 'error' });
       return;
     }
 
-    if (!canBeFoil && quantityFoil > 0) {
+    if (!canBeFoil && !overrideFoil && quantityFoil > 0) {
       enqueueSnackbar('This card cannot be foil', { variant: 'error' });
       return;
     }
@@ -199,6 +201,8 @@ export default function AddCardLocationsDialog({
     setQuantityReg(0);
     setQuantityFoil(0);
     setIsUpdating(false);
+    setOverrideNonFoil(false);
+    setOverrideFoil(false);
     onClose();
   };
 
@@ -282,6 +286,10 @@ export default function AddCardLocationsDialog({
                     foilHelperText={foilExceedsAvailable ? `Maximum available: ${availableFoil}` : undefined}
                     size="medium"
                     orientation="horizontal"
+                    overrideNonFoil={overrideNonFoil}
+                    overrideFoil={overrideFoil}
+                    onOverrideNonFoil={() => setOverrideNonFoil(true)}
+                    onOverrideFoil={() => setOverrideFoil(true)}
                   />
                 </Box>
 

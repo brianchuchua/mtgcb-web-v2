@@ -73,12 +73,16 @@ function EditLocationDialog({
   const [quantityReg, setQuantityReg] = useState(location.quantityReg);
   const [quantityFoil, setQuantityFoil] = useState(location.quantityFoil);
   const [infoAnchorEl, setInfoAnchorEl] = useState<HTMLElement | null>(null);
+  const [overrideNonFoil, setOverrideNonFoil] = useState(false);
+  const [overrideFoil, setOverrideFoil] = useState(false);
   const [updateCardLocation, { isLoading }] = useUpdateCardLocationMutation();
 
   // Update state when location prop changes
   useEffect(() => {
     setQuantityReg(location.quantityReg);
     setQuantityFoil(location.quantityFoil);
+    setOverrideNonFoil(false);
+    setOverrideFoil(false);
   }, [location.quantityReg, location.quantityFoil]);
 
   // Calculate totals already assigned across ALL locations
@@ -109,8 +113,8 @@ function EditLocationDialog({
   const hasValidationError =
     regExceedsAvailable ||
     foilExceedsAvailable ||
-    (!canBeNonFoil && quantityReg > 0) ||
-    (!canBeFoil && quantityFoil > 0);
+    (!canBeNonFoil && !overrideNonFoil && quantityReg > 0) ||
+    (!canBeFoil && !overrideFoil && quantityFoil > 0);
 
   const handleSave = async () => {
     if (quantityReg < 0 || quantityFoil < 0) {
@@ -123,12 +127,12 @@ function EditLocationDialog({
       return;
     }
 
-    if (!canBeNonFoil && quantityReg > 0) {
+    if (!canBeNonFoil && !overrideNonFoil && quantityReg > 0) {
       enqueueSnackbar('This card cannot be non-foil', { variant: 'error' });
       return;
     }
 
-    if (!canBeFoil && quantityFoil > 0) {
+    if (!canBeFoil && !overrideFoil && quantityFoil > 0) {
       enqueueSnackbar('This card cannot be foil', { variant: 'error' });
       return;
     }
@@ -204,6 +208,10 @@ function EditLocationDialog({
               foilHelperText={foilExceedsAvailable ? `Maximum available: ${maxAssignableFoil}` : undefined}
               size="medium"
               orientation="horizontal"
+              overrideNonFoil={overrideNonFoil}
+              overrideFoil={overrideFoil}
+              onOverrideNonFoil={() => setOverrideNonFoil(true)}
+              onOverrideFoil={() => setOverrideFoil(true)}
             />
           </Box>
 
