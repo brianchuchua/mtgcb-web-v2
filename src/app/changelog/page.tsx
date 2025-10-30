@@ -16,6 +16,12 @@ const VersionChip = styled(Chip)(({ theme }) => ({
   },
 }));
 
+const NewCardsChip = styled(Chip)(({ theme }) => ({
+  fontWeight: 600,
+  backgroundColor: theme.palette.success.main,
+  color: theme.palette.success.contrastText,
+}));
+
 const ChangeItem = styled('li')(({ theme }) => ({
   marginBottom: theme.spacing(1),
   color: theme.palette.text.secondary,
@@ -61,6 +67,9 @@ export default function ChangelogPage() {
               {formatDate(release.date)}
             </Typography>
             <VersionChip label={`v${release.version}`} size="small" />
+            {release.type === 'data' && (
+              <NewCardsChip label="New Cards" size="small" />
+            )}
           </Box>
           
           <Divider sx={{ mb: 2 }} />

@@ -2,6 +2,7 @@ interface Release {
   date: string;
   version: string;
   changes: string[];
+  type?: 'feature' | 'data';
 }
 
 interface ChangelogData {
@@ -10,6 +11,12 @@ interface ChangelogData {
 
 const changelogData: ChangelogData = {
   releases: [
+    {
+      date: '2025-10-30',
+      version: '1.7.1',
+      changes: ['Added Marvel\'s Spider-Man Prerelease Promos'],
+      type: 'data',
+    },
     {
       date: '2025-10-29',
       version: '1.7.0',
