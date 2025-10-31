@@ -14,7 +14,7 @@ const changelogData: ChangelogData = {
     {
       date: '2025-10-30',
       version: '1.7.1',
-      changes: ['Added Marvel\'s Spider-Man Prerelease Promos'],
+      changes: ["Added Marvel's Spider-Man Prerelease Promos", 'Updated Secret Lair Drop Series'],
       type: 'data',
     },
     {
@@ -40,7 +40,9 @@ const changelogData: ChangelogData = {
     {
       date: '2025-10-28',
       version: '1.5.1',
-      changes: ['Fixed an issue where cards sorted by release date in goals would sometimes appear in unexpected positions'],
+      changes: [
+        'Fixed an issue where cards sorted by release date in goals would sometimes appear in unexpected positions',
+      ],
     },
     {
       date: '2025-10-28',
