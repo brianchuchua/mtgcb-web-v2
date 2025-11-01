@@ -5,6 +5,7 @@ import {
   CollectionMassEntryResponse,
   CollectionUpdateRequest,
   CollectionUpdateResponse,
+  CollectionHistoryResponse,
 } from './types';
 import {
   AssociateCardLocationRequest,
@@ -364,6 +365,14 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         }
       },
     }),
+
+    getCollectionHistory: builder.query<CollectionHistoryResponse, { limit?: number }>({
+      query: ({ limit = 100 }) => ({
+        url: '/collection/history',
+        params: { limit },
+      }),
+      providesTags: ['Collection', 'Location'],
+    }),
   }),
 });
 
@@ -379,5 +388,6 @@ export const {
   useGetLocationCardsQuery,
   useMassUpdateLocationsMutation,
   useNukeCollectionMutation,
+  useGetCollectionHistoryQuery,
 } = collectionsApi;
 export const { endpoints: collectionsEndpoints } = collectionsApi;

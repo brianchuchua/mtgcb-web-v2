@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-10-31',
+      version: '1.8.0',
+      changes: ['Added Collection History page showing your last 100 collection updates'],
+    },
+    {
       date: '2025-10-30',
       version: '1.7.1',
       changes: ["Added Marvel's Spider-Man Prerelease Promos", 'Updated Secret Lair Drop Series'],

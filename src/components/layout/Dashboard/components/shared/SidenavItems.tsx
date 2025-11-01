@@ -9,6 +9,7 @@ import {
   Launch as ExportIcon,
   HelpOutline as FAQIcon,
   Favorite as FavoriteIcon,
+  History as HistoryIcon,
   Home as HomeIcon,
   SaveAlt as ImportIcon,
   Iso as IsoIcon,
@@ -99,6 +100,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
       pathname?.startsWith('/locations') ||
       pathname === '/export' ||
       pathname === '/import' ||
+      pathname === '/history' ||
       pathname === '/reset-collection';
 
     const isOnResourcesPage =
@@ -220,6 +222,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                       pathname?.startsWith('/locations') ||
                       pathname === '/export' ||
                       pathname === '/import' ||
+                      pathname === '/history' ||
                       pathname === '/reset-collection'
                     }
                   >
@@ -307,6 +310,20 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                         <ExportIcon />
                       </ListItemIcon>
                       <ListItemText primary="Export" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      component={Link}
+                      href="/history"
+                      selected={pathname === '/history'}
+                      onClick={handleClick}
+                      sx={{ pl: 4 }}
+                    >
+                      <ListItemIcon>
+                        <HistoryIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="History" />
                     </ListItemButton>
                   </ListItem>
                   <ListItem disablePadding>

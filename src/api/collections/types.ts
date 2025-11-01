@@ -131,3 +131,81 @@ export interface CollectionMassEntryData {
 }
 
 export type CollectionMassEntryResponse = ApiResponse<CollectionMassEntryData>;
+
+// History types
+export type OperationType =
+  | 'update'
+  | 'mass-update'
+  | 'mass-entry'
+  | 'import'
+  | 'nuke'
+  | 'location-assign'
+  | 'location-update'
+  | 'location-remove'
+  | 'location-mass-update';
+
+export type OperationMode = 'set' | 'increment' | 'merge' | 'replace' | 'remove';
+
+export interface CardInfo {
+  id: number;
+  name: string;
+  setCode: string;
+  setName: string;
+}
+
+export interface SetInfo {
+  id: number;
+  code: string;
+  name: string;
+  slug: string;
+}
+
+export interface LocationInfo {
+  id: number;
+  name: string;
+}
+
+export interface QuantityChange {
+  regular: {
+    before: number | null;
+    after: number | null;
+  };
+  foil: {
+    before: number | null;
+    after: number | null;
+  };
+}
+
+export interface BulkOperationData {
+  cardsAffected: number;
+  created?: number;
+  updated?: number;
+  deleted?: number;
+  setCode?: string;
+  setName?: string;
+  setSlug?: string;
+  rarity?: string;
+  locationId?: number;
+  locationName?: string;
+  quantityReg?: number;
+  quantityFoil?: number;
+}
+
+export interface HistoryEntry {
+  id: number;
+  timestamp: string;
+  operationType: OperationType;
+  mode: OperationMode | null;
+  description: string;
+  card: CardInfo | null;
+  set: SetInfo | null;
+  location: LocationInfo | null;
+  quantities: QuantityChange | null;
+  bulkSummary: BulkOperationData | null;
+}
+
+export interface CollectionHistoryData {
+  history: HistoryEntry[];
+}
+
+export type CollectionHistoryResponse = ApiResponse<CollectionHistoryData>;
