@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-11-01',
+      version: '1.8.1',
+      changes: ['Improved reliability of updating card quantities on slower connections'],
+    },
+    {
       date: '2025-10-31',
       version: '1.8.0',
       changes: ['Added Collection History page showing your last 100 collection updates'],

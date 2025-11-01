@@ -167,7 +167,9 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   const [overrideDialogType, setOverrideDialogType] = useState<'regular' | 'foil'>('regular');
   const [updateCollection] = useUpdateCollectionMutation();
   const { enqueueSnackbar } = useSnackbar();
-  const updatePromiseRef = React.useRef<{ abort: () => void } | null>(null);
+  // Separate promise refs so Regular and Foil updates don't cancel each other
+  const updatePromiseRefReg = React.useRef<{ abort: () => void } | null>(null);
+  const updatePromiseRefFoil = React.useRef<{ abort: () => void } | null>(null);
   const isUserEditingRef = React.useRef(false);
   const editingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -193,7 +195,10 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   // Create debounced update function
   const debouncedUpdate = useCallback(
     debounce(async (newQuantityReg: number, newQuantityFoil: number, changedType: 'regular' | 'foil') => {
-      // Cancel any pending request
+      // Select the correct promise ref based on which field changed
+      const updatePromiseRef = changedType === 'regular' ? updatePromiseRefReg : updatePromiseRefFoil;
+
+      // Cancel any pending request for this specific field
       if (updatePromiseRef.current) {
         updatePromiseRef.current.abort();
       }
@@ -208,18 +213,21 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
       }
 
       try {
+        // Only send the field that actually changed to prevent race conditions
         const promise = updateCollection({
           mode: 'set',
           cards: [
             {
               cardId,
-              quantityReg: newQuantityReg,
-              quantityFoil: newQuantityFoil,
+              // Conditionally include only the field being updated
+              ...(changedType === 'regular'
+                ? { quantityReg: newQuantityReg }
+                : { quantityFoil: newQuantityFoil }),
             },
           ],
         });
 
-        // Store the promise so we can abort it later
+        // Store the promise in the correct ref so we can abort it later
         updatePromiseRef.current = promise;
 
         const result = await promise.unwrap();
