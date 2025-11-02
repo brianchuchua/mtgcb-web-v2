@@ -95,6 +95,7 @@ export interface CardItemProps {
   };
   priceType?: PriceType; // Price type to display
   onClick?: () => void;
+  href?: string; // For Link-based navigation (makes image/name right-clickable)
   isOwnCollection?: boolean;
   goalId?: string;
   imageLinksToTCGPlayer?: boolean; // New prop to enable TCGPlayer link on image
@@ -149,6 +150,7 @@ const CardItemComponent = ({
   },
   priceType = PriceType.Market,
   onClick,
+  href,
   isOwnCollection = false,
   goalId,
   imageLinksToTCGPlayer = false,
@@ -245,9 +247,9 @@ const CardItemComponent = ({
       data-testid="card-item"
     >
       <CardImageContainer
-        onClick={!imageLinksToTCGPlayer && onClick ? handleCardElementClick : undefined}
+        onClick={!imageLinksToTCGPlayer && !href && onClick ? handleCardElementClick : undefined}
         sx={{
-          cursor: imageLinksToTCGPlayer ? 'default' : onClick ? 'pointer' : 'default',
+          cursor: imageLinksToTCGPlayer ? 'default' : (href || onClick) ? 'pointer' : 'default',
           opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
           transition: 'opacity 0.2s ease-in-out',
           position: 'relative',
@@ -333,6 +335,53 @@ const CardItemComponent = ({
               </MissingImageFallback>
             )}
           </Box>
+        ) : href ? (
+          <Link
+            href={href}
+            style={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              textDecoration: 'none',
+            }}
+          >
+            {!imageLoaded && !imageError && (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                animation="wave"
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  borderRadius: getBorderRadius(),
+                  backgroundColor: '#22262c',
+                }}
+              />
+            )}
+            {!imageError ? (
+              <CardImage
+                ref={imageRef}
+                src={getImageUrl()}
+                loading="lazy"
+                alt={name}
+                title={name}
+                setName={setName}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageError(true)}
+                style={{ opacity: imageLoaded ? 1 : 0 }}
+              />
+            ) : (
+              <MissingImageFallback setName={setName}>
+                <Typography variant="subtitle2">{name}</Typography>
+                <Typography variant="caption">Image not available</Typography>
+              </MissingImageFallback>
+            )}
+          </Link>
         ) : (
           <>
             {!imageLoaded && !imageError && (
@@ -420,35 +469,68 @@ const CardItemComponent = ({
           )}
 
           {nameIsVisible && (
-            <Typography
-              variant="h6"
-              noWrap
-              title={name}
-              onClick={onClick ? handleCardElementClick : undefined}
-              data-testid="card-name"
-              sx={{
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                maxWidth: '100%',
-                cursor: onClick ? 'pointer' : 'default',
-                '&:hover': {
-                  textDecoration: onClick ? 'underline' : 'none',
-                },
-                fontSize: '1.25rem',
-                '@container card (max-width: 300px)': {
-                  fontSize: '1.125rem',
-                },
-                '@container card (max-width: 250px)': {
-                  fontSize: '1rem',
-                },
-                '@container card (max-width: 200px)': {
-                  fontSize: '0.875rem',
-                },
-              }}
-            >
-              {name}
-            </Typography>
+            href ? (
+              <Link href={href} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  title={name}
+                  data-testid="card-name"
+                  sx={{
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxWidth: '100%',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      textDecoration: 'underline',
+                    },
+                    fontSize: '1.25rem',
+                    '@container card (max-width: 300px)': {
+                      fontSize: '1.125rem',
+                    },
+                    '@container card (max-width: 250px)': {
+                      fontSize: '1rem',
+                    },
+                    '@container card (max-width: 200px)': {
+                      fontSize: '0.875rem',
+                    },
+                  }}
+                >
+                  {name}
+                </Typography>
+              </Link>
+            ) : (
+              <Typography
+                variant="h6"
+                noWrap
+                title={name}
+                onClick={onClick ? handleCardElementClick : undefined}
+                data-testid="card-name"
+                sx={{
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%',
+                  cursor: onClick ? 'pointer' : 'default',
+                  '&:hover': {
+                    textDecoration: onClick ? 'underline' : 'none',
+                  },
+                  fontSize: '1.25rem',
+                  '@container card (max-width: 300px)': {
+                    fontSize: '1.125rem',
+                  },
+                  '@container card (max-width: 250px)': {
+                    fontSize: '1rem',
+                  },
+                  '@container card (max-width: 200px)': {
+                    fontSize: '0.875rem',
+                  },
+                }}
+              >
+                {name}
+              </Typography>
+            )
           )}
 
           {setIsVisible && (

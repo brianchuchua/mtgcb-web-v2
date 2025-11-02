@@ -17,40 +17,75 @@ import {
   createFilterOptions,
 } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import { useAuth } from '@/hooks/useAuth';
 import { Set } from '@/types/sets';
+import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 // Memoized option component
-const SetOption = memo(({ option, state }: { option: Set; state: AutocompleteRenderOptionState }) => {
-  const { key, selected, inputValue, index, ...htmlProps } = state as any;
-  return (
-    <Box
-      component="li"
-      key={key}
-      {...htmlProps}
-      sx={{
-        py: 0.5,
-        px: 2,
-        cursor: 'pointer',
-        '&:hover': { bgcolor: 'action.hover' },
-        ...(selected && { bgcolor: 'action.selected' }),
-      }}
-    >
-      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="body2" noWrap>
-          {option.name}
-        </Typography>
-        {option.code && (
-          <Typography variant="caption" color="text.secondary" noWrap>
-            {option.code}
-          </Typography>
-        )}
+const SetOption = memo(
+  ({
+    option,
+    state,
+    generateUrl,
+  }: {
+    option: Set;
+    state: AutocompleteRenderOptionState;
+    generateUrl: (set: Set) => string;
+  }) => {
+    const { key, selected, inputValue, index, ...htmlProps } = state as any;
+    const targetUrl = generateUrl(option);
+
+    return (
+      <Box
+        component="li"
+        key={key}
+        {...htmlProps}
+        sx={{
+          padding: 0,
+          cursor: 'pointer',
+          '&:hover': { bgcolor: 'action.hover' },
+          ...(selected && { bgcolor: 'action.selected' }),
+        }}
+      >
+        <Link
+          href={targetUrl}
+          onClick={(e) => {
+            // Allow Ctrl+Click, Cmd+Click, Middle-click, Shift+Click to open in new tab/window
+            // Only prevent default on regular left-click to let Autocomplete handle selection
+            if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) {
+              e.stopPropagation(); // Prevent Autocomplete from handling this click
+              return; // Let browser handle modified clicks normally
+            }
+
+            // Prevent link navigation on regular click - let Autocomplete handle it
+            e.preventDefault();
+          }}
+          style={{
+            display: 'block',
+            width: '100%',
+            padding: '4px 16px',
+            textDecoration: 'none',
+            color: 'inherit',
+          }}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Typography variant="body2" noWrap>
+              {option.name}
+            </Typography>
+            {option.code && (
+              <Typography variant="caption" color="text.secondary" noWrap>
+                {option.code}
+              </Typography>
+            )}
+          </Box>
+        </Link>
       </Box>
-    </Box>
-  );
-});
+    );
+  },
+);
 
 SetOption.displayName = 'SetOption';
 
@@ -148,6 +183,25 @@ export const JumpToSetsMenu = () => {
     return potentialUserId;
   }, [pathname]);
 
+  // Generate context-aware URL for a set
+  const generateSetUrl = useCallback(
+    (set: Set): string => {
+      const collectionUserId = getUserIdFromPath();
+
+      if (collectionUserId) {
+        // If on a collection page, jump to that collection's set
+        return getCollectionSetUrl(collectionUserId, set.slug);
+      } else if (isAuthenticated && user?.userId) {
+        // If logged in but not on a collection page, jump to own collection
+        return getCollectionSetUrl(user.userId, set.slug);
+      } else {
+        // If not logged in and not on a collection page, jump to browse
+        return `/browse/sets/${set.slug}`;
+      }
+    },
+    [isAuthenticated, user, getUserIdFromPath],
+  );
+
   const handleToggle = useCallback(() => {
     setOpen((prev) => !prev);
     if (!open) {
@@ -166,19 +220,7 @@ export const JumpToSetsMenu = () => {
   const handleSetSelect = useCallback(
     (_event: any, value: Set | null) => {
       if (value) {
-        let targetUrl: string;
-        const collectionUserId = getUserIdFromPath();
-
-        if (collectionUserId) {
-          // If on a collection page, jump to that collection's set
-          targetUrl = `/collections/${collectionUserId}/${value.slug}`;
-        } else if (isAuthenticated && user?.userId) {
-          // If logged in but not on a collection page, jump to own collection
-          targetUrl = `/collections/${user.userId}/${value.slug}`;
-        } else {
-          // If not logged in and not on a collection page, jump to browse
-          targetUrl = `/browse/sets/${value.slug}`;
-        }
+        const targetUrl = generateSetUrl(value);
 
         // Signal to browse pages that this is a quick navigation event
         // This triggers browse form state reset while preserving sticky behavior for normal browsing
@@ -188,7 +230,7 @@ export const JumpToSetsMenu = () => {
         handleClose();
       }
     },
-    [isAuthenticated, user, router, handleClose, getUserIdFromPath],
+    [router, handleClose, generateSetUrl],
   );
 
   const getOptionLabel = useCallback((option: Set) => {
@@ -269,7 +311,7 @@ export const JumpToSetsMenu = () => {
                 />
               )}
               renderOption={(props, option, state) => (
-                <SetOption key={option.id} option={option} state={{ ...props, ...state }} />
+                <SetOption key={option.id} option={option} state={{ ...props, ...state }} generateUrl={generateSetUrl} />
               )}
               noOptionsText={inputValue.length === 0 ? 'Type to search...' : 'No sets found'}
               PaperComponent={(props) => <Paper {...props} elevation={1} sx={{ border: 1, borderColor: 'divider' }} />}

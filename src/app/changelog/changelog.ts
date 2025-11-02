@@ -13,6 +13,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-11-01',
+      version: '1.8.2',
+      changes: [
+        'Fixed card images and names to support right-click and open in new tabs',
+        'Fixed Jump to Set menu options to support right-click and modifier keys',
+        'Fixed card price menu to navigate to collection pages when in collection context',
+      ],
+    },
+    {
+      date: '2025-11-01',
       version: '1.8.1',
       changes: ['Improved reliability of updating card quantities on slower connections'],
     },

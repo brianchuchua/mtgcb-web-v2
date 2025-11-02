@@ -19,6 +19,9 @@ import { useRouter } from 'next/navigation';
 import React, { MouseEvent, useState } from 'react';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import { useBrowseUrlContext } from '@/features/browse/BrowseSearchForm/hooks/useBrowseUrlContext';
+import { getCollectionCardUrl } from '@/utils/collectionUrls';
+import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 
 interface CardPriceProps {
   prices: {
@@ -73,6 +76,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
   directToTCGPlayer = false,
 }) => {
   const router = useRouter();
+  const { isCollectionPage, userId } = useBrowseUrlContext();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -105,8 +109,14 @@ const CardPrice: React.FC<CardPriceProps> = ({
   const handleViewCard = () => {
     handleMenuClose();
     if (cardId && cardName) {
-      const cardSlug = cardName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      router.push(`/browse/cards/${cardSlug}/${cardId}`);
+      const cardSlug = generateCardSlug(cardName);
+
+      // Generate context-aware URL (collection vs browse)
+      const cardUrl = isCollectionPage && userId
+        ? getCollectionCardUrl(userId, cardSlug, cardId)
+        : `/browse/cards/${cardSlug}/${cardId}`;
+
+      router.push(cardUrl);
     }
   };
 

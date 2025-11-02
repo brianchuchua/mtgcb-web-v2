@@ -35,7 +35,7 @@ import { ResponsiveWidth, TableColumn } from '@/components/common/VirtualizedTab
 import { PriceType } from '@/types/pricing';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
-import { getCollectionSetUrl } from '@/utils/collectionUrls';
+import { getCollectionSetUrl, getCollectionCardUrl } from '@/utils/collectionUrls';
 
 export interface CardTableRendererProps {
   priceType: PriceType;
@@ -1003,43 +1003,31 @@ export const useCardRowRenderer = (
     }
 
     // Card Name Cell (always shown)
+    // Generate card URL based on context (collection vs browse)
+    const cardSlug = generateCardSlug(card.name);
+    const cardHref = userId
+      ? getCollectionCardUrl(userId, cardSlug, card.id)
+      : `/browse/cards/${cardSlug}/${card.id}`;
+
     cells.push(
       <TableCell
         key="name"
         component="th"
         scope="row"
       >
-        {userId ? (
-          // In collection context, use onCardClick for proper routing
-          <ClickableText
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onCardClick) {
-                onCardClick(card.id, card.name);
-              }
-            }}
-            onMouseEnter={() => showCardPreview(card)}
-            onMouseLeave={hideCardPreview}
-            sx={{ cursor: 'pointer' }}
-          >
-            {card.name}
-          </ClickableText>
-        ) : (
-          // In browse context, use direct link
-          <Link
-            href={`/browse/cards/${generateCardSlug(card.name)}/${card.id}`}
-            style={{
-              color: 'inherit',
-              textDecoration: 'none',
-              display: 'inline',
-            }}
-            onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
-            onMouseEnter={() => showCardPreview(card)}
-            onMouseLeave={hideCardPreview}
-          >
-            <ClickableText>{card.name}</ClickableText>
-          </Link>
-        )}
+        <Link
+          href={cardHref}
+          style={{
+            color: 'inherit',
+            textDecoration: 'none',
+            display: 'inline',
+          }}
+          onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
+          onMouseEnter={() => showCardPreview(card)}
+          onMouseLeave={hideCardPreview}
+        >
+          <ClickableText>{card.name}</ClickableText>
+        </Link>
       </TableCell>,
     );
 

@@ -1,8 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import CardItem, { CardItemProps } from './CardItem';
 import { PriceType } from '@/types/pricing';
+import { getCollectionCardUrl } from '@/utils/collectionUrls';
+import { generateCardSlug } from '@/utils/cards/generateCardSlug';
+import { useBrowseUrlContext } from '@/features/browse/BrowseSearchForm/hooks/useBrowseUrlContext';
 
 export interface CardItemRendererProps {
   card: CardItemProps;
@@ -33,17 +36,28 @@ const CardItemRenderer = ({
   goalId,
   hasLocations = false,
 }: CardItemRendererProps) => {
-  const handleCardClick = () => {
-    if (onClick) {
-      onClick(card.id, card.name);
+  const { isCollectionPage, userId } = useBrowseUrlContext();
+
+  // Generate href for Link-based navigation
+  const cardHref = useMemo(() => {
+    if (!onClick) return undefined;
+
+    const cardSlug = generateCardSlug(card.name);
+
+    // For collection/shared pages, use collection URL
+    if (isCollectionPage && userId) {
+      return getCollectionCardUrl(userId, cardSlug, card.id);
     }
-  };
+
+    // Default to browse URL
+    return `/browse/cards/${cardSlug}/${card.id}`;
+  }, [card.id, card.name, onClick, isCollectionPage, userId]);
 
   return (
-    <CardItem 
-      {...card} 
-      onClick={onClick ? handleCardClick : undefined} 
-      display={settings} 
+    <CardItem
+      {...card}
+      href={cardHref}
+      display={settings}
       priceType={priceType}
       isOwnCollection={isOwnCollection}
       goalId={goalId}
