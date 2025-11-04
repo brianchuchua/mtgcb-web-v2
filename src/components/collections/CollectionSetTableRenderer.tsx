@@ -138,6 +138,7 @@ export const useCollectionSetRowRenderer = (
 ) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const goalId = searchParams?.get('goalId') ? parseInt(searchParams.get('goalId')!) : undefined;
   
   const renderSetRow = (index: number, set: Set) => {
     // Extract userId from the pathname for collection URLs
@@ -240,12 +241,15 @@ export const useCollectionSetRowRenderer = (
 
     // Cost to Complete Cell (collection-specific)
     if (displaySettings.costToCompleteIsVisible !== false) {
+      // When a goal is selected, use the goal-specific cost; otherwise use oneOfEachCard
+      const costValue = goalId && set.costToComplete?.goal !== undefined
+        ? set.costToComplete.goal
+        : set.costToComplete?.oneOfEachCard;
+
       cells.push(
         <TableCell key="costToComplete" align="right">
           <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-            {set.costToComplete?.oneOfEachCard !== undefined
-              ? `$${set.costToComplete.oneOfEachCard.toFixed(2)}`
-              : 'N/A'}
+            {costValue !== undefined ? `$${costValue.toFixed(2)}` : 'N/A'}
           </Typography>
         </TableCell>,
       );

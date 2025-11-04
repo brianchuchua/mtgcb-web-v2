@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-11-03',
+      version: '1.8.3',
+      changes: [
+        'Fixed cost to complete showing $0.00 in table view when viewing goals',
+      ],
+    },
+    {
       date: '2025-11-01',
       version: '1.8.2',
       changes: [
