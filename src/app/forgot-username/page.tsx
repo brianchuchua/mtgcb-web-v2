@@ -99,7 +99,13 @@ export default function ForgotUsernamePage() {
         <Typography component="h1" variant="h5" data-testid="forgot-username-title">
           Forgot Username
         </Typography>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }} data-testid="forgot-username-description">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          align="center"
+          sx={{ mt: 1, mb: 3 }}
+          data-testid="forgot-username-description"
+        >
           Enter your email address and we'll send you your username.
         </Typography>
         <ForgotUsernameForm noValidate onSubmit={handleSubmit(onSubmit)} data-testid="forgot-username-form">
@@ -131,21 +137,21 @@ export default function ForgotUsernamePage() {
             }}
           />
 
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: 'block', mt: 1 }}
-            data-testid="case-sensitive-note"
-          >
-            Note: Emails are case-sensitive.
-          </Typography>
-
           <Box>
-            <FormHelperText error={Boolean(errors.root)} data-testid="form-error">{errors.root?.message}</FormHelperText>
+            <FormHelperText error={Boolean(errors.root)} data-testid="form-error">
+              {errors.root?.message}
+            </FormHelperText>
           </Box>
 
           <SubmitButtonWrapper>
-            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting} data-testid="submit-button">
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              isSubmitting={isSubmitting}
+              data-testid="submit-button"
+            >
               Recover Username
             </Button>
           </SubmitButtonWrapper>
@@ -184,13 +190,29 @@ export default function ForgotUsernamePage() {
             </Typography>
           </Box>
 
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }} data-testid="recaptcha-text">
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            align="center"
+            sx={{ mt: 2 }}
+            data-testid="recaptcha-text"
+          >
             This site is protected by reCAPTCHA and the Google{' '}
-            <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-testid="privacy-link">
+            <Link
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="privacy-link"
+            >
               Privacy Policy
             </Link>{' '}
             and{' '}
-            <Link href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" data-testid="terms-link">
+            <Link
+              href="https://policies.google.com/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="terms-link"
+            >
               Terms of Service
             </Link>{' '}
             apply.

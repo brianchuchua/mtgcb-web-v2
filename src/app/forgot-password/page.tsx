@@ -101,7 +101,13 @@ export default function ForgotPasswordPage() {
         <Typography component="h1" variant="h5" data-testid="forgot-password-title">
           Forgot Password
         </Typography>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1, mb: 3 }} data-testid="forgot-password-description">
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          align="center"
+          sx={{ mt: 1, mb: 3 }}
+          data-testid="forgot-password-description"
+        >
           Enter your username and email address and we'll send you instructions to reset your password.
         </Typography>
         <ForgotPasswordForm noValidate onSubmit={handleSubmit(onSubmit)} data-testid="forgot-password-form">
@@ -155,21 +161,21 @@ export default function ForgotPasswordPage() {
             }}
           />
 
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: 'block', mt: 1 }}
-            data-testid="case-sensitive-note"
-          >
-            Note: Usernames and emails are case-sensitive.
-          </Typography>
-
           <Box>
-            <FormHelperText error={Boolean(errors.root)} data-testid="form-error">{errors.root?.message}</FormHelperText>
+            <FormHelperText error={Boolean(errors.root)} data-testid="form-error">
+              {errors.root?.message}
+            </FormHelperText>
           </Box>
 
           <SubmitButtonWrapper>
-            <Button type="submit" fullWidth variant="contained" color="primary" isSubmitting={isSubmitting} data-testid="submit-button">
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              isSubmitting={isSubmitting}
+              data-testid="submit-button"
+            >
               Send Reset Instructions
             </Button>
           </SubmitButtonWrapper>
@@ -200,7 +206,7 @@ export default function ForgotPasswordPage() {
             data-testid="contact-help-note"
           >
             <Typography variant="body2" color="text.primary" align="center" component="div">
-              Forgot your exact username casing or which email you used? It happens!{' '}
+              Forgot your exact username or which email you used? It happens!{' '}
               <Link href="/contact" data-testid="contact-link">
                 Contact me
               </Link>{' '}
@@ -208,13 +214,29 @@ export default function ForgotPasswordPage() {
             </Typography>
           </Box>
 
-          <Typography variant="caption" color="text.secondary" align="center" sx={{ mt: 2 }} data-testid="recaptcha-text">
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            align="center"
+            sx={{ mt: 2 }}
+            data-testid="recaptcha-text"
+          >
             This site is protected by reCAPTCHA and the Google{' '}
-            <Link href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" data-testid="privacy-link">
+            <Link
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="privacy-link"
+            >
               Privacy Policy
             </Link>{' '}
             and{' '}
-            <Link href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer" data-testid="terms-link">
+            <Link
+              href="https://policies.google.com/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="terms-link"
+            >
               Terms of Service
             </Link>{' '}
             apply.

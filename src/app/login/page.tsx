@@ -141,16 +141,6 @@ export default function LoginPage() {
               },
             }}
           />
-
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: 'block', mt: 1 }}
-            data-testid="case-sensitive-note"
-          >
-            Note: Usernames and passwords are case-sensitive.
-          </Typography>
-
           <Box>
             <FormHelperText error={Boolean(errors.root)} data-testid="form-error">
               {errors.root?.message}

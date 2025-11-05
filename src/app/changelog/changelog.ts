@@ -12,11 +12,21 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-11-04',
+      version: '1.8.5',
+      changes: [
+        'Made login, password reset, and account recovery case-insensitive for usernames and emails. (Legacy accounts whose users intentionally relied on case sensitivity for differentiation still work as expected with appropriate casing. There are only 9 of you, but your accounts matter too!)',
+      ],
+    },
+    {
+      date: '2025-11-04',
+      version: '1.8.4',
+      changes: ['Improved performance of searching by card name by 9x'],
+    },
+    {
       date: '2025-11-03',
       version: '1.8.3',
-      changes: [
-        'Fixed cost to complete showing $0.00 in table view when viewing goals',
-      ],
+      changes: ['Fixed cost to complete showing $0.00 in table view when viewing goals'],
     },
     {
       date: '2025-11-01',
