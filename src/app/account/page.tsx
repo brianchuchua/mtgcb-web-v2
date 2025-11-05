@@ -403,6 +403,42 @@ function ProfileContent() {
 
         <Paper variant="outlined">
           <CardHeader>
+            <Typography variant="h6">Draft Cube Settings</Typography>
+          </CardHeader>
+          <CardContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Choose your preferred draft cube variant. This determines how many uncommons are needed for draft cubes and affects cost calculations.
+            </Typography>
+            <Select
+              value={user?.draftCubeVariant || 'standard'}
+              onChange={async (e) => {
+                const variant = e.target.value as 'standard' | 'two-uncommon';
+                try {
+                  const result = await updateUser({ draftCubeVariant: variant }).unwrap();
+                  if (result.success) {
+                    enqueueSnackbar('Draft cube variant updated successfully', { variant: 'success' });
+                  }
+                } catch (error: any) {
+                  const message = error.data?.error?.message || 'Failed to update draft cube variant';
+                  enqueueSnackbar(message, { variant: 'error' });
+                }
+              }}
+              fullWidth
+              sx={{ maxWidth: 300 }}
+            >
+              <MenuItem value="standard">Standard (4/4/1/1)</MenuItem>
+              <MenuItem value="two-uncommon">Two-Uncommon (4/2/1/1)</MenuItem>
+            </Select>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontSize: '0.85rem' }}>
+              <strong>Standard:</strong> 4x Commons, 4x Uncommons, 1x Rares, 1x Mythics
+              <br />
+              <strong>Two-Uncommon:</strong> 4x Commons, 2x Uncommons, 1x Rares, 1x Mythics
+            </Typography>
+          </CardContent>
+        </Paper>
+
+        <Paper variant="outlined">
+          <CardHeader>
             <Typography variant="h6">Progress Bar Style</Typography>
           </CardHeader>
           <CardContent>

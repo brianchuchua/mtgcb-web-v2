@@ -22,6 +22,7 @@ interface UseFetchCardsForMassImportProps {
   count?: number;
   goalId?: number;
   priceType?: 'market' | 'low' | 'average' | 'high';
+  draftCubeVariant?: 'standard' | 'two-uncommon';
 }
 
 export const useFetchCardsForMassImport = ({
@@ -32,6 +33,7 @@ export const useFetchCardsForMassImport = ({
   count = 1,
   goalId,
   priceType = 'market',
+  draftCubeVariant = 'standard',
 }: UseFetchCardsForMassImportProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -121,10 +123,16 @@ export const useFetchCardsForMassImport = ({
           
           let targetQuantity = count; // Use the count parameter (1 for Buy 1x, 4 for Buy 4x)
           
-          // For draft cube, determine target quantity based on rarity
+          // For draft cube, determine target quantity based on rarity and variant
           if (countType === 'draftcube') {
             const rarity = card.rarity?.toLowerCase();
-            targetQuantity = (rarity === 'common' || rarity === 'uncommon') ? 4 : 1;
+            if (rarity === 'common') {
+              targetQuantity = 4;
+            } else if (rarity === 'uncommon') {
+              targetQuantity = draftCubeVariant === 'two-uncommon' ? 2 : 4;
+            } else {
+              targetQuantity = 1; // rare or mythic
+            }
           }
           
           const neededQuantity = targetQuantity - ownedQuantity;

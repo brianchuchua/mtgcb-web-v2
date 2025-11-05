@@ -11,6 +11,7 @@ import { getFormTarget } from '@/utils/browser/detectSafari';
 import { formatMassImportString, CardWithQuantity } from '@/utils/tcgplayer/formatMassImportString';
 import TCGPlayerMassImportChunksDialog from './TCGPlayerMassImportChunksDialog';
 import { useLazyGetGoalQuery } from '@/api/goals/goalsApi';
+import { useAuth } from '@/hooks/useAuth';
 
 interface TCGPlayerMassImportButtonProps extends Omit<ButtonProps, 'onClick'> {
   setId: string;
@@ -34,11 +35,15 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
 }) => {
   const { submitToTCGPlayer } = useTCGPlayer();
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuth();
   const [localIsLoading, setLocalIsLoading] = useState(false);
   const [showChunksDialog, setShowChunksDialog] = useState(false);
   const [cardsForChunking, setCardsForChunking] = useState<CardWithQuantity[]>([]);
   const priceType = usePriceType();
   const [getGoal] = useLazyGetGoalQuery();
+
+  // Use user's draft cube variant preference, defaulting to 'standard'
+  const draftCubeVariant = user?.draftCubeVariant || 'standard';
 
   const {
     fetchCards,
@@ -52,6 +57,7 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
     count,
     goalId,
     priceType: priceType.toLowerCase() as 'market' | 'low' | 'average' | 'high',
+    draftCubeVariant,
   });
 
   const handleClick = useCallback(async () => {
@@ -91,12 +97,23 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
       const isDraftCube = countType === 'draftcube';
       
       // Convert cards to CardWithQuantity format for consistency
-      const cardsWithQuantity: CardWithQuantity[] = cards.map(card => ({
-        ...card,
-        neededQuantity: isDraftCube 
-          ? (card.rarity?.toLowerCase() === 'common' || card.rarity?.toLowerCase() === 'uncommon' ? 4 : 1)
-          : count
-      }));
+      const cardsWithQuantity: CardWithQuantity[] = cards.map(card => {
+        let neededQuantity = count;
+        if (isDraftCube) {
+          const rarity = card.rarity?.toLowerCase();
+          if (rarity === 'common') {
+            neededQuantity = 4;
+          } else if (rarity === 'uncommon') {
+            neededQuantity = draftCubeVariant === 'two-uncommon' ? 2 : 4;
+          } else {
+            neededQuantity = 1; // rare or mythic
+          }
+        }
+        return {
+          ...card,
+          neededQuantity
+        };
+      });
 
       // Check if we need to chunk the cards
       if (cardsWithQuantity.length > 500) {
@@ -104,7 +121,7 @@ const TCGPlayerMassImportButton: React.FC<TCGPlayerMassImportButtonProps> = ({
         setShowChunksDialog(true);
       } else {
         // Submit immediately for 500 or fewer cards
-        const importString = formatMassImportString(cards, count, isDraftCube);
+        const importString = formatMassImportString(cards, count, isDraftCube, draftCubeVariant);
         const formTarget = getFormTarget();
         submitToTCGPlayer(importString, formTarget);
       }

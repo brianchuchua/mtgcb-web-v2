@@ -30,6 +30,7 @@ export interface CostToCompleteResponse {
 export interface CostToCompleteParams {
   priceType: 'market' | 'low' | 'average' | 'high';
   includeSubsetsInSets?: boolean;
+  variant?: 'standard' | 'two-uncommon';
 }
 
 export interface AllSetsResponse {

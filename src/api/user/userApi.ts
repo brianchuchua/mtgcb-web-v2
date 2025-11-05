@@ -11,6 +11,7 @@ interface UpdateUserRequest {
   password?: string;
   currentPassword?: string;
   isPublic?: boolean;
+  draftCubeVariant?: 'standard' | 'two-uncommon';
   showAsPatreonSupporter?: boolean;
   patreonCardId?: string | null;
   patreonCardColor?: 'white' | 'blue' | 'black' | 'red' | 'green' | 'gold' | 'colorless' | null;
@@ -25,11 +26,19 @@ export const userApi = mtgcbApi.injectEndpoints({
         body: data,
       }),
       invalidatesTags: (result, error, arg) => {
-        const tags: Array<'Auth' | 'PatreonSupporters'> = ['Auth'];
+        const tags: Array<'Auth' | 'PatreonSupporters' | 'CostToComplete' | { type: 'Sets'; id: string }> = ['Auth'];
+
         // If updating showAsPatreonSupporter or card selection, also invalidate the supporters list
         if (arg.showAsPatreonSupporter !== undefined || arg.patreonCardId !== undefined || arg.patreonCardColor !== undefined) {
           tags.push('PatreonSupporters');
         }
+
+        // If updating draft cube variant, invalidate cost-to-complete cache and user's sets cache
+        if (arg.draftCubeVariant !== undefined && result?.data?.userId) {
+          tags.push('CostToComplete');
+          tags.push({ type: 'Sets', id: `user-${result.data.userId}` });
+        }
+
         return tags;
       },
     }),

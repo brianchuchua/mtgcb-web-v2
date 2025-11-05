@@ -17,6 +17,7 @@ import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { useSetPageFilter } from '@/hooks/useSetPageFilter';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
+import { useAuth } from '@/hooks/useAuth';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
@@ -36,6 +37,7 @@ interface SetBrowseClientProps {
 export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
   const dispatch = useDispatch();
   const setPriceType = useSetPriceType();
+  const { user } = useAuth();
 
   // Use browse controller with proper configuration
   const browseController = useBrowseController({
@@ -72,6 +74,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
     {
       priceType: setPriceType,
       includeSubsetsInSets: currentIncludeSubsetsInSets,
+      ...(user?.draftCubeVariant && { variant: user.draftCubeVariant }),
     },
     {
       skip: !set?.id || isSetLoading,

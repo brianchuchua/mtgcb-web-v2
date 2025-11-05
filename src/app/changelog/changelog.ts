@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-11-05',
+      version: '1.9.0',
+      changes: [
+        'Added draft cube variant setting to choose between Standard (4/4/1/1) and Two-Uncommon (4/2/1/1) configurations. You can now select your preferred draft cube style in Account Settings, which affects cost calculations and TCGPlayer purchase recommendations.',
+      ],
+    },
+    {
       date: '2025-11-04',
       version: '1.8.5',
       changes: [

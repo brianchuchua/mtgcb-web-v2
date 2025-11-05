@@ -11,6 +11,7 @@ import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setCompilationState } from '@/redux/slices/compilationSlice';
+import { useAuth } from '@/hooks/useAuth';
 
 interface UseSetDataProps {
   searchParams: any;
@@ -33,7 +34,8 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
   const setPriceType = useSetPriceType();
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const showGoals = useSelector(selectShowGoals);
-  
+  const { user } = useAuth();
+
 
   const apiArgs = useMemo(() => {
     const params = buildApiParamsFromSearchParams(searchParams, 'sets');
@@ -122,6 +124,7 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
     {
       priceType: setPriceType,
       includeSubsetsInSets: includeSubsets,
+      ...(user?.draftCubeVariant && { variant: user.draftCubeVariant }),
     },
     { ...queryConfig, skip: skip || skipCostToComplete },
   );

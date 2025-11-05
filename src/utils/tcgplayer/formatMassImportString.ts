@@ -7,9 +7,10 @@ export interface CardWithQuantity extends CardModel {
 }
 
 export const formatMassImportString = (
-  cards: (CardModel | CardWithQuantity)[], 
+  cards: (CardModel | CardWithQuantity)[],
   quantity: number = 1,
-  isDraftCube: boolean = false
+  isDraftCube: boolean = false,
+  draftCubeVariant: 'standard' | 'two-uncommon' = 'standard'
 ): string => {
   if (!cards || cards.length === 0) {
     return '';
@@ -34,9 +35,15 @@ export const formatMassImportString = (
       if ('neededQuantity' in card && card.neededQuantity !== undefined) {
         cardQuantity = card.neededQuantity;
       } else if (isDraftCube && card.rarity) {
-        // For draft cube, use 4x for commons/uncommons and 1x for rares/mythics
+        // For draft cube, use quantities based on rarity and variant
         const rarity = card.rarity.toLowerCase();
-        cardQuantity = (rarity === 'common' || rarity === 'uncommon') ? 4 : 1;
+        if (rarity === 'common') {
+          cardQuantity = 4;
+        } else if (rarity === 'uncommon') {
+          cardQuantity = draftCubeVariant === 'two-uncommon' ? 2 : 4;
+        } else {
+          cardQuantity = 1; // rare or mythic
+        }
       }
 
       return `${cardQuantity} ${cardName} [${setCode}]`;

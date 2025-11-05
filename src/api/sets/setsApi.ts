@@ -13,15 +13,20 @@ export const setsApi = mtgcbApi.injectEndpoints({
       serializeQueryArgs: ({ queryArgs }) => {
         if (!queryArgs) return '';
 
-        const { priceType, includeSubsetsInSets } = queryArgs;
+        const { priceType, includeSubsetsInSets, variant } = queryArgs;
         let baseKey = `priceType=${priceType}`;
-        
+
         if (includeSubsetsInSets !== undefined) {
           baseKey += `,includeSubsetsInSets=${includeSubsetsInSets}`;
         }
 
+        if (variant !== undefined) {
+          baseKey += `,variant=${variant}`;
+        }
+
         return baseKey;
       },
+      providesTags: ['CostToComplete'],
       keepUnusedDataFor: 300,
     }),
     getAllSets: builder.query<ApiResponse<AllSetsResponse>, void>({

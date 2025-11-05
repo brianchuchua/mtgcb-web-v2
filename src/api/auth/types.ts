@@ -24,6 +24,7 @@ export interface UserData {
   username: string;
   email: string;
   isPublic: boolean;
+  draftCubeVariant?: 'standard' | 'two-uncommon';
   showAsPatreonSupporter?: boolean;
   patreonCardId?: string | null;
   patreonCardColor?: 'white' | 'blue' | 'black' | 'red' | 'green' | 'gold' | 'colorless' | null;
