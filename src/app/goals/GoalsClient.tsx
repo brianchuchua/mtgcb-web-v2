@@ -14,15 +14,15 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
-import { GoalsList } from '@/components/goals/GoalsList';
+import { Goal } from '@/api/goals/types';
 import { GoalWithHydration } from '@/components/goals/GoalWithHydration';
+import { GoalsList } from '@/components/goals/GoalsList';
 import Pagination, { PaginationProps } from '@/components/pagination/Pagination';
 import { usePriceType } from '@/contexts/DisplaySettingsContext';
 import { useGoalsPagination } from '@/hooks/goals/useGoalsPagination';
 import { useAuth } from '@/hooks/useAuth';
-import { Goal } from '@/api/goals/types';
 import { goalsCache } from '@/utils/goalsCache';
 
 export function GoalsClient() {
@@ -48,13 +48,17 @@ export function GoalsClient() {
     offset: 0,
   };
 
-  const { data: listData, isLoading: isListLoading, error: listError } = useGetUserGoalsQuery(listQueryArgs, {
+  const {
+    data: listData,
+    isLoading: isListLoading,
+    error: listError,
+  } = useGetUserGoalsQuery(listQueryArgs, {
     skip: !user?.userId,
   });
 
   // Server list is source of truth - hydrate each goal from cache if available
   const serverGoals = listData?.data?.goals || [];
-  const allGoals = serverGoals.map(serverGoal => {
+  const allGoals = serverGoals.map((serverGoal) => {
     // First check if we have a hydrated version (from the staggered fetch)
     const hydrated = hydratedGoals.get(serverGoal.id);
     if (hydrated) {
@@ -84,7 +88,7 @@ export function GoalsClient() {
   // Calculate initial priority order and delays ONCE when the page or goal IDs change
   // IMPORTANT: We only recalculate when goal IDs change, NOT when progress changes!
   useEffect(() => {
-    const currentGoalIds = visibleGoals.map(g => g.id).join(',');
+    const currentGoalIds = visibleGoals.map((g) => g.id).join(',');
 
     // Only recalculate if the set of goal IDs has changed (page change or list change)
     // Use ref to prevent infinite loop with empty goal lists
@@ -97,7 +101,7 @@ export function GoalsClient() {
     const goalsWithoutProgress: Goal[] = [];
     const goalsWithProgress: Goal[] = [];
 
-    visibleGoals.forEach(goal => {
+    visibleGoals.forEach((goal) => {
       if (goal.progress) {
         goalsWithProgress.push(goal);
       } else {
@@ -116,32 +120,35 @@ export function GoalsClient() {
     });
 
     setDelayMap(newDelayMap);
-    setPriorityOrder(newPriorityOrder.map(g => g.id));
+    setPriorityOrder(newPriorityOrder.map((g) => g.id));
     setInitialGoalIds(currentGoalIds);
     setCurrentlyHydratingIndex(0);
-    setHydrationSessionKey(prev => prev + 1); // Force remount of all GoalWithHydration components
+    setHydrationSessionKey((prev) => prev + 1); // Force remount of all GoalWithHydration components
     initializedRef.current = true; // Mark as initialized
   }, [currentPage, visibleGoals, initialGoalIds]);
 
   // Handle hydration callback
-  const handleGoalHydrated = useCallback((goal: Goal) => {
-    setHydratedGoals(prev => {
-      const newMap = new Map(prev);
-      newMap.set(goal.id, goal);
-      return newMap;
-    });
+  const handleGoalHydrated = useCallback(
+    (goal: Goal) => {
+      setHydratedGoals((prev) => {
+        const newMap = new Map(prev);
+        newMap.set(goal.id, goal);
+        return newMap;
+      });
 
-    // Move to next goal in the list
-    setCurrentlyHydratingIndex(prev => prev + 1);
+      // Move to next goal in the list
+      setCurrentlyHydratingIndex((prev) => prev + 1);
 
-    // Update cache with hydrated goal
-    if (user?.userId) {
-      goalsCache.updateGoal(user.userId, goal);
-    }
-  }, [user?.userId]);
+      // Update cache with hydrated goal
+      if (user?.userId) {
+        goalsCache.updateGoal(user.userId, goal);
+      }
+    },
+    [user?.userId],
+  );
 
   // Start with visible goals, then replace with hydrated versions as they come in
-  const goals = visibleGoals.map(goal => {
+  const goals = visibleGoals.map((goal) => {
     const hydratedVersion = hydratedGoals.get(goal.id);
     return hydratedVersion || goal;
   });
@@ -149,9 +156,8 @@ export function GoalsClient() {
   const error = listError;
 
   // Determine which goal is currently hydrating based on PRIORITY order, not display order
-  const currentlyHydratingGoalId = currentlyHydratingIndex < priorityOrder.length
-    ? priorityOrder[currentlyHydratingIndex]
-    : null;
+  const currentlyHydratingGoalId =
+    currentlyHydratingIndex < priorityOrder.length ? priorityOrder[currentlyHydratingIndex] : null;
 
   const paginationProps: PaginationProps = {
     contentType: 'cards', // Goals use card-like display
@@ -263,7 +269,7 @@ export function GoalsClient() {
           </Typography>
           <Typography variant="body2" paragraph>
             Goals help you track your progress toward collecting whatever you value the most. It can be something like
-            "collect every red goblin" or "collect every legendary creature cheaper than $10".
+            "collect every red goblin" or "collect every legendary creature less expensive than $10".
           </Typography>
           <Typography variant="body2" paragraph>
             <strong>Key features:</strong>

@@ -216,7 +216,7 @@ export default function DraftCubesPage() {
           <AnswerContent>
             <p>
               It depends on the set (for recent sets, it ranges from $60 to $180), although you can always proxy any
-              super-expensive cards and just buy the cheap ones, depending on your collection goals.
+              super-expensive cards and just buy the less expensive ones, depending on your collection goals.
             </p>
             <p>
               If you have a MTG Collection Builder account and you're logged in, you can complete a Draft Cube straight
