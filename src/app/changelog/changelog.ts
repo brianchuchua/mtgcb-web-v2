@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-11-11',
+      version: '1.9.1',
+      changes: ['Added Avatar: The Last Airbender and all related subsets'],
+      type: 'data',
+    },
+    {
       date: '2025-11-05',
       version: '1.9.0',
       changes: [
