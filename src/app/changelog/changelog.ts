@@ -12,6 +12,15 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-11-13',
+      version: '1.9.2',
+      changes: [
+        'Updated over 90,000 cards with latest Scryfall data including oracle text changes',
+        'Updated MTG CB Collector Numbers for aggregate sets',
+        'Fixed collector number sorting to use proper numerical order instead of alphabetical',
+      ],
+    },
+    {
       date: '2025-11-11',
       version: '1.9.1',
       changes: ['Added Avatar: The Last Airbender and all related subsets'],

@@ -21,9 +21,16 @@ export const buildApiParamsFromSearchParams = (
     apiParams.code = searchParams.code;
   }
 
-  // Add sorting parameters
+  // Add sorting parameters - map UI fields to numeric backend fields for proper sorting
   if (searchParams.sortBy) {
-    apiParams.sortBy = searchParams.sortBy;
+    // Map collector number fields to their numeric equivalents for proper sorting
+    // The UI displays these as strings, but the backend has numeric versions for sorting
+    const sortFieldMap: Record<string, string> = {
+      collectorNumber: 'collectorNumberNumeric',
+      mtgcbCollectorNumber: 'mtgcbCollectorNumberNumeric',
+    };
+
+    apiParams.sortBy = sortFieldMap[searchParams.sortBy] || searchParams.sortBy;
   }
 
   if (searchParams.sortOrder) {
