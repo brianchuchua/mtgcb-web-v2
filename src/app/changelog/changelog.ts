@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-11-18',
+      version: '1.9.3',
+      changes: ['Fixed goal descriptions not clearing when user removes all text'],
+    },
+    {
       date: '2025-11-13',
       version: '1.9.2',
       changes: [

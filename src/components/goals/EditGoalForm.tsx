@@ -135,7 +135,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
 
       const request: any = {
         name: trimmedData.name,
-        description: trimmedData.description || undefined,
+        description: trimmedData.description,
         searchCriteria,
         isActive: trimmedData.isActive,
         onePrintingPerPureName,
