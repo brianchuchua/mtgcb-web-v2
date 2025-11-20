@@ -17,6 +17,7 @@ const changelogData: ChangelogData = {
       changes: [
         'Added Secret Lair: An Encyclopedia of Magic and its variants',
         'Updated Secret Lair Drop Series',
+        'Updated Final Fantasy Commander Variants',
       ],
       type: 'data',
     },
