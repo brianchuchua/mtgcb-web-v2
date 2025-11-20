@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-11-20',
+      version: '1.9.5',
+      changes: ['Added Art Series cards'],
+      type: 'data',
+    },
+    {
       date: '2025-11-19',
       version: '1.9.4',
       changes: [
