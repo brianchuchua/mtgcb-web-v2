@@ -14,7 +14,10 @@ const changelogData: ChangelogData = {
     {
       date: '2025-11-19',
       version: '1.9.4',
-      changes: ['Added Secret Lair: An Encyclopedia of Magic and its variants'],
+      changes: [
+        'Added Secret Lair: An Encyclopedia of Magic and its variants',
+        'Updated Secret Lair Drop Series',
+      ],
       type: 'data',
     },
     {
