@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-12-08',
+      version: '1.9.6',
+      changes: ['Added Chocobo Track Foils to Final Fantasy Variants'],
+      type: 'data',
+    },
+    {
       date: '2025-11-20',
       version: '1.9.5',
       changes: ['Added Art Series cards'],
