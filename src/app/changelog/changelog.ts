@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-12-13',
+      version: '1.9.7',
+      changes: ['Added 133 missing Front Face cards', 'Made Front Face card names consistent'],
+      type: 'data',
+    },
+    {
       date: '2025-12-08',
       version: '1.9.6',
       changes: ['Added Chocobo Track Foils to Final Fantasy Variants'],
