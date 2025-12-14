@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-12-14',
+      version: '1.9.8',
+      changes: ['Added missing Substitute Cards'],
+      type: 'data',
+    },
+    {
       date: '2025-12-13',
       version: '1.9.7',
       changes: ['Added 133 missing Front Face cards', 'Made Front Face card names consistent'],
