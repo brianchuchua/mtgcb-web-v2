@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-14',
+      version: '1.9.9',
+      changes: ['Added Avatar prerelease promos'],
+      type: 'data',
+    },
+    {
+      date: '2025-12-14',
       version: '1.9.8',
       changes: ['Added missing Substitute Cards'],
       type: 'data',
