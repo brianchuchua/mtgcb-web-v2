@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-14',
+      version: '1.9.12',
+      changes: ['Updated Media Inserts'],
+      type: 'data',
+    },
+    {
+      date: '2025-12-14',
       version: '1.9.11',
       changes: ['Updated Happy Holidays cards'],
       type: 'data',
