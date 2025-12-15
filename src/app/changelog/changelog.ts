@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-14',
+      version: '1.9.10',
+      changes: ['Updated Secret Lair Drop Series'],
+      type: 'data',
+    },
+    {
+      date: '2025-12-14',
       version: '1.9.9',
       changes: ['Added Avatar prerelease promos'],
       type: 'data',
