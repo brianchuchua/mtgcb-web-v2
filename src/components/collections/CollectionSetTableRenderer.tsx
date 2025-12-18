@@ -290,9 +290,15 @@ export const useCollectionSetTableRenderers = (
   displaySettings: CollectionSetTableRendererProps['displaySettings'],
   currentSortBy: string,
   onSetClick?: (set: Set) => void,
+  hideValue: boolean = false,
 ) => {
-  const columns = useCollectionSetTableColumns({ displaySettings }, currentSortBy);
-  const renderRowContent = useCollectionSetRowRenderer(displaySettings, onSetClick);
+  // When hideValue is true, override value-related visibility settings to hide them
+  const effectiveDisplaySettings = hideValue
+    ? { ...displaySettings, valueIsVisible: false, costToCompleteIsVisible: false }
+    : displaySettings;
+
+  const columns = useCollectionSetTableColumns({ displaySettings: effectiveDisplaySettings }, currentSortBy);
+  const renderRowContent = useCollectionSetRowRenderer(effectiveDisplaySettings, onSetClick);
 
   return { columns, renderRowContent };
 };

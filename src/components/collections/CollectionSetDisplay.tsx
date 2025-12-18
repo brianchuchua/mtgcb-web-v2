@@ -26,6 +26,7 @@ export interface CollectionSetDisplayProps extends Omit<SetDisplayProps, 'setIte
     collectionSets: Map<string, CollectionSetSummary>;
   } | null;
   goalId?: number;
+  hideValue?: boolean;
 }
 
 const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
@@ -38,6 +39,7 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
   costToCompleteData,
   collectionData,
   goalId,
+  hideValue = false,
 }) => {
   const dispatch = useDispatch();
   const currentSortBy = useSelector(selectSortBy) || 'releasedAt';
@@ -52,6 +54,7 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
     displaySettings.table,
     currentSortBy,
     onSetClick,
+    hideValue,
   );
 
   // Handle sort change
@@ -102,6 +105,7 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
                 collectionData={collectionSet}
                 userId={collectionData?.userId}
                 goalId={goalId}
+                hideValue={hideValue}
               />
             );
           }}

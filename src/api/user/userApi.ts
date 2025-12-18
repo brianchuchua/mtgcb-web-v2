@@ -11,6 +11,7 @@ interface UpdateUserRequest {
   password?: string;
   currentPassword?: string;
   isPublic?: boolean;
+  hideCollectionValue?: boolean;
   draftCubeVariant?: 'standard' | 'two-uncommon';
   showAsPatreonSupporter?: boolean;
   patreonCardId?: string | null;

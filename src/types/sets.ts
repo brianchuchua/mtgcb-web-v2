@@ -47,6 +47,7 @@ export interface SetsSearchResult {
   numberOfCardsInMagic?: number;
   percentageCollected?: number;
   totalValue?: number;
+  hideCollectionValue?: boolean;
   // Goal summary (present when goalId provided)
   goalSummary?: GoalSummary;
   // Goal compilation fields (present when goal needs recompilation)

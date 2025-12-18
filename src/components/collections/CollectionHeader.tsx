@@ -41,6 +41,8 @@ interface CollectionHeaderProps {
     percentageCollected: number;
     costToComplete: number;
   };
+  // When true, hides monetary values (for non-owners viewing collections with hideCollectionValue enabled)
+  hideValue?: boolean;
 }
 
 const HeaderContainer = styled(Box)(({ theme }) => ({
@@ -65,6 +67,7 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
   selectedGoalId,
   includeSubsetsInSets = false,
   setInfo,
+  hideValue = false,
 }) => {
   if (isLoading) {
     return (
@@ -131,27 +134,31 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
           {setInfo.uniquePrintingsCollectedInSet}/{setInfo.cardCount}
         </Typography>
 
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
-          Current value:{' '}
-          <Box component="span" sx={{ color: 'success.main' }}>
-            ${setInfo.totalValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </Box>
-        </Typography>
+        {!hideValue && (
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+            Current value:{' '}
+            <Box component="span" sx={{ color: 'success.main' }}>
+              ${setInfo.totalValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Box>
+          </Typography>
+        )}
 
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
-          Cost to complete:{' '}
-          <Box component="span" sx={{ color: 'warning.main' }}>
-            ${setInfo.costToComplete.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </Box>
-        </Typography>
+        {!hideValue && (
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+            Cost to complete:{' '}
+            <Box component="span" sx={{ color: 'warning.main' }}>
+              ${setInfo.costToComplete.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Box>
+          </Typography>
+        )}
 
-        {userId && selectedGoalId && (
+        {userId && selectedGoalId && !hideValue && (
           <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center' }}>
             <TCGPlayerGoalMassImportButton 
               setId={setInfo.id} 
@@ -210,27 +217,31 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
           {goalSummary.collectedCards}/{goalSummary.totalCards}
         </Typography>
 
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
-          Current value:{' '}
-          <Box component="span" sx={{ color: 'success.main' }}>
-            ${goalSummary.totalValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </Box>
-        </Typography>
+        {!hideValue && (
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+            Current value:{' '}
+            <Box component="span" sx={{ color: 'success.main' }}>
+              ${goalSummary.totalValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Box>
+          </Typography>
+        )}
 
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
-          Cost to complete:{' '}
-          <Box component="span" sx={{ color: 'warning.main' }}>
-            ${goalSummary.costToComplete.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </Box>
-        </Typography>
+        {!hideValue && (
+          <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+            Cost to complete:{' '}
+            <Box component="span" sx={{ color: 'warning.main' }}>
+              ${goalSummary.costToComplete.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Box>
+          </Typography>
+        )}
 
-        {userId && selectedGoalId && (
+        {userId && selectedGoalId && !hideValue && (
           <Box sx={{ mt: 0.5, display: 'flex', justifyContent: 'center' }}>
             <TCGPlayerGoalMassImportButton setId="all" userId={userId} goalId={selectedGoalId} includeSubsetsInSets={includeSubsetsInSets} />
           </Box>
@@ -264,15 +275,17 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
         ({totalCardsCollected} total cards collected)
       </Typography>
 
-      <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
-        Collection value:{' '}
-        <Box component="span" sx={{ color: 'success.main' }}>
-          ${totalValue.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </Box>
-      </Typography>
+      {!hideValue && (
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 0 }}>
+          Collection value:{' '}
+          <Box component="span" sx={{ color: 'success.main' }}>
+            ${totalValue.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </Box>
+        </Typography>
+      )}
 
       <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <CollectionProgressBar
@@ -301,6 +314,7 @@ export const CollectionHeader = React.memo(CollectionHeaderComponent, (prevProps
     prevProps.view === nextProps.view &&
     prevProps.selectedGoalId === nextProps.selectedGoalId &&
     prevProps.includeSubsetsInSets === nextProps.includeSubsetsInSets &&
-    JSON.stringify(prevProps.setInfo) === JSON.stringify(nextProps.setInfo)
+    JSON.stringify(prevProps.setInfo) === JSON.stringify(nextProps.setInfo) &&
+    prevProps.hideValue === nextProps.hideValue
   );
 });

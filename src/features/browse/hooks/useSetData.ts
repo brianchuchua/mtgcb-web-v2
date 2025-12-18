@@ -163,6 +163,7 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
       numberOfCardsInMagic: setsSearchResult.data.numberOfCardsInMagic,
       percentageCollected: setsSearchResult.data.percentageCollected,
       totalValue: setsSearchResult.data.totalValue,
+      hideCollectionValue: setsSearchResult.data.hideCollectionValue,
     } : undefined,
     goalSummary: setsSearchResult?.data?.goalSummary,
   };

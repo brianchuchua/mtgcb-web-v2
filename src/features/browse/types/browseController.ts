@@ -129,6 +129,7 @@ export interface CardData {
     numberOfCardsInMagic?: number;
     percentageCollected?: number;
     totalValue?: number;
+    hideCollectionValue?: boolean;
   };
   goalSummary?: any;
 }
@@ -152,6 +153,7 @@ export interface SetData {
     numberOfCardsInMagic?: number;
     percentageCollected?: number;
     totalValue?: number;
+    hideCollectionValue?: boolean;
   };
   goalSummary?: any;
 }
@@ -192,6 +194,7 @@ export interface CardsProps {
     numberOfCardsInMagic?: number;
     percentageCollected?: number;
     totalValue?: number;
+    hideCollectionValue?: boolean;
   };
   goalSummary?: {
     goalId: number;
@@ -226,6 +229,7 @@ export interface SetsProps {
     numberOfCardsInMagic?: number;
     percentageCollected?: number;
     totalValue?: number;
+    hideCollectionValue?: boolean;
   };
   goalSummary?: {
     goalId: number;

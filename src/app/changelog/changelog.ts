@@ -13,6 +13,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-17',
+      version: '1.13.0',
+      changes: [
+        'Added "Hide collection value from others" privacy setting in Account page',
+        'When enabled, hides collection value, set values, cost to complete, Value and Cost to Complete table columns, and "Buy missing cards" buttons from public viewers and share link users',
+      ],
+    },
+    {
+      date: '2025-12-17',
       version: '1.12.0',
       changes: ['Added separate Foil Price column to card table view with TCGPlayer link support'],
     },

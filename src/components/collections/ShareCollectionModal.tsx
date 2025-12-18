@@ -69,6 +69,7 @@ export const ShareCollectionModal = ({
 }: ShareCollectionModalProps) => {
   const [isPrivate, setIsPrivate] = useState(initialIsPrivate);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isUpdatingHideValue, setIsUpdatingHideValue] = useState(false);
   const [includeFilters, setIncludeFilters] = useState(false);
   const [expiresInHours, setExpiresInHours] = useState(0);
   const [showShareLinkForm, setShowShareLinkForm] = useState(false);
@@ -127,6 +128,34 @@ export const ShareCollectionModal = ({
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleHideValueToggle = async () => {
+    if (!isOwnCollection) return;
+
+    const newHideValue = !user?.hideCollectionValue;
+    setIsUpdatingHideValue(true);
+
+    try {
+      const result = await updateUser({ hideCollectionValue: newHideValue }).unwrap();
+
+      if (result.success) {
+        if (user) {
+          updateAuthUser({ ...user, hideCollectionValue: newHideValue });
+        }
+        enqueueSnackbar(
+          newHideValue ? 'Collection value is now hidden from others' : 'Collection value is now visible to others',
+          { variant: 'success' }
+        );
+      } else {
+        throw new Error(result.error?.message);
+      }
+    } catch (error: any) {
+      const message = error.data?.error?.message || 'Failed to update setting';
+      enqueueSnackbar(message, { variant: 'error' });
+    } finally {
+      setIsUpdatingHideValue(false);
     }
   };
 
@@ -326,12 +355,25 @@ export const ShareCollectionModal = ({
                   }
                   label="Make collection public (visible at its public URL)"
                 />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={user?.hideCollectionValue || false}
+                      onChange={handleHideValueToggle}
+                      disabled={isUpdatingHideValue}
+                    />
+                  }
+                  label="Hide collection value from others"
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ ml: 4, mt: -0.5 }}>
+                  Hides total value, cost to complete, and buy buttons from viewers
+                </Typography>
                 <Button
                   variant="outlined"
                   color="error"
                   size="small"
                   onClick={handleRevokeShareLink}
-                  sx={{ alignSelf: 'flex-start' }}
+                  sx={{ alignSelf: 'flex-start', mt: 1 }}
                 >
                   Revoke Share Link
                 </Button>
@@ -513,24 +555,44 @@ export const ShareCollectionModal = ({
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Privacy Settings
           </Typography>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={!isPrivate}
-                onChange={handlePrivacyToggle}
-                disabled={isUpdating}
-              />
-            }
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                Collection is public
-                {isUpdating && <CircularProgress size={16} sx={{ ml: 1 }} />}
-              </Box>
-            }
-          />
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-            Turning off will make your collection private
-          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={!isPrivate}
+                  onChange={handlePrivacyToggle}
+                  disabled={isUpdating}
+                />
+              }
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  Collection is public
+                  {isUpdating && <CircularProgress size={16} sx={{ ml: 1 }} />}
+                </Box>
+              }
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 4, mt: -0.5 }}>
+              Turning off will make your collection private
+            </Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={user?.hideCollectionValue || false}
+                  onChange={handleHideValueToggle}
+                  disabled={isUpdatingHideValue}
+                />
+              }
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  Hide collection value from others
+                  {isUpdatingHideValue && <CircularProgress size={16} sx={{ ml: 1 }} />}
+                </Box>
+              }
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 4, mt: -0.5 }}>
+              Hides total value, cost to complete, and buy buttons from viewers
+            </Typography>
+          </Box>
         </>
       )}
     </>

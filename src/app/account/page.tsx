@@ -68,6 +68,7 @@ function ProfileContent() {
   const [redGreenTableRows, setRedGreenTableRows] = useRedGreenTableRows();
   const [labeledNavigationArrows, setLabeledNavigationArrows] = useLabeledNavigationArrows();
   const [isUpdatingPrivacy, setIsUpdatingPrivacy] = useState(false);
+  const [isUpdatingHideValue, setIsUpdatingHideValue] = useState(false);
   const [hasHandledOAuthCallback, setHasHandledOAuthCallback] = useState(false);
 
   const {
@@ -188,6 +189,24 @@ function ProfileContent() {
       enqueueSnackbar(message, { variant: 'error' });
     } finally {
       setIsUpdatingPrivacy(false);
+    }
+  };
+
+  const handleHideValueToggle = async (hideCollectionValue: boolean) => {
+    setIsUpdatingHideValue(true);
+    try {
+      const result = await updateUser({ hideCollectionValue }).unwrap();
+
+      if (!result.success) {
+        throw new Error(result.error?.message);
+      }
+
+      enqueueSnackbar('Collection value visibility updated successfully', { variant: 'success' });
+    } catch (error: any) {
+      const message = error.data?.error?.message || 'Failed to update collection value visibility';
+      enqueueSnackbar(message, { variant: 'error' });
+    } finally {
+      setIsUpdatingHideValue(false);
     }
   };
 
@@ -370,6 +389,22 @@ function ProfileContent() {
               />
               <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 1 }}>
                 When enabled, your collection is visible at its public URL that anyone can access.
+              </Typography>
+            </Box>
+
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={user?.hideCollectionValue || false}
+                    onChange={(e) => handleHideValueToggle(e.target.checked)}
+                    disabled={isUpdatingHideValue}
+                  />
+                }
+                label="Hide collection value from others"
+              />
+              <Typography variant="body2" color="text.secondary" sx={{ ml: 4, mt: 1 }}>
+                Hides total value, cost to complete, and buy buttons from anyone viewing your public collection or using a share link. You will still see these when logged in.
               </Typography>
             </Box>
 

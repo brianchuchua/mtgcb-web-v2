@@ -30,6 +30,7 @@ interface CollectionSetItemRendererProps {
   collectionData?: CollectionSetSummary;
   userId?: number;
   goalId?: number;
+  hideValue?: boolean;
 }
 
 // Animation for completed sets - rotating gradient
@@ -259,7 +260,8 @@ const CollectionCardCount: React.FC<{
 const CollectionInfoSection: React.FC<{
   collectionData: CollectionSetSummary;
   includeSubsetsInSets?: boolean;
-}> = ({ collectionData, includeSubsetsInSets = false }) => {
+  hideValue?: boolean;
+}> = ({ collectionData, includeSubsetsInSets = false, hideValue = false }) => {
   const [progressBarStyle] = useSetProgressBarStyle();
   const percentage = Math.ceil(collectionData.percentageCollected);
   const totalCards = includeSubsetsInSets ? collectionData.cardCountIncludingSubsets : collectionData.cardCount;
@@ -288,9 +290,11 @@ const CollectionInfoSection: React.FC<{
           ({percentage}% collected, {collectionData.totalCardsCollectedInSet} total cards)
         </Typography>
       )}
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        Current set value: {formatPrice(collectionData.costToComplete.totalValue)}
-      </Typography>
+      {!hideValue && (
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          Current set value: {formatPrice(collectionData.costToComplete.totalValue)}
+        </Typography>
+      )}
     </Box>
   );
 };
@@ -606,6 +610,7 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
   collectionData,
   userId,
   goalId,
+  hideValue = false,
 }) => {
   const [isVisible, setIsVisible] = React.useState(false);
 
@@ -644,10 +649,10 @@ export const CollectionSetItemRenderer: React.FC<CollectionSetItemRendererProps>
         />
 
         {collectionData && (
-          <CollectionInfoSection collectionData={collectionData} includeSubsetsInSets={includeSubsetsInSets} />
+          <CollectionInfoSection collectionData={collectionData} includeSubsetsInSets={includeSubsetsInSets} hideValue={hideValue} />
         )}
 
-        {costToComplete && (
+        {costToComplete && !hideValue && (
           <CostToPurchaseSection
             costToComplete={costToComplete}
             setId={set.id}

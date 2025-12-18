@@ -456,6 +456,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
           view={view}
           selectedGoalId={selectedGoalId}
           includeSubsetsInSets={includeSubsetsInSets}
+          hideValue={!isOwnCollection && collectionSummary?.hideCollectionValue !== false}
         />
       )}
 
@@ -568,6 +569,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
             collectionSets,
           }}
           goalId={selectedGoalId || undefined}
+          hideValue={!isOwnCollection && collectionSummary?.hideCollectionValue !== false}
         />
       )}
 

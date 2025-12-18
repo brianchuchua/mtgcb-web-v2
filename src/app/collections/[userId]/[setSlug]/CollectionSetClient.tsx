@@ -178,6 +178,10 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         ? browseController.cardsProps.goalSummary
         : null;
 
+  // Determine if values should be hidden (for non-owners viewing collections with hideCollectionValue enabled)
+  // For non-owners, hide values until we confirm hideCollectionValue is explicitly false
+  const shouldHideValue = !isOwnCollection && collectionSummary?.hideCollectionValue !== false;
+
   const handleSubsetSelect = useCallback((subsetId: string) => {
     // First, open/expand the subset
     const toggleFunction = subsetToggleRefs.current[subsetId];
@@ -572,6 +576,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               percentageCollected: set.percentageCollected || 0,
               costToComplete: set.costToComplete?.goal || 0,
             }}
+            hideValue={shouldHideValue}
           />
         </Box>
       )}
@@ -652,16 +657,18 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                 {includeSubsetsInSets && set.cardCountIncludingSubsets ? ' including subsets' : ''})
               </Typography>
 
-              <Typography variant="h6" color="text.secondary" sx={{}}>
-                Set value:{' '}
-                <Box component="span" sx={{ color: 'success.main' }}>
-                  $
-                  {(set.totalValue || 0).toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </Box>
-              </Typography>
+              {!shouldHideValue && (
+                <Typography variant="h6" color="text.secondary" sx={{}}>
+                  Set value:{' '}
+                  <Box component="span" sx={{ color: 'success.main' }}>
+                    $
+                    {(set.totalValue || 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </Box>
+                </Typography>
+              )}
 
               <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <CollectionProgressBar
@@ -673,13 +680,15 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                 />
               </Box>
 
-              <SetPageBuyButton
-                set={set}
-                costToComplete={set.costToComplete}
-                includeSubsetsInSets={includeSubsetsInSets}
-                userId={userId}
-                isCollection={true}
-              />
+              {!shouldHideValue && (
+                <SetPageBuyButton
+                  set={set}
+                  costToComplete={set.costToComplete}
+                  includeSubsetsInSets={includeSubsetsInSets}
+                  userId={userId}
+                  isCollection={true}
+                />
+              )}
             </>
           )}
         </Box>

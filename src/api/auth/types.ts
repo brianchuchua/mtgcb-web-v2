@@ -24,6 +24,7 @@ export interface UserData {
   username: string;
   email: string;
   isPublic: boolean;
+  hideCollectionValue?: boolean;
   draftCubeVariant?: 'standard' | 'two-uncommon';
   showAsPatreonSupporter?: boolean;
   patreonCardId?: string | null;

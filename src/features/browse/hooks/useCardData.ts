@@ -208,6 +208,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       numberOfCardsInMagic: cardsSearchResult.data.numberOfCardsInMagic,
       percentageCollected: cardsSearchResult.data.percentageCollected,
       totalValue: cardsSearchResult.data.totalValue,
+      hideCollectionValue: cardsSearchResult.data.hideCollectionValue,
     } : undefined,
     goalSummary: cardsSearchResult?.data?.goalSummary,
   };
