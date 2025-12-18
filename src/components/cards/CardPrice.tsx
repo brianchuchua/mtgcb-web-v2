@@ -566,7 +566,16 @@ const CardPrice: React.FC<CardPriceProps> = ({
     );
   }
 
-  // Only foil price available as a last resort
+  // When foil column is separate and no normal price exists, show em dash
+  if (!showInlineFoil && !normalPriceWithType) {
+    return (
+      <Typography variant="body2" color="text.disabled">
+        —
+      </Typography>
+    );
+  }
+
+  // Only foil price available as a last resort (when foil is shown inline)
   if (foilPrice !== null) {
     return (
       <>
