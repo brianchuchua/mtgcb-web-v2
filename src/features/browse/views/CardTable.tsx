@@ -31,6 +31,7 @@ interface CardTableProps {
     toughnessIsVisible: boolean;
     loyaltyIsVisible: boolean;
     priceIsVisible: boolean;
+    foilPriceIsVisible: boolean;
     locationsIsVisible?: boolean;
   };
   cardDisplaySettings?: {

@@ -62,6 +62,7 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
       toughnessIsVisible: tableCardSettings.toughnessIsVisible,
       loyaltyIsVisible: tableCardSettings.loyaltyIsVisible,
       priceIsVisible: tableCardSettings.priceIsVisible,
+      foilPriceIsVisible: tableCardSettings.foilPriceIsVisible,
     }),
     [
       tableCardSettings.setIsVisible,
@@ -75,6 +76,7 @@ export function useDisplaySettings({ view, viewMode }: UseDisplaySettingsProps) 
       tableCardSettings.toughnessIsVisible,
       tableCardSettings.loyaltyIsVisible,
       tableCardSettings.priceIsVisible,
+      tableCardSettings.foilPriceIsVisible,
     ],
   );
 

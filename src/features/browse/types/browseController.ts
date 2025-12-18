@@ -50,6 +50,7 @@ export interface TableSettings {
   toughnessIsVisible: boolean;
   loyaltyIsVisible: boolean;
   priceIsVisible: boolean;
+  foilPriceIsVisible: boolean;
   quantityIsVisible?: boolean;
   locationsIsVisible?: boolean;
 }

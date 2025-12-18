@@ -51,6 +51,7 @@ export interface CardTableRendererProps {
     toughnessIsVisible?: boolean;
     loyaltyIsVisible?: boolean;
     priceIsVisible?: boolean;
+    foilPriceIsVisible?: boolean;
     quantityIsVisible?: boolean;
     goalProgressIsVisible?: boolean;
     locationsIsVisible?: boolean;
@@ -250,12 +251,27 @@ export const useCardTableColumns = (
     {
       id: priceType,
       label: 'Price',
-      width: {
-        xs: '100px',
-        sm: '150px',
-        default: '200px',
-      },
+      width:
+        displaySettings.priceIsVisible && displaySettings.foilPriceIsVisible
+          ? { xs: '80px', sm: '100px', default: '120px' }
+          : { xs: '100px', sm: '150px', default: '200px' },
       tooltip: <PriceTooltip />,
+      hasInfoIcon: true,
+      sortable: true,
+    },
+    {
+      id: 'foil',
+      label: 'Foil',
+      width:
+        displaySettings.priceIsVisible && displaySettings.foilPriceIsVisible
+          ? { xs: '80px', sm: '100px', default: '120px' }
+          : { xs: '100px', sm: '150px', default: '200px' },
+      tooltip: (
+        <div>
+          <div>Sort by foil {priceType} price</div>
+          <div>Changes to the price type in settings will update this sort</div>
+        </div>
+      ),
       hasInfoIcon: true,
       sortable: true,
     },
@@ -279,10 +295,11 @@ export const useCardTableColumns = (
       column.id === 'market' ||
       column.id === 'low' ||
       column.id === 'average' ||
-      column.id === 'high' ||
-      column.id === 'foil';
+      column.id === 'high';
 
     if (isPriceColumn) return displaySettings.priceIsVisible;
+
+    if (column.id === 'foil') return displaySettings.foilPriceIsVisible;
 
     if (column.id === 'quantityReg' || column.id === 'quantityFoil') {
       return displaySettings.quantityIsVisible ?? false;
@@ -1271,7 +1288,42 @@ export const useCardRowRenderer = (
             cardId={card.id}
             cardName={card.name}
             tcgplayerId={'tcgplayerId' in card ? card.tcgplayerId : undefined}
+            showInlineFoil={!displaySettings.foilPriceIsVisible}
           />
+        </TableCell>,
+      );
+    }
+
+    // Foil Price Cell
+    if (displaySettings.foilPriceIsVisible) {
+      const priceData = preparePriceData(card);
+      const foilPrices = priceData?.foil;
+      const hasFoilPrice =
+        foilPrices &&
+        (foilPrices.market !== null ||
+          foilPrices.low !== null ||
+          foilPrices.average !== null ||
+          foilPrices.high !== null);
+
+      cells.push(
+        <TableCell key="foil" onClick={(e) => e.stopPropagation()}>
+          {hasFoilPrice ? (
+            <CardPrice
+              prices={priceData || null}
+              isLoading={false}
+              priceType={priceType}
+              centered={false}
+              isFoil={true}
+              hideFoilSuffix={true}
+              cardId={card.id}
+              cardName={card.name}
+              tcgplayerId={'tcgplayerId' in card ? card.tcgplayerId : undefined}
+            />
+          ) : (
+            <Typography variant="body2" color="text.disabled">
+              —
+            </Typography>
+          )}
         </TableCell>,
       );
     }
@@ -1542,17 +1594,30 @@ export const extractCardCellValue = (
     case 'low':
     case 'average':
     case 'high':
-    case 'foil':
       // Handle price columns - export raw numeric values
-      if (priceType === columnId || columnId === 'foil') {
+      if (priceType === columnId) {
         const priceData = preparePriceData(card);
-        if (columnId === 'foil' && priceData?.foil) {
-          return priceData.foil.market ?? '';
-        } else if (priceData?.normal) {
+        if (priceData?.normal) {
           return (priceData.normal as any)[columnId] ?? '';
         }
       }
       return '';
+    case 'foil': {
+      // Export foil price using current price type, falling back to market
+      const priceData = preparePriceData(card);
+      if (priceData?.foil) {
+        const foilPrices = priceData.foil;
+        const price =
+          (priceType ? foilPrices[priceType] : null) ??
+          foilPrices.market ??
+          foilPrices.low ??
+          foilPrices.average ??
+          foilPrices.high ??
+          null;
+        return price ?? '';
+      }
+      return '';
+    }
     default:
       return '';
   }

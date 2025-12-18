@@ -211,6 +211,13 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
         type: 'toggle',
       },
       {
+        key: 'tableFoilPrice',
+        label: 'Foil Price',
+        isVisible: tableCardSettings.foilPriceIsVisible,
+        setVisibility: (value: boolean) => updateSetting('tableFoilPriceIsVisible', value),
+        type: 'toggle',
+      },
+      {
         key: 'tableLocations',
         label: 'Locations',
         isVisible: collectionSettings.tableLocationsIsVisible,

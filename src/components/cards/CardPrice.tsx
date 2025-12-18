@@ -46,6 +46,8 @@ interface CardPriceProps {
   cardName?: string; // Card name for TCGPlayer search
   tcgplayerId?: number | string; // TCGPlayer product ID for direct link
   directToTCGPlayer?: boolean; // If true, clicking price goes directly to TCGPlayer (no menu)
+  showInlineFoil?: boolean; // Whether to show foil price inline with regular price (default: true)
+  hideFoilSuffix?: boolean; // Whether to hide the "foil" suffix when displaying foil prices (default: false)
 }
 
 const formatPrice = (price: number): string => {
@@ -74,6 +76,8 @@ const CardPrice: React.FC<CardPriceProps> = ({
   cardName,
   tcgplayerId,
   directToTCGPlayer = false,
+  showInlineFoil = true,
+  hideFoilSuffix = false,
 }) => {
   const router = useRouter();
   const { isCollectionPage, userId } = useBrowseUrlContext();
@@ -95,7 +99,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
     event.preventDefault();
 
     if (directToTCGPlayer) {
-      const tcgPlayerUrl = generateTCGPlayerLink(tcgplayerId, cardName || '');
+      const tcgPlayerUrl = generateTCGPlayerLink(tcgplayerId, cardName || '', isFoil);
       window.open(tcgPlayerUrl, '_blank', 'noopener,noreferrer');
     } else {
       setMenuAnchorEl(event.currentTarget);
@@ -122,7 +126,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   const handleBuyOnTCGPlayer = () => {
     handleMenuClose();
-    const tcgPlayerUrl = generateTCGPlayerLink(tcgplayerId, cardName || '');
+    const tcgPlayerUrl = generateTCGPlayerLink(tcgplayerId, cardName || '', isFoil);
     window.open(tcgPlayerUrl, '_blank', 'noopener,noreferrer');
   };
 
@@ -324,8 +328,8 @@ const CardPrice: React.FC<CardPriceProps> = ({
             sx={{
               fontSize: '1rem',
               cursor: 'pointer',
+              color: 'primary.main',
               '&:hover': {
-                color: 'primary.main',
                 textDecoration: 'underline',
               },
               '@container card (max-width: 250px)': {
@@ -336,7 +340,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
               },
             }}
           >
-            {formatPrice(foilPrice)} foil
+            {formatPrice(foilPrice)}{!hideFoilSuffix && ' foil'}
           </Typography>
         </Box>
         <Menu
@@ -373,7 +377,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
 
   // Handle display cases with fallback mechanism
   // Both prices available
-  if (normalPriceWithType && foilPrice !== null) {
+  if (normalPriceWithType && foilPrice !== null && showInlineFoil) {
     const { price: normalPrice, type: actualPriceType, isFallback } = normalPriceWithType;
 
     return (
@@ -587,7 +591,7 @@ const CardPrice: React.FC<CardPriceProps> = ({
                 },
               }}
             >
-              {formatPrice(foilPrice)} foil
+              {formatPrice(foilPrice)}{!hideFoilSuffix && ' foil'}
             </Typography>
             {/* Only show the info icon if this is NOT a foil-only card */}
             {!isFoilOnlyCard && (

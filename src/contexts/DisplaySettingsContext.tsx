@@ -63,6 +63,7 @@ interface DisplaySettings {
   tableToughnessIsVisible: boolean;
   tableSetIsVisible: boolean;
   tablePriceIsVisible: boolean;
+  tableFoilPriceIsVisible: boolean;
 
   // Table-specific set settings
   tableSetCodeIsVisible: boolean;
@@ -173,6 +174,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
   tableToughnessIsVisible: false,
   tableSetIsVisible: true,
   tablePriceIsVisible: true,
+  tableFoilPriceIsVisible: true,
 
   // Table-specific set settings
   tableSetCodeIsVisible: false,
@@ -380,6 +382,7 @@ export function useTableCardSettings() {
     toughnessIsVisible: settings.tableToughnessIsVisible,
     setIsVisible: settings.tableSetIsVisible,
     priceIsVisible: settings.tablePriceIsVisible,
+    foilPriceIsVisible: settings.tableFoilPriceIsVisible,
   };
 }
 

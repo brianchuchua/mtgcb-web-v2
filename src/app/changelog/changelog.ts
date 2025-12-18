@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-17',
+      version: '1.12.0',
+      changes: ['Added separate Foil Price column to card table view with TCGPlayer link support'],
+    },
+    {
+      date: '2025-12-17',
       version: '1.11.0',
       changes: ['Added Roadmap page to track development progress'],
     },
