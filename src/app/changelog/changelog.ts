@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-18',
+      version: '1.13.3',
+      changes: ['Added Avatar Art Series cards'],
+      type: 'data',
+    },
+    {
+      date: '2025-12-18',
       version: '1.13.2',
       changes: ['Fixed Price column showing foil prices when Foil column is visible'],
     },
