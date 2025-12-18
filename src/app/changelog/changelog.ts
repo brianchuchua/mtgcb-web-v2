@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-12-17',
+      version: '1.10.0',
+      changes: ['Added ability for quantity selectors to multiselect'],
+    },
+    {
       date: '2025-12-14',
       version: '1.9.13',
       changes: ['Updated Secret Lair Showdown'],

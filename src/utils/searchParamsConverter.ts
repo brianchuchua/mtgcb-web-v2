@@ -170,10 +170,13 @@ export const buildApiParamsFromSearchParams = (
 
     // Add stat filtering - apply directly to the numeric fields
     if (searchParams.stats) {
+      // Quantity filter attributes that should use OR logic for multi-select
+      const QUANTITY_ATTRIBUTES = ['quantityAll', 'quantityReg', 'quantityFoil'];
+
       Object.entries(searchParams.stats).forEach(([attribute, conditions]) => {
         if (conditions.length > 0) {
           // Map URL operators to API operators
-          const OPERATOR_MAP = {
+          const OPERATOR_MAP: Record<string, string> = {
             gte: '>=',
             gt: '>',
             lte: '<=',
@@ -207,9 +210,11 @@ export const buildApiParamsFromSearchParams = (
 
           // Only add field if there are actual conditions after filtering
           if (transformedConditions.length > 0) {
-            apiParams[attribute] = {
-              AND: transformedConditions,
-            };
+            // Use OR for quantity attributes (multi-select), AND for other stats (range queries)
+            const isQuantityAttribute = QUANTITY_ATTRIBUTES.includes(attribute);
+            apiParams[attribute] = isQuantityAttribute
+              ? { OR: transformedConditions }
+              : { AND: transformedConditions };
           }
         }
       });

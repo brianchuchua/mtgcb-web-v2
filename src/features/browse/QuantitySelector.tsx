@@ -58,11 +58,11 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
   const [infoAnchorEl, setInfoAnchorEl] = useState<HTMLElement | null>(null);
 
   // Parse current stat filters to determine selected values and custom filters
-  const parseQuantityFilter = (quantityType: QuantityType): { selected: QuantityOption; hasCustomFilter: boolean } => {
+  const parseQuantityFilter = (quantityType: QuantityType): { selected: QuantityOption[]; hasCustomFilter: boolean } => {
     const filters = statFilters?.[quantityType] || [];
-    if (filters.length === 0) return { selected: 'all', hasCustomFilter: false };
+    if (filters.length === 0) return { selected: [], hasCustomFilter: false };
 
-    let matchedOption: QuantityOption | null = null;
+    const matchedOptions: QuantityOption[] = [];
     let hasUnmatchedFilters = false;
 
     // Look for exact matches that correspond to our button options
@@ -73,54 +73,61 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
         hasUnmatchedFilters = true;
         continue;
       }
-      
+
       const [, operator, value] = match;
-      
+
       // Check for exact matches for our button options
       if (operator === 'eq') {
         switch (value) {
-          case '0': 
-            matchedOption = '0x';
+          case '0':
+            matchedOptions.push('0x');
             break;
-          case '1': 
-            matchedOption = '1x';
+          case '1':
+            matchedOptions.push('1x');
             break;
-          case '2': 
-            matchedOption = '2x';
+          case '2':
+            matchedOptions.push('2x');
             break;
-          case '3': 
-            matchedOption = '3x';
+          case '3':
+            matchedOptions.push('3x');
             break;
-          case '4': 
-            matchedOption = '4x';
+          case '4':
+            matchedOptions.push('4x');
             break;
           default:
             hasUnmatchedFilters = true;
         }
-      } else if ((operator === 'gte' && value === '5') || 
+      } else if ((operator === 'gte' && value === '5') ||
                  (operator === 'gt' && value === '4')) {
-        matchedOption = '5x+';
+        matchedOptions.push('5x+');
       } else {
         hasUnmatchedFilters = true;
       }
     }
-    
-    // If we have multiple filters or unmatched filters, it's a custom filter
-    const hasCustomFilter = hasUnmatchedFilters || filters.length > 1;
-    
-    // If we found a match and no custom filters, return the match
-    if (matchedOption && !hasCustomFilter) {
-      return { selected: matchedOption, hasCustomFilter: false };
-    }
-    
-    // Otherwise, return 'all' but indicate there's a custom filter
-    return { selected: 'all', hasCustomFilter };
+
+    // If we have unmatched filters, it's a custom filter
+    const hasCustomFilter = hasUnmatchedFilters;
+
+    return { selected: matchedOptions, hasCustomFilter };
   };
 
   // Use useMemo to prevent unnecessary recalculations
   const allFilterState = useMemo(() => parseQuantityFilter('quantityAll'), [statFilters]);
   const regFilterState = useMemo(() => parseQuantityFilter('quantityReg'), [statFilters]);
   const foilFilterState = useMemo(() => parseQuantityFilter('quantityFoil'), [statFilters]);
+
+  // Convert a QuantityOption to its filter condition string
+  const optionToFilterCondition = (option: QuantityOption): string | null => {
+    switch (option) {
+      case '0x': return 'eq0';
+      case '1x': return 'eq1';
+      case '2x': return 'eq2';
+      case '3x': return 'eq3';
+      case '4x': return 'eq4';
+      case '5x+': return 'gte5';
+      default: return null;
+    }
+  };
 
   const handleQuantityChange = (
     quantityType: QuantityType,
@@ -130,37 +137,30 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
 
     // Create a copy of current stat filters
     const newStatFilters: StatFilters = { ...statFilters };
+    const currentFilters = newStatFilters[quantityType] || [];
 
     if (value === 'all') {
-      // Remove only this specific quantity filter, preserve others
+      // "All" button clears the filter
       delete newStatFilters[quantityType];
     } else {
-      // Add/update the quantity filter
-      let filterCondition: string;
-      switch (value) {
-        case '0x':
-          filterCondition = 'eq0';
-          break;
-        case '1x':
-          filterCondition = 'eq1';
-          break;
-        case '2x':
-          filterCondition = 'eq2';
-          break;
-        case '3x':
-          filterCondition = 'eq3';
-          break;
-        case '4x':
-          filterCondition = 'eq4';
-          break;
-        case '5x+':
-          filterCondition = 'gte5';
-          break;
-        default:
-          return;
+      const filterCondition = optionToFilterCondition(value);
+      if (!filterCondition) return;
+
+      // Toggle behavior: if already selected, remove it; otherwise add it
+      const isCurrentlySelected = currentFilters.includes(filterCondition);
+
+      if (isCurrentlySelected) {
+        // Remove this filter condition
+        const updatedFilters = currentFilters.filter(f => f !== filterCondition);
+        if (updatedFilters.length === 0) {
+          delete newStatFilters[quantityType];
+        } else {
+          newStatFilters[quantityType] = updatedFilters;
+        }
+      } else {
+        // Add this filter condition to the existing ones
+        newStatFilters[quantityType] = [...currentFilters, filterCondition];
       }
-      // Replace only this quantity type's filters
-      newStatFilters[quantityType] = [filterCondition];
     }
 
     // Dispatch the updated filters, preserving all non-quantity filters
@@ -178,38 +178,50 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
   const renderQuantitySelector = (
     label: string,
     quantityType: QuantityType,
-    filterState: { selected: QuantityOption; hasCustomFilter: boolean }
-  ) => (
-    <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, gap: 1 }}>
-        <Typography variant="body2" color="text.secondary">
-          {label}
-        </Typography>
-        {filterState.hasCustomFilter && (
-          <Chip 
-            label="Custom filter active" 
-            size="small" 
-            color="primary" 
-            variant="outlined"
-            sx={{ height: 20, fontSize: '0.75rem' }}
-          />
-        )}
+    filterState: { selected: QuantityOption[]; hasCustomFilter: boolean }
+  ) => {
+    // Check if "All" should appear selected (no filters active)
+    const isAllSelected = filterState.selected.length === 0 && !filterState.hasCustomFilter;
+
+    return (
+      <Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, gap: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            {label}
+          </Typography>
+          {filterState.hasCustomFilter && (
+            <Chip
+              label="Custom filter active"
+              size="small"
+              color="primary"
+              variant="outlined"
+              sx={{ height: 20, fontSize: '0.75rem' }}
+            />
+          )}
+        </Box>
+        <ToggleButtonGroup
+          value={filterState.selected}
+          onChange={(_, value) => {
+            // When clicking on a button, we get the new array of selected values
+            // But we want toggle behavior, so we handle it in handleQuantityChange
+          }}
+          fullWidth
+          size="small"
+        >
+          {QUANTITY_OPTIONS.map((option) => (
+            <StyledToggleButton
+              key={option}
+              value={option}
+              selected={option === 'all' ? isAllSelected : filterState.selected.includes(option)}
+              onClick={() => handleQuantityChange(quantityType, option)}
+            >
+              {option === 'all' ? 'All' : option}
+            </StyledToggleButton>
+          ))}
+        </ToggleButtonGroup>
       </Box>
-      <ToggleButtonGroup
-        value={filterState.selected}
-        exclusive
-        onChange={(_, value) => handleQuantityChange(quantityType, value)}
-        fullWidth
-        size="small"
-      >
-        {QUANTITY_OPTIONS.map((option) => (
-          <StyledToggleButton key={option} value={option}>
-            {option === 'all' ? 'All' : option}
-          </StyledToggleButton>
-        ))}
-      </ToggleButtonGroup>
-    </Box>
-  );
+    );
+  };
 
   return (
     <OutlinedBox label="Quantity Collected">
