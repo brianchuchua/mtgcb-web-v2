@@ -9,6 +9,7 @@ import {
   Launch as ExportIcon,
   HelpOutline as FAQIcon,
   Favorite as FavoriteIcon,
+  FlagOutlined as RoadmapIcon,
   History as HistoryIcon,
   Home as HomeIcon,
   SaveAlt as ImportIcon,
@@ -105,6 +106,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
 
     const isOnResourcesPage =
       pathname === '/news' ||
+      pathname === '/roadmap' ||
       pathname === '/changelog' ||
       pathname === '/faq' ||
       pathname === '/contact' ||
@@ -362,6 +364,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                 onClick={() => setIsResourcesMenuOpen(!isResourcesMenuOpen)}
                 selected={
                   pathname === '/news' ||
+                  pathname === '/roadmap' ||
                   pathname === '/changelog' ||
                   pathname === '/faq' ||
                   pathname === '/contact' ||
@@ -393,6 +396,20 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                       <NewsIcon />
                     </ListItemIcon>
                     <ListItemText primary="News" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href="/roadmap"
+                    selected={pathname === '/roadmap'}
+                    onClick={handleResourceClick}
+                    sx={{ pl: 4 }}
+                  >
+                    <ListItemIcon>
+                      <RoadmapIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Roadmap" />
                   </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding>

@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-17',
+      version: '1.11.0',
+      changes: ['Added Roadmap page to track development progress'],
+    },
+    {
+      date: '2025-12-17',
       version: '1.10.0',
       changes: ['Added ability for quantity selectors to multiselect'],
     },

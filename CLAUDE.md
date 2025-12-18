@@ -9,6 +9,7 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 - First run `yarn type-check` to ensure TypeScript types are correct
 - Run `date` command to get the current date
 - Update the version number using semver conventions in `package.json` and `src/app/changelog/changelog.ts`
+  - Only read the first ~60 lines of changelog.ts to see the current version and format (no need to read the entire file)
   - The headers auto-update based on what's in the changelog.ts file
   - Use the current date from the `date` command for the changelog entry
   - Update the minor version if it's a feature, and the patch version if it's a bug fix
