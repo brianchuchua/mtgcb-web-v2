@@ -146,6 +146,42 @@ const faqData: FAQData = {
       answer: `<p><s>There isn't a definitive answer to this question since it all depends on personal preference and--</s></p><p>Just kidding, it's Booster Draft.</p><p>Speaking more seriously, it's a format where you get to collect <em>and</em> play at the same time, build different decks, and where more cards are playable than any constructed format. And the experience changes every few months! And you can sometimes make a profit with prizing or a lucky pull!</p>`,
       category: 'general',
     },
+    {
+      question: 'How do I create goals?',
+      answer: `
+        <p>Goals help you track progress toward collecting specific cards. To create a goal, go to the <strong>Goals</strong> page and click <strong>Create Goal</strong>.</p>
+
+        <p><strong>The basics:</strong></p>
+        <ol>
+          <li>Give your goal a name (and optionally a description)</li>
+          <li>Set how many copies you want (regular, foil, or any combination)</li>
+          <li>Use filters to define which cards you're targeting</li>
+          <li>Click Create and you're done!</li>
+        </ol>
+
+        <p><strong>Example goals:</strong></p>
+
+        <p><em>Complete a set:</em> Want one copy of every card from Foundations? Select "Foundations" under Sets, set quantity to 1, and create. The site will track your progress and show you exactly which cards you still need.</p>
+
+        <p><em>Collect a creature type:</em> Building a Goblin collection? Type "Goblin" in the Card Types field, set your desired quantity, and optionally filter to specific colors or sets.</p>
+
+        <p><em>Budget collecting:</em> Only want cards under $5? Use the price filters to set a maximum market price, then combine with any other filters you like.</p>
+
+        <p><em>Foil hunting:</em> Want a foil copy of every Mythic from a set? Select the set, filter to Mythic rarity, then set your Foil quantity to 1.</p>
+
+        <p><em>Reserved List tracker:</em> Use the "Reserved List" filter to include only Reserved List cards, then set your quantity target.</p>
+
+        <p><strong>Helpful options:</strong></p>
+        <ul>
+          <li><strong>One printing per card:</strong> When enabled (default), owning any version of a card counts toward your goal. Disable this if you want every single printing.</li>
+          <li><strong>Include cards from sets outside the goal:</strong> When tracking one printing per card for specific sets, this option lets cards you own from <em>other</em> sets count toward your goal too.</li>
+          <li><strong>Flexible finishes:</strong> When setting both regular and foil targets, enable this to include cards that only come in one finish (like some promos that are foil-only).</li>
+        </ul>
+
+        <p>Once created, your goals appear as filters in your collection view, making it easy to see what you have and what you still need!</p>
+      `,
+      category: 'general',
+    },
   ],
 };
 

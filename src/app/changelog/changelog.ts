@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-12-18',
+      version: '1.13.1',
+      changes: ['Added "How do I create goals?" tutorial to the FAQ page'],
+    },
+    {
       date: '2025-12-17',
       version: '1.13.0',
       changes: [
