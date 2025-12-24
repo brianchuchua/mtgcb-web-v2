@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-23',
+      version: '1.13.7',
+      changes: ['Updated missing Archenemy scheme cards'],
+      type: 'data',
+    },
+    {
+      date: '2025-12-23',
       version: '1.13.6',
       changes: ['Updated missing oversized commander cards'],
       type: 'data',
