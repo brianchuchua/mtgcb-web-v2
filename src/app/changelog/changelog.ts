@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-23',
+      version: '1.13.5',
+      changes: ['Updated missing thick stock display commanders'],
+      type: 'data',
+    },
+    {
+      date: '2025-12-23',
       version: '1.13.4',
       changes: ['Updated missing planes for Planechase and Planechase 2012 Edition', 'Added Secret Lair Showcase Planes'],
       type: 'data',
