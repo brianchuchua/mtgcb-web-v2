@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-23',
+      version: '1.13.9',
+      changes: ['Added Oversized 90s Promos and Oversized League Prizes sets', 'Added missing oversized dungeon cards'],
+      type: 'data',
+    },
+    {
+      date: '2025-12-23',
       version: '1.13.8',
       changes: ['Added Vanguard set'],
       type: 'data',
