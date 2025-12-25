@@ -13,26 +13,32 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-23',
+      version: '1.13.8',
+      changes: ['Added Vanguard set'],
+      type: 'data',
+    },
+    {
+      date: '2025-12-23',
       version: '1.13.7',
-      changes: ['Updated missing Archenemy scheme cards'],
+      changes: ['Added missing Archenemy scheme cards'],
       type: 'data',
     },
     {
       date: '2025-12-23',
       version: '1.13.6',
-      changes: ['Updated missing oversized commander cards'],
+      changes: ['Added missing oversized commander cards'],
       type: 'data',
     },
     {
       date: '2025-12-23',
       version: '1.13.5',
-      changes: ['Updated missing thick stock display commanders'],
+      changes: ['Added missing thick stock display commanders'],
       type: 'data',
     },
     {
       date: '2025-12-23',
       version: '1.13.4',
-      changes: ['Updated missing planes for Planechase and Planechase 2012 Edition', 'Added Secret Lair Showcase Planes'],
+      changes: ['Added missing planes for Planechase and Planechase 2012 Edition', 'Added Secret Lair Showcase Planes'],
       type: 'data',
     },
     {
