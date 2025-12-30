@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-12-30',
+      version: '1.13.11',
+      changes: ['Fixed bug with results pagination in some corner cases'],
+    },
+    {
       date: '2025-12-29',
       version: '1.13.10',
       changes: ['Added missing MicroProse promo to Media Inserts set'],
