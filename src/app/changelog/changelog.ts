@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-30',
+      version: '1.13.12',
+      changes: ['Fixed bug with goals that only included specific cards in them'],
+    },
+    {
+      date: '2025-12-30',
       version: '1.13.11',
       changes: ['Fixed bug with results pagination in some corner cases'],
     },
