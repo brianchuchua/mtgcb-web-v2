@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2025-12-29',
+      version: '1.13.10',
+      changes: ['Added missing MicroProse promo to Media Inserts set'],
+      type: 'data',
+    },
+    {
       date: '2025-12-23',
       version: '1.13.9',
       changes: ['Added Oversized 90s Promos and Oversized League Prizes sets', 'Added missing oversized dungeon cards'],
