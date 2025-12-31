@@ -13,6 +13,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-31',
+      version: '1.13.15',
+      changes: [
+        "Added Theros Hero's Path and Born of the Gods Hero's Path sets",
+        'Added missing cards to Battle the Horde, Defeat a God, Face the Hydra, and Open the Helvault sets',
+      ],
+      type: 'data',
+    },
+    {
+      date: '2025-12-31',
       version: '1.13.14',
       changes: ['Added Tales of Middle-earth Scene Box'],
       type: 'data',
