@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2025-12-31',
+      version: '1.13.14',
+      changes: ['Added Tales of Middle-earth Scene Box'],
+      type: 'data',
+    },
+    {
+      date: '2025-12-31',
       version: '1.13.13',
       changes: ['Added missing pagination option'],
     },
