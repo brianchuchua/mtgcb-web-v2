@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-01-01',
+      version: '1.13.16',
+      changes: ['Added missing Oversized cards to Magic Player Rewards'],
+      type: 'data',
+    },
+    {
       date: '2025-12-31',
       version: '1.13.15',
       changes: [
