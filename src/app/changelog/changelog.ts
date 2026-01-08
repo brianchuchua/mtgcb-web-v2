@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-01-08',
+      version: '1.13.21',
+      changes: ['Added Commander 2011 Launch Party promos'],
+      type: 'data',
+    },
+    {
+      date: '2026-01-08',
       version: '1.13.20',
       changes: ['Added missing WPN Promos'],
       type: 'data',
