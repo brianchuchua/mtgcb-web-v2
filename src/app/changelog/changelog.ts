@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-01-08',
+      version: '1.13.19',
+      changes: ['Added Spider-Man Art Series'],
+      type: 'data',
+    },
+    {
+      date: '2026-01-08',
       version: '1.13.18',
       changes: ['Added missing oversized promos to Release Event Promos, Gateway Promos, and WPN Promos'],
       type: 'data',
