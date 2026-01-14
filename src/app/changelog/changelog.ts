@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-01-14',
+      version: '1.13.23',
+      changes: ['Added Lorwyn Eclipsed and related sets'],
+      type: 'data',
+    },
+    {
       date: '2026-01-08',
       version: '1.13.22',
       changes: ['Added missing convention promos'],
