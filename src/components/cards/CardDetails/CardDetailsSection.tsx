@@ -85,6 +85,7 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
           <Typography
             variant="h5"
             fontWeight="600"
+            data-testid="card-name"
             sx={{
               color: (theme) => theme.palette.primary.main,
               fontSize: { xs: '1.25rem', sm: '1.5rem' },
@@ -176,6 +177,7 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
               <Link
                 component={NextLink}
                 href={setUrl}
+                data-testid="card-set-name"
                 sx={{
                   textDecoration: 'none',
                   color: 'inherit',

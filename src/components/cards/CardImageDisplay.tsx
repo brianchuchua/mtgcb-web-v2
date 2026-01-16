@@ -70,6 +70,7 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
       {imageUrl && !imageError ? (
         <Box
           component="img"
+          data-testid="card-image"
           src={imageUrl}
           alt={linkToTCGPlayer ? `${cardName} - Buy on TCGPlayer` : (cardName || 'Card image')}
           title={linkToTCGPlayer ? `${cardName} - Buy on TCGPlayer` : undefined}
@@ -118,6 +119,7 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
 
   return (
     <Box
+      data-testid="card-image-container"
       sx={{
         position: 'relative',
         width,
