@@ -33,7 +33,70 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 - `yarn build` - Production build
 - `yarn type-check` - TypeScript checking
 - `yarn lint` - ESLint
-- `yarn test` - Run tests
+- `yarn test` - Jest unit tests
+- `yarn test:e2e` - Playwright E2E tests
+- `yarn test:e2e tests/path/to/test.ts` - Run specific test file
+
+## E2E Testing (Playwright)
+
+### Prerequisites
+
+- Local web server running (`yarn dev`)
+- Local API server running
+- After Playwright updates: `yarn playwright install chromium`
+
+### Workflow
+
+1. Write/run the specific test file: `yarn test:e2e tests/path/to/test.ts`
+2. Run full suite to catch regressions: `yarn test:e2e`
+
+### Test File Location
+
+- E2E tests live in `/tests/` with subdirectories mirroring features
+- Example: `/tests/browse/browse.e2e.test.ts`, `/tests/login.test.ts`
+
+### Writing Tests
+
+```typescript
+import { expect, test } from '@playwright/test';
+
+test.describe('Feature Name', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/route');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should do something', async ({ page }) => {
+    await expect(page.getByTestId('element-id')).toBeVisible();
+  });
+});
+```
+
+### Key Patterns
+
+- **Use `data-testid` attributes** for reliable element selection
+- **Scope selectors** when elements repeat (e.g., pagination top/bottom):
+  ```typescript
+  const paginationTop = page.getByTestId('pagination-top');
+  await paginationTop.getByTestId('pagination-next').click();
+  ```
+- **Mock API calls** for auth/mutation tests:
+  ```typescript
+  await page.route('http://local.mtgcb.com:5000/auth/login', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, data: { userId: '123' } }),
+    });
+  });
+  ```
+- **Wait for dynamic content** with `waitForFunction`:
+  ```typescript
+  await page.waitForFunction(
+    () => document.querySelectorAll('[data-testid="card-name"]').length > 0,
+    { timeout: 10000 }
+  );
+  ```
 
 ## Code Conventions
 

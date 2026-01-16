@@ -49,10 +49,8 @@ test.describe('Login Page', () => {
     await expect(loginButton).toBeDisabled();
   });
 
-  test('should redirect to collection page after login', async ({ page }) => {
+  test('should redirect to home page after login', async ({ page }) => {
     await page.route('http://local.mtgcb.com:5000/auth/login', async (route) => {
-      const request = route.request();
-
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -71,7 +69,7 @@ test.describe('Login Page', () => {
 
     await Promise.all([
       page.getByTestId('submit-button').click(),
-      page.waitForURL('/collections/123', { timeout: 10000 }),
+      page.waitForURL('/', { timeout: 10000 }),
     ]);
   });
 

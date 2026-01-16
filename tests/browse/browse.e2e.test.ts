@@ -80,47 +80,51 @@ test.describe('Browse Page', () => {
 
   test('should display pagination information', async ({ page }) => {
     // Wait for pagination to load
-    await expect(page.getByTestId('pagination-top')).toBeVisible();
-    
+    const paginationTop = page.getByTestId('pagination-top');
+    await expect(paginationTop).toBeVisible();
+
     // Verify page info displays (e.g., "1-10 of 500")
-    await expect(page.getByTestId('page-info')).toContainText(/\d+-\d+ of \d+/);
-    
-    // Verify page navigation controls
-    await expect(page.getByTestId('pagination-first')).toBeVisible();
-    await expect(page.getByTestId('pagination-prev')).toBeVisible();
-    await expect(page.getByTestId('pagination-next')).toBeVisible();
-    await expect(page.getByTestId('pagination-last')).toBeVisible();
-    
+    await expect(paginationTop.getByTestId('page-info')).toContainText(/\d+-\d+ of \d+/);
+
+    // Verify page navigation controls (scoped to top pagination)
+    await expect(paginationTop.getByTestId('pagination-first')).toBeVisible();
+    await expect(paginationTop.getByTestId('pagination-prev')).toBeVisible();
+    await expect(paginationTop.getByTestId('pagination-next')).toBeVisible();
+    await expect(paginationTop.getByTestId('pagination-last')).toBeVisible();
+
     // First and previous should be disabled on first page
-    await expect(page.getByTestId('pagination-first')).toBeDisabled();
-    await expect(page.getByTestId('pagination-prev')).toBeDisabled();
+    await expect(paginationTop.getByTestId('pagination-first')).toBeDisabled();
+    await expect(paginationTop.getByTestId('pagination-prev')).toBeDisabled();
   });
 
   test('should load real data from API', async ({ page }) => {
     // Wait for sets to load
     await page.waitForSelector('[data-testid="set-item"]');
-    
+
     // Verify real set data is displayed (check for known MTG sets)
     const setNames = await page.getByTestId('set-name').allTextContents();
-    
+
     // Should contain actual MTG set names
     expect(setNames.length).toBeGreaterThan(0);
-    expect(setNames.some(name => name.length > 0)).toBeTruthy();
-    
+    expect(setNames.some((name) => name.length > 0)).toBeTruthy();
+
     // Verify all set names include codes in parentheses (e.g., "Foundations (FDN)")
-    expect(setNames.every(name => /\([A-Z0-9]{2,4}\)$/.test(name))).toBeTruthy();
+    // Set codes can be 2-6 alphanumeric characters (some promo sets have longer codes)
+    expect(setNames.every((name) => /\([A-Z0-9]{2,6}\)$/i.test(name))).toBeTruthy();
   });
 
   test('should handle pagination navigation', async ({ page }) => {
     // Wait for initial load
     await page.waitForSelector('[data-testid="set-item"]');
-    
+
+    const paginationTop = page.getByTestId('pagination-top');
+
     // Get first page set names
     const firstPageSetNames = await page.getByTestId('set-name').allTextContents();
-    
-    // Click next page
-    await page.getByTestId('pagination-next').click();
-    
+
+    // Click next page (scoped to top pagination)
+    await paginationTop.getByTestId('pagination-next').click();
+
     // Wait for the content to actually change
     await page.waitForFunction(
       (firstPageFirstSet) => {
@@ -130,15 +134,15 @@ test.describe('Browse Page', () => {
       firstPageSetNames[0], // Pass the first set name from page 1
       { timeout: 10000 }
     );
-    
+
     // Get second page set names
     const secondPageSetNames = await page.getByTestId('set-name').allTextContents();
-    
+
     // Verify different sets are displayed
     expect(firstPageSetNames).not.toEqual(secondPageSetNames);
-    
-    // Verify pagination controls updated
-    await expect(page.getByTestId('pagination-first')).toBeEnabled();
-    await expect(page.getByTestId('pagination-prev')).toBeEnabled();
+
+    // Verify pagination controls updated (scoped to top pagination)
+    await expect(paginationTop.getByTestId('pagination-first')).toBeEnabled();
+    await expect(paginationTop.getByTestId('pagination-prev')).toBeEnabled();
   });
 });

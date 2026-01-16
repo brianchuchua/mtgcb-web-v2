@@ -73,7 +73,7 @@ test.describe('Sign Up Page', () => {
     await expect(signupButton).toBeDisabled();
   });
 
-  test('should redirect to collection page after successful signup and login', async ({ page }) => {
+  test('should redirect to home page after successful signup and login', async ({ page }) => {
     // Mock successful signup response
     await page.route('/api/auth/register', async (route) => {
       await route.fulfill({
@@ -111,7 +111,7 @@ test.describe('Sign Up Page', () => {
 
     await Promise.all([
       page.getByTestId('submit-button').click(),
-      page.waitForURL('/collections/123', { timeout: 10000 }),
+      page.waitForURL('/?new=true', { timeout: 10000 }),
     ]);
   });
 
