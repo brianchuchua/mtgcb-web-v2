@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-01-21',
+      version: '1.14.0',
+      changes: ['Mass Update button now available when viewing a set with a collection goal selected'],
+      type: 'feature',
+    },
+    {
       date: '2026-01-17',
       version: '1.13.24',
       changes: ['Updated Special Guests'],

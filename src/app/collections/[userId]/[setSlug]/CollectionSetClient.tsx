@@ -11,13 +11,19 @@ import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Confetti from 'react-confetti';
 import { useDispatch, useSelector } from 'react-redux';
-import { useMassUpdateCollectionMutation, useMassUpdateLocationsMutation } from '@/api/collections/collectionsApi';
+import {
+  useMassUpdateCollectionMutation,
+  useMassUpdateLocationsMutation,
+  useMassEntryCollectionMutation,
+} from '@/api/collections/collectionsApi';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
+import MassEntryConfirmDialog from '@/components/collections/MassEntryConfirmDialog';
+import MassEntryPanel, { MassEntryFormData } from '@/components/collections/MassEntryPanel';
 import MassUpdateConfirmDialog from '@/components/collections/MassUpdateConfirmDialog';
 import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
 import MassUpdateLocationPanel, { MassUpdateLocationFormData } from '@/components/collections/MassUpdateLocationPanel';
@@ -133,11 +139,17 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(menuAnchorEl);
 
-  // Mass Update state
+  // Mass Update state (set-level, when no goalId)
   const [isMassUpdateOpen, setIsMassUpdateOpen] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [massUpdateFormData, setMassUpdateFormData] = useState<MassUpdateFormData | null>(null);
   const [massUpdateCollection, { isLoading: isMassUpdateLoading }] = useMassUpdateCollectionMutation();
+
+  // Mass Entry state (page-level, when goalId is selected)
+  const [isMassEntryOpen, setIsMassEntryOpen] = useState(false);
+  const [showMassEntryConfirmDialog, setShowMassEntryConfirmDialog] = useState(false);
+  const [massEntryFormData, setMassEntryFormData] = useState<MassEntryFormData | null>(null);
+  const [massEntryCollection, { isLoading: isMassEntryLoading }] = useMassEntryCollectionMutation();
 
   // Mass Update Location state
   const [isMassUpdateLocationOpen, setIsMassUpdateLocationOpen] = useState(false);
@@ -303,6 +315,14 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     setMassUpdateFormData(null);
   }, []);
 
+  // Get visible card IDs for mass entry (page-level updates when goalId is selected)
+  const visibleCardIds = React.useMemo(() => {
+    if (browseController.view === 'cards' && browseController.cardsProps && 'items' in browseController.cardsProps) {
+      return browseController.cardsProps.items.map((card) => parseInt(card.id));
+    }
+    return [];
+  }, [browseController.view, browseController.cardsProps]);
+
   // Get visible card IDs for mass location update - only cards they own
   const ownedVisibleCardIds = React.useMemo(() => {
     if (browseController.view === 'cards' && browseController.cardsProps && 'items' in browseController.cardsProps) {
@@ -459,6 +479,83 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   const handleMassUpdateLocationCancel = useCallback(() => {
     setIsMassUpdateLocationOpen(false);
+  }, []);
+
+  // Mass Entry handlers (page-level, when goalId is selected)
+  const handleMassEntryToggle = useCallback(() => {
+    setIsMassEntryOpen(!isMassEntryOpen);
+    setMenuAnchorEl(null);
+  }, [isMassEntryOpen]);
+
+  const handleMassEntrySubmit = useCallback((formData: MassEntryFormData) => {
+    setMassEntryFormData(formData);
+    setShowMassEntryConfirmDialog(true);
+  }, []);
+
+  const handleMassEntryCancel = useCallback(() => {
+    setIsMassEntryOpen(false);
+  }, []);
+
+  const handleConfirmMassEntry = useCallback(
+    async () => {
+      if (!massEntryFormData || !visibleCardIds.length) {
+        enqueueSnackbar('No cards available to update', { variant: 'error' });
+        return;
+      }
+
+      try {
+        const response = await massEntryCollection({
+          mode: massEntryFormData.mode,
+          cardIds: visibleCardIds,
+          updates: [
+            {
+              rarity: massEntryFormData.rarity,
+              quantityReg: massEntryFormData.quantityReg,
+              quantityFoil: massEntryFormData.quantityFoil,
+            },
+          ],
+        }).unwrap();
+
+        if (response.success && response.data) {
+          const { updatedCards, totalSkipped } = response.data;
+
+          if (updatedCards === 0 && totalSkipped) {
+            const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
+            enqueueSnackbar(`${totalSkippedCount} card${totalSkippedCount !== 1 ? 's' : ''} skipped due to foil constraints`, {
+              variant: 'error',
+            });
+          } else if (updatedCards > 0) {
+            let message = `Successfully updated ${updatedCards} card${updatedCards !== 1 ? 's' : ''}`;
+
+            if (totalSkipped) {
+              const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
+              if (totalSkippedCount > 0) {
+                message += `. ${totalSkippedCount} card${totalSkippedCount !== 1 ? 's' : ''} skipped due to foil constraints`;
+                enqueueSnackbar(message, { variant: 'warning', autoHideDuration: 6000 });
+              } else {
+                enqueueSnackbar(message, { variant: 'success' });
+              }
+            } else {
+              enqueueSnackbar(message, { variant: 'success' });
+            }
+          }
+
+          setIsMassEntryOpen(false);
+          setShowMassEntryConfirmDialog(false);
+          setMassEntryFormData(null);
+        }
+      } catch (error: any) {
+        enqueueSnackbar(error?.data?.error?.message || 'Failed to mass update collection', {
+          variant: 'error',
+        });
+      }
+    },
+    [massEntryFormData, visibleCardIds, massEntryCollection, enqueueSnackbar],
+  );
+
+  const handleCancelMassEntryConfirm = useCallback(() => {
+    setShowMassEntryConfirmDialog(false);
+    setMassEntryFormData(null);
   }, []);
 
   const isCardGridView = browseController.view === 'cards' && browseController.viewMode === 'grid';
@@ -713,14 +810,14 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                 collectionName={set?.name}
                 setSlug={setSlug}
               />
-              {browseController.view === 'cards' && !selectedGoalId && (
+              {browseController.view === 'cards' && (
                 <>
                   <Tooltip title="More actions">
                     <Button
                       size="small"
                       variant="outlined"
                       onClick={handleMenuOpen}
-                      disabled={isMassUpdateLoading}
+                      disabled={isMassUpdateLoading || isMassEntryLoading}
                       sx={{
                         minWidth: 'auto',
                         px: 1,
@@ -742,7 +839,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                       horizontal: 'right',
                     }}
                   >
-                    <MenuItem onClick={handleMassUpdateToggle}>
+                    <MenuItem onClick={selectedGoalId ? handleMassEntryToggle : handleMassUpdateToggle}>
                       <ListItemIcon>
                         <AutoFixHigh fontSize="small" />
                       </ListItemIcon>
@@ -765,23 +862,48 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       />
       <SearchDescription forceView="cards" />
 
-      {/* Mass Update Panel */}
+      {/* Mass Update Panel (set-level, when no goalId) */}
       {isOwnCollection && browseController.view === 'cards' && !selectedGoalId && (
+        <MassUpdatePanel
+          isOpen={isMassUpdateOpen}
+          onSubmit={handleMassUpdateSubmit}
+          onCancel={handleMassUpdateCancel}
+          isLoading={isMassUpdateLoading}
+        />
+      )}
+
+      {/* Mass Entry Panel (page-level, when goalId is selected) */}
+      {isOwnCollection && browseController.view === 'cards' && selectedGoalId && (
         <>
-          <MassUpdatePanel
-            isOpen={isMassUpdateOpen}
-            onSubmit={handleMassUpdateSubmit}
-            onCancel={handleMassUpdateCancel}
-            isLoading={isMassUpdateLoading}
+          <MassEntryPanel
+            isOpen={isMassEntryOpen}
+            onSubmit={handleMassEntrySubmit}
+            onCancel={handleMassEntryCancel}
+            isLoading={isMassEntryLoading}
+            cardCount={visibleCardIds.length}
           />
-          <MassUpdateLocationPanel
-            isOpen={isMassUpdateLocationOpen}
-            onSubmit={handleMassUpdateLocationSubmit}
-            onCancel={handleMassUpdateLocationCancel}
-            isLoading={isMassUpdateLocationLoading}
-            cardCount={ownedVisibleCardIds.length}
-          />
+          {massEntryFormData && (
+            <MassEntryConfirmDialog
+              open={showMassEntryConfirmDialog}
+              onConfirm={handleConfirmMassEntry}
+              onCancel={handleCancelMassEntryConfirm}
+              formData={massEntryFormData}
+              cardCount={visibleCardIds.length}
+              isLoading={isMassEntryLoading}
+            />
+          )}
         </>
+      )}
+
+      {/* Mass Update Location Panel (available in both contexts) */}
+      {isOwnCollection && browseController.view === 'cards' && (
+        <MassUpdateLocationPanel
+          isOpen={isMassUpdateLocationOpen}
+          onSubmit={handleMassUpdateLocationSubmit}
+          onCancel={handleMassUpdateLocationCancel}
+          isLoading={isMassUpdateLocationLoading}
+          cardCount={ownedVisibleCardIds.length}
+        />
       )}
 
       {browseController.error ? (
