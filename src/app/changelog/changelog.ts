@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-01-21',
+      version: '1.14.1',
+      changes: ['Fixed collection goal calculations when using specific sets and specific cards in the same goal'],
+    },
+    {
+      date: '2026-01-21',
       version: '1.14.0',
       changes: ['Mass Update button now available when viewing a set with a collection goal selected'],
       type: 'feature',
