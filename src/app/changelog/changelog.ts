@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-01-21',
+      version: '1.14.2',
+      changes: [
+        'Fixed goals with "Count cards from all sets" enabled incorrectly including cards that were explicitly excluded',
+      ],
+    },
+    {
+      date: '2026-01-21',
       version: '1.14.1',
       changes: ['Fixed collection goal calculations when using specific sets and specific cards in the same goal'],
     },
