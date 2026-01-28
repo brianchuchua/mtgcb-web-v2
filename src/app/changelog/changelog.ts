@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-01-27',
+      version: '1.14.5',
+      changes: ['Added Promo Pack: Modern Horizons 3'],
+      type: 'data',
+    },
+    {
+      date: '2026-01-27',
       version: '1.14.4',
       changes: ['Updated Promo Pack: Lorwyn Eclipsed'],
       type: 'data',
