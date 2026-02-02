@@ -18,6 +18,7 @@ interface DisplaySettings {
 
   // Layout settings
   cardsPerRow: number;
+  mobileCardsPerRow: number;
   cardSizeMargin: number;
   setsPerRow: number;
 
@@ -129,6 +130,7 @@ const DEFAULT_SETTINGS: DisplaySettings = {
 
   // Layout settings
   cardsPerRow: 0, // 0 means auto
+  mobileCardsPerRow: 1,
   cardSizeMargin: 0.75,
   setsPerRow: 0, // 0 means auto
 
@@ -357,9 +359,11 @@ export function useLayoutSettings() {
   const { settings, updateSetting } = useDisplaySettings();
   return {
     cardsPerRow: settings.cardsPerRow,
+    mobileCardsPerRow: settings.mobileCardsPerRow,
     cardSizeMargin: settings.cardSizeMargin,
     setsPerRow: settings.setsPerRow,
     setCardsPerRow: (value: number) => updateSetting('cardsPerRow', value),
+    setMobileCardsPerRow: (value: number) => updateSetting('mobileCardsPerRow', value),
     setCardSizeMargin: (value: number) => updateSetting('cardSizeMargin', value),
     setSetsPerRow: (value: number) => updateSetting('setsPerRow', value),
   };

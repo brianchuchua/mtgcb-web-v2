@@ -68,6 +68,7 @@ export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCol
   const gallerySettings = useMemo(
     () => ({
       cardsPerRow: layoutSettings.cardsPerRow,
+      mobileCardsPerRow: layoutSettings.mobileCardsPerRow,
       cardSizeMargin: layoutSettings.cardSizeMargin,
       nameIsVisible: cardDisplaySettings.nameIsVisible,
       setIsVisible: cardDisplaySettings.setIconIsVisible,
@@ -75,6 +76,7 @@ export function useCollectionDisplaySettings({ viewMode, view = 'sets' }: UseCol
     }),
     [
       layoutSettings.cardsPerRow,
+      layoutSettings.mobileCardsPerRow,
       layoutSettings.cardSizeMargin,
       cardDisplaySettings.nameIsVisible,
       cardDisplaySettings.setIconIsVisible,

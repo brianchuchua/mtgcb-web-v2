@@ -490,10 +490,10 @@ const CardItemComponent = ({
                       fontSize: '1.125rem',
                     },
                     '@container card (max-width: 250px)': {
-                      fontSize: '1rem',
+                      fontSize: '1.0625rem',
                     },
                     '@container card (max-width: 200px)': {
-                      fontSize: '0.875rem',
+                      fontSize: '1rem',
                     },
                   }}
                 >
@@ -521,10 +521,10 @@ const CardItemComponent = ({
                     fontSize: '1.125rem',
                   },
                   '@container card (max-width: 250px)': {
-                    fontSize: '1rem',
+                    fontSize: '1.0625rem',
                   },
                   '@container card (max-width: 200px)': {
-                    fontSize: '0.875rem',
+                    fontSize: '1rem',
                   },
                 }}
               >
@@ -550,10 +550,10 @@ const CardItemComponent = ({
                   fontSize: '0.8125rem',
                 },
                 '@container card (max-width: 250px)': {
-                  fontSize: '0.75rem',
+                  fontSize: '0.8125rem',
                 },
                 '@container card (max-width: 200px)': {
-                  fontSize: '0.6875rem',
+                  fontSize: '0.8125rem',
                 },
               }}
             >

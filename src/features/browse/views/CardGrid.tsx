@@ -17,6 +17,7 @@ interface CardGridProps {
   pageSize: number;
   gallerySettings: {
     cardsPerRow: number;
+    mobileCardsPerRow: number;
     cardSizeMargin: number;
     nameIsVisible: boolean;
     setIsVisible: boolean;
@@ -93,6 +94,7 @@ const CardGridComponent: React.FC<CardGridProps> = ({
       renderItem={renderItem}
       isLoading={loading}
       columnsPerRow={gallerySettings.cardsPerRow}
+      mobileColumnsPerRow={gallerySettings.mobileCardsPerRow}
       galleryWidth={100}
       horizontalPadding={gallerySettings.cardSizeMargin}
       emptyMessage="No cards found matching your search criteria."

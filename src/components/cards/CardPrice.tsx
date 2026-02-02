@@ -145,10 +145,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
         sx={{
           fontSize: '1rem',
           '@container card (max-width: 250px)': {
-            fontSize: '0.875rem',
+            fontSize: '0.9375rem',
           },
           '@container card (max-width: 200px)': {
-            fontSize: '0.75rem',
+            fontSize: '0.875rem',
           },
         }}
       >
@@ -169,10 +169,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
         sx={{
           fontSize: '1rem',
           '@container card (max-width: 250px)': {
-            fontSize: '0.875rem',
+            fontSize: '0.9375rem',
           },
           '@container card (max-width: 200px)': {
-            fontSize: '0.75rem',
+            fontSize: '0.875rem',
           },
         }}
       >
@@ -333,10 +333,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
                 textDecoration: 'underline',
               },
               '@container card (max-width: 250px)': {
-                fontSize: '0.875rem',
+                fontSize: '0.9375rem',
               },
               '@container card (max-width: 200px)': {
-                fontSize: '0.75rem',
+                fontSize: '0.875rem',
               },
             }}
           >
@@ -396,10 +396,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
                   textDecoration: 'underline',
                 },
                 '@container card (max-width: 250px)': {
-                  fontSize: '0.875rem',
+                  fontSize: '0.9375rem',
                 },
                 '@container card (max-width: 200px)': {
-                  fontSize: '0.75rem',
+                  fontSize: '0.875rem',
                 },
               }}
             >
@@ -491,10 +491,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
                   textDecoration: 'underline',
                 },
                 '@container card (max-width: 250px)': {
-                  fontSize: '0.875rem',
+                  fontSize: '0.9375rem',
                 },
                 '@container card (max-width: 200px)': {
-                  fontSize: '0.75rem',
+                  fontSize: '0.875rem',
                 },
               }}
             >
@@ -593,10 +593,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
                   textDecoration: 'underline',
                 },
                 '@container card (max-width: 250px)': {
-                  fontSize: '0.875rem',
+                  fontSize: '0.9375rem',
                 },
                 '@container card (max-width: 200px)': {
-                  fontSize: '0.75rem',
+                  fontSize: '0.875rem',
                 },
               }}
             >
@@ -678,10 +678,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
       sx={{
         fontSize: '1rem',
         '@container card (max-width: 250px)': {
-          fontSize: '0.875rem',
+          fontSize: '0.9375rem',
         },
         '@container card (max-width: 200px)': {
-          fontSize: '0.75rem',
+          fontSize: '0.875rem',
         },
       }}
     >

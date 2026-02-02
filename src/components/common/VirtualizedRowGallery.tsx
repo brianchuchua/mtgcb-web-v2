@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Virtuoso } from 'react-virtuoso';
@@ -11,6 +11,7 @@ export interface VirtualizedRowGalleryProps<T> {
   renderItem: (item: T, index: number) => React.ReactNode;
   isLoading?: boolean;
   columnsPerRow?: number;
+  mobileColumnsPerRow?: number;
   galleryWidth?: number;
   horizontalPadding?: number;
   emptyMessage?: string;
@@ -19,33 +20,43 @@ export interface VirtualizedRowGalleryProps<T> {
   'data-testid'?: string;
 }
 
-function useResponsiveColumns(userColumns: number | undefined): number {
+function useResponsiveColumns(
+  userColumns: number | undefined,
+  mobileColumns: number = 1,
+  isMobile: boolean
+): { columns: number } {
   const [columns, setColumns] = useState(() => {
-    if (userColumns !== undefined && userColumns !== 0) {
-      return userColumns;
-    }
     if (typeof window !== 'undefined') {
+      if (isMobile) {
+        return mobileColumns;
+      }
+      if (userColumns !== undefined && userColumns !== 0) {
+        return userColumns;
+      }
       return getResponsiveColumns(window.innerWidth);
     }
     return 4; // Default for SSR
   });
 
   useEffect(() => {
-    if (userColumns !== undefined && userColumns !== 0) {
-      setColumns(userColumns);
-      return;
-    }
-
     const handleResize = () => {
+      if (isMobile) {
+        setColumns(mobileColumns);
+        return;
+      }
+      if (userColumns !== undefined && userColumns !== 0) {
+        setColumns(userColumns);
+        return;
+      }
       setColumns(getResponsiveColumns(window.innerWidth));
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [userColumns]);
+  }, [userColumns, mobileColumns, isMobile]);
 
-  return columns;
+  return { columns };
 }
 
 const VirtualizedRowGallery = <T,>({
@@ -53,6 +64,7 @@ const VirtualizedRowGallery = <T,>({
   renderItem,
   isLoading = false,
   columnsPerRow = 4,
+  mobileColumnsPerRow = 1,
   galleryWidth = 95,
   horizontalPadding = 0,
   emptyMessage = 'No items found',
@@ -60,8 +72,10 @@ const VirtualizedRowGallery = <T,>({
   computeItemKey,
   'data-testid': dataTestId,
 }: VirtualizedRowGalleryProps<T>) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isHydrated, setIsHydrated] = useState(false);
-  const effectiveColumns = useResponsiveColumns(columnsPerRow);
+  const { columns: effectiveColumns } = useResponsiveColumns(columnsPerRow, mobileColumnsPerRow, isMobile);
 
   // Mark when hydration is complete
   useEffect(() => {
@@ -106,7 +120,7 @@ const VirtualizedRowGallery = <T,>({
   const rowContent = useCallback(
     (index: number, row: RowGroup<T>) => {
       return (
-        <RowContainer columnsPerRow={effectiveColumns}>
+        <RowContainer columnsPerRow={effectiveColumns} mobileColumnsPerRow={mobileColumnsPerRow}>
           {row.items.map((item, itemIndex) => {
             const globalIndex = row.startIndex + itemIndex;
             const key = computeItemKey ? computeItemKey(globalIndex) : globalIndex;
@@ -124,7 +138,7 @@ const VirtualizedRowGallery = <T,>({
         </RowContainer>
       );
     },
-    [effectiveColumns, renderItem, computeItemKey]
+    [effectiveColumns, mobileColumnsPerRow, renderItem, computeItemKey]
   );
 
   return (
@@ -191,11 +205,12 @@ const GalleryWrapper = styled(Box, {
 
 interface RowContainerProps {
   columnsPerRow: number;
+  mobileColumnsPerRow: number;
 }
 
 const RowContainer = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'columnsPerRow',
-})<RowContainerProps>(({ theme, columnsPerRow }) => ({
+  shouldForwardProp: (prop) => prop !== 'columnsPerRow' && prop !== 'mobileColumnsPerRow',
+})<RowContainerProps>(({ theme, columnsPerRow, mobileColumnsPerRow }) => ({
   display: 'grid',
   gridTemplateColumns: `repeat(${columnsPerRow}, minmax(0, 1fr))`,
   gap: theme.spacing(2),
@@ -203,9 +218,10 @@ const RowContainer = styled(Box, {
   // Make all items in a row the same height
   gridAutoRows: '1fr',
 
-  // Force single column on mobile
+  // Mobile layout with configurable columns
   [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: 'repeat(1, minmax(0, 1fr))',
+    gridTemplateColumns: `repeat(${mobileColumnsPerRow}, minmax(0, 1fr))`,
+    gap: mobileColumnsPerRow === 2 ? theme.spacing(1) : theme.spacing(2),
     gridAutoRows: 'auto', // On mobile, let items be their natural height
   },
 }));

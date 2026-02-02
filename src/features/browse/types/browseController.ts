@@ -29,6 +29,7 @@ export interface PaginationProps {
  */
 export interface GallerySettings {
   cardsPerRow: number;
+  mobileCardsPerRow: number;
   cardSizeMargin: number;
   nameIsVisible: boolean;
   setIsVisible: boolean;

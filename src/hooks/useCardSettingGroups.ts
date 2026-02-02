@@ -1,6 +1,7 @@
 'use client';
 
-import { 
+import { useMediaQuery, useTheme } from '@mui/material';
+import {
   useDisplaySettings,
   useCardDisplaySettings,
   useLayoutSettings,
@@ -13,6 +14,8 @@ import { CardSelectSetting, CardSettingGroup, CardSliderSetting } from '@/compon
 import { PriceType } from '@/types/pricing';
 
 export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardSettingGroup[] => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { updateSetting } = useDisplaySettings();
   const cardDisplaySettings = useCardDisplaySettings();
   const layoutSettings = useLayoutSettings();
@@ -88,26 +91,41 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
   };
 
   // Create card layout settings (only shown in grid view)
+  // Show contextual setting based on device type
   const cardLayoutSettings: CardSettingGroup = {
     label: 'Layout Settings',
     type: 'select',
-    settings: [
-      {
-        key: 'cardsPerRow',
-        label: 'Cards per row (desktop only)',
-        value: layoutSettings.cardsPerRow,
-        setValue: layoutSettings.setCardsPerRow,
-        type: 'select',
-        options: [
-          { value: 0, label: 'Auto' },
-          { value: 1, label: '1' },
-          { value: 2, label: '2' },
-          { value: 3, label: '3' },
-          { value: 4, label: '4' },
-          { value: 5, label: '5' },
+    settings: isMobile
+      ? [
+          {
+            key: 'mobileCardsPerRow',
+            label: 'Cards per row',
+            value: layoutSettings.mobileCardsPerRow,
+            setValue: layoutSettings.setMobileCardsPerRow,
+            type: 'select',
+            options: [
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+            ],
+          },
+        ]
+      : [
+          {
+            key: 'cardsPerRow',
+            label: 'Cards per row',
+            value: layoutSettings.cardsPerRow,
+            setValue: layoutSettings.setCardsPerRow,
+            type: 'select',
+            options: [
+              { value: 0, label: 'Auto' },
+              { value: 1, label: '1' },
+              { value: 2, label: '2' },
+              { value: 3, label: '3' },
+              { value: 4, label: '4' },
+              { value: 5, label: '5' },
+            ],
+          },
         ],
-      },
-    ],
   };
 
   // Create card size settings (only shown in grid view)
@@ -117,7 +135,7 @@ export const useCardSettingGroups = (explicitViewMode?: 'grid' | 'table'): CardS
     settings: [
       {
         key: 'cardSizeMargin',
-        label: 'Shrink cards (desktop only)',
+        label: 'Shrink cards',
         value: layoutSettings.cardSizeMargin,
         setValue: layoutSettings.setCardSizeMargin,
         min: 0,

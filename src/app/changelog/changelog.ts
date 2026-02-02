@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-02-01',
+      version: '1.15.0',
+      changes: ['Added option to display 1 or 2 cards per row on mobile in grid view settings'],
+      type: 'feature',
+    },
+    {
       date: '2026-01-27',
       version: '1.14.5',
       changes: ['Added Promo Pack: Modern Horizons 3'],
