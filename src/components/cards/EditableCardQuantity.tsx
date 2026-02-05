@@ -40,6 +40,10 @@ const QuantityContainer = styled(Box)(({ theme }) => ({
 }));
 
 const QuantityInput = styled(TextField)(({ theme }) => ({
+  // Fill available space when card is narrow
+  '@container card (max-width: 280px)': {
+    width: '100%',
+  },
   '& .MuiOutlinedInput-input': {
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
