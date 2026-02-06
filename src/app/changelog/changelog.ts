@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-02-05',
+      version: '1.15.1',
+      changes: ['Fixed set prices not updating when changing the price type on a goal'],
+    },
+    {
       date: '2026-02-01',
       version: '1.15.0',
       changes: ['Added option to display 1 or 2 cards per row on mobile in grid view settings'],
