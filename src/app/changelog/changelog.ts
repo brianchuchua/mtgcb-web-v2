@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-02-05',
+      version: '1.15.2',
+      changes: ['Fixed set collection value not using foil prices for foil cards on a goal'],
+    },
+    {
+      date: '2026-02-05',
       version: '1.15.1',
       changes: ['Fixed set prices not updating when changing the price type on a goal'],
     },
