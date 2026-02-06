@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-02-06',
+      version: '1.15.3',
+      changes: ['Fixed card sort order not matching displayed values when browsing goals with multiple sets'],
+    },
+    {
       date: '2026-02-05',
       version: '1.15.2',
       changes: ['Fixed set collection value not using foil prices for foil cards on a goal'],
