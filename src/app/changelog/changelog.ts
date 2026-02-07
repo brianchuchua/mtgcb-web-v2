@@ -13,6 +13,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-02-06',
+      version: '1.15.4',
+      changes: [
+        'Fixed goals with "Count cards from all sets" showing every set with a matching card name instead of just the goal\'s sets',
+        'Fixed goal total value being too low when some cards only have foil prices',
+        'Fixed goal progress values not matching between card and set views',
+      ],
+    },
+    {
+      date: '2026-02-06',
       version: '1.15.3',
       changes: ['Fixed card sort order not matching displayed values when browsing goals with multiple sets'],
     },
