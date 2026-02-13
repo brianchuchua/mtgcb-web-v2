@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-02-12',
+      version: '1.16.1',
+      changes: [
+        'Updated Promo Pack: Foundations, Promo Pack: March of the Machine, Promo Pack: Modern Horizons 3, Secret Lair Drop Series, Secret Lair Showdown, Store Championship Promos, Media Inserts, WPN Promos, Spotlight Series, and MagicFest Promos',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-02-08',
       version: '1.16.0',
       changes: ['Added new cards per page options'],
