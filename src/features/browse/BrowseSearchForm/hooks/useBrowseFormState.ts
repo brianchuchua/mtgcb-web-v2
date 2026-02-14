@@ -31,35 +31,35 @@ export const useBrowseFormState = () => {
 
   const debouncedCardNameDispatch = useCallback(
     debounce((value: string) => {
-      dispatch(setCardSearchName(value));
+      dispatch(setCardSearchName(value.trim()));
     }, 300),
     [dispatch],
   );
 
   const debouncedSetNameDispatch = useCallback(
     debounce((value: string) => {
-      dispatch(setSetSearchName(value));
+      dispatch(setSetSearchName(value.trim()));
     }, 300),
     [dispatch],
   );
 
   const debouncedSetCodeDispatch = useCallback(
     debounce((value: string) => {
-      dispatch(setSetCode(value));
+      dispatch(setSetCode(value.trim()));
     }, 300),
     [dispatch],
   );
 
   const debouncedOracleDispatch = useCallback(
     debounce((value: string) => {
-      dispatch(setOracleText(value));
+      dispatch(setOracleText(value.trim()));
     }, 300),
     [dispatch],
   );
 
   const debouncedArtistDispatch = useCallback(
     debounce((value: string) => {
-      dispatch(setArtist(value));
+      dispatch(setArtist(value.trim()));
     }, 300),
     [dispatch],
   );

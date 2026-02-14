@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-02-14',
+      version: '1.16.2',
+      changes: [
+        'Improved handling of pasted text with extra spaces across all search fields',
+      ],
+    },
+    {
       date: '2026-02-12',
       version: '1.16.1',
       changes: [
