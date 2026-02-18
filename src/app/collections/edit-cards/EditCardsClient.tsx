@@ -159,7 +159,7 @@ const EditCardsClient: React.FC = () => {
 
   const [updateCollection, { isLoading: isUpdating }] = useUpdateCollectionMutation();
 
-  const debouncedSetSearchInput = useMemo(() => debounce((value: string) => setSearchInput(value.trim()), 300), []);
+  const debouncedSetSearchInput = useMemo(() => debounce((value: string) => setSearchInput(value), 300), []);
 
   const handleSearchInputChange = (_event: any, value: string, reason: string) => {
     setInputValue(value);

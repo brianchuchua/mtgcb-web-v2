@@ -14,7 +14,7 @@ export const browseApi = mtgcbApi.injectEndpoints({
         return {
           url: '/cards/search',
           method: 'POST',
-          body: safeBody,
+          body: trimCardSearchParams(safeBody),
         };
       },
       invalidatesTags: (result) => (result?.success ? ['Cards'] : []),
@@ -27,7 +27,7 @@ export const browseApi = mtgcbApi.injectEndpoints({
         return {
           url: '/cards/search',
           method: 'POST',
-          body: safeParams,
+          body: trimCardSearchParams(safeParams),
         };
       },
       serializeQueryArgs: ({ queryArgs }) => {
@@ -57,7 +57,7 @@ export const browseApi = mtgcbApi.injectEndpoints({
         return {
           url: '/sets/search',
           method: 'POST',
-          body: safeParams,
+          body: trimSetSearchParams(safeParams),
         };
       },
       serializeQueryArgs: ({ queryArgs }) => {
@@ -134,6 +134,19 @@ export const {
   usePrefetch, // TODO: Rename -- this can get cards or sets
   endpoints,
 } = browseApi;
+
+const trimCardSearchParams = (params: CardApiParams): CardApiParams => ({
+  ...params,
+  ...(params.name && { name: params.name.trim() }),
+  ...(params.oracleText && { oracleText: params.oracleText.trim() }),
+  ...(params.artist && { artist: params.artist.trim() }),
+});
+
+const trimSetSearchParams = (params: SetApiParams): SetApiParams => ({
+  ...params,
+  ...(params.name && { name: params.name.trim() }),
+  ...(params.code && { code: params.code.trim() }),
+});
 
 /**
  * Utility to get the next page API params based on current params

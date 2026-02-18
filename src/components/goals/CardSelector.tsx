@@ -63,7 +63,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
   const priceType = usePriceType();
   const [triggerGetCards, { data: searchResponse, isFetching: isSearching }] = useLazyGetCardsQuery();
 
-  const debouncedSetSearchInput = useMemo(() => debounce((value: string) => setSearchInput(value.trim()), 300), []);
+  const debouncedSetSearchInput = useMemo(() => debounce((value: string) => setSearchInput(value), 300), []);
 
   const handleSearchInputChange = (_event: any, value: string, reason: string) => {
     setInputValue(value);
