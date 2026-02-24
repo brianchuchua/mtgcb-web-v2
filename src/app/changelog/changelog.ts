@@ -12,6 +12,21 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-02-22',
+      version: '1.16.3',
+      changes: [
+        'Added Teenage Mutant Ninja Turtles',
+        'Added Teenage Mutant Ninja Turtles Source Material',
+        'Added Teenage Mutant Ninja Turtles Variants',
+        'Added Teenage Mutant Ninja Turtles Eternal',
+        'Added Teenage Mutant Ninja Turtles Tokens',
+        'Added Teenage Mutant Ninja Turtles Eternal Tokens',
+        'Added Teenage Mutant Ninja Turtles Eternal Front Cards',
+        'Updated Bundle Promos',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-02-14',
       version: '1.16.2',
       changes: [
@@ -22,7 +37,16 @@ const changelogData: ChangelogData = {
       date: '2026-02-12',
       version: '1.16.1',
       changes: [
-        'Updated Promo Pack: Foundations, Promo Pack: March of the Machine, Promo Pack: Modern Horizons 3, Secret Lair Drop Series, Secret Lair Showdown, Store Championship Promos, Media Inserts, WPN Promos, Spotlight Series, and MagicFest Promos',
+        'Updated Promo Pack: Foundations',
+        'Updated Promo Pack: March of the Machine',
+        'Updated Promo Pack: Modern Horizons 3',
+        'Updated Secret Lair Drop Series',
+        'Updated Secret Lair Showdown',
+        'Updated Store Championship Promos',
+        'Updated Media Inserts',
+        'Updated WPN Promos',
+        'Updated Spotlight Series',
+        'Updated MagicFest Promos',
       ],
       type: 'data',
     },
