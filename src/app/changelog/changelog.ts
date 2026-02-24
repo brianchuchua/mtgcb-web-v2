@@ -12,7 +12,7 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
-      date: '2026-02-22',
+      date: '2026-02-24',
       version: '1.16.3',
       changes: [
         'Added Teenage Mutant Ninja Turtles',
