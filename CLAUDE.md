@@ -236,6 +236,29 @@ Uses `NEXT_PUBLIC_MTGCB_API_BASE_URL` environment variable
 - **Locations**: CRUD operations, hierarchy, cards-in-location
 - **Goals**: CRUD operations with progress tracking
 
+## Notion Integration
+
+Claude Code has access to the project's Notion workspace via the Notion MCP plugin. The main task tracking database is **MTG CB - Action Items**.
+
+### Creating Tickets
+
+Use the `mcp__plugin_Notion_notion__notion-create-pages` tool with `data_source_id: "291e7f6b-51f2-8051-84be-000bea5a5d69"` to create tickets. Required/common properties:
+
+- **Name** (title) - ticket description
+- **Type** - Bug, Feature, Enhancement, Tech Debt, Data Issue, Infrastructure, Chore, New Set
+- **Status** - Captured (default for new), Planned, In Progress, Done, Won't Do
+- **Priority** - P0 (This Week), P1 (This Month), P2 (This Quarter), P3 (Someday)
+- **Source** - Patron, Sentry, Facebook, Email, Internal, Other, Wagers
+- **Blocked** - "Blocked" if blocked (optional)
+
+**Preference:** Put detailed context in the **page body content** (not the Notes property). Use the `content` field when creating tickets.
+
+### Searching/Reading Tickets
+
+- Use `mcp__plugin_Notion_notion__notion-search` to find tickets by keyword
+- Use `mcp__plugin_Notion_notion__notion-fetch` with a page ID to read full ticket details
+- Use `mcp__plugin_Notion_notion__notion-query-database-view` to query filtered views
+
 ## Important Notes
 
 - All authenticated routes require auth token
