@@ -2,7 +2,7 @@
 
 This is the latest MTG CB front-end codebase.
 
-I'm not actively looking for contributors until I knock out some tech debt, but if you're super excited about a new feature, reach out and we can talk about it.
+I'm not actively looking for contributors until I knock out some tech debt, but if you're super excited about a new feature, reach out and we can talk about it. Thanks!
 
 ## Setup
 
