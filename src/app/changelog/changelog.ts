@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-02-27',
+      version: '1.16.4',
+      changes: [
+        'Fixed Home, End, and related keyboard shortcuts not working in the card search field on the Add or Remove Cards page',
+      ],
+    },
+    {
       date: '2026-02-24',
       version: '1.16.3',
       changes: [

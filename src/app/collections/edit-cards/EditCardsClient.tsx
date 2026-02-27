@@ -491,6 +491,7 @@ const CardSearchAutocomplete: React.FC<CardSearchAutocompleteProps> = ({
         fullWidth
         isOptionEqualToValue={(option, value) => option.id === value.id}
         filterOptions={(x) => x}
+        handleHomeEndKeys={false}
         renderInput={(params) => (
           <TextField
             {...params}
