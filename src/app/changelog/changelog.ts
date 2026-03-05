@@ -12,6 +12,18 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-03-04',
+      version: '1.16.5',
+      changes: [
+        'Updated Murders at Karlov Manor Tokens',
+        'Updated Promo Pack: Crimson Vow',
+        'Updated Promo Pack: Forgotten Realms',
+        'Updated Promo Pack: Foundations',
+        'Updated Streets of New Capenna Tokens',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-02-27',
       version: '1.16.4',
       changes: [
