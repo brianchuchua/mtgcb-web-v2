@@ -13,6 +13,17 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-03-04',
+      version: '1.16.6',
+      changes: [
+        'Added Final Fantasy Asia WPN Promo Tokens',
+        'Added Chinese Market Alternate Art',
+        'Added Tales of Middle-earth Minigames',
+        'Added Final Fantasy Scene Box',
+      ],
+      type: 'data',
+    },
+    {
+      date: '2026-03-04',
       version: '1.16.5',
       changes: [
         'Updated Murders at Karlov Manor Tokens',
