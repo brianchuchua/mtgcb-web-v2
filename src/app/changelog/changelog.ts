@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-03-05',
+      version: '1.16.8',
+      changes: [
+        'Fixed incorrect foil flags on Secret Lair foil variant cards (Rainbow Foil, Foil Etched, etc.)',
+      ],
+    },
+    {
+      date: '2026-03-05',
       version: '1.16.7',
       changes: [
         'Updated Secret Lair Drop Series',
