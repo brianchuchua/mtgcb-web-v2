@@ -76,7 +76,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
     if (searchInput.length >= 2) {
       triggerGetCards({
         name: searchInput,
-        limit: 20,
+        limit: 200,
         offset: 0,
         sortBy: 'releasedAt',
         sortDirection: 'desc',
