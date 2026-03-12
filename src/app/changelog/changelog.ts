@@ -13,6 +13,16 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-03-11',
+      version: '1.16.10',
+      changes: [
+        'Added 2026 Lunar New Year',
+        'Added The Big Score Promos',
+        'Updated Promo Pack: Foundations',
+      ],
+      type: 'data',
+    },
+    {
+      date: '2026-03-11',
       version: '1.16.9',
       changes: [
         'Fixed goal card selector not showing enough printings for commonly reprinted cards',
