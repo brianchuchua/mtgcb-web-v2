@@ -113,7 +113,6 @@ export function GoalSearchForm({
   // Initialize state from searchConditions
   const [isInitialized, setIsInitialized] = useState(false);
   const [isColorInitialized, setIsColorInitialized] = useState(false);
-  const [previousSelectedSetsLength, setPreviousSelectedSetsLength] = useState(0);
   const [oracleInfoAnchorEl, setOracleInfoAnchorEl] = useState<HTMLElement | null>(null);
   const [reservedListInfoAnchorEl, setReservedListInfoAnchorEl] = useState<HTMLElement | null>(null);
   const [printingsInfoAnchorEl, setPrintingsInfoAnchorEl] = useState<HTMLElement | null>(null);
@@ -668,23 +667,6 @@ export function GoalSearchForm({
     }
   }, [isInitialized, buildConditions, onChange]); // Include onChange in dependencies
 
-  // Reset includeSetsOutsideGoal when sets are removed
-  useEffect(() => {
-    if (isInitialized && onIncludeSetsOutsideGoalChange) {
-      if (selectedSets.length === 0 && previousSelectedSetsLength > 0 && includeSetsOutsideGoal) {
-        // Sets were removed, reset the option
-        onIncludeSetsOutsideGoalChange(false);
-      }
-      setPreviousSelectedSetsLength(selectedSets.length);
-    }
-  }, [
-    selectedSets.length,
-    isInitialized,
-    onIncludeSetsOutsideGoalChange,
-    includeSetsOutsideGoal,
-    previousSelectedSetsLength,
-  ]);
-
   // Build type options from API data
   useEffect(() => {
     if (cardTypesData) {
@@ -1029,7 +1011,7 @@ export function GoalSearchForm({
           <ToggleButton value="every">Every printing of each card</ToggleButton>
         </ToggleButtonGroup>
 
-        {onePrintingPerPureName && onIncludeSetsOutsideGoalChange && selectedSets.length > 0 && (
+        {onePrintingPerPureName && onIncludeSetsOutsideGoalChange && (
           <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
             <FormControlLabel
               control={

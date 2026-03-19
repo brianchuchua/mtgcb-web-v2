@@ -84,17 +84,12 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
         order: undefined,
       };
 
-      const hasSetIdFilter =
-        searchConditions.setId &&
-        ((searchConditions.setId.OR && searchConditions.setId.OR.length > 0) ||
-          (searchConditions.setId.AND && searchConditions.setId.AND.length > 0));
-
       const request: CreateGoalRequest = {
         name: trimmedData.name,
         description: trimmedData.description || undefined,
         searchCriteria,
         onePrintingPerPureName,
-        includeSetsOutsideGoal: onePrintingPerPureName && includeSetsOutsideGoal && hasSetIdFilter ? true : false,
+        includeSetsOutsideGoal: onePrintingPerPureName && includeSetsOutsideGoal,
       };
 
       if (quantityMode === 'all') {

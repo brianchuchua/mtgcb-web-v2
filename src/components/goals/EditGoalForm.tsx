@@ -128,18 +128,13 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
         order: goal.searchCriteria.order,
       };
 
-      const hasSetIdFilter =
-        searchConditions.setId &&
-        ((searchConditions.setId.OR && searchConditions.setId.OR.length > 0) ||
-          (searchConditions.setId.AND && searchConditions.setId.AND.length > 0));
-
       const request: any = {
         name: trimmedData.name,
         description: trimmedData.description,
         searchCriteria,
         isActive: trimmedData.isActive,
         onePrintingPerPureName,
-        includeSetsOutsideGoal: onePrintingPerPureName && includeSetsOutsideGoal && hasSetIdFilter ? true : false,
+        includeSetsOutsideGoal: onePrintingPerPureName && includeSetsOutsideGoal,
       };
 
       if (quantityMode === 'all') {
