@@ -424,14 +424,13 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           cursor: isRegularDisabled && !readOnly && !canBeNonFoil && !overrideNonFoil ? 'pointer' : undefined,
         }}
       >
-        <Box component="span" sx={{ display: 'inline-flex' }}>
+        <Box component="span" sx={{ display: 'inline-flex' }} onClick={(e) => e.stopPropagation()}>
           <LeftButton
             size="small"
             onMouseDown={(e) => {
               e.preventDefault();
               handleDecrement('regular', e);
             }}
-            onClick={(e) => e.stopPropagation()}
             disabled={readOnly || localQuantityReg === 0}
             tabIndex={-1}
             disableFocusRipple
@@ -541,14 +540,13 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
           cursor: isFoilDisabled && !readOnly && !canBeFoil && !overrideFoil ? 'pointer' : undefined,
         }}
       >
-        <Box component="span" sx={{ display: 'inline-flex' }}>
+        <Box component="span" sx={{ display: 'inline-flex' }} onClick={(e) => e.stopPropagation()}>
           <LeftButton
             size="small"
             onMouseDown={(e) => {
               e.preventDefault();
               handleDecrement('foil', e);
             }}
-            onClick={(e) => e.stopPropagation()}
             disabled={readOnly || localQuantityFoil === 0}
             tabIndex={-1}
             disableFocusRipple

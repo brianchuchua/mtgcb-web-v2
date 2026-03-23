@@ -622,14 +622,13 @@ const InlineEditableQuantity: React.FC<{
           cursor: isDisabled ? 'pointer' : undefined,
         }}
       >
-        <Box component="span" sx={{ display: 'inline-flex' }}>
+        <Box component="span" sx={{ display: 'inline-flex' }} onClick={(e) => e.stopPropagation()}>
           <TableLeftButton
             size="small"
             onMouseDown={(e) => {
               e.preventDefault();
               handleDecrement(e);
             }}
-            onClick={(e) => e.stopPropagation()}
             disabled={localQuantity === 0}
             tabIndex={-1}
             disableFocusRipple

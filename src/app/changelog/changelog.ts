@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-03-22',
+      version: '1.17.2',
+      changes: [
+        'Fixed the "Enable Quantity" popup still appearing when decrementing from 1 to 0 in an invalid foil/non-foil field',
+      ],
+    },
+    {
+      date: '2026-03-22',
       version: '1.17.1',
       changes: [
         'Fixed the "Enable Quantity" popup appearing every time when decrementing a value in an invalid foil/non-foil field',
