@@ -629,6 +629,7 @@ const InlineEditableQuantity: React.FC<{
               e.preventDefault();
               handleDecrement(e);
             }}
+            onClick={(e) => e.stopPropagation()}
             disabled={localQuantity === 0}
             tabIndex={-1}
             disableFocusRipple

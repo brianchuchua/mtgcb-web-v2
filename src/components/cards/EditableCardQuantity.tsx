@@ -431,6 +431,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
               e.preventDefault();
               handleDecrement('regular', e);
             }}
+            onClick={(e) => e.stopPropagation()}
             disabled={readOnly || localQuantityReg === 0}
             tabIndex={-1}
             disableFocusRipple
@@ -547,6 +548,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
               e.preventDefault();
               handleDecrement('foil', e);
             }}
+            onClick={(e) => e.stopPropagation()}
             disabled={readOnly || localQuantityFoil === 0}
             tabIndex={-1}
             disableFocusRipple
