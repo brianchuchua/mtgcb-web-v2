@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-03-30',
+      version: '1.17.3',
+      changes: [
+        'Fixed sorting by quantity placing unowned cards at the end instead of the beginning',
+      ],
+    },
+    {
       date: '2026-03-22',
       version: '1.17.2',
       changes: [
