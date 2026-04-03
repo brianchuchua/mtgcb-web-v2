@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-03',
+      version: '1.17.4',
+      changes: [
+        'Fixed a data issue with Warhammer surge foils',
+        'Improved importer performance by reducing batch size',
+      ],
+    },
+    {
       date: '2026-03-30',
       version: '1.17.3',
       changes: [
