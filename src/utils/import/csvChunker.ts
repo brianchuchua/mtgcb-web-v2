@@ -6,7 +6,7 @@
 /**
  * Chunk size constant - adjust if needed for testing
  */
-const CHUNK_SIZE = 1000;
+const CHUNK_SIZE = 500;
 
 /**
  * Represents a chunk of CSV data ready for import
