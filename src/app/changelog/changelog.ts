@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-12',
+      version: '1.17.5',
+      changes: [
+        'Improved spacing below site-wide notification banners',
+      ],
+    },
+    {
       date: '2026-04-03',
       version: '1.17.4',
       changes: [
