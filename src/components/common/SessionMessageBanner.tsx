@@ -32,6 +32,19 @@ const getDefaultIcon = (severity: string) => {
   }
 };
 
+const formatLocalTime = (iso: string) => {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  }).format(date);
+};
+
 const useCountdown = (targetDate: string | undefined) => {
   const [timeLeft, setTimeLeft] = useState('');
   const [isPast, setIsPast] = useState(false);
@@ -103,10 +116,12 @@ const SessionBannerAlert = ({
   message,
   onDismiss,
 }: {
-  message: { id: string; severity: 'error' | 'warning' | 'info' | 'success'; title?: string; message: string; dismissable?: boolean; icon?: React.ReactNode; scheduledAt?: string };
+  message: { id: string; severity: 'error' | 'warning' | 'info' | 'success'; title?: string; message: string; dismissable?: boolean; icon?: React.ReactNode; scheduledAt?: string; scheduleDisplay?: 'countdown' | 'localTime' };
   onDismiss: () => void;
 }) => {
-  const { timeLeft, isPast } = useCountdown(message.scheduledAt);
+  const useLocalTime = message.scheduleDisplay === 'localTime';
+  const { timeLeft, isPast } = useCountdown(useLocalTime ? undefined : message.scheduledAt);
+  const localTime = useLocalTime && message.scheduledAt ? formatLocalTime(message.scheduledAt) : '';
 
   return (
     <Alert
@@ -125,7 +140,7 @@ const SessionBannerAlert = ({
         )
       }
       sx={{
-        mb: 2,
+        mb: 4,
         borderRadius: 2,
         '& .MuiAlert-icon': {
           fontSize: 28,
@@ -141,7 +156,11 @@ const SessionBannerAlert = ({
         {message.message}
         {message.scheduledAt && (
           <Typography component="span" sx={{ fontWeight: 700, ml: 0.5, fontVariantNumeric: 'tabular-nums' }}>
-            {isPast ? '(maintenance has begun)' : `Maintenance will start in: ${timeLeft}`}
+            {useLocalTime
+              ? `Maintenance starts at: ${localTime}`
+              : isPast
+                ? '(maintenance has begun)'
+                : `Maintenance will start in: ${timeLeft}`}
           </Typography>
         )}
       </Box>

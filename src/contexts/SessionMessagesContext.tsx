@@ -10,7 +10,8 @@ interface SessionMessage {
   dismissable?: boolean;
   icon?: React.ReactNode;
   displayType?: 'banner' | 'modal' | 'both';
-  scheduledAt?: string; // ISO 8601 datetime for countdown display
+  scheduledAt?: string; // ISO 8601 datetime
+  scheduleDisplay?: 'countdown' | 'localTime'; // how to render scheduledAt (default: 'countdown')
 }
 
 interface SessionMessagesContextType {
@@ -103,6 +104,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
       displayType: 'banner',
       dismissable: true,
       scheduledAt: '2026-04-14T05:00:00Z', // April 13 10:00 PM Pacific
+      scheduleDisplay: 'localTime',
     },
   ];
 
