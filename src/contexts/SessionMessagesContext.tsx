@@ -102,7 +102,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
         'We are upgrading to faster servers! 🚀 Expect a brief period of downtime — we will keep it as short as possible.',
       displayType: 'banner',
       dismissable: true,
-      scheduledAt: '2026-04-14T06:00:00Z', // April 13 11:00 PM Pacific
+      scheduledAt: '2026-04-14T05:00:00Z', // April 13 10:00 PM Pacific
     },
   ];
 
