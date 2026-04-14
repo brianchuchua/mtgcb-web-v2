@@ -94,19 +94,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
   );
 
   // Define static messages here
-  const messages: SessionMessage[] = [
-    {
-      id: 'render-migration-2026-04',
-      severity: 'info',
-      title: 'Scheduled Maintenance',
-      message:
-        'We are upgrading to faster servers! 🚀 Expect a brief period of downtime — we will keep it as short as possible.',
-      displayType: 'banner',
-      dismissable: true,
-      scheduledAt: '2026-04-14T05:00:00Z', // April 13 10:00 PM Pacific
-      scheduleDisplay: 'localTime',
-    },
-  ];
+  const messages: SessionMessage[] = [];
 
   return (
     <SessionMessagesContext.Provider
