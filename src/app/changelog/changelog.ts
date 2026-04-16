@@ -12,6 +12,21 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-15',
+      version: '1.18.1',
+      changes: [
+        'Added Secrets of Strixhaven',
+        'Added Secrets of Strixhaven Mystical Archive',
+        'Added Secrets of Strixhaven Variants',
+        'Added Secrets of Strixhaven Commander',
+        'Added Secrets of Strixhaven Commander Variants',
+        'Added Promo Pack: Secrets of Strixhaven',
+        'Added Secrets of Strixhaven Tokens',
+        'Added Secrets of Strixhaven Commander Tokens',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-04-13',
       version: '1.18.0',
       changes: [
