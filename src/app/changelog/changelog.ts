@@ -23,6 +23,8 @@ const changelogData: ChangelogData = {
         'Added Promo Pack: Secrets of Strixhaven',
         'Added Secrets of Strixhaven Tokens',
         'Added Secrets of Strixhaven Commander Tokens',
+        'Updated Special Guests',
+        'Updated Bundle Promos',
       ],
       type: 'data',
     },
