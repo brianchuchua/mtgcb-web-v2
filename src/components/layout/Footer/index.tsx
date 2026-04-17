@@ -19,6 +19,10 @@ const Footer = () => {
             ·{' '}
             <Link component={NextLink} href="/contact" color="inherit">
               Contact
+            </Link>{' '}
+            ·{' '}
+            <Link component={NextLink} href="/patrons" color="inherit">
+              Support MTG CB and help keep it ad-free
             </Link>
           </Typography>
           <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
@@ -32,6 +36,10 @@ const Footer = () => {
               ·{' '}
               <Link component={NextLink} href="/contact" color="inherit">
                 Contact
+              </Link>{' '}
+              ·{' '}
+              <Link component={NextLink} href="/patrons" color="inherit">
+                Support MTG CB and help keep it ad-free
               </Link>
             </Typography>
           </Box>

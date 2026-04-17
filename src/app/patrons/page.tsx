@@ -96,11 +96,16 @@ export default function PatronsPage() {
       <Box sx={{ maxWidth: 900, mx: 'auto' }}>
         {/* Header */}
         <Box sx={{ mb: 5, textAlign: 'center' }}>
-          <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 700 }}>
-            Patrons
+          <Typography
+            variant="h3"
+            component="h1"
+            gutterBottom
+            sx={{ fontWeight: 700, typography: { xs: 'h4', sm: 'h3' } }}
+          >
+            Support MTG CB
           </Typography>
           <Typography variant="h6" color="text.secondary">
-            Support MTG Collection Builder and help keep the site ad-free!
+            Join fellow Patrons in keeping the site ad-free!
           </Typography>
         </Box>
 
@@ -247,7 +252,25 @@ export default function PatronsPage() {
           <Grid container spacing={3}>
             {/* Common Tier */}
             <Grid item xs={12} md={6}>
-              <Paper elevation={0} sx={{ p: 3, height: '100%', border: '1px solid', borderColor: 'divider' }}>
+              <Paper
+                component="a"
+                href="https://www.patreon.com/join/mtgcollectionbuilder/checkout?rid=4429817"
+                target="_blank"
+                rel="noopener noreferrer"
+                elevation={0}
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  display: 'block',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                  '&:hover': { transform: 'translateY(-4px)', boxShadow: 8 },
+                }}
+              >
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <TierBadge badgeColor={getBadgeColor('C')}>C</TierBadge>
@@ -277,6 +300,10 @@ export default function PatronsPage() {
             {/* Uncommon Tier */}
             <Grid item xs={12} md={6}>
               <Paper
+                component="a"
+                href="https://www.patreon.com/join/mtgcollectionbuilder/checkout?rid=4429818"
+                target="_blank"
+                rel="noopener noreferrer"
                 elevation={0}
                 sx={{
                   p: 3,
@@ -284,6 +311,12 @@ export default function PatronsPage() {
                   border: '2px solid',
                   borderColor: 'primary.main',
                   position: 'relative',
+                  display: 'block',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                  '&:hover': { transform: 'translateY(-4px)', boxShadow: 8 },
                 }}
               >
                 <Box
@@ -331,7 +364,25 @@ export default function PatronsPage() {
 
             {/* Rare Tier */}
             <Grid item xs={12} md={6}>
-              <Paper elevation={0} sx={{ p: 3, height: '100%', border: '1px solid', borderColor: 'divider' }}>
+              <Paper
+                component="a"
+                href="https://www.patreon.com/join/mtgcollectionbuilder/checkout?rid=4429819"
+                target="_blank"
+                rel="noopener noreferrer"
+                elevation={0}
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  display: 'block',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                  '&:hover': { transform: 'translateY(-4px)', boxShadow: 8 },
+                }}
+              >
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <TierBadge badgeColor={getBadgeColor('R')}>R</TierBadge>
@@ -359,7 +410,25 @@ export default function PatronsPage() {
 
             {/* Mythic Rare Tier */}
             <Grid item xs={12} md={6}>
-              <Paper elevation={0} sx={{ p: 3, height: '100%', border: '1px solid', borderColor: 'divider' }}>
+              <Paper
+                component="a"
+                href="https://www.patreon.com/join/mtgcollectionbuilder/checkout?rid=4429820"
+                target="_blank"
+                rel="noopener noreferrer"
+                elevation={0}
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  display: 'block',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                  '&:hover': { transform: 'translateY(-4px)', boxShadow: 8 },
+                }}
+              >
                 <Box sx={{ mb: 2 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                     <TierBadge badgeColor={getBadgeColor('M')}>M</TierBadge>
@@ -380,7 +449,7 @@ export default function PatronsPage() {
                 </Typography>
                 <Stack spacing={1}>
                   <Typography variant="body2">• Everything in previous tiers</Typography>
-                  <Typography variant="body2">• Immortalized as Mythic Rare supporter</Typography>
+                  <Typography variant="body2">• Immortalized as Mythic Rare supporter below</Typography>
                 </Stack>
               </Paper>
             </Grid>

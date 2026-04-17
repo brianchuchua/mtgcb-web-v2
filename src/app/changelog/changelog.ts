@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-16',
+      version: '1.18.2',
+      changes: [
+        'Made it easier to find where to support MTG CB',
+        'Added direct links to each Patreon tier from the Support page',
+      ],
+    },
+    {
       date: '2026-04-15',
       version: '1.18.1',
       changes: [

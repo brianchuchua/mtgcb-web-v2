@@ -518,7 +518,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                 <ListItemIcon>
                   <FavoriteIcon />
                 </ListItemIcon>
-                <ListItemText primary="Patrons" />
+                <ListItemText primary="Support Us" />
               </ListItemButton>
             </ListItem>
           </List>
