@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-18',
+      version: '1.18.3',
+      changes: [
+        'Improved TCGplayer purchase integration for Lorwyn Eclipsed and related sets',
+      ],
+    },
+    {
       date: '2026-04-16',
       version: '1.18.2',
       changes: [
