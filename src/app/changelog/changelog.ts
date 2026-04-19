@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-18',
+      version: '1.18.4',
+      changes: [
+        'Fixed per-set goal buy buttons for certain goal types',
+      ],
+    },
+    {
+      date: '2026-04-18',
       version: '1.18.3',
       changes: [
         'Improved TCGplayer purchase integration for Lorwyn Eclipsed and related sets',
