@@ -12,6 +12,15 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-19',
+      version: '1.18.5',
+      changes: [
+        'Added Japanese Strixhaven Mystical Archive',
+        'Added Japanese Silver Strixhaven Mystical Archive',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-04-18',
       version: '1.18.4',
       changes: [
