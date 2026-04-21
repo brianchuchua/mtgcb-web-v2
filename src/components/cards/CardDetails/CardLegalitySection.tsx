@@ -5,6 +5,14 @@ import { FORMAT_LEGALITY_OPTIONS } from '@/features/browse/formatLegalityConstan
 
 interface CardLegalitySectionProps {
   legalities?: Record<string, string> | null;
+  /**
+   * When true, renders a "not legal for sanctioned play" note in place of the legality table.
+   * Used for memorabilia printings — Collectors' Edition, 30th Anniversary, World Championship
+   * Decks, Pro Tour Collector Set, oversized event promos — where the physical printing isn't
+   * tournament-legal regardless of the card's oracle status. Matches Scryfall's behavior of
+   * hiding the legality table for these printings.
+   */
+  isNonTournamentLegal?: boolean;
 }
 
 type Status = 'legal' | 'not_legal' | 'banned' | 'restricted';
@@ -35,7 +43,34 @@ function normalizeStatus(raw: string | undefined): Status {
   return 'not_legal';
 }
 
-export const CardLegalitySection: React.FC<CardLegalitySectionProps> = ({ legalities }) => {
+export const CardLegalitySection: React.FC<CardLegalitySectionProps> = ({ legalities, isNonTournamentLegal }) => {
+  // Non-tournament-legal printing: show the explanatory note instead of the table.
+  if (isNonTournamentLegal) {
+    return (
+      <Box>
+        <Typography
+          variant="overline"
+          sx={{
+            display: 'block',
+            fontWeight: 600,
+            color: 'text.secondary',
+            letterSpacing: 0.8,
+            fontSize: '0.6875rem',
+            lineHeight: 1.4,
+            mb: 1,
+          }}
+        >
+          Format Legality
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', lineHeight: 1.6 }}>
+          This printing isn&apos;t legal in any sanctioned format. It&apos;s from a commemorative release
+          (gold-bordered, oversized, or with a non-standard back), so it can&apos;t be played in constructed tournaments
+          — even if other printings of the same card are legal.
+        </Typography>
+      </Box>
+    );
+  }
+
   if (!legalities || Object.keys(legalities).length === 0) {
     return null;
   }

@@ -7,6 +7,7 @@ import NextLink from 'next/link';
 import React, { useMemo, useState } from 'react';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
+import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import {
   CardDetailsSection,
   CardLegalitySection,
@@ -166,6 +167,18 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
     return prices;
   }, [card]);
 
+  // Memorabilia printings (CED, 30A, WC decks, PTC, oversized promos) aren't tournament-legal
+  // regardless of the card's oracle legality. Use the cached all-sets query to look up the
+  // set's type by id; swap the legality table for an explanatory note when memorabilia.
+  // Note: the /sets/all endpoint returns `id` as a number despite the TS type claiming string;
+  // `card.setId` is stringified by formatCard on the backend. Coerce both sides to compare.
+  const { data: allSetsResponse } = useGetAllSetsQuery();
+  const isNonTournamentLegalPrinting = useMemo(() => {
+    if (!card?.setId || !allSetsResponse?.data?.sets) return false;
+    const matchingSet = allSetsResponse.data.sets.find((s) => String(s.id) === String(card.setId));
+    return matchingSet?.setType === 'memorabilia';
+  }, [card?.setId, allSetsResponse]);
+
   if (isLoading) {
     return (
       <Box>
@@ -255,9 +268,12 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
         <Grid size={{ xs: 12, md: 12, lg: 4.5 }}>
           <Paper elevation={0} sx={{ p: 3, backgroundColor: (theme) => theme.palette.background.default }}>
             <CardDetailsSection card={card as any} isCollectionView={false} />
-            {card?.legalities && Object.keys(card.legalities).length > 0 && (
+            {(isNonTournamentLegalPrinting || (card?.legalities && Object.keys(card.legalities).length > 0)) && (
               <Box sx={{ mt: 3 }}>
-                <CardLegalitySection legalities={card.legalities} />
+                <CardLegalitySection
+                  legalities={card?.legalities}
+                  isNonTournamentLegal={isNonTournamentLegalPrinting}
+                />
               </Box>
             )}
           </Paper>
