@@ -12,11 +12,19 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-20',
+      version: '1.18.6',
+      changes: [
+        'Improved data and import accuracy for 1200 cards that were missing foil finish data',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-04-19',
       version: '1.18.5',
       changes: [
         'Added Japanese Strixhaven Mystical Archive',
-        'Added Japanese Silver Strixhaven Mystical Archive',
+        'Added Japanese Silver Scroll Mystical Archive',
       ],
       type: 'data',
     },
