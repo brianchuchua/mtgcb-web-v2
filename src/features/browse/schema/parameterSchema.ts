@@ -307,6 +307,19 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       exclude: [],
     },
   },
+  formatsLegal: {
+    type: 'inclusionExclusion',
+    mode: 'cards',
+    urlParams: {
+      include: 'includeFormats',
+      exclude: 'excludeFormats',
+    },
+    separator: '|',
+    defaultValue: {
+      include: [],
+      exclude: [],
+    },
+  },
   stats: {
     type: 'statFilter',
     mode: 'cards',

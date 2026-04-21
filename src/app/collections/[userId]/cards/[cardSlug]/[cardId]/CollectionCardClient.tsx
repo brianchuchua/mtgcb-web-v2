@@ -5,17 +5,22 @@ import Grid from '@mui/material/Grid2';
 import React, { useMemo, useState } from 'react';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
+import {
+  CardDetailsSection,
+  CardLegalitySection,
+  CardPricesSection,
+  OtherPrintingsSection,
+} from '@/components/cards/CardDetails';
 import CardItem from '@/components/cards/CardItem';
-import { CardDetailsSection, CardPricesSection, OtherPrintingsSection } from '@/components/cards/CardDetails';
-import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
+import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { useAuth } from '@/hooks/useAuth';
 import { useShareTokenContext } from '@/contexts/ShareTokenContext';
+import PrivacyErrorBanner from '@/features/browse/views/PrivacyErrorBanner';
+import { useAuth } from '@/hooks/useAuth';
 import { usePriceType } from '@/hooks/usePriceType';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { extractBaseName } from '@/utils/cards/extractBaseName';
-import PrivacyErrorBanner from '@/features/browse/views/PrivacyErrorBanner';
 import { getCollectionUrl } from '@/utils/collectionUrls';
 
 interface CollectionCardClientProps {
@@ -64,6 +69,7 @@ const selectFields: Array<keyof CardModel | string> = [
   'flavorText',
   'pureName',
   'isReserved',
+  'legalities',
 ];
 
 const otherPrintingsSelectFields: Array<keyof CardModel | string> = [
@@ -86,7 +92,6 @@ const otherPrintingsSelectFields: Array<keyof CardModel | string> = [
   'quantityFoil',
   'flavorName',
 ];
-
 
 export default function CollectionCardClient({ userId, cardId, cardSlug }: CollectionCardClientProps) {
   const { user } = useAuth();
@@ -121,7 +126,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
 
   // Calculate which batch of 500 we need based on current page
   const apiOffset = Math.floor((otherPrintingsPage * printingsPerPage) / 500) * 500;
-  
+
   const { data: otherPrintingsData, isLoading: isOtherPrintingsLoading } = useGetCardsQuery(
     {
       pureName: `"${(card as any)?.pureName || extractBaseName(card?.name)}"`,
@@ -155,7 +160,7 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
 
   const priceData = useMemo(() => {
     if (!card) return null;
-    
+
     const prices = card.prices || {
       normal: {
         market: card.market ? parseFloat(card.market) : null,
@@ -194,27 +199,20 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
   // Check for privacy error (403)
   const isPrivacyError = error && 'status' in error && error.status === 403;
   const hasInvalidShareLink = shareToken && isViewingSharedCollection(userId) && isPrivacyError;
-  
+
   if (isPrivacyError) {
     return (
       <Box>
         <Breadcrumbs
-          items={[
-            { label: 'Home', href: '/' },
-            { label: hasInvalidShareLink ? 'Invalid share link' : 'Private user' },
-          ]}
+          items={[{ label: 'Home', href: '/' }, { label: hasInvalidShareLink ? 'Invalid share link' : 'Private user' }]}
         />
         <Box sx={{ mt: 3 }}>
-          {hasInvalidShareLink ? (
-            <InvalidShareLinkBanner username={username} />
-          ) : (
-            <PrivacyErrorBanner />
-          )}
+          {hasInvalidShareLink ? <InvalidShareLinkBanner username={username} /> : <PrivacyErrorBanner />}
         </Box>
       </Box>
     );
   }
-  
+
   if (error || (!card && !isLoading)) {
     return (
       <Box>
@@ -233,10 +231,8 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
 
   return (
     <Box>
-      {!hasInvalidShareLink && (
-        <SharedCollectionBanner username={username || 'User'} userId={userId} />
-      )}
-      
+      {!hasInvalidShareLink && <SharedCollectionBanner username={username || 'User'} userId={userId} />}
+
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
@@ -283,42 +279,43 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
         {/* Column 2: Card Details */}
         <Grid size={{ xs: 12, md: 12, lg: 4.5 }}>
           <Paper elevation={0} sx={{ p: 3, backgroundColor: (theme) => theme.palette.background.default }}>
-            <CardDetailsSection 
-              card={card as any} 
-              userId={userId} 
-              isCollectionView={true} 
-            />
+            <CardDetailsSection card={card as any} userId={userId} isCollectionView={true} />
+            {(card as any)?.legalities && Object.keys((card as any).legalities).length > 0 && (
+              <Box sx={{ mt: 3 }}>
+                <CardLegalitySection legalities={(card as any).legalities} />
+              </Box>
+            )}
           </Paper>
         </Grid>
 
         {/* Column 3: Prices and Other Printings */}
         <Grid size={{ xs: 12, md: 12, lg: 4 }}>
           {/* Prices Section */}
-          <Paper 
-            elevation={0} 
-            sx={{ 
-              p: 2, 
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
               mb: 2,
               backgroundColor: (theme) => theme.palette.background.default,
             }}
           >
-            <CardPricesSection 
-              priceData={priceData} 
-              tcgplayerId={card?.tcgplayerId} 
+            <CardPricesSection
+              priceData={priceData}
+              tcgplayerId={card?.tcgplayerId}
               cardName={card?.name}
               pricesUpdatedAt={card?.pricesUpdatedAt}
             />
           </Paper>
 
           {/* Other Printings Section */}
-          <Paper 
-            elevation={0} 
-            sx={{ 
+          <Paper
+            elevation={0}
+            sx={{
               p: 2,
               backgroundColor: (theme) => theme.palette.background.default,
             }}
           >
-            <OtherPrintingsSection 
+            <OtherPrintingsSection
               printings={paginatedPrintings as any[]}
               currentPage={otherPrintingsPage}
               totalCount={totalPrintingCount}

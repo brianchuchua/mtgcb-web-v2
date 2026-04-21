@@ -44,6 +44,9 @@ export interface CardModel {
   releaseDate: string | null;
   canBeFoil?: boolean;
   canBeNonFoil?: boolean;
+  // Format legality: full Scryfall map (jsonb) and list of formats where card is legal (text[])
+  legalities?: Record<string, string> | null;
+  legalIn?: string[] | null;
   // Collection quantities (only present when userId is provided)
   quantityReg?: number;
   quantityFoil?: number;
@@ -133,14 +136,25 @@ export interface CardApiParams {
     OR?: string[];
     AND?: string[];
   };
-  setType?: string | string[] | {
+  legalIn?: {
+    AND?: string[];
     OR?: string[];
     NOT?: string[];
   };
-  setCategory?: string | string[] | {
-    OR?: string[];
-    NOT?: string[];
-  };
+  setType?:
+    | string
+    | string[]
+    | {
+        OR?: string[];
+        NOT?: string[];
+      };
+  setCategory?:
+    | string
+    | string[]
+    | {
+        OR?: string[];
+        NOT?: string[];
+      };
   [key: string]: any; // Allow for dynamic stat filters
   limit?: number;
   offset?: number;
@@ -164,14 +178,20 @@ export interface SetApiParams {
   name?: string;
   slug?: string;
   code?: string;
-  setType?: string | string[] | {
-    OR?: string[];
-    NOT?: string[];
-  };
-  category?: string | string[] | {
-    OR?: string[];
-    NOT?: string[];
-  };
+  setType?:
+    | string
+    | string[]
+    | {
+        OR?: string[];
+        NOT?: string[];
+      };
+  category?:
+    | string
+    | string[]
+    | {
+        OR?: string[];
+        NOT?: string[];
+      };
   parentSetId?: string | null;
   releasedAt?: string;
   isDraftable?: boolean;

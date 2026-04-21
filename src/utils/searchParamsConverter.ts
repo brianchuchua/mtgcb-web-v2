@@ -144,6 +144,29 @@ export const buildApiParamsFromSearchParams = (
       }
     }
 
+    // Add format legality filtering
+    // Frontend model: include[] (OR) and exclude[] (NOT) arrays from AutocompleteWithNegation
+    // API model: legalIn: { OR?, NOT? } — OR means "legal in any", NOT means "not legal in any"
+    // AND (strict intersection) isn't exposed in the default UI; power users can edit goal JSON directly
+    if (searchParams.formatsLegal) {
+      const includeFormats = searchParams.formatsLegal.include;
+      const excludeFormats = searchParams.formatsLegal.exclude;
+
+      if (includeFormats.length > 0 || excludeFormats.length > 0) {
+        const legalInFilter: { OR?: string[]; NOT?: string[] } = {};
+
+        if (includeFormats.length > 0) {
+          legalInFilter.OR = includeFormats;
+        }
+
+        if (excludeFormats.length > 0) {
+          legalInFilter.NOT = excludeFormats;
+        }
+
+        apiParams.legalIn = legalInFilter;
+      }
+    }
+
     // Add set filtering - using OR for includes (since a card can only belong to one set)
     if (searchParams.sets) {
       const includeSets = searchParams.sets.include;
@@ -212,9 +235,7 @@ export const buildApiParamsFromSearchParams = (
           if (transformedConditions.length > 0) {
             // Use OR for quantity attributes (multi-select), AND for other stats (range queries)
             const isQuantityAttribute = QUANTITY_ATTRIBUTES.includes(attribute);
-            apiParams[attribute] = isQuantityAttribute
-              ? { OR: transformedConditions }
-              : { AND: transformedConditions };
+            apiParams[attribute] = isQuantityAttribute ? { OR: transformedConditions } : { AND: transformedConditions };
           }
         }
       });
@@ -279,18 +300,18 @@ export const buildApiParamsFromSearchParams = (
     if (searchParams.completionStatus) {
       const includeStatuses = searchParams.completionStatus.include;
       const excludeStatuses = searchParams.completionStatus.exclude;
-      
+
       if (includeStatuses.length > 0 || excludeStatuses.length > 0) {
         const statusFilter: any = {};
-        
+
         if (includeStatuses.length > 0) {
           statusFilter.OR = includeStatuses;
         }
-        
+
         if (excludeStatuses.length > 0) {
           statusFilter.NOT = excludeStatuses;
         }
-        
+
         apiParams.completionStatus = statusFilter;
       }
     }

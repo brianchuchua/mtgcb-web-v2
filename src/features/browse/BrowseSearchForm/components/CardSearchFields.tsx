@@ -1,8 +1,10 @@
 import React from 'react';
-import SearchField from './SearchField';
 import OracleTextField from './OracleTextField';
+import SearchField from './SearchField';
 import ToggleSwitch from './ToggleSwitch';
+import AdvancedFilters from '@/features/browse/AdvancedFilters';
 import ColorSelector from '@/features/browse/ColorSelector';
+import FormatLegalitySelector from '@/features/browse/FormatLegalitySelector';
 import LayoutSelector from '@/features/browse/LayoutSelector';
 import OwnershipStatusSelector from '@/features/browse/OwnershipStatusSelector';
 import QuantitySelector from '@/features/browse/QuantitySelector';
@@ -10,7 +12,6 @@ import RaritySelector from '@/features/browse/RaritySelector';
 import SetSelector from '@/features/browse/SetSelector';
 import StatSearch from '@/features/browse/StatSearch';
 import TypeSelector from '@/features/browse/TypeSelector';
-import AdvancedFilters from '@/features/browse/AdvancedFilters';
 
 interface CardSearchFieldsProps {
   localCardName: string;
@@ -47,7 +48,6 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
   statResetTrigger,
   selectedGoalId,
 }) => {
-
   return (
     <>
       <SearchField
@@ -60,11 +60,17 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
       />
       {isCollectionPage && <OwnershipStatusSelector />}
       <OracleTextField value={localOracleText} onChange={handleOracleChange} />
-      <SearchField label="Artist" value={localArtist} onChange={handleArtistChange} placeholder="Search by artist name" />
+      <SearchField
+        label="Artist"
+        value={localArtist}
+        onChange={handleArtistChange}
+        placeholder="Search by artist name"
+      />
       <TypeSelector />
       <LayoutSelector />
       <ColorSelector />
       <RaritySelector />
+      <FormatLegalitySelector />
       {!isSetPage && <SetSelector />}
       {!selectedGoalId && (
         <ToggleSwitch

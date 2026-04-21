@@ -32,6 +32,7 @@ import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
 import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
 import OutlinedBox from '@/components/ui/OutlinedBox';
+import { FORMAT_LEGALITY_OPTIONS } from '@/features/browse/formatLegalityConstants';
 import { ColorMatchType, MTG_COLORS } from '@/types/browse';
 
 interface GoalSearchFormProps {
@@ -147,6 +148,9 @@ export function GoalSearchForm({
   // Rarity state
   const [selectedRarities, setSelectedRarities] = useState<AutocompleteOption[]>([]);
 
+  // Format legality state
+  const [selectedLegalIn, setSelectedLegalIn] = useState<AutocompleteOption[]>([]);
+
   // Set state
   const [setOptions, setSetOptions] = useState<AutocompleteOption[]>([]);
   const [selectedSets, setSelectedSets] = useState<AutocompleteOption[]>([]);
@@ -174,7 +178,7 @@ export function GoalSearchForm({
   const formatLayoutName = (layout: string): string => {
     return layout
       .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
 
@@ -300,6 +304,33 @@ export function GoalSearchForm({
       setSelectedRarities(selected);
     }
   }, [isInitialized, searchConditions.rarityNumeric]);
+
+  // Parse initial format legality conditions (only once)
+  useEffect(() => {
+    if (!isInitialized && searchConditions.legalIn) {
+      const selected: AutocompleteOption[] = [];
+      const legalInAutocompleteOptions = toAutocompleteOptions(
+        FORMAT_LEGALITY_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+        'Formats',
+      );
+
+      searchConditions.legalIn.OR?.forEach((f: string) => {
+        const option = legalInAutocompleteOptions.find((opt) => opt.value === f);
+        if (option) {
+          selected.push({ ...option, exclude: false });
+        }
+      });
+
+      searchConditions.legalIn.NOT?.forEach((f: string) => {
+        const option = legalInAutocompleteOptions.find((opt) => opt.value === f);
+        if (option) {
+          selected.push({ ...option, exclude: true });
+        }
+      });
+
+      setSelectedLegalIn(selected);
+    }
+  }, [isInitialized, searchConditions.legalIn]);
 
   // Parse initial set conditions (only once when sets are loaded)
   useEffect(() => {
@@ -509,6 +540,19 @@ export function GoalSearchForm({
       }
     }
 
+    // Format Legality
+    const legalInInclude = selectedLegalIn.filter((f) => !f.exclude);
+    const legalInExclude = selectedLegalIn.filter((f) => f.exclude);
+    if (legalInInclude.length > 0 || legalInExclude.length > 0) {
+      conditions.legalIn = {};
+      if (legalInInclude.length > 0) {
+        conditions.legalIn.OR = legalInInclude.map((f) => f.value);
+      }
+      if (legalInExclude.length > 0) {
+        conditions.legalIn.NOT = legalInExclude.map((f) => f.value);
+      }
+    }
+
     // Sets
     const setInclude = selectedSets.filter((s) => !s.exclude);
     const setExclude = selectedSets.filter((s) => s.exclude);
@@ -615,6 +659,7 @@ export function GoalSearchForm({
     selectedTypes,
     selectedLayouts,
     selectedRarities,
+    selectedLegalIn,
     selectedSets,
     selectedSetTypes,
     selectedSetCategories,
@@ -654,7 +699,13 @@ export function GoalSearchForm({
 
   // Mark as initialized once all data is loaded
   useEffect(() => {
-    if (cardTypeOptions.length > 0 && layoutOptions.length > 0 && setOptions.length > 0 && setTypeOptions.length > 0 && !isInitialized) {
+    if (
+      cardTypeOptions.length > 0 &&
+      layoutOptions.length > 0 &&
+      setOptions.length > 0 &&
+      setTypeOptions.length > 0 &&
+      !isInitialized
+    ) {
       setIsInitialized(true);
     }
   }, [cardTypeOptions.length, layoutOptions.length, setOptions.length, setTypeOptions.length, isInitialized]);
@@ -901,6 +952,17 @@ export function GoalSearchForm({
         options={toAutocompleteOptions(RARITY_OPTIONS, 'Rarities')}
         selectedOptions={selectedRarities}
         setSelectedOptionsRemotely={setSelectedRarities}
+      />
+
+      {/* Format Legality Selector */}
+      <AutocompleteWithNegation
+        label="Format Legality"
+        options={toAutocompleteOptions(
+          FORMAT_LEGALITY_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+          'Formats',
+        )}
+        selectedOptions={selectedLegalIn}
+        setSelectedOptionsRemotely={setSelectedLegalIn}
       />
 
       {/* Set Selector */}
@@ -1202,10 +1264,12 @@ export function GoalSearchForm({
             Giant Spider has been printed in over 20 different sets (Alpha, Beta, 4th Edition, etc.).
           </Typography>
           <Typography variant="body2" component="div" sx={{ mb: 0.5 }}>
-            • <strong>Any printing:</strong> Having any version of Giant Spider counts as 1 towards your goal -- you only need one copy of any Giant Spider for that card to be considered collected across all sets.
+            • <strong>Any printing:</strong> Having any version of Giant Spider counts as 1 towards your goal -- you
+            only need one copy of any Giant Spider for that card to be considered collected across all sets.
           </Typography>
           <Typography variant="body2" component="div" sx={{ mb: 1 }}>
-            • <strong>Every printing:</strong> Each different set&apos;s Giant Spider counts separately -- you&apos;ll need a copy of each printing of Giant Spider, one for each set it was printed in.
+            • <strong>Every printing:</strong> Each different set&apos;s Giant Spider counts separately -- you&apos;ll
+            need a copy of each printing of Giant Spider, one for each set it was printed in.
           </Typography>
           <Typography variant="body2" component="div">
             <em>(Note: Specific cards you include or exclude will always override this setting.)</em>

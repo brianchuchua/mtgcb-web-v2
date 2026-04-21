@@ -1,10 +1,14 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { getCardsPreferences, getSetsPreferences } from './preferences';
+import { parseUrlToState } from '@/features/browse/schema/urlStateAdapters';
+import { clearSearchState, loadSearchState } from '@/hooks/useSearchStateSync';
 import {
   BrowseSearchParams,
   BrowseState,
   ColorFilter,
   ColorMatchType,
   CompletionStatusFilter,
+  FormatLegalityFilter,
   LayoutFilter,
   RarityFilter,
   SetCategoryFilter,
@@ -16,9 +20,6 @@ import {
   StatFilters,
   TypeFilter,
 } from '@/types/browse';
-import { getCardsPreferences, getSetsPreferences } from './preferences';
-import { clearSearchState, loadSearchState } from '@/hooks/useSearchStateSync';
-import { parseUrlToState } from '@/features/browse/schema/urlStateAdapters';
 
 // Type for resetSearch options
 interface ResetSearchOptions {
@@ -84,9 +85,7 @@ function getInitialState(): BrowseState {
 
     // Check if URL has search parameters (excluding contentType)
     const urlParams = new URLSearchParams(window.location.search);
-    const hasUrlSearchParams = Array.from(urlParams.entries())
-      .filter(([key]) => key !== 'contentType')
-      .length > 0;
+    const hasUrlSearchParams = Array.from(urlParams.entries()).filter(([key]) => key !== 'contentType').length > 0;
 
     if (hasUrlSearchParams) {
       // URL has params - parse and merge (URL has highest priority)
@@ -221,6 +220,14 @@ export const browseSlice = createSlice({
         delete state.cardsSearchParams.sets;
       } else {
         state.cardsSearchParams.sets = action.payload;
+      }
+    },
+    setFormatsLegal: (state, action: PayloadAction<FormatLegalityFilter>) => {
+      // Cards-specific field
+      if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
+        delete state.cardsSearchParams.formatsLegal;
+      } else {
+        state.cardsSearchParams.formatsLegal = action.payload;
       }
     },
     setStats: (state, action: PayloadAction<StatFilters>) => {
@@ -421,12 +428,14 @@ export const browseSlice = createSlice({
             };
 
       // Store current goal/location to optionally preserve
-      const currentGoalId = state.viewContentType === 'cards'
-        ? state.cardsSearchParams.selectedGoalId
-        : state.setsSearchParams.selectedGoalId;
-      const currentLocationId = state.viewContentType === 'cards'
-        ? state.cardsSearchParams.selectedLocationId
-        : state.setsSearchParams.selectedLocationId;
+      const currentGoalId =
+        state.viewContentType === 'cards'
+          ? state.cardsSearchParams.selectedGoalId
+          : state.setsSearchParams.selectedGoalId;
+      const currentLocationId =
+        state.viewContentType === 'cards'
+          ? state.cardsSearchParams.selectedLocationId
+          : state.setsSearchParams.selectedLocationId;
 
       if (state.viewContentType === 'cards') {
         // Get user preferences from localStorage
@@ -610,6 +619,7 @@ export const {
   setLayouts,
   setRarities,
   setSets,
+  setFormatsLegal,
   setStats,
   setSetCategories,
   setSetTypes,

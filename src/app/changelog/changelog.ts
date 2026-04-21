@@ -12,6 +12,17 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-21',
+      version: '1.19.0',
+      changes: [
+        'Added Format Legality filter to card browse, collection pages, and goals — filter by Standard, Modern, Commander, Pauper, Vintage, and every other Magic format. Supports both include (playable in these formats) and exclude (not playable in these formats).',
+        'Added Format Legality section to card detail pages showing per-format status (Legal, Restricted, Banned, Not Legal) with a distinction for digital-only formats (Alchemy, Historic, Timeless, etc.).',
+        'Restricted cards (e.g., Vintage-restricted like Black Lotus) correctly appear in "playable in Vintage" searches — restricted means deckbuildable at 1 copy, not excluded.',
+        'Search and Goal Summary descriptions now reflect the active Format Legality filter (e.g., "Searching cards: playable in Modern, not playable in Pauper").',
+      ],
+      type: 'feature',
+    },
+    {
       date: '2026-04-20',
       version: '1.18.6',
       changes: [

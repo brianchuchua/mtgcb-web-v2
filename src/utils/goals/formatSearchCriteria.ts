@@ -1,4 +1,5 @@
 import { CardApiParams } from '@/api/browse/types';
+import { getFormatLabel } from '@/features/browse/formatLegalityConstants';
 
 interface SearchCriteriaDescription {
   conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'> & {
@@ -45,7 +46,7 @@ export function formatSearchCriteria(
   const formatLayoutName = (layout: string): string => {
     return layout
       .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
 
@@ -163,6 +164,44 @@ export function formatSearchCriteria(
     attributeParts.push(`(Reserved List only)`);
   } else if (conditions.isReserved === false) {
     attributeParts.push(`(excluding Reserved List)`);
+  }
+
+  // Format Legality
+  // Shape: { OR?: string[]; AND?: string[]; NOT?: string[] }
+  // The `legalIn` column is populated by the importer for cards whose status is either
+  // "legal" OR "restricted" in a format — i.e., cards you can actually build a deck with.
+  // We phrase the summary as "playable in X" rather than "legal in X" to be accurate: a
+  // Vintage-restricted card like Black Lotus is playable (capped at 1 copy), not strictly legal.
+  //
+  // OR  → "playable in Modern/Pauper" (card is playable in any of these)
+  // AND → "playable in all of Modern/Pauper" (intersection; rare in the default UI)
+  // NOT → "not playable in Modern/Pauper" (card can't be deckbuilt in any of these)
+  // Combos join with commas: "playable in Modern, not playable in Pauper".
+  if (conditions.legalIn) {
+    const legalParts: string[] = [];
+
+    if (conditions.legalIn.OR && conditions.legalIn.OR.length > 0) {
+      const names = conditions.legalIn.OR.map(getFormatLabel);
+      legalParts.push(`playable in ${names.join('/')}`);
+    }
+
+    if (conditions.legalIn.AND && conditions.legalIn.AND.length > 0) {
+      const names = conditions.legalIn.AND.map(getFormatLabel);
+      if (names.length === 1) {
+        legalParts.push(`playable in ${names[0]}`);
+      } else {
+        legalParts.push(`playable in all of ${names.join('/')}`);
+      }
+    }
+
+    if (conditions.legalIn.NOT && conditions.legalIn.NOT.length > 0) {
+      const names = conditions.legalIn.NOT.map(getFormatLabel);
+      legalParts.push(`not playable in ${names.join('/')}`);
+    }
+
+    if (legalParts.length > 0) {
+      attributeParts.push(legalParts.join(', '));
+    }
   }
 
   // Sets - handle separately to place at the end (skip if on a set page for search descriptions)

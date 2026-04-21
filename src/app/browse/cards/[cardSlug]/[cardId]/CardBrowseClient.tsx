@@ -1,18 +1,23 @@
 'use client';
 
-import { Box, Paper, Typography, Button } from '@mui/material';
+import ImportContactsIcon from '@mui/icons-material/ImportContacts';
+import { Box, Button, Paper, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
+import NextLink from 'next/link';
 import React, { useMemo, useState } from 'react';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
+import {
+  CardDetailsSection,
+  CardLegalitySection,
+  CardPricesSection,
+  OtherPrintingsSection,
+} from '@/components/cards/CardDetails';
 import { CardImageDisplay } from '@/components/cards/CardImageDisplay';
-import { CardDetailsSection, CardPricesSection, OtherPrintingsSection } from '@/components/cards/CardDetails';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import NextLink from 'next/link';
-import { extractBaseName } from '@/utils/cards/extractBaseName';
-import ImportContactsIcon from '@mui/icons-material/ImportContacts';
 import { useAuth } from '@/hooks/useAuth';
 import { usePriceType } from '@/hooks/usePriceType';
+import { extractBaseName } from '@/utils/cards/extractBaseName';
 import { getCollectionCardUrl } from '@/utils/collectionUrls';
 
 interface CardBrowseClientProps {
@@ -57,6 +62,7 @@ const selectFields: Array<keyof CardModel | string> = [
   'flavorText',
   'pureName',
   'isReserved',
+  'legalities',
 ];
 
 const otherPrintingsSelectFields: Array<keyof CardModel | string> = [
@@ -85,7 +91,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
   const priceType = usePriceType();
   const [otherPrintingsPage, setOtherPrintingsPage] = useState(0);
   const printingsPerPage = 20;
-  
+
   const {
     data: cardsData,
     isLoading,
@@ -107,7 +113,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
 
   // Calculate which batch of 500 we need based on current page
   const apiOffset = Math.floor((otherPrintingsPage * printingsPerPage) / 500) * 500;
-  
+
   const { data: otherPrintingsData, isLoading: isOtherPrintingsLoading } = useGetCardsQuery(
     {
       pureName: `"${(card as any)?.pureName || extractBaseName(card?.name)}"`,
@@ -126,7 +132,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
     if (!otherPrintingsData?.data?.cards || !cardId) return [];
     return otherPrintingsData.data.cards.filter((printing) => printing.id !== cardId);
   }, [otherPrintingsData?.data?.cards, cardId]);
-  
+
   const paginatedPrintings = useMemo(() => {
     // Calculate position within the current 500-item batch
     const localStart = (otherPrintingsPage * printingsPerPage) % 500;
@@ -139,7 +145,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
 
   const priceData = useMemo(() => {
     if (!card) return null;
-    
+
     const prices = card.prices || {
       normal: {
         market: card.market ? parseFloat(card.market) : null,
@@ -214,7 +220,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
             linkToTCGPlayer={true}
             maxWidth={{ xs: 400, sm: 500, md: 600 }}
           />
-          
+
           {/* View in Collection Button */}
           {isAuthenticated && (
             <Paper
@@ -248,41 +254,43 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
         {/* Column 2: Card Details */}
         <Grid size={{ xs: 12, md: 12, lg: 4.5 }}>
           <Paper elevation={0} sx={{ p: 3, backgroundColor: (theme) => theme.palette.background.default }}>
-            <CardDetailsSection 
-              card={card as any} 
-              isCollectionView={false} 
-            />
+            <CardDetailsSection card={card as any} isCollectionView={false} />
+            {card?.legalities && Object.keys(card.legalities).length > 0 && (
+              <Box sx={{ mt: 3 }}>
+                <CardLegalitySection legalities={card.legalities} />
+              </Box>
+            )}
           </Paper>
         </Grid>
 
         {/* Column 3: Prices and Other Printings */}
         <Grid size={{ xs: 12, md: 12, lg: 4 }}>
           {/* Prices Section */}
-          <Paper 
-            elevation={0} 
-            sx={{ 
-              p: 2, 
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
               mb: 2,
               backgroundColor: (theme) => theme.palette.background.default,
             }}
           >
-            <CardPricesSection 
-              priceData={priceData} 
-              tcgplayerId={card?.tcgplayerId} 
+            <CardPricesSection
+              priceData={priceData}
+              tcgplayerId={card?.tcgplayerId}
               cardName={card?.name}
               pricesUpdatedAt={card?.pricesUpdatedAt}
             />
           </Paper>
 
           {/* Other Printings Section */}
-          <Paper 
-            elevation={0} 
-            sx={{ 
+          <Paper
+            elevation={0}
+            sx={{
               p: 2,
               backgroundColor: (theme) => theme.palette.background.default,
             }}
           >
-            <OtherPrintingsSection 
+            <OtherPrintingsSection
               printings={paginatedPrintings as any[]}
               currentPage={otherPrintingsPage}
               totalCount={totalPrintingCount}

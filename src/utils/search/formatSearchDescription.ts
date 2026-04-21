@@ -23,20 +23,20 @@ export function formatSearchDescription(
   showGoals?: string,
   selectedLocationId?: number | null,
   includeChildLocations?: boolean,
-  isSetPage?: boolean
+  isSetPage?: boolean,
 ): string {
   // For sets, we don't use the formatSearchCriteria function
   if (contentType === 'sets') {
     const parts: string[] = [];
-    
+
     if (searchParams.name) {
       parts.push(`matching "${searchParams.name}"`);
     }
-    
+
     if (searchParams.code) {
       parts.push(`code "${searchParams.code}"`);
     }
-    
+
     if (searchParams.setCategories) {
       const { include, exclude } = searchParams.setCategories;
       if (include.length > 0) {
@@ -46,7 +46,7 @@ export function formatSearchDescription(
         parts.push(`excluding ${exclude.join('/')}`);
       }
     }
-    
+
     if (searchParams.setTypes) {
       const { include, exclude } = searchParams.setTypes;
       if (include.length > 0) {
@@ -56,11 +56,11 @@ export function formatSearchDescription(
         parts.push(`not ${exclude.join('/')}`);
       }
     }
-    
+
     if (searchParams.completionStatus) {
       const { include, exclude } = searchParams.completionStatus;
       if (include.length > 0) {
-        const statusText = include.map(s => {
+        const statusText = include.map((s) => {
           if (s === 'complete') return 'complete';
           if (s === 'partial') return 'partial';
           if (s === 'empty') return 'not started';
@@ -69,7 +69,7 @@ export function formatSearchDescription(
         parts.push(statusText.join('/'));
       }
       if (exclude.length > 0) {
-        const statusText = exclude.map(s => {
+        const statusText = exclude.map((s) => {
           if (s === 'complete') return 'incomplete';
           if (s === 'partial') return 'not partial';
           if (s === 'empty') return 'started';
@@ -78,13 +78,13 @@ export function formatSearchDescription(
         parts.push(statusText.join('/'));
       }
     }
-    
+
     if (searchParams.showSubsets === false) {
       parts.push('main only');
     }
-    
+
     let description = parts.length > 0 ? `sets: ${parts.join(', ')}` : 'sets: all';
-    
+
     // Add goal information for sets
     if (selectedGoalId) {
       if (showGoals === 'needed') {
@@ -95,13 +95,13 @@ export function formatSearchDescription(
         description += ' for goal';
       }
     }
-    
+
     return description;
   }
-  
+
   // For cards, convert to API params and use formatSearchCriteria
   const apiParams = buildApiParamsFromSearchParams(searchParams, 'cards') as Partial<CardApiParams>;
-  
+
   // Convert API params to the format expected by formatSearchCriteria
   const searchCriteria = {
     conditions: {
@@ -113,6 +113,7 @@ export function formatSearchDescription(
       ...(apiParams.layout && { layout: apiParams.layout }),
       ...(apiParams.rarityNumeric && { rarityNumeric: apiParams.rarityNumeric }),
       ...(apiParams.setId && { setId: apiParams.setId }),
+      ...(apiParams.legalIn && { legalIn: apiParams.legalIn }),
       ...(apiParams.convertedManaCost && { convertedManaCost: apiParams.convertedManaCost }),
       ...(apiParams.powerNumeric && { powerNumeric: apiParams.powerNumeric }),
       ...(apiParams.toughnessNumeric && { toughnessNumeric: apiParams.toughnessNumeric }),
@@ -127,12 +128,12 @@ export function formatSearchDescription(
       ...(apiParams.quantityAll && { quantityAll: apiParams.quantityAll }),
     },
   };
-  
+
   const hasFilters = Object.keys(searchCriteria.conditions).length > 0;
-  let baseDescription = hasFilters 
+  let baseDescription = hasFilters
     ? formatSearchCriteria(searchCriteria, onePrintingPerPureName, false, isSetPage)
     : 'cards: all';
-  
+
   // Add goal information if selected
   if (selectedGoalId) {
     if (showGoals === 'needed') {
@@ -143,13 +144,11 @@ export function formatSearchDescription(
       baseDescription += ' for goal';
     }
   }
-  
+
   // Add location information if selected
   if (selectedLocationId) {
-    baseDescription += includeChildLocations 
-      ? ' in location (including sublocations)'
-      : ' in location';
+    baseDescription += includeChildLocations ? ' in location (including sublocations)' : ' in location';
   }
-  
+
   return baseDescription;
 }

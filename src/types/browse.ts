@@ -41,6 +41,11 @@ export interface CompletionStatusFilter {
   exclude: string[];
 }
 
+export interface FormatLegalityFilter {
+  include: string[];
+  exclude: string[];
+}
+
 export interface StatCondition {
   attribute: string;
   operator: string;
@@ -95,6 +100,7 @@ export interface BrowseSearchParams {
   pageSize?: number;
   viewMode?: 'grid' | 'table';
   completionStatus?: CompletionStatusFilter;
+  formatsLegal?: FormatLegalityFilter;
   selectedGoalId?: number | null;
   showGoals?: ShowGoalsOption;
   selectedLocationId?: number | null;
