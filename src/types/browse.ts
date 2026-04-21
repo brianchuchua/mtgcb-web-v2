@@ -101,6 +101,13 @@ export interface BrowseSearchParams {
   viewMode?: 'grid' | 'table';
   completionStatus?: CompletionStatusFilter;
   formatsLegal?: FormatLegalityFilter;
+  /**
+   * When true, the Format Legality filter uses `formatRelevantIn` (legal + restricted + banned)
+   * instead of `legalIn` (legal + restricted). Lets users include banned cards in format-based
+   * filtering — useful for "collect every card printed for Modern" rather than "cards currently
+   * playable in Modern". Also flips the search-summary phrasing ("printed for X" vs "playable in X").
+   */
+  formatsLegalIncludeBanned?: boolean;
   selectedGoalId?: number | null;
   showGoals?: ShowGoalsOption;
   selectedLocationId?: number | null;

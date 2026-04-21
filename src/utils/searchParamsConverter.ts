@@ -146,24 +146,32 @@ export const buildApiParamsFromSearchParams = (
 
     // Add format legality filtering
     // Frontend model: include[] (OR) and exclude[] (NOT) arrays from AutocompleteWithNegation
-    // API model: legalIn: { OR?, NOT? } — OR means "legal in any", NOT means "not legal in any"
+    // API model: legalIn or formatRelevantIn: { OR?, NOT? }
+    //   - OR means "in any of these formats", NOT means "not in any of these"
+    //   - `legalIn` is the default (playable: legal + restricted)
+    //   - `formatRelevantIn` kicks in when the "Include banned cards" toggle is on —
+    //     broader pool that also counts banned cards as part of the format
     // AND (strict intersection) isn't exposed in the default UI; power users can edit goal JSON directly
     if (searchParams.formatsLegal) {
       const includeFormats = searchParams.formatsLegal.include;
       const excludeFormats = searchParams.formatsLegal.exclude;
 
       if (includeFormats.length > 0 || excludeFormats.length > 0) {
-        const legalInFilter: { OR?: string[]; NOT?: string[] } = {};
+        const filter: { OR?: string[]; NOT?: string[] } = {};
 
         if (includeFormats.length > 0) {
-          legalInFilter.OR = includeFormats;
+          filter.OR = includeFormats;
         }
 
         if (excludeFormats.length > 0) {
-          legalInFilter.NOT = excludeFormats;
+          filter.NOT = excludeFormats;
         }
 
-        apiParams.legalIn = legalInFilter;
+        if (searchParams.formatsLegalIncludeBanned) {
+          apiParams.formatRelevantIn = filter;
+        } else {
+          apiParams.legalIn = filter;
+        }
       }
     }
 

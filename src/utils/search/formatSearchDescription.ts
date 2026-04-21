@@ -114,6 +114,7 @@ export function formatSearchDescription(
       ...(apiParams.rarityNumeric && { rarityNumeric: apiParams.rarityNumeric }),
       ...(apiParams.setId && { setId: apiParams.setId }),
       ...(apiParams.legalIn && { legalIn: apiParams.legalIn }),
+      ...(apiParams.formatRelevantIn && { formatRelevantIn: apiParams.formatRelevantIn }),
       ...(apiParams.convertedManaCost && { convertedManaCost: apiParams.convertedManaCost }),
       ...(apiParams.powerNumeric && { powerNumeric: apiParams.powerNumeric }),
       ...(apiParams.toughnessNumeric && { toughnessNumeric: apiParams.toughnessNumeric }),

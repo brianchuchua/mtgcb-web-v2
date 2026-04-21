@@ -150,6 +150,10 @@ export function GoalSearchForm({
 
   // Format legality state
   const [selectedLegalIn, setSelectedLegalIn] = useState<AutocompleteOption[]>([]);
+  // When true, the goal uses the broader `formatRelevantIn` column (legal+restricted+banned)
+  // instead of `legalIn` (legal+restricted). For "collect every card printed for Modern"
+  // goals where banned cards still count as part of the format.
+  const [includeBannedFormats, setIncludeBannedFormats] = useState(false);
 
   // Set state
   const [setOptions, setSetOptions] = useState<AutocompleteOption[]>([]);
@@ -305,32 +309,37 @@ export function GoalSearchForm({
     }
   }, [isInitialized, searchConditions.rarityNumeric]);
 
-  // Parse initial format legality conditions (only once)
+  // Parse initial format legality conditions (only once). The goal may use either `legalIn`
+  // (playable) or `formatRelevantIn` (broader pool including banned) — whichever is present
+  // sets both the selected-formats state and the include-banned toggle.
   useEffect(() => {
-    if (!isInitialized && searchConditions.legalIn) {
-      const selected: AutocompleteOption[] = [];
-      const legalInAutocompleteOptions = toAutocompleteOptions(
-        FORMAT_LEGALITY_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
-        'Formats',
-      );
+    if (isInitialized) return;
+    const source = searchConditions.legalIn || searchConditions.formatRelevantIn;
+    if (!source) return;
 
-      searchConditions.legalIn.OR?.forEach((f: string) => {
-        const option = legalInAutocompleteOptions.find((opt) => opt.value === f);
-        if (option) {
-          selected.push({ ...option, exclude: false });
-        }
-      });
+    const selected: AutocompleteOption[] = [];
+    const formatAutocompleteOptions = toAutocompleteOptions(
+      FORMAT_LEGALITY_OPTIONS.map((o) => ({ value: o.value, label: o.label })),
+      'Formats',
+    );
 
-      searchConditions.legalIn.NOT?.forEach((f: string) => {
-        const option = legalInAutocompleteOptions.find((opt) => opt.value === f);
-        if (option) {
-          selected.push({ ...option, exclude: true });
-        }
-      });
+    source.OR?.forEach((f: string) => {
+      const option = formatAutocompleteOptions.find((opt) => opt.value === f);
+      if (option) {
+        selected.push({ ...option, exclude: false });
+      }
+    });
 
-      setSelectedLegalIn(selected);
-    }
-  }, [isInitialized, searchConditions.legalIn]);
+    source.NOT?.forEach((f: string) => {
+      const option = formatAutocompleteOptions.find((opt) => opt.value === f);
+      if (option) {
+        selected.push({ ...option, exclude: true });
+      }
+    });
+
+    setSelectedLegalIn(selected);
+    setIncludeBannedFormats(!!searchConditions.formatRelevantIn);
+  }, [isInitialized, searchConditions.legalIn, searchConditions.formatRelevantIn]);
 
   // Parse initial set conditions (only once when sets are loaded)
   useEffect(() => {
@@ -540,16 +549,23 @@ export function GoalSearchForm({
       }
     }
 
-    // Format Legality
+    // Format Legality — writes to `formatRelevantIn` when "Include banned cards" is on,
+    // otherwise to `legalIn`. The two columns share shape so the rest of the criteria builder
+    // doesn't care which one is used.
     const legalInInclude = selectedLegalIn.filter((f) => !f.exclude);
     const legalInExclude = selectedLegalIn.filter((f) => f.exclude);
     if (legalInInclude.length > 0 || legalInExclude.length > 0) {
-      conditions.legalIn = {};
+      const filter: { OR?: string[]; NOT?: string[] } = {};
       if (legalInInclude.length > 0) {
-        conditions.legalIn.OR = legalInInclude.map((f) => f.value);
+        filter.OR = legalInInclude.map((f) => f.value);
       }
       if (legalInExclude.length > 0) {
-        conditions.legalIn.NOT = legalInExclude.map((f) => f.value);
+        filter.NOT = legalInExclude.map((f) => f.value);
+      }
+      if (includeBannedFormats) {
+        conditions.formatRelevantIn = filter;
+      } else {
+        conditions.legalIn = filter;
       }
     }
 
@@ -660,6 +676,7 @@ export function GoalSearchForm({
     selectedLayouts,
     selectedRarities,
     selectedLegalIn,
+    includeBannedFormats,
     selectedSets,
     selectedSetTypes,
     selectedSetCategories,
@@ -964,6 +981,32 @@ export function GoalSearchForm({
         selectedOptions={selectedLegalIn}
         setSelectedOptionsRemotely={setSelectedLegalIn}
       />
+      {selectedLegalIn.length > 0 && (
+        <FormControlLabel
+          sx={{ ml: 0.5, mt: -0.5, mb: -0.75 }}
+          control={
+            <Switch
+              size="small"
+              checked={includeBannedFormats}
+              onChange={(e) => setIncludeBannedFormats(e.target.checked)}
+            />
+          }
+          label={
+            <Typography variant="body2" color="text.secondary">
+              Include banned cards
+              <Tooltip
+                title="Banned cards aren't currently playable but have been printed in the format. Turn on to collect them as part of the format's card pool — useful for 'collect every card printed for Modern' goals."
+                placement="top"
+                arrow
+              >
+                <InfoOutlinedIcon
+                  sx={{ fontSize: '0.875rem', ml: 0.5, verticalAlign: 'middle', color: 'action.disabled' }}
+                />
+              </Tooltip>
+            </Typography>
+          }
+        />
+      )}
 
       {/* Set Selector */}
       <AutocompleteWithNegation

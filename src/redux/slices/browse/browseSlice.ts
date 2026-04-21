@@ -230,6 +230,15 @@ export const browseSlice = createSlice({
         state.cardsSearchParams.formatsLegal = action.payload;
       }
     },
+    setFormatsLegalIncludeBanned: (state, action: PayloadAction<boolean>) => {
+      // Cards-specific toggle paired with formatsLegal. Paralleled by isReserved etc. —
+      // delete when off to keep state lean; URL param reflects the persisted `true` value.
+      if (!action.payload) {
+        delete state.cardsSearchParams.formatsLegalIncludeBanned;
+      } else {
+        state.cardsSearchParams.formatsLegalIncludeBanned = action.payload;
+      }
+    },
     setStats: (state, action: PayloadAction<StatFilters>) => {
       const hasConditions = Object.values(action.payload).some((conditions) => conditions.length > 0);
 
@@ -620,6 +629,7 @@ export const {
   setRarities,
   setSets,
   setFormatsLegal,
+  setFormatsLegalIncludeBanned,
   setStats,
   setSetCategories,
   setSetTypes,

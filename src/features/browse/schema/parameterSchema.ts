@@ -320,6 +320,12 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       exclude: [],
     },
   },
+  formatsLegalIncludeBanned: {
+    type: 'boolean',
+    mode: 'cards',
+    urlParam: 'includeBannedFormats',
+    defaultValue: false,
+  },
   stats: {
     type: 'statFilter',
     mode: 'cards',

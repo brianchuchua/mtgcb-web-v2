@@ -44,9 +44,12 @@ export interface CardModel {
   releaseDate: string | null;
   canBeFoil?: boolean;
   canBeNonFoil?: boolean;
-  // Format legality: full Scryfall map (jsonb) and list of formats where card is legal (text[])
+  // Format legality: full Scryfall map (jsonb) and denormalized list(s) of formats the card
+  // relates to. `legalIn` = playable (legal + restricted); `formatRelevantIn` = broader
+  // (legal + restricted + banned) for "collect every card printed for Modern" use cases.
   legalities?: Record<string, string> | null;
   legalIn?: string[] | null;
+  formatRelevantIn?: string[] | null;
   // Collection quantities (only present when userId is provided)
   quantityReg?: number;
   quantityFoil?: number;
@@ -137,6 +140,16 @@ export interface CardApiParams {
     AND?: string[];
   };
   legalIn?: {
+    AND?: string[];
+    OR?: string[];
+    NOT?: string[];
+  };
+  /**
+   * Broader variant of legalIn that also includes banned statuses. Used when the user toggles
+   * "Include banned cards" — lets them filter by "cards printed for Modern" rather than
+   * "cards currently playable in Modern". Same shape as legalIn.
+   */
+  formatRelevantIn?: {
     AND?: string[];
     OR?: string[];
     NOT?: string[];

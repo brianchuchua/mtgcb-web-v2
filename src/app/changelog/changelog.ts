@@ -13,6 +13,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-21',
+      version: '1.20.0',
+      changes: [
+        'Added "Include banned cards" toggle to the Format Legality filter — include banned cards in searches and goals (e.g., collect every card printed for Modern).',
+      ],
+      type: 'feature',
+    },
+    {
+      date: '2026-04-21',
       version: '1.19.0',
       changes: [
         'Added Format Legality filter to card browse, collection pages, and goals — filter by Standard, Modern, Commander, Pauper, Vintage, and every other Magic format. Supports both include (playable in these formats) and exclude (not playable in these formats).',

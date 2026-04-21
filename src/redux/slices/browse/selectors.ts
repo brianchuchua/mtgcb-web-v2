@@ -40,6 +40,8 @@ export const selectLayouts = (state: RootState) => state.browse.cardsSearchParam
 export const selectRarities = (state: RootState) => state.browse.cardsSearchParams.rarities;
 export const selectSets = (state: RootState) => state.browse.cardsSearchParams.sets;
 export const selectFormatsLegal = (state: RootState) => state.browse.cardsSearchParams.formatsLegal;
+export const selectFormatsLegalIncludeBanned = (state: RootState) =>
+  !!state.browse.cardsSearchParams.formatsLegalIncludeBanned;
 export const selectStats = (state: RootState) => state.browse.cardsSearchParams.stats;
 export const selectOneResultPerCardName = (state: RootState) => state.browse.cardsSearchParams.oneResultPerCardName;
 export const selectIncludeBadDataOnly = (state: RootState) => state.browse.cardsSearchParams.includeBadDataOnly;

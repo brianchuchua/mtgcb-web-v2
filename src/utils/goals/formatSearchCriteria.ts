@@ -167,36 +167,36 @@ export function formatSearchCriteria(
   }
 
   // Format Legality
-  // Shape: { OR?: string[]; AND?: string[]; NOT?: string[] }
-  // The `legalIn` column is populated by the importer for cards whose status is either
-  // "legal" OR "restricted" in a format — i.e., cards you can actually build a deck with.
-  // We phrase the summary as "playable in X" rather than "legal in X" to be accurate: a
-  // Vintage-restricted card like Black Lotus is playable (capped at 1 copy), not strictly legal.
-  //
-  // OR  → "playable in Modern/Pauper" (card is playable in any of these)
-  // AND → "playable in all of Modern/Pauper" (intersection; rare in the default UI)
-  // NOT → "not playable in Modern/Pauper" (card can't be deckbuilt in any of these)
-  // Combos join with commas: "playable in Modern, not playable in Pauper".
-  if (conditions.legalIn) {
+  // Two possible columns carry the filter:
+  //   - `legalIn` (playable: legal + restricted)          → phrased "playable in Modern"
+  //   - `formatRelevantIn` (legal + restricted + banned)   → phrased "printed for Modern"
+  // Both share the same { OR, AND, NOT } shape; only the verb changes. Same phrasing rules:
+  //   OR  → "... Modern/Pauper" (any of these)
+  //   AND → "... in all of Modern/Pauper" (intersection)
+  //   NOT → "not ... Modern/Pauper"
+  const formatLegalitySource = conditions.formatRelevantIn || conditions.legalIn;
+  const formatLegalityVerb = conditions.formatRelevantIn ? 'printed for' : 'playable in';
+  const formatLegalityNotVerb = conditions.formatRelevantIn ? 'not printed for' : 'not playable in';
+  if (formatLegalitySource) {
     const legalParts: string[] = [];
 
-    if (conditions.legalIn.OR && conditions.legalIn.OR.length > 0) {
-      const names = conditions.legalIn.OR.map(getFormatLabel);
-      legalParts.push(`playable in ${names.join('/')}`);
+    if (formatLegalitySource.OR && formatLegalitySource.OR.length > 0) {
+      const names = formatLegalitySource.OR.map(getFormatLabel);
+      legalParts.push(`${formatLegalityVerb} ${names.join('/')}`);
     }
 
-    if (conditions.legalIn.AND && conditions.legalIn.AND.length > 0) {
-      const names = conditions.legalIn.AND.map(getFormatLabel);
+    if (formatLegalitySource.AND && formatLegalitySource.AND.length > 0) {
+      const names = formatLegalitySource.AND.map(getFormatLabel);
       if (names.length === 1) {
-        legalParts.push(`playable in ${names[0]}`);
+        legalParts.push(`${formatLegalityVerb} ${names[0]}`);
       } else {
-        legalParts.push(`playable in all of ${names.join('/')}`);
+        legalParts.push(`${formatLegalityVerb} all of ${names.join('/')}`);
       }
     }
 
-    if (conditions.legalIn.NOT && conditions.legalIn.NOT.length > 0) {
-      const names = conditions.legalIn.NOT.map(getFormatLabel);
-      legalParts.push(`not playable in ${names.join('/')}`);
+    if (formatLegalitySource.NOT && formatLegalitySource.NOT.length > 0) {
+      const names = formatLegalitySource.NOT.map(getFormatLabel);
+      legalParts.push(`${formatLegalityNotVerb} ${names.join('/')}`);
     }
 
     if (legalParts.length > 0) {
