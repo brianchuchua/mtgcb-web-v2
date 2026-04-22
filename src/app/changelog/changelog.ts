@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-22',
+      version: '1.20.1',
+      changes: [
+        'Goal browsing is much faster — pages like a full Commander collection now load in about half the time.',
+        'Fixed an inflated result count when filtering a goal by location.',
+      ],
+    },
+    {
       date: '2026-04-21',
       version: '1.20.0',
       changes: [
@@ -33,33 +41,24 @@ const changelogData: ChangelogData = {
     {
       date: '2026-04-20',
       version: '1.18.6',
-      changes: [
-        'Improved data and import accuracy for 1200 cards that were missing foil finish data',
-      ],
+      changes: ['Improved data and import accuracy for 1200 cards that were missing foil finish data'],
       type: 'data',
     },
     {
       date: '2026-04-19',
       version: '1.18.5',
-      changes: [
-        'Added Japanese Strixhaven Mystical Archive',
-        'Added Japanese Silver Scroll Mystical Archive',
-      ],
+      changes: ['Added Japanese Strixhaven Mystical Archive', 'Added Japanese Silver Scroll Mystical Archive'],
       type: 'data',
     },
     {
       date: '2026-04-18',
       version: '1.18.4',
-      changes: [
-        'Fixed per-set goal buy buttons for certain goal types',
-      ],
+      changes: ['Fixed per-set goal buy buttons for certain goal types'],
     },
     {
       date: '2026-04-18',
       version: '1.18.3',
-      changes: [
-        'Improved TCGplayer purchase integration for Lorwyn Eclipsed and related sets',
-      ],
+      changes: ['Improved TCGplayer purchase integration for Lorwyn Eclipsed and related sets'],
     },
     {
       date: '2026-04-16',
@@ -89,16 +88,12 @@ const changelogData: ChangelogData = {
     {
       date: '2026-04-13',
       version: '1.18.0',
-      changes: [
-        'Moved to a new hosting provider for improved performance and reliability',
-      ],
+      changes: ['Moved to a new hosting provider for improved performance and reliability'],
     },
     {
       date: '2026-04-12',
       version: '1.17.5',
-      changes: [
-        'Improved spacing below site-wide notification banners',
-      ],
+      changes: ['Improved spacing below site-wide notification banners'],
     },
     {
       date: '2026-04-03',
@@ -111,9 +106,7 @@ const changelogData: ChangelogData = {
     {
       date: '2026-03-30',
       version: '1.17.3',
-      changes: [
-        'Fixed sorting by quantity placing unowned cards at the end instead of the beginning',
-      ],
+      changes: ['Fixed sorting by quantity placing unowned cards at the end instead of the beginning'],
     },
     {
       date: '2026-03-22',
@@ -139,33 +132,23 @@ const changelogData: ChangelogData = {
     {
       date: '2026-03-11',
       version: '1.16.10',
-      changes: [
-        'Added 2026 Lunar New Year',
-        'Added The Big Score Promos',
-        'Updated Promo Pack: Foundations',
-      ],
+      changes: ['Added 2026 Lunar New Year', 'Added The Big Score Promos', 'Updated Promo Pack: Foundations'],
       type: 'data',
     },
     {
       date: '2026-03-11',
       version: '1.16.9',
-      changes: [
-        'Fixed goal card selector not showing enough printings for commonly reprinted cards',
-      ],
+      changes: ['Fixed goal card selector not showing enough printings for commonly reprinted cards'],
     },
     {
       date: '2026-03-05',
       version: '1.16.8',
-      changes: [
-        'Fixed incorrect foil flags on Secret Lair foil variant cards (Rainbow Foil, Foil Etched, etc.)',
-      ],
+      changes: ['Fixed incorrect foil flags on Secret Lair foil variant cards (Rainbow Foil, Foil Etched, etc.)'],
     },
     {
       date: '2026-03-05',
       version: '1.16.7',
-      changes: [
-        'Updated Secret Lair Drop Series',
-      ],
+      changes: ['Updated Secret Lair Drop Series'],
       type: 'data',
     },
     {
@@ -216,9 +199,7 @@ const changelogData: ChangelogData = {
     {
       date: '2026-02-14',
       version: '1.16.2',
-      changes: [
-        'Improved handling of pasted text with extra spaces across all search fields',
-      ],
+      changes: ['Improved handling of pasted text with extra spaces across all search fields'],
     },
     {
       date: '2026-02-12',
