@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-23',
+      version: '1.20.2',
+      changes: [
+        "Improved the accuracy of goal 'Current value' on goal and per-set pages.",
+        "Goal 'Current value' now caps each card's contribution at your goal's target quantity — extra copies beyond the target no longer count.",
+      ],
+    },
+    {
       date: '2026-04-22',
       version: '1.20.1',
       changes: [
