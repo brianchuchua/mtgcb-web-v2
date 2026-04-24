@@ -818,6 +818,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                       variant="outlined"
                       onClick={handleMenuOpen}
                       disabled={isMassUpdateLoading || isMassEntryLoading}
+                      data-testid="collection-set-more-actions"
                       sx={{
                         minWidth: 'auto',
                         px: 1,

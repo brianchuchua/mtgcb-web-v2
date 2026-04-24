@@ -181,6 +181,25 @@ All text input fields **MUST** enforce API character limits using HTML `maxLengt
 - Search fields (card name, oracle text, artist): 2000
 - File uploads (CSV import): 30MB
 
+### Numeric Input Validation (REQUIRED)
+
+All numeric inputs that hit the API **MUST** clamp and mirror the API's bounds. Import constants from `@/utils/validationLimits`:
+
+```tsx
+import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
+
+<TextField
+  type="number"
+  onChange={(e) => setValue(clampCollectionQuantity(parseInt(e.target.value) || 0))}
+  inputProps={{ min: COLLECTION_QUANTITY_MIN, max: COLLECTION_QUANTITY_MAX }}
+/>
+```
+
+**Numeric Limits (must match mtgcb-api-v3):**
+- Collection quantities (set mode): 0..9999
+- Collection quantity deltas (increment mode): -9999..9999
+- Goal target quantities: 1..9999
+
 ## Project Structure
 
 ```

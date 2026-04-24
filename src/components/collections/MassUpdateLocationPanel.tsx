@@ -20,6 +20,14 @@ import { styled } from '@mui/material/styles';
 import React, { useMemo, useState } from 'react';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { LocationHierarchy } from '@/api/locations/types';
+import {
+  COLLECTION_QUANTITY_DELTA_MAX,
+  COLLECTION_QUANTITY_DELTA_MIN,
+  COLLECTION_QUANTITY_MAX,
+  COLLECTION_QUANTITY_MIN,
+  clampCollectionQuantity,
+  clampCollectionQuantityDelta,
+} from '@/utils/validationLimits';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -202,13 +210,13 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
     // For change mode (increment), allow negative values
     if (uiMode === 'change') {
       // Allow any value including negative for decrement
-      setFormData({ ...formData, [field]: value });
+      setFormData({ ...formData, [field]: clampCollectionQuantityDelta(value) });
     } else {
       // For set mode, only allow non-negative
       if (value < 0) {
         return;
       }
-      setFormData({ ...formData, [field]: value });
+      setFormData({ ...formData, [field]: clampCollectionQuantity(value) });
     }
   };
 
@@ -416,7 +424,11 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
                           handleQuantityChange('quantityReg', Math.max(0, formData.quantityReg - 1));
                         }
                       }}
-                      disabled={isLoading || (uiMode !== 'change' && formData.quantityReg === 0)}
+                      disabled={
+                        isLoading ||
+                        (uiMode !== 'change' && formData.quantityReg === 0) ||
+                        (uiMode === 'change' && formData.quantityReg <= COLLECTION_QUANTITY_DELTA_MIN)
+                      }
                       tabIndex={-1}
                       disableFocusRipple
                     >
@@ -426,8 +438,12 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
                       type="number"
                       value={formData.quantityReg}
                       onChange={(e) => handleQuantityChange('quantityReg', parseInt(e.target.value) || 0)}
-                      inputProps={{
-                        min: uiMode === 'change' ? undefined : 0,
+                      slotProps={{
+                        htmlInput: {
+                          min: uiMode === 'change' ? COLLECTION_QUANTITY_DELTA_MIN : COLLECTION_QUANTITY_MIN,
+                          max: uiMode === 'change' ? COLLECTION_QUANTITY_DELTA_MAX : COLLECTION_QUANTITY_MAX,
+                          'data-testid': 'mass-update-location-quantity-regular',
+                        },
                       }}
                       size="small"
                       disabled={isLoading}
@@ -439,7 +455,11 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
                         e.currentTarget.blur();
                         handleQuantityChange('quantityReg', formData.quantityReg + 1);
                       }}
-                      disabled={isLoading}
+                      disabled={
+                        isLoading ||
+                        formData.quantityReg >=
+                          (uiMode === 'change' ? COLLECTION_QUANTITY_DELTA_MAX : COLLECTION_QUANTITY_MAX)
+                      }
                       tabIndex={-1}
                       disableFocusRipple
                     >
@@ -470,7 +490,11 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
                           handleQuantityChange('quantityFoil', Math.max(0, formData.quantityFoil - 1));
                         }
                       }}
-                      disabled={isLoading || (uiMode !== 'change' && formData.quantityFoil === 0)}
+                      disabled={
+                        isLoading ||
+                        (uiMode !== 'change' && formData.quantityFoil === 0) ||
+                        (uiMode === 'change' && formData.quantityFoil <= COLLECTION_QUANTITY_DELTA_MIN)
+                      }
                       tabIndex={-1}
                       disableFocusRipple
                     >
@@ -480,8 +504,12 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
                       type="number"
                       value={formData.quantityFoil}
                       onChange={(e) => handleQuantityChange('quantityFoil', parseInt(e.target.value) || 0)}
-                      inputProps={{
-                        min: uiMode === 'change' ? undefined : 0,
+                      slotProps={{
+                        htmlInput: {
+                          min: uiMode === 'change' ? COLLECTION_QUANTITY_DELTA_MIN : COLLECTION_QUANTITY_MIN,
+                          max: uiMode === 'change' ? COLLECTION_QUANTITY_DELTA_MAX : COLLECTION_QUANTITY_MAX,
+                          'data-testid': 'mass-update-location-quantity-foil',
+                        },
                       }}
                       size="small"
                       disabled={isLoading}
@@ -493,7 +521,11 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
                         e.currentTarget.blur();
                         handleQuantityChange('quantityFoil', formData.quantityFoil + 1);
                       }}
-                      disabled={isLoading}
+                      disabled={
+                        isLoading ||
+                        formData.quantityFoil >=
+                          (uiMode === 'change' ? COLLECTION_QUANTITY_DELTA_MAX : COLLECTION_QUANTITY_MAX)
+                      }
                       tabIndex={-1}
                       disableFocusRipple
                     >

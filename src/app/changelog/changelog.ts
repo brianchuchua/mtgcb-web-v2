@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-24',
+      version: '1.20.4',
+      changes: [
+        'Card quantities are now capped at 9999 per card.',
+        'CSV import flags any rows whose quantity got capped.',
+      ],
+    },
+    {
       date: '2026-04-23',
       version: '1.20.3',
       changes: [

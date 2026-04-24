@@ -45,6 +45,7 @@ import { usePriceType } from '@/hooks/usePriceType';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
+import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
 const EditCardsClient: React.FC = () => {
   const router = useRouter();
@@ -310,8 +311,11 @@ const EditCardsClient: React.FC = () => {
 
       // Focus back on search input
       searchInputRef.current?.focus();
-    } catch (error) {
-      enqueueSnackbar(`Failed to update ${selectedCard.name}`, { variant: 'error' });
+    } catch (error: any) {
+      enqueueSnackbar(
+        error?.data?.error?.message || `Failed to update ${selectedCard.name}`,
+        { variant: 'error' },
+      );
     }
   };
 
@@ -822,7 +826,7 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
                   if (isRegularDisabled) {
                     handleDisabledFieldClick('regular');
                   } else {
-                    setQuantityRegular(Math.max(0, quantityRegular - 1));
+                    setQuantityRegular(clampCollectionQuantity(quantityRegular - 1));
                   }
                 }}
                 disabled={quantityRegular === 0 || isRegularDisabled}
@@ -835,8 +839,14 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
               <QuantityInput
                 type="number"
                 value={quantityRegular}
-                onChange={(e) => setQuantityRegular(Math.max(0, parseInt(e.target.value) || 0))}
-                inputProps={{ min: 0 }}
+                onChange={(e) => setQuantityRegular(clampCollectionQuantity(parseInt(e.target.value) || 0))}
+                slotProps={{
+                  htmlInput: {
+                    min: COLLECTION_QUANTITY_MIN,
+                    max: COLLECTION_QUANTITY_MAX,
+                    'data-testid': 'edit-cards-quantity-regular',
+                  },
+                }}
                 autoFocus={canBeNonFoil}
                 onFocus={(e) => e.target.select()}
                 onKeyPress={(e) => {
@@ -863,7 +873,7 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
                   if (isRegularDisabled) {
                     handleDisabledFieldClick('regular');
                   } else {
-                    setQuantityRegular(quantityRegular + 1);
+                    setQuantityRegular(clampCollectionQuantity(quantityRegular + 1));
                   }
                 }}
                 tabIndex={-1}
@@ -912,7 +922,7 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
                   if (isFoilDisabled) {
                     handleDisabledFieldClick('foil');
                   } else {
-                    setQuantityFoil(Math.max(0, quantityFoil - 1));
+                    setQuantityFoil(clampCollectionQuantity(quantityFoil - 1));
                   }
                 }}
                 disabled={quantityFoil === 0 || isFoilDisabled}
@@ -925,8 +935,14 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
               <QuantityInput
                 type="number"
                 value={quantityFoil}
-                onChange={(e) => setQuantityFoil(Math.max(0, parseInt(e.target.value) || 0))}
-                inputProps={{ min: 0 }}
+                onChange={(e) => setQuantityFoil(clampCollectionQuantity(parseInt(e.target.value) || 0))}
+                slotProps={{
+                  htmlInput: {
+                    min: COLLECTION_QUANTITY_MIN,
+                    max: COLLECTION_QUANTITY_MAX,
+                    'data-testid': 'edit-cards-quantity-foil',
+                  },
+                }}
                 autoFocus={!canBeNonFoil && canBeFoil}
                 onFocus={(e) => e.target.select()}
                 onKeyPress={(e) => {
@@ -953,7 +969,7 @@ const QuantityEditor: React.FC<QuantityEditorProps> = ({
                   if (isFoilDisabled) {
                     handleDisabledFieldClick('foil');
                   } else {
-                    setQuantityFoil(quantityFoil + 1);
+                    setQuantityFoil(clampCollectionQuantity(quantityFoil + 1));
                   }
                 }}
                 tabIndex={-1}

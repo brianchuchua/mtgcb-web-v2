@@ -31,6 +31,7 @@ import { CardLocationTableCell } from './CardLocationTableCell';
 import CardPrice from './CardPrice';
 import { GoalStatusTableCell } from './GoalStatusTableCell';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
+import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 import { ResponsiveWidth, TableColumn } from '@/components/common/VirtualizedTable';
 import { PriceType } from '@/types/pricing';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
@@ -481,7 +482,10 @@ const InlineEditableQuantity: React.FC<{
         setIsLoading(false);
         // Don't show error or reset for aborted requests
         if (error.name !== 'AbortError' && error.message !== 'Aborted') {
-          enqueueSnackbar(`Failed to update ${cardName} quantity`, { variant: 'error' });
+          enqueueSnackbar(
+            error?.data?.error?.message || `Failed to update ${cardName} quantity`,
+            { variant: 'error' },
+          );
           setLocalQuantity(quantity); // Reset on error
         }
       }
@@ -514,7 +518,7 @@ const InlineEditableQuantity: React.FC<{
     }
 
     const numValue = parseInt(value) || 0;
-    const newQuantity = Math.max(0, numValue);
+    const newQuantity = clampCollectionQuantity(numValue);
     setLocalQuantity(newQuantity);
     debouncedUpdate(newQuantity);
   };
@@ -526,9 +530,14 @@ const InlineEditableQuantity: React.FC<{
       setInputValue('0');
       debouncedUpdate(0);
     } else {
-      // Ensure the display value matches the numeric value
-      const numValue = parseInt(inputValue) || 0;
+      // Clamp the display value to the API bounds so the user never sees a
+      // value that would be rejected on submit.
+      const numValue = clampCollectionQuantity(parseInt(inputValue) || 0);
       setInputValue(numValue.toString());
+      if (numValue !== localQuantity) {
+        setLocalQuantity(numValue);
+        debouncedUpdate(numValue);
+      }
     }
   };
 
@@ -554,7 +563,7 @@ const InlineEditableQuantity: React.FC<{
       isUserEditingRef.current = false;
     }, 2000);
 
-    const newQuantity = localQuantity + 1;
+    const newQuantity = clampCollectionQuantity(localQuantity + 1);
     setLocalQuantity(newQuantity);
     setInputValue(newQuantity.toString());
     debouncedUpdate(newQuantity);
@@ -654,7 +663,13 @@ const InlineEditableQuantity: React.FC<{
                   (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
                 }
               }}
-              inputProps={{ min: 0 }}
+              slotProps={{
+                htmlInput: {
+                  min: COLLECTION_QUANTITY_MIN,
+                  max: COLLECTION_QUANTITY_MAX,
+                  'data-testid': 'card-table-quantity',
+                },
+              }}
               variant="outlined"
               size="small"
               disabled={isDisabled}

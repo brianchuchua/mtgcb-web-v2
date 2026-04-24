@@ -24,6 +24,7 @@ import debounce from 'lodash.debounce';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
+import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
 const QuantityContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -265,7 +266,10 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         }
         // Don't show error for aborted requests
         if (error.name !== 'AbortError' && error.message !== 'Aborted') {
-          enqueueSnackbar(`Error updating ${cardName}`, { variant: 'error' });
+          enqueueSnackbar(
+            error?.data?.error?.message || `Error updating ${cardName}`,
+            { variant: 'error' },
+          );
         }
       }
     }, 400),
@@ -273,7 +277,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   );
 
   const handleQuantityChange = (type: 'regular' | 'foil', value: number) => {
-    const newValue = Math.max(0, value);
+    const newValue = clampCollectionQuantity(value);
 
     // Mark as user editing
     isUserEditingRef.current = true;
@@ -300,11 +304,11 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
   const handleIncrement = (type: 'regular' | 'foil', event: React.MouseEvent<HTMLButtonElement>) => {
     event.currentTarget.blur();
     if (type === 'regular') {
-      const newValue = localQuantityReg + 1;
+      const newValue = clampCollectionQuantity(localQuantityReg + 1);
       setInputValueReg(newValue.toString());
       handleQuantityChange('regular', newValue);
     } else {
-      const newValue = localQuantityFoil + 1;
+      const newValue = clampCollectionQuantity(localQuantityFoil + 1);
       setInputValueFoil(newValue.toString());
       handleQuantityChange('foil', newValue);
     }
@@ -358,12 +362,22 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
         debouncedUpdate(localQuantityReg, newValue, 'foil');
       }
     } else {
-      // Ensure the display value matches the numeric value
-      const numValue = parseInt(inputValue) || 0;
+      // Ensure the display value matches the numeric value, clamped to the
+      // API bounds so the user's displayed value never drifts from what the
+      // server will accept.
+      const numValue = clampCollectionQuantity(parseInt(inputValue) || 0);
       if (type === 'regular') {
         setInputValueReg(numValue.toString());
+        if (numValue !== localQuantityReg) {
+          setLocalQuantityReg(numValue);
+          debouncedUpdate(numValue, localQuantityFoil, 'regular');
+        }
       } else {
         setInputValueFoil(numValue.toString());
+        if (numValue !== localQuantityFoil) {
+          setLocalQuantityFoil(numValue);
+          debouncedUpdate(localQuantityReg, numValue, 'foil');
+        }
       }
     }
   };
@@ -457,7 +471,14 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
                   (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
                 }
               }}
-              inputProps={{ min: 0 }}
+              slotProps={{
+                htmlInput: {
+                  min: COLLECTION_QUANTITY_MIN,
+                  max: COLLECTION_QUANTITY_MAX,
+                  'data-testid': 'editable-card-quantity-regular',
+                },
+                inputLabel: { shrink: true },
+              }}
               variant="outlined"
               size="small"
               label={
@@ -467,7 +488,6 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
                   {showSuccessReg && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
                 </Box>
               }
-              InputLabelProps={{ shrink: true }}
               disabled={isRegularDisabled}
               error={regularHasError}
             />
@@ -573,7 +593,14 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
                   (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
                 }
               }}
-              inputProps={{ min: 0 }}
+              slotProps={{
+                htmlInput: {
+                  min: COLLECTION_QUANTITY_MIN,
+                  max: COLLECTION_QUANTITY_MAX,
+                  'data-testid': 'editable-card-quantity-foil',
+                },
+                inputLabel: { shrink: true },
+              }}
               variant="outlined"
               size="small"
               label={
@@ -583,7 +610,6 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
                   {showSuccessFoil && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
                 </Box>
               }
-              InputLabelProps={{ shrink: true }}
               disabled={isFoilDisabled}
               error={foilHasError}
             />

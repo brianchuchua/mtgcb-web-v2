@@ -35,6 +35,7 @@ import {
 import { useGetLocationsQuery, useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { LocationHierarchy } from '@/api/locations/types';
 import { DualQuantitySelector } from '@/components/shared/QuantitySelector';
+import { COLLECTION_QUANTITY_MAX } from '@/utils/validationLimits';
 
 interface AddCardLocationsDialogProps {
   open: boolean;
@@ -130,11 +131,17 @@ export default function AddCardLocationsDialog({
     }
   }, [existingLocation]);
 
-  // Calculate available quantities (owned - already assigned to other locations)
+  // Calculate available quantities (owned - already assigned to other locations), capped at the API limit
   const currentLocationReg = existingLocation?.quantityReg || 0;
   const currentLocationFoil = existingLocation?.quantityFoil || 0;
-  const availableReg = totalQuantityReg - totalAssignedReg + currentLocationReg;
-  const availableFoil = totalQuantityFoil - totalAssignedFoil + currentLocationFoil;
+  const availableReg = Math.min(
+    COLLECTION_QUANTITY_MAX,
+    totalQuantityReg - totalAssignedReg + currentLocationReg,
+  );
+  const availableFoil = Math.min(
+    COLLECTION_QUANTITY_MAX,
+    totalQuantityFoil - totalAssignedFoil + currentLocationFoil,
+  );
 
   // Validate quantities don't exceed available
   const regExceedsAvailable = quantityReg > availableReg;

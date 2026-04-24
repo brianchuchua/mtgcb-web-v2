@@ -30,6 +30,7 @@ import { useDeleteGoal } from '@/hooks/goals/useDeleteGoal';
 import { trimFormData } from '@/utils/form/trimFormData';
 import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
 import { useSetNames } from '@/utils/goals/useSetNames';
+import { GOAL_TARGET_QUANTITY_MAX } from '@/utils/validationLimits';
 
 interface EditGoalFormProps {
   goal: Goal;
@@ -333,6 +334,8 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                         if (isChangingMode) return true;
                         if (quantityMode !== 'separate') return true;
                         if (value !== undefined && value !== null && value < 0) return 'Cannot be negative';
+                        if (value !== undefined && value !== null && value > GOAL_TARGET_QUANTITY_MAX)
+                          return `Cannot exceed ${GOAL_TARGET_QUANTITY_MAX}`;
                         const foilValue = getValues('targetQuantityFoil');
                         const regValue = value || 0;
                         const foilVal = foilValue || 0;
@@ -377,7 +380,13 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                               }
                             }}
                             onFocus={(e) => e.target.select()}
-                            inputProps={{ min: 0 }}
+                            slotProps={{
+                              htmlInput: {
+                                min: 0,
+                                max: GOAL_TARGET_QUANTITY_MAX,
+                                'data-testid': 'target-quantity-reg',
+                              },
+                            }}
                             variant="outlined"
                             size="small"
                             error={!!errors.targetQuantityReg}
@@ -388,7 +397,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                             onMouseDown={(e) => {
                               e.preventDefault();
                               e.currentTarget.blur();
-                              onChange((value || 0) + 1);
+                              onChange(Math.min(GOAL_TARGET_QUANTITY_MAX, (value || 0) + 1));
                             }}
                             tabIndex={-1}
                             disableFocusRipple
@@ -418,6 +427,8 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                         if (!value && value !== 0) return true;
                         const numValue = Number(value);
                         if (isNaN(numValue) || numValue < 0) return 'Cannot be negative';
+                        if (numValue > GOAL_TARGET_QUANTITY_MAX)
+                          return `Cannot exceed ${GOAL_TARGET_QUANTITY_MAX}`;
                         return true;
                       },
                     }}
@@ -456,7 +467,13 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                               }
                             }}
                             onFocus={(e) => e.target.select()}
-                            inputProps={{ min: 0 }}
+                            slotProps={{
+                              htmlInput: {
+                                min: 0,
+                                max: GOAL_TARGET_QUANTITY_MAX,
+                                'data-testid': 'target-quantity-foil',
+                              },
+                            }}
                             variant="outlined"
                             size="small"
                             error={!!errors.targetQuantityFoil}
@@ -467,7 +484,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                             onMouseDown={(e) => {
                               e.preventDefault();
                               e.currentTarget.blur();
-                              onChange((value || 0) + 1);
+                              onChange(Math.min(GOAL_TARGET_QUANTITY_MAX, (value || 0) + 1));
                             }}
                             tabIndex={-1}
                             disableFocusRipple
@@ -525,6 +542,8 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                       }
                       const numValue = Number(value);
                       if (isNaN(numValue) || numValue < 1) return 'Must be at least 1';
+                      if (numValue > GOAL_TARGET_QUANTITY_MAX)
+                        return `Cannot exceed ${GOAL_TARGET_QUANTITY_MAX}`;
                       return true;
                     },
                   }}
@@ -567,7 +586,13 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                             }
                           }}
                           onFocus={(e) => e.target.select()}
-                          inputProps={{ min: 0 }}
+                          slotProps={{
+                            htmlInput: {
+                              min: 0,
+                              max: GOAL_TARGET_QUANTITY_MAX,
+                              'data-testid': 'target-quantity-all',
+                            },
+                          }}
                           variant="outlined"
                           size="small"
                           error={!!errors.targetQuantityAll}
@@ -578,7 +603,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
                           onMouseDown={(e) => {
                             e.preventDefault();
                             e.currentTarget.blur();
-                            onChange((value || 0) + 1);
+                            onChange(Math.min(GOAL_TARGET_QUANTITY_MAX, (value || 0) + 1));
                           }}
                           tabIndex={-1}
                           disableFocusRipple

@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useState } from 'react';
+import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -186,7 +187,7 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
       return;
     }
 
-    setFormData({ ...formData, [field]: value });
+    setFormData({ ...formData, [field]: clampCollectionQuantity(value) });
   };
 
   const getRarityLabel = (rarity: string): string => {
@@ -345,8 +346,12 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
                     type="number"
                     value={formData.quantityReg}
                     onChange={(e) => handleQuantityChange('quantityReg', parseInt(e.target.value) || 0)}
-                    inputProps={{
-                      min: 0,
+                    slotProps={{
+                      htmlInput: {
+                        min: COLLECTION_QUANTITY_MIN,
+                        max: COLLECTION_QUANTITY_MAX,
+                        'data-testid': 'mass-entry-quantity-regular',
+                      },
                     }}
                     size="small"
                     disabled={isLoading}
@@ -358,7 +363,7 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
                       e.currentTarget.blur();
                       handleQuantityChange('quantityReg', formData.quantityReg + 1);
                     }}
-                    disabled={isLoading}
+                    disabled={isLoading || formData.quantityReg >= COLLECTION_QUANTITY_MAX}
                     tabIndex={-1}
                     disableFocusRipple
                   >
@@ -392,8 +397,12 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
                     type="number"
                     value={formData.quantityFoil}
                     onChange={(e) => handleQuantityChange('quantityFoil', parseInt(e.target.value) || 0)}
-                    inputProps={{
-                      min: 0,
+                    slotProps={{
+                      htmlInput: {
+                        min: COLLECTION_QUANTITY_MIN,
+                        max: COLLECTION_QUANTITY_MAX,
+                        'data-testid': 'mass-entry-quantity-foil',
+                      },
                     }}
                     size="small"
                     disabled={isLoading}
@@ -405,7 +414,7 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
                       e.currentTarget.blur();
                       handleQuantityChange('quantityFoil', formData.quantityFoil + 1);
                     }}
-                    disabled={isLoading}
+                    disabled={isLoading || formData.quantityFoil >= COLLECTION_QUANTITY_MAX}
                     tabIndex={-1}
                     disableFocusRipple
                   >

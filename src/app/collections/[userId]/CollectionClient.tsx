@@ -477,6 +477,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
                       size="small"
                       variant="outlined"
                       onClick={handleMenuOpen}
+                      data-testid="collection-more-actions"
                       sx={{
                         minWidth: 'auto',
                         px: 1,
