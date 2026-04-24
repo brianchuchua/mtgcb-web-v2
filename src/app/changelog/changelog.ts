@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-23',
+      version: '1.20.3',
+      changes: [
+        'Fixed goal sort order in specific corner cases when sorting by price.',
+      ],
+    },
+    {
+      date: '2026-04-23',
       version: '1.20.2',
       changes: [
         "Improved the accuracy of goal 'Current value' on goal and per-set pages.",
