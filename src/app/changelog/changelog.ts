@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-25',
+      version: '1.21.1',
+      changes: ['Added missing surge foils for Final Fantasy Commander Variants'],
+      type: 'data',
+    },
+    {
+      date: '2026-04-25',
       version: '1.21.0',
       changes: [
         'Added an "Unassigned" option to the Location filter — show cards you own that haven\'t been placed in any location yet.',
