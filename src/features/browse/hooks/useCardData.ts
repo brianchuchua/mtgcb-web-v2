@@ -3,6 +3,7 @@ import { useMemo, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
+import { isUnassignedLocation } from '@/api/locations/types';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { selectSelectedGoalId, selectShowGoals, selectSelectedLocationId, selectIncludeChildLocations } from '@/redux/slices/browse';
 import { usePriceType } from '@/hooks/usePriceType';
@@ -102,9 +103,12 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
         showGoalProgress: true,
         ...(showGoals !== 'all' && { showGoals })
       }),
+      // selectedLocationId can be -1 (unassigned sentinel) or a positive Location ID. Both are
+      // truthy. includeChildLocations doesn't apply to the unassigned sentinel — omit it so the
+      // backend doesn't get a meaningless param.
       ...(selectedLocationId && userId && {
         locationId: selectedLocationId,
-        includeChildLocations
+        ...(isUnassignedLocation(selectedLocationId) ? {} : { includeChildLocations }),
       }),
       limit: pagination.pageSize,
       offset: (pagination.currentPage - 1) * pagination.pageSize,

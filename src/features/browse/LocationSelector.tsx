@@ -19,7 +19,11 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
-import { LocationHierarchy } from '@/api/locations/types';
+import {
+  LocationHierarchy,
+  UNASSIGNED_LOCATION_ID,
+  isUnassignedLocation,
+} from '@/api/locations/types';
 import { useAuth } from '@/hooks/useAuth';
 import {
   resetSearch,
@@ -66,7 +70,7 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
       // Reset all search filters but preserve both goal and location selections
       dispatch(resetSearch({ preserveGoal: true, preserveLocation: true }));
 
-      // Set the new location ID
+      // Set the new location ID (UNASSIGNED_LOCATION_ID is the sentinel for "no assignment")
       dispatch(setSelectedLocationId(locationId));
     }
   };
@@ -182,28 +186,44 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
   }
 
   return (
-    <Box>
+    <Box data-testid="location-selector">
       <FormControl fullWidth margin="dense" sx={{ mt: 0 }}>
         <InputLabel id="location-selector-label" shrink>
           Location
         </InputLabel>
         <Select
           labelId="location-selector-label"
-          value={selectedLocationId || ''}
+          value={selectedLocationId ?? ''}
           onChange={handleChange}
           label="Location"
           displayEmpty
           renderValue={(value: number | '' | 'create-new-location') => {
-            if (!value || value === 'create-new-location') {
+            if (value === '' || value === 'create-new-location') {
               return 'All locations';
             }
-            const selectedLocation = findLocationInHierarchy(locations, value);
+            if (value === UNASSIGNED_LOCATION_ID) {
+              return 'Unassigned';
+            }
+            const selectedLocation = findLocationInHierarchy(locations, value as number);
             return selectedLocation?.name || 'All locations';
           }}
         >
           <MenuItem value="">
             <em>All locations</em>
           </MenuItem>
+          <MenuItem
+            value={UNASSIGNED_LOCATION_ID}
+            sx={{ p: 1.5 }}
+            data-testid="location-option-unassigned"
+          >
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="body2">Unassigned</Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                Cards you own that aren't in any location
+              </Typography>
+            </Box>
+          </MenuItem>
+          <Divider />
           {renderLocationOptions(locations)}
           {isOwnCollection && <Divider />}
           {isOwnCollection && (
@@ -229,7 +249,7 @@ const LocationSelector = ({ userId }: LocationSelectorProps) => {
           )}
         </Select>
       </FormControl>
-      {selectedLocationId && (
+      {selectedLocationId != null && !isUnassignedLocation(selectedLocationId) && (
         <FormControlLabel
           control={
             <Checkbox checked={includeChildLocations} onChange={handleIncludeChildLocationsChange} size="small" />

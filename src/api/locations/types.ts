@@ -1,3 +1,11 @@
+// Sentinel locationId for "owned cards that have not been placed in any location yet". Kept
+// in sync with the backend constant in src/features/search/cards/utils/locationFilters.ts.
+export const UNASSIGNED_LOCATION_ID = -1;
+
+export function isUnassignedLocation(locationId: number | null | undefined): boolean {
+  return locationId === UNASSIGNED_LOCATION_ID;
+}
+
 export interface Location {
   id: number;
   name: string;

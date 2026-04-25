@@ -1,4 +1,5 @@
 import { CardApiParams } from '@/api/browse/types';
+import { isUnassignedLocation } from '@/api/locations/types';
 import { BrowseSearchParams } from '@/types/browse';
 import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
@@ -146,8 +147,11 @@ export function formatSearchDescription(
     }
   }
 
-  // Add location information if selected
-  if (selectedLocationId) {
+  // Add location information if selected. The unassigned sentinel (-1) is a separate filter
+  // mode — it isn't a real Location row, so the "include sublocations" suffix doesn't apply.
+  if (isUnassignedLocation(selectedLocationId)) {
+    baseDescription += ' not assigned to any location';
+  } else if (selectedLocationId) {
     baseDescription += includeChildLocations ? ' in location (including sublocations)' : ' in location';
   }
 

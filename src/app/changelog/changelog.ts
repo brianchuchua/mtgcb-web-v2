@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-25',
+      version: '1.21.0',
+      changes: [
+        'Added an "Unassigned" option to the Location filter — show cards you own that haven\'t been placed in any location yet.',
+      ],
+      type: 'feature',
+    },
+    {
       date: '2026-04-24',
       version: '1.20.4',
       changes: [
