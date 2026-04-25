@@ -26,6 +26,7 @@
 
 # techdebt documentation (local only)
 /docs/techdebt/
+/docs/reference/
 
 # debug
 npm-debug.log*
