@@ -25,6 +25,33 @@ if (process.env.NODE_ENV === 'production') {
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
+
+    // Drop browser-extension / in-app-browser / malware noise.
+    // Rationale and pattern → issue mapping in
+    // docs/techdebt/sentry-noise-filter-plan.md.
+    beforeSend(event, hint) {
+      const err = hint?.originalException as Error | undefined;
+      const msg = err?.message ?? event.message ?? '';
+      const frames = event.exception?.values?.[0]?.stacktrace?.frames ?? [];
+      const topFrame = frames[frames.length - 1]?.filename ?? '';
+
+      if (/^(chrome-extension|moz-extension|safari-extension|safari-web-extension):/.test(topFrame)) return null;
+      if (/injected\.bundle\.js|injectedScript|content_script/.test(topFrame)) return null;
+
+      if (/ethereum|MetaMask|web3|setExternalProvider/.test(msg)) return null;
+
+      if (/(removeChild|insertBefore).*not a child of this node/.test(msg)) return null;
+      if (/expected a <body> element/.test(msg)) return null;
+
+      if (/runtime\.sendMessage|Tab not found|postEvent.*Method not found/.test(msg)) return null;
+      if (/window\.webkit\.messageHandlers|window\.setDgResult/.test(msg)) return null;
+
+      if (/sevendata\.fun/.test(msg)) return null;
+
+      if (/BodyStreamBuffer was aborted/.test(msg)) return null;
+
+      return event;
+    },
   });
 }
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
