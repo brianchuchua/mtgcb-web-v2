@@ -30,6 +30,7 @@ export const FORMAT_LEGALITY_OPTIONS: FormatLegalityOption[] = [
   { value: 'premodern', label: 'Premodern' },
   { value: 'oldschool', label: 'Old School' },
   { value: 'predh', label: 'PreDH' },
+  { value: 'tlr', label: 'Tiny Leaders: Reborn' },
   { value: 'penny', label: 'Penny Dreadful' },
   { value: 'future', label: 'Future Standard' },
 
