@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-26',
+      version: '1.21.3',
+      changes: ['Added more Secret Lair cards'],
+      type: 'data',
+    },
+    {
+      date: '2026-04-26',
       version: '1.21.2',
       changes: [
         'Improved status message wording and pluralization across the site.',
