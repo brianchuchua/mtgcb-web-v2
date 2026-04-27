@@ -55,6 +55,11 @@ const selectFields: Array<keyof CardModel | string> = [
   'foil',
   'prices',
   'pricesUpdatedAt',
+  'cardKingdomRetail',
+  'cardKingdomFoil',
+  'cardKingdomUrl',
+  'cardKingdomFoilUrl',
+  'cardKingdomPricesUpdatedAt',
   'releasedAt',
   'canBeFoil',
   'canBeNonFoil',
@@ -230,7 +235,27 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
             cardName={card?.name}
             setName={card?.setName}
             tcgplayerId={card?.tcgplayerId || undefined}
-            linkToTCGPlayer={true}
+            // On the detail page we want clicking the image to open a buy-options menu
+            // (not a one-click direct route to TCGPlayer), so the user can pick TCG or
+            // Card Kingdom with equal prominence.
+            showBuyMenuOnClick={true}
+            hideViewCardOption={true}
+            tcgHasRegular={Boolean(
+              priceData?.normal &&
+                (priceData.normal.market != null ||
+                  priceData.normal.low != null ||
+                  priceData.normal.average != null ||
+                  priceData.normal.high != null),
+            )}
+            tcgHasFoil={Boolean(
+              priceData?.foil &&
+                (priceData.foil.market != null ||
+                  priceData.foil.low != null ||
+                  priceData.foil.average != null ||
+                  priceData.foil.high != null),
+            )}
+            cardKingdomUrl={card?.cardKingdomUrl}
+            cardKingdomFoilUrl={card?.cardKingdomFoilUrl}
             maxWidth={{ xs: 400, sm: 500, md: 600 }}
           />
 
@@ -295,6 +320,11 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
               tcgplayerId={card?.tcgplayerId}
               cardName={card?.name}
               pricesUpdatedAt={card?.pricesUpdatedAt}
+              cardKingdomRetail={card?.cardKingdomRetail}
+              cardKingdomFoil={card?.cardKingdomFoil}
+              cardKingdomUrl={card?.cardKingdomUrl}
+              cardKingdomFoilUrl={card?.cardKingdomFoilUrl}
+              cardKingdomPricesUpdatedAt={card?.cardKingdomPricesUpdatedAt}
             />
           </Paper>
 

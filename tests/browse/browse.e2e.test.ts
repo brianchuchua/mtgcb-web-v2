@@ -60,25 +60,25 @@ test.describe('Browse Page', () => {
   test('should have clickable set names that navigate to set details', async ({ page }) => {
     // Wait for sets to load
     await page.waitForSelector('[data-testid="set-item"]');
-    
-    // Get the first set's name
+
+    // Capture the first set's name for the breadcrumb assertion before we navigate.
     const firstSetName = page.getByTestId('set-name').first();
     const setNameText = await firstSetName.textContent();
-    
-    // Extract just the set name without the code for breadcrumb check
     const setNameOnly = setNameText?.replace(/\s*\([A-Z0-9]+\)$/, '') || '';
-    
-    // The set-name testid sits on a <Typography> nested inside a Next.js
-    // <Link>. Under parallel load, clicking the inner element occasionally
-    // races against hydration. Click the actual <a> ancestor and wait for the
-    // navigation in parallel.
-    await firstSetName.scrollIntoViewIfNeeded();
-    const setLink = firstSetName.locator('xpath=ancestor::a[1]');
-    await Promise.all([
-      page.waitForURL(/\/browse\/sets\/[a-z0-9-]+$/, { timeout: 15000 }),
-      setLink.click(),
-    ]);
-    
+
+    // Locate the anchor directly via its href. Next.js Link hydration can still
+    // swallow the first click even after Playwright's actionability check passes
+    // (visible/enabled/stable doesn't imply React's delegated click handler is
+    // wired), so retry until navigation actually happens. The per-attempt budget
+    // is short so a hung click doesn't burn the whole timeout.
+    const setLink = page.locator('a[href^="/browse/sets/"]').first();
+    await setLink.scrollIntoViewIfNeeded();
+    await setLink.waitFor({ state: 'visible' });
+    await expect(async () => {
+      await setLink.click();
+      await page.waitForURL(/\/browse\/sets\/[a-z0-9-]+$/, { timeout: 5000 });
+    }).toPass({ timeout: 30000 });
+
     // Verify the set name appears on the details page (in breadcrumbs - may not include code)
     await expect(page.getByTestId('breadcrumbs')).toContainText(setNameOnly);
   });

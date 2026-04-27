@@ -41,6 +41,15 @@ export interface CardModel {
     } | null;
   };
   pricesUpdatedAt?: string | null;
+  // Card Kingdom buy-link feature (per docs/future-features/CARD_KINGDOM_INTEGRATION_PLAN.md).
+  // Two-slot model mirroring TCG: nonfoil + foil-or-equivalent. Special-treatment Card rows
+  // (Rainbow Foil / Foil Etched / etc.) only have the foil slot populated; the foil column
+  // holds whatever specific treatment that Card row represents.
+  cardKingdomRetail?: string | null;
+  cardKingdomFoil?: string | null;
+  cardKingdomUrl?: string | null;
+  cardKingdomFoilUrl?: string | null;
+  cardKingdomPricesUpdatedAt?: string | null;
   releaseDate: string | null;
   canBeFoil?: boolean;
   canBeNonFoil?: boolean;

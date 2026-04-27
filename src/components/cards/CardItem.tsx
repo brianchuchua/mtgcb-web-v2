@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import AddCardLocationsDialog from './AddCardLocationsDialog';
+import { BuyOptionsMenu } from './BuyOptionsMenu';
 import CardLocationPills from './CardLocationPills';
 import CardPrice from './CardPrice';
 import { EditableCardQuantity } from './EditableCardQuantity';
@@ -51,6 +52,10 @@ export interface CardItemProps {
   high?: string | null;
   market?: string | null;
   foil?: string | null;
+  // Card Kingdom buy-link inputs (optional). When present, the buy menu adds a
+  // "Buy on Card Kingdom" item alongside the existing TCGPlayer item.
+  cardKingdomUrl?: string | null;
+  cardKingdomFoilUrl?: string | null;
   // Collection quantities
   quantityReg?: number;
   quantityFoil?: number;
@@ -99,6 +104,14 @@ export interface CardItemProps {
   isOwnCollection?: boolean;
   goalId?: string;
   imageLinksToTCGPlayer?: boolean; // New prop to enable TCGPlayer link on image
+  /**
+   * If true (and imageLinksToTCGPlayer is false), clicking the image opens a buy-options
+   * menu with TCGPlayer + Card Kingdom entries — used on the card detail page where we
+   * don't want one source to have visual priority.
+   */
+  imageOpensBuyMenu?: boolean;
+  /** Hides the "View Card Page" item on the buy menu (detail-page usage). */
+  hideViewCardOption?: boolean;
   directPriceToTCGPlayer?: boolean; // If true, clicking price goes directly to TCGPlayer (no menu)
   hasLocations?: boolean; // Whether the user has any locations created
 }
@@ -123,6 +136,8 @@ const CardItemComponent = ({
   high,
   market,
   foil,
+  cardKingdomUrl,
+  cardKingdomFoilUrl,
   quantityReg,
   quantityFoil,
   canBeFoil,
@@ -154,14 +169,43 @@ const CardItemComponent = ({
   isOwnCollection = false,
   goalId,
   imageLinksToTCGPlayer = false,
+  imageOpensBuyMenu = false,
+  hideViewCardOption = false,
   directPriceToTCGPlayer = false,
   hasLocations = false,
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
+  const [buyMenuAnchorEl, setBuyMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const buyMenuOpen = Boolean(buyMenuAnchorEl);
   const imageRef = useRef<HTMLImageElement>(null);
   const pathname = usePathname();
+  // Buy-menu mode is mutually exclusive with imageLinksToTCGPlayer; the latter wins to
+  // preserve the legacy direct-link behavior for callers that still want it.
+  const buyMenuActive = imageOpensBuyMenu && !imageLinksToTCGPlayer;
+  const handleImageBuyMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    if (!buyMenuActive) return;
+    event.preventDefault();
+    event.stopPropagation();
+    setBuyMenuAnchorEl(event.currentTarget);
+  };
+  const handleBuyMenuClose = () => setBuyMenuAnchorEl(null);
+  // Per-finish TCG price availability for the BuyOptionsMenu split.
+  const hasNormalTcgPrice = Boolean(
+    prices?.normal &&
+      (prices.normal.market != null ||
+        prices.normal.low != null ||
+        prices.normal.average != null ||
+        prices.normal.high != null),
+  );
+  const hasFoilTcgPrice = Boolean(
+    prices?.foil &&
+      (prices.foil.market != null ||
+        prices.foil.low != null ||
+        prices.foil.average != null ||
+        prices.foil.high != null),
+  );
 
   const handleAddLocation = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -323,6 +367,54 @@ const CardItemComponent = ({
                 loading="lazy"
                 alt={`${name} - Buy on TCGPlayer`}
                 title={`${name} - Buy on TCGPlayer`}
+                setName={setName}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageError(true)}
+                style={{ opacity: imageLoaded ? 1 : 0 }}
+              />
+            ) : (
+              <MissingImageFallback setName={setName}>
+                <Typography variant="subtitle2">{name}</Typography>
+                <Typography variant="caption">Image not available</Typography>
+              </MissingImageFallback>
+            )}
+          </Box>
+        ) : buyMenuActive ? (
+          <Box
+            onClick={handleImageBuyMenuOpen}
+            data-testid="card-image-buy-menu-trigger"
+            sx={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              cursor: 'pointer',
+            }}
+          >
+            {!imageLoaded && !imageError && (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                animation="wave"
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  borderRadius: getBorderRadius(),
+                  backgroundColor: '#22262c',
+                }}
+              />
+            )}
+            {!imageError ? (
+              <CardImage
+                ref={imageRef}
+                src={getImageUrl()}
+                loading="lazy"
+                alt={name}
+                title={name}
                 setName={setName}
                 onLoad={() => setImageLoaded(true)}
                 onError={() => setImageError(true)}
@@ -596,6 +688,9 @@ const CardItemComponent = ({
                 cardName={name}
                 tcgplayerId={tcgplayerId}
                 directToTCGPlayer={directPriceToTCGPlayer}
+                cardKingdomUrl={cardKingdomUrl}
+                cardKingdomFoilUrl={cardKingdomFoilUrl}
+                hideViewCardOption={hideViewCardOption}
               />
             </Box>
           )}
@@ -654,6 +749,21 @@ const CardItemComponent = ({
           totalQuantityFoil={quantityFoil || 0}
           canBeFoil={canBeFoil}
           canBeNonFoil={canBeNonFoil}
+        />
+      )}
+      {buyMenuActive && (
+        <BuyOptionsMenu
+          anchorEl={buyMenuAnchorEl}
+          open={buyMenuOpen}
+          onClose={handleBuyMenuClose}
+          cardId={id}
+          cardName={name}
+          tcgplayerId={tcgplayerId}
+          tcgHasRegular={hasNormalTcgPrice}
+          tcgHasFoil={hasFoilTcgPrice}
+          cardKingdomUrl={cardKingdomUrl}
+          cardKingdomFoilUrl={cardKingdomFoilUrl}
+          hideViewCardOption={hideViewCardOption}
         />
       )}
     </StyledCard>

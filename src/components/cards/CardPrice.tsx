@@ -2,26 +2,17 @@
 
 import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {
   Box,
   IconButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
   Popover,
   Skeleton,
   Typography,
 } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import React, { MouseEvent, useState } from 'react';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
-import { useBrowseUrlContext } from '@/features/browse/BrowseSearchForm/hooks/useBrowseUrlContext';
-import { getCollectionCardUrl } from '@/utils/collectionUrls';
-import { generateCardSlug } from '@/utils/cards/generateCardSlug';
+import { BuyOptionsMenu } from './BuyOptionsMenu';
 
 interface CardPriceProps {
   prices: {
@@ -48,6 +39,15 @@ interface CardPriceProps {
   directToTCGPlayer?: boolean; // If true, clicking price goes directly to TCGPlayer (no menu)
   showInlineFoil?: boolean; // Whether to show foil price inline with regular price (default: true)
   hideFoilSuffix?: boolean; // Whether to hide the "foil" suffix when displaying foil prices (default: false)
+  // Card Kingdom buy-link inputs. When at least one URL is present, the buy menu adds
+  // CK item(s) alongside the existing TCGPlayer item — two items ("Buy Regular" + "Buy Foil")
+  // when both URLs exist, one item otherwise. Falls back to a name-based CK search when
+  // neither URL is set but cardName is.
+  cardKingdomUrl?: string | null;
+  cardKingdomFoilUrl?: string | null;
+  // Hides the "View Card Page" menu item — used on detail pages where the user is
+  // already on the card page and that option would be a no-op.
+  hideViewCardOption?: boolean;
 }
 
 const formatPrice = (price: number): string => {
@@ -78,9 +78,10 @@ const CardPrice: React.FC<CardPriceProps> = ({
   directToTCGPlayer = false,
   showInlineFoil = true,
   hideFoilSuffix = false,
+  cardKingdomUrl = null,
+  cardKingdomFoilUrl = null,
+  hideViewCardOption = false,
 }) => {
-  const router = useRouter();
-  const { isCollectionPage, userId } = useBrowseUrlContext();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -110,25 +111,23 @@ const CardPrice: React.FC<CardPriceProps> = ({
     setMenuAnchorEl(null);
   };
 
-  const handleViewCard = () => {
-    handleMenuClose();
-    if (cardId && cardName) {
-      const cardSlug = generateCardSlug(cardName);
-
-      // Generate context-aware URL (collection vs browse)
-      const cardUrl = isCollectionPage && userId
-        ? getCollectionCardUrl(userId, cardSlug, cardId)
-        : `/browse/cards/${cardSlug}/${cardId}`;
-
-      router.push(cardUrl);
-    }
-  };
-
-  const handleBuyOnTCGPlayer = () => {
-    handleMenuClose();
-    const tcgPlayerUrl = generateTCGPlayerLink(tcgplayerId, cardName || '', isFoil);
-    window.open(tcgPlayerUrl, '_blank', 'noopener,noreferrer');
-  };
+  // Per-finish TCG availability — drives the split "Buy on TCGPlayer (Regular) / (Foil)"
+  // items in the buy menu. Each side is "available" when at least one of its tier prices
+  // (market/low/average/high) is non-null.
+  const hasNormalTcgPrice = Boolean(
+    prices?.normal &&
+      (prices.normal.market != null ||
+        prices.normal.low != null ||
+        prices.normal.average != null ||
+        prices.normal.high != null),
+  );
+  const hasFoilTcgPrice = Boolean(
+    prices?.foil &&
+      (prices.foil.market != null ||
+        prices.foil.low != null ||
+        prices.foil.average != null ||
+        prices.foil.high != null),
+  );
 
   const open = Boolean(anchorEl);
   const menuOpen = Boolean(menuAnchorEl);
@@ -343,34 +342,19 @@ const CardPrice: React.FC<CardPriceProps> = ({
             {formatPrice(foilPrice)}{!hideFoilSuffix && ' foil'}
           </Typography>
         </Box>
-        <Menu
+        <BuyOptionsMenu
           anchorEl={menuAnchorEl}
           open={menuOpen}
           onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-          {cardId && cardName && (
-            <MenuItem onClick={handleViewCard}>
-              <ListItemIcon>
-                <OpenInNewIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>View Card Page</ListItemText>
-            </MenuItem>
-          )}
-          <MenuItem onClick={handleBuyOnTCGPlayer}>
-            <ListItemIcon>
-              <ShoppingCartIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Buy on TCGPlayer</ListItemText>
-          </MenuItem>
-        </Menu>
+          cardId={cardId}
+          cardName={cardName}
+          tcgplayerId={tcgplayerId}
+          tcgHasRegular={hasNormalTcgPrice}
+          tcgHasFoil={hasFoilTcgPrice}
+          cardKingdomUrl={cardKingdomUrl}
+          cardKingdomFoilUrl={cardKingdomFoilUrl}
+          hideViewCardOption={hideViewCardOption}
+        />
       </>
     );
   }
@@ -439,34 +423,19 @@ const CardPrice: React.FC<CardPriceProps> = ({
         >
           {renderPopoverContent()}
         </Popover>
-        <Menu
+        <BuyOptionsMenu
           anchorEl={menuAnchorEl}
           open={menuOpen}
           onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-          {cardId && cardName && (
-            <MenuItem onClick={handleViewCard}>
-              <ListItemIcon>
-                <OpenInNewIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>View Card Page</ListItemText>
-            </MenuItem>
-          )}
-          <MenuItem onClick={handleBuyOnTCGPlayer}>
-            <ListItemIcon>
-              <ShoppingCartIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Buy on TCGPlayer</ListItemText>
-          </MenuItem>
-        </Menu>
+          cardId={cardId}
+          cardName={cardName}
+          tcgplayerId={tcgplayerId}
+          tcgHasRegular={hasNormalTcgPrice}
+          tcgHasFoil={hasFoilTcgPrice}
+          cardKingdomUrl={cardKingdomUrl}
+          cardKingdomFoilUrl={cardKingdomFoilUrl}
+          hideViewCardOption={hideViewCardOption}
+        />
       </>
     );
   }
@@ -534,34 +503,19 @@ const CardPrice: React.FC<CardPriceProps> = ({
         >
           {renderPopoverContent()}
         </Popover>
-        <Menu
+        <BuyOptionsMenu
           anchorEl={menuAnchorEl}
           open={menuOpen}
           onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-          {cardId && cardName && (
-            <MenuItem onClick={handleViewCard}>
-              <ListItemIcon>
-                <OpenInNewIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>View Card Page</ListItemText>
-            </MenuItem>
-          )}
-          <MenuItem onClick={handleBuyOnTCGPlayer}>
-            <ListItemIcon>
-              <ShoppingCartIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Buy on TCGPlayer</ListItemText>
-          </MenuItem>
-        </Menu>
+          cardId={cardId}
+          cardName={cardName}
+          tcgplayerId={tcgplayerId}
+          tcgHasRegular={hasNormalTcgPrice}
+          tcgHasFoil={hasFoilTcgPrice}
+          cardKingdomUrl={cardKingdomUrl}
+          cardKingdomFoilUrl={cardKingdomFoilUrl}
+          hideViewCardOption={hideViewCardOption}
+        />
       </>
     );
   }
@@ -637,34 +591,19 @@ const CardPrice: React.FC<CardPriceProps> = ({
         >
           {renderPopoverContent()}
         </Popover>
-        <Menu
+        <BuyOptionsMenu
           anchorEl={menuAnchorEl}
           open={menuOpen}
           onClose={handleMenuClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}
-        >
-          {cardId && cardName && (
-            <MenuItem onClick={handleViewCard}>
-              <ListItemIcon>
-                <OpenInNewIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>View Card Page</ListItemText>
-            </MenuItem>
-          )}
-          <MenuItem onClick={handleBuyOnTCGPlayer}>
-            <ListItemIcon>
-              <ShoppingCartIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Buy on TCGPlayer</ListItemText>
-          </MenuItem>
-        </Menu>
+          cardId={cardId}
+          cardName={cardName}
+          tcgplayerId={tcgplayerId}
+          tcgHasRegular={hasNormalTcgPrice}
+          tcgHasFoil={hasFoilTcgPrice}
+          cardKingdomUrl={cardKingdomUrl}
+          cardKingdomFoilUrl={cardKingdomFoilUrl}
+          hideViewCardOption={hideViewCardOption}
+        />
       </>
     );
   }

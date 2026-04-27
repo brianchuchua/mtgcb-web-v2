@@ -1,13 +1,38 @@
 import { Box, Paper, Skeleton, Typography } from '@mui/material';
-import React, { useState, useMemo } from 'react';
+import React, { MouseEvent, useState, useMemo } from 'react';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import { BuyOptionsMenu } from './BuyOptionsMenu';
 
 interface CardImageDisplayProps {
   cardId: string;
   cardName?: string;
   setName?: string;
   tcgplayerId?: number | string;
+  /**
+   * If true, the entire card image becomes a direct anchor to TCGPlayer (legacy behavior
+   * — used by callers that want a one-click route to TCG without the buy menu).
+   */
   linkToTCGPlayer?: boolean;
+  /**
+   * If true (and linkToTCGPlayer is false), clicking the image opens a buy-options menu
+   * with TCGPlayer + Card Kingdom entries (the same items the price-link menu shows).
+   * Used on the card detail page where we don't want one source to have visual priority
+   * over the other.
+   */
+  showBuyMenuOnClick?: boolean;
+  /**
+   * If true and `showBuyMenuOnClick` is on, the menu omits the "View Card Page" item
+   * (the user is already on the detail page so it'd be a no-op).
+   */
+  hideViewCardOption?: boolean;
+  /**
+   * Per-finish TCG price availability. When both are true, the menu splits into
+   * "Buy on TCGPlayer (Regular)" + "(Foil)" items; otherwise it shows a single TCG item.
+   */
+  tcgHasRegular?: boolean;
+  tcgHasFoil?: boolean;
+  cardKingdomUrl?: string | null;
+  cardKingdomFoilUrl?: string | null;
   width?: {
     xs?: number | string;
     sm?: number | string;
@@ -31,11 +56,19 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
   setName,
   tcgplayerId,
   linkToTCGPlayer = false,
+  showBuyMenuOnClick = false,
+  hideViewCardOption = false,
+  tcgHasRegular,
+  tcgHasFoil,
+  cardKingdomUrl = null,
+  cardKingdomFoilUrl = null,
   width = { xs: '100%' },
   maxWidth = { xs: 300, sm: 400 },
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const menuOpen = Boolean(menuAnchorEl);
 
   const imageUrl = useMemo(() => {
     if (!cardId) return null;
@@ -49,6 +82,17 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
     if (!linkToTCGPlayer) return null;
     return generateTCGPlayerLink(tcgplayerId, cardName);
   }, [linkToTCGPlayer, tcgplayerId, cardName]);
+
+  // Buy-menu mode is mutually exclusive with linkToTCGPlayer; the latter wins to
+  // preserve legacy behavior for callers that still want a direct TCG anchor.
+  const buyMenuActive = showBuyMenuOnClick && !linkToTCGPlayer;
+
+  const handleImageClick = (event: MouseEvent<HTMLElement>) => {
+    if (!buyMenuActive) return;
+    event.preventDefault();
+    setMenuAnchorEl(event.currentTarget);
+  };
+  const handleMenuClose = () => setMenuAnchorEl(null);
 
   const imageContent = (
     <>
@@ -117,7 +161,7 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
     </>
   );
 
-  return (
+  const containerBox = (
     <Box
       data-testid="card-image-container"
       sx={{
@@ -150,9 +194,48 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
         >
           {imageContent}
         </Box>
+      ) : buyMenuActive ? (
+        <Box
+          onClick={handleImageClick}
+          data-testid="card-image-buy-menu-trigger"
+          sx={{
+            display: 'block',
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            cursor: 'pointer',
+          }}
+        >
+          {imageContent}
+        </Box>
       ) : (
         imageContent
       )}
     </Box>
+  );
+
+  if (!buyMenuActive) {
+    return containerBox;
+  }
+
+  return (
+    <>
+      {containerBox}
+      <BuyOptionsMenu
+        anchorEl={menuAnchorEl}
+        open={menuOpen}
+        onClose={handleMenuClose}
+        cardId={cardId}
+        cardName={cardName}
+        tcgplayerId={tcgplayerId}
+        tcgHasRegular={tcgHasRegular}
+        tcgHasFoil={tcgHasFoil}
+        cardKingdomUrl={cardKingdomUrl}
+        cardKingdomFoilUrl={cardKingdomFoilUrl}
+        hideViewCardOption={hideViewCardOption}
+      />
+    </>
   );
 };

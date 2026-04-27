@@ -1304,6 +1304,8 @@ export const useCardRowRenderer = (
             cardName={card.name}
             tcgplayerId={'tcgplayerId' in card ? card.tcgplayerId : undefined}
             showInlineFoil={!displaySettings.foilPriceIsVisible}
+            cardKingdomUrl={'cardKingdomUrl' in card ? card.cardKingdomUrl : undefined}
+            cardKingdomFoilUrl={'cardKingdomFoilUrl' in card ? card.cardKingdomFoilUrl : undefined}
           />
         </TableCell>,
       );
@@ -1333,6 +1335,8 @@ export const useCardRowRenderer = (
               cardId={card.id}
               cardName={card.name}
               tcgplayerId={'tcgplayerId' in card ? card.tcgplayerId : undefined}
+              cardKingdomUrl={'cardKingdomUrl' in card ? card.cardKingdomUrl : undefined}
+              cardKingdomFoilUrl={'cardKingdomFoilUrl' in card ? card.cardKingdomFoilUrl : undefined}
             />
           ) : (
             <Typography variant="body2" color="text.disabled">

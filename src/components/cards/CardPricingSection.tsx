@@ -2,7 +2,7 @@ import { Box, Link, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import React, { useMemo } from 'react';
 import { CardModel } from '@/api/browse/types';
-import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import { generateCardKingdomLink, generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 
 interface CardPricingSectionProps {
   card: CardModel;
@@ -167,6 +167,101 @@ export const CardPricingSection: React.FC<CardPricingSectionProps> = ({
           >
             <Typography variant="body2" fontWeight="medium">
               Buy on TCGPlayer →
+            </Typography>
+          </Link>
+        </Box>
+      )}
+
+      {/* Card Kingdom prices + buy link. Renders only when at least one CK price is populated.
+          Two-slot model: nonfoil + foil-or-equivalent. For special-treatment Card rows
+          (Rainbow / Surge / Ripple / Galaxy Foil, Foil Etched, etc.), the "Foil" label
+          covers whatever treatment that row represents — same convention TCG uses. */}
+      <CardKingdomPricingRow card={card} compact={compact} />
+    </Box>
+  );
+};
+
+interface CardKingdomPricingRowProps {
+  card: CardModel;
+  compact: boolean;
+}
+
+const CardKingdomPricingRow: React.FC<CardKingdomPricingRowProps> = ({ card, compact }) => {
+  const ckRetail = card.cardKingdomRetail ? parseFloat(card.cardKingdomRetail) : null;
+  const ckFoil = card.cardKingdomFoil ? parseFloat(card.cardKingdomFoil) : null;
+  if (ckRetail === null && ckFoil === null) return null;
+
+  const ckLinkPath = card.cardKingdomUrl ?? card.cardKingdomFoilUrl ?? null;
+
+  return (
+    <Box
+      data-testid="card-kingdom-pricing-row"
+      sx={{
+        mt: compact ? 1 : 2,
+        pt: compact ? 1 : 2,
+        borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+      }}
+    >
+      {!compact && (
+        <Typography
+          variant="h6"
+          sx={{ mb: 1, fontWeight: 500, fontSize: { xs: '1rem', sm: '1.125rem' } }}
+        >
+          Card Kingdom
+        </Typography>
+      )}
+      <Grid container spacing={2}>
+        {ckRetail !== null && (
+          <Grid size={{ xs: 12, sm: compact ? 12 : 6 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              data-testid="card-kingdom-nonfoil-price"
+            >
+              <Typography variant="body2" color="text.secondary">
+                {compact ? 'CK:' : 'Regular:'}
+              </Typography>
+              <Typography variant="body1" fontWeight="medium">
+                ${ckRetail.toFixed(2)}
+              </Typography>
+            </Box>
+          </Grid>
+        )}
+        {ckFoil !== null && (
+          <Grid size={{ xs: 12, sm: compact ? 12 : 6 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              data-testid="card-kingdom-foil-price"
+            >
+              <Typography variant="body2" color="text.secondary">
+                {compact ? 'CK Foil:' : 'Foil:'}
+              </Typography>
+              <Typography variant="body1" fontWeight="medium">
+                ${ckFoil.toFixed(2)}
+              </Typography>
+            </Box>
+          </Grid>
+        )}
+      </Grid>
+      {!compact && (ckLinkPath || card.name) && (
+        <Box sx={{ mt: 2, textAlign: { xs: 'center', sm: 'left' } }}>
+          <Link
+            href={generateCardKingdomLink(ckLinkPath, card.name)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="buy-on-card-kingdom-link"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 1,
+              textDecoration: 'none',
+              color: (theme) => theme.palette.primary.main,
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            }}
+          >
+            <Typography variant="body2" fontWeight="medium">
+              Buy on Card Kingdom →
             </Typography>
           </Link>
         </Box>

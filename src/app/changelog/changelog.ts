@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-26',
+      version: '1.23.0',
+      changes: ['Added support for Card Kingdom'],
+      type: 'feature',
+    },
+    {
+      date: '2026-04-26',
       version: '1.22.0',
       changes: ['Added Tiny Leaders: Reborn to the format legality filter and card detail pages.'],
       type: 'feature',
@@ -26,9 +32,7 @@ const changelogData: ChangelogData = {
     {
       date: '2026-04-26',
       version: '1.21.2',
-      changes: [
-        'Improved status message wording and pluralization across the site.',
-      ],
+      changes: ['Improved status message wording and pluralization across the site.'],
     },
     {
       date: '2026-04-25',
@@ -55,9 +59,7 @@ const changelogData: ChangelogData = {
     {
       date: '2026-04-23',
       version: '1.20.3',
-      changes: [
-        'Fixed goal sort order in specific corner cases when sorting by price.',
-      ],
+      changes: ['Fixed goal sort order in specific corner cases when sorting by price.'],
     },
     {
       date: '2026-04-23',

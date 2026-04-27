@@ -47,6 +47,14 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       'average',
       'high',
       'foil',
+      // Card Kingdom URL fields needed so the buy menu can show regular/foil
+      // options on grid + table views (e.g. /collections/[userId]?contentType=cards).
+      // Prices aren't strictly required here but they're cheap to include and let
+      // future grid features show CK prices without another round-trip.
+      'cardKingdomUrl',
+      'cardKingdomFoilUrl',
+      'cardKingdomRetail',
+      'cardKingdomFoil',
       'collectorNumber',
       'mtgcbCollectorNumber',
       'rarity',

@@ -59,6 +59,11 @@ const selectFields: Array<keyof CardModel | string> = [
   'foil',
   'prices',
   'pricesUpdatedAt',
+  'cardKingdomRetail',
+  'cardKingdomFoil',
+  'cardKingdomUrl',
+  'cardKingdomFoilUrl',
+  'cardKingdomPricesUpdatedAt',
   'releasedAt',
   'canBeFoil',
   'canBeNonFoil',
@@ -268,6 +273,8 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
             collectorNumber={card?.collectorNumber}
             rarity={card?.rarity}
             prices={priceData || undefined}
+            cardKingdomUrl={card?.cardKingdomUrl}
+            cardKingdomFoilUrl={card?.cardKingdomFoilUrl}
             quantityReg={card?.quantityReg}
             quantityFoil={card?.quantityFoil}
             canBeFoil={card?.canBeFoil}
@@ -275,8 +282,13 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
             locations={card?.locations}
             isOwnCollection={isOwnCollection}
             priceType={priceType}
-            imageLinksToTCGPlayer={true}
-            directPriceToTCGPlayer={true}
+            // Detail page: image and price both open the buy-options menu (no direct TCG link).
+            // hideViewCardOption suppresses the "View Card Page" item since the user is
+            // already on the detail page.
+            imageLinksToTCGPlayer={false}
+            imageOpensBuyMenu={true}
+            directPriceToTCGPlayer={false}
+            hideViewCardOption={true}
             display={{
               nameIsVisible: true,
               setIsVisible: true,
@@ -320,6 +332,11 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
               tcgplayerId={card?.tcgplayerId}
               cardName={card?.name}
               pricesUpdatedAt={card?.pricesUpdatedAt}
+              cardKingdomRetail={card?.cardKingdomRetail}
+              cardKingdomFoil={card?.cardKingdomFoil}
+              cardKingdomUrl={card?.cardKingdomUrl}
+              cardKingdomFoilUrl={card?.cardKingdomFoilUrl}
+              cardKingdomPricesUpdatedAt={card?.cardKingdomPricesUpdatedAt}
             />
           </Paper>
 

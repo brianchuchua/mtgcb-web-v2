@@ -1,4 +1,17 @@
-import { expect, test } from '@playwright/test';
+import { expect, Locator, Page, test } from '@playwright/test';
+
+const CARD_URL_PATTERN = /\/browse\/cards\/[a-z0-9-]+\/[a-f0-9-]+$/;
+
+// Next.js Link hydration can swallow the first Playwright click even after the
+// actionability check passes — the inner DOM is visible/stable before React's
+// delegated click handler is wired. Retry the click until navigation happens,
+// with a short per-attempt budget so a hung click doesn't burn the whole timeout.
+async function clickAndWaitForCardDetails(page: Page, locator: Locator): Promise<void> {
+  await expect(async () => {
+    await locator.click();
+    await page.waitForURL(CARD_URL_PATTERN, { timeout: 5000 });
+  }).toPass({ timeout: 30000 });
+}
 
 test.describe('Card Details Page', () => {
   test.describe('Basic Rendering', () => {
@@ -19,10 +32,7 @@ test.describe('Card Details Page', () => {
       const firstCardItem = page.getByTestId('card-item').first();
 
       // Click on the card to navigate to details
-      await firstCardItem.click();
-
-      // Wait for navigation to complete
-      await page.waitForURL(/\/browse\/cards\/[a-z0-9-]+\/[a-f0-9-]+$/);
+      await clickAndWaitForCardDetails(page, firstCardItem);
       await page.waitForLoadState('networkidle');
 
       // Verify card image container is visible
@@ -44,8 +54,7 @@ test.describe('Card Details Page', () => {
       const expectedCardName = await cardNameElement.textContent();
 
       // Navigate to details page
-      await firstCardItem.click();
-      await page.waitForURL(/\/browse\/cards\/[a-z0-9-]+\/[a-f0-9-]+$/);
+      await clickAndWaitForCardDetails(page, firstCardItem);
       await page.waitForLoadState('networkidle');
 
       // Verify card name is displayed on the details page
@@ -60,9 +69,7 @@ test.describe('Card Details Page', () => {
     test('should display set information on card details page', async ({ page }) => {
       // Navigate to a card details page
       const firstCardItem = page.getByTestId('card-item').first();
-      await firstCardItem.click();
-
-      await page.waitForURL(/\/browse\/cards\/[a-z0-9-]+\/[a-f0-9-]+$/);
+      await clickAndWaitForCardDetails(page, firstCardItem);
       await page.waitForLoadState('networkidle');
 
       // Verify set name is displayed and clickable
@@ -82,8 +89,7 @@ test.describe('Card Details Page', () => {
     test('should display breadcrumbs with correct navigation path', async ({ page }) => {
       // Navigate to a card details page
       const firstCardItem = page.getByTestId('card-item').first();
-      await firstCardItem.click();
-      await page.waitForURL(/\/browse\/cards\/[a-z0-9-]+\/[a-f0-9-]+$/);
+      await clickAndWaitForCardDetails(page, firstCardItem);
       await page.waitForLoadState('networkidle');
 
       // Verify breadcrumbs are displayed
@@ -99,9 +105,7 @@ test.describe('Card Details Page', () => {
     test('should load all basic card details elements', async ({ page }) => {
       // Navigate to a card details page
       const firstCardItem = page.getByTestId('card-item').first();
-      await firstCardItem.click();
-
-      await page.waitForURL(/\/browse\/cards\/[a-z0-9-]+\/[a-f0-9-]+$/);
+      await clickAndWaitForCardDetails(page, firstCardItem);
       await page.waitForLoadState('networkidle');
 
       // Verify all basic elements are present

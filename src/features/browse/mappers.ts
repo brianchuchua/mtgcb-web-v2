@@ -45,6 +45,11 @@ export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
         : null,
     },
     tcgplayerId: card.tcgplayerId !== null ? card.tcgplayerId : undefined,
+    // Card Kingdom URL fields — required for the price-link buy menu in grid + table
+    // contexts to show the split "(Regular) / (Foil)" options. Without these the
+    // CardPrice → BuyOptionsMenu flow only sees the name-search fallback.
+    cardKingdomUrl: card.cardKingdomUrl ?? null,
+    cardKingdomFoilUrl: card.cardKingdomFoilUrl ?? null,
     releaseDate: card.releaseDate,
     // Include quantity fields if present
     quantityReg: card.quantityReg,
