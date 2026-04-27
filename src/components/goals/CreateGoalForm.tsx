@@ -105,7 +105,7 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
 
       const response = await createGoal(request).unwrap();
 
-      enqueueSnackbar('Goal created successfully!', { variant: 'success' });
+      enqueueSnackbar('Goal created', { variant: 'success' });
       if (response.data) {
         onSuccess(response.data);
       }

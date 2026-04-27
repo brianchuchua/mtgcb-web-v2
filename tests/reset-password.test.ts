@@ -83,7 +83,7 @@ test.describe('Reset Password Page', () => {
       ]);
 
       // Check for success message in snackbar before redirect
-      await expect(page.getByText('Your password has been successfully reset! Go ahead and log in.')).toBeVisible();
+      await expect(page.getByText('Your password has been reset. Go ahead and log in.')).toBeVisible();
     });
 
     test('should handle API error response', async ({ page }) => {

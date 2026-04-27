@@ -71,7 +71,7 @@ export default function CreateLocationForm() {
       };
 
       await createLocation(cleanedData).unwrap();
-      enqueueSnackbar('Location created successfully', { variant: 'success' });
+      enqueueSnackbar('Location created', { variant: 'success' });
       router.push('/locations');
     } catch (error: any) {
       const message = error?.data?.error?.message || 'Failed to create location';

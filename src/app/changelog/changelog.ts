@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-26',
+      version: '1.21.2',
+      changes: [
+        'Improved status message wording and pluralization across the site.',
+      ],
+    },
+    {
       date: '2026-04-25',
       version: '1.21.1',
       changes: ['Added missing surge foils for Final Fantasy Commander Variants'],

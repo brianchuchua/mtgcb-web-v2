@@ -23,6 +23,7 @@ import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
 import { resetSearch, clearSelectedGoal, clearSelectedLocation, selectIncludeSubsetsInSets } from '@/redux/slices/browse';
+import pluralize from '@/utils/pluralize';
 import { useCardSearchParams } from '@/hooks/useBrowseSearchParams';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
@@ -230,7 +231,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
         )}
 
         <Typography variant="body1" color="text.secondary">
-          {set?.cardCount ? `${set.cardCount} cards` : 'N/A'}
+          {set?.cardCount ? `${set.cardCount} ${pluralize(set.cardCount, 'card')}` : 'N/A'}
         </Typography>
 
         {set && costToCompleteData?.data && (

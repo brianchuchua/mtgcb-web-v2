@@ -19,6 +19,7 @@ import React, { useCallback, useState } from 'react';
 import SetIcon from '@/components/sets/SetIcon';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
+import pluralize from '@/utils/pluralize';
 
 interface ParentDropdownProps {
   parentSet: any;
@@ -159,7 +160,7 @@ const ParentDropdown: React.FC<ParentDropdownProps> = ({ parentSet, currentPath,
                 <br />
                 <Typography variant="caption" color="text.secondary" noWrap component="span">
                   {parentSet.releasedAt && formatISODate(parentSet.releasedAt)} •{' '}
-                  {parentSet.cardCount ? `${parentSet.cardCount} cards` : 'N/A'}
+                  {parentSet.cardCount ? `${parentSet.cardCount} ${pluralize(parentSet.cardCount, 'card')}` : 'N/A'}
                 </Typography>
               </>
             }

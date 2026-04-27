@@ -20,6 +20,7 @@ import capitalize from '@/utils/capitalize';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
 import { formatISODate } from '@/utils/dateUtils';
 import { formatPrice } from '@/utils/formatters';
+import pluralize from '@/utils/pluralize';
 
 interface CollectionSetItemRendererProps {
   set: Set;
@@ -251,7 +252,7 @@ const CollectionCardCount: React.FC<{
   // Fallback to regular card count for non-collection views
   return (
     <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center', mt: 0.5 }}>
-      {cardCount ? `${cardCount} cards` : 'N/A'}
+      {cardCount ? `${cardCount} ${pluralize(Number(cardCount), 'card')}` : 'N/A'}
     </Typography>
   );
 };
@@ -274,7 +275,7 @@ const CollectionInfoSection: React.FC<{
       {progressBarStyle === 'linear' ? (
         <>
           <Typography variant="caption" color="text.secondary">
-            ({collectionData.totalCardsCollectedInSet} total cards)
+            ({collectionData.totalCardsCollectedInSet} total {pluralize(collectionData.totalCardsCollectedInSet, 'card')})
           </Typography>
           <Box sx={{ mt: 1, mb: 1 }}>
             <CollectionProgressBar 
@@ -287,7 +288,7 @@ const CollectionInfoSection: React.FC<{
         </>
       ) : (
         <Typography variant="caption" color="text.secondary">
-          ({percentage}% collected, {collectionData.totalCardsCollectedInSet} total cards)
+          ({percentage}% collected, {collectionData.totalCardsCollectedInSet} total {pluralize(collectionData.totalCardsCollectedInSet, 'card')})
         </Typography>
       )}
       {!hideValue && (

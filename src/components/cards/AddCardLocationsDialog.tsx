@@ -186,7 +186,7 @@ export default function AddCardLocationsDialog({
           quantityReg: quantityReg,
           quantityFoil: quantityFoil,
         }).unwrap();
-        enqueueSnackbar('Location quantities updated successfully', { variant: 'success' });
+        enqueueSnackbar('Location quantities updated', { variant: 'success' });
       } else {
         await associateCardLocation({
           cardId,
@@ -194,7 +194,7 @@ export default function AddCardLocationsDialog({
           quantityReg: quantityReg,
           quantityFoil: quantityFoil,
         }).unwrap();
-        enqueueSnackbar('Card added to location successfully', { variant: 'success' });
+        enqueueSnackbar('Card added to location', { variant: 'success' });
       }
       handleClose();
     } catch (error: any) {

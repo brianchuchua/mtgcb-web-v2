@@ -127,7 +127,7 @@ export default function EditLocationForm({ location, onDeleteStart }: EditLocati
       }
 
       await updateLocation({ id: location.id, data: updates }).unwrap();
-      enqueueSnackbar('Location updated successfully', { variant: 'success' });
+      enqueueSnackbar('Location updated', { variant: 'success' });
       router.push('/locations');
     } catch (error: any) {
       const message = error?.data?.error?.message || 'Failed to update location';

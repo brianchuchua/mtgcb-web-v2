@@ -24,7 +24,7 @@ export function useDeleteLocation(options?: UseDeleteLocationOptions) {
 
     try {
       await deleteLocation(locationToDelete.id).unwrap();
-      enqueueSnackbar('Location deleted successfully', { variant: 'success' });
+      enqueueSnackbar('Location deleted', { variant: 'success' });
       options?.onSuccess?.();
     } catch (error) {
       enqueueSnackbar('Failed to delete location', { variant: 'error' });

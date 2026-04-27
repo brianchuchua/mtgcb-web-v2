@@ -60,7 +60,7 @@ export const PatreonSection = () => {
     try {
       const result = await disconnectPatreon().unwrap();
       if (result.success) {
-        enqueueSnackbar('Patreon account disconnected successfully', { variant: 'success' });
+        enqueueSnackbar('Patreon account disconnected', { variant: 'success' });
         setDisconnectDialogOpen(false);
       } else {
         throw new Error(result.error?.message || 'Failed to disconnect');
@@ -77,7 +77,7 @@ export const PatreonSection = () => {
       if (!result.success) {
         throw new Error(result.error?.message || 'Failed to update setting');
       }
-      enqueueSnackbar('Supporter display setting updated successfully', { variant: 'success' });
+      enqueueSnackbar('Supporter display setting updated', { variant: 'success' });
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to update supporter display setting';
       enqueueSnackbar(message, { variant: 'error' });
@@ -154,7 +154,7 @@ export const PatreonSection = () => {
         throw new Error(result.error?.message || 'Failed to save custom card');
       }
 
-      enqueueSnackbar('Custom card saved successfully!', { variant: 'success' });
+      enqueueSnackbar('Custom card saved', { variant: 'success' });
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to save custom card';
       enqueueSnackbar(message, { variant: 'error' });
@@ -175,7 +175,7 @@ export const PatreonSection = () => {
       setSelectedCard(null);
       setCardSearchInput('');
       setSelectedColor('white');
-      enqueueSnackbar('Custom card deleted successfully!', { variant: 'success' });
+      enqueueSnackbar('Custom card deleted', { variant: 'success' });
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to delete custom card';
       enqueueSnackbar(message, { variant: 'error' });

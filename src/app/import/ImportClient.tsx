@@ -541,7 +541,7 @@ export const ImportClient: React.FC = () => {
                           </>
                         )
                       ) : importResult.failedRows === 0 ? (
-                        <>Successfully imported all {importResult.totalRows} rows</>
+                        <>Imported all {importResult.totalRows} rows</>
                       ) : importResult.partialSuccess ? (
                         <>
                           Partially successful: {importResult.successfulRows} of {importResult.totalRows} rows imported

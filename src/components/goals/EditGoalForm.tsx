@@ -158,7 +158,7 @@ export function EditGoalForm({ goal, userId, onClose, onSuccess, onDeleteStart }
         body: request,
       }).unwrap();
 
-      enqueueSnackbar('Goal updated successfully!', { variant: 'success' });
+      enqueueSnackbar('Goal updated', { variant: 'success' });
       onSuccess(goal);
     } catch (error: any) {
       enqueueSnackbar(error?.data?.error?.message || 'Failed to update goal', { variant: 'error' });

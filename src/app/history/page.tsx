@@ -19,6 +19,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCollectionCardUrl, getCollectionSetUrl, getCollectionUrl } from '@/utils/collectionUrls';
+import pluralize from '@/utils/pluralize';
 import { useRouter } from 'next/navigation';
 
 const ITEMS_PER_PAGE = 5;
@@ -190,13 +191,14 @@ const formatBulkOperationSummary = (entry: HistoryEntry, userId: number) => {
     }
 
     // Build rarity text (only for mass-update and mass-entry, not location operations)
-    let rarityText = 'cards';
+    const cardWord = pluralize(bulkSummary.cardsAffected ?? 0, 'card');
+    let rarityText = cardWord;
     if (bulkSummary.rarity && operationType !== 'location-mass-update') {
       rarityText = bulkSummary.rarity === 'all'
-        ? 'cards'
+        ? cardWord
         : bulkSummary.rarity === 'mythic'
-          ? 'mythic cards'
-          : `${bulkSummary.rarity} cards`;
+          ? `mythic ${cardWord}`
+          : `${bulkSummary.rarity} ${cardWord}`;
     }
 
     // Build quantity text
@@ -221,7 +223,7 @@ const formatBulkOperationSummary = (entry: HistoryEntry, userId: number) => {
         if (location) {
           return (
             <Typography variant="body2" component="span">
-              Removed {bulkSummary.cardsAffected} cards from{' '}
+              Removed {bulkSummary.cardsAffected} {cardWord} from{' '}
               <Link
                 href={`${getCollectionUrl({ userId, contentType: 'cards' })}&locationId=${location.id}`}
                 style={{ color: 'inherit', textDecoration: 'underline' }}
@@ -233,7 +235,7 @@ const formatBulkOperationSummary = (entry: HistoryEntry, userId: number) => {
         } else {
           return (
             <Typography variant="body2" component="span">
-              Removed {bulkSummary.cardsAffected} cards from all locations
+              Removed {bulkSummary.cardsAffected} {cardWord} from all locations
             </Typography>
           );
         }
@@ -246,7 +248,7 @@ const formatBulkOperationSummary = (entry: HistoryEntry, userId: number) => {
           const preposition = action === 'Removed' ? 'from' : 'to';
           return (
             <Typography variant="body2" component="span">
-              {action} {quantityText} {preposition} {bulkSummary.cardsAffected} cards in{' '}
+              {action} {quantityText} {preposition} {bulkSummary.cardsAffected} {cardWord} in{' '}
               <Link
                 href={`${getCollectionUrl({ userId, contentType: 'cards' })}&locationId=${location.id}`}
                 style={{ color: 'inherit', textDecoration: 'underline' }}
@@ -260,7 +262,7 @@ const formatBulkOperationSummary = (entry: HistoryEntry, userId: number) => {
         // For set mode
         return (
           <Typography variant="body2" component="span">
-            {action} {bulkSummary.cardsAffected} cards in{' '}
+            {action} {bulkSummary.cardsAffected} {cardWord} in{' '}
             <Link
               href={`${getCollectionUrl({ userId, contentType: 'cards' })}&locationId=${location.id}`}
               style={{ color: 'inherit', textDecoration: 'underline' }}
@@ -409,7 +411,7 @@ const HistoryEntryItem = ({ entry, userId }: { entry: HistoryEntry; userId: numb
           {/* Keep bullet format for import only */}
           {entry.bulkSummary && entry.operationType === 'import' && (
             <Typography variant="body2" component="span">
-              • {entry.bulkSummary.cardsAffected} cards
+              • {entry.bulkSummary.cardsAffected} {pluralize(entry.bulkSummary.cardsAffected ?? 0, 'card')}
             </Typography>
           )}
         </Box>

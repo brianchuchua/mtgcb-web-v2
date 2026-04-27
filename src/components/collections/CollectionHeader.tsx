@@ -6,6 +6,7 @@ import { CollectionProgressBar } from './CollectionProgressBar';
 import SetIcon from '@/components/sets/SetIcon';
 import TCGPlayerGoalMassImportButton from '@/components/tcgplayer/TCGPlayerGoalMassImportButton';
 import { getCollectionSetUrl, getCollectionUrl } from '@/utils/collectionUrls';
+import pluralize from '@/utils/pluralize';
 
 interface CollectionHeaderProps {
   username: string;
@@ -272,7 +273,7 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
       </Typography>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-        ({totalCardsCollected} total cards collected)
+        ({totalCardsCollected} total {pluralize(totalCardsCollected, 'card')} collected)
       </Typography>
 
       {!hideValue && (

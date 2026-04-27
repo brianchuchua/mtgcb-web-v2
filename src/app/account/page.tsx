@@ -112,7 +112,7 @@ function ProfileContent() {
 
     if (patreonStatus === 'linked') {
       setHasHandledOAuthCallback(true);
-      enqueueSnackbar('Patreon account linked successfully!', { variant: 'success' });
+      enqueueSnackbar('Patreon account linked', { variant: 'success' });
       router.replace('/account');
     } else if (error) {
       setHasHandledOAuthCallback(true);
@@ -149,7 +149,7 @@ function ProfileContent() {
         return;
       }
 
-      enqueueSnackbar('Profile updated successfully', { variant: 'success' });
+      enqueueSnackbar('Profile updated', { variant: 'success' });
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to update profile';
       enqueueSnackbar(message, { variant: 'error' });
@@ -167,7 +167,7 @@ function ProfileContent() {
       }
 
       resetPassword();
-      enqueueSnackbar('Password updated successfully', { variant: 'success' });
+      enqueueSnackbar('Password updated', { variant: 'success' });
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to update password';
       enqueueSnackbar(message, { variant: 'error' });
@@ -183,7 +183,7 @@ function ProfileContent() {
         throw new Error(result.error?.message);
       }
 
-      enqueueSnackbar('Privacy settings updated successfully', { variant: 'success' });
+      enqueueSnackbar('Privacy settings updated', { variant: 'success' });
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to update privacy settings';
       enqueueSnackbar(message, { variant: 'error' });
@@ -201,7 +201,7 @@ function ProfileContent() {
         throw new Error(result.error?.message);
       }
 
-      enqueueSnackbar('Collection value visibility updated successfully', { variant: 'success' });
+      enqueueSnackbar('Collection value visibility updated', { variant: 'success' });
     } catch (error: any) {
       const message = error.data?.error?.message || 'Failed to update collection value visibility';
       enqueueSnackbar(message, { variant: 'error' });
@@ -445,13 +445,14 @@ function ProfileContent() {
               Choose your preferred draft cube variant. This determines how many uncommons are needed for draft cubes and affects cost calculations.
             </Typography>
             <Select
+              data-testid="draft-cube-variant-select"
               value={user?.draftCubeVariant || 'standard'}
               onChange={async (e) => {
                 const variant = e.target.value as 'standard' | 'two-uncommon';
                 try {
                   const result = await updateUser({ draftCubeVariant: variant }).unwrap();
                   if (result.success) {
-                    enqueueSnackbar('Draft cube variant updated successfully', { variant: 'success' });
+                    enqueueSnackbar('Draft cube variant updated', { variant: 'success' });
                   }
                 } catch (error: any) {
                   const message = error.data?.error?.message || 'Failed to update draft cube variant';

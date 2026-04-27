@@ -24,7 +24,7 @@ export function useDeleteGoal(userId: number, options?: UseDeleteGoalOptions) {
 
     try {
       await deleteGoal({ userId, goalId: goalToDelete.id }).unwrap();
-      enqueueSnackbar('Goal deleted successfully', { variant: 'success' });
+      enqueueSnackbar('Goal deleted', { variant: 'success' });
       options?.onSuccess?.();
     } catch (error) {
       enqueueSnackbar('Failed to delete goal', { variant: 'error' });

@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
       }).unwrap();
 
       if (result.success) {
-        enqueueSnackbar('Your password has been successfully reset! Go ahead and log in.', {
+        enqueueSnackbar('Your password has been reset. Go ahead and log in.', {
           variant: 'success',
         });
         router.push('/login');

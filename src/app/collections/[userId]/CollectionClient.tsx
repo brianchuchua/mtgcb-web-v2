@@ -28,6 +28,7 @@ import { useCollectionBrowseController } from '@/features/collections/useCollect
 import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { useAuth } from '@/hooks/useAuth';
 import { selectIncludeSubsetsInSets, selectSelectedGoalId } from '@/redux/slices/browse';
+import pluralize from '@/utils/pluralize';
 
 interface CollectionClientProps {
   userId: number;
@@ -138,16 +139,18 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
 
           if (updatedCards === 0 && totalSkipped) {
             const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
-            enqueueSnackbar(`${totalSkippedCount} card${totalSkippedCount !== 1 ? 's' : ''} skipped due to foil constraints`, {
+            enqueueSnackbar(`${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`, {
               variant: 'error',
             });
-          } else if (updatedCards > 0) {
-            let message = `Successfully updated ${updatedCards} card${updatedCards !== 1 ? 's' : ''}`;
+          } else if (updatedCards === 0) {
+            enqueueSnackbar('No cards needed updating', { variant: 'info' });
+          } else {
+            let message = `Updated ${updatedCards} ${pluralize(updatedCards, 'card')}`;
 
             if (totalSkipped) {
               const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
               if (totalSkippedCount > 0) {
-                message += `. ${totalSkippedCount} card${totalSkippedCount !== 1 ? 's' : ''} skipped due to foil constraints`;
+                message += `. ${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`;
                 enqueueSnackbar(message, { variant: 'warning', autoHideDuration: 6000 });
               } else {
                 enqueueSnackbar(message, { variant: 'success' });
@@ -239,13 +242,13 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
 
             // Match the single card dialog success messages
             if (formData.mode === 'remove') {
-              message = 'Locations cleared successfully';
+              message = 'Locations cleared';
             } else if (formData.mode === 'set' && operations.created > operations.updated) {
-              message = 'Cards added to location successfully';
+              message = 'Cards added to location';
             } else if (formData.mode === 'increment' || operations.updated > operations.created) {
-              message = 'Location quantities updated successfully';
+              message = 'Location quantities updated';
             } else {
-              message = `Successfully updated ${successful} card${successful !== 1 ? 's' : ''}`;
+              message = `Updated ${successful} ${pluralize(successful, 'card')}`;
             }
 
             // Count unique cards that had quantities capped

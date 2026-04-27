@@ -58,7 +58,7 @@ export const ResetCollectionClient = () => {
       const result = await nukeCollection().unwrap();
 
       if (result.success && result.data) {
-        enqueueSnackbar(`Successfully deleted ${result.data.deletedCount} collection entries`, { variant: 'success' });
+        enqueueSnackbar(`Deleted ${result.data.deletedCount} collection ${result.data.deletedCount === 1 ? 'entry' : 'entries'}`, { variant: 'success' });
         handleClose();
         router.push('/');
       } else {

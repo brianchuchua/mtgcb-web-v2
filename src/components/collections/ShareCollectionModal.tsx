@@ -184,7 +184,7 @@ export const ShareCollectionModal = ({
       ).unwrap();
       
       if (result.success && result.data) {
-        enqueueSnackbar('Share link generated successfully!', { variant: 'success' });
+        enqueueSnackbar('Share link generated', { variant: 'success' });
         setShowShareLinkForm(false);
         // Auto copy the new link
         if (result.data.shareUrl) {

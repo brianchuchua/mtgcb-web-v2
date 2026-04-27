@@ -14,6 +14,7 @@ import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
 import { formatPrice } from '@/utils/formatters';
+import pluralize from '@/utils/pluralize';
 
 const SetItemRenderer: React.FC<SetItemRendererProps> = ({
   set,
@@ -236,7 +237,7 @@ const SetCardCount: React.FC<SetCardCountProps> = ({
       sx={{ textAlign: 'center', mt: 0.5 }}
       data-testid="set-card-count"
     >
-      {cardCount ? `${cardCount} cards` : 'N/A'}
+      {cardCount ? `${cardCount} ${pluralize(Number(cardCount), 'card')}` : 'N/A'}
     </Typography>
   );
 };

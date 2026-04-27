@@ -12,6 +12,7 @@ import { useIndependentBrowseController } from '@/features/browse/useIndependent
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import capitalize from '@/utils/capitalize';
 import { formatISODate } from '@/utils/dateUtils';
+import pluralize from '@/utils/pluralize';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
@@ -154,7 +155,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {subset.releasedAt && formatISODate(subset.releasedAt)} •{' '}
-              {subset.cardCount ? `${subset.cardCount} cards` : 'N/A'}
+              {subset.cardCount ? `${subset.cardCount} ${pluralize(subset.cardCount, 'card')}` : 'N/A'}
             </Typography>
           </Box>
           {isActive ? <ExpandLessIcon color="primary" /> : <ExpandMoreIcon color="primary" />}
@@ -206,7 +207,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
                   </Typography>
 
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                    ({subsetWithCollectionData.totalCardsCollectedInSet || 0} total cards collected)
+                    ({subsetWithCollectionData.totalCardsCollectedInSet || 0} total {pluralize(subsetWithCollectionData.totalCardsCollectedInSet || 0, 'card')} collected)
                   </Typography>
 
                   <Typography variant="h6" color="text.secondary" sx={{}}>
@@ -273,7 +274,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
               )}
               
               <Typography variant="body1" color="text.secondary">
-                {subset.cardCount ? `${subset.cardCount} cards` : 'N/A'}
+                {subset.cardCount ? `${subset.cardCount} ${pluralize(subset.cardCount, 'card')}` : 'N/A'}
               </Typography>
             </Box>
           )}

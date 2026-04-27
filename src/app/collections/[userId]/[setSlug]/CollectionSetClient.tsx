@@ -59,6 +59,7 @@ import { useCardSearchParams } from '@/hooks/useBrowseSearchParams';
 import capitalize from '@/utils/capitalize';
 import { getCollectionUrl } from '@/utils/collectionUrls';
 import { formatISODate } from '@/utils/dateUtils';
+import pluralize from '@/utils/pluralize';
 
 // Allow time for CSS animation to complete before scrolling
 const SUBSET_EXPANSION_DELAY_MS = 100;
@@ -272,9 +273,11 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             variant: 'warning',
             autoHideDuration: 6000, // Display for 6 seconds
           });
+        } else if (updatedCount === 0) {
+          enqueueSnackbar(`No cards needed updating in ${set.name}`, { variant: 'info' });
         } else {
           // Normal case: Some or all cards were updated
-          let message = `Successfully updated ${updatedCount} cards in ${set.name}`;
+          let message = `Updated ${updatedCount} ${pluralize(updatedCount, 'card')} in ${set.name}`;
 
           // Add information about skipped cards if any
           if (totalSkipped && (totalSkipped.cannotBeFoil > 0 || totalSkipped.cannotBeNonFoil > 0)) {
@@ -397,13 +400,13 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
             // Match the single card dialog success messages
             if (formData.mode === 'remove') {
-              message = 'Locations cleared successfully';
+              message = 'Locations cleared';
             } else if (formData.mode === 'set' && operations.created > operations.updated) {
-              message = 'Cards added to location successfully';
+              message = 'Cards added to location';
             } else if (formData.mode === 'increment' || operations.updated > operations.created) {
-              message = 'Location quantities updated successfully';
+              message = 'Location quantities updated';
             } else {
-              message = `Successfully updated ${successful} card${successful !== 1 ? 's' : ''}`;
+              message = `Updated ${successful} ${pluralize(successful, 'card')}`;
             }
 
             // Count unique cards that had quantities capped
@@ -521,16 +524,18 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
           if (updatedCards === 0 && totalSkipped) {
             const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
-            enqueueSnackbar(`${totalSkippedCount} card${totalSkippedCount !== 1 ? 's' : ''} skipped due to foil constraints`, {
+            enqueueSnackbar(`${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`, {
               variant: 'error',
             });
-          } else if (updatedCards > 0) {
-            let message = `Successfully updated ${updatedCards} card${updatedCards !== 1 ? 's' : ''}`;
+          } else if (updatedCards === 0) {
+            enqueueSnackbar('No cards needed updating', { variant: 'info' });
+          } else {
+            let message = `Updated ${updatedCards} ${pluralize(updatedCards, 'card')}`;
 
             if (totalSkipped) {
               const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
               if (totalSkippedCount > 0) {
-                message += `. ${totalSkippedCount} card${totalSkippedCount !== 1 ? 's' : ''} skipped due to foil constraints`;
+                message += `. ${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`;
                 enqueueSnackbar(message, { variant: 'warning', autoHideDuration: 6000 });
               } else {
                 enqueueSnackbar(message, { variant: 'success' });
@@ -750,7 +755,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               </Typography>
 
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                ({set.totalCardsCollectedInSet || 0} total cards collected
+                ({set.totalCardsCollectedInSet || 0} total {pluralize(set.totalCardsCollectedInSet || 0, 'card')} collected
                 {includeSubsetsInSets && set.cardCountIncludingSubsets ? ' including subsets' : ''})
               </Typography>
 

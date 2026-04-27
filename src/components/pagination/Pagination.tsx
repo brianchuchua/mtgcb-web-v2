@@ -458,6 +458,20 @@ export interface PaginationProps {
 
 Pagination.displayName = 'Pagination';
 
+// customItemName is always passed in plural form (e.g. "locations", "goals").
+// Strip a trailing "s" when count is 1 so we say "1 location" not "1 locations".
+const pluralizeItemLabel = (
+  count: number,
+  contentType: 'cards' | 'sets',
+  customItemName?: string,
+): string => {
+  if (customItemName) {
+    return count === 1 && customItemName.endsWith('s') ? customItemName.slice(0, -1) : customItemName;
+  }
+  if (contentType === 'cards') return count === 1 ? 'card' : 'cards';
+  return count === 1 ? 'set' : 'sets';
+};
+
 interface ItemRangeDisplayProps {
   startItem: number;
   endItem: number;
@@ -486,7 +500,7 @@ const ItemRangeDisplay: React.FC<ItemRangeDisplayProps> = ({
           whiteSpace: 'nowrap',
         }}
       >
-        {startItem}-{endItem} of {totalItems} {customItemName || (contentType === 'cards' ? 'cards' : 'sets')}
+        {startItem}-{endItem} of {totalItems} {pluralizeItemLabel(totalItems, contentType, customItemName)}
       </Typography>
     );
   }
@@ -494,7 +508,7 @@ const ItemRangeDisplay: React.FC<ItemRangeDisplayProps> = ({
   return (
     <ItemRangeInfo data-testid="page-info">
       <Typography variant="body1" color="text.secondary">
-        Showing {startItem}-{endItem} of {totalItems} {customItemName || (contentType === 'cards' ? 'cards' : 'sets')}
+        Showing {startItem}-{endItem} of {totalItems} {pluralizeItemLabel(totalItems, contentType, customItemName)}
       </Typography>
     </ItemRangeInfo>
   );

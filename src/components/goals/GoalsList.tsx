@@ -27,6 +27,7 @@ import { useDeleteGoal } from '@/hooks/goals/useDeleteGoal';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate } from '@/utils/dateUtils';
 import { getCollectionUrl } from '@/utils/collectionUrls';
+import pluralize from '@/utils/pluralize';
 
 interface GoalsListProps {
   goals: Goal[];
@@ -161,7 +162,7 @@ export function GoalsList({ goals, userId, hydratingGoalId }: GoalsListProps) {
                               <CircularProgress size={12} thickness={5} />
                             )}
                             <Typography variant="caption" color="text.primary" fontWeight="medium">
-                              {goal.progress.collectedCards} / {goal.progress.totalCards} cards
+                              {goal.progress.collectedCards} / {goal.progress.totalCards} {pluralize(goal.progress.totalCards, 'card')}
                             </Typography>
                           </Box>
                         </Box>

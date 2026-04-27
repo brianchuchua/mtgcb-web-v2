@@ -34,6 +34,7 @@ import { useGetHomeStatisticsQuery } from '@/api/statistics/statisticsApi';
 import { HomeStatisticsData } from '@/api/statistics/types';
 import { useDisplaySettings } from '@/contexts/DisplaySettingsContext';
 import { useAuth } from '@/hooks/useAuth';
+import pluralize from '@/utils/pluralize';
 
 export default function AuthenticatedHomePageClient() {
   const router = useRouter();
@@ -651,7 +652,7 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {stats.quickWins.closestSetByCost.cardsOwned} / {stats.quickWins.closestSetByCost.totalCards}{' '}
-                      cards
+                      {pluralize(stats.quickWins.closestSetByCost.totalCards, 'card')}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -720,7 +721,8 @@ const QuickWinsSection: React.FC<QuickWinsSectionProps> = ({ stats, router, isMo
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {stats.quickWins.secondClosestSetByCost.cardsOwned} /{' '}
-                      {stats.quickWins.secondClosestSetByCost.totalCards} cards
+                      {stats.quickWins.secondClosestSetByCost.totalCards}{' '}
+                      {pluralize(stats.quickWins.secondClosestSetByCost.totalCards, 'card')}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

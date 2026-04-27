@@ -121,7 +121,7 @@ export const ShareLinkManager = () => {
       ).unwrap();
       
       if (result.success && result.data) {
-        enqueueSnackbar('Share link generated successfully!', { variant: 'success' });
+        enqueueSnackbar('Share link generated', { variant: 'success' });
         // Auto copy the new link
         if (result.data.shareUrl) {
           const absoluteUrl = getAbsoluteShareUrl(result.data.shareUrl);
@@ -147,7 +147,7 @@ export const ShareLinkManager = () => {
       ).unwrap();
       
       if (result.success) {
-        enqueueSnackbar('Share link regenerated successfully!', { variant: 'success' });
+        enqueueSnackbar('Share link regenerated', { variant: 'success' });
       }
     } catch (err) {
       enqueueSnackbar('Failed to regenerate share link', { variant: 'error' });
@@ -160,7 +160,7 @@ export const ShareLinkManager = () => {
       const result = await revokeShareLink().unwrap();
       
       if (result.success) {
-        enqueueSnackbar('Share link revoked successfully', { variant: 'success' });
+        enqueueSnackbar('Share link revoked', { variant: 'success' });
       }
     } catch (err) {
       enqueueSnackbar('Failed to revoke share link', { variant: 'error' });

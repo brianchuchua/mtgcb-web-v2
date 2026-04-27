@@ -68,11 +68,16 @@ test.describe('Browse Page', () => {
     // Extract just the set name without the code for breadcrumb check
     const setNameOnly = setNameText?.replace(/\s*\([A-Z0-9]+\)$/, '') || '';
     
-    // Click on the set name
-    await firstSetName.click();
-    
-    // Verify navigation to set details page
-    await expect(page).toHaveURL(/\/browse\/sets\/[a-z0-9-]+$/);
+    // The set-name testid sits on a <Typography> nested inside a Next.js
+    // <Link>. Under parallel load, clicking the inner element occasionally
+    // races against hydration. Click the actual <a> ancestor and wait for the
+    // navigation in parallel.
+    await firstSetName.scrollIntoViewIfNeeded();
+    const setLink = firstSetName.locator('xpath=ancestor::a[1]');
+    await Promise.all([
+      page.waitForURL(/\/browse\/sets\/[a-z0-9-]+$/, { timeout: 15000 }),
+      setLink.click(),
+    ]);
     
     // Verify the set name appears on the details page (in breadcrumbs - may not include code)
     await expect(page.getByTestId('breadcrumbs')).toContainText(setNameOnly);
