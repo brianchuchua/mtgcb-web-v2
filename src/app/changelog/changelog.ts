@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-28',
+      version: '1.24.1',
+      changes: ['Auto-reload the website if a user visits it right as a new version is deploying'],
+    },
+    {
+      date: '2026-04-28',
       version: '1.24.0',
       changes: ['Added notification for when new website update is available'],
       type: 'feature',

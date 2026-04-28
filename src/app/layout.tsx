@@ -42,6 +42,12 @@ export default function RootLayout({
         <link href="//cdn.jsdelivr.net/npm/mana-font@latest/css/mana.css" rel="stylesheet" type="text/css" />
         <link href="//cdn.jsdelivr.net/npm/keyrune@latest/css/keyrune.css" rel="stylesheet" type="text/css" />
         <meta name="apple-mobile-web-app-title" content="MTG CB" />
+        <script
+          id="chunk-load-recovery"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var KEY='mtgcb:chunk-reload',COOLDOWN=60000,P=/Loading chunk \\d+ failed|Failed to load chunk|ChunkLoadError|Loading CSS chunk \\d+ failed|Failed to fetch dynamically imported module|module factory is not available/i;function isErr(v){if(!v)return false;if(typeof v==='object'){if(v.name==='ChunkLoadError')return true;if(typeof v.message==='string'&&P.test(v.message))return true;}if(typeof v==='string'&&P.test(v))return true;return false;}function recent(){try{var l=window.sessionStorage.getItem(KEY);return!!l&&Date.now()-Number(l)<COOLDOWN;}catch(e){return false;}}function go(){if(recent())return;try{window.sessionStorage.setItem(KEY,String(Date.now()));}catch(e){}window.location.reload();}window.addEventListener('error',function(e){if(e&&e.target&&e.target.tagName==='SCRIPT'){var s=e.target.src||'';if(/\\/_next\\/static\\/chunks\\//.test(s)){go();return;}}if(isErr(e.error||e.message))go();},true);window.addEventListener('unhandledrejection',function(e){if(isErr(e.reason))go();});})();`,
+          }}
+        />
       </head>
       <body className={roboto.variable}>
         <AppRouterCacheProvider>
