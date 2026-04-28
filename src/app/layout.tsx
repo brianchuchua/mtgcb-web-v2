@@ -7,6 +7,8 @@ import { Roboto } from 'next/font/google';
 import { ReactNode } from 'react';
 import ClientLayout from './ClientLayout';
 import Dashboard from '@/components/layout/Dashboard';
+import ChunkLoadErrorRecovery from '@/components/providers/ChunkLoadErrorRecovery';
+import NewVersionAvailable from '@/components/providers/NewVersionAvailable';
 import SnackbarProvider from '@/components/providers/NotistackProvider';
 import ReCaptchaProvider from '@/components/providers/ReCaptchaProvider';
 import { TCGPlayerProvider } from '@/context/TCGPlayerContext';
@@ -49,6 +51,8 @@ export default function RootLayout({
               <ClientLayout>
                 <ReCaptchaProvider>
                   <SnackbarProvider>
+                    <ChunkLoadErrorRecovery />
+                    <NewVersionAvailable />
                     <TCGPlayerProvider>
                       <SessionMessagesProvider>
                         <Dashboard>{children}</Dashboard>

@@ -1,12 +1,23 @@
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 
+const BUILD_SHA =
+  process.env.RENDER_GIT_COMMIT ||
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  process.env.SOURCE_VERSION ||
+  process.env.GIT_SHA ||
+  '';
+
 const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
   },
   compiler: {
     emotion: true,
+  },
+  ...(BUILD_SHA ? { deploymentId: BUILD_SHA } : {}),
+  env: {
+    NEXT_PUBLIC_BUILD_SHA: BUILD_SHA,
   },
 };
 

@@ -50,6 +50,15 @@ if (process.env.NODE_ENV === 'production') {
 
       if (/BodyStreamBuffer was aborted/.test(msg)) return null;
 
+      // Stale-deploy chunk-load errors. ChunkLoadErrorRecovery auto-reloads
+      // the page when these fire, so Sentry has no useful signal here.
+      if (
+        /Loading chunk \d+ failed|Failed to load chunk|ChunkLoadError|Loading CSS chunk \d+ failed|Failed to fetch dynamically imported module|module factory is not available/i.test(
+          msg,
+        )
+      )
+        return null;
+
       return event;
     },
   });

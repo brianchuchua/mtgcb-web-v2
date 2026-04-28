@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-04-28',
+      version: '1.24.0',
+      changes: ['Added notification for when new website update is available'],
+      type: 'feature',
+    },
+    {
       date: '2026-04-26',
       version: '1.23.0',
       changes: ['Added support for Card Kingdom'],
