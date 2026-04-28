@@ -59,6 +59,12 @@ if (process.env.NODE_ENV === 'production') {
       )
         return null;
 
+      // reCAPTCHA v3 script-load timeouts. The provider is mounted at the
+      // root layout so the Google script loads on every page, but only auth
+      // pages (login/signup/forgot-*) ever call executeRecaptcha. Timeouts
+      // on non-auth pages don't block any user action — pure background noise.
+      if (/reCAPTCHA Timeout|Verification timed out/i.test(msg)) return null;
+
       return event;
     },
   });
