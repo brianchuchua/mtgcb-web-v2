@@ -4,7 +4,7 @@ import { useSnackbar } from 'notistack';
 import { useEffect } from 'react';
 
 const RELOAD_FLAG_KEY = 'mtgcb:chunk-reload';
-const RELOAD_COOLDOWN_MS = 60_000;
+const RELOAD_COOLDOWN_MS = 5_000;
 const RELOAD_DELAY_MS = 1500;
 
 const CHUNK_ERROR_PATTERN =
