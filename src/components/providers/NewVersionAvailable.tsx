@@ -6,8 +6,8 @@ import IconButton from '@mui/material/IconButton';
 import { SnackbarKey, useSnackbar } from 'notistack';
 import { useEffect, useRef } from 'react';
 
-const POLL_INTERVAL_MS = 60_000;
-const INITIAL_DELAY_MS = 5_000;
+const POLL_INTERVAL_MS = 300_000;
+const INITIAL_DELAY_MS = 30_000;
 const VERSION_ENDPOINT = '/api/version';
 
 export default function NewVersionAvailable() {
