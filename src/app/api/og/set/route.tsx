@@ -18,16 +18,12 @@ interface SetData {
   isPrivate?: boolean;
 }
 
-async function fetchSetData(
-  userId: string,
-  setSlug: string,
-  shareToken?: string
-): Promise<SetData | null> {
+async function fetchSetData(userId: number, setSlug: string, shareToken?: string): Promise<SetData | null> {
   try {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
-    
+
     if (shareToken) {
       headers['X-Share-Token'] = shareToken;
     }
@@ -38,7 +34,7 @@ async function fetchSetData(
       method: 'POST',
       headers,
       body: JSON.stringify({
-        userId: parseInt(userId),
+        userId,
         slug: setSlug,
         limit: 1,
         priceType: 'market',
@@ -65,7 +61,7 @@ async function fetchSetData(
     }
 
     const data = await response.json();
-    
+
     if (data?.success && data?.data?.sets?.length > 0) {
       const set = data.data.sets[0];
       return {
@@ -81,7 +77,7 @@ async function fetchSetData(
         isPrivate: false,
       };
     }
-    
+
     return null;
   } catch (error) {
     return null;
@@ -94,13 +90,18 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId');
     const setSlug = searchParams.get('setSlug');
     const shareToken = searchParams.get('shareToken');
-    
+
     if (!userId || !setSlug) {
       return new Response('Missing userId or setSlug', { status: 400 });
     }
 
-    const setData = await fetchSetData(userId, setSlug, shareToken || undefined);
-    
+    const numericUserId = parseInt(userId, 10);
+    if (!Number.isInteger(numericUserId) || numericUserId < 1) {
+      return new Response('Invalid userId', { status: 400 });
+    }
+
+    const setData = await fetchSetData(numericUserId, setSlug, shareToken || undefined);
+
     // Default values
     const isPrivate = setData?.isPrivate ?? false;
     const setName = setData?.setName || 'Set';
@@ -138,7 +139,7 @@ export async function GET(request: NextRequest) {
               pointerEvents: 'none',
             }}
           />
-          
+
           {isPrivate ? (
             // Private Collection View
             <div
@@ -196,7 +197,7 @@ export async function GET(request: NextRequest) {
                   </div>
                 </div>
               </div>
-              
+
               {/* Private message */}
               <div
                 style={{
@@ -217,13 +218,7 @@ export async function GET(request: NextRequest) {
                     border: '2px solid rgba(255, 255, 255, 0.1)',
                   }}
                 >
-                  <svg
-                    width="80"
-                    height="80"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    style={{ marginBottom: 30 }}
-                  >
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" style={{ marginBottom: 30 }}>
                     <path
                       d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V7c0-2.757-2.243-5-5-5zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm4 10.723V19a1 1 0 11-2 0v-1.277a2 2 0 112 0z"
                       fill="#666666"
@@ -326,7 +321,7 @@ export async function GET(request: NextRequest) {
                 >
                   Set Completion
                 </div>
-                
+
                 {/* Progress Bar */}
                 <div
                   style={{
@@ -486,7 +481,7 @@ export async function GET(request: NextRequest) {
       {
         width: 1200,
         height: 630,
-      }
+      },
     );
   } catch (error) {
     return new Response('Failed to generate image', { status: 500 });

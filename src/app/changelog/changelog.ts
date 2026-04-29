@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-28',
+      version: '1.24.3',
+      changes: [
+        'Fixed an error that could occur when visiting a collection URL with an invalid user ID.',
+      ],
+    },
+    {
+      date: '2026-04-28',
       version: '1.24.2',
       changes: [
         'Fixed an error that could occur when importing large or messy collection CSVs, and made imports faster.',

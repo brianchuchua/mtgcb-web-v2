@@ -22,7 +22,7 @@ interface CardData {
   isPrivate?: boolean;
 }
 
-async function fetchCardData(userId: string, cardId: string, shareToken?: string): Promise<CardData | null> {
+async function fetchCardData(userId: number, cardId: string, shareToken?: string): Promise<CardData | null> {
   try {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ async function fetchCardData(userId: string, cardId: string, shareToken?: string
     const apiUrl = `${MTGCB_API_BASE_URL}/cards/search`;
 
     const requestBody = {
-      userId: parseInt(userId),
+      userId,
       id: cardId,
       limit: 1,
       offset: 0,
@@ -113,7 +113,12 @@ export async function GET(request: NextRequest) {
       return new Response('Missing userId or cardId', { status: 400 });
     }
 
-    const cardData = await fetchCardData(userId, cardId, shareToken || undefined);
+    const numericUserId = parseInt(userId, 10);
+    if (!Number.isInteger(numericUserId) || numericUserId < 1) {
+      return new Response('Invalid userId', { status: 400 });
+    }
+
+    const cardData = await fetchCardData(numericUserId, cardId, shareToken || undefined);
 
     // Default values
     const isPrivate = cardData?.isPrivate ?? false;

@@ -71,7 +71,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ use
   const { userId: userIdParam } = await params;
   const userId = parseInt(userIdParam, 10);
 
-  if (isNaN(userId)) {
+  if (!Number.isInteger(userId) || userId < 1) {
     return <div>Invalid user ID</div>;
   }
 

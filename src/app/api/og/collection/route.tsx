@@ -15,12 +15,12 @@ interface CollectionSummary {
   isPrivate?: boolean;
 }
 
-async function fetchCollectionData(userId: string, shareToken?: string): Promise<CollectionSummary | null> {
+async function fetchCollectionData(userId: number, shareToken?: string): Promise<CollectionSummary | null> {
   try {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
-    
+
     if (shareToken) {
       headers['X-Share-Token'] = shareToken;
     }
@@ -31,7 +31,7 @@ async function fetchCollectionData(userId: string, shareToken?: string): Promise
       method: 'POST',
       headers,
       body: JSON.stringify({
-        userId: parseInt(userId),
+        userId,
         limit: 1,
         offset: 0,
         priceType: 'market',
@@ -57,7 +57,7 @@ async function fetchCollectionData(userId: string, shareToken?: string): Promise
     }
 
     const data = await response.json();
-    
+
     if (data?.success && data?.data) {
       return {
         username: data.data.username || 'User',
@@ -69,7 +69,7 @@ async function fetchCollectionData(userId: string, shareToken?: string): Promise
         isPrivate: false,
       };
     }
-    
+
     return null;
   } catch (error) {
     return null;
@@ -81,23 +81,28 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const shareToken = searchParams.get('shareToken');
-    
+
     if (!userId) {
       return new Response('Missing userId', { status: 400 });
     }
 
-    const collectionData = await fetchCollectionData(userId, shareToken || undefined);
-    
+    const numericUserId = parseInt(userId, 10);
+    if (!Number.isInteger(numericUserId) || numericUserId < 1) {
+      return new Response('Invalid userId', { status: 400 });
+    }
+
+    const collectionData = await fetchCollectionData(numericUserId, shareToken || undefined);
+
     // If we couldn't fetch data at all (network error, API down, etc.), show a generic message
     if (!collectionData) {
       // Default to showing as if it's a public collection with no data yet
       // This prevents showing "private" when the API is just unreachable
     }
-    
+
     const isPrivate = collectionData?.isPrivate ?? false; // Default to public if we can't determine
     const username = collectionData?.username || 'User';
     const uniquePrintingsCollected = collectionData?.uniquePrintingsCollected || 0;
-    const numberOfCardsInMagic = collectionData?.numberOfCardsInMagic || 1;  // Avoid division by zero
+    const numberOfCardsInMagic = collectionData?.numberOfCardsInMagic || 1; // Avoid division by zero
     const percentageCollected = collectionData?.percentageCollected || 0;
     const totalCardsCollected = collectionData?.totalCardsCollected || 0;
 
@@ -127,7 +132,7 @@ export async function GET(request: NextRequest) {
               pointerEvents: 'none',
             }}
           />
-          
+
           {isPrivate ? (
             // Private Collection View
             <div
@@ -185,7 +190,7 @@ export async function GET(request: NextRequest) {
                   </div>
                 </div>
               </div>
-              
+
               {/* Private message */}
               <div
                 style={{
@@ -206,13 +211,7 @@ export async function GET(request: NextRequest) {
                     border: '2px solid rgba(255, 255, 255, 0.1)',
                   }}
                 >
-                  <svg
-                    width="80"
-                    height="80"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    style={{ marginBottom: 30 }}
-                  >
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" style={{ marginBottom: 30 }}>
                     <path
                       d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V7c0-2.757-2.243-5-5-5zM9 7c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm4 10.723V19a1 1 0 11-2 0v-1.277a2 2 0 112 0z"
                       fill="#666666"
@@ -315,7 +314,7 @@ export async function GET(request: NextRequest) {
                 >
                   Collection Progress
                 </div>
-                
+
                 {/* Progress Bar */}
                 <div
                   style={{
@@ -475,7 +474,7 @@ export async function GET(request: NextRequest) {
       {
         width: 1200,
         height: 630,
-      }
+      },
     );
   } catch (error) {
     return new Response('Failed to generate image', { status: 500 });

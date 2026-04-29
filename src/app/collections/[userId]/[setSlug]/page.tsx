@@ -10,10 +10,7 @@ interface CollectionSetPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export async function generateMetadata({
-  params,
-  searchParams,
-}: CollectionSetPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: CollectionSetPageProps): Promise<Metadata> {
   const { userId, setSlug } = await params;
   const resolvedSearchParams = await searchParams;
   const shareToken = resolvedSearchParams.shareToken as string | undefined;
@@ -37,7 +34,7 @@ export async function generateMetadata({
     ogImageUrl = imageUrl.toString();
   }
 
-  const title = `${setSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} - MTG Collection Builder`;
+  const title = `${setSlug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())} - MTG Collection Builder`;
   const description = `View collection details for this Magic: The Gathering set`;
 
   return {
@@ -70,8 +67,8 @@ export async function generateMetadata({
 export default async function CollectionSetPage({ params }: CollectionSetPageProps) {
   const { userId: userIdParam, setSlug } = await params;
   const userId = parseInt(userIdParam, 10);
-  
-  if (isNaN(userId)) {
+
+  if (!Number.isInteger(userId) || userId < 1) {
     return <div>Invalid user ID</div>;
   }
 

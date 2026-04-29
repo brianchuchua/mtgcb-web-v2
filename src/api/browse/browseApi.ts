@@ -3,14 +3,15 @@ import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 import { Set, SetsSearchResult } from '@/types/sets';
 import { filterCollectionParams } from '@/utils/collectionContextFilter';
+import { stripInvalidUserId } from '@/utils/sanitizeUserId';
 
 export const browseApi = mtgcbApi.injectEndpoints({
   endpoints: (builder) => ({
     // TODO: Switch usage of this to getCards
     searchCards: builder.mutation<ApiResponse<CardSearchData>, CardApiParams>({
       query: (body) => {
-        // Filter out collection-specific params if userId is not present (safety net)
-        const safeBody = filterCollectionParams(body, Boolean(body.userId), 'cards');
+        const cleaned = stripInvalidUserId(body);
+        const safeBody = filterCollectionParams(cleaned, Boolean(cleaned.userId), 'cards');
         return {
           url: '/cards/search',
           method: 'POST',
@@ -22,8 +23,8 @@ export const browseApi = mtgcbApi.injectEndpoints({
 
     getCards: builder.query<ApiResponse<CardSearchData>, CardApiParams>({
       query: (params) => {
-        // Filter out collection-specific params if userId is not present (safety net)
-        const safeParams = filterCollectionParams(params, Boolean(params.userId), 'cards');
+        const cleaned = stripInvalidUserId(params);
+        const safeParams = filterCollectionParams(cleaned, Boolean(cleaned.userId), 'cards');
         return {
           url: '/cards/search',
           method: 'POST',
@@ -52,8 +53,8 @@ export const browseApi = mtgcbApi.injectEndpoints({
 
     getSets: builder.query<ApiResponse<SetsSearchResult>, SetApiParams>({
       query: (params) => {
-        // Filter out collection-specific params if userId is not present (safety net)
-        const safeParams = filterCollectionParams(params, Boolean(params.userId), 'sets');
+        const cleaned = stripInvalidUserId(params);
+        const safeParams = filterCollectionParams(cleaned, Boolean(cleaned.userId), 'sets');
         return {
           url: '/sets/search',
           method: 'POST',

@@ -1,10 +1,11 @@
 import { usePathname } from 'next/navigation';
 import { useSessionStorage } from '@/hooks/useSessionStorage';
+import { isValidUserId } from '@/utils/sanitizeUserId';
 
 export const useBrowseUrlContext = () => {
   const pathname = usePathname();
   const isSharedPage = pathname?.startsWith('/shared/') || false;
-  
+
   // Use sessionStorage hook to automatically get userId when it's available
   // Note: We store as string in sessionStorage but parse it here
   const [sharedUserIdStr] = useSessionStorage<string | null>('mtgcb_share_user', null);
@@ -21,22 +22,22 @@ export const useBrowseUrlContext = () => {
   const isCollectionPage = pathname?.startsWith('/collections/') || isSharedPage;
 
   // Check if we're on a collection-specific set page (including shared)
-  const isCollectionSetPage = 
+  const isCollectionSetPage =
     (pathname?.includes('/collections/') && pathname?.split('/').length > 3 && !pathname?.includes('/cards/')) ||
     (pathname?.includes('/shared/') && pathname?.split('/').length > 3 && !pathname?.includes('/cards/'));
 
   const getUserIdFromPath = (): number | null => {
     // For shared pages, use the userId from sessionStorage
     if (isSharedPage) {
-      return !isNaN(sharedUserId || NaN) ? sharedUserId : null;
+      return isValidUserId(sharedUserId) ? sharedUserId : null;
     }
-    
+
     // For regular collection pages
     if (!pathname?.startsWith('/collections/')) return null;
     const parts = pathname.split('/');
     if (parts.length >= 3) {
       const userId = parseInt(parts[2], 10);
-      return isNaN(userId) ? null : userId;
+      return isValidUserId(userId) ? userId : null;
     }
     return null;
   };

@@ -12,10 +12,7 @@ interface CollectionCardPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export async function generateMetadata({
-  params,
-  searchParams,
-}: CollectionCardPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: CollectionCardPageProps): Promise<Metadata> {
   const { userId, cardId, cardSlug } = await params;
   const resolvedSearchParams = await searchParams;
   const shareToken = resolvedSearchParams.shareToken as string | undefined;
@@ -39,7 +36,7 @@ export async function generateMetadata({
     ogImageUrl = imageUrl.toString();
   }
 
-  const title = `${cardSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} - MTG Collection Builder`;
+  const title = `${cardSlug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())} - MTG Collection Builder`;
   const description = `View collection details for this Magic: The Gathering card`;
 
   return {
@@ -71,17 +68,11 @@ export async function generateMetadata({
 
 export default async function CollectionCardPage({ params }: CollectionCardPageProps) {
   const { userId, cardId, cardSlug } = await params;
-  
+
   const numericUserId = parseInt(userId, 10);
-  if (isNaN(numericUserId)) {
+  if (!Number.isInteger(numericUserId) || numericUserId < 1) {
     redirect('/');
   }
 
-  return (
-    <CollectionCardClient 
-      userId={numericUserId} 
-      cardId={cardId} 
-      cardSlug={cardSlug} 
-    />
-  );
+  return <CollectionCardClient userId={numericUserId} cardId={cardId} cardSlug={cardSlug} />;
 }

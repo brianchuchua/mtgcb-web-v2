@@ -17,7 +17,7 @@ interface GoalData {
   isPrivate?: boolean;
 }
 
-async function fetchGoalData(userId: string, goalId: string, shareToken?: string): Promise<GoalData | null> {
+async function fetchGoalData(userId: number, goalId: number, shareToken?: string): Promise<GoalData | null> {
   try {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
@@ -31,14 +31,13 @@ async function fetchGoalData(userId: string, goalId: string, shareToken?: string
     const apiUrl = `${MTGCB_API_BASE_URL}/cards/search`;
 
     const requestBody = {
-      userId: parseInt(userId),
-      goalId: parseInt(goalId),
+      userId,
+      goalId,
       showGoalProgress: true,
       limit: 1,
       offset: 0,
       priceType: 'market',
     };
-
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -72,7 +71,6 @@ async function fetchGoalData(userId: string, goalId: string, shareToken?: string
       const goalSummary = data.data.goalSummary;
       const username = data.data.username || 'User';
 
-
       if (goalSummary) {
         const result = {
           goalName: goalSummary.goalName || 'Unknown Goal',
@@ -102,12 +100,20 @@ export async function GET(request: NextRequest) {
     const goalId = searchParams.get('goalId');
     const shareToken = searchParams.get('shareToken');
 
-
     if (!userId || !goalId) {
       return new Response('Missing userId or goalId', { status: 400 });
     }
 
-    const goalData = await fetchGoalData(userId, goalId, shareToken || undefined);
+    const numericUserId = parseInt(userId, 10);
+    const numericGoalId = parseInt(goalId, 10);
+    if (!Number.isInteger(numericUserId) || numericUserId < 1) {
+      return new Response('Invalid userId', { status: 400 });
+    }
+    if (!Number.isInteger(numericGoalId) || numericGoalId < 1) {
+      return new Response('Invalid goalId', { status: 400 });
+    }
+
+    const goalData = await fetchGoalData(numericUserId, numericGoalId, shareToken || undefined);
 
     // Default values
     const isPrivate = goalData?.isPrivate ?? false;
