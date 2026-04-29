@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-28',
+      version: '1.24.2',
+      changes: [
+        'Fixed an error that could occur when importing large or messy collection CSVs, and made imports faster.',
+      ],
+    },
+    {
+      date: '2026-04-28',
       version: '1.24.1',
       changes: ['Auto-reload the website if a user visits it right as a new version is deploying'],
     },
