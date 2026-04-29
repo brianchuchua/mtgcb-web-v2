@@ -13,15 +13,20 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-29',
+      version: '1.24.5',
+      changes: [
+        'Improved how the site updates to a new version for users currently using an older version, along with users who hit the website within a 10 second window, right as it transitions from an older build to a newer build.',
+      ],
+    },
+    {
+      date: '2026-04-29',
       version: '1.24.4',
       changes: ['Stability fixes for rare corner cases.'],
     },
     {
       date: '2026-04-28',
       version: '1.24.3',
-      changes: [
-        'Fixed an error that could occur when visiting a collection URL with an invalid user ID.',
-      ],
+      changes: ['Fixed an error that could occur when visiting a collection URL with an invalid user ID.'],
     },
     {
       date: '2026-04-28',

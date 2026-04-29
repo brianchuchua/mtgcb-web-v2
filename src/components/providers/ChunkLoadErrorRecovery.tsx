@@ -1,11 +1,17 @@
 'use client';
 
-import { useSnackbar } from 'notistack';
 import { useEffect } from 'react';
 
-const RELOAD_FLAG_KEY = 'mtgcb:chunk-reload';
-const RELOAD_COOLDOWN_MS = 5_000;
-const RELOAD_DELAY_MS = 1500;
+const STATE_KEY = 'mtgcb:chunk-recovery';
+const SCHEDULED_FLAG = '__mtgcbChunkScheduled';
+const MAX_ATTEMPTS = 4;
+const SCHEDULES = [0, 3000, 10000, 30000];
+
+declare global {
+  interface Window {
+    __mtgcbChunkScheduled?: boolean;
+  }
+}
 
 const CHUNK_ERROR_PATTERN =
   /Loading chunk \d+ failed|Failed to load chunk|ChunkLoadError|Loading CSS chunk \d+ failed|Failed to fetch dynamically imported module|module factory is not available/i;
@@ -21,39 +27,39 @@ function isChunkLoadError(value: unknown): boolean {
   return false;
 }
 
-function recentlyReloaded(): boolean {
+function readState(): { attempts: number } {
   try {
-    const last = window.sessionStorage.getItem(RELOAD_FLAG_KEY);
-    if (!last) return false;
-    return Date.now() - Number(last) < RELOAD_COOLDOWN_MS;
+    const raw = window.sessionStorage.getItem(STATE_KEY);
+    if (!raw) return { attempts: 0 };
+    const parsed = JSON.parse(raw);
+    return { attempts: parsed.attempts || 0 };
   } catch {
-    return false;
+    return { attempts: 0 };
   }
 }
 
-function markReload(): void {
+function writeState(state: { attempts: number }): void {
   try {
-    window.sessionStorage.setItem(RELOAD_FLAG_KEY, String(Date.now()));
-  } catch {
-    // sessionStorage unavailable — recovery proceeds without loop guard
-  }
+    window.sessionStorage.setItem(STATE_KEY, JSON.stringify(state));
+  } catch {}
 }
 
 export default function ChunkLoadErrorRecovery() {
-  const { enqueueSnackbar } = useSnackbar();
-
   useEffect(() => {
-    let recovering = false;
-
     const triggerRecovery = () => {
-      if (recovering || recentlyReloaded()) return;
-      recovering = true;
-      markReload();
-      enqueueSnackbar('A new version is available. Reloading...', {
-        variant: 'info',
-        autoHideDuration: RELOAD_DELAY_MS,
-      });
-      window.setTimeout(() => window.location.reload(), RELOAD_DELAY_MS);
+      if (window[SCHEDULED_FLAG]) return;
+      const state = readState();
+      if (state.attempts >= MAX_ATTEMPTS) return;
+      const delay = SCHEDULES[state.attempts] ?? SCHEDULES[SCHEDULES.length - 1];
+      state.attempts += 1;
+      writeState(state);
+      window[SCHEDULED_FLAG] = true;
+      window.setTimeout(() => {
+        try {
+          window.sessionStorage.setItem('mtgcb:chunk-our-reload', '1');
+        } catch {}
+        window.location.reload();
+      }, delay);
     };
 
     const handleError = (event: ErrorEvent) => {
@@ -71,7 +77,7 @@ export default function ChunkLoadErrorRecovery() {
       window.removeEventListener('error', handleError);
       window.removeEventListener('unhandledrejection', handleRejection);
     };
-  }, [enqueueSnackbar]);
+  }, []);
 
   return null;
 }
