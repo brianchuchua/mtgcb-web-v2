@@ -165,7 +165,7 @@ const VirtualizedRowGallery = <T,>({
           data={rows}
           itemContent={rowContent}
           increaseViewportBy={600}
-          computeItemKey={(index) => rows[index].id}
+          computeItemKey={(index) => rows[index]?.id ?? index}
           // Add proper spacing between rows that Virtuoso can measure
           components={{
             Item: ({ children, item, context, ...props }) => (

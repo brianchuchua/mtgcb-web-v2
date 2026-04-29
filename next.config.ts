@@ -28,6 +28,8 @@ export default withSentryConfig(nextConfig, {
   org: 'brian-chuchua',
   project: 'mtgcb-web-v2',
 
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
   // Print logs in heroku build output
   silent: false,
 

@@ -13,6 +13,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-29',
+      version: '1.24.6',
+      changes: [
+        'Fixed rare bug with Safari iOS when scrolling through table views',
+        'Improved ability to debug future similar issues',
+      ],
+    },
+    {
+      date: '2026-04-29',
       version: '1.24.5',
       changes: [
         'Improved how the site updates to a new version for users currently using an older version, along with users who hit the website within a 10 second window, right as it transitions from an older build to a newer build.',
