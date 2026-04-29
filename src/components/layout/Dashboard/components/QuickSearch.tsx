@@ -4,7 +4,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, IconButton, InputAdornment, Paper, Popper, TextField, Tooltip, Typography } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 export const QuickSearch = () => {
@@ -13,7 +13,7 @@ export const QuickSearch = () => {
   const { user, isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
-  const anchorRef = useRef<HTMLButtonElement>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   // Extract userId from collection paths
   const getUserIdFromPath = useCallback((): string | null => {
@@ -83,7 +83,7 @@ export const QuickSearch = () => {
     <>
       <Tooltip title="Quick Search">
         <IconButton
-          ref={anchorRef}
+          ref={setAnchorEl}
           size="large"
           aria-label="quick search"
           onClick={handleToggle}
@@ -94,7 +94,7 @@ export const QuickSearch = () => {
         </IconButton>
       </Tooltip>
 
-      <Popper open={open} anchorEl={anchorRef.current} placement="bottom-end" style={{ zIndex: 1300 }} disablePortal>
+      <Popper open={open} anchorEl={anchorEl} placement="bottom-end" style={{ zIndex: 1300 }} disablePortal>
         <Paper elevation={1} sx={{ width: 300, mt: 1.5, border: 1, borderColor: 'divider' }}>
           <Box sx={{ p: 2 }}>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>

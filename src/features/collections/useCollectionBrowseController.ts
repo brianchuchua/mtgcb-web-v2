@@ -1,10 +1,16 @@
+// Reads ref.current during render are intentional: this hook does cross-render
+// previous-value diffing to detect URL→Redux sync direction. The state-based
+// "setState during render" alternative has different commit semantics (React
+// drops the changing render's output), which would hide the isWaitingForGoalSync
+// signal from useBrowseController and let stale fetches fire mid-sync.
+/* eslint-disable react-compiler/react-compiler */
 import { useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { useViewMode } from '@/features/browse/hooks';
 import { BrowseControllerResult } from '@/features/browse/types';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { useCollectionDisplaySettings } from '@/features/collections/hooks/useCollectionDisplaySettings';
-import { useViewMode } from '@/features/browse/hooks';
-import { selectViewContentType, selectSets, selectSelectedGoalId } from '@/redux/slices/browse';
+import { selectSelectedGoalId, selectSets, selectViewContentType } from '@/redux/slices/browse';
 
 interface UseCollectionBrowseControllerProps {
   userId: number;
@@ -47,11 +53,10 @@ export const useCollectionBrowseController = ({
   // Update refs for next render
   prevSelectedGoalIdRef.current = selectedGoalId;
   prevUrlGoalIdRef.current = goalIdFromUrl;
-  
-  
+
   // Use collection-specific display settings
   const collectionDisplaySettings = useCollectionDisplaySettings({ viewMode, view: currentView });
-  
+
   const browseController = useBrowseController({
     skipCostToComplete: true,
     userId,
@@ -59,7 +64,7 @@ export const useCollectionBrowseController = ({
     waitForSetFilter: isSetSpecificPage && currentView === 'cards',
     // Skip until goalId is synced from URL or until set is ready
     skipCardsUntilReady: (isWaitingForGoalSync && currentView === 'cards') || skipCardsUntilReady,
-    waitForInitialLoad: isWaitingForGoalSync
+    waitForInitialLoad: isWaitingForGoalSync,
   });
 
   // Override the display settings with collection-specific ones
@@ -67,14 +72,22 @@ export const useCollectionBrowseController = ({
     ...browseController,
     userId,
   };
-  
+
   // If we have setsProps, override the displaySettings
-  if ('setsProps' in customBrowseController && customBrowseController.setsProps && 'displaySettings' in customBrowseController.setsProps) {
+  if (
+    'setsProps' in customBrowseController &&
+    customBrowseController.setsProps &&
+    'displaySettings' in customBrowseController.setsProps
+  ) {
     customBrowseController.setsProps.displaySettings = collectionDisplaySettings.setDisplaySettings;
   }
-  
+
   // If we have cardsProps, override the displaySettings to include quantity visibility
-  if ('cardsProps' in customBrowseController && customBrowseController.cardsProps && 'gallerySettings' in customBrowseController.cardsProps) {
+  if (
+    'cardsProps' in customBrowseController &&
+    customBrowseController.cardsProps &&
+    'gallerySettings' in customBrowseController.cardsProps
+  ) {
     customBrowseController.cardsProps.gallerySettings = collectionDisplaySettings.gallerySettings;
     customBrowseController.cardsProps.tableSettings = collectionDisplaySettings.tableSettings;
     // Merge cardDisplaySettings to preserve goalProgressIsVisible from browse controller
@@ -83,7 +96,7 @@ export const useCollectionBrowseController = ({
       ...collectionDisplaySettings.cardDisplaySettings,
     };
   }
-  
+
   // Override pagination props to include collection-specific settings
   if ('paginationProps' in customBrowseController && customBrowseController.paginationProps) {
     customBrowseController.paginationProps.settingGroups = collectionDisplaySettings.settingGroups;

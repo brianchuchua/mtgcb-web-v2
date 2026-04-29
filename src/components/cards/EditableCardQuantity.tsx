@@ -22,7 +22,7 @@ import {
 } from '@mui/material';
 import debounce from 'lodash.debounce';
 import { useSnackbar } from 'notistack';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
@@ -197,84 +197,85 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
     }
   }, [quantityReg, quantityFoil]);
 
-  // Create debounced update function
-  const debouncedUpdate = useCallback(
-    debounce(async (newQuantityReg: number, newQuantityFoil: number, changedType: 'regular' | 'foil') => {
-      // Select the correct promise ref based on which field changed
-      const updatePromiseRef = changedType === 'regular' ? updatePromiseRefReg : updatePromiseRefFoil;
+  // The debounced callback reads updatePromiseRefReg/Foil.current to abort the
+  // latest in-flight request per field. This closure runs after the debounce delay
+  // (event-handler context), not during render — but the compiler flags the
+  // transitive ref access.
+  /* eslint-disable react-compiler/react-compiler */
+  const debouncedUpdate = useMemo(
+    () =>
+      debounce(async (newQuantityReg: number, newQuantityFoil: number, changedType: 'regular' | 'foil') => {
+        // Select the correct promise ref based on which field changed
+        const updatePromiseRef = changedType === 'regular' ? updatePromiseRefReg : updatePromiseRefFoil;
 
-      // Cancel any pending request for this specific field
-      if (updatePromiseRef.current) {
-        updatePromiseRef.current.abort();
-      }
+        // Cancel any pending request for this specific field
+        if (updatePromiseRef.current) {
+          updatePromiseRef.current.abort();
+        }
 
-      // Set loading state
-      if (changedType === 'regular') {
-        setIsLoadingReg(true);
-        setShowSuccessReg(false);
-      } else {
-        setIsLoadingFoil(true);
-        setShowSuccessFoil(false);
-      }
-
-      try {
-        // Only send the field that actually changed to prevent race conditions
-        const promise = updateCollection({
-          mode: 'set',
-          cards: [
-            {
-              cardId,
-              // Conditionally include only the field being updated
-              ...(changedType === 'regular'
-                ? { quantityReg: newQuantityReg }
-                : { quantityFoil: newQuantityFoil }),
-            },
-          ],
-        });
-
-        // Store the promise in the correct ref so we can abort it later
-        updatePromiseRef.current = promise;
-
-        const result = await promise.unwrap();
-
-        if (result.success) {
-          // Set success state - persists until page navigation
-          if (changedType === 'regular') {
-            setIsLoadingReg(false);
-            setShowSuccessReg(true);
-          } else {
-            setIsLoadingFoil(false);
-            setShowSuccessFoil(true);
-          }
-
-          // Success is now shown inline with checkmark icon
+        // Set loading state
+        if (changedType === 'regular') {
+          setIsLoadingReg(true);
+          setShowSuccessReg(false);
         } else {
+          setIsLoadingFoil(true);
+          setShowSuccessFoil(false);
+        }
+
+        try {
+          // Only send the field that actually changed to prevent race conditions
+          const promise = updateCollection({
+            mode: 'set',
+            cards: [
+              {
+                cardId,
+                // Conditionally include only the field being updated
+                ...(changedType === 'regular' ? { quantityReg: newQuantityReg } : { quantityFoil: newQuantityFoil }),
+              },
+            ],
+          });
+
+          // Store the promise in the correct ref so we can abort it later
+          updatePromiseRef.current = promise;
+
+          const result = await promise.unwrap();
+
+          if (result.success) {
+            // Set success state - persists until page navigation
+            if (changedType === 'regular') {
+              setIsLoadingReg(false);
+              setShowSuccessReg(true);
+            } else {
+              setIsLoadingFoil(false);
+              setShowSuccessFoil(true);
+            }
+
+            // Success is now shown inline with checkmark icon
+          } else {
+            // Clear loading state on error
+            if (changedType === 'regular') {
+              setIsLoadingReg(false);
+            } else {
+              setIsLoadingFoil(false);
+            }
+            enqueueSnackbar(`Failed to update ${cardName}`, { variant: 'error' });
+          }
+        } catch (error: any) {
           // Clear loading state on error
           if (changedType === 'regular') {
             setIsLoadingReg(false);
           } else {
             setIsLoadingFoil(false);
           }
-          enqueueSnackbar(`Failed to update ${cardName}`, { variant: 'error' });
+          // Don't show error for aborted requests
+          if (error.name !== 'AbortError' && error.message !== 'Aborted') {
+            enqueueSnackbar(error?.data?.error?.message || `Error updating ${cardName}`, { variant: 'error' });
+          }
         }
-      } catch (error: any) {
-        // Clear loading state on error
-        if (changedType === 'regular') {
-          setIsLoadingReg(false);
-        } else {
-          setIsLoadingFoil(false);
-        }
-        // Don't show error for aborted requests
-        if (error.name !== 'AbortError' && error.message !== 'Aborted') {
-          enqueueSnackbar(
-            error?.data?.error?.message || `Error updating ${cardName}`,
-            { variant: 'error' },
-          );
-        }
-      }
-    }, 400),
+      }, 400),
     [cardId, cardName, updateCollection, enqueueSnackbar],
   );
+  /* eslint-enable react-compiler/react-compiler */
 
   const handleQuantityChange = (type: 'regular' | 'foil', value: number) => {
     const newValue = clampCollectionQuantity(value);
@@ -460,56 +461,56 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
             flex: 1,
           }}
         >
-            <QuantityInput
-              type="number"
-              value={inputValueReg}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('regular', e)}
-              onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('regular', e)}
-              onFocus={handleInputFocus}
-              onClick={(e) => {
-                if (!isRegularDisabled) {
-                  (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
-                }
-              }}
-              slotProps={{
-                htmlInput: {
-                  min: COLLECTION_QUANTITY_MIN,
-                  max: COLLECTION_QUANTITY_MAX,
-                  'data-testid': 'editable-card-quantity-regular',
-                },
-                inputLabel: { shrink: true },
-              }}
-              variant="outlined"
-              size="small"
-              label={
-                <Box display="flex" alignItems="center" gap={0.25}>
-                  Regular
-                  {isLoadingReg && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
-                  {showSuccessReg && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
-                </Box>
+          <QuantityInput
+            type="number"
+            value={inputValueReg}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('regular', e)}
+            onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('regular', e)}
+            onFocus={handleInputFocus}
+            onClick={(e) => {
+              if (!isRegularDisabled) {
+                (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
               }
-              disabled={isRegularDisabled}
-              error={regularHasError}
+            }}
+            slotProps={{
+              htmlInput: {
+                min: COLLECTION_QUANTITY_MIN,
+                max: COLLECTION_QUANTITY_MAX,
+                'data-testid': 'editable-card-quantity-regular',
+              },
+              inputLabel: { shrink: true },
+            }}
+            variant="outlined"
+            size="small"
+            label={
+              <Box display="flex" alignItems="center" gap={0.25}>
+                Regular
+                {isLoadingReg && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
+                {showSuccessReg && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
+              </Box>
+            }
+            disabled={isRegularDisabled}
+            error={regularHasError}
+          />
+          {isRegularDisabled && !readOnly && !canBeNonFoil && !overrideNonFoil && (
+            <Box
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDisabledFieldClick('regular');
+              }}
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                cursor: 'pointer',
+                zIndex: 1,
+              }}
             />
-            {isRegularDisabled && !readOnly && !canBeNonFoil && !overrideNonFoil && (
-              <Box
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleDisabledFieldClick('regular');
-                }}
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  cursor: 'pointer',
-                  zIndex: 1,
-                }}
-              />
-            )}
-          </Box>
+          )}
+        </Box>
         <Tooltip
           title={
             !canBeNonFoil && !overrideNonFoil
@@ -582,56 +583,56 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
             flex: 1,
           }}
         >
-            <QuantityInput
-              type="number"
-              value={inputValueFoil}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('foil', e)}
-              onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('foil', e)}
-              onFocus={handleInputFocus}
-              onClick={(e) => {
-                if (!isFoilDisabled) {
-                  (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
-                }
-              }}
-              slotProps={{
-                htmlInput: {
-                  min: COLLECTION_QUANTITY_MIN,
-                  max: COLLECTION_QUANTITY_MAX,
-                  'data-testid': 'editable-card-quantity-foil',
-                },
-                inputLabel: { shrink: true },
-              }}
-              variant="outlined"
-              size="small"
-              label={
-                <Box display="flex" alignItems="center" gap={0.25}>
-                  Foils
-                  {isLoadingFoil && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
-                  {showSuccessFoil && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
-                </Box>
+          <QuantityInput
+            type="number"
+            value={inputValueFoil}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('foil', e)}
+            onBlur={(e: React.FocusEvent<HTMLInputElement>) => handleInputBlur('foil', e)}
+            onFocus={handleInputFocus}
+            onClick={(e) => {
+              if (!isFoilDisabled) {
+                (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
               }
-              disabled={isFoilDisabled}
-              error={foilHasError}
+            }}
+            slotProps={{
+              htmlInput: {
+                min: COLLECTION_QUANTITY_MIN,
+                max: COLLECTION_QUANTITY_MAX,
+                'data-testid': 'editable-card-quantity-foil',
+              },
+              inputLabel: { shrink: true },
+            }}
+            variant="outlined"
+            size="small"
+            label={
+              <Box display="flex" alignItems="center" gap={0.25}>
+                Foils
+                {isLoadingFoil && <CircularProgress size={12} thickness={5} sx={{ color: 'primary.main' }} />}
+                {showSuccessFoil && <CheckCircleIcon sx={{ fontSize: '0.875rem', color: 'inherit' }} />}
+              </Box>
+            }
+            disabled={isFoilDisabled}
+            error={foilHasError}
+          />
+          {isFoilDisabled && !readOnly && !canBeFoil && !overrideFoil && (
+            <Box
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDisabledFieldClick('foil');
+              }}
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                cursor: 'pointer',
+                zIndex: 1,
+              }}
             />
-            {isFoilDisabled && !readOnly && !canBeFoil && !overrideFoil && (
-              <Box
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleDisabledFieldClick('foil');
-                }}
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  cursor: 'pointer',
-                  zIndex: 1,
-                }}
-              />
-            )}
-          </Box>
+          )}
+        </Box>
         <Tooltip
           title={
             !canBeFoil && !overrideFoil

@@ -1,6 +1,6 @@
 {
   "name": "mtgcb-web-v2",
-  "version": "1.24.3",
+  "version": "1.24.4",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -16,6 +16,7 @@
     "test:e2e": "playwright test",
     "test:e2e-ui": "playwright test --ui",
     "test:e2e-report": "playwright show-report",
+    "test:manual": "node scripts/test-manual.js",
     "test:all": "yarn test && yarn test:e2e"
   },
   "dependencies": {

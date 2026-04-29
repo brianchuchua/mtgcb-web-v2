@@ -742,7 +742,8 @@ const PageSizeControl: React.FC<PageSizeControlProps> = ({
   customItemName,
   hideSettingsPanel = false,
 }) => {
-  const cardSettingGroups = customSettingGroups || useCardSettingGroups(viewMode);
+  const defaultCardSettingGroups = useCardSettingGroups(viewMode);
+  const cardSettingGroups = customSettingGroups || defaultCardSettingGroups;
   const isSmallScreen = useMediaQuery('(max-width:1199px)');
   const labelId = `${contentType}-per-page-label`;
 

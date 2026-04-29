@@ -3,13 +3,12 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchStateSessionSync } from './browse/useSearchStateSessionSync';
-import { convertStateToUrlParams, parseUrlToState } from '@/features/browse/schema/urlStateAdapters';
-import { useCardsPageSize } from '@/hooks/useCardsPageSize';
-import { useSetsPageSize } from '@/hooks/useSetsPageSize';
 import { usePreferredCardViewMode, usePreferredSetViewMode } from '@/contexts/DisplaySettingsContext';
+import { convertStateToUrlParams, parseUrlToState } from '@/features/browse/schema/urlStateAdapters';
 import { useBrowsePreferencesReady, usePreferredViewContentType } from '@/hooks/useBrowsePreferences';
+import { useCardsPageSize } from '@/hooks/useCardsPageSize';
 import { loadSearchState, saveSearchState } from '@/hooks/useSearchStateSync';
-import { isSetSpecificPage } from '@/utils/routeHelpers';
+import { useSetsPageSize } from '@/hooks/useSetsPageSize';
 import {
   resetAllSearches,
   selectCardSearchParams,
@@ -24,6 +23,7 @@ import {
   setViewContentType,
 } from '@/redux/slices/browse';
 import { BrowsePagination } from '@/types/browse';
+import { isSetSpecificPage } from '@/utils/routeHelpers';
 
 // Balance between responsiveness and avoiding URL spam during rapid typing
 const DEBOUNCE_URL_SYNC_MS = 100;
@@ -51,7 +51,7 @@ function syncReduxFromUrlOrSession(
     resetBeforeSync: boolean;
     forcePageOne: boolean;
     isNavigation: boolean;
-  }
+  },
 ): void {
   // Update view type from URL if present (for navigation/back button)
   if (options.isNavigation) {
@@ -65,9 +65,7 @@ function syncReduxFromUrlOrSession(
   }
 
   // Check if we have any search parameters in the URL (excluding contentType)
-  const hasSearchParams = Array.from(search.entries()).some(
-    ([key]) => key !== 'contentType'
-  );
+  const hasSearchParams = Array.from(search.entries()).some(([key]) => key !== 'contentType');
 
   if (!hasSearchParams) {
     // No URL params - behavior depends on context
@@ -238,14 +236,25 @@ export function useBrowseStateSync() {
 
     // Sync Redux from URL or sessionStorage (initialization)
     syncReduxFromUrlOrSession(search, dispatch, cardsPageSize, setsPageSize, pathname, {
-      resetBeforeSync: false,  // Don't reset on init, preserve Redux defaults
-      forcePageOne: true,      // Always start at page 1 on init
-      isNavigation: false,     // Initial load - allow sessionStorage restore
+      resetBeforeSync: false, // Don't reset on init, preserve Redux defaults
+      forcePageOne: true, // Always start at page 1 on init
+      isNavigation: false, // Initial load - allow sessionStorage restore
     });
 
     prevView.current = initialView;
     hasInit.current = true;
-  }, [dispatch, search, cardsPageSize, setsPageSize, cardsPageSizeReady, setsPageSizeReady, preferencesReady, pathname, preferredViewContentType, setPreferredViewContentType]);
+  }, [
+    dispatch,
+    search,
+    cardsPageSize,
+    setsPageSize,
+    cardsPageSizeReady,
+    setsPageSizeReady,
+    preferencesReady,
+    pathname,
+    preferredViewContentType,
+    setPreferredViewContentType,
+  ]);
 
   /** ------------------------------------------------------------------
    *  Handle URL changes after initialization
@@ -269,9 +278,9 @@ export function useBrowseStateSync() {
     // URL changed externally (user navigation, browser back/forward, shared link)
     // Sync Redux from URL
     syncReduxFromUrlOrSession(search, dispatch, cardsPageSize, setsPageSize, pathname, {
-      resetBeforeSync: true,   // Reset to ensure clean state
-      forcePageOne: false,     // Respect page number from URL
-      isNavigation: true,      // Navigation - respect empty URL (don't restore from sessionStorage)
+      resetBeforeSync: true, // Reset to ensure clean state
+      forcePageOne: false, // Respect page number from URL
+      isNavigation: true, // Navigation - respect empty URL (don't restore from sessionStorage)
     });
 
     prevSearchParamsString.current = currentSearchString;
@@ -288,15 +297,22 @@ export function useBrowseStateSync() {
 
     // Check if state is empty (only has metadata/preference fields, no actual search criteria)
     // Exclude: pagination, view preferences, sort preferences, subset display preferences, and the view type itself
-    const metadataFields = ['currentPage', 'pageSize', 'viewMode', 'sortBy', 'sortOrder', 'viewContentType', 'showSubsets', 'includeSubsetsInSets'];
-    const stateWithoutMeta = Object.keys(state).filter(
-      k => !metadataFields.includes(k)
-    );
+    const metadataFields = [
+      'currentPage',
+      'pageSize',
+      'viewMode',
+      'sortBy',
+      'sortOrder',
+      'viewContentType',
+      'showSubsets',
+      'includeSubsetsInSets',
+    ];
+    const stateWithoutMeta = Object.keys(state).filter((k) => !metadataFields.includes(k));
 
-    const hasSearchData = stateWithoutMeta.some(k => {
+    const hasSearchData = stateWithoutMeta.some((k) => {
       const value = (state as any)[k];
-      const hasData = value !== '' && value !== null && value !== undefined &&
-             (!Array.isArray(value) || value.length > 0);
+      const hasData =
+        value !== '' && value !== null && value !== undefined && (!Array.isArray(value) || value.length > 0);
       return hasData;
     });
 
@@ -306,7 +322,6 @@ export function useBrowseStateSync() {
     const sessionState = loadSearchState(viewType);
 
     if (sessionState && Object.keys(sessionState).length > 0) {
-
       // Merge: Redux state (from URL) + sessionStorage data
       const pageSize = viewType === 'cards' ? cardsPageSize : setsPageSize;
       const mergedState = { ...state, ...sessionState, currentPage: 1, pageSize };
@@ -406,10 +421,13 @@ export function useBrowseStateSync() {
     prevCriteria.current = { cards: cardsJSON, sets: setsJSON };
   }, [viewType, cardState, setState, dispatch]);
 
-
   /** ------------------------------------------------------------------
    *  Sync search state to sessionStorage (for F5 refresh restore)
    * ------------------------------------------------------------------ */
+  // hasInit is intentionally a ref (not state) so the init useEffect above
+  // doesn't re-fire when init flips false→true. Reading .current here passes
+  // the latest init flag to the session-sync hook without triggering a render loop.
+  // eslint-disable-next-line react-compiler/react-compiler
   useSearchStateSessionSync(viewType, cardState, setState, hasInit.current);
 
   const updatePagination = useCallback(
@@ -422,6 +440,8 @@ export function useBrowseStateSync() {
   const pageSize = viewType === 'cards' ? cardsPageSize : setsPageSize;
 
   // Don't return valid pagination until we've initialized with localStorage values
+  // (hasInit is a ref, see comment above on the useSearchStateSessionSync call)
+  // eslint-disable-next-line react-compiler/react-compiler
   const isReady = hasInit.current && cardsPageSizeReady && setsPageSizeReady && preferencesReady;
 
   return {

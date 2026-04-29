@@ -16,8 +16,8 @@ import {
   Typography,
   createFilterOptions,
 } from '@mui/material';
-import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import { useAuth } from '@/hooks/useAuth';
@@ -97,7 +97,7 @@ export const JumpToSetsMenu = () => {
   const [selectedSet, setSelectedSet] = useState<Set | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [resultLimit, setResultLimit] = useState(100);
-  const anchorRef = useRef<HTMLButtonElement>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const listboxRef = useRef<HTMLUListElement>(null);
 
   // Fetch all sets
@@ -263,7 +263,7 @@ export const JumpToSetsMenu = () => {
     <>
       <Tooltip title="Jump to set">
         <IconButton
-          ref={anchorRef}
+          ref={setAnchorEl}
           size="large"
           aria-label="jump to set"
           onClick={handleToggle}
@@ -274,7 +274,7 @@ export const JumpToSetsMenu = () => {
         </IconButton>
       </Tooltip>
 
-      <Popper open={open} anchorEl={anchorRef.current} placement="bottom-end" style={{ zIndex: 1300 }} disablePortal>
+      <Popper open={open} anchorEl={anchorEl} placement="bottom-end" style={{ zIndex: 1300 }} disablePortal>
         <Paper elevation={1} sx={{ width: 300, mt: 1.5, border: 1, borderColor: 'divider' }}>
           <Box sx={{ p: 2 }}>
             <Typography variant="subtitle2" sx={{ mb: 1 }}>
@@ -311,7 +311,12 @@ export const JumpToSetsMenu = () => {
                 />
               )}
               renderOption={(props, option, state) => (
-                <SetOption key={option.id} option={option} state={{ ...props, ...state }} generateUrl={generateSetUrl} />
+                <SetOption
+                  key={option.id}
+                  option={option}
+                  state={{ ...props, ...state }}
+                  generateUrl={generateSetUrl}
+                />
               )}
               noOptionsText={inputValue.length === 0 ? 'Type to search...' : 'No sets found'}
               PaperComponent={(props) => <Paper {...props} elevation={1} sx={{ border: 1, borderColor: 'divider' }} />}

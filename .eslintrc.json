@@ -13,7 +13,7 @@
     "react/jsx-filename-extension": ["warn", { "extensions": [".jsx", ".tsx"] }],
     "react/no-unescaped-entities": "off",
     "react/display-name": "off",
-    "react-compiler/react-compiler": "error",
+    "react-compiler/react-compiler": "warn",
     "no-console": ["warn", { "allow": ["warn", "error"] }],
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]

@@ -1,4 +1,9 @@
 // TODO: Not being used, deprecated?
+// File-level disable: see line-level eslint-disable on the empty deps array below.
+// React Compiler refuses to optimize the whole component when any react-* rule is
+// disabled inline; suppressing the meta-warning at file scope keeps that decision
+// local to this dead-code module and out of the rest of the codebase.
+/* eslint-disable react-compiler/react-compiler */
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

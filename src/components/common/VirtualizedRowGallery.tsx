@@ -88,6 +88,31 @@ const VirtualizedRowGallery = <T,>({
     [items, effectiveColumns]
   );
 
+  // Row renderer for Virtuoso
+  const rowContent = useCallback(
+    (index: number, row: RowGroup<T>) => {
+      return (
+        <RowContainer columnsPerRow={effectiveColumns} mobileColumnsPerRow={mobileColumnsPerRow}>
+          {row.items.map((item, itemIndex) => {
+            const globalIndex = row.startIndex + itemIndex;
+            const key = computeItemKey ? computeItemKey(globalIndex) : globalIndex;
+            return (
+              <ItemContainer key={key}>
+                {renderItem(item, globalIndex)}
+              </ItemContainer>
+            );
+          })}
+          {/* Fill empty cells in the last row */}
+          {row.items.length < effectiveColumns &&
+            Array.from({ length: effectiveColumns - row.items.length }).map((_, i) => (
+              <EmptyCell key={`empty-${i}`} />
+            ))}
+        </RowContainer>
+      );
+    },
+    [effectiveColumns, mobileColumnsPerRow, renderItem, computeItemKey]
+  );
+
   // Only show empty message when not loading and actually have no items
   if (!isLoading && items && items.length === 0) {
     if (emptyStateComponent) {
@@ -115,31 +140,6 @@ const VirtualizedRowGallery = <T,>({
       ></Box>
     );
   }
-
-  // Row renderer for Virtuoso
-  const rowContent = useCallback(
-    (index: number, row: RowGroup<T>) => {
-      return (
-        <RowContainer columnsPerRow={effectiveColumns} mobileColumnsPerRow={mobileColumnsPerRow}>
-          {row.items.map((item, itemIndex) => {
-            const globalIndex = row.startIndex + itemIndex;
-            const key = computeItemKey ? computeItemKey(globalIndex) : globalIndex;
-            return (
-              <ItemContainer key={key}>
-                {renderItem(item, globalIndex)}
-              </ItemContainer>
-            );
-          })}
-          {/* Fill empty cells in the last row */}
-          {row.items.length < effectiveColumns &&
-            Array.from({ length: effectiveColumns - row.items.length }).map((_, i) => (
-              <EmptyCell key={`empty-${i}`} />
-            ))}
-        </RowContainer>
-      );
-    },
-    [effectiveColumns, mobileColumnsPerRow, renderItem, computeItemKey]
-  );
 
   return (
     <GalleryWrapper

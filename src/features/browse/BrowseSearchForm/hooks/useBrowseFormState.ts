@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import debounce from 'lodash.debounce';
+import { useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   selectArtist,
   selectCardSearchName,
@@ -29,38 +29,43 @@ export const useBrowseFormState = () => {
   const [localOracleText, setLocalOracleText] = useState(reduxOracleText);
   const [localArtist, setLocalArtist] = useState(reduxArtist);
 
-  const debouncedCardNameDispatch = useCallback(
-    debounce((value: string) => {
-      dispatch(setCardSearchName(value));
-    }, 300),
+  const debouncedCardNameDispatch = useMemo(
+    () =>
+      debounce((value: string) => {
+        dispatch(setCardSearchName(value));
+      }, 300),
     [dispatch],
   );
 
-  const debouncedSetNameDispatch = useCallback(
-    debounce((value: string) => {
-      dispatch(setSetSearchName(value));
-    }, 300),
+  const debouncedSetNameDispatch = useMemo(
+    () =>
+      debounce((value: string) => {
+        dispatch(setSetSearchName(value));
+      }, 300),
     [dispatch],
   );
 
-  const debouncedSetCodeDispatch = useCallback(
-    debounce((value: string) => {
-      dispatch(setSetCode(value));
-    }, 300),
+  const debouncedSetCodeDispatch = useMemo(
+    () =>
+      debounce((value: string) => {
+        dispatch(setSetCode(value));
+      }, 300),
     [dispatch],
   );
 
-  const debouncedOracleDispatch = useCallback(
-    debounce((value: string) => {
-      dispatch(setOracleText(value));
-    }, 300),
+  const debouncedOracleDispatch = useMemo(
+    () =>
+      debounce((value: string) => {
+        dispatch(setOracleText(value));
+      }, 300),
     [dispatch],
   );
 
-  const debouncedArtistDispatch = useCallback(
-    debounce((value: string) => {
-      dispatch(setArtist(value));
-    }, 300),
+  const debouncedArtistDispatch = useMemo(
+    () =>
+      debounce((value: string) => {
+        dispatch(setArtist(value));
+      }, 300),
     [dispatch],
   );
 

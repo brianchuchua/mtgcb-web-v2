@@ -25,18 +25,18 @@ import debounce from 'lodash.debounce';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSnackbar } from 'notistack';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CardItemProps } from './CardItem';
 import { CardLocationTableCell } from './CardLocationTableCell';
 import CardPrice from './CardPrice';
 import { GoalStatusTableCell } from './GoalStatusTableCell';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
-import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 import { ResponsiveWidth, TableColumn } from '@/components/common/VirtualizedTable';
 import { PriceType } from '@/types/pricing';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
-import { getCollectionSetUrl, getCollectionCardUrl } from '@/utils/collectionUrls';
+import { getCollectionCardUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
+import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
 export interface CardTableRendererProps {
   priceType: PriceType;
@@ -293,10 +293,7 @@ export const useCardTableColumns = (
     if (column.id === 'loyaltyNumeric') return displaySettings.loyaltyIsVisible;
 
     const isPriceColumn =
-      column.id === 'market' ||
-      column.id === 'low' ||
-      column.id === 'average' ||
-      column.id === 'high';
+      column.id === 'market' || column.id === 'low' || column.id === 'average' || column.id === 'high';
 
     if (isPriceColumn) return displaySettings.priceIsVisible;
 
@@ -441,57 +438,60 @@ const InlineEditableQuantity: React.FC<{
     }
   }, [quantity]);
 
-  const debouncedUpdate = useCallback(
-    debounce(async (newQuantity: number) => {
-      // Cancel any pending request
-      if (updatePromiseRef.current) {
-        updatePromiseRef.current.abort();
-      }
-
-      // Set loading state
-      setIsLoading(true);
-      setShowSuccess(false);
-
-      try {
-        // Only send the quantity that actually changed to prevent race conditions
-        // when rapidly updating both regular and foil quantities
-        const promise = updateCollection({
-          mode: 'set',
-          cards: [
-            {
-              cardId: parseInt(cardId),
-              // Conditionally include only the field being updated
-              ...(quantityType === 'regular'
-                ? { quantityReg: newQuantity }
-                : { quantityFoil: newQuantity }),
-            },
-          ],
-        });
-
-        // Store the promise so we can abort it later
-        updatePromiseRef.current = promise;
-
-        await promise.unwrap();
-
-        // Set success state - persists until page navigation
-        setIsLoading(false);
-        setShowSuccess(true);
-        // Success is now shown inline with checkmark icon
-      } catch (error: any) {
-        // Clear loading state on error
-        setIsLoading(false);
-        // Don't show error or reset for aborted requests
-        if (error.name !== 'AbortError' && error.message !== 'Aborted') {
-          enqueueSnackbar(
-            error?.data?.error?.message || `Failed to update ${cardName} quantity`,
-            { variant: 'error' },
-          );
-          setLocalQuantity(quantity); // Reset on error
+  // The debounced callback reads updatePromiseRef.current to abort the latest
+  // in-flight request. This closure runs after the debounce delay (event-handler
+  // context), not during render — but the compiler flags the transitive ref access.
+  /* eslint-disable react-compiler/react-compiler */
+  const debouncedUpdate = useMemo(
+    () =>
+      debounce(async (newQuantity: number) => {
+        // Cancel any pending request
+        if (updatePromiseRef.current) {
+          updatePromiseRef.current.abort();
         }
-      }
-    }, 400),
+
+        // Set loading state
+        setIsLoading(true);
+        setShowSuccess(false);
+
+        try {
+          // Only send the quantity that actually changed to prevent race conditions
+          // when rapidly updating both regular and foil quantities
+          const promise = updateCollection({
+            mode: 'set',
+            cards: [
+              {
+                cardId: parseInt(cardId),
+                // Conditionally include only the field being updated
+                ...(quantityType === 'regular' ? { quantityReg: newQuantity } : { quantityFoil: newQuantity }),
+              },
+            ],
+          });
+
+          // Store the promise so we can abort it later
+          updatePromiseRef.current = promise;
+
+          await promise.unwrap();
+
+          // Set success state - persists until page navigation
+          setIsLoading(false);
+          setShowSuccess(true);
+          // Success is now shown inline with checkmark icon
+        } catch (error: any) {
+          // Clear loading state on error
+          setIsLoading(false);
+          // Don't show error or reset for aborted requests
+          if (error.name !== 'AbortError' && error.message !== 'Aborted') {
+            enqueueSnackbar(error?.data?.error?.message || `Failed to update ${cardName} quantity`, {
+              variant: 'error',
+            });
+            setLocalQuantity(quantity); // Reset on error
+          }
+        }
+      }, 400),
     [updateCollection, cardId, cardName, quantityType, enqueueSnackbar, quantity],
   );
+  /* eslint-enable react-compiler/react-compiler */
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -646,54 +646,54 @@ const InlineEditableQuantity: React.FC<{
           </TableLeftButton>
         </Box>
         <Box
-            sx={{
-              position: 'relative',
-              display: 'flex',
-              flex: 1,
+          sx={{
+            position: 'relative',
+            display: 'flex',
+            flex: 1,
+          }}
+        >
+          <TableQuantityInput
+            type="number"
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
+            onFocus={handleInputFocus}
+            onClick={(e) => {
+              if (!isDisabled) {
+                (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
+              }
             }}
-          >
-            <TableQuantityInput
-              type="number"
-              value={inputValue}
-              onChange={handleInputChange}
-              onBlur={handleInputBlur}
-              onFocus={handleInputFocus}
+            slotProps={{
+              htmlInput: {
+                min: COLLECTION_QUANTITY_MIN,
+                max: COLLECTION_QUANTITY_MAX,
+                'data-testid': 'card-table-quantity',
+              },
+            }}
+            variant="outlined"
+            size="small"
+            disabled={isDisabled}
+            error={hasError}
+          />
+          {isDisabled && (
+            <Box
               onClick={(e) => {
-                if (!isDisabled) {
-                  (e.currentTarget.querySelector('input') as HTMLInputElement)?.select();
-                }
+                e.preventDefault();
+                e.stopPropagation();
+                handleDisabledFieldClick();
               }}
-              slotProps={{
-                htmlInput: {
-                  min: COLLECTION_QUANTITY_MIN,
-                  max: COLLECTION_QUANTITY_MAX,
-                  'data-testid': 'card-table-quantity',
-                },
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                cursor: 'pointer',
+                zIndex: 1,
               }}
-              variant="outlined"
-              size="small"
-              disabled={isDisabled}
-              error={hasError}
             />
-            {isDisabled && (
-              <Box
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleDisabledFieldClick();
-                }}
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  cursor: 'pointer',
-                  zIndex: 1,
-                }}
-              />
-            )}
-          </Box>
+          )}
+        </Box>
         <Tooltip
           title={tooltipMessage}
           placement="top"
@@ -725,66 +725,66 @@ const InlineEditableQuantity: React.FC<{
         </Tooltip>
       </TableQuantityContainer>
       {isLoading && (
-          <CircularProgress
-            size={10}
-            thickness={5}
-            sx={{
-              position: 'absolute',
-              right: '-14px',
-              top: '29%',
-              transform: 'translateY(-25%)',
-              color: 'primary.main',
-            }}
-          />
-        )}
-        {showSuccess && (
-          <CheckCircleIcon
-            sx={{
-              position: 'absolute',
-              right: '-14px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              fontSize: '0.75rem',
-              color: 'inherit',
-            }}
-          />
-        )}
+        <CircularProgress
+          size={10}
+          thickness={5}
+          sx={{
+            position: 'absolute',
+            right: '-14px',
+            top: '29%',
+            transform: 'translateY(-25%)',
+            color: 'primary.main',
+          }}
+        />
+      )}
+      {showSuccess && (
+        <CheckCircleIcon
+          sx={{
+            position: 'absolute',
+            right: '-14px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            fontSize: '0.75rem',
+            color: 'inherit',
+          }}
+        />
+      )}
 
-        <Dialog
-          open={showOverrideDialog}
-          onClose={handleOverrideCancel}
-          aria-labelledby="override-dialog-title"
-          aria-describedby="override-dialog-description"
-        >
-          <DialogTitle id="override-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <WarningAmberIcon color="warning" />
-            Enable {quantityType === 'regular' ? 'Non-Foil' : 'Foil'} Quantity?
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="override-dialog-description" component="div">
-              <Typography variant="body2" gutterBottom>
-                According to our data, this card doesn&apos;t come in {quantityType === 'regular' ? 'non-foil' : 'foil'}{' '}
-                finish.
-              </Typography>
-              <Typography variant="body2" gutterBottom>
-                However, this data can sometimes be incorrect or incomplete. If you have this card in{' '}
-                {quantityType === 'regular' ? 'non-foil' : 'foil'} finish, you can override this restriction.
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 500, mt: 2 }}>
-                Would you like to enable this field anyway?
-              </Typography>
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleOverrideCancel} color="inherit">
-              Cancel
-            </Button>
-            <Button onClick={handleOverrideConfirm} variant="contained" color="primary" autoFocus>
-              Enable Field
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
+      <Dialog
+        open={showOverrideDialog}
+        onClose={handleOverrideCancel}
+        aria-labelledby="override-dialog-title"
+        aria-describedby="override-dialog-description"
+      >
+        <DialogTitle id="override-dialog-title" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <WarningAmberIcon color="warning" />
+          Enable {quantityType === 'regular' ? 'Non-Foil' : 'Foil'} Quantity?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="override-dialog-description" component="div">
+            <Typography variant="body2" gutterBottom>
+              According to our data, this card doesn&apos;t come in {quantityType === 'regular' ? 'non-foil' : 'foil'}{' '}
+              finish.
+            </Typography>
+            <Typography variant="body2" gutterBottom>
+              However, this data can sometimes be incorrect or incomplete. If you have this card in{' '}
+              {quantityType === 'regular' ? 'non-foil' : 'foil'} finish, you can override this restriction.
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 500, mt: 2 }}>
+              Would you like to enable this field anyway?
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleOverrideCancel} color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={handleOverrideConfirm} variant="contained" color="primary" autoFocus>
+            Enable Field
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
@@ -929,8 +929,8 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
 
             const x = mousePositionRef.current.x - 150; // Center horizontally (299px / 2)
             const y = shouldShowAbove
-              ? mousePositionRef.current.y - cardHeight - offset  // Above cursor
-              : mousePositionRef.current.y + offset;              // Below cursor
+              ? mousePositionRef.current.y - cardHeight - offset // Above cursor
+              : mousePositionRef.current.y + offset; // Below cursor
 
             hoverCardRef.current!.style.left = `${x}px`;
             hoverCardRef.current!.style.top = `${y}px`;
@@ -989,8 +989,8 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
 
       const x = mousePositionRef.current.x - 150; // Center horizontally (299px / 2)
       const y = shouldShowAbove
-        ? mousePositionRef.current.y - cardHeight - offset  // Above cursor
-        : mousePositionRef.current.y + offset;              // Below cursor
+        ? mousePositionRef.current.y - cardHeight - offset // Above cursor
+        : mousePositionRef.current.y + offset; // Below cursor
 
       hoverCardRef.current.style.left = `${x}px`;
       hoverCardRef.current.style.top = `${y}px`;
@@ -1037,16 +1037,10 @@ export const useCardRowRenderer = (
     // Card Name Cell (always shown)
     // Generate card URL based on context (collection vs browse)
     const cardSlug = generateCardSlug(card.name);
-    const cardHref = userId
-      ? getCollectionCardUrl(userId, cardSlug, card.id)
-      : `/browse/cards/${cardSlug}/${card.id}`;
+    const cardHref = userId ? getCollectionCardUrl(userId, cardSlug, card.id) : `/browse/cards/${cardSlug}/${card.id}`;
 
     cells.push(
-      <TableCell
-        key="name"
-        component="th"
-        scope="row"
-      >
+      <TableCell key="name" component="th" scope="row">
         <Link
           href={cardHref}
           style={{

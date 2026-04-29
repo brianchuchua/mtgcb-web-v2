@@ -36,6 +36,15 @@ const VirtualizedGallery = <T,>({
     setIsHydrated(true);
   }, []);
 
+  // Item content renderer for the Virtuoso component
+  const itemContent = React.useCallback(
+    (index: number) => {
+      const item = items[index];
+      return renderItem(item, index);
+    },
+    [items, renderItem],
+  );
+
   // Only show empty message when not loading and actually have no items
   if (!isLoading && items && items.length === 0) {
     return (
@@ -60,15 +69,6 @@ const VirtualizedGallery = <T,>({
       ></Box>
     );
   }
-
-  // Item content renderer for the Virtuoso component
-  const itemContent = React.useCallback(
-    (index: number) => {
-      const item = items[index];
-      return renderItem(item, index);
-    },
-    [items, renderItem],
-  );
 
   return (
     <GalleryWrapper

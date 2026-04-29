@@ -9,8 +9,15 @@ dotenv.config({ path: path.resolve(__dirname, '.env.local') });
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+// Manual / agent-driven exploratory tests live under tests/manual/ and are
+// run on-demand via `yarn test:manual` (which sets RUN_MANUAL_TESTS=1 to
+// flip the ignore off). The default suite (and CI) excludes them so they
+// don't block on screenshot reviews.
+const RUN_MANUAL_TESTS = process.env.RUN_MANUAL_TESTS === '1';
+
 export default defineConfig({
   testDir: './tests',
+  testIgnore: RUN_MANUAL_TESTS ? [] : ['**/manual/**'],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

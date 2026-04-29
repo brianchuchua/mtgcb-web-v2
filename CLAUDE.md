@@ -98,6 +98,124 @@ test.describe('Feature Name', () => {
   );
   ```
 
+## Agent-Driven Manual Testing
+
+A separate test suite under `tests/manual/` for **agent-driven exploratory verification** of user stories. These are **not** regression tests — they exist so an AI agent (or a human) can drive a flow end-to-end, capture screenshots, and inspect outcomes without writing brittle assertions.
+
+### Why a separate suite?
+
+- Regular e2e tests assert specific behavior and gate CI. They fail loudly if anything regresses.
+- Manual tests **explore and capture state**. They take screenshots, log structured observations, and let a reviewer (Claude or human) inspect the output.
+- Mixing them dilutes both: assertion-driven suites get noisy with screenshots, and exploratory suites get pruned every time someone tightens a flaky assertion.
+- Best practice (2026): keep them separate. Industry-standard visual-regression tooling (Playwright's `toHaveScreenshot`, Chromatic, Percy) is *also* separate from functional e2e. We're doing the same with a lighter-weight pattern.
+
+### Do NOT add `tests/manual/` to the regular e2e run.
+
+`yarn test:e2e` continues to run only `tests/` (excluding `tests/manual/`). Manual tests are run on-demand:
+
+```bash
+yarn test:manual                                 # the whole suite
+yarn test:manual tests/manual/goals/goal-flow.e2e.test.ts   # a single story
+```
+
+### File layout
+
+```
+tests/manual/
+  <user-story>/
+    <flow>.e2e.test.ts
+```
+
+One file per *flow*, grouped under the user story it belongs to. Examples:
+
+- `tests/manual/browse/cards-grid.e2e.test.ts`
+- `tests/manual/browse/jump-to-set-menu.e2e.test.ts`
+- `tests/manual/goals/goal-flow.e2e.test.ts`
+- `tests/manual/collection/edit-cards.e2e.test.ts`
+
+Screenshots go to `test-results/manual-screenshots/<descriptive-name>.png` (gitignored).
+
+### The pattern
+
+```typescript
+import { test } from '@playwright/test';
+import path from 'path';
+import { LOCAL_TEST_USER_ID, authenticateAsLocalTestUser, getLocalTestJwt } from '../../utils/auth';
+
+const SHOTS_DIR = path.join(process.cwd(), 'test-results', 'manual-screenshots');
+const shot = (name: string) => path.join(SHOTS_DIR, `${name}.png`);
+
+test.describe('User story: <one sentence>', () => {
+  // For auth'd flows, skip cleanly when the JWT isn't set.
+  test.beforeEach(async ({ context }) => {
+    test.skip(!getLocalTestJwt(), 'E2E_TEST_JWT_1337 not set');
+    await authenticateAsLocalTestUser(context);
+  });
+
+  test('happy path: <flow description>', async ({ page }) => {
+    // Listen for the React errors that matter — hook ordering, etc.
+    const reactErrors: string[] = [];
+    page.on('console', (msg) => {
+      if (msg.type() !== 'error') return;
+      const text = msg.text();
+      if (text.includes('Rendered more hooks') || text.includes('Rendered fewer hooks')
+          || text.includes('Rules of Hooks') || text.includes('hook order')) {
+        reactErrors.push(text);
+      }
+    });
+
+    await page.goto('/some-route');
+    await page.waitForLoadState('networkidle');
+
+    // Snapshot at meaningful moments.
+    await page.screenshot({ path: shot('01-landing'), fullPage: false });
+
+    // Drive the flow: click, type, navigate.
+    await page.getByRole('button', { name: /start/i }).click();
+    await page.waitForLoadState('networkidle');
+    await page.screenshot({ path: shot('02-after-click') });
+
+    // Emit structured observations the agent can grep out of `--reporter=line` output.
+    console.log(JSON.stringify({
+      url: page.url(),
+      reactErrors,
+      label: 'flow-result',
+    }));
+  });
+});
+```
+
+### How the agent inspects results
+
+When run with `--reporter=line`, the `console.log(JSON.stringify(...))` lines surface inline. The agent reads them out of the test output (Bash result) and inspects screenshots with the Read tool (PNG files render as images for vision-capable models). Examples:
+
+```bash
+yarn test:manual tests/manual/goals/goal-flow.e2e.test.ts --reporter=line
+# Read tool: test-results/manual-screenshots/goal-03-after-switch.png
+```
+
+### Conventions / checklist for new manual tests
+
+- **One file per flow.** Don't pack 12 tests into one file — they're tedious to inspect.
+- **Use `fullPage: false` by default.** Top-of-page is usually what matters; `fullPage: true` for verifying scroll content.
+- **Wait for *content* before screenshotting**, not just `networkidle`. Virtualized tables/grids populate lazily — wait for `>= N rows/items` before capturing.
+- **Always log structured JSON** at decision points: URLs after navigation, counts, geometry data. Use a `label` field so the agent can grep specific entries.
+- **Always listen for console errors** — at minimum the React hook-ordering ones. Check the array at the end and `expect(reactErrors).toEqual([])` if you want it to actually *fail* on regression. Otherwise just log it.
+- **For auth'd flows**, use `test.skip(!getLocalTestJwt(), ...)` so the test doesn't fail when the JWT isn't set.
+- **Keep them stable.** If the screenshot would only make sense in your specific dev DB, note that in a comment so future-you (or future-Claude) doesn't go chasing imaginary regressions.
+
+### When to write a new manual test
+
+- After a non-trivial refactor of a user-facing flow (hook restructure, component swap, big re-render-path change).
+- When you suppress a lint rule with "this is intentional, here's why" — write a manual test that exercises the path the suppression protects.
+- When the regular e2e suite passes but you want a human-or-agent eyeball on visual layout (popper anchoring, grid spacing, etc.).
+- When debugging a flaky bug — the captured screenshots become the bug-report attachment.
+
+### When *not* to write one
+
+- Pure unit logic, validation rules, API responses → use jest or regular e2e.
+- Anything you'd want CI to fail on → write a regular e2e in `tests/`.
+
 ## Code Conventions
 
 - Functional components with arrow functions: `const Component = () => {}`
