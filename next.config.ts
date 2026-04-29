@@ -15,7 +15,6 @@ const nextConfig: NextConfig = {
   compiler: {
     emotion: true,
   },
-  ...(BUILD_SHA ? { deploymentId: BUILD_SHA } : {}),
   env: {
     NEXT_PUBLIC_BUILD_SHA: BUILD_SHA,
   },
