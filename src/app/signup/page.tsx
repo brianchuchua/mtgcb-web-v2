@@ -101,7 +101,7 @@ export default function SignUpPage() {
       }
     } catch (error: any) {
       const errorData = error.data as ApiResponse<SignUpData | LoginData>;
-      let message = errorData?.error?.message || 'There was a problem trying to sign up. Please try again in a moment.';
+      const message = errorData?.error?.message || 'There was a problem trying to sign up. Please try again in a moment.';
 
       setError('root', {
         type: 'manual',

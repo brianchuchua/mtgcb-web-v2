@@ -69,7 +69,7 @@ export function checkWinCondition(state: GameStateData, config: GameConfig): boo
 }
 
 export function triggerWin(state: GameStateData, config: GameConfig): GameStateData {
-  let newState = setBlockSpawning(state, true);
+  const newState = setBlockSpawning(state, true);
 
   // Schedule the state change for later
   newState.scheduledStateChange = {
@@ -87,7 +87,7 @@ export function triggerWin(state: GameStateData, config: GameConfig): GameStateD
 }
 
 export function triggerGameOver(state: GameStateData, config: GameConfig): GameStateData {
-  let newState = setBlockSpawning(state, true);
+  const newState = setBlockSpawning(state, true);
 
   // Schedule the state change for later
   newState.scheduledStateChange = {

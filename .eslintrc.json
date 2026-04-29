@@ -1,23 +1,35 @@
 {
   "extends": [
-    "airbnb",
-    "airbnb/hooks",
     "next/core-web-vitals",
     "next/typescript",
-    "prettier",
-    "eslint-plugin-react-compiler"
+    "prettier"
   ],
+  "plugins": ["react-compiler"],
   "rules": {
     "import/prefer-default-export": "off",
     "react/react-in-jsx-scope": "off",
     "react/jsx-uses-react": "off",
-    "no-console": ["warn", { "allow": ["warn", "error"] }],
     "react/jsx-props-no-spreading": "off",
     "react/jsx-filename-extension": ["warn", { "extensions": [".jsx", ".tsx"] }],
-    "react-compiler/react-compiler": "error"
+    "react/no-unescaped-entities": "off",
+    "react/display-name": "off",
+    "react-compiler/react-compiler": "error",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
   },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*", "**/*.test.ts", "**/*.test.tsx", "tests/**/*"],
+      "rules": {
+        "@typescript-eslint/no-require-imports": "off",
+        "@typescript-eslint/no-unused-vars": "off"
+      }
+    }
+  ],
   "env": {
     "browser": true,
-    "es2021": true
+    "es2021": true,
+    "jest": true
   }
 }
