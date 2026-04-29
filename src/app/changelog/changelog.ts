@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-04-29',
+      version: '1.24.7',
+      changes: [
+        'On the Add or Remove Cards page, clicking the card now opens your collection entry instead of the browse view.',
+      ],
+    },
+    {
+      date: '2026-04-29',
       version: '1.24.6',
       changes: [
         'Fixed rare bug with Safari iOS when scrolling through table views',

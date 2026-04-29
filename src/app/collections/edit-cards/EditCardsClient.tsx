@@ -43,8 +43,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePriceType } from '@/hooks/usePriceType';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
-import { generateCardUrl } from '@/utils/cards/generateCardSlug';
+import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
+import { getCollectionCardUrl } from '@/utils/collectionUrls';
 import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
 const EditCardsClient: React.FC = () => {
@@ -251,11 +252,12 @@ const EditCardsClient: React.FC = () => {
   };
 
   const handleCardClick = useCallback(() => {
-    if (selectedCard) {
-      const cardUrl = generateCardUrl(selectedCard.name, selectedCard.id);
+    if (selectedCard && user?.userId) {
+      const cardSlug = generateCardSlug(selectedCard.name);
+      const cardUrl = getCollectionCardUrl(user.userId, cardSlug, selectedCard.id);
       router.push(cardUrl);
     }
-  }, [selectedCard, router]);
+  }, [selectedCard, router, user?.userId]);
 
   const handleSave = async () => {
     if (!selectedCard) return;

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { authenticateAsLocalTestUser, getLocalTestJwt } from '../utils/auth';
+import { LOCAL_TEST_USER_ID, authenticateAsLocalTestUser, getLocalTestJwt } from '../utils/auth';
 
 // Mirrors the API's Collection quantity bounds (@/utils/validationLimits).
 const COLLECTION_QUANTITY_MAX = 9999;
@@ -90,6 +90,20 @@ test.describe('Edit Cards page - collection quantity limits', () => {
     test('Save button is enabled once a card is selected', async ({ page }) => {
       // After the card is picked in beforeEach, the Save button should be clickable.
       await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled();
+    });
+  });
+
+  test.describe('card link navigation', () => {
+    test('clicking the card image goes to the collection card page, not /browse', async ({ page }) => {
+      // The card image is the first <img> with cursor: pointer rendered after selection.
+      // Clicking it should navigate into the user's collection-context card page.
+      const cardImage = page.locator('img[alt="Giant Spider"]').first();
+      await expect(cardImage).toBeVisible();
+      await cardImage.click();
+
+      await page.waitForURL(/\/collections\/\d+\/cards\//, { timeout: 5000 });
+      expect(page.url()).toContain(`/collections/${LOCAL_TEST_USER_ID}/cards/giant-spider/`);
+      expect(page.url()).not.toContain('/browse/cards/');
     });
   });
 });
