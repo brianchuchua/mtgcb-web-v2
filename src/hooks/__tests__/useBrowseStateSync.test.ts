@@ -32,6 +32,8 @@ jest.mock('../useSearchStateSync', () => ({
   loadSearchState: jest.fn(() => null), // No saved search state by default
   saveSearchState: jest.fn(),
   clearSearchState: jest.fn(),
+  syncSharedFieldsToStorage: jest.fn(),
+  SHARED_CROSS_VIEW_FIELDS: ['selectedGoalId', 'selectedLocationId', 'includeChildLocations', 'showGoals'],
 }));
 
 describe('useBrowseStateSync', () => {

@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-05-03',
+      version: '1.24.8',
+      changes: [
+        'Fixed cases where your collection goal could revert to a previous selection.',
+      ],
+    },
+    {
       date: '2026-04-29',
       version: '1.24.7',
       changes: [

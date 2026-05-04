@@ -192,6 +192,68 @@ export function clearSpecificSearchField(view: 'cards' | 'sets', field: keyof Br
   }
 }
 
+// Fields that the browse slice keeps synchronized between cardsSearchParams and
+// setsSearchParams (setSelectedGoalId / setShowGoals / setSelectedLocationId /
+// setIncludeChildLocations all write to both). sessionStorage only persists the
+// active view, so these need to be mirrored to the inactive view's stored state
+// to prevent stale values from rehydrating on navigation.
+export const SHARED_CROSS_VIEW_FIELDS: ReadonlyArray<keyof BrowseSearchParams> = [
+  'selectedGoalId',
+  'selectedLocationId',
+  'includeChildLocations',
+  'showGoals',
+];
+
+/**
+ * Mirror the SHARED_CROSS_VIEW_FIELDS from `source` into the sessionStorage entry
+ * for `view`, leaving all other fields in storage untouched. Used to keep the
+ * inactive view's stored state in sync after a goal/location/showGoals change.
+ */
+export function syncSharedFieldsToStorage(
+  view: 'cards' | 'sets',
+  source: Partial<BrowseSearchParams>,
+): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    const key = `mtgcb_search_state_${view}`;
+    const stored = sessionStorage.getItem(key);
+    const parsed: Partial<BrowseSearchParams> = stored ? JSON.parse(stored) : {};
+
+    let mutated = false;
+    for (const field of SHARED_CROSS_VIEW_FIELDS) {
+      const sourceValue = source[field];
+      const isUnset =
+        sourceValue === undefined ||
+        sourceValue === null ||
+        sourceValue === '' ||
+        (Array.isArray(sourceValue) && sourceValue.length === 0);
+
+      if (isUnset) {
+        if (field in parsed) {
+          delete parsed[field];
+          mutated = true;
+        }
+      } else if (parsed[field] !== sourceValue) {
+        (parsed as Record<string, unknown>)[field] = sourceValue;
+        mutated = true;
+      }
+    }
+
+    if (!mutated) return;
+
+    if (Object.keys(parsed).length === 0) {
+      sessionStorage.removeItem(key);
+    } else {
+      sessionStorage.setItem(key, JSON.stringify(parsed));
+    }
+  } catch (error) {
+    console.warn('Failed to sync shared fields to sessionStorage:', error);
+  }
+}
+
 /**
  * Hook to automatically sync search state to sessionStorage
  */
