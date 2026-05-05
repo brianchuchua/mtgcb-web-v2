@@ -12,11 +12,15 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-05-05',
+      version: '1.24.9',
+      changes: ['Added 2300+ missing Art Series cards and created 35+ new sets to hold signed and unsigned variants.'],
+      type: 'data',
+    },
+    {
       date: '2026-05-03',
       version: '1.24.8',
-      changes: [
-        'Fixed cases where your collection goal could revert to a previous selection.',
-      ],
+      changes: ['Fixed cases where your collection goal could revert to a previous selection.'],
     },
     {
       date: '2026-04-29',
