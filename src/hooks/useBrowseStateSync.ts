@@ -356,18 +356,33 @@ export function useBrowseStateSync() {
 
   /** ------------------------------------------------------------------
    *  Save viewContentType preference to localStorage when it changes
+   *
+   *  IMPORTANT: this effect intentionally depends only on `viewType` and
+   *  `pathname`. Including `preferredViewContentType` and
+   *  `setPreferredViewContentType` here creates an infinite cross-tab write
+   *  loop:
+   *    - Tab A and Tab B have different Redux `viewType`s.
+   *    - Tab A writes its viewType to localStorage.
+   *    - Browser fires the native `storage` event in Tab B, which
+   *      `useLocalStorage` listens for and uses to update Tab B's
+   *      `preferredViewContentType` state.
+   *    - That re-runs Tab B's effect, which sees `viewType !==
+   *      preferredViewContentType` and writes its own viewType back.
+   *    - Tab A receives the storage event → repeat. Forever, ~16ms / cycle.
+   *  We dedupe via a ref so we still only write when Redux `viewType`
+   *  actually transitions, ignoring noise from other tabs.
    * ------------------------------------------------------------------ */
+  const lastSavedViewType = useRef<'cards' | 'sets' | null>(null);
   useEffect(() => {
     if (!hasInit.current) return;
-
-    // Only save if user explicitly changed view on a browse page
-    // Don't save if we're on a set-specific page (forced context)
-    const setSpecificPage = isSetSpecificPage(pathname);
-
-    if (!setSpecificPage && viewType !== preferredViewContentType) {
-      setPreferredViewContentType(viewType);
-    }
-  }, [viewType, pathname, preferredViewContentType, setPreferredViewContentType]);
+    if (isSetSpecificPage(pathname)) return;
+    if (viewType === lastSavedViewType.current) return;
+    lastSavedViewType.current = viewType;
+    setPreferredViewContentType(viewType);
+    // setPreferredViewContentType and preferredViewContentType intentionally
+    // omitted — see block comment above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewType, pathname]);
 
   /** ------------------------------------------------------------------
    *  When *search state* changes, rewrite the URL (debounced)

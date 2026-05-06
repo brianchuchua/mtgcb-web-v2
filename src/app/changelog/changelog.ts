@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-05-06',
+      version: '1.25.1',
+      changes: [
+        'Fixed an issue where having two browser tabs open on the site could cause your remembered cards/sets view preference to ping-pong between them.',
+      ],
+    },
+    {
+      date: '2026-05-06',
       version: '1.25.0',
       changes: [
         'Added Type and Artist as sort options for cards.',
