@@ -9,6 +9,7 @@ import { useCollectionSetTableRenderers, extractCollectionSetCellValue } from '@
 import VirtualizedRowGallery from '@/components/common/VirtualizedRowGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
 import { SetDisplayProps } from '@/components/sets/SetDisplay';
+import { usePreferredSetsSortBy, usePreferredSetsSortOrder } from '@/hooks/useBrowsePreferences';
 import {
   selectIncludeSubsetsInSets,
   selectSortBy,
@@ -46,6 +47,9 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
   const currentSortOrder = useSelector(selectSortOrder) || 'desc';
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
+  const [, setPreferredSetsSortBy] = usePreferredSetsSortBy();
+  const [, setPreferredSetsSortOrder] = usePreferredSetsSortOrder();
+
 
   const displaySets = setItems;
 
@@ -64,11 +68,15 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
       if (isClickingCurrentSortColumn) {
         const newOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
         dispatch(setSortOrder(newOrder));
+        setPreferredSetsSortOrder(newOrder);
       } else {
-        dispatch(setSortBy(columnId as SortByOption));
+        const newSortBy = columnId as SortByOption;
+        dispatch(setSortBy(newSortBy));
         // Default to 'desc' for date-based columns, 'asc' for others
         const defaultOrder = columnId === 'releasedAt' ? 'desc' : 'asc';
         dispatch(setSortOrder(defaultOrder));
+        setPreferredSetsSortBy(newSortBy);
+        setPreferredSetsSortOrder(defaultOrder);
       }
     }
   };

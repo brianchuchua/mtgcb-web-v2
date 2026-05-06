@@ -6,6 +6,12 @@ import {
   setSortOrder
 } from '@/redux/slices/browse';
 import { SortByOption } from '@/types/browse';
+import {
+  usePreferredCardsSortBy,
+  usePreferredCardsSortOrder,
+  usePreferredSetsSortBy,
+  usePreferredSetsSortOrder,
+} from '@/hooks/useBrowsePreferences';
 import { useFilteredSortBy } from '@/hooks/useFilteredSortBy';
 
 /**
@@ -19,6 +25,11 @@ export function useSort() {
   // Use filtered sort values to prevent collection-only sorts in browse context
   const { sortBy, sortOrder } = useFilteredSortBy();
 
+  const [, setPreferredCardsSortBy] = usePreferredCardsSortBy();
+  const [, setPreferredCardsSortOrder] = usePreferredCardsSortOrder();
+  const [, setPreferredSetsSortBy] = usePreferredSetsSortBy();
+  const [, setPreferredSetsSortOrder] = usePreferredSetsSortOrder();
+
   const handleSort = useCallback((columnId: string) => {
     if (!columnId) return;
 
@@ -26,8 +37,14 @@ export function useSort() {
     if (isClickingCurrentSortColumn) {
       const newOrder = sortOrder === 'asc' ? 'desc' : 'asc';
       dispatch(setSortOrder(newOrder));
+      if (viewType === 'cards') {
+        setPreferredCardsSortOrder(newOrder);
+      } else {
+        setPreferredSetsSortOrder(newOrder);
+      }
     } else {
-      dispatch(setSortBy(columnId as SortByOption));
+      const newSortBy = columnId as SortByOption;
+      dispatch(setSortBy(newSortBy));
       // Default sort order depends on view type and column
       let defaultOrder: 'asc' | 'desc';
       if (viewType === 'cards') {
@@ -38,8 +55,24 @@ export function useSort() {
         defaultOrder = columnId === 'releasedAt' ? 'desc' : 'asc';
       }
       dispatch(setSortOrder(defaultOrder));
+      if (viewType === 'cards') {
+        setPreferredCardsSortBy(newSortBy);
+        setPreferredCardsSortOrder(defaultOrder);
+      } else {
+        setPreferredSetsSortBy(newSortBy);
+        setPreferredSetsSortOrder(defaultOrder);
+      }
     }
-  }, [dispatch, sortBy, sortOrder, viewType]);
+  }, [
+    dispatch,
+    sortBy,
+    sortOrder,
+    viewType,
+    setPreferredCardsSortBy,
+    setPreferredCardsSortOrder,
+    setPreferredSetsSortBy,
+    setPreferredSetsSortOrder,
+  ]);
 
   return {
     sortBy,

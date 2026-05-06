@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-05-06',
+      version: '1.24.10',
+      changes: ['Fixed sorting cards or sets by clicking a table column header not being remembered between sessions.'],
+    },
+    {
       date: '2026-05-05',
       version: '1.24.9',
       changes: ['Added 2300+ missing Art Series cards and created 35+ new sets to hold signed and unsigned variants.'],

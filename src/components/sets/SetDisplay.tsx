@@ -7,6 +7,7 @@ import { useSetTableRenderers, extractSetCellValue } from './SetTableRenderer';
 import { CostToComplete } from '@/api/sets/types';
 import VirtualizedRowGallery from '@/components/common/VirtualizedRowGallery';
 import VirtualizedTable from '@/components/common/VirtualizedTable';
+import { usePreferredSetsSortBy, usePreferredSetsSortOrder } from '@/hooks/useBrowsePreferences';
 import {
   selectIncludeSubsetsInSets,
   selectSortBy,
@@ -67,6 +68,9 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   const currentSortOrder = useSelector(selectSortOrder) || 'desc';
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
 
+  const [, setPreferredSetsSortBy] = usePreferredSetsSortBy();
+  const [, setPreferredSetsSortOrder] = usePreferredSetsSortOrder();
+
 
   const displaySets = setItems;
 
@@ -80,9 +84,13 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
       if (isClickingCurrentSortColumn) {
         const newOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
         dispatch(setSortOrder(newOrder));
+        setPreferredSetsSortOrder(newOrder);
       } else {
-        dispatch(setSortBy(columnId as SortByOption));
+        const newSortBy = columnId as SortByOption;
+        dispatch(setSortBy(newSortBy));
         dispatch(setSortOrder('asc'));
+        setPreferredSetsSortBy(newSortBy);
+        setPreferredSetsSortOrder('asc');
       }
     }
   };
