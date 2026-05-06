@@ -62,6 +62,8 @@ export type SortByOption =
   | 'collectorNumber'
   | 'mtgcbCollectorNumber'
   | 'rarityNumeric'
+  | 'type'
+  | 'artist'
   | 'powerNumeric'
   | 'toughnessNumeric'
   | 'loyaltyNumeric'
@@ -71,6 +73,9 @@ export type SortByOption =
   | 'average'
   | 'high'
   | 'foil'
+  // Set-specific sort options
+  | 'category'
+  | 'isDraftable'
   // Collection-specific sort options
   | 'totalValue'
   | 'costToComplete.oneOfEachCard'

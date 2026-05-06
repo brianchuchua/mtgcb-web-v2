@@ -13,6 +13,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-05-06',
+      version: '1.25.0',
+      changes: [
+        'Added Type and Artist as sort options for cards.',
+        'Added Category and Draftable as sort options for sets.',
+      ],
+      type: 'feature',
+    },
+    {
+      date: '2026-05-06',
       version: '1.24.10',
       changes: ['Fixed sorting cards or sets by clicking a table column header not being remembered between sessions.'],
     },

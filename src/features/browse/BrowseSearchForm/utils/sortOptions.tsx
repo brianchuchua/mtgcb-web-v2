@@ -35,6 +35,12 @@ export const getCardSortOptions = (isPriceMismatched: (priceOption: string) => b
     <MenuItem key="rarityNumeric" value="rarityNumeric">
       Rarity
     </MenuItem>,
+    <MenuItem key="type" value="type">
+      Type
+    </MenuItem>,
+    <MenuItem key="artist" value="artist">
+      Artist
+    </MenuItem>,
     <MenuItem key="powerNumeric" value="powerNumeric">
       Power
     </MenuItem>,
@@ -102,6 +108,12 @@ export const getSetSortOptions = (isCollectionPage: boolean) => {
     </MenuItem>,
     <MenuItem key="setType" value="setType">
       Set Type
+    </MenuItem>,
+    <MenuItem key="category" value="category">
+      Category
+    </MenuItem>,
+    <MenuItem key="isDraftable" value="isDraftable">
+      Draftable
     </MenuItem>,
   ];
 
