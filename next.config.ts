@@ -9,47 +9,32 @@ const BUILD_SHA =
   '';
 
 const nextConfig: NextConfig = {
-  experimental: {
-    reactCompiler: true,
-  },
+  reactCompiler: true,
   compiler: {
     emotion: true,
   },
   env: {
     NEXT_PUBLIC_BUILD_SHA: BUILD_SHA,
   },
+  allowedDevOrigins: ['local.mtgcb.com'],
 };
 
 export default withSentryConfig(nextConfig, {
   // For all available options, see:
-  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
+  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
   org: 'brian-chuchua',
   project: 'mtgcb-web-v2',
 
   authToken: process.env.SENTRY_AUTH_TOKEN,
 
-  // Print logs in heroku build output
+  // Print logs in build output
   silent: false,
-
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: true,
 
-  // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
-  // tunnelRoute: "/monitoring",
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
-
-  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-  // See the following for more information:
-  // https://docs.sentry.io/product/crons/
-  // https://vercel.com/docs/cron-jobs
-  automaticVercelMonitors: true,
+  // Note: disableLogger and automaticVercelMonitors are Webpack-only and were removed
+  // when migrating to Turbopack-default in Next.js 16. Re-add under a `webpack: {}` block
+  // if we ever switch back to Webpack.
 });

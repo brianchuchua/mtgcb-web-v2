@@ -25,9 +25,11 @@ test.describe('Browse Page', () => {
     const firstSetItem = page.getByTestId('set-item').first();
     await expect(firstSetItem.getByTestId('set-name')).toBeVisible();
     
-    // Verify set name includes code in parentheses (e.g., "Foundations (FDN)")
+    // Verify set name includes code in parentheses (e.g., "Foundations (FDN)").
+    // Some special-edition codes can run longer than the standard 2-4 chars
+    // (e.g., "Secrets of Strixhaven Art Series (Signed) (ASSOS)").
     const setNameText = await firstSetItem.getByTestId('set-name').textContent();
-    expect(setNameText).toMatch(/\([A-Z0-9]{2,4}\)$/);
+    expect(setNameText).toMatch(/\([A-Z0-9]{2,8}\)$/);
     
     await expect(firstSetItem.getByTestId('set-icon')).toBeVisible();
     await expect(firstSetItem.getByTestId('set-release-date')).toBeVisible();

@@ -10,7 +10,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env.local') });
  * See https://playwright.dev/docs/test-configuration.
  */
 // Manual / agent-driven exploratory tests live under tests/manual/ and are
-// run on-demand via `yarn test:manual` (which sets RUN_MANUAL_TESTS=1 to
+// run on-demand via `pnpm test:manual` (which sets RUN_MANUAL_TESTS=1 to
 // flip the ignore off). The default suite (and CI) excludes them so they
 // don't block on screenshot reviews.
 const RUN_MANUAL_TESTS = process.env.RUN_MANUAL_TESTS === '1';
@@ -77,7 +77,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'yarn dev',
+    command: 'pnpm dev',
     url: 'http://local.mtgcb.com:3000',
     reuseExistingServer: !process.env.CI,
   },

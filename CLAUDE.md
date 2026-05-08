@@ -6,7 +6,7 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 
 ## For Every Feature (Once I Confirm It's Complete)
 
-- First run `yarn type-check` to ensure TypeScript types are correct
+- First run `pnpm type-check` to ensure TypeScript types are correct
 - Run `date` command to get the current date
 - Update the version number using semver conventions in `package.json` and `src/app/changelog/changelog.ts`
   - Only read the first ~60 lines of changelog.ts to see the current version and format (no need to read the entire file)
@@ -20,35 +20,37 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 
 ## Tech Stack
 
-- Next.js 15 + React 19
+- Next.js 16 + React 19.2 (Turbopack default; React Compiler v1.0 stable)
 - MUI 6 + Emotion
 - Redux Toolkit + RTK Query
 - TypeScript (strict mode)
 - React Hook Form + React Virtuoso
 - Playwright testing
 
+Package manager: **pnpm 10.33.4** (pinned via `packageManager` field; Corepack auto-fetches). Node: **24.15.0** (pinned via `engines.node` and `.node-version`).
+
 ## Commands
 
-- `yarn dev` - Development server
-- `yarn build` - Production build
-- `yarn type-check` - TypeScript checking
-- `yarn lint` - ESLint
-- `yarn test` - Jest unit tests
-- `yarn test:e2e` - Playwright E2E tests
-- `yarn test:e2e tests/path/to/test.ts` - Run specific test file
+- `pnpm dev` - Development server
+- `pnpm build` - Production build
+- `pnpm type-check` - TypeScript checking
+- `pnpm lint` - ESLint
+- `pnpm test` - Jest unit tests
+- `pnpm test:e2e` - Playwright E2E tests
+- `pnpm test:e2e tests/path/to/test.ts` - Run specific test file
 
 ## E2E Testing (Playwright)
 
 ### Prerequisites
 
-- Local web server running (`yarn dev`)
+- Local web server running (`pnpm dev`)
 - Local API server running
-- After Playwright updates: `yarn playwright install chromium`
+- After Playwright updates: `pnpm exec playwright install chromium`
 
 ### Workflow
 
-1. Write/run the specific test file: `yarn test:e2e tests/path/to/test.ts`
-2. Run full suite to catch regressions: `yarn test:e2e`
+1. Write/run the specific test file: `pnpm test:e2e tests/path/to/test.ts`
+2. Run full suite to catch regressions: `pnpm test:e2e`
 
 ### Test File Location
 
@@ -111,11 +113,11 @@ A separate test suite under `tests/manual/` for **agent-driven exploratory verif
 
 ### Do NOT add `tests/manual/` to the regular e2e run.
 
-`yarn test:e2e` continues to run only `tests/` (excluding `tests/manual/`). Manual tests are run on-demand:
+`pnpm test:e2e` continues to run only `tests/` (excluding `tests/manual/`). Manual tests are run on-demand:
 
 ```bash
-yarn test:manual                                 # the whole suite
-yarn test:manual tests/manual/goals/goal-flow.e2e.test.ts   # a single story
+pnpm test:manual                                 # the whole suite
+pnpm test:manual tests/manual/goals/goal-flow.e2e.test.ts   # a single story
 ```
 
 ### File layout
@@ -190,7 +192,7 @@ test.describe('User story: <one sentence>', () => {
 When run with `--reporter=line`, the `console.log(JSON.stringify(...))` lines surface inline. The agent reads them out of the test output (Bash result) and inspects screenshots with the Read tool (PNG files render as images for vision-capable models). Examples:
 
 ```bash
-yarn test:manual tests/manual/goals/goal-flow.e2e.test.ts --reporter=line
+pnpm test:manual tests/manual/goals/goal-flow.e2e.test.ts --reporter=line
 # Read tool: test-results/manual-screenshots/goal-03-after-switch.png
 ```
 
