@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-05-08',
+      version: '1.26.1',
+      changes: [
+        'Improved the accuracy of the TCGPlayer buy buttons.',
+      ],
+    },
+    {
       date: '2026-05-07',
       version: '1.26.0',
       changes: [

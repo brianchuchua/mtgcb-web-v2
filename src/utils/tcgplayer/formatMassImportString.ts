@@ -20,14 +20,12 @@ export const formatMassImportString = (
     .map((card) => {
       const cardName = card.tcgplayerName || card.name;
 
-      let setCode = '';
-      if (card.tcgplayerSetCode) {
-        setCode = card.tcgplayerSetCode;
-      } else if (card.setName) {
-        setCode = card.setName;
-      } else {
-        setCode = 'Unknown Set';
-      }
+      // Only TCGPlayer's own abbreviation is trusted here. MTG CB's setCode and the
+      // human-readable setName both risk silent mismatches — TCGPlayer would either buy the
+      // wrong printing (name-match) or accept a similar-but-wrong abbreviation. When the
+      // canonical code is missing, emit a literal "[Unknown Set Code]" so TCGPlayer fails to
+      // match and the user notices, rather than ending up with the wrong card.
+      const setCode = card.tcgplayerSetCode || 'Unknown Set Code';
 
       let cardQuantity = quantity;
       
