@@ -12,6 +12,25 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-05-12',
+      version: '1.26.2',
+      changes: [
+        'Updated Foundations',
+        'Updated MagicFest Promos',
+        'Updated Media Inserts',
+        'Updated Promo Pack: Foundations',
+        'Updated Promo Pack: Modern Horizons 3',
+        'Updated Promo Pack: Secrets of Strixhaven',
+        'Updated Secret Lair Drop Series',
+        'Updated Spotlight Series',
+        'Updated Store Championship Promos',
+        'Updated The Big Score Promos',
+        'Updated The Lost Caverns of Ixalan Art Series',
+        'Updated WPN Promos',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-05-08',
       version: '1.26.1',
       changes: [

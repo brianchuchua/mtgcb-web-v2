@@ -10,18 +10,16 @@ if (process.env.NODE_ENV === 'production') {
     // Add optional integrations for additional features
     integrations: [Sentry.replayIntegration()],
 
-    // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-    tracesSampleRate: 0.1,
+    // 1% sampling. Quota is 5M spans/month shared with mtgcb-api-v3 and
+    // PAYG is disabled. At 10% the org burned its cap in 13 days.
+    tracesSampleRate: 0.01,
     // Enable logs to be sent to Sentry
     enableLogs: true,
 
-    // Define how likely Replay events are sampled.
-    // This sets the sample rate to be 10%. You may want this to be 100% while
-    // in development and sample at a lower rate in production
-    replaysSessionSampleRate: 0.1,
-
-    // Define how likely Replay events are sampled when an error occurs.
-    replaysOnErrorSampleRate: 1.0,
+    // Replay quota is 50/month with PAYG disabled. Background sampling is off;
+    // we only capture a small fraction of sessions that hit an error.
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: 0.05,
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
