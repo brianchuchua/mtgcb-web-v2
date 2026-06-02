@@ -5,20 +5,24 @@ interface CardHoverPreviewProps {
   cardId: string;
   cardName?: string;
   setName?: string;
+  /** Override the previewed image URL. Defaults to the card's front "normal" image; pass an
+   *  explicit URL to preview a back face ({cardId}b.jpg) or any other variant. */
+  imageUrl?: string;
   children: React.ReactNode;
 }
 
-export const CardHoverPreview: React.FC<CardHoverPreviewProps> = ({ 
-  cardId, 
-  cardName, 
+export const CardHoverPreview: React.FC<CardHoverPreviewProps> = ({
+  cardId,
+  cardName,
   setName,
-  children 
+  imageUrl: imageUrlOverride,
+  children
 }) => {
   const [showPreview, setShowPreview] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  const imageUrl = `https://r2.mtgcollectionbuilder.com/cards/images/normal/${cardId}.jpg?v=${
+  const imageUrl = imageUrlOverride ?? `https://r2.mtgcollectionbuilder.com/cards/images/normal/${cardId}.jpg?v=${
     process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'
   }`;
 

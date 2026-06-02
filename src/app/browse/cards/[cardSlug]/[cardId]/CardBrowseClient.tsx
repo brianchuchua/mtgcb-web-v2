@@ -69,6 +69,8 @@ const selectFields: Array<keyof CardModel | string> = [
   'pureName',
   'isReserved',
   'legalities',
+  // Truthy when the card has a back-face image — drives CardImageDisplay's flip overlay button.
+  'backScryfallId',
 ];
 
 const otherPrintingsSelectFields: Array<keyof CardModel | string> = [
@@ -235,6 +237,7 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
             cardName={card?.name}
             setName={card?.setName}
             tcgplayerId={card?.tcgplayerId || undefined}
+            backScryfallId={(card as any)?.backScryfallId ?? null}
             // On the detail page we want clicking the image to open a buy-options menu
             // (not a one-click direct route to TCGPlayer), so the user can pick TCG or
             // Card Kingdom with equal prominence.

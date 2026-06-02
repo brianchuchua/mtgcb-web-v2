@@ -52,6 +52,12 @@ export const SearchForms = () => {
   if (pathname === '/collections/edit-cards') {
     return null;
   }
+
+  // Don't render on the migrate page — it has its own focused, self-contained UI with no
+  // browse-style search.
+  if (/^\/collections\/[^/]+\/migrate$/.test(pathname ?? '')) {
+    return null;
+  }
   
   // Don't render on browse card detail pages
   if (pathname?.startsWith('/browse/cards/') && pathname?.split('/').length > 3) {

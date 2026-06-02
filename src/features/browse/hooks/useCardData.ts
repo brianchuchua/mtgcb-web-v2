@@ -69,11 +69,17 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       'releaseDate',
       'canBeFoil',
       'canBeNonFoil',
+      // Surfaces double-sided cards to the grid so CardItem can render the flip overlay.
+      'backScryfallId',
     ];
 
     // Add quantity fields when userId is present
     if (userId) {
       selectFields.push('quantityReg', 'quantityFoil');
+      // `deprecated` only surfaces in user-scoped paths (the API hides deprecated cards
+      // from anonymous browse), so it rides along with the collection fields. Without it
+      // in the select whitelist the response strips it and CardItem can't show the chip.
+      selectFields.push('deprecated');
       if (cardDisplaySettings.locationsIsVisible || collectionSettings.tableLocationsIsVisible) {
         selectFields.push('locations');
       }

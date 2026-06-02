@@ -1,25 +1,30 @@
-import React, { useState, useMemo } from 'react';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Box,
-  Typography,
-  ToggleButton,
-  ToggleButtonGroup,
-  Collapse,
-  styled,
   Chip,
+  Collapse,
   FormControlLabel,
   IconButton,
   Popover,
   Switch,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+  styled,
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setStats, selectStats, setIncludeBadDataOnly, selectIncludeBadDataOnly, selectSelectedGoalId } from '@/redux/slices/browse';
-import { StatFilters } from '@/types/browse';
 import OutlinedBox from '@/components/ui/OutlinedBox';
-
+import {
+  selectIncludeBadDataOnly,
+  selectSelectedGoalId,
+  selectStats,
+  setIncludeBadDataOnly,
+  setStats,
+} from '@/redux/slices/browse';
+import { StatFilters } from '@/types/browse';
 
 const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   flex: 1,
@@ -58,7 +63,9 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
   const [infoAnchorEl, setInfoAnchorEl] = useState<HTMLElement | null>(null);
 
   // Parse current stat filters to determine selected values and custom filters
-  const parseQuantityFilter = (quantityType: QuantityType): { selected: QuantityOption[]; hasCustomFilter: boolean } => {
+  const parseQuantityFilter = (
+    quantityType: QuantityType,
+  ): { selected: QuantityOption[]; hasCustomFilter: boolean } => {
     const filters = statFilters?.[quantityType] || [];
     if (filters.length === 0) return { selected: [], hasCustomFilter: false };
 
@@ -97,8 +104,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
           default:
             hasUnmatchedFilters = true;
         }
-      } else if ((operator === 'gte' && value === '5') ||
-                 (operator === 'gt' && value === '4')) {
+      } else if ((operator === 'gte' && value === '5') || (operator === 'gt' && value === '4')) {
         matchedOptions.push('5x+');
       } else {
         hasUnmatchedFilters = true;
@@ -119,20 +125,24 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
   // Convert a QuantityOption to its filter condition string
   const optionToFilterCondition = (option: QuantityOption): string | null => {
     switch (option) {
-      case '0x': return 'eq0';
-      case '1x': return 'eq1';
-      case '2x': return 'eq2';
-      case '3x': return 'eq3';
-      case '4x': return 'eq4';
-      case '5x+': return 'gte5';
-      default: return null;
+      case '0x':
+        return 'eq0';
+      case '1x':
+        return 'eq1';
+      case '2x':
+        return 'eq2';
+      case '3x':
+        return 'eq3';
+      case '4x':
+        return 'eq4';
+      case '5x+':
+        return 'gte5';
+      default:
+        return null;
     }
   };
 
-  const handleQuantityChange = (
-    quantityType: QuantityType,
-    value: QuantityOption | null
-  ) => {
+  const handleQuantityChange = (quantityType: QuantityType, value: QuantityOption | null) => {
     if (!value) return;
 
     // Create a copy of current stat filters
@@ -151,7 +161,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
 
       if (isCurrentlySelected) {
         // Remove this filter condition
-        const updatedFilters = currentFilters.filter(f => f !== filterCondition);
+        const updatedFilters = currentFilters.filter((f) => f !== filterCondition);
         if (updatedFilters.length === 0) {
           delete newStatFilters[quantityType];
         } else {
@@ -178,7 +188,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
   const renderQuantitySelector = (
     label: string,
     quantityType: QuantityType,
-    filterState: { selected: QuantityOption[]; hasCustomFilter: boolean }
+    filterState: { selected: QuantityOption[]; hasCustomFilter: boolean },
   ) => {
     // Check if "All" should appear selected (no filters active)
     const isAllSelected = filterState.selected.length === 0 && !filterState.hasCustomFilter;
@@ -226,22 +236,16 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
   return (
     <OutlinedBox label="Quantity Collected">
       {renderQuantitySelector('All Cards', 'quantityAll', allFilterState)}
-      
+
       <ExpandableText onClick={() => setExpanded(!expanded)}>
-        <Typography variant="body2">
-          {expanded ? 'Less' : 'More'} options
-        </Typography>
+        <Typography variant="body2">{expanded ? 'Less' : 'More'} options</Typography>
         {expanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
       </ExpandableText>
 
       <Collapse in={expanded}>
-        <Box sx={{ mt: 2 }}>
-          {renderQuantitySelector('Normal Cards', 'quantityReg', regFilterState)}
-        </Box>
-        <Box sx={{ mt: 2 }}>
-          {renderQuantitySelector('Foil Cards', 'quantityFoil', foilFilterState)}
-        </Box>
-        
+        <Box sx={{ mt: 2 }}>{renderQuantitySelector('Normal Cards', 'quantityReg', regFilterState)}</Box>
+        <Box sx={{ mt: 2 }}>{renderQuantitySelector('Foil Cards', 'quantityFoil', foilFilterState)}</Box>
+
         {!selectedGoalId && (
           <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
             <FormControlLabel
@@ -293,7 +297,8 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
       >
         <Box sx={{ p: 2, maxWidth: 300 }}>
           <Typography variant="body2" component="div">
-            Shows cards that were input that aren&apos;t possible to own, like foil printings of cards that don&apos;t come in foil
+            Shows cards that were input that aren&apos;t possible to own, like foil printings of cards that don&apos;t
+            come in foil or cards that have migrated to more accurate double-sided entries.
           </Typography>
         </Box>
       </Popover>

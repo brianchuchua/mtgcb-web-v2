@@ -59,6 +59,14 @@ export interface CardModel {
   legalities?: Record<string, string> | null;
   legalIn?: string[] | null;
   formatRelevantIn?: string[] | null;
+  // Deprecation: when `deprecated` is true the card is hidden in default browse paths.
+  // It still surfaces in a user's own collection views (with this flag set) so they can
+  // act on it. `replacedByCardId` points at the active successor card when one exists.
+  deprecated?: boolean;
+  replacedByCardId?: string | null;
+  // Truthy when the card has a back-face image at R2's `{cardId}b.jpg` (DSTs, transform,
+  // modal DFC, reversible_card, etc.). The grid uses this to surface a flip-card overlay.
+  backScryfallId?: string | null;
   // Collection quantities (only present when userId is provided)
   quantityReg?: number;
   quantityFoil?: number;

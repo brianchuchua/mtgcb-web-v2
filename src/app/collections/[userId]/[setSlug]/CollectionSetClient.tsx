@@ -21,6 +21,7 @@ import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
+import { DeprecatedCardsBanner } from '@/components/collections/DeprecatedCardsBanner';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import MassEntryConfirmDialog from '@/components/collections/MassEntryConfirmDialog';
 import MassEntryPanel, { MassEntryFormData } from '@/components/collections/MassEntryPanel';
@@ -640,6 +641,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
         />
       )}
       {!hasInvalidShareLink && <SharedCollectionBanner username={username || 'User'} userId={userId} />}
+      {isOwnCollection && set?.id && <DeprecatedCardsBanner userId={userId} setId={parseInt(set.id)} />}
 
       <Breadcrumbs
         items={[

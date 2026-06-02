@@ -42,9 +42,10 @@ import CardPrice from '@/components/cards/CardPrice';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { usePriceType } from '@/hooks/usePriceType';
+import CachedIcon from '@mui/icons-material/Cached';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
-import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
+import { getCardBackImageUrl, getCardImageUrl } from '@/utils/cards/getCardImageUrl';
 import { getCollectionCardUrl } from '@/utils/collectionUrls';
 import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
@@ -576,6 +577,27 @@ interface CardDisplayProps {
 }
 
 const CardDisplay: React.FC<CardDisplayProps> = ({ selectedCard, handleCardClick, priceType }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [backRequested, setBackRequested] = useState(false);
+  const [backImageLoaded, setBackImageLoaded] = useState(false);
+  const [backImageError, setBackImageError] = useState(false);
+  // Reset flip state whenever the selected card changes so the next card always starts on
+  // its front face.
+  useEffect(() => {
+    setIsFlipped(false);
+    setBackRequested(false);
+    setBackImageLoaded(false);
+    setBackImageError(false);
+  }, [selectedCard.card.id]);
+
+  const hasBackFace = Boolean((selectedCard.card as any).backScryfallId);
+
+  const handleFlip = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setBackRequested(true);
+    setIsFlipped((prev) => !prev);
+  };
+
   return (
     <Box
       sx={{
@@ -588,13 +610,122 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ selectedCard, handleCardClick
       }}
     >
       <CardWrapper>
-        <SimpleCardImage
-          src={getCardImageUrl(selectedCard.card.id)}
-          alt={selectedCard.card.name}
-          onClick={handleCardClick}
-          loading="lazy"
-          setName={selectedCard.card.setName}
-        />
+        <Box
+          sx={{
+            position: 'relative',
+            height: '100%',
+            aspectRatio: '488/680',
+            maxWidth: '100%',
+            // 3D context for the flip. Only direct descendants inherit the 3D space.
+            perspective: '1400px',
+          }}
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              transformStyle: 'preserve-3d',
+              transition: 'transform 0.55s cubic-bezier(.4, 0, .2, 1)',
+              transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+              willChange: 'transform',
+            }}
+          >
+            <Box
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+              }}
+            >
+              <SimpleCardImage
+                src={getCardImageUrl(selectedCard.card.id)}
+                alt={selectedCard.card.name}
+                onClick={handleCardClick}
+                loading="lazy"
+                setName={selectedCard.card.setName}
+                style={{ width: '100%', height: '100%', maxWidth: '100%', maxHeight: '100%' }}
+              />
+            </Box>
+            {hasBackFace && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
+                  transform: 'rotateY(180deg)',
+                }}
+              >
+                {backRequested && !backImageError ? (
+                  <SimpleCardImage
+                    src={getCardBackImageUrl(selectedCard.card.id)}
+                    alt={`${selectedCard.card.name} (back face)`}
+                    onClick={handleCardClick}
+                    loading="lazy"
+                    setName={selectedCard.card.setName}
+                    onLoad={() => setBackImageLoaded(true)}
+                    onError={() => setBackImageError(true)}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      opacity: backImageLoaded ? 1 : 0,
+                      transition: 'opacity 0.3s ease-in-out',
+                    }}
+                  />
+                ) : null}
+              </Box>
+            )}
+          </Box>
+          {hasBackFace && (
+            <Box
+              component="button"
+              type="button"
+              onClick={handleFlip}
+              aria-label={isFlipped ? `Show front of ${selectedCard.card.name}` : `Show back of ${selectedCard.card.name}`}
+              title={isFlipped ? 'Show front face' : 'Show back face'}
+              sx={{
+                position: 'absolute',
+                top: '6%',
+                right: '6%',
+                zIndex: 2,
+                width: 40,
+                height: 40,
+                minWidth: 40,
+                minHeight: 40,
+                borderRadius: '50%',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffffff',
+                backgroundColor: 'rgba(0, 0, 0, 0.55)',
+                backdropFilter: 'blur(2px)',
+                transition: 'background-color 0.15s ease-in-out, transform 0.15s ease-in-out',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                  transform: 'scale(1.08)',
+                },
+                '&:focus-visible': {
+                  outline: '2px solid #ffffff',
+                  outlineOffset: 2,
+                },
+              }}
+            >
+              <CachedIcon
+                sx={{
+                  fontSize: 22,
+                  transition: 'transform 0.25s ease-in-out',
+                  transform: isFlipped ? 'rotate(180deg)' : 'rotate(0deg)',
+                }}
+              />
+            </Box>
+          )}
+        </Box>
       </CardWrapper>
       <CardMetadata selectedCard={selectedCard} handleCardClick={handleCardClick} priceType={priceType} />
     </Box>

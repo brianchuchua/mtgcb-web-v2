@@ -73,6 +73,11 @@ export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
     canBeNonFoil: card.canBeNonFoil,
     // Location data
     locations: card.locations,
+    // Deprecation state — only present for owned-but-deprecated cards (the API filters
+    // deprecated cards out of default browse paths for non-owners).
+    deprecated: card.deprecated === true,
+    // Truthy when the card has a back-face image — drives the flip overlay in CardItem.
+    backScryfallId: card.backScryfallId ?? null,
   }));
 };
 

@@ -89,11 +89,16 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
       'releaseDate',
       'canBeFoil',
       'canBeNonFoil',
+      // Surfaces double-sided cards so CardItem can render the flip overlay.
+      'backScryfallId',
     ];
-    
+
     // Add quantity fields when userId is present
     if (userId) {
       selectFields.push('quantityReg', 'quantityFoil');
+      // `deprecated` only surfaces in user-scoped paths; without it in the select whitelist
+      // the response strips it and CardItem can't show the deprecation chip.
+      selectFields.push('deprecated');
     }
     
     // Add goal progress fields when goal is selected

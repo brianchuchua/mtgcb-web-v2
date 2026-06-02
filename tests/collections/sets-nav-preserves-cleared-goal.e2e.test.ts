@@ -55,8 +55,9 @@ test.describe('Collection goal: clearing goal persists across Sets breadcrumb na
     await page.waitForLoadState('networkidle');
 
     // 4. Click into a specific set. Set links target /collections/{userId}/{slug}.
+    // Exclude /migrate (sidenav "Update Cards" link) so we land on a real set tile.
     const setLink = page
-      .locator(`a[href*="/collections/${LOCAL_TEST_USER_ID}/"]`)
+      .locator(`a[href*="/collections/${LOCAL_TEST_USER_ID}/"]:not([href*="/migrate"])`)
       .filter({ hasNotText: /^$/ })
       .first();
     await setLink.waitFor({ timeout: 10000 });

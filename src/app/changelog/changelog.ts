@@ -12,6 +12,17 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-05-26',
+      version: '1.27.0',
+      changes: [
+        'Double-sided tokens are getting reworked to represent the actual physical printings — one entry per real-world token product instead of separate halves for each face, with accurate pricing and both faces shown. Rolling out one set at a time over the next few weeks.',
+        'Added an Update Cards tool (under Manage Collection) that moves your copies of older token entries onto the new ones. Old entries only show up if you previously recorded them, and disappear once migrated.',
+        'Added a 3D flip-card button on double-sided token images in the grid, table, card pages, and Add or Remove Cards page. Coming to other double-sided cards (like transform cards) once their data is added.',
+        'Hovering a double-sided token\'s name in the table view now shows both faces side by side.',
+      ],
+      type: 'feature',
+    },
+    {
       date: '2026-05-12',
       version: '1.26.2',
       changes: [

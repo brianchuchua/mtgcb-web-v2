@@ -34,7 +34,7 @@ import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
 import { ResponsiveWidth, TableColumn } from '@/components/common/VirtualizedTable';
 import { PriceType } from '@/types/pricing';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
-import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
+import { getCardBackImageUrl, getCardImageUrl } from '@/utils/cards/getCardImageUrl';
 import { getCollectionCardUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
 import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
@@ -788,14 +788,23 @@ const InlineEditableQuantity: React.FC<{
   );
 };
 
+// Single-face overlay is 299×416. When showing both faces (e.g. custom combined tokens on
+// the migrate page) we double the width with a small gap so both fronts can sit side by
+// side at their native aspect ratio.
+const SINGLE_WIDTH = 299;
+const DOUBLE_WIDTH = 608; // 2 × 299 + 10px gap
+const PREVIEW_HEIGHT = 416; // 299 * 1.393
+
 export const useCardPreviewEffect = (cards: CardItemProps[]) => {
   // Refs for preview functionality
   const mousePositionRef = useRef({ x: 0, y: 0 });
   const hoverCardRef = useRef<HTMLDivElement | null>(null);
   const currentCardRef = useRef<string | null>(null);
   const previewImageRef = useRef<HTMLImageElement | null>(null);
+  const backImageRef = useRef<HTMLImageElement | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
   const errorRef = useRef<HTMLDivElement | null>(null);
+  const currentWidthRef = useRef<number>(SINGLE_WIDTH);
 
   // Initialize and handle tooltip system for the virtualized table
   useEffect(() => {
@@ -805,14 +814,16 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
     container.id = 'card-preview-container';
     container.style.position = 'fixed';
     container.style.zIndex = '9999';
-    container.style.width = '299px';
-    container.style.height = 'calc(299px * 1.393)';
+    container.style.width = `${SINGLE_WIDTH}px`;
+    container.style.height = `${PREVIEW_HEIGHT}px`;
     container.style.borderRadius = '5%';
     container.style.overflow = 'hidden';
     container.style.backgroundColor = '#1c2025';
     container.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
     container.style.display = 'none';
     container.style.pointerEvents = 'none';
+    // Default to single-face; toggled per-show by showCardPreview.
+    container.dataset.faces = '1';
     document.body.appendChild(container);
 
     const loadingDiv = document.createElement('div');
@@ -904,8 +915,28 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
 
     container.appendChild(img);
 
+    // Optional back-face image. Hidden by default; activated when a caller passes
+    // backImageUrl to showCardPreview. Failures are silent (back is best-effort) — the
+    // front-face loading/error state already covers the primary feedback.
+    const backImg = document.createElement('img');
+    backImg.style.position = 'absolute';
+    backImg.style.top = '0';
+    backImg.style.right = '0';
+    backImg.style.width = '50%';
+    backImg.style.height = '100%';
+    backImg.style.objectFit = 'contain';
+    backImg.style.display = 'none';
+    backImg.onload = () => {
+      backImg.style.display = 'block';
+    };
+    backImg.onerror = () => {
+      backImg.style.display = 'none';
+    };
+    container.appendChild(backImg);
+
     hoverCardRef.current = container;
     previewImageRef.current = img;
+    backImageRef.current = backImg;
     loadingRef.current = loadingDiv;
     errorRef.current = errorDiv;
 
@@ -918,18 +949,18 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
         window.requestAnimationFrame(() => {
           const isCardPreviewVisible = hoverCardRef.current && hoverCardRef.current.style.display !== 'none';
           if (isCardPreviewVisible) {
-            // Card dimensions
-            const cardHeight = 416; // 299px * 1.393 ≈ 416px
             const offset = 20; // Distance from cursor
 
             // Check viewport space
             const viewportHeight = window.innerHeight;
             const spaceBelow = viewportHeight - mousePositionRef.current.y;
-            const shouldShowAbove = spaceBelow < cardHeight + offset + 20; // 20px buffer
+            const shouldShowAbove = spaceBelow < PREVIEW_HEIGHT + offset + 20; // 20px buffer
 
-            const x = mousePositionRef.current.x - 150; // Center horizontally (299px / 2)
+            // Center horizontally using the current container width (varies between
+            // single- and double-face).
+            const x = mousePositionRef.current.x - currentWidthRef.current / 2;
             const y = shouldShowAbove
-              ? mousePositionRef.current.y - cardHeight - offset // Above cursor
+              ? mousePositionRef.current.y - PREVIEW_HEIGHT - offset // Above cursor
               : mousePositionRef.current.y + offset; // Below cursor
 
             hoverCardRef.current!.style.left = `${x}px`;
@@ -954,7 +985,10 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
     };
   }, [cards]);
 
-  const showCardPreview = (card: CardItemProps) => {
+  const showCardPreview = (
+    card: CardItemProps,
+    options?: { backImageUrl?: string },
+  ) => {
     if (!hoverCardRef.current || !previewImageRef.current) return;
 
     const isDifferentCard = currentCardRef.current !== card.id;
@@ -964,8 +998,19 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
       const borderRadius = card.setName === 'Limited Edition Alpha' ? '7%' : '5%';
       hoverCardRef.current.style.borderRadius = borderRadius;
 
+      // Resize the overlay based on whether we're showing one face or two. Front image
+      // takes the full width on single, the left 50% on double; back fills the right 50%.
+      const showBack = Boolean(options?.backImageUrl);
+      const width = showBack ? DOUBLE_WIDTH : SINGLE_WIDTH;
+      currentWidthRef.current = width;
+      hoverCardRef.current.style.width = `${width}px`;
+      previewImageRef.current.style.width = showBack ? '50%' : '100%';
+
       if (previewImageRef.current) {
         previewImageRef.current.style.display = 'none';
+      }
+      if (backImageRef.current) {
+        backImageRef.current.style.display = 'none';
       }
 
       if (loadingRef.current) {
@@ -978,24 +1023,29 @@ export const useCardPreviewEffect = (cards: CardItemProps[]) => {
 
       hoverCardRef.current.style.display = 'block';
 
-      // Card dimensions
-      const cardHeight = 416; // 299px * 1.393 ≈ 416px
       const offset = 20; // Distance from cursor
 
       // Check viewport space
       const viewportHeight = window.innerHeight;
       const spaceBelow = viewportHeight - mousePositionRef.current.y;
-      const shouldShowAbove = spaceBelow < cardHeight + offset + 20; // 20px buffer
+      const shouldShowAbove = spaceBelow < PREVIEW_HEIGHT + offset + 20; // 20px buffer
 
-      const x = mousePositionRef.current.x - 150; // Center horizontally (299px / 2)
+      const x = mousePositionRef.current.x - width / 2; // Center horizontally
       const y = shouldShowAbove
-        ? mousePositionRef.current.y - cardHeight - offset // Above cursor
+        ? mousePositionRef.current.y - PREVIEW_HEIGHT - offset // Above cursor
         : mousePositionRef.current.y + offset; // Below cursor
 
       hoverCardRef.current.style.left = `${x}px`;
       hoverCardRef.current.style.top = `${y}px`;
 
       previewImageRef.current.src = getCardImageUrl(card.id);
+      if (backImageRef.current) {
+        if (showBack) {
+          backImageRef.current.src = options!.backImageUrl!;
+        } else {
+          backImageRef.current.removeAttribute('src');
+        }
+      }
     } else if (hoverCardRef.current.style.display === 'none') {
       hoverCardRef.current.style.display = 'block';
     }
@@ -1049,7 +1099,12 @@ export const useCardRowRenderer = (
             display: 'inline',
           }}
           onClick={(e) => e.stopPropagation()} // Prevent row click when clicking link
-          onMouseEnter={() => showCardPreview(card)}
+          onMouseEnter={() =>
+            showCardPreview(
+              card,
+              card.backScryfallId ? { backImageUrl: getCardBackImageUrl(card.id) } : undefined,
+            )
+          }
           onMouseLeave={hideCardPreview}
         >
           <ClickableText>{card.name}</ClickableText>

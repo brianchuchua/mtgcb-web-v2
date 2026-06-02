@@ -15,6 +15,7 @@ import {
   Place as LocationIcon,
   GridOn as MassIcon,
   History as HistoryIcon,
+  SwapHoriz as MigrationIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
@@ -37,9 +38,16 @@ const OperationChip = styled(Chip, {
     'location-update': { bg: theme.palette.info.main, text: theme.palette.info.contrastText },
     'location-remove': { bg: theme.palette.warning.main, text: theme.palette.warning.contrastText },
     'location-mass-update': { bg: theme.palette.info.dark, text: theme.palette.info.contrastText },
+    migration: { bg: theme.palette.primary.dark, text: theme.palette.primary.contrastText },
   };
 
-  const colors = colorMap[operationType];
+  // Fall back to a neutral grey for any unrecognized operationType the backend may add in
+  // the future, so an unmapped value can't crash the page (this was the source of the
+  // "Cannot read properties of undefined (reading 'bg')" runtime error).
+  const colors = colorMap[operationType] ?? {
+    bg: theme.palette.grey[700],
+    text: theme.palette.common.white,
+  };
   return {
     fontWeight: 600,
     backgroundColor: colors.bg,
@@ -102,8 +110,10 @@ const getOperationIcon = (operationType: OperationType) => {
     'location-update': <EditIcon fontSize="small" />,
     'location-remove': <DeleteIcon fontSize="small" />,
     'location-mass-update': <LocationIcon fontSize="small" />,
+    migration: <MigrationIcon fontSize="small" />,
   };
-  return iconMap[operationType];
+  // Unknown future operationTypes fall back to a neutral icon so the row still renders.
+  return iconMap[operationType] ?? <HistoryIcon fontSize="small" />;
 };
 
 const getOperationLabel = (operationType: OperationType) => {
@@ -117,8 +127,9 @@ const getOperationLabel = (operationType: OperationType) => {
     'location-update': 'Location Update',
     'location-remove': 'Location Remove',
     'location-mass-update': 'Location Mass Update',
+    migration: 'Migration',
   };
-  return labelMap[operationType];
+  return labelMap[operationType] ?? operationType;
 };
 
 const getModeLabel = (mode: string, entry: HistoryEntry) => {

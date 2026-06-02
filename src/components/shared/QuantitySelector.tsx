@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -15,9 +15,9 @@ const StyledQuantityBox = styled(Box)(({ theme }) => ({
       borderColor: theme.palette.primary.main,
     },
   },
-  [theme.breakpoints.down('sm')]: {
-    width: '100%',
-  },
+  // Width stays at 160px on every viewport; we used to stretch to 100% on mobile but
+  // that gave the InputLabel too narrow a max-width inside flex parents and clipped
+  // the label to "R..." on the migrate page's candidate cells.
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -154,23 +154,30 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
 }) => {
   const [localValue, setLocalValue] = useState(value.toString());
 
+  // Mirror the latest value into a ref so rapid +/- clicks compute the next value from
+  // the freshest baseline instead of a stale render closure. Without this, three quick
+  // clicks would all read value=N and all emit onChange(N+1), so only one increment lands.
+  const latestValueRef = useRef(value);
   useEffect(() => {
+    latestValueRef.current = value;
     setLocalValue(value.toString());
   }, [value]);
 
   const handleIncrement = useCallback(() => {
-    const newValue = value + 1;
+    const newValue = latestValueRef.current + 1;
     if (max === undefined || newValue <= max) {
+      latestValueRef.current = newValue;
       onChange(newValue);
     }
-  }, [value, max, onChange]);
+  }, [max, onChange]);
 
   const handleDecrement = useCallback(() => {
-    const newValue = value - 1;
+    const newValue = latestValueRef.current - 1;
     if (newValue >= min) {
+      latestValueRef.current = newValue;
       onChange(newValue);
     }
-  }, [value, min, onChange]);
+  }, [min, onChange]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;

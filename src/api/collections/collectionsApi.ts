@@ -6,6 +6,11 @@ import {
   CollectionUpdateRequest,
   CollectionUpdateResponse,
   CollectionHistoryResponse,
+  DeprecatedHoldingsResponse,
+  DeprecatedCardCountResponse,
+  DeprecatedHoldingSetsResponse,
+  MigrationRequestItem,
+  RunMigrationsResponse,
 } from './types';
 import {
   AssociateCardLocationRequest,
@@ -373,6 +378,72 @@ const collectionsApi = mtgcbApi.injectEndpoints({
       }),
       providesTags: ['Collection', 'Location'],
     }),
+
+    getDeprecatedHoldings: builder.query<
+      DeprecatedHoldingsResponse,
+      { setId?: number; cardId?: number } | void
+    >({
+      query: (args) => ({
+        url: '/collection/migrations/deprecated-cards',
+        params: {
+          ...(args?.setId != null ? { setId: args.setId } : {}),
+          ...(args?.cardId != null ? { cardId: args.cardId } : {}),
+        },
+      }),
+      providesTags: ['Collection'],
+    }),
+
+    getDeprecatedCardCount: builder.query<DeprecatedCardCountResponse, { setId: number }>({
+      query: ({ setId }) => ({
+        url: '/collection/migrations/deprecated-cards/count',
+        params: { setId },
+      }),
+      providesTags: ['Collection'],
+    }),
+
+    getDeprecatedHoldingSets: builder.query<DeprecatedHoldingSetsResponse, void>({
+      query: () => ({
+        url: '/collection/migrations/deprecated-cards/sets',
+      }),
+      providesTags: ['Collection'],
+    }),
+
+    runDeprecatedMigrations: builder.mutation<
+      RunMigrationsResponse,
+      { migrations: MigrationRequestItem[] }
+    >({
+      query: (body) => ({
+        url: '/collection/migrations/run',
+        method: 'POST',
+        body,
+      }),
+      async onQueryStarted(_arg, { getState, dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success) {
+            const state = getState() as RootState;
+            const userId = state.auth.user?.userId;
+            if (userId) {
+              dispatch(
+                mtgcbApi.util.invalidateTags([
+                  'Collection',
+                  { type: 'Cards', id: `user-${userId}` },
+                  { type: 'Sets', id: `user-${userId}` },
+                  { type: 'Goals', id: `user-${userId}` },
+                  'Goals',
+                  'Location',
+                  'Statistics',
+                ]),
+              );
+            } else {
+              dispatch(mtgcbApi.util.invalidateTags(['Collection', 'Location']));
+            }
+          }
+        } catch {
+          // Error is already handled by RTK Query
+        }
+      },
+    }),
   }),
 });
 
@@ -389,5 +460,9 @@ export const {
   useMassUpdateLocationsMutation,
   useNukeCollectionMutation,
   useGetCollectionHistoryQuery,
+  useGetDeprecatedHoldingsQuery,
+  useGetDeprecatedCardCountQuery,
+  useGetDeprecatedHoldingSetsQuery,
+  useRunDeprecatedMigrationsMutation,
 } = collectionsApi;
 export const { endpoints: collectionsEndpoints } = collectionsApi;

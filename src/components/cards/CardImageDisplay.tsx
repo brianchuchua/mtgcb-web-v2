@@ -1,4 +1,5 @@
 import { Box, Paper, Skeleton, Typography } from '@mui/material';
+import CachedIcon from '@mui/icons-material/Cached';
 import React, { MouseEvent, useState, useMemo } from 'react';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { BuyOptionsMenu } from './BuyOptionsMenu';
@@ -44,6 +45,11 @@ interface CardImageDisplayProps {
     sm?: number;
     md?: number;
   };
+  /**
+   * Truthy when the card has a back-face image at R2's `{cardId}b.jpg`. When set, a small
+   * flip-card button overlays the image and toggles between front and back face.
+   */
+  backScryfallId?: string | null;
 }
 
 const getBorderRadius = (setName: string | undefined) => {
@@ -64,11 +70,19 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
   cardKingdomFoilUrl = null,
   width = { xs: '100%' },
   maxWidth = { xs: 300, sm: 400 },
+  backScryfallId,
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
+  const [isFlipped, setIsFlipped] = useState(false);
+  // Back image is only requested on first flip — avoids fetching `{id}b.jpg` for cards
+  // the user never inspects. Once mounted, it stays so subsequent flips are instant.
+  const [backRequested, setBackRequested] = useState(false);
+  const [backImageLoaded, setBackImageLoaded] = useState(false);
+  const [backImageError, setBackImageError] = useState(false);
   const menuOpen = Boolean(menuAnchorEl);
+  const hasBackFace = Boolean(backScryfallId);
 
   const imageUrl = useMemo(() => {
     if (!cardId) return null;
@@ -76,6 +90,19 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
       process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'
     }`;
   }, [cardId]);
+  const backImageUrl = useMemo(() => {
+    if (!cardId) return null;
+    return `https://r2.mtgcollectionbuilder.com/cards/images/normal/${cardId}b.jpg?v=${
+      process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'
+    }`;
+  }, [cardId]);
+
+  const handleFlipCard = (event: MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setBackRequested(true);
+    setIsFlipped((prev) => !prev);
+  };
 
   const borderRadius = useMemo(() => getBorderRadius(setName), [setName]);
   const tcgPlayerLink = useMemo(() => {
@@ -173,8 +200,29 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
         borderRadius,
         overflow: 'hidden',
         boxShadow: 3,
+        // 3D context for the flip. `perspective` only affects direct descendants, so the
+        // rotating wrapper inherits a real 3D space and the flip doesn't flatten.
+        perspective: '1400px',
       }}
     >
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          transformStyle: 'preserve-3d',
+          transition: 'transform 0.55s cubic-bezier(.4, 0, .2, 1)',
+          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+          willChange: 'transform',
+        }}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+          }}
+        >
       {linkToTCGPlayer && tcgPlayerLink ? (
         <Box
           component="a"
@@ -212,6 +260,124 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
         </Box>
       ) : (
         imageContent
+      )}
+        </Box>
+        {hasBackFace && (
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+            }}
+          >
+            {backRequested && !backImageLoaded && !backImageError && (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                animation="wave"
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  borderRadius,
+                  backgroundColor: '#22262c',
+                }}
+              />
+            )}
+            {backRequested && backImageUrl && !backImageError ? (
+              <Box
+                component="img"
+                src={backImageUrl}
+                alt={`${cardName || 'Card'} (back face)`}
+                loading="lazy"
+                onLoad={() => setBackImageLoaded(true)}
+                onError={() => setBackImageError(true)}
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  opacity: backImageLoaded ? 1 : 0,
+                  transition: 'opacity 0.4s ease-in-out',
+                  borderRadius,
+                }}
+              />
+            ) : backImageError ? (
+              <Paper
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor: 'grey.100',
+                  borderRadius,
+                  textAlign: 'center',
+                  p: 2,
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  Back face not available
+                </Typography>
+              </Paper>
+            ) : null}
+          </Box>
+        )}
+      </Box>
+      {hasBackFace && !imageError && (
+        <Box
+          component="button"
+          type="button"
+          onClick={handleFlipCard}
+          aria-label={isFlipped ? `Show front of ${cardName || 'card'}` : `Show back of ${cardName || 'card'}`}
+          title={isFlipped ? 'Show front face' : 'Show back face'}
+          data-testid="card-flip-button"
+          sx={{
+            position: 'absolute',
+            top: '6%',
+            right: '6%',
+            zIndex: 2,
+            width: 36,
+            height: 36,
+            minWidth: 36,
+            minHeight: 36,
+            borderRadius: '50%',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#ffffff',
+            backgroundColor: 'rgba(0, 0, 0, 0.55)',
+            backdropFilter: 'blur(2px)',
+            transition: 'background-color 0.15s ease-in-out, transform 0.15s ease-in-out',
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.75)',
+              transform: 'scale(1.08)',
+            },
+            '&:focus-visible': {
+              outline: '2px solid #ffffff',
+              outlineOffset: 2,
+            },
+          }}
+        >
+          <CachedIcon
+            sx={{
+              fontSize: 20,
+              transition: 'transform 0.25s ease-in-out',
+              transform: isFlipped ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
+        </Box>
       )}
     </Box>
   );

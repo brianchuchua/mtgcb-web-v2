@@ -1,10 +1,12 @@
 'use client';
 
-import { Box, Card, CardContent, Chip, Skeleton, Typography } from '@mui/material';
+import { alpha, Box, Button, Card, CardContent, Chip, Popover, Skeleton, Theme, Typography } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import CachedIcon from '@mui/icons-material/Cached';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import AddCardLocationsDialog from './AddCardLocationsDialog';
 import { BuyOptionsMenu } from './BuyOptionsMenu';
 import CardLocationPills from './CardLocationPills';
@@ -114,6 +116,16 @@ export interface CardItemProps {
   hideViewCardOption?: boolean;
   directPriceToTCGPlayer?: boolean; // If true, clicking price goes directly to TCGPlayer (no menu)
   hasLocations?: boolean; // Whether the user has any locations created
+  /**
+   * If true, the card has been deprecated. The API only returns deprecated cards to a viewer
+   * who owns a nonzero quantity, so this implicitly only appears on owned-but-deprecated cards.
+   */
+  deprecated?: boolean;
+  /**
+   * Truthy when the card has a back-face image at R2's `{cardId}b.jpg` (DSTs, transform,
+   * modal DFC, reversible_card, etc.). When set, a flip-card button overlays the image.
+   */
+  backScryfallId?: string | null;
 }
 
 /**
@@ -173,9 +185,18 @@ const CardItemComponent = ({
   hideViewCardOption = false,
   directPriceToTCGPlayer = false,
   hasLocations = false,
+  deprecated = false,
+  backScryfallId,
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const hasBackFace = Boolean(backScryfallId);
+  // Back image is only requested on first flip — avoids bandwidth on grids of DFCs the
+  // user never inspects. Once mounted, it stays so subsequent flips are instant.
+  const [backRequested, setBackRequested] = useState(false);
+  const [backImageLoaded, setBackImageLoaded] = useState(false);
+  const [backImageError, setBackImageError] = useState(false);
   const [locationDialogOpen, setLocationDialogOpen] = useState(false);
   const [buyMenuAnchorEl, setBuyMenuAnchorEl] = useState<HTMLElement | null>(null);
   const buyMenuOpen = Boolean(buyMenuAnchorEl);
@@ -259,6 +280,16 @@ const CardItemComponent = ({
   const getImageUrl = () => {
     return `https://r2.mtgcollectionbuilder.com/cards/images/normal/${id}.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`;
   };
+  const getBackImageUrl = () => {
+    return `https://r2.mtgcollectionbuilder.com/cards/images/normal/${id}b.jpg?v=${process.env.NEXT_PUBLIC_IMAGE_CACHE_DATE || '20241220'}`;
+  };
+
+  const handleFlipCard = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setBackRequested(true);
+    setIsFlipped((prev) => !prev);
+  };
 
   // Get TCGPlayer affiliate link for this card
   const getTCGPlayerLink = () => {
@@ -297,6 +328,10 @@ const CardItemComponent = ({
           opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
           transition: 'opacity 0.2s ease-in-out',
           position: 'relative',
+          // 3D context for the card-flip animation. `perspective` only affects direct
+          // descendants, so the rotating wrapper inherits a real 3D space and the flip
+          // doesn't collapse into a 2D scale-skew.
+          perspective: '1200px',
           '&:hover': {
             opacity: 1,
           },
@@ -327,6 +362,24 @@ const CardItemComponent = ({
             }),
         }}
       >
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            transformStyle: 'preserve-3d',
+            transition: 'transform 0.55s cubic-bezier(.4, 0, .2, 1)',
+            transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+            willChange: 'transform',
+          }}
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+            }}
+          >
         {imageLinksToTCGPlayer ? (
           <Box
             component="a"
@@ -511,6 +564,99 @@ const CardItemComponent = ({
             )}
           </>
         )}
+          </Box>
+          {hasBackFace && (
+            <Box
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
+                transform: 'rotateY(180deg)',
+              }}
+            >
+              {backRequested && !backImageLoaded && !backImageError && (
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height="100%"
+                  animation="wave"
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    borderRadius: getBorderRadius(),
+                    backgroundColor: '#22262c',
+                  }}
+                />
+              )}
+              {backRequested && !backImageError ? (
+                <CardImage
+                  src={getBackImageUrl()}
+                  loading="lazy"
+                  alt={`${name} (back face)`}
+                  title={`${name} (back face)`}
+                  setName={setName}
+                  onLoad={() => setBackImageLoaded(true)}
+                  onError={() => setBackImageError(true)}
+                  style={{ opacity: backImageLoaded ? 1 : 0 }}
+                />
+              ) : backImageError ? (
+                <MissingImageFallback setName={setName}>
+                  <Typography variant="subtitle2">{name}</Typography>
+                  <Typography variant="caption">Back face not available</Typography>
+                </MissingImageFallback>
+              ) : null}
+            </Box>
+          )}
+        </Box>
+        {hasBackFace && !imageError && (
+          <Box
+            component="button"
+            type="button"
+            onClick={handleFlipCard}
+            aria-label={isFlipped ? `Show front of ${name}` : `Show back of ${name}`}
+            title={isFlipped ? 'Show front face' : 'Show back face'}
+            data-testid="card-flip-button"
+            sx={{
+              position: 'absolute',
+              top: '6%',
+              right: '6%',
+              zIndex: 2,
+              width: 32,
+              height: 32,
+              minWidth: 32,
+              minHeight: 32,
+              borderRadius: '50%',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              backgroundColor: 'rgba(0, 0, 0, 0.55)',
+              backdropFilter: 'blur(2px)',
+              transition: 'background-color 0.15s ease-in-out, transform 0.15s ease-in-out',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                transform: 'scale(1.08)',
+              },
+              '&:focus-visible': {
+                outline: '2px solid #ffffff',
+                outlineOffset: 2,
+              },
+            }}
+          >
+            <CachedIcon
+              sx={{
+                fontSize: 18,
+                transition: 'transform 0.25s ease-in-out',
+                transform: isFlipped ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}
+            />
+          </Box>
+        )}
       </CardImageContainer>
 
       {(nameIsVisible || setIsVisible || priceIsVisible || quantityIsVisible || goalProgressIsVisible) && (
@@ -623,6 +769,12 @@ const CardItemComponent = ({
                 {name}
               </Typography>
             )
+          )}
+
+          {deprecated && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 0.5 }}>
+              <DeprecatedChipWithInfo userId={userId} cardId={id} />
+            </Box>
           )}
 
           {setIsVisible && (
@@ -915,5 +1067,137 @@ const MissingImageFallback = styled(Box, {
     width: '100%',
   },
 }));
+
+interface DeprecatedChipWithInfoProps {
+  /** Used to build a /collections/[userId]/migrate link in the popover. Null on shared
+   *  collection views where we don't expose the migration tool to non-owners. */
+  userId: string | null;
+  /** The card this chip is rendered for. Threaded into the migrate link as ?cardId so
+   *  the migrate page deep-links straight to this card instead of starting at the top
+   *  of the user's deprecated list. */
+  cardId: string;
+}
+
+/**
+ * Subtle "card data update available" indicator for card boxes in the collection view.
+ *
+ * Mirrors the dot+letterspaced-label pattern from CardLegalitySection.tsx and the
+ * migrate page's ResolutionStatus — a small warning-colored dot with a soft halo plus
+ * uppercase letterspaced "UPDATE AVAILABLE" label, ending in a small inline ⓘ icon.
+ * The whole strip is clickable; click opens a Popover explaining the update and
+ * (for owners) linking to the update tool.
+ *
+ * Avoids the MUI Chip look, which read as too heavy on the otherwise-clean card box.
+ * Component name retains "Deprecated" since that's the DB column it surfaces, but no
+ * user-facing string uses that word.
+ */
+function DeprecatedChipWithInfo({ userId, cardId }: DeprecatedChipWithInfoProps) {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const open = Boolean(anchorEl);
+
+  const handleOpen = (event: MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => setAnchorEl(null);
+  // Stop click events inside the popover from bubbling up to the parent card's onClick
+  // (which would navigate away from the collection page mid-read).
+  const stopPropagation = (event: MouseEvent<HTMLElement>) => event.stopPropagation();
+
+  const warningColor = (theme: Theme) => theme.palette.warning.main;
+
+  return (
+    <>
+      <Box
+        component="button"
+        type="button"
+        onClick={handleOpen}
+        aria-label="Card data update available. Click for details."
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 0.625,
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          // Soft pill-shaped hit area gives a subtle hover affordance without a heavy chip.
+          borderRadius: '999px',
+          px: 0.5,
+          py: 0.25,
+          transition: 'background-color 0.15s',
+          '&:hover': (theme) => ({
+            backgroundColor: alpha(theme.palette.warning.main, 0.08),
+          }),
+        }}
+      >
+        <Box
+          sx={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            bgcolor: warningColor,
+            boxShadow: (theme) => `0 0 0 2px ${alpha(theme.palette.warning.main, 0.18)}`,
+          }}
+        />
+        <Typography
+          component="span"
+          sx={{
+            color: warningColor,
+            fontWeight: 600,
+            fontSize: '0.6875rem',
+            letterSpacing: 0.6,
+            textTransform: 'uppercase',
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+          }}
+        >
+          Update Available
+        </Typography>
+        <InfoOutlinedIcon sx={{ fontSize: 13, color: warningColor }} />
+      </Box>
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        onClick={stopPropagation}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Box sx={{ p: 2, maxWidth: 320 }}>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
+            Card data update available
+          </Typography>
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            There&apos;s an update for this card entry — usually a corrected double-sided
+            token product, fresher pricing data, or improved face data. Your copies
+            here don&apos;t count toward your value, collection percentage, or goal
+            progress until you apply the update.
+          </Typography>
+          {userId ? (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+              <Button
+                component={Link}
+                href={`/collections/${userId}/migrate?cardId=${cardId}`}
+                color="warning"
+                variant="outlined"
+                size="small"
+                onClick={stopPropagation}
+                sx={{ whiteSpace: 'nowrap' }}
+              >
+                Update
+              </Button>
+            </Box>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              Sign in as the owner of this collection to apply card updates.
+            </Typography>
+          )}
+        </Box>
+      </Popover>
+    </>
+  );
+}
 
 export default CardItem;

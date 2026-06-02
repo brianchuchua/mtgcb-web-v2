@@ -18,6 +18,7 @@ import {
   ListAlt as ListAltIcon,
   Newspaper as NewsIcon,
   DeleteForever as ResetIcon,
+  PublishedWithChanges as PublishedWithChangesIcon,
   Style as StyleIcon,
   Storage as TemplateIcon,
   Timeline as TimelineIcon,
@@ -102,6 +103,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
       pathname === '/export' ||
       pathname === '/import' ||
       pathname === '/history' ||
+      /^\/collections\/\d+\/migrate$/.test(pathname ?? '') ||
       pathname === '/reset-collection';
 
     const isOnResourcesPage =
@@ -225,6 +227,7 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                       pathname === '/export' ||
                       pathname === '/import' ||
                       pathname === '/history' ||
+                      /^\/collections\/\d+\/migrate$/.test(pathname ?? '') ||
                       pathname === '/reset-collection'
                     }
                   >
@@ -326,6 +329,20 @@ export const SidenavItems = ({ onNavigate }: SidenavItemsProps) => {
                         <HistoryIcon />
                       </ListItemIcon>
                       <ListItemText primary="History" />
+                    </ListItemButton>
+                  </ListItem>
+                  <ListItem disablePadding>
+                    <ListItemButton
+                      component={Link}
+                      href={`/collections/${user.userId}/migrate`}
+                      selected={pathname === `/collections/${user.userId}/migrate`}
+                      onClick={handleClick}
+                      sx={{ pl: 4 }}
+                    >
+                      <ListItemIcon>
+                        <PublishedWithChangesIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="Update Cards" />
                     </ListItemButton>
                   </ListItem>
                   <ListItem disablePadding>

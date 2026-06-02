@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Link, Paper, Typography } from '@mui/material';
+import { Alert, AlertTitle, Box, Button, Link, Paper, Typography } from '@mui/material';
+import NextLink from 'next/link';
 import Grid from '@mui/material/Grid2';
 import React, { useMemo, useState } from 'react';
 import { useGetCardsQuery } from '@/api/browse/browseApi';
@@ -76,6 +77,13 @@ const selectFields: Array<keyof CardModel | string> = [
   'pureName',
   'isReserved',
   'legalities',
+  // Surface deprecation state on the card detail page so we can render the "This entry
+  // has been replaced" banner + chip. The API gates deprecated rows on ownership in the
+  // collection path, so this only ever returns true for owners-with-copies anyway.
+  'deprecated',
+  'replacedByCardId',
+  // Truthy when the card has a back-face image — drives CardItem's flip overlay button.
+  'backScryfallId',
 ];
 
 const otherPrintingsSelectFields: Array<keyof CardModel | string> = [
@@ -259,6 +267,34 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
         ]}
       />
 
+      {card?.deprecated === true && (
+        <Alert
+          severity="warning"
+          variant="outlined"
+          sx={{ mt: 2 }}
+          action={
+            isOwnCollection ? (
+              <Button
+                component={NextLink}
+                href={`/collections/${userId}/migrate?cardId=${cardId}`}
+                color="warning"
+                variant="outlined"
+                size="small"
+                sx={{ whiteSpace: 'nowrap', alignSelf: 'center' }}
+              >
+                Update
+              </Button>
+            ) : undefined
+          }
+        >
+          <AlertTitle>Card data update available</AlertTitle>
+          There&apos;s an update for this card entry — usually a corrected double-sided
+          token product, fresher pricing data, or improved face data. Your copies here
+          don&apos;t count toward your value, collection percentage, or goal progress
+          until you apply the update.
+        </Alert>
+      )}
+
       {/* Compact Three Column Layout */}
       <Grid container spacing={2} sx={{ mt: 1, alignItems: 'flex-start' }}>
         {/* Column 1: Card Image & Collection Management */}
@@ -280,6 +316,8 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
             canBeFoil={card?.canBeFoil}
             canBeNonFoil={card?.canBeNonFoil}
             locations={card?.locations}
+            deprecated={card?.deprecated === true}
+            backScryfallId={(card as any)?.backScryfallId ?? null}
             isOwnCollection={isOwnCollection}
             priceType={priceType}
             // Detail page: image and price both open the buy-options menu (no direct TCG link).
