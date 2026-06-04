@@ -12,7 +12,15 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
-      date: '2026-05-26',
+      date: '2026-06-04',
+      version: '1.27.1',
+      changes: [
+        'Updated Secret Lair Drop Series',
+      ],
+      type: 'data',
+    },
+    {
+      date: '2026-06-02',
       version: '1.27.0',
       changes: [
         'Double-sided tokens are getting reworked to represent the actual physical printings — one entry per real-world token product instead of separate halves for each face, with accurate pricing and both faces shown. Rolling out one set at a time over the next few weeks.',
