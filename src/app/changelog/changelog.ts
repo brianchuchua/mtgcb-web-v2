@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-06-04',
+      version: '1.27.2',
+      changes: [
+        'Added reversible back images for 1300+ double-sided cards',
+      ],
+    },
+    {
+      date: '2026-06-04',
       version: '1.27.1',
       changes: [
         'Updated Secret Lair Drop Series',
