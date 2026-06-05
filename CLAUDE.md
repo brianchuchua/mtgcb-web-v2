@@ -405,3 +405,9 @@ Use the `mcp__plugin_Notion_notion__notion-create-pages` tool with `data_source_
 - Collection endpoints marked "UNUSED" should be avoided
 - Use existing patterns when adding new features
 - Defensive null checks throughout components
+
+### Import chunker card-identity map (KEEP IN SYNC WITH API)
+
+`src/utils/import/csvChunker.ts` splits a collection import into 500-row chunks and **must group every row of the same card (foil + non-foil + etched) into the same chunk** — otherwise the API's `replace`-mode upsert overwrites the card across chunks and silently drops a finish. It does this by grouping on each format's card-identity columns (`FORMAT_IDENTITY` + the `custom` mapping logic).
+
+That map is **duplicated** from the API import schemas (`mtgcb-api-v3/src/features/import/formats/<format>.ts` → `resolution.idFields` + `manualResolutionFields`). There is no shared source. **If you add an import format, or change a format's id / name / set / collector columns or CSV headers in the API, update `FORMAT_IDENTITY` (and `customIdentity`) here too.** Unknown formats fall back to file-order chunking and emit a warning (the split-finish bug can recur for them).

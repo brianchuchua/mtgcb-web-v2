@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-06-04',
+      version: '1.27.3',
+      changes: [
+        'Improved accuracy when importing large collections.',
+      ],
+    },
+    {
+      date: '2026-06-04',
       version: '1.27.2',
       changes: [
         'Added reversible back images for 1300+ double-sided cards',

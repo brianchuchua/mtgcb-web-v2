@@ -114,10 +114,13 @@ export const useChunkedImport = (importMutation: any) => {
             deleted: currentProgress.deleted + result.deleted,
             errors: [
               ...currentProgress.errors,
-              // Adjust row numbers to be global, not chunk-relative
+              // Map chunk-relative row numbers back to the original file rows.
+              // Rows are grouped by card before chunking, so the chunk order no
+              // longer matches the file order; originalRowNumbers carries the
+              // mapping. err.row is 1-indexed within the chunk.
               ...result.errors.map((err) => ({
                 ...err,
-                row: err.row + chunk.startRow - 1,
+                row: chunk.originalRowNumbers[err.row - 1] ?? err.row,
               })),
             ],
           };
@@ -181,8 +184,13 @@ export const useChunkedImport = (importMutation: any) => {
         };
       }
     ) => {
-      // Split CSV into chunks
-      const chunkResult = splitCsvIntoChunks(csvContent);
+      // Split CSV into chunks. Pass the format (and custom field mappings) so a
+      // card's finishes are grouped into the same chunk by card identity.
+      const chunkResult = splitCsvIntoChunks(
+        csvContent,
+        importParams.query.format,
+        importParams.fieldMappings,
+      );
 
       if (chunkResult.warnings.length > 0) {
         console.warn('CSV chunking warnings:', chunkResult.warnings);
