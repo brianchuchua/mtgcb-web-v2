@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-06-11',
+      version: '1.27.4',
+      changes: [
+        'Added 34 missing special foil treatment cards in Secret Lair Drop Series',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-06-04',
       version: '1.27.3',
       changes: [
