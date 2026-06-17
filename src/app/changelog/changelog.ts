@@ -12,6 +12,16 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-06-17',
+      version: '1.27.5',
+      changes: [
+        'Added Marvel Super Heroes',
+        'Added Marvel Super Heroes Commander',
+        'Updated Marvel Universe',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-06-11',
       version: '1.27.4',
       changes: [
