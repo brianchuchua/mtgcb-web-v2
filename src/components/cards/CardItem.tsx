@@ -620,7 +620,7 @@ const CardItemComponent = ({
             data-testid="card-flip-button"
             sx={{
               position: 'absolute',
-              top: '6%',
+              top: '12%',
               right: '6%',
               zIndex: 2,
               width: 32,

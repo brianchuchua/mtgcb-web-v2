@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-06-18',
+      version: '1.27.7',
+      changes: [
+        'Fixed the show back face button overlapping the mana cost on flip cards',
+      ],
+    },
+    {
+      date: '2026-06-18',
       version: '1.27.6',
       changes: [
         'Updated The List',
