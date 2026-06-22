@@ -7,5 +7,15 @@
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "prettier.requireConfig": true,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "jest.jestCommandLine": "jest --runInBand --detectOpenHandles"
+  "jest.jestCommandLine": "jest --runInBand --detectOpenHandles",
+  "workbench.editor.customLabels.enabled": true,
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/page.tsx": "${dirname} (page)",
+    "**/app/**/layout.tsx": "${dirname} (layout)",
+    "**/app/**/loading.tsx": "${dirname} (loading)",
+    "**/app/**/error.tsx": "${dirname} (error)",
+    "**/app/**/not-found.tsx": "${dirname} (not-found)",
+    "**/app/**/template.tsx": "${dirname} (template)",
+    "**/app/**/route.ts": "${dirname} (route)"
+  }
 }
