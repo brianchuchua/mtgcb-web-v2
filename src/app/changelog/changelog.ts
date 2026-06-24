@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-06-24',
+      version: '1.27.8',
+      changes: [
+        'Fixed goal summary totals counting cards you had manually excluded from the goal',
+      ],
+    },
+    {
       date: '2026-06-18',
       version: '1.27.7',
       changes: [
