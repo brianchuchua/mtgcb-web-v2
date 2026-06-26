@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-06-25',
+      version: '1.27.10',
+      changes: ['Migrated Secrets of Strixhaven tokens to double-sided printings'],
+      type: 'data',
+    },
+    {
+      date: '2026-06-25',
       version: '1.27.9',
       changes: [
         'Fixed import issues with ManaBox and some etched cards',
