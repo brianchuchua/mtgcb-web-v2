@@ -12,65 +12,56 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-06-25',
+      version: '1.27.9',
+      changes: [
+        'Fixed import issues with ManaBox and some etched cards',
+        'Repaired foil treatment data cross several sets',
+        'Updated Secret Lair Drop Series',
+      ],
+    },
+    {
       date: '2026-06-24',
       version: '1.27.8',
-      changes: [
-        'Fixed goal summary totals counting cards you had manually excluded from the goal',
-      ],
+      changes: ['Fixed goal summary totals counting cards you had manually excluded from the goal'],
     },
     {
       date: '2026-06-18',
       version: '1.27.7',
-      changes: [
-        'Fixed the show back face button overlapping the mana cost on flip cards',
-      ],
+      changes: ['Fixed the show back face button overlapping the mana cost on flip cards'],
     },
     {
       date: '2026-06-18',
       version: '1.27.6',
-      changes: [
-        'Updated The List',
-      ],
+      changes: ['Updated The List'],
       type: 'data',
     },
     {
       date: '2026-06-17',
       version: '1.27.5',
-      changes: [
-        'Added Marvel Super Heroes',
-        'Added Marvel Super Heroes Commander',
-        'Updated Marvel Universe',
-      ],
+      changes: ['Added Marvel Super Heroes', 'Added Marvel Super Heroes Commander', 'Updated Marvel Universe'],
       type: 'data',
     },
     {
       date: '2026-06-11',
       version: '1.27.4',
-      changes: [
-        'Added 34 missing special foil treatment cards in Secret Lair Drop Series',
-      ],
+      changes: ['Added 34 missing special foil treatment cards in Secret Lair Drop Series'],
       type: 'data',
     },
     {
       date: '2026-06-04',
       version: '1.27.3',
-      changes: [
-        'Improved accuracy when importing large collections.',
-      ],
+      changes: ['Improved accuracy when importing large collections.'],
     },
     {
       date: '2026-06-04',
       version: '1.27.2',
-      changes: [
-        'Added reversible back images for 1300+ double-sided cards',
-      ],
+      changes: ['Added reversible back images for 1300+ double-sided cards'],
     },
     {
       date: '2026-06-04',
       version: '1.27.1',
-      changes: [
-        'Updated Secret Lair Drop Series',
-      ],
+      changes: ['Updated Secret Lair Drop Series'],
       type: 'data',
     },
     {
@@ -80,7 +71,7 @@ const changelogData: ChangelogData = {
         'Double-sided tokens are getting reworked to represent the actual physical printings — one entry per real-world token product instead of separate halves for each face, with accurate pricing and both faces shown. Rolling out one set at a time over the next few weeks.',
         'Added an Update Cards tool (under Manage Collection) that moves your copies of older token entries onto the new ones. Old entries only show up if you previously recorded them, and disappear once migrated.',
         'Added a 3D flip-card button on double-sided token images in the grid, table, card pages, and Add or Remove Cards page. Coming to other double-sided cards (like transform cards) once their data is added.',
-        'Hovering a double-sided token\'s name in the table view now shows both faces side by side.',
+        "Hovering a double-sided token's name in the table view now shows both faces side by side.",
       ],
       type: 'feature',
     },
@@ -106,16 +97,12 @@ const changelogData: ChangelogData = {
     {
       date: '2026-05-08',
       version: '1.26.1',
-      changes: [
-        'Improved the accuracy of the TCGPlayer buy buttons.',
-      ],
+      changes: ['Improved the accuracy of the TCGPlayer buy buttons.'],
     },
     {
       date: '2026-05-07',
       version: '1.26.0',
-      changes: [
-        'Behind-the-scenes performance upgrades for faster page loads and a smoother browsing experience.',
-      ],
+      changes: ['Behind-the-scenes performance upgrades for faster page loads and a smoother browsing experience.'],
       type: 'feature',
     },
     {
