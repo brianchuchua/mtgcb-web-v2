@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-06-26',
+      version: '1.27.11',
+      changes: ['Updated card legality data for all formats'],
+    },
+    {
       date: '2026-06-25',
       version: '1.27.10',
       changes: ['Migrated Secrets of Strixhaven tokens to double-sided printings'],

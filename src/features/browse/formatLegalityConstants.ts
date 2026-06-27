@@ -33,6 +33,7 @@ export const FORMAT_LEGALITY_OPTIONS: FormatLegalityOption[] = [
   { value: 'tlr', label: 'Tiny Leaders: Reborn' },
   { value: 'penny', label: 'Penny Dreadful' },
   { value: 'future', label: 'Future Standard' },
+  { value: 'competitivebrawl', label: 'Competitive Brawl' },
 
   // Digital-only (Arena / MTGO)
   { value: 'alchemy', label: 'Alchemy', digital: true },
