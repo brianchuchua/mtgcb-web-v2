@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-02',
+      version: '1.27.12',
+      changes: ['Improved double-sided token data to maximize the number of unique faces shown for that specific set'],
+      type: 'data',
+    },
+    {
       date: '2026-06-26',
       version: '1.27.11',
       changes: ['Updated card legality data for all formats'],
