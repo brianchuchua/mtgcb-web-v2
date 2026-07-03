@@ -13,9 +13,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-07-02',
+      version: '1.27.13',
+      changes: ['Migrated Teenage Mutant Ninja Turtles tokens to double-sided printings'],
+      type: 'data',
+    },
+    {
+      date: '2026-07-02',
       version: '1.27.12',
       changes: ['Improved double-sided token data to maximize the number of unique faces shown for that specific set'],
-      type: 'data',
     },
     {
       date: '2026-06-26',
@@ -89,6 +94,7 @@ const changelogData: ChangelogData = {
         'Added an Update Cards tool (under Manage Collection) that moves your copies of older token entries onto the new ones. Old entries only show up if you previously recorded them, and disappear once migrated.',
         'Added a 3D flip-card button on double-sided token images in the grid, table, card pages, and Add or Remove Cards page. Coming to other double-sided cards (like transform cards) once their data is added.',
         "Hovering a double-sided token's name in the table view now shows both faces side by side.",
+        'Migrated Final Fantasy tokens to double-sided printings',
       ],
       type: 'feature',
     },
