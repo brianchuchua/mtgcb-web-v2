@@ -12,6 +12,18 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-08',
+      version: '1.27.14',
+      changes: [
+        'Added Marvel Super Heroes tokens',
+        'Added Marvel Super Heroes Commander tokens',
+        'Added Marvel Super Heroes art cards',
+        'Added Marvel Super Heroes Jumpstart front cards',
+        'Updated Media Inserts',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-07-02',
       version: '1.27.13',
       changes: ['Migrated Teenage Mutant Ninja Turtles tokens to double-sided printings'],
