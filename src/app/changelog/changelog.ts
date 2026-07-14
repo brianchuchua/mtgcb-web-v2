@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-14',
+      version: '1.27.15',
+      changes: ['Updated 2,551 cards to include collector numbers in their names to tell them apart from similar cards'],
+      type: 'data',
+    },
+    {
       date: '2026-07-08',
       version: '1.27.14',
       changes: [
