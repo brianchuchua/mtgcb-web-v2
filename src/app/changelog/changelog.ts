@@ -13,6 +13,19 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-07-14',
+      version: '1.27.16',
+      changes: [
+        'Updated MagicFest Promos',
+        'Updated Media Inserts',
+        'Updated Pro Tour Promos',
+        'Updated Secret Lair Drop Series',
+        'Updated Spotlight Series',
+        'Updated WPN Promos',
+      ],
+      type: 'data',
+    },
+    {
+      date: '2026-07-14',
       version: '1.27.15',
       changes: ['Updated 2,551 cards to include collector numbers in their names to tell them apart from similar cards'],
       type: 'data',
