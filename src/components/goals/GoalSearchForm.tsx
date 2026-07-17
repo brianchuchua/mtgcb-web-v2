@@ -743,6 +743,7 @@ export function GoalSearchForm({
         ...(cardTypesData.cardTypes || []),
         ...(cardTypesData.superTypes || []),
         ...(cardTypesData.artifactTypes || []),
+        ...(cardTypesData.battleTypes || []),
         ...(cardTypesData.enchantmentTypes || []),
         ...(cardTypesData.landTypes || []),
         ...(cardTypesData.planeswalkerTypes || []),

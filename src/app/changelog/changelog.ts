@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-17',
+      version: '1.27.18',
+      changes: [
+        'Fixed card type filters missing the Battle and Siege types',
+        'Added Kindred and Dungeon to the card type filter options',
+      ],
+    },
+    {
       date: '2026-07-16',
       version: '1.27.17',
       changes: ['Migrated Avatar: The Last Airbender tokens to double-sided printings'],

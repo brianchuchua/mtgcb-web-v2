@@ -2,6 +2,7 @@ export interface CardTypes {
   cardTypes: string[];
   superTypes: string[];
   artifactTypes: string[];
+  battleTypes: string[];
   enchantmentTypes: string[];
   landTypes: string[];
   planeswalkerTypes: string[];

@@ -33,6 +33,12 @@ const TypeSelector = () => {
           value: type,
           exclude: false,
         })),
+        ...(cardTypes.battleTypes ?? []).map((type) => ({
+          category: 'Battle Types',
+          label: type,
+          value: type,
+          exclude: false,
+        })),
         ...cardTypes.enchantmentTypes.map((type) => ({
           category: 'Enchantment Types',
           label: type,
