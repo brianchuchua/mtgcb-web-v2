@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-16',
+      version: '1.27.17',
+      changes: ['Migrated Avatar: The Last Airbender tokens to double-sided printings'],
+      type: 'data',
+    },
+    {
       date: '2026-07-14',
       version: '1.27.16',
       changes: [
