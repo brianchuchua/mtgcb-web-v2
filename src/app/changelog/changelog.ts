@@ -14,7 +14,12 @@ const changelogData: ChangelogData = {
     {
       date: '2026-07-25',
       version: '1.27.19',
-      changes: ['Removed several duplicate entries from Secret Lair cards', 'Fixed foil finish data for 4,390 cards'],
+      changes: [
+        'Removed several duplicate entries from Secret Lair cards',
+        'Fixed foil finish data for 4,390 cards',
+        'Updated Secret Lair Drop Series',
+        'Migrated tokens to double-sided printings for Lorwyn Eclipsed, Edge of Eternities, Tarkir: Dragonstorm, Aetherdrift, Innistrad Remastered, Foundations, Duskmourn: House of Horrors, and Bloomburrow',
+      ],
     },
     {
       date: '2026-07-17',
