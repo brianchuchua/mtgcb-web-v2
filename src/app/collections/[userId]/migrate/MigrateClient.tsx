@@ -565,7 +565,8 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           MTG CB occasionally publishes improved data for a card entry — refreshed pricing,
-          corrected double-sided face combinations, or other printing fixes. When that
+          corrected double-sided face combinations, retired duplicate entries, or other
+          printing fixes. When that
           happens, your copies on the old entry stop counting toward your value, collection
           percentage, and goal progress until you move them to the new entry — either with
           this tool or manually from your collection.
@@ -636,10 +637,10 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
       </Typography>
 
       <Alert severity="info" sx={{ mb: 2 }}>
-        These cards have updated entries — improved printing data, fresher pricing, or corrected double-sided face
-        combinations. Move your copies to the updated entry so they count toward your value, percentage, and goal
-        progress. If there are multiple candidates, it&apos;s a double-sided token — pick the matching pair. Once you
-        apply an update, you won&apos;t see the old version anymore.
+        These cards have updated entries — improved printing data, fresher pricing, corrected double-sided face
+        combinations, or duplicate entries that were retired. Move your copies to the updated entry so they count
+        toward your value, percentage, and goal progress. If there are multiple candidates, it&apos;s a double-sided
+        token — pick the matching pair. Once you apply an update, you won&apos;t see the old version anymore.
       </Alert>
 
       {/* Required Set picker. A user with thousands of replaced cards across sets is

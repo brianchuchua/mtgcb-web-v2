@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-25',
+      version: '1.27.19',
+      changes: ['Removed several duplicate entries from Secret Lair cards', 'Fixed foil finish data for 4,390 cards'],
+    },
+    {
       date: '2026-07-17',
       version: '1.27.18',
       changes: [
@@ -41,7 +46,9 @@ const changelogData: ChangelogData = {
     {
       date: '2026-07-14',
       version: '1.27.15',
-      changes: ['Updated 2,551 cards to include collector numbers in their names to tell them apart from similar cards'],
+      changes: [
+        'Updated 2,551 cards to include collector numbers in their names to tell them apart from similar cards',
+      ],
       type: 'data',
     },
     {
