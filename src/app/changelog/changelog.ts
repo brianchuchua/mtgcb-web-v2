@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-26',
+      version: '1.27.20',
+      changes: ["Migrated Marvel's Spider-Man tokens to double-sided printings"],
+      type: 'data',
+    },
+    {
       date: '2026-07-25',
       version: '1.27.19',
       changes: [
