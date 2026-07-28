@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-27',
+      version: '1.27.21',
+      changes: [
+        'Added double-sided tokens and reorganized token sets for Theros Beyond Death, Throne of Eldraine, Core Set 2021, Double Masters, and Zendikar Rising',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-07-26',
       version: '1.27.20',
       changes: ["Migrated Marvel's Spider-Man tokens to double-sided printings"],
