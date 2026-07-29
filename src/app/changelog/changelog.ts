@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-28',
+      version: '1.27.22',
+      changes: [
+        "Added double-sided tokens and reorganized token sets for Dominaria United, Dominaria Remastered, Ravnica Remastered, Jurassic World Collection, Assassin's Creed, Kaldheim, and Kamigawa: Neon Dynasty",
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-07-27',
       version: '1.27.21',
       changes: [
