@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-07-29',
+      version: '1.27.23',
+      changes: [
+        'Added double-sided tokens and reorganized token sets for Commander 2014, Commander 2015, Commander 2016, Commander 2017, Commander 2018, Commander 2019, Commander 2020, Commander 2021, and Starter Commander Decks',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-07-28',
       version: '1.27.22',
       changes: [
