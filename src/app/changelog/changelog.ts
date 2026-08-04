@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-04',
+      version: '1.27.25',
+      changes: ['Added The Hobbit, The Hobbit Variants, and The Hobbit Eternal as new sets'],
+      type: 'data',
+    },
+    {
       date: '2026-07-29',
       version: '1.27.24',
       changes: [
