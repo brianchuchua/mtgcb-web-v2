@@ -34,6 +34,8 @@ interface CardImageDisplayProps {
   tcgHasFoil?: boolean;
   cardKingdomUrl?: string | null;
   cardKingdomFoilUrl?: string | null;
+  journeysEndUrl?: string | null;
+  journeysEndFoilUrl?: string | null;
   width?: {
     xs?: number | string;
     sm?: number | string;
@@ -68,6 +70,8 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
   tcgHasFoil,
   cardKingdomUrl = null,
   cardKingdomFoilUrl = null,
+  journeysEndUrl = null,
+  journeysEndFoilUrl = null,
   width = { xs: '100%' },
   maxWidth = { xs: 300, sm: 400 },
   backScryfallId,
@@ -400,6 +404,8 @@ export const CardImageDisplay: React.FC<CardImageDisplayProps> = ({
         tcgHasFoil={tcgHasFoil}
         cardKingdomUrl={cardKingdomUrl}
         cardKingdomFoilUrl={cardKingdomFoilUrl}
+        journeysEndUrl={journeysEndUrl}
+        journeysEndFoilUrl={journeysEndFoilUrl}
         hideViewCardOption={hideViewCardOption}
       />
     </>

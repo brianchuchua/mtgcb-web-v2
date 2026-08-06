@@ -35,6 +35,47 @@ export const generateCardKingdomLink = (
   return `${CK_BASE_URL}/${CK_AFFILIATE_PARAMS}`;
 };
 
+/**
+ * Journey's End referral code + base URL. Hardcoded per
+ * docs/future-features/JOURNEYS_END_INTEGRATION_PLAN.md §7 (in mtgcb-api-v3) —
+ * mirrors how the TCGPlayer and Card Kingdom codes are hardcoded in this file.
+ * Their partner dashboard instructs: append ?ref=mtgcb (or &ref= when a query
+ * string already exists), plus an optional &subId=placement for tracking where
+ * on the site the click originated.
+ */
+const JE_BASE_URL = 'https://journeysendgames.com';
+const JE_REF_CODE = 'mtgcb';
+
+/**
+ * Generates a Journey's End Games referral link.
+ *
+ * @param jeUrl - The JE product path stored in Card.journeysEndUrl /
+ *   journeysEndFoilUrl, e.g. "products/lightning-bolt-m10-nm". The caller picks
+ *   nonfoil or foil based on display context.
+ * @param subId - Optional placement tag (e.g. "cardpage", "buymenu") recorded in
+ *   the partner dashboard alongside the referral.
+ * @param cardName - Fallback for cards without a matched JE product: links to
+ *   their storefront search (`/a/search?type=product&q=…`).
+ * @returns A full URL with the referral code appended. With neither a path nor
+ *   a name, links to the storefront homepage.
+ */
+export const generateJourneysEndLink = (
+  jeUrl?: string | null,
+  subId?: string,
+  cardName?: string,
+): string => {
+  const refSuffix = `ref=${JE_REF_CODE}${subId ? `&subId=${encodeURIComponent(subId)}` : ''}`;
+  if (jeUrl) {
+    const path = jeUrl.startsWith('/') ? jeUrl.slice(1) : jeUrl;
+    const joiner = path.includes('?') ? '&' : '?';
+    return `${JE_BASE_URL}/${path}${joiner}${refSuffix}`;
+  }
+  if (cardName) {
+    return `${JE_BASE_URL}/a/search?type=product&q=${encodeURIComponent(cardName)}&${refSuffix}`;
+  }
+  return `${JE_BASE_URL}/?${refSuffix}`;
+};
+
 export type TcgPrinting = 'foil' | 'normal';
 
 /**

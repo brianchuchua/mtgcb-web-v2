@@ -2,7 +2,11 @@ import { Box, Link, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import React, { useMemo } from 'react';
 import { CardModel } from '@/api/browse/types';
-import { generateCardKingdomLink, generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import {
+  generateCardKingdomLink,
+  generateJourneysEndLink,
+  generateTCGPlayerLink,
+} from '@/utils/affiliateLinkBuilder';
 
 interface CardPricingSectionProps {
   card: CardModel;
@@ -177,6 +181,11 @@ export const CardPricingSection: React.FC<CardPricingSectionProps> = ({
           (Rainbow / Surge / Ripple / Galaxy Foil, Foil Etched, etc.), the "Foil" label
           covers whatever treatment that row represents — same convention TCG uses. */}
       <CardKingdomPricingRow card={card} compact={compact} />
+
+      {/* Journey's End prices + buy link — same two-slot convention as Card Kingdom.
+          The row itself only renders when at least one JE price exists; its buy link
+          falls back to a storefront name search when only the name is available. */}
+      <JourneysEndPricingRow card={card} compact={compact} />
     </Box>
   );
 };
@@ -185,6 +194,90 @@ interface CardKingdomPricingRowProps {
   card: CardModel;
   compact: boolean;
 }
+
+const JourneysEndPricingRow: React.FC<CardKingdomPricingRowProps> = ({ card, compact }) => {
+  const jeRetail = card.journeysEndRetail ? parseFloat(card.journeysEndRetail) : null;
+  const jeFoil = card.journeysEndFoil ? parseFloat(card.journeysEndFoil) : null;
+  if (jeRetail === null && jeFoil === null) return null;
+
+  const jeLinkPath = card.journeysEndUrl ?? card.journeysEndFoilUrl ?? null;
+
+  return (
+    <Box
+      data-testid="journeys-end-pricing-row"
+      sx={{
+        mt: compact ? 1 : 2,
+        pt: compact ? 1 : 2,
+        borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+      }}
+    >
+      {!compact && (
+        <Typography
+          variant="h6"
+          sx={{ mb: 1, fontWeight: 500, fontSize: { xs: '1rem', sm: '1.125rem' } }}
+        >
+          Journey&apos;s End Games
+        </Typography>
+      )}
+      <Grid container spacing={2}>
+        {jeRetail !== null && (
+          <Grid size={{ xs: 12, sm: compact ? 12 : 6 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              data-testid="journeys-end-nonfoil-price"
+            >
+              <Typography variant="body2" color="text.secondary">
+                {compact ? 'JE:' : 'Regular:'}
+              </Typography>
+              <Typography variant="body1" fontWeight="medium">
+                ${jeRetail.toFixed(2)}
+              </Typography>
+            </Box>
+          </Grid>
+        )}
+        {jeFoil !== null && (
+          <Grid size={{ xs: 12, sm: compact ? 12 : 6 }}>
+            <Box
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              data-testid="journeys-end-foil-price"
+            >
+              <Typography variant="body2" color="text.secondary">
+                {compact ? 'JE Foil:' : 'Foil:'}
+              </Typography>
+              <Typography variant="body1" fontWeight="medium">
+                ${jeFoil.toFixed(2)}
+              </Typography>
+            </Box>
+          </Grid>
+        )}
+      </Grid>
+      {!compact && (jeLinkPath || card.name) && (
+        <Box sx={{ mt: 2, textAlign: { xs: 'center', sm: 'left' } }}>
+          <Link
+            href={generateJourneysEndLink(jeLinkPath, 'cardpage', card.name)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid="buy-on-journeys-end-link"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 1,
+              textDecoration: 'none',
+              color: (theme) => theme.palette.primary.main,
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            }}
+          >
+            <Typography variant="body2" fontWeight="medium">
+              Buy on Journey&apos;s End Games →
+            </Typography>
+          </Link>
+        </Box>
+      )}
+    </Box>
+  );
+};
 
 const CardKingdomPricingRow: React.FC<CardKingdomPricingRowProps> = ({ card, compact }) => {
   const ckRetail = card.cardKingdomRetail ? parseFloat(card.cardKingdomRetail) : null;

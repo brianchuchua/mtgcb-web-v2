@@ -5,10 +5,15 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Box, Button, Divider, IconButton, Typography } from '@mui/material';
 import React from 'react';
 import { usePersistedBoolean } from '@/hooks/usePersistedBoolean';
-import { generateCardKingdomLink, generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import {
+  generateCardKingdomLink,
+  generateJourneysEndLink,
+  generateTCGPlayerLink,
+} from '@/utils/affiliateLinkBuilder';
 
 const TCG_EXPANDED_STORAGE_KEY = 'mtgcb-tcgplayer-prices-expanded';
 const CK_EXPANDED_STORAGE_KEY = 'mtgcb-card-kingdom-prices-expanded';
+const JE_EXPANDED_STORAGE_KEY = 'mtgcb-journeys-end-prices-expanded';
 
 interface PriceData {
   normal?: {
@@ -38,6 +43,13 @@ interface CardPricesSectionProps {
   cardKingdomUrl?: string | null;
   cardKingdomFoilUrl?: string | null;
   cardKingdomPricesUpdatedAt?: string | null;
+  // Journey's End buy-link feature inputs — same two-slot model as Card Kingdom, including
+  // a storefront name-search fallback button when the card has no matched JE product.
+  journeysEndRetail?: string | null;
+  journeysEndFoil?: string | null;
+  journeysEndUrl?: string | null;
+  journeysEndFoilUrl?: string | null;
+  journeysEndPricesUpdatedAt?: string | null;
 }
 
 const formatPriceUpdateDate = (dateString: string | null | undefined): string => {
@@ -179,6 +191,11 @@ export const CardPricesSection: React.FC<CardPricesSectionProps> = ({
   cardKingdomUrl,
   cardKingdomFoilUrl,
   cardKingdomPricesUpdatedAt,
+  journeysEndRetail,
+  journeysEndFoil,
+  journeysEndUrl,
+  journeysEndFoilUrl,
+  journeysEndPricesUpdatedAt,
 }) => {
   // Both detail blocks start collapsed — the buy buttons below carry the prices, so
   // the user has the cost they care about without having to expand anything. The
@@ -187,6 +204,7 @@ export const CardPricesSection: React.FC<CardPricesSectionProps> = ({
   // remembers UI preferences).
   const [tcgExpanded, toggleTcgExpanded] = usePersistedBoolean(TCG_EXPANDED_STORAGE_KEY, false);
   const [ckExpanded, toggleCkExpanded] = usePersistedBoolean(CK_EXPANDED_STORAGE_KEY, false);
+  const [jeExpanded, toggleJeExpanded] = usePersistedBoolean(JE_EXPANDED_STORAGE_KEY, false);
 
   const ckRetail = cardKingdomRetail ? parseFloat(cardKingdomRetail) : null;
   const ckFoil = cardKingdomFoil ? parseFloat(cardKingdomFoil) : null;
@@ -233,6 +251,28 @@ export const CardPricesSection: React.FC<CardPricesSectionProps> = ({
   const ckSingleLabel = ckSinglePrice !== null
     ? `${ckSingleBase} (${formatUsd(ckSinglePrice)})`
     : ckSingleBase;
+
+  const jeRetail = journeysEndRetail ? parseFloat(journeysEndRetail) : null;
+  const jeFoil = journeysEndFoil ? parseFloat(journeysEndFoil) : null;
+  const hasJePrices = jeRetail !== null || jeFoil !== null;
+  const hasJeRegularUrl = Boolean(journeysEndUrl);
+  const hasJeFoilUrl = Boolean(journeysEndFoilUrl);
+
+  const jeRegularLabel = jeRetail !== null
+    ? `Buy on Journey's End Games (Regular) (${formatUsd(jeRetail)})`
+    : "Buy on Journey's End Games (Regular)";
+  const jeFoilLabel = jeFoil !== null
+    ? `Buy on Journey's End Games (Foil) (${formatUsd(jeFoil)})`
+    : "Buy on Journey's End Games (Foil)";
+  // Single-button JE label — same finish-qualifier convention as CK above.
+  const jeSinglePrice = hasJeRegularUrl ? jeRetail : jeFoil;
+  const jeSingleIsFoilOnly = hasJeFoilUrl && !hasJeRegularUrl;
+  const jeSingleBase = jeSingleIsFoilOnly
+    ? "Buy on Journey's End Games (Foil)"
+    : "Buy on Journey's End Games";
+  const jeSingleLabel = jeSinglePrice !== null
+    ? `${jeSingleBase} (${formatUsd(jeSinglePrice)})`
+    : jeSingleBase;
 
   return (
     <>
@@ -355,6 +395,51 @@ export const CardPricesSection: React.FC<CardPricesSectionProps> = ({
                   <Typography variant="body2">Foil</Typography>
                   <Typography variant="body2" fontWeight="600">
                     ${ckFoil.toFixed(2)}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          )}
+        </Box>
+      )}
+
+      {/* Journey's End prices — only renders when at least one JE price is populated. */}
+      {hasJePrices && (
+        <Box sx={{ mt: 2 }} data-testid="journeys-end-prices">
+          <Divider sx={{ mb: 1.5 }} />
+          <CollapsibleHeader
+            title="Journey's End Games Prices"
+            subtitle={
+              journeysEndPricesUpdatedAt ? formatPriceUpdateDate(journeysEndPricesUpdatedAt) : null
+            }
+            expanded={jeExpanded}
+            onToggle={toggleJeExpanded}
+            testId="journeys-end-prices-header"
+          />
+          {jeExpanded && (
+            <Box
+              sx={{ pl: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}
+              data-testid="journeys-end-prices-detail"
+            >
+              {jeRetail !== null && (
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  data-testid="journeys-end-nonfoil-price"
+                >
+                  <Typography variant="body2">Regular</Typography>
+                  <Typography variant="body2" fontWeight="600">
+                    ${jeRetail.toFixed(2)}
+                  </Typography>
+                </Box>
+              )}
+              {jeFoil !== null && (
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                  data-testid="journeys-end-foil-price"
+                >
+                  <Typography variant="body2">Foil</Typography>
+                  <Typography variant="body2" fontWeight="600">
+                    ${jeFoil.toFixed(2)}
                   </Typography>
                 </Box>
               )}
@@ -494,6 +579,81 @@ export const CardPricesSection: React.FC<CardPricesSectionProps> = ({
           sx={{ ...buyButtonSx, mt: 1 }}
         >
           Buy on Card Kingdom
+        </Button>
+      )}
+      {hasJeRegularUrl && hasJeFoilUrl && (
+        <>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<ShoppingCartIcon />}
+            href={generateJourneysEndLink(journeysEndUrl, 'cardpage')}
+            target="_blank"
+            rel="noopener noreferrer"
+            fullWidth
+            data-testid="buy-regular-on-journeys-end-button"
+            sx={{ ...buyButtonSx, mt: 1 }}
+          >
+            {jeRegularLabel}
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<ShoppingCartIcon />}
+            href={generateJourneysEndLink(journeysEndFoilUrl, 'cardpage')}
+            target="_blank"
+            rel="noopener noreferrer"
+            fullWidth
+            data-testid="buy-foil-on-journeys-end-button"
+            sx={{ ...buyButtonSx, mt: 1 }}
+          >
+            {jeFoilLabel}
+          </Button>
+        </>
+      )}
+      {hasJeRegularUrl && !hasJeFoilUrl && (
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<ShoppingCartIcon />}
+          href={generateJourneysEndLink(journeysEndUrl, 'cardpage')}
+          target="_blank"
+          rel="noopener noreferrer"
+          fullWidth
+          data-testid="buy-on-journeys-end-button"
+          sx={{ ...buyButtonSx, mt: 1 }}
+        >
+          {jeSingleLabel}
+        </Button>
+      )}
+      {!hasJeRegularUrl && hasJeFoilUrl && (
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<ShoppingCartIcon />}
+          href={generateJourneysEndLink(journeysEndFoilUrl, 'cardpage')}
+          target="_blank"
+          rel="noopener noreferrer"
+          fullWidth
+          data-testid="buy-on-journeys-end-button"
+          sx={{ ...buyButtonSx, mt: 1 }}
+        >
+          {jeSingleLabel}
+        </Button>
+      )}
+      {!hasJeRegularUrl && !hasJeFoilUrl && cardName && (
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<ShoppingCartIcon />}
+          href={generateJourneysEndLink(null, 'cardpage', cardName)}
+          target="_blank"
+          rel="noopener noreferrer"
+          fullWidth
+          data-testid="buy-on-journeys-end-button"
+          sx={{ ...buyButtonSx, mt: 1 }}
+        >
+          Buy on Journey&apos;s End Games
         </Button>
       )}
     </>

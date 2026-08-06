@@ -396,6 +396,109 @@ describe('CardPricesSection', () => {
     });
   });
 
+  describe("Journey's End display", () => {
+    it('renders no JE price block but a name-search fallback button when no JE data is provided', () => {
+      render(
+        <CardPricesSection
+          priceData={FULL_TCG_PRICES}
+          tcgplayerId={123456}
+          cardName="Lightning Bolt"
+        />,
+      );
+      expect(screen.queryByTestId('journeys-end-prices')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('buy-regular-on-journeys-end-button')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('buy-foil-on-journeys-end-button')).not.toBeInTheDocument();
+      const fallback = screen.getByTestId('buy-on-journeys-end-button');
+      expect(fallback).toHaveTextContent("Buy on Journey's End Games");
+      expect(fallback).toHaveAttribute(
+        'href',
+        'https://journeysendgames.com/a/search?type=product&q=Lightning%20Bolt&ref=mtgcb&subId=cardpage',
+      );
+    });
+
+    it('renders the JE block header and starts collapsed', () => {
+      render(
+        <CardPricesSection
+          priceData={FULL_TCG_PRICES}
+          tcgplayerId={123456}
+          cardName="Lightning Bolt"
+          journeysEndRetail="1.99"
+          journeysEndFoil="4.99"
+          journeysEndUrl="products/lightning-bolt-m10-nm"
+          journeysEndFoilUrl="products/lightning-bolt-m10-nm-foil"
+        />,
+      );
+      expect(screen.getByText("Journey's End Games Prices")).toBeInTheDocument();
+      expect(screen.queryByTestId('journeys-end-prices-detail')).not.toBeInTheDocument();
+    });
+
+    it('expands the JE block when its header is clicked and shows both prices', () => {
+      render(
+        <CardPricesSection
+          priceData={FULL_TCG_PRICES}
+          tcgplayerId={123456}
+          cardName="Lightning Bolt"
+          journeysEndRetail="1.99"
+          journeysEndFoil="4.99"
+          journeysEndUrl="products/lightning-bolt-m10-nm"
+          journeysEndFoilUrl="products/lightning-bolt-m10-nm-foil"
+        />,
+      );
+      fireEvent.click(screen.getByTestId('journeys-end-prices-header'));
+      expect(screen.getByTestId('journeys-end-prices-detail')).toBeInTheDocument();
+      expect(screen.getByTestId('journeys-end-nonfoil-price')).toHaveTextContent('$1.99');
+      expect(screen.getByTestId('journeys-end-foil-price')).toHaveTextContent('$4.99');
+    });
+
+    it('renders TWO JE buttons with embedded prices and referral hrefs when both URLs exist', () => {
+      render(
+        <CardPricesSection
+          priceData={FULL_TCG_PRICES}
+          tcgplayerId={123456}
+          cardName="Lightning Bolt"
+          journeysEndRetail="1.99"
+          journeysEndFoil="4.99"
+          journeysEndUrl="products/lightning-bolt-m10-nm"
+          journeysEndFoilUrl="products/lightning-bolt-m10-nm-foil"
+        />,
+      );
+      const regular = screen.getByTestId('buy-regular-on-journeys-end-button');
+      const foil = screen.getByTestId('buy-foil-on-journeys-end-button');
+      expect(regular).toHaveTextContent("Buy on Journey's End Games (Regular) ($1.99)");
+      expect(foil).toHaveTextContent("Buy on Journey's End Games (Foil) ($4.99)");
+      expect(regular).toHaveAttribute(
+        'href',
+        'https://journeysendgames.com/products/lightning-bolt-m10-nm?ref=mtgcb&subId=cardpage',
+      );
+      expect(foil).toHaveAttribute(
+        'href',
+        'https://journeysendgames.com/products/lightning-bolt-m10-nm-foil?ref=mtgcb&subId=cardpage',
+      );
+    });
+
+    it('renders ONE JE button keeping the "(Foil)" qualifier for foil-only treatment rows', () => {
+      render(
+        <CardPricesSection
+          priceData={FULL_TCG_PRICES}
+          tcgplayerId={123456}
+          cardName="Heroic Intervention (Rainbow Foil)"
+          journeysEndFoil="79.99"
+          journeysEndFoilUrl="products/heroic-intervention-sld-rainbow-foil"
+        />,
+      );
+      const button = screen.getByTestId('buy-on-journeys-end-button');
+      expect(button).toHaveTextContent("Buy on Journey's End Games (Foil) ($79.99)");
+      expect(screen.queryByTestId('buy-regular-on-journeys-end-button')).not.toBeInTheDocument();
+    });
+
+    it('omits all JE buttons when no JE URLs exist and there is no card name', () => {
+      render(<CardPricesSection priceData={FULL_TCG_PRICES} tcgplayerId={123456} />);
+      expect(screen.queryByTestId('buy-on-journeys-end-button')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('buy-regular-on-journeys-end-button')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('buy-foil-on-journeys-end-button')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Equal-prominence styling', () => {
     it('TCG and CK buttons share the same MUI variant for visual parity', () => {
       render(

@@ -1355,6 +1355,8 @@ export const useCardRowRenderer = (
             showInlineFoil={!displaySettings.foilPriceIsVisible}
             cardKingdomUrl={'cardKingdomUrl' in card ? card.cardKingdomUrl : undefined}
             cardKingdomFoilUrl={'cardKingdomFoilUrl' in card ? card.cardKingdomFoilUrl : undefined}
+            journeysEndUrl={'journeysEndUrl' in card ? card.journeysEndUrl : undefined}
+            journeysEndFoilUrl={'journeysEndFoilUrl' in card ? card.journeysEndFoilUrl : undefined}
           />
         </TableCell>,
       );
@@ -1386,6 +1388,8 @@ export const useCardRowRenderer = (
               tcgplayerId={'tcgplayerId' in card ? card.tcgplayerId : undefined}
               cardKingdomUrl={'cardKingdomUrl' in card ? card.cardKingdomUrl : undefined}
               cardKingdomFoilUrl={'cardKingdomFoilUrl' in card ? card.cardKingdomFoilUrl : undefined}
+              journeysEndUrl={'journeysEndUrl' in card ? card.journeysEndUrl : undefined}
+              journeysEndFoilUrl={'journeysEndFoilUrl' in card ? card.journeysEndFoilUrl : undefined}
             />
           ) : (
             <Typography variant="body2" color="text.disabled">

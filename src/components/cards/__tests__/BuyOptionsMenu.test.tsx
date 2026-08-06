@@ -90,6 +90,57 @@ describe('BuyOptionsMenu', () => {
     });
   });
 
+  describe("Journey's End items", () => {
+    it('renders TWO JE items ("Regular" + "Foil") when both URLs are present', () => {
+      renderMenu({
+        journeysEndUrl: 'products/foo-nm',
+        journeysEndFoilUrl: 'products/foo-nm-foil',
+      });
+      expect(screen.getByTestId('buy-regular-on-journeys-end-menu-item')).toBeInTheDocument();
+      expect(screen.getByTestId('buy-foil-on-journeys-end-menu-item')).toBeInTheDocument();
+      expect(screen.getByText("Buy on Journey's End Games (Regular)")).toBeInTheDocument();
+      expect(screen.getByText("Buy on Journey's End Games (Foil)")).toBeInTheDocument();
+      expect(screen.queryByTestId('buy-on-journeys-end-menu-item')).not.toBeInTheDocument();
+    });
+
+    it('renders ONE JE item when only the regular URL is present', () => {
+      renderMenu({ journeysEndUrl: 'products/foo-nm', journeysEndFoilUrl: null });
+      expect(screen.getByTestId('buy-on-journeys-end-menu-item')).toBeInTheDocument();
+      expect(screen.queryByTestId('buy-regular-on-journeys-end-menu-item')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('buy-foil-on-journeys-end-menu-item')).not.toBeInTheDocument();
+    });
+
+    it('renders ONE JE item when only the foil URL is present (special-treatment Card row)', () => {
+      renderMenu({ journeysEndUrl: null, journeysEndFoilUrl: 'products/foo-rainbow-foil' });
+      expect(screen.getByTestId('buy-on-journeys-end-menu-item')).toBeInTheDocument();
+      expect(screen.queryByTestId('buy-regular-on-journeys-end-menu-item')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('buy-foil-on-journeys-end-menu-item')).not.toBeInTheDocument();
+    });
+
+    it('falls back to a name-based search item when no JE URL is set but cardName is', () => {
+      renderMenu({
+        journeysEndUrl: null,
+        journeysEndFoilUrl: null,
+        cardName: 'Lightning Bolt',
+      });
+      expect(screen.getByTestId('buy-on-journeys-end-menu-item')).toBeInTheDocument();
+      expect(screen.queryByTestId('buy-regular-on-journeys-end-menu-item')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('buy-foil-on-journeys-end-menu-item')).not.toBeInTheDocument();
+    });
+
+    it('omits JE items entirely when neither URL nor card name is available', () => {
+      renderMenu({
+        journeysEndUrl: null,
+        journeysEndFoilUrl: null,
+        cardName: undefined,
+        cardId: undefined,
+      });
+      expect(screen.queryByTestId('buy-on-journeys-end-menu-item')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('buy-regular-on-journeys-end-menu-item')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('buy-foil-on-journeys-end-menu-item')).not.toBeInTheDocument();
+    });
+  });
+
   describe('TCGPlayer split (regular vs foil)', () => {
     it('renders TWO TCG items when both tcgHasRegular and tcgHasFoil are true', () => {
       renderMenu({ tcgHasRegular: true, tcgHasFoil: true });

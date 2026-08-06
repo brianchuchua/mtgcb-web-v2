@@ -50,6 +50,8 @@ export const mapApiCardsToCardItems = (cards: CardModel[]): CardItemProps[] => {
     // CardPrice → BuyOptionsMenu flow only sees the name-search fallback.
     cardKingdomUrl: card.cardKingdomUrl ?? null,
     cardKingdomFoilUrl: card.cardKingdomFoilUrl ?? null,
+    journeysEndUrl: card.journeysEndUrl ?? null,
+    journeysEndFoilUrl: card.journeysEndFoilUrl ?? null,
     releaseDate: card.releaseDate,
     // Include quantity fields if present
     quantityReg: card.quantityReg,

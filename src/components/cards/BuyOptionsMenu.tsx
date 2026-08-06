@@ -8,7 +8,11 @@ import React from 'react';
 import { useBrowseUrlContext } from '@/features/browse/BrowseSearchForm/hooks/useBrowseUrlContext';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCollectionCardUrl } from '@/utils/collectionUrls';
-import { generateCardKingdomLink, generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import {
+  generateCardKingdomLink,
+  generateJourneysEndLink,
+  generateTCGPlayerLink,
+} from '@/utils/affiliateLinkBuilder';
 
 /**
  * Shared buy-options menu — used by CardPrice (price-link click), CardImageDisplay
@@ -23,6 +27,8 @@ import { generateCardKingdomLink, generateTCGPlayerLink } from '@/utils/affiliat
  *     Kingdom (Foil)" when both URLs are populated; collapsed to a single
  *     "Buy on Card Kingdom" item otherwise; falls back to a CK catalog name search when no
  *     URLs but a cardName is available.
+ *  4. Journey's End item(s) — same split/collapse logic as Card Kingdom, falling back to
+ *     a JE storefront name search when no URLs but a cardName is available.
  */
 
 export interface BuyOptionsMenuProps {
@@ -44,6 +50,8 @@ export interface BuyOptionsMenuProps {
   tcgHasFoil?: boolean;
   cardKingdomUrl?: string | null;
   cardKingdomFoilUrl?: string | null;
+  journeysEndUrl?: string | null;
+  journeysEndFoilUrl?: string | null;
   /** Hides the "View Card Page" item — used on the card detail page. */
   hideViewCardOption?: boolean;
 }
@@ -59,6 +67,8 @@ export const BuyOptionsMenu: React.FC<BuyOptionsMenuProps> = ({
   tcgHasFoil,
   cardKingdomUrl = null,
   cardKingdomFoilUrl = null,
+  journeysEndUrl = null,
+  journeysEndFoilUrl = null,
   hideViewCardOption = false,
 }) => {
   const router = useRouter();
@@ -75,6 +85,10 @@ export const BuyOptionsMenu: React.FC<BuyOptionsMenuProps> = ({
   const hasCkRegular = Boolean(cardKingdomUrl);
   const hasCkFoil = Boolean(cardKingdomFoilUrl);
   const hasCkUrl = hasCkRegular || hasCkFoil;
+
+  const hasJeRegular = Boolean(journeysEndUrl);
+  const hasJeFoil = Boolean(journeysEndFoilUrl);
+  const hasJeUrl = hasJeRegular || hasJeFoil;
 
   const handleViewCard = () => {
     onClose();
@@ -104,6 +118,12 @@ export const BuyOptionsMenu: React.FC<BuyOptionsMenuProps> = ({
     openInNewTab(generateCardKingdomLink(cardKingdomFoilUrl ?? null, cardName || ''));
   const handleBuyOnCKFallback = () =>
     openInNewTab(generateCardKingdomLink(null, cardName || ''));
+  const handleBuyRegularOnJE = () =>
+    openInNewTab(generateJourneysEndLink(journeysEndUrl ?? null, 'buymenu'));
+  const handleBuyFoilOnJE = () =>
+    openInNewTab(generateJourneysEndLink(journeysEndFoilUrl ?? null, 'buymenu'));
+  const handleBuyOnJEFallback = () =>
+    openInNewTab(generateJourneysEndLink(null, 'buymenu', cardName || ''));
 
   return (
     <Menu
@@ -208,6 +228,49 @@ export const BuyOptionsMenu: React.FC<BuyOptionsMenuProps> = ({
             <ShoppingCartIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Buy on Card Kingdom</ListItemText>
+        </MenuItem>
+      )}
+      {hasJeRegular && hasJeFoil && (
+        <MenuItem
+          onClick={handleBuyRegularOnJE}
+          data-testid="buy-regular-on-journeys-end-menu-item"
+        >
+          <ListItemIcon>
+            <ShoppingCartIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Buy on Journey&apos;s End Games (Regular)</ListItemText>
+        </MenuItem>
+      )}
+      {hasJeRegular && hasJeFoil && (
+        <MenuItem onClick={handleBuyFoilOnJE} data-testid="buy-foil-on-journeys-end-menu-item">
+          <ListItemIcon>
+            <ShoppingCartIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Buy on Journey&apos;s End Games (Foil)</ListItemText>
+        </MenuItem>
+      )}
+      {hasJeRegular && !hasJeFoil && (
+        <MenuItem onClick={handleBuyRegularOnJE} data-testid="buy-on-journeys-end-menu-item">
+          <ListItemIcon>
+            <ShoppingCartIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Buy on Journey&apos;s End Games</ListItemText>
+        </MenuItem>
+      )}
+      {!hasJeRegular && hasJeFoil && (
+        <MenuItem onClick={handleBuyFoilOnJE} data-testid="buy-on-journeys-end-menu-item">
+          <ListItemIcon>
+            <ShoppingCartIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Buy on Journey&apos;s End Games</ListItemText>
+        </MenuItem>
+      )}
+      {!hasJeUrl && cardName && (
+        <MenuItem onClick={handleBuyOnJEFallback} data-testid="buy-on-journeys-end-menu-item">
+          <ListItemIcon>
+            <ShoppingCartIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Buy on Journey&apos;s End Games</ListItemText>
         </MenuItem>
       )}
     </Menu>

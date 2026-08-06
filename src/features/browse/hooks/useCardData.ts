@@ -55,6 +55,11 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       'cardKingdomFoilUrl',
       'cardKingdomRetail',
       'cardKingdomFoil',
+      // Journey's End equivalents — same reasoning as the Card Kingdom fields above.
+      'journeysEndUrl',
+      'journeysEndFoilUrl',
+      'journeysEndRetail',
+      'journeysEndFoil',
       'collectorNumber',
       'mtgcbCollectorNumber',
       'rarity',

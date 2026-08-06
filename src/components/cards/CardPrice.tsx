@@ -45,6 +45,10 @@ interface CardPriceProps {
   // neither URL is set but cardName is.
   cardKingdomUrl?: string | null;
   cardKingdomFoilUrl?: string | null;
+  // Journey's End buy-link inputs — same split/collapse behavior as Card Kingdom, falling
+  // back to a JE storefront name search when neither URL is set but cardName is.
+  journeysEndUrl?: string | null;
+  journeysEndFoilUrl?: string | null;
   // Hides the "View Card Page" menu item — used on detail pages where the user is
   // already on the card page and that option would be a no-op.
   hideViewCardOption?: boolean;
@@ -80,6 +84,8 @@ const CardPrice: React.FC<CardPriceProps> = ({
   hideFoilSuffix = false,
   cardKingdomUrl = null,
   cardKingdomFoilUrl = null,
+  journeysEndUrl = null,
+  journeysEndFoilUrl = null,
   hideViewCardOption = false,
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -353,6 +359,8 @@ const CardPrice: React.FC<CardPriceProps> = ({
           tcgHasFoil={hasFoilTcgPrice}
           cardKingdomUrl={cardKingdomUrl}
           cardKingdomFoilUrl={cardKingdomFoilUrl}
+          journeysEndUrl={journeysEndUrl}
+          journeysEndFoilUrl={journeysEndFoilUrl}
           hideViewCardOption={hideViewCardOption}
         />
       </>
@@ -434,6 +442,8 @@ const CardPrice: React.FC<CardPriceProps> = ({
           tcgHasFoil={hasFoilTcgPrice}
           cardKingdomUrl={cardKingdomUrl}
           cardKingdomFoilUrl={cardKingdomFoilUrl}
+          journeysEndUrl={journeysEndUrl}
+          journeysEndFoilUrl={journeysEndFoilUrl}
           hideViewCardOption={hideViewCardOption}
         />
       </>
@@ -514,6 +524,8 @@ const CardPrice: React.FC<CardPriceProps> = ({
           tcgHasFoil={hasFoilTcgPrice}
           cardKingdomUrl={cardKingdomUrl}
           cardKingdomFoilUrl={cardKingdomFoilUrl}
+          journeysEndUrl={journeysEndUrl}
+          journeysEndFoilUrl={journeysEndFoilUrl}
           hideViewCardOption={hideViewCardOption}
         />
       </>
@@ -602,6 +614,8 @@ const CardPrice: React.FC<CardPriceProps> = ({
           tcgHasFoil={hasFoilTcgPrice}
           cardKingdomUrl={cardKingdomUrl}
           cardKingdomFoilUrl={cardKingdomFoilUrl}
+          journeysEndUrl={journeysEndUrl}
+          journeysEndFoilUrl={journeysEndFoilUrl}
           hideViewCardOption={hideViewCardOption}
         />
       </>

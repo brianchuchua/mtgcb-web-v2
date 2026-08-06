@@ -65,6 +65,11 @@ const selectFields: Array<keyof CardModel | string> = [
   'cardKingdomUrl',
   'cardKingdomFoilUrl',
   'cardKingdomPricesUpdatedAt',
+  'journeysEndRetail',
+  'journeysEndFoil',
+  'journeysEndUrl',
+  'journeysEndFoilUrl',
+  'journeysEndPricesUpdatedAt',
   'releasedAt',
   'canBeFoil',
   'canBeNonFoil',
@@ -311,6 +316,8 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
             prices={priceData || undefined}
             cardKingdomUrl={card?.cardKingdomUrl}
             cardKingdomFoilUrl={card?.cardKingdomFoilUrl}
+            journeysEndUrl={card?.journeysEndUrl}
+            journeysEndFoilUrl={card?.journeysEndFoilUrl}
             quantityReg={card?.quantityReg}
             quantityFoil={card?.quantityFoil}
             canBeFoil={card?.canBeFoil}
@@ -375,6 +382,11 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
               cardKingdomUrl={card?.cardKingdomUrl}
               cardKingdomFoilUrl={card?.cardKingdomFoilUrl}
               cardKingdomPricesUpdatedAt={card?.cardKingdomPricesUpdatedAt}
+              journeysEndRetail={card?.journeysEndRetail}
+              journeysEndFoil={card?.journeysEndFoil}
+              journeysEndUrl={card?.journeysEndUrl}
+              journeysEndFoilUrl={card?.journeysEndFoilUrl}
+              journeysEndPricesUpdatedAt={card?.journeysEndPricesUpdatedAt}
             />
           </Paper>
 

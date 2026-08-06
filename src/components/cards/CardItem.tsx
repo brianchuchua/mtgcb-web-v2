@@ -58,6 +58,10 @@ export interface CardItemProps {
   // "Buy on Card Kingdom" item alongside the existing TCGPlayer item.
   cardKingdomUrl?: string | null;
   cardKingdomFoilUrl?: string | null;
+  // Journey's End buy-link inputs (optional). Same behavior as Card Kingdom, including a
+  // name-search fallback when no JE URLs exist.
+  journeysEndUrl?: string | null;
+  journeysEndFoilUrl?: string | null;
   // Collection quantities
   quantityReg?: number;
   quantityFoil?: number;
@@ -150,6 +154,8 @@ const CardItemComponent = ({
   foil,
   cardKingdomUrl,
   cardKingdomFoilUrl,
+  journeysEndUrl,
+  journeysEndFoilUrl,
   quantityReg,
   quantityFoil,
   canBeFoil,
@@ -842,6 +848,8 @@ const CardItemComponent = ({
                 directToTCGPlayer={directPriceToTCGPlayer}
                 cardKingdomUrl={cardKingdomUrl}
                 cardKingdomFoilUrl={cardKingdomFoilUrl}
+                journeysEndUrl={journeysEndUrl}
+                journeysEndFoilUrl={journeysEndFoilUrl}
                 hideViewCardOption={hideViewCardOption}
               />
             </Box>
@@ -915,6 +923,8 @@ const CardItemComponent = ({
           tcgHasFoil={hasFoilTcgPrice}
           cardKingdomUrl={cardKingdomUrl}
           cardKingdomFoilUrl={cardKingdomFoilUrl}
+          journeysEndUrl={journeysEndUrl}
+          journeysEndFoilUrl={journeysEndFoilUrl}
           hideViewCardOption={hideViewCardOption}
         />
       )}

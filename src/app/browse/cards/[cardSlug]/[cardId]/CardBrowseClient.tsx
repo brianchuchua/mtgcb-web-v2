@@ -60,6 +60,11 @@ const selectFields: Array<keyof CardModel | string> = [
   'cardKingdomUrl',
   'cardKingdomFoilUrl',
   'cardKingdomPricesUpdatedAt',
+  'journeysEndRetail',
+  'journeysEndFoil',
+  'journeysEndUrl',
+  'journeysEndFoilUrl',
+  'journeysEndPricesUpdatedAt',
   'releasedAt',
   'canBeFoil',
   'canBeNonFoil',
@@ -259,6 +264,8 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
             )}
             cardKingdomUrl={card?.cardKingdomUrl}
             cardKingdomFoilUrl={card?.cardKingdomFoilUrl}
+            journeysEndUrl={card?.journeysEndUrl}
+            journeysEndFoilUrl={card?.journeysEndFoilUrl}
             maxWidth={{ xs: 400, sm: 500, md: 600 }}
           />
 
@@ -328,6 +335,11 @@ export default function CardBrowseClient({ cardId, cardSlug }: CardBrowseClientP
               cardKingdomUrl={card?.cardKingdomUrl}
               cardKingdomFoilUrl={card?.cardKingdomFoilUrl}
               cardKingdomPricesUpdatedAt={card?.cardKingdomPricesUpdatedAt}
+              journeysEndRetail={card?.journeysEndRetail}
+              journeysEndFoil={card?.journeysEndFoil}
+              journeysEndUrl={card?.journeysEndUrl}
+              journeysEndFoilUrl={card?.journeysEndFoilUrl}
+              journeysEndPricesUpdatedAt={card?.journeysEndPricesUpdatedAt}
             />
           </Paper>
 

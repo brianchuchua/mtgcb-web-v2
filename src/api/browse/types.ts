@@ -50,6 +50,14 @@ export interface CardModel {
   cardKingdomUrl?: string | null;
   cardKingdomFoilUrl?: string | null;
   cardKingdomPricesUpdatedAt?: string | null;
+  // Journey's End buy-link feature (per docs/future-features/JOURNEYS_END_INTEGRATION_PLAN.md
+  // in mtgcb-api-v3). Same two-slot model as Card Kingdom; URLs are product paths with the
+  // storefront host + referral params added by affiliateLinkBuilder.
+  journeysEndRetail?: string | null;
+  journeysEndFoil?: string | null;
+  journeysEndUrl?: string | null;
+  journeysEndFoilUrl?: string | null;
+  journeysEndPricesUpdatedAt?: string | null;
   releaseDate: string | null;
   canBeFoil?: boolean;
   canBeNonFoil?: boolean;

@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-06',
+      version: '1.28.0',
+      changes: ["Added support for Journey's End Games"],
+      type: 'feature',
+    },
+    {
       date: '2026-08-04',
       version: '1.27.25',
       changes: ['Added The Hobbit, The Hobbit Variants, and The Hobbit Eternal as new sets'],

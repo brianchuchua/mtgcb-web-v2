@@ -1,11 +1,79 @@
 import {
   generateCardKingdomLink,
+  generateJourneysEndLink,
   generateTCGPlayerLink,
   generateTCGPlayerAffiliateLink,
   generateTCGPlayerSealedProductLink,
 } from '../affiliateLinkBuilder';
 
 describe('affiliateLinkBuilder', () => {
+  describe('generateJourneysEndLink', () => {
+    it('builds a direct product URL from a stored JE path with the referral code appended', () => {
+      const url = generateJourneysEndLink('products/lightning-bolt-m10-nm');
+      expect(url).toBe('https://journeysendgames.com/products/lightning-bolt-m10-nm?ref=mtgcb');
+    });
+
+    it('appends a subId when one is provided', () => {
+      const url = generateJourneysEndLink('products/lightning-bolt-m10-nm', 'cardpage');
+      expect(url).toBe(
+        'https://journeysendgames.com/products/lightning-bolt-m10-nm?ref=mtgcb&subId=cardpage',
+      );
+    });
+
+    it('uses & instead of ? when the stored path already has a query string', () => {
+      const url = generateJourneysEndLink('pages/mtg-deck-builder?deck=abc123');
+      expect(url).toBe('https://journeysendgames.com/pages/mtg-deck-builder?deck=abc123&ref=mtgcb');
+    });
+
+    it('strips a leading slash if one ever ends up in the DB', () => {
+      const url = generateJourneysEndLink('/products/foo-nm');
+      expect(url).toBe('https://journeysendgames.com/products/foo-nm?ref=mtgcb');
+      expect(url).not.toContain('com//products');
+    });
+
+    it('falls back to a JE storefront search when no path is given but a card name is', () => {
+      const url = generateJourneysEndLink(null, 'cardpage', 'Fireball');
+      expect(url).toBe(
+        'https://journeysendgames.com/a/search?type=product&q=Fireball&ref=mtgcb&subId=cardpage',
+      );
+    });
+
+    it('URL-encodes card names in the search fallback', () => {
+      const url = generateJourneysEndLink(null, undefined, "Aladdin's Lamp");
+      expect(url).toBe(
+        "https://journeysendgames.com/a/search?type=product&q=Aladdin's%20Lamp&ref=mtgcb",
+      );
+    });
+
+    it('prefers the stored product path over the name-search fallback', () => {
+      const url = generateJourneysEndLink('products/fireball-m25-nm', 'cardpage', 'Fireball');
+      expect(url).toBe(
+        'https://journeysendgames.com/products/fireball-m25-nm?ref=mtgcb&subId=cardpage',
+      );
+    });
+
+    it('links to the storefront homepage with the ref code when neither path nor name is given', () => {
+      expect(generateJourneysEndLink()).toBe('https://journeysendgames.com/?ref=mtgcb');
+      expect(generateJourneysEndLink(null)).toBe('https://journeysendgames.com/?ref=mtgcb');
+    });
+
+    it('URL-encodes the subId', () => {
+      const url = generateJourneysEndLink('products/foo-nm', 'set page');
+      expect(url).toContain('subId=set%20page');
+    });
+
+    it('always carries the referral code regardless of call shape', () => {
+      const calls = [
+        generateJourneysEndLink('products/foo-nm'),
+        generateJourneysEndLink('products/foo-nm', 'buymenu'),
+        generateJourneysEndLink(),
+      ];
+      for (const url of calls) {
+        expect(url).toContain('ref=mtgcb');
+      }
+    });
+  });
+
   describe('generateCardKingdomLink', () => {
     const AFFILIATE_QUERY =
       '?partner=MTGCB&utm_source=MTGCB&utm_medium=affiliate&utm_campaign=MTGCB';
