@@ -12,6 +12,18 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-10',
+      version: '1.28.2',
+      changes: ['Updated card legalities across formats'],
+      type: 'data',
+    },
+    {
+      date: '2026-08-09',
+      version: '1.28.1',
+      changes: ['Added double-sided tokens and reorganized token sets for Outlaws of Thunder Junction'],
+      type: 'data',
+    },
+    {
       date: '2026-08-06',
       version: '1.28.0',
       changes: ["Added support for Journey's End Games"],
