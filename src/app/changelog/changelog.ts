@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-11',
+      version: '1.28.3',
+      changes: [
+        'Added double-sided tokens and reorganized token sets for Modern Horizons 3, Murders at Karlov Manor, The Lost Caverns of Ixalan, Phyrexia: All Will Be One, Wilds of Eldraine, Streets of New Capenna, and Adventures in the Forgotten Realms',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-08-10',
       version: '1.28.2',
       changes: ['Updated card legalities across formats'],
