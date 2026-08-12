@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-12',
+      version: '1.28.4',
+      changes: ['Updated Secret Lair Drop Series'],
+      type: 'data',
+    },
+    {
       date: '2026-08-11',
       version: '1.28.3',
       changes: [
