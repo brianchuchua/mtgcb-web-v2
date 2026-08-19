@@ -12,6 +12,17 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-18',
+      version: '1.28.5',
+      changes: [
+        'Updated Secret Lair Drop Series',
+        'Updated various promo sets',
+        'Added double-sided tokens for The Hobbit',
+        'Split Marvel Super Heroes Commander into Marvel Super Heroes Jumpstart and Marvel Super Heroes Beginner Box',
+        'Fixed sorting cards by price when browsing a specific set and filtering by cards missing from a goal',
+      ],
+    },
+    {
       date: '2026-08-12',
       version: '1.28.4',
       changes: ['Updated Secret Lair Drop Series'],
