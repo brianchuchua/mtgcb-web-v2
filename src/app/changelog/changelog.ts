@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-21',
+      version: '1.28.6',
+      changes: [
+        "Added double-sided tokens and reorganized token sets for The Brothers' War, March of the Machine, The Lord of the Rings: Tales of Middle-earth, Commander Legends, Commander Masters, Modern Horizons, Modern Horizons 2, and Double Masters 2022",
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-08-18',
       version: '1.28.5',
       changes: [
