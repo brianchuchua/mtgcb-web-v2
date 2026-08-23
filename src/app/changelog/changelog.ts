@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-22',
+      version: '1.28.7',
+      changes: [
+        "Added double-sided tokens and reorganized token sets for Strixhaven: School of Mages, Commander Legends: Battle for Baldur's Gate, Unfinity, The Big Score, Breaking News, Fallout, Doctor Who, Warhammer 40,000, Unsanctioned, Archenemy: Nicol Bolas, Planechase Anthology, Modern Event Deck 2014, Game Night 2019, Game Night: Free-for-All, and the Guilds of Ravnica and Ravnica Allegiance Guild Kits",
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-08-21',
       version: '1.28.6',
       changes: [
