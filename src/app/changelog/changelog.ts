@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-23',
+      version: '1.28.8',
+      changes: [
+        'Added double-sided tokens and reorganized token sets for Ikoria: Lair of Behemoths, The List, Hour of Devastation, and Amonkhet',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-08-22',
       version: '1.28.7',
       changes: [
