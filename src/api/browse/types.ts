@@ -231,6 +231,7 @@ export interface SetApiParams {
         NOT?: string[];
       };
   parentSetId?: string | null;
+  subsetGroupId?: string | null;
   releasedAt?: string;
   isDraftable?: boolean;
   limit?: number;

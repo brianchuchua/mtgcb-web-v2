@@ -13,6 +13,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-08-26',
+      version: '1.28.11',
+      changes: [
+        'Fixed the "Show Subsets" toggle so that turning it off now also hides Secret Lair drops and other sets that belong to a subset group',
+        'Fixed the Jump to Set menu so that main sets are listed ahead of Secret Lair drops and other subsets',
+      ],
+    },
+    {
+      date: '2026-08-26',
       version: '1.28.10',
       changes: ['Connected 231 sets to their parent sets and to relevant subset groups'],
       type: 'data',

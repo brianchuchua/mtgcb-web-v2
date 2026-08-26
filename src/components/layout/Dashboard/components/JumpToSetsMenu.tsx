@@ -103,6 +103,14 @@ export const JumpToSetsMenu = () => {
   // Fetch all sets
   const { data: setsResponse, isLoading } = useGetAllSetsQuery();
 
+  /**
+   * A set is a "main" set only if it is a subset by neither axis: no parent
+   * expansion and no subset group. Secret Lair drops carry only a subsetGroupId,
+   * so checking parentSetId alone would sort all of them ahead of real sets.
+   * Subset-group umbrellas (isSubsetGroup) have neither and stay at the top.
+   */
+  const isMainSet = (set: Set) => set.parentSetId === null && set.subsetGroupId === null;
+
   // Sort sets with smart ordering based on search input
   const allSets = useMemo(() => {
     if (!setsResponse?.data?.sets) return [];
@@ -121,9 +129,9 @@ export const JumpToSetsMenu = () => {
         if (aCodeMatch && !bCodeMatch) return -1;
         if (!aCodeMatch && bCodeMatch) return 1;
 
-        // Then prioritize main sets (parentSetId === null) over subsets
-        const aIsMainSet = a.parentSetId === null;
-        const bIsMainSet = b.parentSetId === null;
+        // Then prioritize main sets over subsets
+        const aIsMainSet = isMainSet(a);
+        const bIsMainSet = isMainSet(b);
 
         if (aIsMainSet && !bIsMainSet) return -1;
         if (!aIsMainSet && bIsMainSet) return 1;
@@ -137,9 +145,9 @@ export const JumpToSetsMenu = () => {
 
     // Default sort: main sets first, then by release date (newest first)
     return sets.sort((a, b) => {
-      // Prioritize main sets (parentSetId === null) over subsets
-      const aIsMainSet = a.parentSetId === null;
-      const bIsMainSet = b.parentSetId === null;
+      // Prioritize main sets over subsets
+      const aIsMainSet = isMainSet(a);
+      const bIsMainSet = isMainSet(b);
 
       if (aIsMainSet && !bIsMainSet) return -1;
       if (!aIsMainSet && bIsMainSet) return 1;

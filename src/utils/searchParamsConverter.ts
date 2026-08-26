@@ -300,8 +300,12 @@ export const buildApiParamsFromSearchParams = (
       }
     }
 
+    // A set counts as a subset if it has a parent OR belongs to a subset group.
+    // Both are needed: Secret Lair drops carry only subsetGroupId, so filtering
+    // on parentSetId alone leaves them in the list.
     if (searchParams.showSubsets === false) {
       apiParams.parentSetId = null;
+      apiParams.subsetGroupId = null;
     }
 
     // Add completion status for collections
