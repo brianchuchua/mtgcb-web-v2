@@ -9,6 +9,7 @@ const BUILD_SHA =
   '';
 
 const nextConfig: NextConfig = {
+  agentRules: false,
   reactCompiler: true,
   compiler: {
     emotion: true,

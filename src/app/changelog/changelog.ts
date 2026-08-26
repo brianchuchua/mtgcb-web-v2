@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-25',
+      version: '1.28.9',
+      changes: ['Added missing double-sided tokens for The List, The Walking Dead Secret Lair, and Challenger Decks'],
+      type: 'data',
+    },
+    {
       date: '2026-08-23',
       version: '1.28.8',
       changes: [
