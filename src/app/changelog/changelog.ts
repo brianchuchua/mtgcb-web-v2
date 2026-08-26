@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-26',
+      version: '1.28.10',
+      changes: ['Connected 231 sets to their parent sets and to relevant subset groups'],
+      type: 'data',
+    },
+    {
       date: '2026-08-25',
       version: '1.28.9',
       changes: ['Added missing double-sided tokens for The List, The Walking Dead Secret Lair, and Challenger Decks'],
