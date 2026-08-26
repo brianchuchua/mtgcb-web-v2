@@ -13,6 +13,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-08-26',
+      version: '1.28.12',
+      changes: [
+        'Split 3,313 Secret Lair cards into the 412 sets matching their original Secret Lair drops',
+        'Fixed set type names being displayed with missing capitalization, such as "Secret lair" instead of "Secret Lair"',
+      ],
+    },
+    {
+      date: '2026-08-26',
       version: '1.28.11',
       changes: [
         'Fixed the "Show Subsets" toggle so that turning it off now also hides Secret Lair drops and other sets that belong to a subset group',
