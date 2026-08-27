@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-08-26',
+      version: '1.28.13',
+      changes: ['Fixed collection csv imports to improve their accuracy'],
+    },
+    {
+      date: '2026-08-26',
       version: '1.28.12',
       changes: [
         'Split 3,313 Secret Lair cards into the 412 sets matching their original Secret Lair drops',
