@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-27',
+      version: '1.29.0',
+      changes: ['Improved compression for faster load times'],
+    },
+    {
       date: '2026-08-26',
       version: '1.28.13',
       changes: ['Fixed collection csv imports to improve their accuracy'],
