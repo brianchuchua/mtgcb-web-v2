@@ -156,6 +156,14 @@ export interface CardApiParams {
     OR?: string[];
     NOT?: string[];
   };
+  borderColor?: {
+    OR?: string[];
+    NOT?: string[];
+  };
+  frameEffects?: {
+    OR?: string[];
+    NOT?: string[];
+  };
   rarityNumeric?: {
     OR?: string[];
     AND?: string[];
@@ -210,6 +218,7 @@ export interface CardApiParams {
   includeLocations?: boolean;
   includeBadDataOnly?: boolean;
   isReserved?: boolean;
+  isFullArt?: boolean;
 }
 
 export interface SetApiParams {

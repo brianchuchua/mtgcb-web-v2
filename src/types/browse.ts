@@ -21,6 +21,16 @@ export interface RarityFilter {
   exclude: string[];
 }
 
+export interface BorderColorFilter {
+  include: string[];
+  exclude: string[];
+}
+
+export interface FrameEffectFilter {
+  include: string[];
+  exclude: string[];
+}
+
 export interface SetFilter {
   include: string[];
   exclude: string[];
@@ -91,6 +101,8 @@ export interface BrowseSearchParams {
   colors?: ColorFilter;
   types?: TypeFilter;
   layouts?: LayoutFilter;
+  borderColors?: BorderColorFilter;
+  frameEffects?: FrameEffectFilter;
   rarities?: RarityFilter;
   sets?: SetFilter;
   stats?: StatFilters;
@@ -119,6 +131,11 @@ export interface BrowseSearchParams {
   includeChildLocations?: boolean;
   includeBadDataOnly?: boolean;
   isReserved?: boolean;
+  /**
+   * Tri-state full-art filter. `undefined` leaves full-art status unfiltered,
+   * `true` keeps only full-art printings, `false` excludes them.
+   */
+  isFullArt?: boolean;
 }
 
 export interface BrowsePagination {

@@ -2,11 +2,11 @@
 
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Collapse, FormControl, InputLabel, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Box, Collapse, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectIsReserved, setIsReserved } from '@/redux/slices/browse';
+import { selectIsFullArt, selectIsReserved, setIsFullArt, setIsReserved } from '@/redux/slices/browse';
 
 interface AdvancedFiltersProps {
   resetTrigger?: number;
@@ -53,62 +53,86 @@ const StyledToggleButton = styled(ToggleButton)(({ theme }) => ({
   flex: 1,
 }));
 
-const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ resetTrigger }) => {
+/**
+ * Tri-state boolean filter choice. `all` clears the filter (sends nothing to the
+ * API), `only` matches `true`, `exclude` matches `false`.
+ */
+type TriState = 'all' | 'only' | 'exclude';
+
+export const triStateToBoolean = (value: TriState): boolean | undefined =>
+  value === 'all' ? undefined : value === 'only';
+
+export const booleanToTriState = (value: boolean | undefined): TriState =>
+  value === undefined ? 'all' : value ? 'only' : 'exclude';
+
+/**
+ * Binds one tri-state toggle to a Redux boolean field. Local state leads once the
+ * user touches the control so that in-flight Redux updates can't clobber the click,
+ * while an untouched control keeps mirroring Redux (URL restores, goal switches).
+ */
+function useTriStateFilter(
+  reduxValue: boolean | undefined,
+  setAction: (value: boolean | undefined) => { type: string },
+  resetTrigger: number | undefined,
+  onExpand: () => void,
+) {
   const dispatch = useDispatch();
-  const reduxIsReserved = useSelector(selectIsReserved);
   const userModified = useRef(false);
-  const [mainExpanded, setMainExpanded] = useState(false);
-  const [isReservedFilter, setIsReservedFilter] = useState<'all' | 'reserved' | 'exclude'>(() => {
-    if (reduxIsReserved === true) return 'reserved';
-    if (reduxIsReserved === false) return 'exclude';
-    return 'all';
-  });
+  const [value, setValue] = useState<TriState>(() => booleanToTriState(reduxValue));
 
-  // Expand automatically if there's an active filter
   useEffect(() => {
-    if (reduxIsReserved !== undefined && !userModified.current) {
-      setMainExpanded(true);
+    if (reduxValue !== undefined && !userModified.current) {
+      onExpand();
     }
-  }, [reduxIsReserved]);
+  }, [reduxValue, onExpand]);
 
-  // Reset when resetTrigger changes
   useEffect(() => {
     if (resetTrigger && resetTrigger > 0) {
       userModified.current = false;
-      setIsReservedFilter('all');
-      setMainExpanded(false);
-      dispatch(setIsReserved(undefined));
+      setValue('all');
+      dispatch(setAction(undefined));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetTrigger, dispatch]);
 
-  // Sync with Redux state when it changes
   useEffect(() => {
     if (!userModified.current) {
-      if (reduxIsReserved === true) {
-        setIsReservedFilter('reserved');
-      } else if (reduxIsReserved === false) {
-        setIsReservedFilter('exclude');
-      } else {
-        setIsReservedFilter('all');
-      }
+      setValue(booleanToTriState(reduxValue));
     }
-  }, [reduxIsReserved]);
+  }, [reduxValue]);
 
-  // Update Redux when local state changes
   useEffect(() => {
     if (!userModified.current) return;
+    dispatch(setAction(triStateToBoolean(value)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, dispatch]);
 
-    const newValue = isReservedFilter === 'all' ? undefined : isReservedFilter === 'reserved' ? true : false;
-    dispatch(setIsReserved(newValue));
-  }, [isReservedFilter, dispatch]);
-
-  const handleIsReservedChange = (value: 'all' | 'reserved' | 'exclude' | null) => {
-    if (!value) return;
+  const onChange = useCallback((next: TriState | null) => {
+    if (!next) return;
     userModified.current = true;
-    setIsReservedFilter(value);
-  };
+    setValue(next);
+  }, []);
 
-  const hasActiveFilters = reduxIsReserved !== undefined;
+  return { value, onChange };
+}
+
+const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ resetTrigger }) => {
+  const reduxIsReserved = useSelector(selectIsReserved);
+  const reduxIsFullArt = useSelector(selectIsFullArt);
+  const [mainExpanded, setMainExpanded] = useState(false);
+
+  const expand = useCallback(() => setMainExpanded(true), []);
+
+  const reserved = useTriStateFilter(reduxIsReserved, setIsReserved, resetTrigger, expand);
+  const fullArt = useTriStateFilter(reduxIsFullArt, setIsFullArt, resetTrigger, expand);
+
+  useEffect(() => {
+    if (resetTrigger && resetTrigger > 0) {
+      setMainExpanded(false);
+    }
+  }, [resetTrigger]);
+
+  const hasActiveFilters = reduxIsReserved !== undefined || reduxIsFullArt !== undefined;
 
   return (
     <Box>
@@ -136,26 +160,34 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({ resetTrigger }) => {
           <Box>
             <FilterLabel>Reserved List</FilterLabel>
             <ToggleButtonGroup
-              value={isReservedFilter}
+              value={reserved.value}
               exclusive
-              onChange={(_, value) => handleIsReservedChange(value)}
+              onChange={(_, value) => reserved.onChange(value)}
               fullWidth
               size="small"
+              aria-label="Reserved List filter"
             >
               <StyledToggleButton value="all">All cards</StyledToggleButton>
-              <StyledToggleButton value="reserved">Reserved only</StyledToggleButton>
+              <StyledToggleButton value="only">Reserved only</StyledToggleButton>
               <StyledToggleButton value="exclude">Exclude Reserved</StyledToggleButton>
             </ToggleButtonGroup>
           </Box>
 
-          {/* Future boolean filters can be added here following the same pattern:
-              <Box sx={{ mt: 2 }}>
-                <FilterLabel>Filter Name</FilterLabel>
-                <ToggleButtonGroup...>
-                  ...
-                </ToggleButtonGroup>
-              </Box>
-          */}
+          <Box sx={{ mt: 2 }}>
+            <FilterLabel>Full Art</FilterLabel>
+            <ToggleButtonGroup
+              value={fullArt.value}
+              exclusive
+              onChange={(_, value) => fullArt.onChange(value)}
+              fullWidth
+              size="small"
+              aria-label="Full Art filter"
+            >
+              <StyledToggleButton value="all">All cards</StyledToggleButton>
+              <StyledToggleButton value="only">Full Art only</StyledToggleButton>
+              <StyledToggleButton value="exclude">Exclude Full Art</StyledToggleButton>
+            </ToggleButtonGroup>
+          </Box>
         </ContentBox>
       </Collapse>
     </Box>

@@ -9,6 +9,8 @@ import {
   ColorMatchType,
   CompletionStatusFilter,
   FormatLegalityFilter,
+  BorderColorFilter,
+  FrameEffectFilter,
   LayoutFilter,
   RarityFilter,
   SetCategoryFilter,
@@ -206,7 +208,23 @@ export const browseSlice = createSlice({
         state.cardsSearchParams.layouts = action.payload;
       }
     },
-    setRarities: (state, action: PayloadAction<RarityFilter>) => {
+    setBorderColors: (state, action: PayloadAction<BorderColorFilter>) => {
+      // Cards-specific field
+      if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
+        delete state.cardsSearchParams.borderColors;
+      } else {
+        state.cardsSearchParams.borderColors = action.payload;
+      }
+    },
+    setFrameEffects: (state, action: PayloadAction<FrameEffectFilter>) => {
+      // Cards-specific field
+      if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
+        delete state.cardsSearchParams.frameEffects;
+      } else {
+        state.cardsSearchParams.frameEffects = action.payload;
+      }
+    },
+    setRarities: (state, action: PayloadAction<RarityFilter>) =>{
       // Cards-specific field
       if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
         delete state.cardsSearchParams.rarities;
@@ -297,6 +315,14 @@ export const browseSlice = createSlice({
         delete state.cardsSearchParams.isReserved;
       } else {
         state.cardsSearchParams.isReserved = action.payload;
+      }
+    },
+    setIsFullArt: (state, action: PayloadAction<boolean | undefined>) => {
+      // Cards-specific field
+      if (action.payload === undefined) {
+        delete state.cardsSearchParams.isFullArt;
+      } else {
+        state.cardsSearchParams.isFullArt = action.payload;
       }
     },
     setSortBy: (state, action: PayloadAction<SortByOption>) => {
@@ -626,6 +652,8 @@ export const {
   setColors,
   setTypes,
   setLayouts,
+  setBorderColors,
+  setFrameEffects,
   setRarities,
   setSets,
   setFormatsLegal,
@@ -639,6 +667,7 @@ export const {
   setOneResultPerCardName,
   setIncludeBadDataOnly,
   setIsReserved,
+  setIsFullArt,
   setSortBy,
   setSortOrder,
   setPagination,

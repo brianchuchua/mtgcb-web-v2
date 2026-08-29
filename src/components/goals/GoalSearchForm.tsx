@@ -6,9 +6,15 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import {
+  Alert,
   Box,
   Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControlLabel,
   IconButton,
   InputAdornment,
@@ -27,12 +33,13 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useGetSetTypesQuery } from '@/api/browse/browseApi';
 import { CardApiParams } from '@/api/browse/types';
-import { useGetCardLayoutsQuery, useGetCardTypesQuery } from '@/api/cards/cardsApi';
+import { useGetCardLayoutsQuery, useGetCardTreatmentsQuery, useGetCardTypesQuery } from '@/api/cards/cardsApi';
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
 import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
 import OutlinedBox from '@/components/ui/OutlinedBox';
 import { FORMAT_LEGALITY_OPTIONS } from '@/features/browse/formatLegalityConstants';
+import { formatBorderColorName, formatFrameEffectName } from '@/features/browse/treatmentLabels';
 import { ColorMatchType, MTG_COLORS } from '@/types/browse';
 
 interface GoalSearchFormProps {
@@ -116,6 +123,8 @@ export function GoalSearchForm({
   const [isColorInitialized, setIsColorInitialized] = useState(false);
   const [oracleInfoAnchorEl, setOracleInfoAnchorEl] = useState<HTMLElement | null>(null);
   const [reservedListInfoAnchorEl, setReservedListInfoAnchorEl] = useState<HTMLElement | null>(null);
+  const [fullArtInfoAnchorEl, setFullArtInfoAnchorEl] = useState<HTMLElement | null>(null);
+  const [printingScopePromptOpen, setPrintingScopePromptOpen] = useState(false);
   const [printingsInfoAnchorEl, setPrintingsInfoAnchorEl] = useState<HTMLElement | null>(null);
 
   // Local states for all search fields
@@ -144,6 +153,10 @@ export function GoalSearchForm({
   // Layout state
   const [layoutOptions, setLayoutOptions] = useState<AutocompleteOption[]>([]);
   const [selectedLayouts, setSelectedLayouts] = useState<AutocompleteOption[]>([]);
+  const [borderColorOptions, setBorderColorOptions] = useState<AutocompleteOption[]>([]);
+  const [selectedBorderColors, setSelectedBorderColors] = useState<AutocompleteOption[]>([]);
+  const [frameEffectOptions, setFrameEffectOptions] = useState<AutocompleteOption[]>([]);
+  const [selectedFrameEffects, setSelectedFrameEffects] = useState<AutocompleteOption[]>([]);
 
   // Rarity state
   const [selectedRarities, setSelectedRarities] = useState<AutocompleteOption[]>([]);
@@ -173,9 +186,13 @@ export function GoalSearchForm({
   // Reserved list state
   const [isReserved, setIsReserved] = useState<boolean | undefined>(searchConditions.isReserved);
 
+  // Full art state
+  const [isFullArt, setIsFullArt] = useState<boolean | undefined>(searchConditions.isFullArt);
+
   // Fetch data for dropdowns
   const { data: cardTypesData } = useGetCardTypesQuery();
   const { data: cardLayoutsData } = useGetCardLayoutsQuery();
+  const { data: cardTreatmentsData } = useGetCardTreatmentsQuery();
   const { data: setTypesData } = useGetSetTypesQuery();
 
   // Helper to format layout names for display
@@ -278,6 +295,62 @@ export function GoalSearchForm({
       setSelectedLayouts(selected);
     }
   }, [isInitialized, searchConditions.layout, layoutOptions]);
+
+  /**
+   * Rebuilds the selected treatments from a saved goal.
+   *
+   * A token can outlive the vocabulary: the options come from `/cards/treatments`,
+   * which derives them from the data, so a treatment that no longer matches any
+   * card disappears from the list while saved goals still reference it. Falling
+   * back to an option built from the raw value keeps the criterion visible and,
+   * more importantly, keeps it in the goal — dropping it here would silently
+   * rewrite the goal the moment the user pressed save.
+   */
+  const hydrateTreatment = (
+    condition: { OR?: string[]; NOT?: string[] } | undefined,
+    options: AutocompleteOption[],
+    toFallback: (value: string) => AutocompleteOption,
+  ): AutocompleteOption[] => {
+    if (!condition) return [];
+
+    const resolve = (value: string, exclude: boolean): AutocompleteOption => {
+      const option = options.find((opt) => opt.value === value);
+      return { ...(option ?? toFallback(value)), exclude };
+    };
+
+    return [
+      ...(condition.OR ?? []).map((value) => resolve(value, false)),
+      ...(condition.NOT ?? []).map((value) => resolve(value, true)),
+    ];
+  };
+
+  useEffect(() => {
+    if (!isInitialized && searchConditions.borderColor && borderColorOptions.length > 0) {
+      setSelectedBorderColors(
+        hydrateTreatment(searchConditions.borderColor, borderColorOptions, (value) => ({
+          category: 'Borders',
+          label: formatBorderColorName(value.replace(/"/g, '')),
+          value,
+          exclude: false,
+        })),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitialized, searchConditions.borderColor, borderColorOptions]);
+
+  useEffect(() => {
+    if (!isInitialized && searchConditions.frameEffects && frameEffectOptions.length > 0) {
+      setSelectedFrameEffects(
+        hydrateTreatment(searchConditions.frameEffects, frameEffectOptions, (value) => ({
+          category: 'Frame Effects',
+          label: formatFrameEffectName(value.replace(/"/g, '')),
+          value,
+          exclude: false,
+        })),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitialized, searchConditions.frameEffects, frameEffectOptions]);
 
   // Parse initial rarity conditions (only once)
   useEffect(() => {
@@ -449,6 +522,11 @@ export function GoalSearchForm({
     setIsReserved(searchConditions.isReserved);
   }, [searchConditions.isReserved]);
 
+  // Update isFullArt when searchConditions changes
+  useEffect(() => {
+    setIsFullArt(searchConditions.isFullArt);
+  }, [searchConditions.isFullArt]);
+
   // Parse initial stat conditions (only once)
   useEffect(() => {
     if (!isInitialized) {
@@ -533,6 +611,32 @@ export function GoalSearchForm({
       }
       if (layoutExclude.length > 0) {
         conditions.layout.NOT = layoutExclude.map((l) => l.value);
+      }
+    }
+
+    // Border colours
+    const borderColorInclude = selectedBorderColors.filter((b) => !b.exclude);
+    const borderColorExclude = selectedBorderColors.filter((b) => b.exclude);
+    if (borderColorInclude.length > 0 || borderColorExclude.length > 0) {
+      conditions.borderColor = {};
+      if (borderColorInclude.length > 0) {
+        conditions.borderColor.OR = borderColorInclude.map((b) => b.value);
+      }
+      if (borderColorExclude.length > 0) {
+        conditions.borderColor.NOT = borderColorExclude.map((b) => b.value);
+      }
+    }
+
+    // Frame effects
+    const frameEffectInclude = selectedFrameEffects.filter((f) => !f.exclude);
+    const frameEffectExclude = selectedFrameEffects.filter((f) => f.exclude);
+    if (frameEffectInclude.length > 0 || frameEffectExclude.length > 0) {
+      conditions.frameEffects = {};
+      if (frameEffectInclude.length > 0) {
+        conditions.frameEffects.OR = frameEffectInclude.map((f) => f.value);
+      }
+      if (frameEffectExclude.length > 0) {
+        conditions.frameEffects.NOT = frameEffectExclude.map((f) => f.value);
       }
     }
 
@@ -666,6 +770,11 @@ export function GoalSearchForm({
       conditions.isReserved = isReserved;
     }
 
+    // Add isFullArt filter if specified
+    if (isFullArt !== undefined) {
+      conditions.isFullArt = isFullArt;
+    }
+
     return conditions;
   }, [
     name,
@@ -674,6 +783,8 @@ export function GoalSearchForm({
     colorState,
     selectedTypes,
     selectedLayouts,
+    selectedBorderColors,
+    selectedFrameEffects,
     selectedRarities,
     selectedLegalIn,
     includeBannedFormats,
@@ -683,6 +794,7 @@ export function GoalSearchForm({
     statConditions,
     cardFilter,
     isReserved,
+    isFullArt,
   ]);
 
   // Initialize color state when searchConditions change (only once)
@@ -775,6 +887,30 @@ export function GoalSearchForm({
       setLayoutOptions(options);
     }
   }, [cardLayoutsData]);
+
+  // Build treatment options from API data. Border colours are quoted for an exact
+  // column match; frame effects are not, because they share one text column and
+  // have to match as a substring.
+  useEffect(() => {
+    if (cardTreatmentsData) {
+      setBorderColorOptions(
+        cardTreatmentsData.borderColors.map((borderColor) => ({
+          category: 'Borders',
+          label: formatBorderColorName(borderColor),
+          value: `"${borderColor}"`,
+          exclude: false,
+        })),
+      );
+      setFrameEffectOptions(
+        cardTreatmentsData.frameEffects.map((frameEffect) => ({
+          category: 'Frame Effects',
+          label: formatFrameEffectName(frameEffect),
+          value: frameEffect,
+          exclude: false,
+        })),
+      );
+    }
+  }, [cardTreatmentsData]);
 
   const handleColorToggle = (color: string) => {
     if (color === 'C') {
@@ -1009,6 +1145,22 @@ export function GoalSearchForm({
         />
       )}
 
+      {/* Border Color Selector */}
+      <AutocompleteWithNegation
+        label="Borders"
+        options={borderColorOptions}
+        selectedOptions={selectedBorderColors}
+        setSelectedOptionsRemotely={setSelectedBorderColors}
+      />
+
+      {/* Frame Effect Selector */}
+      <AutocompleteWithNegation
+        label="Frame Effects"
+        options={frameEffectOptions}
+        selectedOptions={selectedFrameEffects}
+        setSelectedOptionsRemotely={setSelectedFrameEffects}
+      />
+
       {/* Set Selector */}
       <AutocompleteWithNegation
         label="Sets"
@@ -1071,11 +1223,69 @@ export function GoalSearchForm({
           }}
           fullWidth
           size="small"
+          aria-label="Reserved List filter"
         >
           <ToggleButton value="all">Include all cards</ToggleButton>
           <ToggleButton value="reserved">Reserved List only</ToggleButton>
           <ToggleButton value="exclude">Exclude Reserved List</ToggleButton>
         </ToggleButtonGroup>
+      </Paper>
+
+      {/* Full Art Filter */}
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+          <Typography variant="subtitle2">Full Art</Typography>
+          <IconButton
+            size="small"
+            onClick={(e) => setFullArtInfoAnchorEl(e.currentTarget)}
+            sx={{
+              padding: 0.5,
+              color: 'action.disabled',
+              '&:hover': {
+                backgroundColor: 'transparent',
+                color: 'primary.main',
+              },
+            }}
+          >
+            <InfoOutlinedIcon fontSize="small" />
+          </IconButton>
+        </Box>
+        <ToggleButtonGroup
+          value={isFullArt === undefined ? 'all' : isFullArt ? 'fullArt' : 'exclude'}
+          exclusive
+          onChange={(_, value) => {
+            if (value === null) return;
+            const newValue = value === 'all' ? undefined : value === 'fullArt';
+            setIsFullArt(newValue);
+            // Full-art printings share very few distinct card names, so "any printing of
+            // each card" quietly shrinks the goal. Ask rather than decide for them.
+            if (newValue === true && onePrintingPerPureName) {
+              setPrintingScopePromptOpen(true);
+            }
+          }}
+          fullWidth
+          size="small"
+          aria-label="Full Art filter"
+        >
+          <ToggleButton value="all">Include all cards</ToggleButton>
+          <ToggleButton value="fullArt">Full Art only</ToggleButton>
+          <ToggleButton value="exclude">Exclude Full Art</ToggleButton>
+        </ToggleButtonGroup>
+
+        {isFullArt === true && onePrintingPerPureName && (
+          <Alert
+            severity="warning"
+            sx={{ mt: 2 }}
+            action={
+              <Button color="inherit" size="small" onClick={() => onOnePrintingPerPureNameChange(false)}>
+                Count every printing
+              </Button>
+            }
+          >
+            This goal counts any one printing of each card name. Because full art cards share very few distinct names,
+            that is far fewer cards than every full art printing.
+          </Alert>
+        )}
       </Paper>
 
       {/* Printing Options */}
@@ -1283,6 +1493,61 @@ export function GoalSearchForm({
           </Typography>
         </Box>
       </Popover>
+
+      <Popover
+        open={Boolean(fullArtInfoAnchorEl)}
+        anchorEl={fullArtInfoAnchorEl}
+        onClose={() => setFullArtInfoAnchorEl(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            Full art cards use artwork that fills the whole card, with no standard art box.
+          </Typography>
+          <Typography variant="body2" component="div" sx={{ mb: 0.5 }}>
+            • <strong>Include all cards:</strong> No filter applied, show all cards regardless of full art status
+          </Typography>
+          <Typography variant="body2" component="div" sx={{ mb: 0.5 }}>
+            • <strong>Full Art only:</strong> Show only full art cards
+          </Typography>
+          <Typography variant="body2" component="div">
+            • <strong>Exclude Full Art:</strong> Hide all full art cards from results
+          </Typography>
+        </Box>
+      </Popover>
+
+      <Dialog open={printingScopePromptOpen} onClose={() => setPrintingScopePromptOpen(false)} maxWidth="xs">
+        <DialogTitle>Count every full art printing?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Full art cards share very few distinct card names — every full art basic land, for example, is one of just
+            12 names. This goal currently counts any one printing of each name, so it would ask for a handful of cards
+            rather than every full art printing.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPrintingScopePromptOpen(false)}>Keep any printing</Button>
+          <Button
+            variant="contained"
+            onClick={() => {
+              onOnePrintingPerPureNameChange(false);
+              if (includeSetsOutsideGoal && onIncludeSetsOutsideGoalChange) {
+                onIncludeSetsOutsideGoalChange(false);
+              }
+              setPrintingScopePromptOpen(false);
+            }}
+          >
+            Count every printing
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Popover
         open={Boolean(printingsInfoAnchorEl)}

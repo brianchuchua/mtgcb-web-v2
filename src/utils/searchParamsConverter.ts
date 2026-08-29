@@ -64,6 +64,11 @@ export const buildApiParamsFromSearchParams = (
       apiParams.isReserved = searchParams.isReserved;
     }
 
+    // Add isFullArt parameter
+    if (searchParams.isFullArt !== undefined) {
+      apiParams.isFullArt = searchParams.isFullArt;
+    }
+
     // Add color filtering
     if (searchParams.colors) {
       if (searchParams.colors.includeColorless) {
@@ -116,6 +121,31 @@ export const buildApiParamsFromSearchParams = (
         apiParams.layout = {
           ...(includeLayouts.length > 0 && { OR: includeLayouts }),
           ...(excludeLayouts.length > 0 && { NOT: excludeLayouts }),
+        };
+      }
+    }
+
+    // Border colour and frame effect filtering. Both use OR for includes: a card has
+    // exactly one border colour, and matching any one selected frame effect is what
+    // users expect from a multi-select.
+    if (searchParams.borderColors) {
+      const { include, exclude } = searchParams.borderColors;
+
+      if (include.length > 0 || exclude.length > 0) {
+        apiParams.borderColor = {
+          ...(include.length > 0 && { OR: include }),
+          ...(exclude.length > 0 && { NOT: exclude }),
+        };
+      }
+    }
+
+    if (searchParams.frameEffects) {
+      const { include, exclude } = searchParams.frameEffects;
+
+      if (include.length > 0 || exclude.length > 0) {
+        apiParams.frameEffects = {
+          ...(include.length > 0 && { OR: include }),
+          ...(exclude.length > 0 && { NOT: exclude }),
         };
       }
     }

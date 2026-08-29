@@ -281,6 +281,32 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       exclude: [],
     },
   },
+  borderColors: {
+    type: 'inclusionExclusion',
+    mode: 'cards',
+    urlParams: {
+      include: 'includeBorderColors',
+      exclude: 'excludeBorderColors',
+    },
+    separator: '|',
+    defaultValue: {
+      include: [],
+      exclude: [],
+    },
+  },
+  frameEffects: {
+    type: 'inclusionExclusion',
+    mode: 'cards',
+    urlParams: {
+      include: 'includeFrameEffects',
+      exclude: 'excludeFrameEffects',
+    },
+    separator: '|',
+    defaultValue: {
+      include: [],
+      exclude: [],
+    },
+  },
   rarities: {
     type: 'inclusionExclusion',
     mode: 'cards',
@@ -362,6 +388,12 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     type: 'boolean',
     mode: 'cards',
     urlParam: 'isReserved',
+    defaultValue: undefined,
+  },
+  isFullArt: {
+    type: 'boolean',
+    mode: 'cards',
+    urlParam: 'isFullArt',
     defaultValue: undefined,
   },
 };

@@ -6,6 +6,8 @@ import AdvancedFilters from '@/features/browse/AdvancedFilters';
 import ColorSelector from '@/features/browse/ColorSelector';
 import FormatLegalitySelector from '@/features/browse/FormatLegalitySelector';
 import LayoutSelector from '@/features/browse/LayoutSelector';
+import BorderColorSelector from '@/features/browse/BorderColorSelector';
+import FrameEffectSelector from '@/features/browse/FrameEffectSelector';
 import OwnershipStatusSelector from '@/features/browse/OwnershipStatusSelector';
 import QuantitySelector from '@/features/browse/QuantitySelector';
 import RaritySelector from '@/features/browse/RaritySelector';
@@ -71,6 +73,8 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
       <ColorSelector />
       <RaritySelector />
       <FormatLegalitySelector />
+      <BorderColorSelector />
+      <FrameEffectSelector />
       {!isSetPage && <SetSelector />}
       {!selectedGoalId && (
         <ToggleSwitch

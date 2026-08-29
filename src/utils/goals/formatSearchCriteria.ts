@@ -1,5 +1,6 @@
 import { CardApiParams } from '@/api/browse/types';
 import { getFormatLabel } from '@/features/browse/formatLegalityConstants';
+import { formatBorderColorName, formatFrameEffectName } from '@/features/browse/treatmentLabels';
 
 interface SearchCriteriaDescription {
   conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'> & {
@@ -164,6 +165,47 @@ export function formatSearchCriteria(
     attributeParts.push(`(Reserved List only)`);
   } else if (conditions.isReserved === false) {
     attributeParts.push(`(excluding Reserved List)`);
+  }
+
+  // Full Art
+  if (conditions.isFullArt === true) {
+    attributeParts.push(`(Full Art only)`);
+  } else if (conditions.isFullArt === false) {
+    attributeParts.push(`(excluding Full Art)`);
+  }
+
+  // Border colours
+  if (conditions.borderColor) {
+    const included = (conditions.borderColor.OR || []).map((b: string) =>
+      formatBorderColorName(b.replace(/"/g, '')),
+    );
+    const excluded = (conditions.borderColor.NOT || []).map((b: string) =>
+      formatBorderColorName(b.replace(/"/g, '')),
+    );
+
+    if (included.length > 0) {
+      attributeParts.push(`(${included.join('/')} border)`);
+    }
+    if (excluded.length > 0) {
+      attributeParts.push(`(excluding ${excluded.join('/')} border)`);
+    }
+  }
+
+  // Frame effects
+  if (conditions.frameEffects) {
+    const included = (conditions.frameEffects.OR || []).map((f: string) =>
+      formatFrameEffectName(f.replace(/"/g, '')),
+    );
+    const excluded = (conditions.frameEffects.NOT || []).map((f: string) =>
+      formatFrameEffectName(f.replace(/"/g, '')),
+    );
+
+    if (included.length > 0) {
+      attributeParts.push(`(${included.join('/')})`);
+    }
+    if (excluded.length > 0) {
+      attributeParts.push(`(excluding ${excluded.join('/')})`);
+    }
   }
 
   // Format Legality

@@ -30,6 +30,7 @@ const schemaToReduxKeyMap: Record<string, string> = {
   selectedGoalId: 'selectedGoalId',
   selectedLocationId: 'selectedLocationId',
   isReserved: 'isReserved',
+  isFullArt: 'isFullArt',
 };
 
 export function parseUrlToState(
@@ -96,6 +97,7 @@ const reduxToSchemaKeyMap: Record<string, string | [string, string]> = {
   selectedGoalId: 'selectedGoalId',
   selectedLocationId: 'selectedLocationId',
   isReserved: 'isReserved',
+  isFullArt: 'isFullArt',
 };
 
 export function convertStateToUrlParams(

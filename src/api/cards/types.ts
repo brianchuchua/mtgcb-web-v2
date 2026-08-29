@@ -14,3 +14,14 @@ export interface CardTypes {
 export interface CardLayouts {
   layouts: string[];
 }
+
+/**
+ * Card treatments, derived from the data rather than hardcoded — `borderColors`
+ * from the column's distinct values, `frameEffects` unnested from the Postgres
+ * array literal it is stored as. Whatever the importer writes is what the filter
+ * UI offers.
+ */
+export interface CardTreatments {
+  borderColors: string[];
+  frameEffects: string[];
+}

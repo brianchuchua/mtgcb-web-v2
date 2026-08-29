@@ -1,4 +1,4 @@
-import { CardLayouts, CardTypes } from '@/api/cards/types';
+import { CardLayouts, CardTreatments, CardTypes } from '@/api/cards/types';
 import { mtgcbApi } from '@/api/mtgcbApi';
 
 export const browseApi = mtgcbApi.injectEndpoints({
@@ -13,8 +13,13 @@ export const browseApi = mtgcbApi.injectEndpoints({
       transformResponse: (response: { success: boolean; data: CardLayouts }) => response.data,
       keepUnusedDataFor: 86400, // 24 hours (matching backend cache)
     }),
+    getCardTreatments: builder.query<CardTreatments, void>({
+      query: () => '/cards/treatments',
+      transformResponse: (response: { success: boolean; data: CardTreatments }) => response.data,
+      keepUnusedDataFor: 86400, // 24 hours (matching backend cache)
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetCardTypesQuery, useGetCardLayoutsQuery } = browseApi;
+export const { useGetCardTypesQuery, useGetCardLayoutsQuery, useGetCardTreatmentsQuery } = browseApi;

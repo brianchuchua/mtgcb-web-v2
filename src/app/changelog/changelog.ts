@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-08-29',
+      version: '1.31.0',
+      changes: [
+        'Added Full Art, Borders and Frame Effects filters to card search and collection goals',
+      ],
+    },
+    {
+      date: '2026-08-29',
       version: '1.30.0',
       changes: [
         'Sorting by name now matches the order Wizards uses when they number a set',

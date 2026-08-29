@@ -227,6 +227,19 @@ pnpm test:manual tests/manual/goals/goal-flow.e2e.test.ts --reporter=line
 - Defensive programming with null checks
 - MUI styled components for styling
 
+### Card and set name sorting belongs to the API
+
+Sorting by name is done entirely server-side and follows a Wizards-style rule (shipped 2026-08-29):
+word-by-word, so a space ends a word and sorts before any letter ("Boom Scholar" before
+"Boommobile"), punctuation significant, and a leading "The"/"A"/"An" ignored ("The Aetherspark"
+files under A). The client just renders whatever order the API returns.
+
+**Do not re-sort card or set names in the browser.** A plain `localeCompare` looks right but does
+not strip the leading article, so any client-side sort will quietly disagree with the server's
+paging and with the collector numbers printed on the cards. If a list genuinely has to be sorted
+locally, mirror `compareWotcNames()` from `mtgcb-api-v3/src/utils/nameCollation.ts` rather than
+inventing one.
+
 ### Info Icons (Click Behavior Only)
 
 All info icons must use **click behavior with Popovers**, not hover tooltips, for mobile compatibility:

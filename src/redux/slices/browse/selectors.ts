@@ -37,6 +37,8 @@ export const selectArtist = (state: RootState) => state.browse.cardsSearchParams
 export const selectColors = (state: RootState) => state.browse.cardsSearchParams.colors;
 export const selectTypes = (state: RootState) => state.browse.cardsSearchParams.types;
 export const selectLayouts = (state: RootState) => state.browse.cardsSearchParams.layouts;
+export const selectBorderColors = (state: RootState) => state.browse.cardsSearchParams.borderColors;
+export const selectFrameEffects = (state: RootState) => state.browse.cardsSearchParams.frameEffects;
 export const selectRarities = (state: RootState) => state.browse.cardsSearchParams.rarities;
 export const selectSets = (state: RootState) => state.browse.cardsSearchParams.sets;
 export const selectFormatsLegal = (state: RootState) => state.browse.cardsSearchParams.formatsLegal;
@@ -46,6 +48,7 @@ export const selectStats = (state: RootState) => state.browse.cardsSearchParams.
 export const selectOneResultPerCardName = (state: RootState) => state.browse.cardsSearchParams.oneResultPerCardName;
 export const selectIncludeBadDataOnly = (state: RootState) => state.browse.cardsSearchParams.includeBadDataOnly;
 export const selectIsReserved = (state: RootState) => state.browse.cardsSearchParams.isReserved;
+export const selectIsFullArt = (state: RootState) => state.browse.cardsSearchParams.isFullArt;
 export const selectCardSortBy = (state: RootState) => state.browse.cardsSearchParams.sortBy;
 export const selectCardSortOrder = (state: RootState) => state.browse.cardsSearchParams.sortOrder;
 export const selectCardCurrentPage = (state: RootState) => state.browse.cardsSearchParams.currentPage || 1;
