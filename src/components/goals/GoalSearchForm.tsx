@@ -39,7 +39,16 @@ import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
 import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
 import OutlinedBox from '@/components/ui/OutlinedBox';
 import { FORMAT_LEGALITY_OPTIONS } from '@/features/browse/formatLegalityConstants';
-import { formatBorderColorName, formatFrameEffectName } from '@/features/browse/treatmentLabels';
+import {
+  RELEASE_DATE_FROM_PLACEHOLDER,
+  RELEASE_DATE_TO_PLACEHOLDER,
+  isUsableReleaseBound,
+} from '@/features/browse/releaseDateBounds';
+import {
+  formatBorderColorName,
+  formatFrameEffectName,
+  formatFrameStyleName,
+} from '@/features/browse/treatmentLabels';
 import { ColorMatchType, MTG_COLORS } from '@/types/browse';
 
 interface GoalSearchFormProps {
@@ -155,6 +164,8 @@ export function GoalSearchForm({
   const [selectedLayouts, setSelectedLayouts] = useState<AutocompleteOption[]>([]);
   const [borderColorOptions, setBorderColorOptions] = useState<AutocompleteOption[]>([]);
   const [selectedBorderColors, setSelectedBorderColors] = useState<AutocompleteOption[]>([]);
+  const [frameStyleOptions, setFrameStyleOptions] = useState<AutocompleteOption[]>([]);
+  const [selectedFrameStyles, setSelectedFrameStyles] = useState<AutocompleteOption[]>([]);
   const [frameEffectOptions, setFrameEffectOptions] = useState<AutocompleteOption[]>([]);
   const [selectedFrameEffects, setSelectedFrameEffects] = useState<AutocompleteOption[]>([]);
 
@@ -188,6 +199,11 @@ export function GoalSearchForm({
 
   // Full art state
   const [isFullArt, setIsFullArt] = useState<boolean | undefined>(searchConditions.isFullArt);
+
+  // Release date state. Held as the two bounds the user typed rather than as the
+  // API's comparison tokens, so the inputs round-trip exactly what was saved.
+  const [releasedFrom, setReleasedFrom] = useState('');
+  const [releasedTo, setReleasedTo] = useState('');
 
   // Fetch data for dropdowns
   const { data: cardTypesData } = useGetCardTypesQuery();
@@ -337,6 +353,37 @@ export function GoalSearchForm({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized, searchConditions.borderColor, borderColorOptions]);
+
+  useEffect(() => {
+    if (!isInitialized && searchConditions.frameStyle && frameStyleOptions.length > 0) {
+      setSelectedFrameStyles(
+        hydrateTreatment(searchConditions.frameStyle, frameStyleOptions, (value) => ({
+          category: 'Frames',
+          label: formatFrameStyleName(value.replace(/"/g, '')),
+          value,
+          exclude: false,
+        })),
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitialized, searchConditions.frameStyle, frameStyleOptions]);
+
+  /**
+   * Saved goals carry the API's comparison tokens, so the bounds are read back
+   * out of them. Anything the form cannot express — an OR of dates, a `!=` — is
+   * left alone rather than half-loaded into the two boxes.
+   */
+  useEffect(() => {
+    if (isInitialized || !searchConditions.releasedAt) return;
+
+    const releasedAt = searchConditions.releasedAt;
+    const tokens =
+      typeof releasedAt === 'string' ? [releasedAt] : [...(releasedAt.AND || []), ...(releasedAt.OR || [])];
+
+    setReleasedFrom(tokens.find((token) => token.startsWith('>='))?.slice(2) ?? '');
+    setReleasedTo(tokens.find((token) => token.startsWith('<='))?.slice(2) ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isInitialized, searchConditions.releasedAt]);
 
   useEffect(() => {
     if (!isInitialized && searchConditions.frameEffects && frameEffectOptions.length > 0) {
@@ -627,6 +674,19 @@ export function GoalSearchForm({
       }
     }
 
+    // Frame styles (base frame era)
+    const frameStyleInclude = selectedFrameStyles.filter((f) => !f.exclude);
+    const frameStyleExclude = selectedFrameStyles.filter((f) => f.exclude);
+    if (frameStyleInclude.length > 0 || frameStyleExclude.length > 0) {
+      conditions.frameStyle = {};
+      if (frameStyleInclude.length > 0) {
+        conditions.frameStyle.OR = frameStyleInclude.map((f) => f.value);
+      }
+      if (frameStyleExclude.length > 0) {
+        conditions.frameStyle.NOT = frameStyleExclude.map((f) => f.value);
+      }
+    }
+
     // Frame effects
     const frameEffectInclude = selectedFrameEffects.filter((f) => !f.exclude);
     const frameEffectExclude = selectedFrameEffects.filter((f) => f.exclude);
@@ -775,6 +835,16 @@ export function GoalSearchForm({
       conditions.isFullArt = isFullArt;
     }
 
+    // Release date. Both bounds are inclusive; the API reads a bare year or month
+    // as the whole year or month, so `>=2019`/`<=2021` spans both years entirely.
+    const releaseBounds = [
+      ...(releasedFrom.trim() ? [`>=${releasedFrom.trim()}`] : []),
+      ...(releasedTo.trim() ? [`<=${releasedTo.trim()}`] : []),
+    ];
+    if (releaseBounds.length > 0) {
+      conditions.releasedAt = releaseBounds.length === 1 ? releaseBounds[0] : { AND: releaseBounds };
+    }
+
     return conditions;
   }, [
     name,
@@ -784,6 +854,7 @@ export function GoalSearchForm({
     selectedTypes,
     selectedLayouts,
     selectedBorderColors,
+    selectedFrameStyles,
     selectedFrameEffects,
     selectedRarities,
     selectedLegalIn,
@@ -795,6 +866,8 @@ export function GoalSearchForm({
     cardFilter,
     isReserved,
     isFullArt,
+    releasedFrom,
+    releasedTo,
   ]);
 
   // Initialize color state when searchConditions change (only once)
@@ -898,6 +971,15 @@ export function GoalSearchForm({
           category: 'Borders',
           label: formatBorderColorName(borderColor),
           value: `"${borderColor}"`,
+          exclude: false,
+        })),
+      );
+      // Defaulted: an API that predates this filter answers without `frameStyles`.
+      setFrameStyleOptions(
+        (cardTreatmentsData.frameStyles ?? []).map((frameStyle) => ({
+          category: 'Frames',
+          label: formatFrameStyleName(frameStyle),
+          value: frameStyle,
           exclude: false,
         })),
       );
@@ -1153,6 +1235,14 @@ export function GoalSearchForm({
         setSelectedOptionsRemotely={setSelectedBorderColors}
       />
 
+      {/* Frame Style Selector */}
+      <AutocompleteWithNegation
+        label="Frames"
+        options={frameStyleOptions}
+        selectedOptions={selectedFrameStyles}
+        setSelectedOptionsRemotely={setSelectedFrameStyles}
+      />
+
       {/* Frame Effect Selector */}
       <AutocompleteWithNegation
         label="Frame Effects"
@@ -1160,6 +1250,56 @@ export function GoalSearchForm({
         selectedOptions={selectedFrameEffects}
         setSelectedOptionsRemotely={setSelectedFrameEffects}
       />
+
+      {/* Release Date Filter */}
+      <OutlinedBox
+        label={
+          <Stack component="span" direction="row" alignItems="center" spacing={0.5}>
+            <span>Release Date</span>
+            <Tooltip
+              title="Enter a year (2019), a year and month (2019-07), or a full date (2019-07-12). Both ends are inclusive and either can be left empty."
+              enterTouchDelay={0}
+            >
+              <InfoOutlinedIcon sx={{ fontSize: '1rem' }} />
+            </Tooltip>
+          </Stack>
+        }
+      >
+        <Stack direction="row" spacing={1}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder={RELEASE_DATE_FROM_PLACEHOLDER}
+            value={releasedFrom}
+            onChange={(event) => setReleasedFrom(event.target.value)}
+            error={!isUsableReleaseBound(releasedFrom)}
+            slotProps={{
+              htmlInput: {
+                'aria-label': 'From',
+                maxLength: 10,
+                autoComplete: 'off',
+                spellCheck: 'false',
+              },
+            }}
+          />
+          <TextField
+            fullWidth
+            size="small"
+            placeholder={RELEASE_DATE_TO_PLACEHOLDER}
+            value={releasedTo}
+            onChange={(event) => setReleasedTo(event.target.value)}
+            error={!isUsableReleaseBound(releasedTo)}
+            slotProps={{
+              htmlInput: {
+                'aria-label': 'To',
+                maxLength: 10,
+                autoComplete: 'off',
+                spellCheck: 'false',
+              },
+            }}
+          />
+        </Stack>
+      </OutlinedBox>
 
       {/* Set Selector */}
       <AutocompleteWithNegation

@@ -4,7 +4,7 @@ import { Box, FormControl, InputLabel, styled } from '@mui/material';
 import React from 'react';
 
 interface OutlinedBoxProps {
-  label: string;
+  label: React.ReactNode;
   children: React.ReactNode;
   fullWidth?: boolean;
   margin?: 'none' | 'dense' | 'normal';

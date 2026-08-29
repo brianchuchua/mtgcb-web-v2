@@ -1,6 +1,10 @@
 import { CardApiParams } from '@/api/browse/types';
 import { getFormatLabel } from '@/features/browse/formatLegalityConstants';
-import { formatBorderColorName, formatFrameEffectName } from '@/features/browse/treatmentLabels';
+import {
+  formatBorderColorName,
+  formatFrameEffectName,
+  formatFrameStyleName,
+} from '@/features/browse/treatmentLabels';
 
 interface SearchCriteriaDescription {
   conditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'> & {
@@ -189,6 +193,29 @@ export function formatSearchCriteria(
     if (excluded.length > 0) {
       attributeParts.push(`(excluding ${excluded.join('/')} border)`);
     }
+  }
+
+  // Frame styles (Scryfall's base frame era)
+  if (conditions.frameStyle) {
+    const included = (conditions.frameStyle.OR || []).map((f: string) =>
+      formatFrameStyleName(f.replace(/"/g, '')),
+    );
+    const excluded = (conditions.frameStyle.NOT || []).map((f: string) =>
+      formatFrameStyleName(f.replace(/"/g, '')),
+    );
+
+    if (included.length > 0) {
+      attributeParts.push(`(${included.join('/')} frame)`);
+    }
+    if (excluded.length > 0) {
+      attributeParts.push(`(excluding ${excluded.join('/')} frame)`);
+    }
+  }
+
+  // Release date
+  const releaseDatePhrase = describeReleaseDate(conditions.releasedAt);
+  if (releaseDatePhrase) {
+    attributeParts.push(`(${releaseDatePhrase})`);
   }
 
   // Frame effects
@@ -567,6 +594,13 @@ export function formatSearchCriteria(
 
         if (cardDescParts.length > 0) {
           mainParts.push(`cards: ${cardDescParts.join(' ')}`);
+        } else if (attributeParts.length > 0) {
+          // Attributes qualify a noun that colour/rarity/type/layout would
+          // normally supply. With none of those set, the sentence still needs
+          // one, or a frame-only search reads "Searching (1997 Retro frame)".
+          // "all" here means every type and colour, matching how a set-only
+          // search already reads ("cards: all in Zendikar").
+          mainParts.push('cards: all');
         }
       }
     }
@@ -589,6 +623,11 @@ export function formatSearchCriteria(
 
       if (cardDescParts.length > 0) {
         mainParts.push(cardDescParts.join(' '));
+      } else if (attributeParts.length > 0) {
+        // Same reason as the search-description branch above: the attributes
+        // qualify a noun, and with no colour/rarity/type/layout to supply one a
+        // frame-only goal would read "1x of (1997 Retro frame)".
+        mainParts.push('every card');
       }
     }
   }
@@ -650,6 +689,31 @@ export function formatSearchCriteria(
   }
 
   return result;
+}
+
+/**
+ * Turns the API's release-date comparison tokens back into a phrase. The API
+ * widens a partial bound to its whole year or month, so the token is echoed as
+ * written rather than padded out to a full date — "released 2019 or later"
+ * reads truer than "released 2019-01-01 or later" and means the same thing.
+ */
+function describeReleaseDate(releasedAt: CardApiParams['releasedAt']): string | null {
+  if (!releasedAt) return null;
+
+  const tokens =
+    typeof releasedAt === 'string' ? [releasedAt] : [...(releasedAt.AND || []), ...(releasedAt.OR || [])];
+
+  const from = tokens.find((token) => token.startsWith('>='))?.slice(2);
+  const to = tokens.find((token) => token.startsWith('<='))?.slice(2);
+
+  if (from && to) {
+    return from === to ? `released ${from}` : `released ${from} to ${to}`;
+  }
+  if (from) return `released ${from} or later`;
+  if (to) return `released ${to} or earlier`;
+
+  const exact = tokens.find((token) => !/^[<>=!]/.test(token));
+  return exact ? `released ${exact}` : null;
 }
 
 export function formatGoalDescription(

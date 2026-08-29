@@ -8,7 +8,9 @@ import FormatLegalitySelector from '@/features/browse/FormatLegalitySelector';
 import LayoutSelector from '@/features/browse/LayoutSelector';
 import BorderColorSelector from '@/features/browse/BorderColorSelector';
 import FrameEffectSelector from '@/features/browse/FrameEffectSelector';
+import FrameStyleSelector from '@/features/browse/FrameStyleSelector';
 import OwnershipStatusSelector from '@/features/browse/OwnershipStatusSelector';
+import ReleaseDateSelector from '@/features/browse/ReleaseDateSelector';
 import QuantitySelector from '@/features/browse/QuantitySelector';
 import RaritySelector from '@/features/browse/RaritySelector';
 import SetSelector from '@/features/browse/SetSelector';
@@ -74,7 +76,9 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
       <RaritySelector />
       <FormatLegalitySelector />
       <BorderColorSelector />
+      <FrameStyleSelector />
       <FrameEffectSelector />
+      <ReleaseDateSelector />
       {!isSetPage && <SetSelector />}
       {!selectedGoalId && (
         <ToggleSwitch

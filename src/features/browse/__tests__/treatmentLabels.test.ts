@@ -1,4 +1,8 @@
-import { formatBorderColorName, formatFrameEffectName } from '@/features/browse/treatmentLabels';
+import {
+  formatBorderColorName,
+  formatFrameEffectName,
+  formatFrameStyleName,
+} from '@/features/browse/treatmentLabels';
 
 /**
  * The treatment vocabularies are served from the data, not hardcoded, so the
@@ -83,6 +87,35 @@ describe('treatmentLabels', () => {
 
     it('handles an unknown border colour', () => {
       expect(formatBorderColorName('chartreuse')).toBe('Chartreuse');
+    });
+  });
+
+  describe('formatFrameStyleName', () => {
+    /**
+     * A bare year in a dropdown says nothing about what the frame looks like.
+     * 1997 in particular is the one Wizards reprints as "retro frame", and it is
+     * what the patron asking for this feature was after.
+     */
+    it('names the era, not just the year', () => {
+      expect(formatFrameStyleName('1993')).toBe('1993 Original');
+      expect(formatFrameStyleName('1997')).toBe('1997 Retro');
+      expect(formatFrameStyleName('2003')).toBe('2003 Modern');
+      expect(formatFrameStyleName('2015')).toBe('2015 Current');
+    });
+
+    it('names the non-numeric era', () => {
+      expect(formatFrameStyleName('future')).toBe('Future Sight');
+    });
+
+    it('falls back to a readable label for an unknown era', () => {
+      expect(formatFrameStyleName('2030')).toBe('2030');
+      expect(formatFrameStyleName('retro')).toBe('Retro');
+    });
+
+    it('never returns an empty label for a token in the shipped vocabulary', () => {
+      for (const style of ['1993', '1997', '2003', '2015', 'future']) {
+        expect(formatFrameStyleName(style).length).toBeGreaterThan(0);
+      }
     });
   });
 });

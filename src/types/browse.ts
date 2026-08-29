@@ -31,6 +31,22 @@ export interface FrameEffectFilter {
   exclude: string[];
 }
 
+export interface FrameStyleFilter {
+  include: string[];
+  exclude: string[];
+}
+
+/**
+ * Release date window, both bounds optional and inclusive. Each bound is a
+ * `YYYY`, `YYYY-MM` or `YYYY-MM-DD` string; the API widens a partial bound to
+ * cover the whole year or month, so `{ from: '2019' }` means "from the start of
+ * 2019" and `{ to: '2019' }` means "up to the end of 2019".
+ */
+export interface ReleaseDateFilter {
+  from?: string;
+  to?: string;
+}
+
 export interface SetFilter {
   include: string[];
   exclude: string[];
@@ -102,7 +118,9 @@ export interface BrowseSearchParams {
   types?: TypeFilter;
   layouts?: LayoutFilter;
   borderColors?: BorderColorFilter;
+  frameStyles?: FrameStyleFilter;
   frameEffects?: FrameEffectFilter;
+  releaseDate?: ReleaseDateFilter;
   rarities?: RarityFilter;
   sets?: SetFilter;
   stats?: StatFilters;

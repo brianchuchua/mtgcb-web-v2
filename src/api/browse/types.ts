@@ -1,3 +1,15 @@
+/**
+ * A date filter, as comparison tokens: `'>=2019'`, `'<=2020-06'`, `'2022-11-18'`,
+ * or several ANDed into a range. Bounds may be a year, a year-month or a full
+ * date — the API widens a partial bound to cover that whole year or month.
+ */
+export type DateApiCondition =
+  | string
+  | {
+      AND?: string[];
+      OR?: string[];
+    };
+
 export interface CardModel {
   id: string;
   name: string;
@@ -160,10 +172,16 @@ export interface CardApiParams {
     OR?: string[];
     NOT?: string[];
   };
+  frameStyle?: {
+    OR?: string[];
+    NOT?: string[];
+  };
   frameEffects?: {
     OR?: string[];
     NOT?: string[];
   };
+  /** The printing's own release date — see {@link DateApiCondition}. */
+  releasedAt?: DateApiCondition;
   rarityNumeric?: {
     OR?: string[];
     AND?: string[];
@@ -241,7 +259,7 @@ export interface SetApiParams {
       };
   parentSetId?: string | null;
   subsetGroupId?: string | null;
-  releasedAt?: string;
+  releasedAt?: DateApiCondition;
   isDraftable?: boolean;
   limit?: number;
   offset?: number;

@@ -38,7 +38,9 @@ export const selectColors = (state: RootState) => state.browse.cardsSearchParams
 export const selectTypes = (state: RootState) => state.browse.cardsSearchParams.types;
 export const selectLayouts = (state: RootState) => state.browse.cardsSearchParams.layouts;
 export const selectBorderColors = (state: RootState) => state.browse.cardsSearchParams.borderColors;
+export const selectFrameStyles = (state: RootState) => state.browse.cardsSearchParams.frameStyles;
 export const selectFrameEffects = (state: RootState) => state.browse.cardsSearchParams.frameEffects;
+export const selectReleaseDate = (state: RootState) => state.browse.cardsSearchParams.releaseDate;
 export const selectRarities = (state: RootState) => state.browse.cardsSearchParams.rarities;
 export const selectSets = (state: RootState) => state.browse.cardsSearchParams.sets;
 export const selectFormatsLegal = (state: RootState) => state.browse.cardsSearchParams.formatsLegal;

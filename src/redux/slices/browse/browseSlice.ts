@@ -11,6 +11,8 @@ import {
   FormatLegalityFilter,
   BorderColorFilter,
   FrameEffectFilter,
+  FrameStyleFilter,
+  ReleaseDateFilter,
   LayoutFilter,
   RarityFilter,
   SetCategoryFilter,
@@ -216,12 +218,36 @@ export const browseSlice = createSlice({
         state.cardsSearchParams.borderColors = action.payload;
       }
     },
+    setFrameStyles: (state, action: PayloadAction<FrameStyleFilter>) => {
+      // Cards-specific field
+      if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
+        delete state.cardsSearchParams.frameStyles;
+      } else {
+        state.cardsSearchParams.frameStyles = action.payload;
+      }
+    },
     setFrameEffects: (state, action: PayloadAction<FrameEffectFilter>) => {
       // Cards-specific field
       if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
         delete state.cardsSearchParams.frameEffects;
       } else {
         state.cardsSearchParams.frameEffects = action.payload;
+      }
+    },
+    /**
+     * Either bound may be cleared on its own, so an empty string is treated as
+     * "no bound" rather than stored — a half-open window is a normal state, and
+     * only a window with neither bound drops the filter entirely.
+     */
+    setReleaseDate: (state, action: PayloadAction<ReleaseDateFilter>) => {
+      // Cards-specific field
+      const from = action.payload.from?.trim() || undefined;
+      const to = action.payload.to?.trim() || undefined;
+
+      if (!from && !to) {
+        delete state.cardsSearchParams.releaseDate;
+      } else {
+        state.cardsSearchParams.releaseDate = { ...(from && { from }), ...(to && { to }) };
       }
     },
     setRarities: (state, action: PayloadAction<RarityFilter>) =>{
@@ -653,7 +679,9 @@ export const {
   setTypes,
   setLayouts,
   setBorderColors,
+  setFrameStyles,
   setFrameEffects,
+  setReleaseDate,
   setRarities,
   setSets,
   setFormatsLegal,

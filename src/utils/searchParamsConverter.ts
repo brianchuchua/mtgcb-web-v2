@@ -139,6 +139,17 @@ export const buildApiParamsFromSearchParams = (
       }
     }
 
+    if (searchParams.frameStyles) {
+      const { include, exclude } = searchParams.frameStyles;
+
+      if (include.length > 0 || exclude.length > 0) {
+        apiParams.frameStyle = {
+          ...(include.length > 0 && { OR: include }),
+          ...(exclude.length > 0 && { NOT: exclude }),
+        };
+      }
+    }
+
     if (searchParams.frameEffects) {
       const { include, exclude } = searchParams.frameEffects;
 
@@ -147,6 +158,18 @@ export const buildApiParamsFromSearchParams = (
           ...(include.length > 0 && { OR: include }),
           ...(exclude.length > 0 && { NOT: exclude }),
         };
+      }
+    }
+
+    // Release date window. The API reads a bare year or month as the whole year
+    // or month, so `>=2019` starts at Jan 1 and `<=2019` runs through Dec 31 —
+    // which is what an inclusive "from"/"to" pair should mean at any precision.
+    if (searchParams.releaseDate) {
+      const { from, to } = searchParams.releaseDate;
+      const bounds = [...(from ? [`>=${from}`] : []), ...(to ? [`<=${to}`] : [])];
+
+      if (bounds.length > 0) {
+        apiParams.releasedAt = bounds.length === 1 ? bounds[0] : { AND: bounds };
       }
     }
 

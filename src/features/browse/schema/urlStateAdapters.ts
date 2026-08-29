@@ -1,5 +1,5 @@
 import { ParameterConfig, browseParameterSchema } from './parameterSchema';
-import { BrowseSearchParams, ColorFilter, StatFilters } from '@/types/browse';
+import { BrowseSearchParams, ColorFilter, ReleaseDateFilter, StatFilters } from '@/types/browse';
 
 const schemaToReduxKeyMap: Record<string, string> = {
   cardName: 'name',
@@ -65,6 +65,9 @@ export function parseUrlToState(
         break;
       case 'statFilter':
         parseStatFilterParameter(state, reduxKey, searchParams, config);
+        break;
+      case 'dateRange':
+        parseDateRangeParameter(state, reduxKey, searchParams, config);
         break;
     }
   });
@@ -162,6 +165,11 @@ export function convertStateToUrlParams(
           addStatFilterParameter(params, value as StatFilters, config);
         }
         break;
+      case 'dateRange':
+        if (typeof value === 'object') {
+          addDateRangeParameter(params, value as ReleaseDateFilter, config);
+        }
+        break;
     }
   });
 
@@ -220,6 +228,17 @@ function parseInclusionExclusionParameter(
       include: includeValue ? includeValue.split(config.separator) : [],
       exclude: excludeValue ? excludeValue.split(config.separator) : [],
     };
+  }
+}
+
+function parseDateRangeParameter(state: any, key: string, searchParams: URLSearchParams, config: ParameterConfig) {
+  if (config.type !== 'dateRange') return;
+
+  const from = searchParams.get(config.urlParams.from);
+  const to = searchParams.get(config.urlParams.to);
+
+  if (from || to) {
+    state[key] = { ...(from && { from }), ...(to && { to }) };
   }
 }
 
@@ -312,6 +331,18 @@ function addInclusionExclusionParameter(
 
   if (value.exclude && value.exclude.length > 0) {
     params.set(config.urlParams.exclude, value.exclude.join(config.separator));
+  }
+}
+
+function addDateRangeParameter(params: URLSearchParams, value: ReleaseDateFilter, config: ParameterConfig) {
+  if (config.type !== 'dateRange') return;
+
+  if (value.from) {
+    params.set(config.urlParams.from, value.from);
+  }
+
+  if (value.to) {
+    params.set(config.urlParams.to, value.to);
   }
 }
 

@@ -39,9 +39,25 @@ const FRAME_EFFECT_LABELS: Record<string, string> = {
   waxingandwaningmoondfc: 'Waxing and Waning Moon (DFC)',
 };
 
+/**
+ * Scryfall's base `frame` era. The years alone mean nothing to most collectors,
+ * so each is paired with the name the community uses for it — 1997 in
+ * particular is the one Wizards themselves reprint as "retro frame".
+ */
+const FRAME_STYLE_LABELS: Record<string, string> = {
+  '1993': '1993 Original',
+  '1997': '1997 Retro',
+  '2003': '2003 Modern',
+  '2015': '2015 Current',
+  future: 'Future Sight',
+};
+
 const capitalize = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
 export const formatFrameEffectName = (effect: string): string =>
   FRAME_EFFECT_LABELS[effect] ?? capitalize(effect);
 
 export const formatBorderColorName = (borderColor: string): string => capitalize(borderColor);
+
+export const formatFrameStyleName = (frameStyle: string): string =>
+  FRAME_STYLE_LABELS[frameStyle] ?? capitalize(frameStyle);

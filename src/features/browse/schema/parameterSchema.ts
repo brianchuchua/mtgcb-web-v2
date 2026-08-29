@@ -5,6 +5,7 @@ export type ParameterType =
   | 'inclusionExclusion'
   | 'colorFilter'
   | 'statFilter'
+  | 'dateRange'
   | 'enum';
 
 export type BrowseMode = 'cards' | 'sets' | 'both';
@@ -56,6 +57,19 @@ export interface ColorFilterParameterConfig extends BaseParameterConfig {
   };
 }
 
+/**
+ * A two-ended date window. Either end can stand alone, so the two bounds get
+ * their own URL params rather than being packed into one.
+ */
+export interface DateRangeParameterConfig extends BaseParameterConfig {
+  type: 'dateRange';
+  urlParams: {
+    from: string;
+    to: string;
+  };
+  defaultValue?: { from?: string; to?: string };
+}
+
 export interface StatFilterParameterConfig extends BaseParameterConfig {
   type: 'statFilter';
   urlParam: string;
@@ -76,6 +90,7 @@ export type ParameterConfig =
   | InclusionExclusionParameterConfig
   | ColorFilterParameterConfig
   | StatFilterParameterConfig
+  | DateRangeParameterConfig
   | EnumParameterConfig;
 
 export const browseParameterSchema: Record<string, ParameterConfig> = {
@@ -294,6 +309,19 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       exclude: [],
     },
   },
+  frameStyles: {
+    type: 'inclusionExclusion',
+    mode: 'cards',
+    urlParams: {
+      include: 'includeFrameStyles',
+      exclude: 'excludeFrameStyles',
+    },
+    separator: '|',
+    defaultValue: {
+      include: [],
+      exclude: [],
+    },
+  },
   frameEffects: {
     type: 'inclusionExclusion',
     mode: 'cards',
@@ -306,6 +334,15 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       include: [],
       exclude: [],
     },
+  },
+  releaseDate: {
+    type: 'dateRange',
+    mode: 'cards',
+    urlParams: {
+      from: 'releasedAfter',
+      to: 'releasedBefore',
+    },
+    defaultValue: undefined,
   },
   rarities: {
     type: 'inclusionExclusion',

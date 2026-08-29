@@ -13,10 +13,16 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-08-29',
-      version: '1.31.0',
+      version: '1.32.0',
       changes: [
-        'Added Full Art, Borders and Frame Effects filters to card search and collection goals',
+        'Added Frames and Release Date filters to card search and collection goals',
+        'Updated card legality data across formats',
       ],
+    },
+    {
+      date: '2026-08-29',
+      version: '1.31.0',
+      changes: ['Added Full Art, Borders and Frame Effects filters to card search and collection goals'],
     },
     {
       date: '2026-08-29',

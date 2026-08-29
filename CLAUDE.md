@@ -227,6 +227,25 @@ pnpm test:manual tests/manual/goals/goal-flow.e2e.test.ts --reporter=line
 - Defensive programming with null checks
 - MUI styled components for styling
 
+### The search summary describes filters by exclusion, not by inclusion
+
+`formatSearchDescription` builds the "Searching cards: …" line from the API params
+`buildApiParamsFromSearchParams` produces. It used to copy a hand-written list of
+fields across, which meant every filter added after that list was written was
+simply absent from the sentence — Borders, Frame Effects, Full Art and Reserved
+List all shipped filtering correctly while the summary still read "cards: all".
+
+It now copies everything except `NON_CRITERIA_PARAMS`, the small fixed set of
+paging/ordering/context keys. **When you add a filter, you add nothing here** —
+but if you add a param that controls *how* the search runs rather than what it
+matches, add it to that exclusion set. `formatSearchDescription.test.ts` has a
+drift guard that fails when a filter does not change the sentence.
+
+The sentence needs a noun. Colour, rarity, type and layout supply one; the rest
+of the criteria render as parenthesised qualifiers. A search built only from
+qualifiers falls back to "cards: all" (or "every card" for a goal) so it does not
+read as "Searching (1997 Retro frame)".
+
 ### Card and set name sorting belongs to the API
 
 Sorting by name is done entirely server-side and follows a Wizards-style rule (shipped 2026-08-29):

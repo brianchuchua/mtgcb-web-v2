@@ -5,6 +5,28 @@ import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 
 /**
+ * Keys `buildApiParamsFromSearchParams` emits that describe how to run the
+ * search rather than what it matches. `oneResultPerCardName` is passed to
+ * `formatSearchCriteria` separately, as its own argument.
+ */
+const NON_CRITERIA_PARAMS = new Set([
+  'sortBy',
+  'sortDirection',
+  'limit',
+  'offset',
+  'select',
+  'oneResultPerCardName',
+  'userId',
+  'priceType',
+  'goalId',
+  'showGoals',
+  'showGoalProgress',
+  'locationId',
+  'includeChildLocations',
+  'includeLocations',
+]);
+
+/**
  * Converts browse search params to a human-readable description
  * @param searchParams - The search parameters from Redux
  * @param contentType - Whether we're searching cards or sets
@@ -103,32 +125,17 @@ export function formatSearchDescription(
   // For cards, convert to API params and use formatSearchCriteria
   const apiParams = buildApiParamsFromSearchParams(searchParams, 'cards') as Partial<CardApiParams>;
 
-  // Convert API params to the format expected by formatSearchCriteria
+  // Everything the converter emits is a search criterion except the handful of
+  // keys below, which control paging, ordering and the surrounding context.
+  // Listing the exclusions rather than the inclusions is deliberate: an allowlist
+  // has to be extended for every new filter, and silently reports "cards: all"
+  // for any filter someone forgets to add.
   const searchCriteria = {
-    conditions: {
-      ...(apiParams.name && { name: apiParams.name }),
-      ...(apiParams.oracleText && { oracleText: apiParams.oracleText }),
-      ...(apiParams.artist && { artist: apiParams.artist }),
-      ...(apiParams.colors_array && { colors_array: apiParams.colors_array }),
-      ...(apiParams.type && { type: apiParams.type }),
-      ...(apiParams.layout && { layout: apiParams.layout }),
-      ...(apiParams.rarityNumeric && { rarityNumeric: apiParams.rarityNumeric }),
-      ...(apiParams.setId && { setId: apiParams.setId }),
-      ...(apiParams.legalIn && { legalIn: apiParams.legalIn }),
-      ...(apiParams.formatRelevantIn && { formatRelevantIn: apiParams.formatRelevantIn }),
-      ...(apiParams.convertedManaCost && { convertedManaCost: apiParams.convertedManaCost }),
-      ...(apiParams.powerNumeric && { powerNumeric: apiParams.powerNumeric }),
-      ...(apiParams.toughnessNumeric && { toughnessNumeric: apiParams.toughnessNumeric }),
-      ...(apiParams.loyaltyNumeric && { loyaltyNumeric: apiParams.loyaltyNumeric }),
-      ...(apiParams.market && { market: apiParams.market }),
-      ...(apiParams.low && { low: apiParams.low }),
-      ...(apiParams.average && { average: apiParams.average }),
-      ...(apiParams.high && { high: apiParams.high }),
-      ...(apiParams.foil && { foil: apiParams.foil }),
-      ...(apiParams.quantityReg && { quantityReg: apiParams.quantityReg }),
-      ...(apiParams.quantityFoil && { quantityFoil: apiParams.quantityFoil }),
-      ...(apiParams.quantityAll && { quantityAll: apiParams.quantityAll }),
-    },
+    conditions: Object.fromEntries(
+      Object.entries(apiParams).filter(
+        ([key, value]) => !NON_CRITERIA_PARAMS.has(key) && value !== undefined,
+      ),
+    ) as Partial<CardApiParams>,
   };
 
   const hasFilters = Object.keys(searchCriteria.conditions).length > 0;
