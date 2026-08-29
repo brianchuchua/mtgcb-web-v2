@@ -12,6 +12,16 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-29',
+      version: '1.30.0',
+      changes: [
+        'Sorting by name now matches the order Wizards uses when they number a set',
+        'A space now ends a word when sorting, so "Boom Scholar" comes before "Boommobile" instead of after it',
+        'Cards starting with an article like "The", "A" or "An" are now filed under the word that follows, so "The Aetherspark" sits with the A\'s instead of the T\'s',
+        'Set names sort the same way',
+      ],
+    },
+    {
       date: '2026-08-27',
       version: '1.29.0',
       changes: ['Improved compression for faster load times'],
