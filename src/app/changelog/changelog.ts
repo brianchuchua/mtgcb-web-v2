@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-08-31',
+      version: '1.32.1',
+      changes: [
+        'Fixed an issue where overzealous anti-bot configuration caused user registration and account management to fail',
+      ],
+    },
+    {
       date: '2026-08-29',
       version: '1.32.0',
       changes: [

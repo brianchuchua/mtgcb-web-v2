@@ -1,46 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { proxyPostToMtgcbApi } from '@/utils/server/mtgcbApiServer';
 
 export async function POST(request: NextRequest) {
+  let body: { token?: string; newPassword?: string };
   try {
-    const { token, newPassword } = await request.json();
-
-    // Call the actual API with the private key
-    const apiResponse = await fetch(`${process.env.NEXT_PUBLIC_MTGCB_API_BASE_URL}/auth/reset-password`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token,
-        newPassword,
-        privateKey: process.env.MTGCB_API_PRIVATE_KEY,
-      }),
-    });
-
-    const data = await apiResponse.json();
-
-    if (!apiResponse.ok) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: data.error,
-        },
-        { status: apiResponse.status },
-      );
-    }
-
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Reset password error:', error);
+    body = await request.json();
+  } catch {
     return NextResponse.json(
-      {
-        success: false,
-        error: {
-          message: 'An unexpected error occurred',
-          code: 'INTERNAL_SERVER_ERROR',
-        },
-      },
-      { status: 500 },
+      { success: false, error: { message: 'Invalid request body', code: 'BAD_REQUEST' } },
+      { status: 400 },
     );
   }
+
+  return proxyPostToMtgcbApi('/auth/reset-password', {
+    token: body.token,
+    newPassword: body.newPassword,
+    privateKey: process.env.MTGCB_API_PRIVATE_KEY,
+  });
 }

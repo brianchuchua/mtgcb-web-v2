@@ -438,6 +438,32 @@ Use the `mcp__plugin_Notion_notion__notion-create-pages` tool with `data_source_
 - Use existing patterns when adding new features
 - Defensive null checks throughout components
 
+### Server→API calls must go through `mtgcbApiServer.ts` (2026-08-31 outage)
+
+Next.js route handlers calling the MTG CB API server-to-server (the five `/api/auth/*`
+proxies) traverse the public internet, where Cloudflare's bot protection can intercept
+them with an HTML challenge page. On 2026-08-31 that broke registration for ~10 hours:
+every route did `await apiResponse.json()` **before** checking `apiResponse.ok`, so the
+challenge HTML threw a SyntaxError, hit the catch block, and returned an opaque 500 that
+Sentry never saw (`console.error` is not collected).
+
+Rules, enforced by `src/utils/server/__tests__/mtgcbApiServer.test.ts` and
+`src/app/api/auth/__tests__/authProxyRoutes.test.ts`:
+
+1. **Every server-side fetch to the API goes through `proxyPostToMtgcbApi` /
+   `postToMtgcbApi`** in `src/utils/server/mtgcbApiServer.ts`. It checks content-type
+   before parsing, has a 10s timeout, distinguishes a Cloudflare challenge
+   (`cf-mitigated: challenge`) from other failures, and reports to Sentry with tag
+   `hop: server-to-api`.
+2. **Server-side calls prefer `MTGCB_API_SERVER_URL`** (Render private-network address,
+   no Cloudflare in the path) and fall back to `NEXT_PUBLIC_MTGCB_API_BASE_URL`. Never
+   repoint `NEXT_PUBLIC_MTGCB_API_BASE_URL` itself — it is inlined into the browser
+   bundle and used by RTK Query for direct browser→API calls.
+3. **`GET /api/health/api-hop` is the synthetic canary** for this hop (no writes, no
+   email, no reCAPTCHA). External uptime monitoring should hit it and alert on non-200.
+   After ANY Cloudflare zone/bot-protection change, curl it in production — the OG image
+   routes return 200 even when the API is unreachable, so they prove nothing.
+
 ### Import chunker card-identity map (KEEP IN SYNC WITH API)
 
 `src/utils/import/csvChunker.ts` splits a collection import into 500-row chunks and **must group every row of the same card (foil + non-foil + etched) into the same chunk** — otherwise the API's `replace`-mode upsert overwrites the card across chunks and silently drops a finish. It does this by grouping on each format's card-identity columns (`FORMAT_IDENTITY` + the `custom` mapping logic).

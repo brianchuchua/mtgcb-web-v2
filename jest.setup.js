@@ -42,8 +42,17 @@ jest.mock('next/navigation', () => ({
 }));
 
 // -----------------------------------------------------------------------------
+// Browser-only mocks below — skipped for tests that opt into the node
+// environment (e.g. Next.js route handlers) via /** @jest-environment node */
+// -----------------------------------------------------------------------------
+
+const isBrowserEnvironment = typeof window !== 'undefined';
+
+// -----------------------------------------------------------------------------
 // Mock window.matchMedia (Required for MUI components)
 // -----------------------------------------------------------------------------
+
+if (isBrowserEnvironment) {
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -118,6 +127,8 @@ const sessionStorageMock = (() => {
 })();
 
 global.sessionStorage = sessionStorageMock;
+
+}
 
 // -----------------------------------------------------------------------------
 // Console Error Suppression (Optional - Use Carefully)
