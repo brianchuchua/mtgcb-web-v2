@@ -1,0 +1,27 @@
+# Keeps dependencies (including transitive ones) fresh so that Dependabot
+# security alerts are mostly resolved by routine updates rather than by
+# one-off manual triage.
+#
+# Updates are grouped so a week's worth of bumps arrives as at most two pull
+# requests -- one for production dependencies, one for dev/build tooling --
+# instead of a stream of individual PRs and alert emails.
+#
+# Note: this file controls update pull requests. It does not control alert
+# emails; those are configured per-account under
+# GitHub Settings -> Notifications -> Dependabot alerts.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      production-dependencies:
+        dependency-type: production
+      development-dependencies:
+        dependency-type: development
