@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-09-03',
+      version: '1.32.4',
+      changes: ['Fixed card images in the first row showing "Image not available" after using "Jump to Subset"'],
+    },
+    {
+      date: '2026-09-03',
       version: '1.32.3',
       changes: ['Set pages with a collection goal now point you to subsets that still have missing cards instead of showing "No cards found"'],
     },

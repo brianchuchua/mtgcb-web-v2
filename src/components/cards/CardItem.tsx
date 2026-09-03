@@ -130,6 +130,11 @@ export interface CardItemProps {
    * modal DFC, reversible_card, etc.). When set, a flip-card button overlays the image.
    */
   backScryfallId?: string | null;
+  /**
+   * True for the placeholder rows a controller renders while the cards query is in flight.
+   * These carry a synthetic id, so there is no image to request for them.
+   */
+  isLoadingSkeleton?: boolean;
 }
 
 /**
@@ -193,6 +198,7 @@ const CardItemComponent = ({
   hasLocations = false,
   deprecated = false,
   backScryfallId,
+  isLoadingSkeleton = false,
 }: CardItemProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -208,6 +214,23 @@ const CardItemComponent = ({
   const buyMenuOpen = Boolean(buyMenuAnchorEl);
   const imageRef = useRef<HTMLImageElement>(null);
   const pathname = usePathname();
+
+  // Both image URLs are derived from `id`, and React reuses this component when a grid row
+  // is handed a different card (a placeholder row swapped for the real one, a page change).
+  // Without this the previous card's loaded/errored state latches onto the new image and it
+  // never appears. Guarded on the id actually changing so a mount doesn't clobber a load
+  // event that already fired.
+  const renderedIdRef = useRef(id);
+  useEffect(() => {
+    if (renderedIdRef.current === id) return;
+    renderedIdRef.current = id;
+    setImageLoaded(false);
+    setImageError(false);
+    setIsFlipped(false);
+    setBackRequested(false);
+    setBackImageLoaded(false);
+    setBackImageError(false);
+  }, [id]);
   // Buy-menu mode is mutually exclusive with imageLinksToTCGPlayer; the latter wins to
   // preserve the legacy direct-link behavior for callers that still want it.
   const buyMenuActive = imageOpensBuyMenu && !imageLinksToTCGPlayer;
@@ -319,6 +342,62 @@ const CardItemComponent = ({
     }
   };
 
+  const imageAlt = imageLinksToTCGPlayer ? `${name} - Buy on TCGPlayer` : name;
+
+  // Placeholder rows carry a synthetic id, so `${id}.jpg` would 404 and latch the "Image not
+  // available" fallback on for whichever real card replaces the row.
+  const frontImageContent = isLoadingSkeleton ? (
+    <Skeleton
+      variant="rectangular"
+      width="100%"
+      height="100%"
+      animation="wave"
+      sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        borderRadius: getBorderRadius(),
+        backgroundColor: '#22262c',
+      }}
+    />
+  ) : (
+    <>
+      {!imageLoaded && !imageError && (
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height="100%"
+          animation="wave"
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            borderRadius: getBorderRadius(),
+            backgroundColor: '#22262c',
+          }}
+        />
+      )}
+      {!imageError ? (
+        <CardImage
+          ref={imageRef}
+          src={getImageUrl()}
+          loading="lazy"
+          alt={imageAlt}
+          title={imageAlt}
+          setName={setName}
+          onLoad={() => setImageLoaded(true)}
+          onError={() => setImageError(true)}
+          style={{ opacity: imageLoaded ? 1 : 0 }}
+        />
+      ) : (
+        <MissingImageFallback setName={setName}>
+          <Typography variant="subtitle2">{name}</Typography>
+          <Typography variant="caption">Image not available</Typography>
+        </MissingImageFallback>
+      )}
+    </>
+  );
+
   return (
     <StyledCard
       sx={{
@@ -386,13 +465,15 @@ const CardItemComponent = ({
               WebkitBackfaceVisibility: 'hidden',
             }}
           >
-        {imageLinksToTCGPlayer ? (
+        {isLoadingSkeleton ? (
+          frontImageContent
+        ) : imageLinksToTCGPlayer ? (
           <Box
             component="a"
             href={getTCGPlayerLink()}
             target="_blank"
             rel="noreferrer"
-            title={`${name} - Buy on TCGPlayer`}
+            title={imageAlt}
             sx={{
               display: 'block',
               width: '100%',
@@ -404,39 +485,7 @@ const CardItemComponent = ({
               cursor: 'pointer',
             }}
           >
-            {!imageLoaded && !imageError && (
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height="100%"
-                animation="wave"
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  borderRadius: getBorderRadius(),
-                  backgroundColor: '#22262c',
-                }}
-              />
-            )}
-            {!imageError ? (
-              <CardImage
-                ref={imageRef}
-                src={getImageUrl()}
-                loading="lazy"
-                alt={`${name} - Buy on TCGPlayer`}
-                title={`${name} - Buy on TCGPlayer`}
-                setName={setName}
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageError(true)}
-                style={{ opacity: imageLoaded ? 1 : 0 }}
-              />
-            ) : (
-              <MissingImageFallback setName={setName}>
-                <Typography variant="subtitle2">{name}</Typography>
-                <Typography variant="caption">Image not available</Typography>
-              </MissingImageFallback>
-            )}
+            {frontImageContent}
           </Box>
         ) : buyMenuActive ? (
           <Box
@@ -452,39 +501,7 @@ const CardItemComponent = ({
               cursor: 'pointer',
             }}
           >
-            {!imageLoaded && !imageError && (
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height="100%"
-                animation="wave"
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  borderRadius: getBorderRadius(),
-                  backgroundColor: '#22262c',
-                }}
-              />
-            )}
-            {!imageError ? (
-              <CardImage
-                ref={imageRef}
-                src={getImageUrl()}
-                loading="lazy"
-                alt={name}
-                title={name}
-                setName={setName}
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageError(true)}
-                style={{ opacity: imageLoaded ? 1 : 0 }}
-              />
-            ) : (
-              <MissingImageFallback setName={setName}>
-                <Typography variant="subtitle2">{name}</Typography>
-                <Typography variant="caption">Image not available</Typography>
-              </MissingImageFallback>
-            )}
+            {frontImageContent}
           </Box>
         ) : href ? (
           <Link
@@ -499,76 +516,10 @@ const CardItemComponent = ({
               textDecoration: 'none',
             }}
           >
-            {!imageLoaded && !imageError && (
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height="100%"
-                animation="wave"
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  borderRadius: getBorderRadius(),
-                  backgroundColor: '#22262c',
-                }}
-              />
-            )}
-            {!imageError ? (
-              <CardImage
-                ref={imageRef}
-                src={getImageUrl()}
-                loading="lazy"
-                alt={name}
-                title={name}
-                setName={setName}
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageError(true)}
-                style={{ opacity: imageLoaded ? 1 : 0 }}
-              />
-            ) : (
-              <MissingImageFallback setName={setName}>
-                <Typography variant="subtitle2">{name}</Typography>
-                <Typography variant="caption">Image not available</Typography>
-              </MissingImageFallback>
-            )}
+            {frontImageContent}
           </Link>
         ) : (
-          <>
-            {!imageLoaded && !imageError && (
-              <Skeleton
-                variant="rectangular"
-                width="100%"
-                height="100%"
-                animation="wave"
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  borderRadius: getBorderRadius(),
-                  backgroundColor: '#22262c',
-                }}
-              />
-            )}
-            {!imageError ? (
-              <CardImage
-                ref={imageRef}
-                src={getImageUrl()}
-                loading="lazy"
-                alt={name}
-                title={name}
-                setName={setName}
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageError(true)}
-                style={{ opacity: imageLoaded ? 1 : 0 }}
-              />
-            ) : (
-              <MissingImageFallback setName={setName}>
-                <Typography variant="subtitle2">{name}</Typography>
-                <Typography variant="caption">Image not available</Typography>
-              </MissingImageFallback>
-            )}
-          </>
+          frontImageContent
         )}
           </Box>
           {hasBackFace && (
