@@ -12,9 +12,9 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Confetti from 'react-confetti';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  useMassEntryCollectionMutation,
   useMassUpdateCollectionMutation,
   useMassUpdateLocationsMutation,
-  useMassEntryCollectionMutation,
 } from '@/api/collections/collectionsApi';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
@@ -26,8 +26,8 @@ import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLin
 import MassEntryConfirmDialog from '@/components/collections/MassEntryConfirmDialog';
 import MassEntryPanel, { MassEntryFormData } from '@/components/collections/MassEntryPanel';
 import MassUpdateConfirmDialog from '@/components/collections/MassUpdateConfirmDialog';
-import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
 import MassUpdateLocationPanel, { MassUpdateLocationFormData } from '@/components/collections/MassUpdateLocationPanel';
+import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
 import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
 import { Pagination } from '@/components/pagination';
@@ -37,26 +37,27 @@ import { SetNavigationButtons } from '@/components/sets/SetNavigationButtons';
 import { SetPageBuyButton } from '@/components/sets/SetPageBuyButton';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useShareTokenContext } from '@/contexts/ShareTokenContext';
+import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { CardsProps } from '@/features/browse/types/browseController';
 import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
-import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { useAuth } from '@/hooks/useAuth';
+import { useCardSearchParams } from '@/hooks/useBrowseSearchParams';
 import { useConfetti } from '@/hooks/useConfetti';
 import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { useSetPageFilter } from '@/hooks/useSetPageFilter';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import {
-  resetSearch,
   clearSelectedGoal,
   clearSelectedLocation,
+  resetSearch,
   selectIncludeSubsetsInSets,
   selectSelectedGoalId,
+  selectShowGoals,
   setSelectedGoalId,
 } from '@/redux/slices/browse';
-import { useCardSearchParams } from '@/hooks/useBrowseSearchParams';
 import capitalize from '@/utils/capitalize';
 import { getCollectionUrl } from '@/utils/collectionUrls';
 import { formatISODate } from '@/utils/dateUtils';
@@ -85,6 +86,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const cardSearchParams = useCardSearchParams();
   const includeSubsetsInSets = useSelector(selectIncludeSubsetsInSets);
   const selectedGoalId = useSelector(selectSelectedGoalId);
+  const showGoals = useSelector(selectShowGoals);
 
   // Check if we're waiting for goalId to sync from URL
   const goalIdParam = searchParams?.get('goalId');
@@ -93,20 +95,13 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const isWaitingForGoalSync = hasGoalInUrl && !isNaN(goalIdFromUrl!) && goalIdFromUrl !== selectedGoalId;
 
   // Fetch set data and manage set filter
-  const {
-    set,
-    subsets,
-    parentSet,
-    isSetLoading,
-    isSubsetsLoading,
-    isReady,
-    isSuccess,
-  } = useSetPageFilter({
+  const { set, subsets, parentSet, isSetLoading, isSubsetsLoading, isReady, isSuccess } = useSetPageFilter({
     setSlug,
     priceType: setPriceType,
     includeSubsetsInSets,
     userId: userId,
     goalId: selectedGoalId || null,
+    showGoals,
     skipQueries: isWaitingForGoalSync,
   });
 
@@ -114,7 +109,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     userId,
     isSetSpecificPage: true,
     // Skip cards until we have the correct set filter applied
-    skipCardsUntilReady: !isReady
+    skipCardsUntilReady: !isReady,
   });
 
   // Reset browse form state when Quick Search or Jump to Set is used
@@ -161,7 +156,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   const { showConfetti, recycleConfetti, handleConfettiComplete } = useConfetti(
     isSetLoading || isSubsetsLoading,
-    set?.percentageCollected || 0
+    set?.percentageCollected || 0,
   );
 
   const setName = isSetLoading ? '' : set?.name || 'Set not found';
@@ -500,64 +495,64 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     setIsMassEntryOpen(false);
   }, []);
 
-  const handleConfirmMassEntry = useCallback(
-    async () => {
-      if (!massEntryFormData || !visibleCardIds.length) {
-        enqueueSnackbar('No cards available to update', { variant: 'error' });
-        return;
-      }
+  const handleConfirmMassEntry = useCallback(async () => {
+    if (!massEntryFormData || !visibleCardIds.length) {
+      enqueueSnackbar('No cards available to update', { variant: 'error' });
+      return;
+    }
 
-      try {
-        const response = await massEntryCollection({
-          mode: massEntryFormData.mode,
-          cardIds: visibleCardIds,
-          updates: [
+    try {
+      const response = await massEntryCollection({
+        mode: massEntryFormData.mode,
+        cardIds: visibleCardIds,
+        updates: [
+          {
+            rarity: massEntryFormData.rarity,
+            quantityReg: massEntryFormData.quantityReg,
+            quantityFoil: massEntryFormData.quantityFoil,
+          },
+        ],
+      }).unwrap();
+
+      if (response.success && response.data) {
+        const { updatedCards, totalSkipped } = response.data;
+
+        if (updatedCards === 0 && totalSkipped) {
+          const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
+          enqueueSnackbar(
+            `${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`,
             {
-              rarity: massEntryFormData.rarity,
-              quantityReg: massEntryFormData.quantityReg,
-              quantityFoil: massEntryFormData.quantityFoil,
-            },
-          ],
-        }).unwrap();
-
-        if (response.success && response.data) {
-          const { updatedCards, totalSkipped } = response.data;
-
-          if (updatedCards === 0 && totalSkipped) {
-            const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
-            enqueueSnackbar(`${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`, {
               variant: 'error',
-            });
-          } else if (updatedCards === 0) {
-            enqueueSnackbar('No cards needed updating', { variant: 'info' });
-          } else {
-            let message = `Updated ${updatedCards} ${pluralize(updatedCards, 'card')}`;
+            },
+          );
+        } else if (updatedCards === 0) {
+          enqueueSnackbar('No cards needed updating', { variant: 'info' });
+        } else {
+          let message = `Updated ${updatedCards} ${pluralize(updatedCards, 'card')}`;
 
-            if (totalSkipped) {
-              const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
-              if (totalSkippedCount > 0) {
-                message += `. ${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`;
-                enqueueSnackbar(message, { variant: 'warning', autoHideDuration: 6000 });
-              } else {
-                enqueueSnackbar(message, { variant: 'success' });
-              }
+          if (totalSkipped) {
+            const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
+            if (totalSkippedCount > 0) {
+              message += `. ${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`;
+              enqueueSnackbar(message, { variant: 'warning', autoHideDuration: 6000 });
             } else {
               enqueueSnackbar(message, { variant: 'success' });
             }
+          } else {
+            enqueueSnackbar(message, { variant: 'success' });
           }
-
-          setIsMassEntryOpen(false);
-          setShowMassEntryConfirmDialog(false);
-          setMassEntryFormData(null);
         }
-      } catch (error: any) {
-        enqueueSnackbar(error?.data?.error?.message || 'Failed to mass update collection', {
-          variant: 'error',
-        });
+
+        setIsMassEntryOpen(false);
+        setShowMassEntryConfirmDialog(false);
+        setMassEntryFormData(null);
       }
-    },
-    [massEntryFormData, visibleCardIds, massEntryCollection, enqueueSnackbar],
-  );
+    } catch (error: any) {
+      enqueueSnackbar(error?.data?.error?.message || 'Failed to mass update collection', {
+        variant: 'error',
+      });
+    }
+  }, [massEntryFormData, visibleCardIds, massEntryCollection, enqueueSnackbar]);
 
   const handleCancelMassEntryConfirm = useCallback(() => {
     setShowMassEntryConfirmDialog(false);
@@ -568,6 +563,39 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const isCardTableView = browseController.view === 'cards' && browseController.viewMode === 'table';
 
   const cardsProps = browseController.cardsProps as CardsProps;
+
+  // The main list only covers this set's own cards, while the goal header (and the buy button) can
+  // fold subsets in. When every main-set card is complete for the goal, the "missing" filter leaves
+  // the list empty even though subsets still hold missing cards — point the user at them.
+  const isGoalMissingFilter = !!selectedGoalId && showGoals === 'incomplete';
+  const mainListIsEmpty =
+    isReady && cardsProps.loading === false && Array.isArray(cardsProps.items) && cardsProps.items.length === 0;
+  const subsetsWithMissingGoalCards = isGoalMissingFilter
+    ? subsets.filter((subset) => getMissingGoalCardCount(subset) > 0)
+    : [];
+  const shouldPointToSubsets = isGoalMissingFilter && mainListIsEmpty && subsetsWithMissingGoalCards.length > 0;
+  const autoExpandedSubsetIds = new Set<string>(
+    shouldPointToSubsets ? subsetsWithMissingGoalCards.map((subset) => subset.id) : [],
+  );
+  const jumpToFirstSubsetWithMissingCards = () => {
+    const first = subsetsWithMissingGoalCards[0];
+    const element = first ? subsetRefs.current[first.id] : null;
+    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const goalSubsetsEmptyState = shouldPointToSubsets ? (
+    <InfoBanner
+      title="All cards in the main set are complete for this goal"
+      message={`Cards still missing for this goal are in ${subsetsWithMissingGoalCards.length} ${pluralize(
+        subsetsWithMissingGoalCards.length,
+        'subset',
+      )}, expanded below.`}
+      action={
+        <Button variant="outlined" onClick={jumpToFirstSubsetWithMissingCards}>
+          Jump to subsets
+        </Button>
+      }
+    />
+  ) : undefined;
 
   if (isSetLoading) {
     return (
@@ -725,7 +753,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
             sx={{
               m: 0.5,
               minHeight: '24px', // Reserve space to prevent layout shift
-              visibility: username ? 'visible' : 'hidden'
+              visibility: username ? 'visible' : 'hidden',
             }}
           >
             (Part of{' '}
@@ -757,7 +785,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               </Typography>
 
               <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                ({set.totalCardsCollectedInSet || 0} total {pluralize(set.totalCardsCollectedInSet || 0, 'card')} collected
+                ({set.totalCardsCollectedInSet || 0} total {pluralize(set.totalCardsCollectedInSet || 0, 'card')}{' '}
+                collected
                 {includeSubsetsInSets && set.cardCountIncludingSubsets ? ' including subsets' : ''})
               </Typography>
 
@@ -930,6 +959,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               isOwnCollection={isOwnCollection}
               goalId={selectedGoalId ? selectedGoalId.toString() : undefined}
               hasLocations={hasLocations}
+              emptyStateComponent={goalSubsetsEmptyState}
             />
           )}
           {isCardTableView && (
@@ -938,6 +968,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               isOwnCollection={isOwnCollection}
               goalId={selectedGoalId ? selectedGoalId.toString() : undefined}
               hasLocations={hasLocations}
+              emptyStateComponent={goalSubsetsEmptyState}
             />
           )}
         </>
@@ -958,6 +989,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               isOwnCollection={isOwnCollection}
               userId={userId}
               goalId={selectedGoalId || undefined}
+              autoExpand={autoExpandedSubsetIds.has(subset.id)}
               ref={(el) => {
                 if (el) {
                   subsetRefs.current[subset.id] = el;
@@ -985,3 +1017,10 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
     </Box>
   );
 };
+
+function getMissingGoalCardCount(subset: any): number {
+  const total = Number(subset?.cardCount);
+  const owned = Number(subset?.uniquePrintingsCollectedInSet);
+  if (!Number.isFinite(total) || !Number.isFinite(owned)) return 0;
+  return Math.max(total - owned, 0);
+}

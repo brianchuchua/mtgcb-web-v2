@@ -34,6 +34,7 @@ interface CardGridProps {
   isOwnCollection?: boolean;
   goalId?: string;
   hasLocations?: boolean;
+  emptyStateComponent?: React.ReactNode;
 }
 
 const CardGridComponent: React.FC<CardGridProps> = ({
@@ -46,6 +47,7 @@ const CardGridComponent: React.FC<CardGridProps> = ({
   isOwnCollection = false,
   goalId,
   hasLocations = false,
+  emptyStateComponent,
 }) => {
   const dispatch = useDispatch();
 
@@ -75,7 +77,7 @@ const CardGridComponent: React.FC<CardGridProps> = ({
     dispatch(resetSearch({ preserveGoal: false, preserveLocation: false }));
   };
 
-  const emptyStateComponent = (
+  const defaultEmptyStateComponent = (
     <InfoBanner
       title="No cards found matching your search criteria"
       message="Try adjusting your filters or search terms, or use the button below to reset all search criteria."
@@ -98,7 +100,7 @@ const CardGridComponent: React.FC<CardGridProps> = ({
       galleryWidth={100}
       horizontalPadding={gallerySettings.cardSizeMargin}
       emptyMessage="No cards found matching your search criteria."
-      emptyStateComponent={emptyStateComponent}
+      emptyStateComponent={emptyStateComponent ?? defaultEmptyStateComponent}
       computeItemKey={(index) => {
         const item = items[index];
         if (!item) return index;

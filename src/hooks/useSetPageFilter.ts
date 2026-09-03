@@ -32,6 +32,9 @@ export interface UseSetPageFilterOptions {
   /** Optional goalId for collection queries */
   goalId?: number | null;
 
+  /** Goal completion filter; when set with goalId, subsets are filtered to those matching it */
+  showGoals?: 'all' | 'complete' | 'incomplete';
+
   /** Skip all queries (e.g., while waiting for sync) */
   skipQueries?: boolean;
 }
@@ -93,6 +96,7 @@ export function useSetPageFilter(options: UseSetPageFilterOptions): UseSetPageFi
       ...(options.userId && { userId: options.userId }),
       priceType: options.priceType,
       ...(options.goalId && { goalId: options.goalId }),
+      ...(options.goalId && options.showGoals && options.showGoals !== 'all' && { showGoals: options.showGoals }),
     },
     {
       skip: !set?.id || options.skipQueries,

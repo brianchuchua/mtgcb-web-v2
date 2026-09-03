@@ -41,6 +41,7 @@ interface CardTableProps {
   isOwnCollection?: boolean;
   goalId?: string;
   hasLocations?: boolean;
+  emptyStateComponent?: React.ReactNode;
 }
 
 const CardTable: React.FC<CardTableProps> = ({
@@ -56,6 +57,7 @@ const CardTable: React.FC<CardTableProps> = ({
   isOwnCollection = false,
   goalId,
   hasLocations = false,
+  emptyStateComponent,
 }) => {
   const dispatch = useDispatch();
   const [redGreenTableRows] = useRedGreenTableRows();
@@ -123,7 +125,7 @@ const CardTable: React.FC<CardTableProps> = ({
     return `mtgcb-cards-${context}-${today}.csv`;
   };
 
-  const emptyStateComponent = (
+  const defaultEmptyStateComponent = (
     <InfoBanner
       title="No cards found matching your search criteria"
       message="Try adjusting your filters or search terms, or use the button below to reset all search criteria."
@@ -146,7 +148,7 @@ const CardTable: React.FC<CardTableProps> = ({
       sortOrder={sortOrder}
       onSortChange={onSort}
       emptyMessage="No cards found matching your search criteria."
-      emptyStateComponent={emptyStateComponent}
+      emptyStateComponent={emptyStateComponent ?? defaultEmptyStateComponent}
       computeItemKey={(index) => items[index]?.id || index}
       getRowProps={getRowProps}
       useRedGreenRows={redGreenTableRows}

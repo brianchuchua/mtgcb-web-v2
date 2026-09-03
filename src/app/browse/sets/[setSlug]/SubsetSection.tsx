@@ -26,13 +26,19 @@ interface SubsetSectionProps {
   isOwnCollection?: boolean;
   userId?: number;
   goalId?: number;
+  /** Expand automatically, e.g. when the main set list is empty but this subset still has cards for the filter */
+  autoExpand?: boolean;
 }
 
 export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function SubsetSection(
-  { subset, searchParams, onRegisterToggle, isOwnCollection = false, userId, goalId },
+  { subset, searchParams, onRegisterToggle, isOwnCollection = false, userId, goalId, autoExpand = false },
   ref,
 ) {
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState(autoExpand);
+
+  useEffect(() => {
+    if (autoExpand) setIsActive(true);
+  }, [autoExpand]);
   const setPriceType = useSetPriceType();
 
   // Fetch user locations for the "Add card to location" button
@@ -95,6 +101,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
     return 'Special Set';
   };
 
+  const goalCounts = getGoalCounts(subset, goalId, userId);
   const isCardGridView = isActive && browseController.view === 'cards' && browseController.viewMode === 'grid';
   const isCardTableView = isActive && browseController.view === 'cards' && browseController.viewMode === 'table';
   const cardsProps = browseController.cardsProps as CardsProps;
@@ -155,7 +162,16 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {subset.releasedAt && formatISODate(subset.releasedAt)} •{' '}
-              {subset.cardCount ? `${subset.cardCount} ${pluralize(subset.cardCount, 'card')}` : 'N/A'}
+              {goalCounts
+                ? `${goalCounts.owned}/${goalCounts.total} collected for goal`
+                : subset.cardCount
+                  ? `${subset.cardCount} ${pluralize(subset.cardCount, 'card')}`
+                  : 'N/A'}
+              {goalCounts && goalCounts.missing > 0 && (
+                <Box component="span" sx={{ color: 'warning.main' }}>
+                  {' '}• {goalCounts.missing} missing
+                </Box>
+              )}
             </Typography>
           </Box>
           {isActive ? <ExpandLessIcon color="primary" /> : <ExpandMoreIcon color="primary" />}
@@ -296,3 +312,14 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
     </Box>
   );
 });
+
+// With a goal attached, the sets search returns goal-scoped counts per subset:
+// cardCount is the number of goal names in the subset and uniquePrintingsCollectedInSet
+// is how many of those the user owns (any printing when the goal allows it).
+function getGoalCounts(subset: any, goalId?: number, userId?: number) {
+  if (!goalId || !userId) return null;
+  const total = Number(subset?.cardCount);
+  const owned = Number(subset?.uniquePrintingsCollectedInSet);
+  if (!Number.isFinite(total) || !Number.isFinite(owned)) return null;
+  return { total, owned, missing: Math.max(total - owned, 0) };
+}
