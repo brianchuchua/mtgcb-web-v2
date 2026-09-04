@@ -13,13 +13,24 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-09-03',
+      version: '1.32.5',
+      changes: [
+        'Punch cards, checklists, substitute cards now live in their own helper sets',
+        'The Teenage Mutant Ninja Turtles Eternal boss deck has been moved to its own set',
+      ],
+      type: 'data',
+    },
+    {
+      date: '2026-09-03',
       version: '1.32.4',
       changes: ['Fixed card images in the first row showing "Image not available" after using "Jump to Subset"'],
     },
     {
       date: '2026-09-03',
       version: '1.32.3',
-      changes: ['Set pages with a collection goal now point you to subsets that still have missing cards instead of showing "No cards found"'],
+      changes: [
+        'Set pages with a collection goal now point you to subsets that still have missing cards instead of showing "No cards found"',
+      ],
     },
     {
       date: '2026-09-03',
