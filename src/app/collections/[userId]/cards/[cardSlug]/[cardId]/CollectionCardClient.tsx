@@ -81,6 +81,7 @@ const selectFields: Array<keyof CardModel | string> = [
   'flavorText',
   'pureName',
   'isReserved',
+  'note',
   'legalities',
   // Surface deprecation state on the card detail page so we can render the "This entry
   // has been replaced" banner + chip. The API gates deprecated rows on ownership in the

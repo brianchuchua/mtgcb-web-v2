@@ -32,6 +32,7 @@ import { ShareCollectionButton } from '@/components/collections/ShareCollectionB
 import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
+import { NoteCallout } from '@/components/notes/NoteCallout';
 import SetIcon from '@/components/sets/SetIcon';
 import { SetNavigationButtons } from '@/components/sets/SetNavigationButtons';
 import { SetPageBuyButton } from '@/components/sets/SetPageBuyButton';
@@ -824,6 +825,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
               )}
             </>
           )}
+
+          <NoteCallout note={set?.note} label="Set notes" collapsible sx={{ mt: 2 }} />
         </Box>
       )}
 

@@ -20,6 +20,8 @@ export interface Set {
   isDraftable: boolean;
   isSubsetGroup: boolean;
   subsetGroupId: string | null;
+  // Site-authored editorial note shown under the set page header. Null when there is nothing to say.
+  note?: string | null;
   createdAt: string | null;
   updatedAt: string | null;
   // Collection fields (when userId is provided)

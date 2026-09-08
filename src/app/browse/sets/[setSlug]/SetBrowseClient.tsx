@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import SubsetSection from './SubsetSection';
 import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
 import { SearchDescription } from '@/components/browse/SearchDescription';
+import { NoteCallout } from '@/components/notes/NoteCallout';
 import { Pagination } from '@/components/pagination';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import SetIcon from '@/components/sets/SetIcon';
@@ -242,6 +243,8 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
             isCollection={false}
           />
         )}
+
+        <NoteCallout note={set?.note} label="Set notes" collapsible sx={{ mt: 2 }} />
       </Box>
 
       <Pagination

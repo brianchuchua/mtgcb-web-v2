@@ -4,6 +4,7 @@ import { Box, Typography, Divider, Chip, Link, IconButton, Popover } from '@mui/
 import React from 'react';
 import NextLink from 'next/link';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { NoteCallout } from '@/components/notes/NoteCallout';
 import SetIcon from '@/components/sets/SetIcon';
 import { formatManaCost } from '@/utils/manaFormatter';
 import capitalize from '@/utils/capitalize';
@@ -29,6 +30,7 @@ interface CardDetailsSectionProps {
     canBeNonFoil?: boolean;
     canBeFoil?: boolean;
     isReserved?: boolean;
+    note?: string | null;
   };
   userId?: number; // Optional for browse mode
   isCollectionView?: boolean;
@@ -257,6 +259,9 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
           </Box>
         )}
       </Box>
+
+      {/* Site-authored note about this printing (where it is recorded, provenance, quirks) */}
+      <NoteCallout note={card.note} label="About this printing" maxWidth="100%" sx={{ mt: 1 }} />
 
       <Popover
         open={Boolean(anchorEl)}

@@ -73,6 +73,7 @@ const selectFields: Array<keyof CardModel | string> = [
   'flavorText',
   'pureName',
   'isReserved',
+  'note',
   'legalities',
   // Truthy when the card has a back-face image — drives CardImageDisplay's flip overlay button.
   'backScryfallId',

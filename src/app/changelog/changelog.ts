@@ -13,6 +13,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-09-08',
+      version: '1.33.0',
+      changes: [
+        'Added notes to card and set pages -- especially useful for cards that were printed in multiple sets but are physically indistinguishable, so must live in only one',
+      ],
+    },
+    {
+      date: '2026-09-08',
       version: '1.32.6',
       changes: [
         'Reorganized The List into 240 subsets, with Mystery Booster now part of The List',

@@ -87,6 +87,9 @@ export interface CardModel {
   // Truthy when the card has a back-face image at R2's `{cardId}b.jpg` (DSTs, transform,
   // modal DFC, reversible_card, etc.). The grid uses this to surface a flip-card overlay.
   backScryfallId?: string | null;
+  // Site-authored editorial note shown on the card page (where a printing lives after a
+  // reorganisation, promo provenance, foil quirks). Null when there is nothing to say.
+  note?: string | null;
   // Collection quantities (only present when userId is provided)
   quantityReg?: number;
   quantityFoil?: number;
