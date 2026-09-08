@@ -4,6 +4,7 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {
   Alert,
+  AlertTitle,
   Box,
   Button,
   Card,
@@ -27,6 +28,7 @@ import {
   useGetDeprecatedHoldingsQuery,
   useGetDeprecatedHoldingSetsQuery,
   useRunDeprecatedMigrationsMutation,
+  useUpdateCollectionMutation,
 } from '@/api/collections/collectionsApi';
 import {
   DeprecatedHolding,
@@ -90,14 +92,16 @@ const resolutionLabel: Record<MigrationResolution, string> = {
   auto: 'Ready to update',
   ambiguous: 'Assign update',
   no_target: 'No update available yet',
+  never_printed: 'Never printed',
 };
 
-type ResolutionTone = 'success' | 'warning' | 'muted';
+type ResolutionTone = 'success' | 'warning' | 'muted' | 'error';
 
 const resolutionTone: Record<MigrationResolution, ResolutionTone> = {
   auto: 'success',
   ambiguous: 'warning',
   no_target: 'muted',
+  never_printed: 'error',
 };
 
 /**
@@ -117,6 +121,8 @@ function toneColor(theme: Theme, tone: ResolutionTone): string {
       return theme.palette.success.main;
     case 'warning':
       return theme.palette.warning.main;
+    case 'error':
+      return theme.palette.error.main;
     case 'muted':
     default:
       return theme.palette.text.disabled;
@@ -230,6 +236,8 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
   const sets = useMemo(() => setsQuery.data?.data?.sets ?? [], [setsQuery.data]);
 
   const [runMigrations, { isLoading: isMigrating }] = useRunDeprecatedMigrationsMutation();
+  // never_printed rows have no successor by design; the only action is to drop the entry.
+  const [updateCollection, { isLoading: isRemoving }] = useUpdateCollectionMutation();
 
   // Cards the user explicitly skipped this session. The API still returns them, so we
   // mask them client-side and unmask on page refresh — gives the user a way to defer a
@@ -475,6 +483,28 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
     setErrorMessage(null);
   }, [current]);
 
+  // Remove-only path for never_printed rows: zero both finishes on the deprecated card. The
+  // user has already been told to record the real printing themselves (see the copy in
+  // CurrentHoldingCard); we deliberately do not guess a target for them.
+  const handleRemove = useCallback(async () => {
+    if (!current || current.resolution !== 'never_printed') return;
+    try {
+      const response = await updateCollection({
+        mode: 'set',
+        cards: [{ cardId: current.sourceCardId, quantityReg: 0, quantityFoil: 0 }],
+      }).unwrap();
+      if (!response.success) {
+        setErrorMessage('Failed to remove this card. Try again or skip for now.');
+        return;
+      }
+      setErrorMessage(null);
+      setMigratedThisSession((n) => n + 1);
+      await refetch();
+    } catch (err) {
+      setErrorMessage('Failed to remove this card. Try again or skip for now.');
+    }
+  }, [current, updateCollection, refetch]);
+
   const handleMigrate = useCallback(async () => {
     if (!current) return;
     if (!canMigrateCurrent) {
@@ -719,19 +749,31 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
           <Button
             variant="outlined"
             onClick={handleSkip}
-            disabled={isMigrating || isFetching}
+            disabled={isMigrating || isRemoving || isFetching}
             sx={{ width: { xs: '100%', sm: 'auto' } }}
           >
             Skip for now
           </Button>
-          <Button
-            variant="contained"
-            onClick={handleMigrate}
-            disabled={!canMigrateCurrent || isMigrating || isFetching}
-            sx={{ width: { xs: '100%', sm: 'auto' } }}
-          >
-            {isMigrating || isFetching ? 'Updating…' : 'Apply update'}
-          </Button>
+          {current?.resolution === 'never_printed' ? (
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleRemove}
+              disabled={isRemoving || isFetching}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
+            >
+              {isRemoving || isFetching ? 'Removing…' : 'Remove from collection'}
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              onClick={handleMigrate}
+              disabled={!canMigrateCurrent || isMigrating || isFetching}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
+            >
+              {isMigrating || isFetching ? 'Updating…' : 'Apply update'}
+            </Button>
+          )}
         </Stack>
       </Paper>
     </Container>
@@ -777,7 +819,11 @@ function CurrentHoldingCard({
   const isFullyAllocated =
     candidates.length > 0 && !totals.overReg && !totals.overFoil && !totals.remainingReg && !totals.remainingFoil;
   const effectiveResolution: MigrationResolution =
-    holding.resolution === 'no_target' ? 'no_target' : isFullyAllocated ? 'auto' : 'ambiguous';
+    holding.resolution === 'no_target' || holding.resolution === 'never_printed'
+      ? holding.resolution
+      : isFullyAllocated
+        ? 'auto'
+        : 'ambiguous';
 
   return (
     <Card variant="outlined">
@@ -914,6 +960,12 @@ function CurrentHoldingCard({
                   candidateCount={candidates.length}
                 />
               </>
+            ) : holding.resolution === 'never_printed' ? (
+              <Alert severity="warning">
+                <AlertTitle>This card was never printed</AlertTitle>
+                It was added to Scryfall in error and has since been removed, so there is nothing to update it to.
+                Check your collection for the card you actually own, record that printing, then remove this entry.
+              </Alert>
             ) : (
               <Alert severity="info">
                 No update available yet for this card. Skip for now and check back later — it&apos;ll resurface once an

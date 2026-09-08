@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-08',
+      version: '1.32.6',
+      changes: [
+        'Reorganized The List into 240 subsets, with Mystery Booster now part of The List',
+        'Labeled some cards as never printed and integrated into the Update Cards page flow',
+      ],
+    },
+    {
       date: '2026-09-03',
       version: '1.32.5',
       changes: [

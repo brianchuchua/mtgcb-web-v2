@@ -88,11 +88,16 @@ export function useSetPageFilter(options: UseSetPageFilterOptions): UseSetPageFi
 
   const set = setsData?.data?.sets?.[0];
 
-  // Fetch subsets
+  // Fetch subsets. A rollup set (The List, Secret Lair Drop Series, Prerelease Cards) owns its
+  // members through Set.subsetGroupId, not parentSetId — a List child's parent is the origin
+  // set it reprints from. Discovering by parentSetId only found the handful of children that
+  // happened to name the rollup as parent, and The List alone has 240+ members, so the old
+  // cap of 100 truncated the rest. 500 is the API's maximum page size.
+  const isSubsetGroup = Boolean(set?.isSubsetGroup);
   const { data: subsetsData, isLoading: isSubsetsLoading } = useGetSetsQuery(
     {
-      parentSetId: set?.id,
-      limit: 100,
+      ...(isSubsetGroup ? { subsetGroupId: set?.id } : { parentSetId: set?.id }),
+      limit: 500,
       ...(options.userId && { userId: options.userId }),
       priceType: options.priceType,
       ...(options.goalId && { goalId: options.goalId }),

@@ -211,7 +211,7 @@ export interface CollectionHistoryData {
 
 export type CollectionHistoryResponse = ApiResponse<CollectionHistoryData>;
 
-export type MigrationResolution = 'auto' | 'ambiguous' | 'no_target';
+export type MigrationResolution = 'auto' | 'ambiguous' | 'no_target' | 'never_printed';
 
 export interface MigrationCandidate {
   cardId: number;
