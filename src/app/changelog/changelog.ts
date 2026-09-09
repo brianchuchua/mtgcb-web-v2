@@ -13,6 +13,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-09-08',
+      version: '1.33.1',
+      changes: [
+        'Fixed release date sorting so promos from aggregate sets like Magic Player Rewards appear in the year they were actually printed',
+        'Fixed collection goals with "count cards from any set" sorting some cards by a printing that is not in the goal',
+      ],
+    },
+    {
+      date: '2026-09-08',
       version: '1.33.0',
       changes: [
         'Added notes to card and set pages -- especially useful for cards that were printed in multiple sets but are physically indistinguishable, so must live in only one',

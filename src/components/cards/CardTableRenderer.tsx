@@ -69,8 +69,8 @@ export const useCardTableColumns = (
   // Tooltip components
   const ReleaseDateTooltip = () => (
     <div>
-      <div>Sort by set release date</div>
-      <div>Sets are displayed by name, but sorted chronologically</div>
+      <div>Sort by release date</div>
+      <div>Sets are displayed by name, but each printing is sorted by its own release date</div>
     </div>
   );
 
