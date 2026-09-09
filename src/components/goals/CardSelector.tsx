@@ -5,12 +5,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
 import {
+  Alert,
   Autocomplete,
   Box,
   Chip,
   CircularProgress,
   IconButton,
   InputAdornment,
+  Link,
   Popover,
   Stack,
   TextField,
@@ -19,9 +21,11 @@ import {
   debounce,
   styled,
 } from '@mui/material';
-import React, { useCallback, useMemo, useState } from 'react';
+import NextLink from 'next/link';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLazyGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
+import { useLazyGetCardsByIdsQuery } from '@/api/cards/cardsApi';
 import { useAuth } from '@/hooks/useAuth';
 import { usePriceType } from '@/hooks/usePriceType';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
@@ -47,6 +51,8 @@ interface CardOption {
   card: CardModel;
 }
 
+const CARD_LOOKUP_BATCH_SIZE = 500;
+
 const CardSelector: React.FC<CardSelectorProps> = ({
   value,
   onChange,
@@ -59,9 +65,13 @@ const CardSelector: React.FC<CardSelectorProps> = ({
   const [selectedCard, setSelectedCard] = useState<CardOption | null>(null);
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [infoAnchorEl, setInfoAnchorEl] = useState<HTMLElement | null>(null);
+  const [cardInfoCache, setCardInfoCache] = useState<Map<string, CardModel>>(new Map());
+  const [unresolvedCardIds, setUnresolvedCardIds] = useState<Set<string>>(new Set());
+  const requestedCardIdsRef = useRef<Set<string>>(new Set());
   const { user } = useAuth();
   const priceType = usePriceType();
   const [triggerGetCards, { data: searchResponse, isFetching: isSearching }] = useLazyGetCardsQuery();
+  const [lookupCardsByIds] = useLazyGetCardsByIdsQuery();
 
   const debouncedSetSearchInput = useMemo(() => debounce((value: string) => setSearchInput(value), 300), []);
 
@@ -72,7 +82,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (searchInput.length >= 2) {
       triggerGetCards({
         name: searchInput,
@@ -114,6 +124,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
   const handleCardSelect = (_event: any, option: CardOption | null) => {
     if (option && !allSelectedCards.has(option.id)) {
       // Add the card to cache immediately when selected
+      requestedCardIdsRef.current.add(option.id);
       setCardInfoCache((prev) => {
         const newCache = new Map(prev);
         newCache.set(option.id, option.card);
@@ -154,56 +165,48 @@ const CardSelector: React.FC<CardSelectorProps> = ({
     });
   };
 
-  const getCardInfo = useCallback(
-    async (cardId: string) => {
-      try {
-        const response = await triggerGetCards({
-          id: { OR: [cardId] },
-          limit: 1,
-          offset: 0,
-          userId: user?.userId,
-          priceType: priceType,
-        }).unwrap();
+  // Saved ids may point at printings that were deprecated after the goal was created, and
+  // the search endpoint hides those. The by-ids lookup returns them with `deprecated` set
+  // so the chips can name them and the notice below can explain what to do.
+  useEffect(() => {
+    const missingIds = Array.from(allSelectedCards.keys()).filter((id) => !requestedCardIdsRef.current.has(id));
+    if (missingIds.length === 0) return;
+    missingIds.forEach((id) => requestedCardIdsRef.current.add(id));
 
-        if (response?.data?.cards && response.data.cards.length > 0) {
-          return response.data.cards[0];
+    const hydrateCardInfo = async () => {
+      const foundCards = new Map<string, CardModel>();
+      const numericIds = missingIds.map(Number).filter((id) => Number.isInteger(id) && id > 0);
+
+      for (let start = 0; start < numericIds.length; start += CARD_LOOKUP_BATCH_SIZE) {
+        const batch = numericIds.slice(start, start + CARD_LOOKUP_BATCH_SIZE);
+        try {
+          const cards = await lookupCardsByIds({ ids: batch }).unwrap();
+          cards.forEach((card) => foundCards.set(card.id.toString(), card));
+        } catch (error) {
+          console.error('Error fetching card info:', error);
         }
-      } catch (error) {
-        console.error('Error fetching card info:', error);
       }
-      return null;
-    },
-    [triggerGetCards, user?.userId, priceType],
-  );
 
-  const [cardInfoCache, setCardInfoCache] = useState<Map<string, CardModel>>(new Map());
-
-  React.useEffect(() => {
-    const fetchMissingCardInfo = async () => {
-      const missingIds = Array.from(allSelectedCards.keys()).filter((id) => !cardInfoCache.has(id));
-
-      if (missingIds.length > 0) {
-        const promises = missingIds.map(async (id) => {
-          const card = await getCardInfo(id);
-          if (card) {
-            return { id, card };
-          }
-          return null;
+      setCardInfoCache((prev) => {
+        const next = new Map(prev);
+        foundCards.forEach((card, id) => next.set(id, card));
+        return next;
+      });
+      setUnresolvedCardIds((prev) => {
+        const next = new Set(prev);
+        missingIds.forEach((id) => {
+          if (!foundCards.has(id)) next.add(id);
         });
-
-        const results = await Promise.all(promises);
-        const newCache = new Map(cardInfoCache);
-        results.forEach((result) => {
-          if (result) {
-            newCache.set(result.id, result.card);
-          }
-        });
-        setCardInfoCache(newCache);
-      }
+        return next;
+      });
     };
 
-    fetchMissingCardInfo();
-  }, [allSelectedCards, cardInfoCache, getCardInfo]);
+    hydrateCardInfo();
+  }, [allSelectedCards, lookupCardsByIds]);
+
+  const deprecatedSelectedCount = Array.from(allSelectedCards.keys()).filter(
+    (id) => cardInfoCache.get(id)?.deprecated === true,
+  ).length;
 
   return (
     <Box>
@@ -273,7 +276,8 @@ const CardSelector: React.FC<CardSelectorProps> = ({
                   {option.name}
                   {option.card.flavorName && (
                     <Typography component="span" variant="body2" color="text.secondary">
-                      {' '}({option.card.flavorName})
+                      {' '}
+                      ({option.card.flavorName})
                     </Typography>
                   )}
                 </Typography>
@@ -290,6 +294,8 @@ const CardSelector: React.FC<CardSelectorProps> = ({
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
           {Array.from(allSelectedCards.entries()).map(([cardId, { type }]) => {
             const cardInfo = cardInfoCache.get(cardId);
+            const isUnresolved = !cardInfo && unresolvedCardIds.has(cardId);
+            const isDeprecated = cardInfo?.deprecated === true;
             const isExclude = type === 'exclude';
 
             return (
@@ -304,7 +310,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       {isExclude && <Typography variant="inherit">NOT</Typography>}
                       <Typography variant="inherit">
-                        {cardInfo ? cardInfo.name : 'Loading...'}
+                        {cardInfo ? cardInfo.name : isUnresolved ? `Card #${cardId}` : 'Loading...'}
                         {cardInfo?.flavorName && ` (${cardInfo.flavorName})`}
                       </Typography>
                       {cardInfo && (
@@ -312,8 +318,23 @@ const CardSelector: React.FC<CardSelectorProps> = ({
                           [{cardInfo.setName}]
                         </Typography>
                       )}
+                      {isUnresolved && (
+                        <Typography variant="caption" sx={{ opacity: 0.8 }}>
+                          [not found]
+                        </Typography>
+                      )}
+                      {isDeprecated && (
+                        <Typography
+                          variant="caption"
+                          sx={{ fontWeight: 700, color: isExclude ? 'inherit' : 'warning.main' }}
+                        >
+                          [replaced]
+                        </Typography>
+                      )}
                     </Box>
                   }
+                  data-testid={`card-selector-chip-${cardId}`}
+                  data-deprecated={isDeprecated ? 'true' : undefined}
                   onClick={() => handleChipClick(cardId)}
                   onDelete={() => handleChipDelete(cardId)}
                   deleteIcon={
@@ -336,6 +357,11 @@ const CardSelector: React.FC<CardSelectorProps> = ({
                         },
                       },
                     }),
+                    ...(isDeprecated &&
+                      !isExclude && {
+                        borderColor: 'warning.main',
+                        borderStyle: 'dashed',
+                      }),
                   }}
                   icon={
                     <Tooltip title={isExclude ? 'Click to include' : 'Click to exclude'}>
@@ -359,6 +385,24 @@ const CardSelector: React.FC<CardSelectorProps> = ({
             );
           })}
         </Box>
+      )}
+
+      {deprecatedSelectedCount > 0 && (
+        <Alert severity="warning" sx={{ mt: 1.5 }} data-testid="card-selector-deprecated-notice">
+          <Typography variant="body2" component="div">
+            {deprecatedSelectedCount === 1
+              ? '1 of these cards has been replaced by an updated entry and no longer counts toward goals. Remove it here, and if you own copies, move them to the updated printing on the '
+              : `${deprecatedSelectedCount} of these cards have been replaced by updated entries and no longer count toward goals. Remove them here, and if you own copies, move them to their updated printings on the `}
+            {user?.userId ? (
+              <Link component={NextLink} href={`/collections/${user.userId}/migrate`}>
+                Update Cards
+              </Link>
+            ) : (
+              'Update Cards'
+            )}
+            {' page.'}
+          </Typography>
+        </Alert>
       )}
 
       <Popover

@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-09',
+      version: '1.34.0',
+      changes: [
+        'Fixed goal editor card selection getting stuck on "Loading..." when editing a goal whose cards have since been replaced',
+        'Goal editor now directs you to Update Cards page if you had any cards included or excluded that have since been replaced',
+      ],
+    },
+    {
       date: '2026-09-08',
       version: '1.33.1',
       changes: [

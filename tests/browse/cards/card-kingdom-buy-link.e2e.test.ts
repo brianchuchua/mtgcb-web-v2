@@ -28,7 +28,7 @@ const FOIL_ETCHED_CARD_URL = '/browse/cards/najeela-the-blade-blossom-foil-etche
 // A Card row that genuinely has no CK data (e.g., a freshly-released printing or a
 // card the heuristic couldn't bind). Update this id if it ever gets bound — the
 // SQL `WHERE "cardKingdomId" IS NULL AND "cardKingdomFoilId" IS NULL` finds candidates.
-const UNBOUND_CARD_URL = '/browse/cards/light-up-the-stage/102898';
+const UNBOUND_CARD_URL = '/browse/cards/mega-flare-scene-art-card/101416';
 
 test.describe('Card Kingdom buy-link on the card detail page', () => {
   test.describe('Section headers', () => {
