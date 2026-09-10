@@ -22,29 +22,29 @@
   "dependencies": {
     "@emotion/cache": "11.14.0",
     "@emotion/react": "11.14.0",
-    "@emotion/styled": "11.14.0",
-    "@mui/icons-material": "6.3.0",
-    "@mui/material": "6.3.0",
-    "@mui/material-nextjs": "6.3.0",
-    "@mui/x-charts": "8.11.2",
-    "@next/third-parties": "16.3.3",
-    "@reduxjs/toolkit": "2.5.0",
-    "@sentry/nextjs": "10.51.0",
-    "@types/node": "22.10.4",
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3",
+    "@emotion/styled": "11.14.1",
+    "@mui/icons-material": "9.4.0",
+    "@mui/material": "9.4.0",
+    "@mui/material-nextjs": "9.4.0",
+    "@mui/x-charts": "9.13.0",
+    "@next/third-parties": "16.3.4",
+    "@reduxjs/toolkit": "2.12.0",
+    "@sentry/nextjs": "10.73.0",
+    "@types/node": "26.4.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
     "clsx": "2.1.1",
     "lodash.debounce": "4.0.8",
-    "next": "16.3.3",
-    "notistack": "3.0.1",
-    "react": "19.2.6",
+    "next": "16.3.4",
+    "notistack": "3.0.2",
+    "react": "19.2.8",
     "react-confetti": "6.4.0",
-    "react-dom": "19.2.6",
-    "react-google-recaptcha-v3": "1.10.1",
-    "react-hook-form": "7.54.2",
-    "react-redux": "9.2.0",
-    "react-virtuoso": "4.12.5",
-    "typescript": "5.7.2"
+    "react-dom": "19.2.8",
+    "react-google-recaptcha-v3": "1.11.0",
+    "react-hook-form": "7.87.0",
+    "react-redux": "9.3.0",
+    "react-virtuoso": "4.18.13",
+    "typescript": "7.0.2"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",
@@ -81,8 +81,8 @@
       "unrs-resolver"
     ],
     "overrides": {
-      "@types/react": "19.2.14",
-      "@types/react-dom": "19.2.3"
+      "@types/react": "19.2.18",
+      "@types/react-dom": "19.2.7"
     }
   }
 }
