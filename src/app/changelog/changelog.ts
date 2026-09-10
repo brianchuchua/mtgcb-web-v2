@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-09-10',
+      version: '1.34.3',
+      changes: ['Split 26 Bundle promos into their own bundle subsets'],
+      type: 'data',
+    },
+    {
+      date: '2026-09-10',
       version: '1.34.2',
       changes: ['Split 1311 Prerelease cards into their own prerelease subsets'],
       type: 'data',
