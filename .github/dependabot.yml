@@ -1,14 +1,20 @@
-# Keeps dependencies (including transitive ones) fresh so that Dependabot
-# security alerts are mostly resolved by routine updates rather than by
-# one-off manual triage.
+# Dependabot version updates are DISABLED here (open-pull-requests-limit: 0).
 #
-# Updates are grouped so a week's worth of bumps arrives as at most two pull
-# requests -- one for production dependencies, one for dev/build tooling --
-# instead of a stream of individual PRs and alert emails.
+# Grouped weekly version-update PRs were tried and removed: the noise they were
+# meant to fix was per-advisory alert email about transitive build-tooling
+# packages (fast-uri, brace-expansion, glob, picomatch...), and this file does
+# not control those. Alert emails are turned off per-account under
+# GitHub Settings -> Notifications -> Dependabot alerts; outstanding alerts get
+# reviewed in the repo's Security tab instead.
 #
-# Note: this file controls update pull requests. It does not control alert
-# emails; those are configured per-account under
-# GitHub Settings -> Notifications -> Dependabot alerts.
+# Dependabot SECURITY updates are unaffected by this file and remain on -- they
+# are a repository setting (Settings -> Code security), independent of the
+# version-update config here. Only routine version bumps are suppressed.
+#
+# To re-enable version updates, set open-pull-requests-limit back to 3. The
+# schedule and grouping below are kept so that flip stays a one-line change:
+# they collapse a week's bumps into at most two PRs, one for production
+# dependencies and one for dev/build tooling.
 version: 2
 
 updates:
@@ -16,7 +22,7 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 0
     commit-message:
       prefix: chore
       include: scope
