@@ -12,6 +12,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-10',
+      version: '1.34.1',
+      changes: ['Added Magic Premiere Shop sets'],
+      type: 'data',
+    },
+    {
       date: '2026-09-09',
       version: '1.34.0',
       changes: [
