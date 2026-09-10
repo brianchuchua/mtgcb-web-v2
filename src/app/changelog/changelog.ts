@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-09-10',
+      version: '1.34.2',
+      changes: ['Split 1311 Prerelease cards into their own prerelease subsets'],
+      type: 'data',
+    },
+    {
+      date: '2026-09-10',
       version: '1.34.1',
       changes: ['Added Magic Premiere Shop sets'],
       type: 'data',
