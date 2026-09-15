@@ -12,6 +12,17 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-15',
+      version: '1.34.4',
+      changes: [
+        'Added The Zeta Set',
+        'Updated Secret Lair Drop Series',
+        'Moved some double-sided tokens around and added notes to their sets',
+        'Fixed some missing card data for which cards could be foil',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-09-10',
       version: '1.34.3',
       changes: ['Split 26 Bundle promos into their own bundle subsets'],
