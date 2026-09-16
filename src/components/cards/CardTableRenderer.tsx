@@ -31,6 +31,7 @@ import { CardLocationTableCell } from './CardLocationTableCell';
 import CardPrice from './CardPrice';
 import { GoalStatusTableCell } from './GoalStatusTableCell';
 import { useUpdateCollectionMutation } from '@/api/collections/collectionsApi';
+import { DeprecatedUpdateIndicator } from '@/components/collections/DeprecatedUpdateIndicator';
 import { ResponsiveWidth, TableColumn } from '@/components/common/VirtualizedTable';
 import { PriceType } from '@/types/pricing';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
@@ -1109,6 +1110,12 @@ export const useCardRowRenderer = (
         >
           <ClickableText>{card.name}</ClickableText>
         </Link>
+        {/* Stacked under the name, the same way GoalStatusTableCell stacks under a quantity. */}
+        {card.deprecated && (
+          <Box sx={{ mt: 0.25 }}>
+            <DeprecatedUpdateIndicator userId={userId} cardId={card.id} />
+          </Box>
+        )}
       </TableCell>,
     );
 

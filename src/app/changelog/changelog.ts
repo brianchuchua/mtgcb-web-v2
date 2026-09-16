@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-16',
+      version: '1.35.0',
+      changes: ['Added Update Available notice for out-of-date card entries in table view'],
+    },
+    {
       date: '2026-09-15',
       version: '1.34.4',
       changes: [
