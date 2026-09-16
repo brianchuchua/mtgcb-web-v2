@@ -59,6 +59,7 @@ export const NoteCallout: React.FC<NoteCalloutProps> = ({
     <Box
       role="note"
       aria-label={label}
+      data-testid="note-callout"
       sx={[
         (theme) => ({
           textAlign: 'left',
@@ -76,6 +77,7 @@ export const NoteCallout: React.FC<NoteCalloutProps> = ({
       {collapsible ? (
         <ButtonBase
           onClick={() => setExpanded((value) => !value)}
+          data-testid="note-callout-toggle"
           aria-expanded={expanded}
           aria-controls={contentId}
           sx={{

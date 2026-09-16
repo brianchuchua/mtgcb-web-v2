@@ -3,6 +3,8 @@
 import { Box, Link } from '@mui/material';
 import NextLink from 'next/link';
 import React from 'react';
+import { useNoteLinkUserId } from '@/hooks/useNoteLinkUserId';
+import { resolveNoteHref } from '@/utils/noteLinks';
 
 interface NoteTextProps {
   text: string;
@@ -13,15 +15,20 @@ interface NoteTextProps {
  * blank-line paragraphs and Markdown-style links `[label](/browse/sets/the-list)`.
  * Only site-relative paths and https URLs become links; anything else renders as its label.
  * Nothing is parsed as HTML, so a note can never inject markup.
+ *
+ * Browse links are rewritten to the reader's collection when there is one, so a note that
+ * points at another set or printing lands on the page that shows what they own.
  */
 export const NoteText: React.FC<NoteTextProps> = ({ text }) => {
+  const linkUserId = useNoteLinkUserId();
+
   const paragraphs = text.split(/\n\s*\n/).filter((paragraph) => paragraph.trim() !== '');
 
   return (
     <>
       {paragraphs.map((paragraph, index) => (
         <Box key={index} component="span" sx={{ display: 'block', mt: index > 0 ? 1 : 0 }}>
-          {renderInline(paragraph)}
+          {renderInline(paragraph, linkUserId)}
         </Box>
       ))}
     </>
@@ -32,7 +39,7 @@ const LINK_PATTERN = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 
 const isSafeHref = (href: string) => href.startsWith('/') || href.startsWith('https://');
 
-function renderInline(paragraph: string): React.ReactNode[] {
+function renderInline(paragraph: string, collectionUserId: number | null): React.ReactNode[] {
   const nodes: React.ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
@@ -48,7 +55,7 @@ function renderInline(paragraph: string): React.ReactNode[] {
         <Link
           key={`${match.index}-${href}`}
           component={NextLink}
-          href={href}
+          href={resolveNoteHref(href, collectionUserId)}
           sx={{ color: 'inherit', textDecorationColor: 'currentColor', '&:hover': { color: 'primary.main' } }}
         >
           {label}
