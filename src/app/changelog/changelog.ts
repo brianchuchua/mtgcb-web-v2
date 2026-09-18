@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-18',
+      version: '1.35.3',
+      changes: [
+        'Updated Convention Promos, MagicFest Promos, Forgotten Realms Oversized Cards, Media Inserts, Secret Lair Showdown, Spotlight Series, The List, Unknown Event, and WPN Promos',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-09-17',
       version: '1.35.2',
       changes: [
