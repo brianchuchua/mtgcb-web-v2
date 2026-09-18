@@ -12,6 +12,18 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-17',
+      version: '1.35.2',
+      changes: [
+        'Split 78 Buy-a-Box, Release Event, Store Championship, Pro Tour, and Open House promos into 26 new subsets',
+        'Oversized planes, schemes, and display commanders moved to 20 new subsets',
+        'Eighth and Ninth Edition starter-deck cards moved to their own subsets',
+        'Added HarperPrism Book Promos and Dragon Con as their own sets',
+        'Planeswalker Deck and Welcome Deck cards moved to 13 new Variants subsets',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-09-16',
       version: '1.35.1',
       changes: ['Links inside set and card notes now take you to your collection pages when you are signed in'],
