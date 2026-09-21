@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-20',
+      version: '1.35.4',
+      changes: [
+        'Updated TCGPlayer price bindings for thousands of cards',
+        'Marked several duplicate cards from MH3 for the card replacement page',
+      ],
+    },
+    {
       date: '2026-09-18',
       version: '1.35.3',
       changes: [
