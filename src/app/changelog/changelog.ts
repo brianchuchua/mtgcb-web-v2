@@ -12,6 +12,20 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-22',
+      version: '1.35.5',
+      changes: [
+        'Added Reality Fracture',
+        'Added Reality Fracture Variants',
+        'Added Reality Fracture Commander',
+        'Added Reality Fracture Commander Variants',
+        'Added Reality Fracture Bundle Promos',
+        'Added Reality Fracture Secret Lair Bundle',
+        'Updated Special Guests',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-09-20',
       version: '1.35.4',
       changes: [
