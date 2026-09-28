@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-27',
+      version: '1.35.7',
+      changes: [
+        'Fixed the data on thousands of more cards and sets -- things like sets that were missing set types, cards that were missing the flavor text of their other side when double-sided, typos, incorrect images, duplicates, cards that were never printed, etc.',
+      ],
+    },
+    {
       date: '2026-09-26',
       version: '1.35.6',
       changes: [
