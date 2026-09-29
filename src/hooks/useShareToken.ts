@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { smartDecodeToken } from '@/utils/tokenEncoder';
+import { safeSessionStorage } from '@/utils/browser/safeStorage';
 
 const SHARE_TOKEN_KEY = 'mtgcb_share_token';
 const SHARE_USER_KEY = 'mtgcb_share_user';
@@ -22,7 +23,7 @@ export const useShareToken = () => {
     if (!pathname.startsWith('/shared/')) return;
     
     const checkForUserId = () => {
-      const storedUserId = sessionStorage.getItem(SHARE_USER_KEY);
+      const storedUserId = safeSessionStorage.getItem(SHARE_USER_KEY);
       if (storedUserId && storedUserId !== shareUserId) {
         setShareUserId(storedUserId);
       }
@@ -51,12 +52,12 @@ export const useShareToken = () => {
       const decodedToken = smartDecodeToken(encodedToken);
       
       // Store the token
-      sessionStorage.setItem(SHARE_TOKEN_KEY, decodedToken);
+      safeSessionStorage.setItem(SHARE_TOKEN_KEY, decodedToken);
       setShareToken(decodedToken);
       setIsSharedUrl(true);
       
       // Check if userId has been set by the shared page component
-      const storedUserId = sessionStorage.getItem(SHARE_USER_KEY);
+      const storedUserId = safeSessionStorage.getItem(SHARE_USER_KEY);
       if (storedUserId) {
         setShareUserId(storedUserId);
       }
@@ -71,13 +72,13 @@ export const useShareToken = () => {
     const userId = collectionsIndex !== -1 ? pathSegments[collectionsIndex + 1] : null;
 
     if (token && userId) {
-      sessionStorage.setItem(SHARE_TOKEN_KEY, token);
-      sessionStorage.setItem(SHARE_USER_KEY, userId);
+      safeSessionStorage.setItem(SHARE_TOKEN_KEY, token);
+      safeSessionStorage.setItem(SHARE_USER_KEY, userId);
       setShareToken(token);
       setShareUserId(userId);
     } else if (userId) {
-      const storedToken = sessionStorage.getItem(SHARE_TOKEN_KEY);
-      const storedUserId = sessionStorage.getItem(SHARE_USER_KEY);
+      const storedToken = safeSessionStorage.getItem(SHARE_TOKEN_KEY);
+      const storedUserId = safeSessionStorage.getItem(SHARE_USER_KEY);
       
       if (storedToken && storedUserId === userId) {
         setShareToken(storedToken);
@@ -86,8 +87,8 @@ export const useShareToken = () => {
         clearShareToken();
       }
     } else {
-      const storedToken = sessionStorage.getItem(SHARE_TOKEN_KEY);
-      const storedUserId = sessionStorage.getItem(SHARE_USER_KEY);
+      const storedToken = safeSessionStorage.getItem(SHARE_TOKEN_KEY);
+      const storedUserId = safeSessionStorage.getItem(SHARE_USER_KEY);
       
       if (storedToken && storedUserId) {
         setShareToken(storedToken);
@@ -97,8 +98,8 @@ export const useShareToken = () => {
   }, [pathname, searchParams]);
 
   const clearShareToken = useCallback(() => {
-    sessionStorage.removeItem(SHARE_TOKEN_KEY);
-    sessionStorage.removeItem(SHARE_USER_KEY);
+    safeSessionStorage.removeItem(SHARE_TOKEN_KEY);
+    safeSessionStorage.removeItem(SHARE_USER_KEY);
     setShareToken(null);
     setShareUserId(null);
   }, []);

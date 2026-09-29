@@ -7,6 +7,7 @@ import { useResolveShareTokenMutation } from '@/api/user/shareLinkApi';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import { Box, CircularProgress } from '@mui/material';
 import { smartDecodeToken } from '@/utils/tokenEncoder';
+import { safeSessionStorage } from '@/utils/browser/safeStorage';
 
 interface SharedCollectionPageProps {
   params: Promise<{
@@ -49,7 +50,7 @@ export default function SharedCollectionPage({
           
           // Store the userId in sessionStorage for useShareToken hook
           if (data?.userId) {
-            sessionStorage.setItem('mtgcb_share_user', data.userId.toString());
+            safeSessionStorage.setItem('mtgcb_share_user', data.userId.toString());
           }
         })
         .catch((err) => {

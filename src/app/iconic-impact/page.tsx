@@ -44,6 +44,7 @@ import {
 // Import the type from the game engine
 import type { SetStatistics } from '@/features/games/iconic-impact';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { safeLocalStorage } from '@/utils/browser/safeStorage';
 
 const MAX_GAME_WIDTH = 800;
 const GAME_HEIGHT = 500;
@@ -402,7 +403,7 @@ export default function IconicImpactPage() {
 
   // Load checkpoint on mount
   useEffect(() => {
-    const savedCheckpoint = localStorage.getItem('mtgcb_iconic_impact_checkpoint');
+    const savedCheckpoint = safeLocalStorage.getItem('mtgcb_iconic_impact_checkpoint');
     if (savedCheckpoint) {
       try {
         const checkpointData = JSON.parse(savedCheckpoint) as CheckpointData;
@@ -508,7 +509,7 @@ export default function IconicImpactPage() {
         setGameState(state);
         // Clear checkpoint if game over
         if (state === 'gameover') {
-          localStorage.removeItem('mtgcb_iconic_impact_checkpoint');
+          safeLocalStorage.removeItem('mtgcb_iconic_impact_checkpoint');
           setCheckpoint(null);
         }
       },
@@ -569,7 +570,7 @@ export default function IconicImpactPage() {
       },
       onAllWavesComplete: () => {
         // Clear checkpoint when all waves complete
-        localStorage.removeItem('mtgcb_iconic_impact_checkpoint');
+        safeLocalStorage.removeItem('mtgcb_iconic_impact_checkpoint');
       },
     };
 
@@ -611,7 +612,7 @@ export default function IconicImpactPage() {
     setCurrentWave(1); // Set to wave 1 when starting
     setCompletedInWave(0);
     // Clear checkpoint when starting fresh
-    localStorage.removeItem('mtgcb_iconic_impact_checkpoint');
+    safeLocalStorage.removeItem('mtgcb_iconic_impact_checkpoint');
     setCheckpoint(null);
 
     // Lock in the bad-at sets at game start
@@ -887,7 +888,7 @@ export default function IconicImpactPage() {
           <Button
             onClick={() => {
               setShowResumeDialog(false);
-              localStorage.removeItem('mtgcb_iconic_impact_checkpoint');
+              safeLocalStorage.removeItem('mtgcb_iconic_impact_checkpoint');
               setCheckpoint(null);
               setCurrentWave(0);
               setCompletedInWave(0);

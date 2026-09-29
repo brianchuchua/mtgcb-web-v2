@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { safeSessionStorage } from '@/utils/browser/safeStorage';
 
 interface SessionMessage {
   id: string;
@@ -35,7 +36,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
 
   useEffect(() => {
     // Load dismissed banners from sessionStorage
-    const storedBanners = sessionStorage.getItem(DISMISSED_BANNERS_KEY);
+    const storedBanners = safeSessionStorage.getItem(DISMISSED_BANNERS_KEY);
     if (storedBanners) {
       try {
         const ids = JSON.parse(storedBanners);
@@ -46,7 +47,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
     }
 
     // Load dismissed modals from sessionStorage
-    const storedModals = sessionStorage.getItem(DISMISSED_MODALS_KEY);
+    const storedModals = safeSessionStorage.getItem(DISMISSED_MODALS_KEY);
     if (storedModals) {
       try {
         const ids = JSON.parse(storedModals);
@@ -64,7 +65,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
       const next = new Set(prev);
       next.add(id);
       // Save to sessionStorage
-      sessionStorage.setItem(DISMISSED_BANNERS_KEY, JSON.stringify(Array.from(next)));
+      safeSessionStorage.setItem(DISMISSED_BANNERS_KEY, JSON.stringify(Array.from(next)));
       return next;
     });
   }, []);
@@ -74,7 +75,7 @@ export const SessionMessagesProvider = ({ children }: { children: React.ReactNod
       const next = new Set(prev);
       next.add(id);
       // Save to sessionStorage
-      sessionStorage.setItem(DISMISSED_MODALS_KEY, JSON.stringify(Array.from(next)));
+      safeSessionStorage.setItem(DISMISSED_MODALS_KEY, JSON.stringify(Array.from(next)));
       return next;
     });
   }, []);

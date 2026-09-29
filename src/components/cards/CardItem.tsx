@@ -16,6 +16,7 @@ import { DeprecatedUpdateIndicator } from '@/components/collections/DeprecatedUp
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
+import { safeSessionStorage } from '@/utils/browser/safeStorage';
 
 export interface CardItemProps {
   id: string;
@@ -282,7 +283,7 @@ const CardItemComponent = ({
   const directUserId = collectionMatch ? collectionMatch[1] : null;
   
   // For shared URLs, get userId from sessionStorage (set by SharedCollectionPage)
-  const sharedUserId = pathname?.startsWith('/shared/') ? sessionStorage.getItem('mtgcb_share_user') : null;
+  const sharedUserId = pathname?.startsWith('/shared/') ? safeSessionStorage.getItem('mtgcb_share_user') : null;
   
   // Use whichever userId is available
   const userId = directUserId || sharedUserId;

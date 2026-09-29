@@ -6,6 +6,7 @@ import { Box, IconButton, InputAdornment, Paper, Popper, TextField, Tooltip, Typ
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { safeSessionStorage } from '@/utils/browser/safeStorage';
 
 export const QuickSearch = () => {
   const router = useRouter();
@@ -67,7 +68,7 @@ export const QuickSearch = () => {
 
       // Signal to browse pages that this is a quick navigation event
       // This triggers browse form state reset while preserving sticky behavior for normal browsing
-      sessionStorage.setItem('quickNavReset', 'true');
+      safeSessionStorage.setItem('quickNavReset', 'true');
 
       router.push(targetUrl);
       handleClose();

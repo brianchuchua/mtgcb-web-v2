@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { safeLocalStorage } from '@/utils/browser/safeStorage';
 
 const STORAGE_KEY = 'mtgcb-locations-pagination';
 const DEFAULT_PAGE_SIZE = 9;
@@ -21,7 +22,7 @@ export const useLocationsPagination = (): UseLocationsPaginationReturn => {
 
   // Load page size from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = safeLocalStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
         const state: LocationsPaginationState = JSON.parse(stored);
@@ -37,7 +38,7 @@ export const useLocationsPagination = (): UseLocationsPaginationReturn => {
   // Save page size to localStorage whenever it changes
   useEffect(() => {
     const state: LocationsPaginationState = { pageSize };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [pageSize]);
 
   const onPageChange = useCallback((page: number) => {

@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-09-29',
+      version: '1.35.9',
+      changes: ['Fixed pages showing an error for people whose browser blocks site storage or all cookies'],
+    },
+    {
+      date: '2026-09-29',
       version: '1.35.8',
       changes: [
         'Added Mystery Booster Commander Edition',

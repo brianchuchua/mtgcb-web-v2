@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useAppDispatch } from '@/redux/hooks';
 import { resetSearch, setCardSearchName, setViewContentType } from '@/redux/slices/browse/browseSlice';
+import { safeSessionStorage } from '@/utils/browser/safeStorage';
 
 /**
  * Hook to detect and handle quick navigation from header components
@@ -31,7 +32,7 @@ export const useQuickNavReset = () => {
     }
 
     // Check if navigation came from Quick Search or Jump to Sets
-    const quickNavFlag = sessionStorage.getItem('quickNavReset');
+    const quickNavFlag = safeSessionStorage.getItem('quickNavReset');
 
     if (quickNavFlag === 'true') {
       // Capture URL params that were just set by quick navigation
@@ -59,7 +60,7 @@ export const useQuickNavReset = () => {
       }
 
       // Clear the flag so subsequent URL changes don't trigger reset
-      sessionStorage.removeItem('quickNavReset');
+      safeSessionStorage.removeItem('quickNavReset');
     }
   }, [pathname, searchParams, dispatch]);
 };

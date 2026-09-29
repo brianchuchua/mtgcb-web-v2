@@ -23,6 +23,7 @@ import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import { useAuth } from '@/hooks/useAuth';
 import { Set } from '@/types/sets';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
+import { safeSessionStorage } from '@/utils/browser/safeStorage';
 
 // Memoized option component
 const SetOption = memo(
@@ -232,7 +233,7 @@ export const JumpToSetsMenu = () => {
 
         // Signal to browse pages that this is a quick navigation event
         // This triggers browse form state reset while preserving sticky behavior for normal browsing
-        sessionStorage.setItem('quickNavReset', 'true');
+        safeSessionStorage.setItem('quickNavReset', 'true');
 
         router.push(targetUrl);
         handleClose();

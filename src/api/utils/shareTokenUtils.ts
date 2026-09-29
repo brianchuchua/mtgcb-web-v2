@@ -1,3 +1,5 @@
+import { safeSessionStorage } from '@/utils/browser/safeStorage';
+
 // Endpoints that should never have share tokens appended
 const EXCLUDE_SHARE_TOKEN_ENDPOINTS = [
   '/user/share-link',
@@ -30,7 +32,7 @@ export const getShareTokenFromWindow = (): string | null => {
   const sharedIndex = pathSegments.indexOf('shared');
   if (sharedIndex !== -1 && pathSegments[sharedIndex + 1]) {
     // Token is already stored in sessionStorage by useShareToken hook
-    const storedToken = sessionStorage.getItem('mtgcb_share_token');
+    const storedToken = safeSessionStorage.getItem('mtgcb_share_token');
     if (storedToken) {
       return storedToken;
     }
@@ -45,8 +47,8 @@ export const getShareTokenFromWindow = (): string | null => {
   }
   
   // Check sessionStorage for persisted share token
-  const storedToken = sessionStorage.getItem('mtgcb_share_token');
-  const storedUserId = sessionStorage.getItem('mtgcb_share_user');
+  const storedToken = safeSessionStorage.getItem('mtgcb_share_token');
+  const storedUserId = safeSessionStorage.getItem('mtgcb_share_user');
   
   // Only return stored token if we're viewing the same user's collection
   const collectionsIndex = pathSegments.indexOf('collections');
