@@ -3,6 +3,9 @@
  * Keep in sync with mtgcb-api-v3 CLAUDE.md "Numeric Limits" section.
  */
 
+// The API rejects card search text (name, rules text, artist) longer than this with a 400.
+export const SEARCH_TEXT_MAX_LENGTH = 2000;
+
 export const COLLECTION_QUANTITY_MIN = 0;
 export const COLLECTION_QUANTITY_MAX = 9999;
 

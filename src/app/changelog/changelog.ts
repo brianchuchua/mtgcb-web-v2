@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-09-29',
+      version: '1.35.10',
+      changes: ['Fixed card searches silently failing when a very long list was pasted into the search box'],
+    },
+    {
+      date: '2026-09-29',
       version: '1.35.9',
       changes: ['Fixed pages showing an error for people whose browser blocks site storage or all cookies'],
     },

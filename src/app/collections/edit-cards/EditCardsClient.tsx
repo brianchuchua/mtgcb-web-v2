@@ -47,7 +47,12 @@ import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardBackImageUrl, getCardImageUrl } from '@/utils/cards/getCardImageUrl';
 import { getCollectionCardUrl } from '@/utils/collectionUrls';
-import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
+import {
+  COLLECTION_QUANTITY_MAX,
+  COLLECTION_QUANTITY_MIN,
+  SEARCH_TEXT_MAX_LENGTH,
+  clampCollectionQuantity,
+} from '@/utils/validationLimits';
 
 const EditCardsClient: React.FC = () => {
   const router = useRouter();
@@ -506,6 +511,7 @@ const CardSearchAutocomplete: React.FC<CardSearchAutocompleteProps> = ({
             placeholder="Ex. Giant Spider"
             autoFocus
             inputRef={searchInputRef}
+            inputProps={{ ...params.inputProps, maxLength: SEARCH_TEXT_MAX_LENGTH }}
             InputProps={{
               ...params.InputProps,
               endAdornment: (

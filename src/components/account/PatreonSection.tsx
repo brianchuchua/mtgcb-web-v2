@@ -25,6 +25,7 @@ import { useUpdateUserMutation } from '@/api/user/userApi';
 import { CustomCard } from '@/components/patrons/CustomCard';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { SEARCH_TEXT_MAX_LENGTH } from '@/utils/validationLimits';
 
 export const PatreonSection = () => {
   const { user } = useAuth();
@@ -359,6 +360,7 @@ export const PatreonSection = () => {
                     placeholder="Type card name..."
                     helperText="Search for any Magic card by name"
                     InputLabelProps={{ shrink: true }}
+                    inputProps={{ ...params.inputProps, maxLength: SEARCH_TEXT_MAX_LENGTH }}
                   />
                 )}
                 renderOption={(props, option) => (

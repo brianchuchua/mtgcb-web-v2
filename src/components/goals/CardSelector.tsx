@@ -29,6 +29,7 @@ import { useLazyGetCardsByIdsQuery } from '@/api/cards/cardsApi';
 import { useAuth } from '@/hooks/useAuth';
 import { usePriceType } from '@/hooks/usePriceType';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
+import { SEARCH_TEXT_MAX_LENGTH } from '@/utils/validationLimits';
 
 interface CardSelectorProps {
   value: CardFilter;
@@ -228,6 +229,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({
             {...params}
             label={label}
             placeholder={allSelectedCards.size === 0 ? placeholder : ''}
+            inputProps={{ ...params.inputProps, maxLength: SEARCH_TEXT_MAX_LENGTH }}
             InputProps={{
               ...params.InputProps,
               startAdornment: (
