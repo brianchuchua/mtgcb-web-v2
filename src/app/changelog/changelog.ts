@@ -12,6 +12,17 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-09-29',
+      version: '1.35.8',
+      changes: [
+        'Added Mystery Booster Commander Edition',
+        'Added Japan Standard Cup',
+        'Updated Foundations Commander',
+        'Updated Secret Lair',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-09-27',
       version: '1.35.7',
       changes: [
