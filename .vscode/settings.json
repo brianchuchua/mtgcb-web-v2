@@ -7,7 +7,8 @@
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "prettier.requireConfig": true,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "jest.jestCommandLine": "jest --runInBand --detectOpenHandles",
+  "jest.jestCommandLine": "pnpm jest --runInBand --detectOpenHandles",
+  "jest.runMode": "on-demand",
   "workbench.editor.customLabels.enabled": true,
   "workbench.editor.customLabels.patterns": {
     "**/app/**/page.tsx": "${dirname} (page)",

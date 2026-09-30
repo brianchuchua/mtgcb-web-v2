@@ -4,10 +4,13 @@ import { LOCAL_TEST_USER_ID, authenticateAsLocalTestUser, getLocalTestJwt } from
 // Mirrors the API's Collection quantity bounds (@/utils/validationLimits).
 const COLLECTION_QUANTITY_MAX = 9999;
 
-// Card with known-stable data on the local DB: Giant Spider (id=99, Alpha).
-// User 1337 (Manath) owns 1 of these — it's a cheap, always-resolvable pick
-// for the autocomplete, chosen to keep the test stable across local refreshes.
-const TEST_CARD_NAME_PREFIX = 'Giant Spi';
+// Card with known-stable data on the local DB: Giant Spider (id=12390, Tenth Edition).
+// It needs both a regular and a foil printing so both quantity inputs are enabled
+// (Alpha has no foil, so its foil input is disabled). Results are sorted
+// newest-first, so the option is picked by its full label: the first result
+// changes whenever a newer Giant Spider printing is added.
+const TEST_CARD_NAME_PREFIX = 'Giant Spider';
+const TEST_CARD_OPTION_LABEL = 'Giant Spider [Tenth Edition]';
 
 test.describe('Edit Cards page - collection quantity limits', () => {
   test.beforeEach(async ({ context, page }) => {
@@ -22,8 +25,9 @@ test.describe('Edit Cards page - collection quantity limits', () => {
     await searchBox.fill(TEST_CARD_NAME_PREFIX);
 
     // Wait for debounce (300ms) + API + dropdown render.
-    await page.getByRole('option').first().waitFor({ timeout: 10000 });
-    await page.getByRole('option').first().click();
+    const alphaOption = page.getByRole('option', { name: TEST_CARD_OPTION_LABEL, exact: true });
+    await alphaOption.waitFor({ timeout: 10000 });
+    await alphaOption.click();
 
     // Give the form a moment to mount the quantity inputs.
     await page.getByTestId('edit-cards-quantity-regular').waitFor();

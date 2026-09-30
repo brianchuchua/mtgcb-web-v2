@@ -43,6 +43,12 @@ const customJestConfig = {
     '<rootDir>/tests/', // Playwright E2E tests
   ],
 
+  // Don't re-run watch mode when Playwright writes its output (next/jest already ignores .next)
+  watchPathIgnorePatterns: [
+    '<rootDir>/test-results/',
+    '<rootDir>/playwright-report/',
+  ],
+
   // Don't transform node_modules
   transformIgnorePatterns: [
     '/node_modules/',

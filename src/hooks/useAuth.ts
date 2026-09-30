@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLogoutMutation, useMeQuery } from '@/api/auth/authApi';
 import { clearAuth, setUser, startLoading, stopLoading } from '@/redux/slices/authSlice';
 import type { RootState } from '@/redux/store';
+import { syncSentryUser } from '@/utils/sentryUser';
 
 export function useAuth() {
   const dispatch = useDispatch();
@@ -25,6 +26,11 @@ export function useAuth() {
       }
     }
   }, [meData, isMeLoading, isMeError, meError, dispatch]);
+
+  const userId = user?.userId;
+  useEffect(() => {
+    syncSentryUser(userId);
+  }, [userId]);
 
   const handleLogout = async () => {
     try {
