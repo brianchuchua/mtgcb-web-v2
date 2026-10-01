@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-01',
+      version: '1.35.11',
+      changes: [
+        'Correctly sorted binders on my bookshelf (thanks, Reddit)',
+        'Updated binder image on Binder Templates page',
+      ],
+    },
+    {
       date: '2026-09-29',
       version: '1.35.10',
       changes: ['Fixed card searches silently failing when a very long list was pasted into the search box'],

@@ -36,7 +36,7 @@ export default function BinderTemplatesPage() {
           >
             <Box
               component="img"
-              src="https://r2.mtgcollectionbuilder.com/images/mtgcb-binders.png"
+              src="https://r2.mtgcollectionbuilder.com/images/mtgcb-binders-corrected.png"
               alt="Binder Templates Example"
               sx={{
                 position: 'absolute',
