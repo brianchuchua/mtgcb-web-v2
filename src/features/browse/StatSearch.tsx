@@ -6,12 +6,12 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Box, Button, IconButton, MenuItem, Paper, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { usePathname } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { CardSelectSetting } from '@/components/cards/CardSettingsPanel';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
+import { useIsCollectionContext } from '@/hooks/useIsCollectionContext';
 import { usePriceType } from '@/hooks/usePriceType';
 import { selectStats, setStats } from '@/redux/slices/browse';
 import { StatCondition, StatFilters } from '@/types/browse';
@@ -104,15 +104,13 @@ interface StatSearchProps {
 
 const StatSearch: React.FC<StatSearchProps> = ({ resetTrigger }) => {
   const dispatch = useDispatch();
-  const pathname = usePathname();
   const { enqueueSnackbar } = useSnackbar();
   const reduxStats = useSelector(selectStats);
   const userModified = useRef(false);
   const [conditions, setConditions] = useState<StatCondition[]>(() => parseReduxStats(reduxStats));
   const prevDisplayPriceType = useRef<string | null>(null);
 
-  // Check if we're on a collection page
-  const isCollectionPage = pathname?.startsWith('/collections/') || false;
+  const isCollectionPage = useIsCollectionContext();
 
   // Get the available stat attributes based on whether we're on a collection page
   const STAT_ATTRIBUTES = isCollectionPage 

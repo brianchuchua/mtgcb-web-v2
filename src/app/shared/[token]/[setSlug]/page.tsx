@@ -7,6 +7,7 @@ import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLin
 import { Box, CircularProgress } from '@mui/material';
 import { smartDecodeToken } from '@/utils/tokenEncoder';
 import { safeSessionStorage } from '@/utils/browser/safeStorage';
+import { useSharedLinkOwnedDefault } from '@/hooks/useSharedLinkOwnedDefault';
 
 interface SharedSetPageProps {
   params: Promise<{
@@ -29,6 +30,7 @@ export default function SharedSetPage({
   const [error, setError] = useState<any>(null);
   
   const [resolveShareToken] = useResolveShareTokenMutation();
+  const ownedDefaultReady = useSharedLinkOwnedDefault(token);
 
   useEffect(() => {
     Promise.all([params, searchParams]).then(([p, sp]) => {
@@ -62,7 +64,7 @@ export default function SharedSetPage({
     }
   }, [token, resolveShareToken]);
 
-  if (!isParamsReady || isLoading) {
+  if (!isParamsReady || isLoading || !ownedDefaultReady) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
         <CircularProgress />

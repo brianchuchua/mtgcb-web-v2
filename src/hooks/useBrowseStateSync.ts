@@ -9,6 +9,7 @@ import { useBrowsePreferencesReady, usePreferredViewContentType } from '@/hooks/
 import { useCardsPageSize } from '@/hooks/useCardsPageSize';
 import { loadSearchState, saveSearchState } from '@/hooks/useSearchStateSync';
 import { useSetsPageSize } from '@/hooks/useSetsPageSize';
+import { useDropSharedOwnedDefault } from '@/hooks/useSharedLinkOwnedDefault';
 import {
   resetAllSearches,
   selectCardSearchParams,
@@ -165,6 +166,7 @@ function syncReduxFromUrlOrSession(
 }
 
 export function useBrowseStateSync() {
+  useDropSharedOwnedDefault();
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();

@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-02',
+      version: '1.35.13',
+      changes: [
+        'Fixed the Owned filter and collection sorts not working on shared collection links',
+        'Shared collection links now open showing only owned cards and sets by default',
+      ],
+    },
+    {
       date: '2026-10-01',
       version: '1.35.12',
       changes: ['Added the player Bio and Decklist cards to Pro Tour Collector Set'],
