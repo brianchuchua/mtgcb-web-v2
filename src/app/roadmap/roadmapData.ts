@@ -21,7 +21,7 @@ export const roadmapItems: RoadmapItem[] = [
     title: 'Data Clean-Up Project',
     description:
       'Adding every missing English card to the database, including tokens, emblems, art cards, and other oddities, while creating and reorganizing subsets.',
-    status: 'in-progress',
+    status: 'completed',
   },
   {
     id: 'community-vote',

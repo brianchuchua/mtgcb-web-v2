@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-01',
+      version: '1.35.12',
+      changes: ['Added the player Bio and Decklist cards to Pro Tour Collector Set'],
+      type: 'data',
+    },
+    {
+      date: '2026-10-01',
       version: '1.35.11',
       changes: [
         'Correctly sorted binders on my bookshelf (thanks, Reddit)',
