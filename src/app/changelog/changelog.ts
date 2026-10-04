@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-04',
+      version: '1.35.14',
+      changes: ['Added a confetti celebration when you complete a collection goal'],
+    },
+    {
       date: '2026-10-02',
       version: '1.35.13',
       changes: [

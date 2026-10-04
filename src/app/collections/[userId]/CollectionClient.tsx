@@ -13,6 +13,7 @@ import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisplay';
+import CompletionConfetti from '@/components/collections/CompletionConfetti';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import MassEntryPanel, { MassEntryFormData } from '@/components/collections/MassEntryPanel';
 import MassEntryConfirmDialog from '@/components/collections/MassEntryConfirmDialog';
@@ -27,6 +28,7 @@ import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { useAuth } from '@/hooks/useAuth';
+import { useConfettiBurst, useGoalCompletionTrigger } from '@/hooks/useConfetti';
 import { selectIncludeSubsetsInSets, selectSelectedGoalId } from '@/redux/slices/browse';
 import pluralize from '@/utils/pluralize';
 
@@ -426,6 +428,9 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
     goalSummary.goalId !== selectedGoalId
   );
 
+  const { showConfetti, recycleConfetti, handleConfettiComplete, celebrate } = useConfettiBurst();
+  useGoalCompletionTrigger({ goalId: selectedGoalId, goalSummary, enabled: isOwnCollection, celebrate });
+
   // Show loading state for initial load
   if (
     isLoading &&
@@ -443,6 +448,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
 
   return (
     <>
+      <CompletionConfetti show={showConfetti} recycle={recycleConfetti} onComplete={handleConfettiComplete} />
       {!hasInvalidShareLink && <SharedCollectionBanner username={username || 'User'} userId={userId} />}
 
       {(collectionSummary || isLoading) && (

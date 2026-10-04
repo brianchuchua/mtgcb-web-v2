@@ -55,6 +55,9 @@ export interface UseSetPageFilterReturn {
   /** Loading state for subsets query */
   isSubsetsLoading: boolean;
 
+  /** True while the main set query is fetching, including refetches after a collection change */
+  isSetFetching: boolean;
+
   /** True when set filter has been applied and cards query can proceed */
   isReady: boolean;
 
@@ -72,6 +75,7 @@ export function useSetPageFilter(options: UseSetPageFilterOptions): UseSetPageFi
     data: setsData,
     isSuccess,
     isLoading: isSetLoading,
+    isFetching: isSetFetching,
   } = useGetSetsQuery(
     {
       limit: 1,
@@ -178,6 +182,7 @@ export function useSetPageFilter(options: UseSetPageFilterOptions): UseSetPageFi
     parentSet,
     isSetLoading,
     isSubsetsLoading,
+    isSetFetching,
     isReady: isSetReady,
     isSuccess,
   };

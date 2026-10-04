@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import Confetti from 'react-confetti';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   useMassEntryCollectionMutation,
@@ -21,6 +20,7 @@ import SubsetSection from '@/app/browse/sets/[setSlug]/SubsetSection';
 import { SearchDescription } from '@/components/browse/SearchDescription';
 import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
+import CompletionConfetti from '@/components/collections/CompletionConfetti';
 import { DeprecatedCardsBanner } from '@/components/collections/DeprecatedCardsBanner';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import MassEntryConfirmDialog from '@/components/collections/MassEntryConfirmDialog';
@@ -45,7 +45,7 @@ import InfoBanner from '@/features/browse/views/InfoBanner';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
 import { useAuth } from '@/hooks/useAuth';
 import { useCardSearchParams } from '@/hooks/useBrowseSearchParams';
-import { useConfetti } from '@/hooks/useConfetti';
+import { useConfettiBurst, useGoalCompletionTrigger, useSetCompletionTrigger } from '@/hooks/useConfetti';
 import { useInitialUrlSync } from '@/hooks/useInitialUrlSync';
 import { useSetNavigation } from '@/hooks/useSetNavigation';
 import { useSetPageFilter } from '@/hooks/useSetPageFilter';
@@ -96,7 +96,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
   const isWaitingForGoalSync = hasGoalInUrl && !isNaN(goalIdFromUrl!) && goalIdFromUrl !== selectedGoalId;
 
   // Fetch set data and manage set filter
-  const { set, subsets, parentSet, isSetLoading, isSubsetsLoading, isReady, isSuccess } = useSetPageFilter({
+  const { set, subsets, parentSet, isSetLoading, isSubsetsLoading, isSetFetching, isReady, isSuccess } = useSetPageFilter({
     setSlug,
     priceType: setPriceType,
     includeSubsetsInSets,
@@ -155,11 +155,6 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   const pathname = usePathname();
 
-  const { showConfetti, recycleConfetti, handleConfettiComplete } = useConfetti(
-    isSetLoading || isSubsetsLoading,
-    set?.percentageCollected || 0,
-  );
-
   const setName = isSetLoading ? '' : set?.name || 'Set not found';
 
   const { previousSet, nextSet, handleSetNavigation } = useSetNavigation({
@@ -187,6 +182,15 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       : browseController.cardsProps && 'goalSummary' in browseController.cardsProps
         ? browseController.cardsProps.goalSummary
         : null;
+
+  const { showConfetti, recycleConfetti, handleConfettiComplete, celebrate } = useConfettiBurst();
+  useSetCompletionTrigger({
+    resetKey: `${setSlug}|${selectedGoalId ?? ''}|${includeSubsetsInSets}`,
+    isSettled: !isWaitingForGoalSync && !isSetLoading && !isSetFetching && Boolean(set),
+    percentageCollected: set?.percentageCollected,
+    celebrate,
+  });
+  useGoalCompletionTrigger({ goalId: selectedGoalId, goalSummary, enabled: isOwnCollection, celebrate });
 
   // Determine if values should be hidden (for non-owners viewing collections with hideCollectionValue enabled)
   // For non-owners, hide values until we confirm hideCollectionValue is explicitly false
@@ -659,16 +663,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
 
   return (
     <Box>
-      {showConfetti && (
-        <Confetti
-          style={{ position: 'fixed', height: '100vh', width: '100vw', zIndex: 9999 }}
-          gravity={0.1}
-          recycle={recycleConfetti}
-          run={true}
-          numberOfPieces={400}
-          onConfettiComplete={handleConfettiComplete}
-        />
-      )}
+      <CompletionConfetti show={showConfetti} recycle={recycleConfetti} onComplete={handleConfettiComplete} />
       {!hasInvalidShareLink && <SharedCollectionBanner username={username || 'User'} userId={userId} />}
       {isOwnCollection && set?.id && <DeprecatedCardsBanner userId={userId} setId={parseInt(set.id)} />}
 
