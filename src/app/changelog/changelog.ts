@@ -13,6 +13,17 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-06',
+      version: '1.35.16',
+      changes: [
+        'Updated Secret Lair Drop Series',
+        'Added Foundations Commander Tokens',
+        'Updated Unknown Event',
+        'Updated WPN Promos',
+      ],
+      type: 'data',
+    },
+    {
+      date: '2026-10-06',
       version: '1.35.15',
       changes: [
         'Added Promo Pack: Reality Fracture',
