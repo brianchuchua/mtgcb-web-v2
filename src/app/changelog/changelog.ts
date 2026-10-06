@@ -12,6 +12,17 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-06',
+      version: '1.35.15',
+      changes: [
+        'Added Promo Pack: Reality Fracture',
+        'Added Reality Fracture Tokens',
+        'Added Reality Fracture Commander Tokens',
+        'Updated The Big Score Promos',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-10-04',
       version: '1.35.14',
       changes: ['Added a confetti celebration when you complete a collection goal'],
