@@ -520,6 +520,7 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
               : ''
           }
           placement="top"
+          disableInteractive
           disableHoverListener={canBeNonFoil || overrideNonFoil}
           disableFocusListener={canBeNonFoil || overrideNonFoil}
           disableTouchListener={canBeNonFoil || overrideNonFoil}
@@ -641,7 +642,8 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
                 : "This card doesn't come in foil. (Click to override.)"
               : ''
           }
-          placement="top"
+          placement="bottom"
+          disableInteractive
           disableHoverListener={canBeFoil || overrideFoil}
           disableFocusListener={canBeFoil || overrideFoil}
           disableTouchListener={canBeFoil || overrideFoil}

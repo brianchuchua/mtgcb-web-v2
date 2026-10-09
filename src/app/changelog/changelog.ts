@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-09',
+      version: '1.35.19',
+      changes: ['Fixed the "no foil" pop-up covering the regular add button in grid view at some resolutions'],
+    },
+    {
+      date: '2026-10-09',
       version: '1.35.18',
       changes: [
         'Fixed Moxfield imports missing cards from The List and Mystery Booster',
