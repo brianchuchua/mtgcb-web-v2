@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-09',
+      version: '1.35.18',
+      changes: [
+        'Fixed Moxfield imports missing cards from The List and Mystery Booster',
+        'Improved importer strictness and accuracy when ambiguities are possible in some import formats',
+      ],
+    },
+    {
       date: '2026-10-08',
       version: '1.35.17',
       changes: ['Fixed location names showing as "undefined" when exporting or copying cards from the table view'],
