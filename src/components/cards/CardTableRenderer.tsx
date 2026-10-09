@@ -1646,7 +1646,7 @@ export const extractCardCellValue = (
       // Flatten locations array to readable string format
       return (
         card.locations
-          ?.map((loc: any) => `${loc.name} (R:${loc.quantityReg || 0} F:${loc.quantityFoil || 0})`)
+          ?.map((loc) => `${loc.locationName} (R:${loc.quantityReg || 0} F:${loc.quantityFoil || 0})`)
           .join('; ') || ''
       );
     case 'collectorNumber':

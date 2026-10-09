@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-08',
+      version: '1.35.17',
+      changes: ['Fixed location names showing as "undefined" when exporting or copying cards from the table view'],
+    },
+    {
       date: '2026-10-06',
       version: '1.35.16',
       changes: [
