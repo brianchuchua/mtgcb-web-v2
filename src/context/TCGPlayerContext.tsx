@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, ReactNode } from 'react';
 
-const TCGPLAYER_AFFILIATE_URL = 'https://partner.tcgplayer.com/c/5252996/1830156/21018';
+const TCGPLAYER_AFFILIATE_URL = 'https://partner.tcgplayer.com/c/4944197/1830156/21018';
 
 interface TCGPlayerContextType {
   submitToTCGPlayer: (importString: string, target?: string) => void;
