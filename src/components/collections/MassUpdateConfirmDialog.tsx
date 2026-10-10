@@ -12,6 +12,7 @@ import {
 import { styled } from '@mui/material/styles';
 import React from 'react';
 import { MassUpdateFormData } from './MassUpdatePanel';
+import { getMassUpdateRarityLabel } from './massUpdateRarities';
 
 interface MassUpdateConfirmDialogProps {
   open: boolean;
@@ -35,19 +36,8 @@ const ConfirmationBox = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
 }));
 
-const getRarityLabel = (rarity: string): string => {
-  const labels: Record<string, string> = {
-    common: 'commons',
-    uncommon: 'uncommons',
-    rare: 'rares',
-    mythic: 'mythics',
-    all: 'cards',
-  };
-  return labels[rarity] || rarity;
-};
-
 const getActionDescription = (formData: MassUpdateFormData, setName?: string): string => {
-  const rarityLabel = getRarityLabel(formData.rarity);
+  const rarityLabel = getMassUpdateRarityLabel(formData.rarity);
   const { mode, quantityReg, quantityFoil } = formData;
   const setPhrase = setName ? ` in ${setName}` : ' in this set';
 

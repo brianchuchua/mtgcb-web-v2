@@ -20,6 +20,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCollectionCardUrl, getCollectionSetUrl, getCollectionUrl } from '@/utils/collectionUrls';
+import { getHistoryRarityText } from '@/utils/historyRarityText';
 import pluralize from '@/utils/pluralize';
 import { useRouter } from 'next/navigation';
 
@@ -203,14 +204,10 @@ const formatBulkOperationSummary = (entry: HistoryEntry, userId: number) => {
 
     // Build rarity text (only for mass-update and mass-entry, not location operations)
     const cardWord = pluralize(bulkSummary.cardsAffected ?? 0, 'card');
-    let rarityText = cardWord;
-    if (bulkSummary.rarity && operationType !== 'location-mass-update') {
-      rarityText = bulkSummary.rarity === 'all'
-        ? cardWord
-        : bulkSummary.rarity === 'mythic'
-          ? `mythic ${cardWord}`
-          : `${bulkSummary.rarity} ${cardWord}`;
-    }
+    const rarityText = getHistoryRarityText(
+      operationType !== 'location-mass-update' ? bulkSummary.rarity : undefined,
+      bulkSummary.cardsAffected ?? 0,
+    );
 
     // Build quantity text
     const regQty = bulkSummary.quantityReg ?? 0;

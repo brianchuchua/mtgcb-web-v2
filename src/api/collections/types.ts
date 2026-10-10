@@ -71,7 +71,7 @@ export interface CollectionMassUpdateRequest {
   mode: 'set' | 'increment';
   setId: number;
   updates: Array<{
-    rarity: 'common' | 'uncommon' | 'rare' | 'mythic' | 'all';
+    rarity: 'common' | 'commonNoBasicLand' | 'uncommon' | 'rare' | 'mythic' | 'special' | 'basicLand' | 'all';
     quantityReg: number;
     quantityFoil: number;
   }>;
@@ -104,7 +104,7 @@ export interface CollectionMassEntryRequest {
   mode: 'set' | 'increment';
   cardIds: number[];
   updates: Array<{
-    rarity: 'common' | 'uncommon' | 'rare' | 'mythic' | 'all';
+    rarity: 'common' | 'commonNoBasicLand' | 'uncommon' | 'rare' | 'mythic' | 'special' | 'basicLand' | 'all';
     quantityReg: number;
     quantityFoil: number;
   }>;

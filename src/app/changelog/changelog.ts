@@ -13,6 +13,15 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-09',
+      version: '1.36.0',
+      changes: [
+        'Mass Update can target basic lands and special cards once more, along with commons with or without basic lands',
+        'Fixed a bug where Mass Updates could affect cards that were retired from the database',
+        'Draft cube purchases and prices no longer include basic lands -- this just makes more sense',
+      ],
+    },
+    {
+      date: '2026-10-09',
       version: '1.35.19',
       changes: ['Fixed the "no foil" pop-up covering the regular add button in grid view at some resolutions'],
     },

@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react';
 import { useLazyGetCardsQuery, useLazyGetSetsQuery } from '@/api/browse/browseApi';
+import { removeBasicLandsForDraftCube } from '@/utils/tcgplayer/draftCubeCards';
 import { CardWithQuantity } from '@/utils/tcgplayer/formatMassImportString';
 
 export type CountType = 'all' | 'mythic' | 'rare' | 'uncommon' | 'common' | 'draftcube';
@@ -73,8 +74,8 @@ export const useFetchCardsForMassImport = ({
         const cardsResult = await getCards(
           {
             select: userId 
-              ? ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode', 'quantityReg', 'quantityFoil', 'canBeFoil', 'canBeNonFoil']
-              : ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'code', 'tcgplayerSetCode', 'canBeFoil', 'canBeNonFoil'],
+              ? ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'type', 'code', 'tcgplayerSetCode', 'quantityReg', 'quantityFoil', 'canBeFoil', 'canBeNonFoil']
+              : ['id', 'name', 'tcgplayerName', 'setName', 'setId', 'tcgplayerId', 'rarity', 'type', 'code', 'tcgplayerSetCode', 'canBeFoil', 'canBeNonFoil'],
             limit,
             offset,
             setId: {
@@ -106,6 +107,10 @@ export const useFetchCardsForMassImport = ({
         const totalCount = cardsResult.data.data.totalCount || 0;
         offset += limit;
         hasMore = offset < totalCount;
+      }
+
+      if (countType === 'draftcube') {
+        allCards = removeBasicLandsForDraftCube(allCards);
       }
 
       if (allCards.length === 0) {

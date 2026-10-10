@@ -19,6 +19,7 @@ import {
 import { styled } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
+import { MASS_UPDATE_RARITY_OPTIONS, MassUpdateRarity, getMassUpdateRarityLabel } from './massUpdateRarities';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
@@ -120,7 +121,7 @@ const FormSection = styled(Box)(({ theme }) => ({
 
 export interface MassEntryFormData {
   mode: 'set' | 'increment';
-  rarity: 'common' | 'uncommon' | 'rare' | 'mythic' | 'all';
+  rarity: MassUpdateRarity;
   quantityReg: number;
   quantityFoil: number;
 }
@@ -190,19 +191,8 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
     setFormData({ ...formData, [field]: clampCollectionQuantity(value) });
   };
 
-  const getRarityLabel = (rarity: string): string => {
-    const labels: Record<string, string> = {
-      common: 'commons',
-      uncommon: 'uncommons',
-      rare: 'rares',
-      mythic: 'mythics',
-      all: 'cards',
-    };
-    return labels[rarity] || rarity;
-  };
-
   const getActionDescription = (): string => {
-    const rarityLabel = getRarityLabel(formData.rarity);
+    const rarityLabel = getMassUpdateRarityLabel(formData.rarity);
     const { quantityReg, quantityFoil } = formData;
 
     if (uiMode === 'set') {
@@ -262,7 +252,7 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
 
   return (
     <Collapse in={isOpen}>
-      <StyledPaper elevation={0}>
+      <StyledPaper elevation={0} data-testid="mass-entry-panel">
         <Typography variant="subtitle1" fontWeight="500" gutterBottom sx={{ textAlign: 'center' }}>
           Mass Update Up to {cardCount} Card{cardCount !== 1 ? 's' : ''} on This Page By
         </Typography>
@@ -310,11 +300,11 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
                     },
                   }}
                 >
-                  <MenuItem value="all">All cards</MenuItem>
-                  <MenuItem value="common">All commons</MenuItem>
-                  <MenuItem value="uncommon">All uncommons</MenuItem>
-                  <MenuItem value="rare">All rares</MenuItem>
-                  <MenuItem value="mythic">All mythics</MenuItem>
+                  {MASS_UPDATE_RARITY_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.menuLabel}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Box>
