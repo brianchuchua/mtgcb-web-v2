@@ -6,7 +6,7 @@ import NextLink from 'next/link';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { NoteCallout } from '@/components/notes/NoteCallout';
 import SetIcon from '@/components/sets/SetIcon';
-import { formatManaCost } from '@/utils/manaFormatter';
+import { formatManaCost, formatSymbolText } from '@/utils/manaFormatter';
 import capitalize from '@/utils/capitalize';
 import { getCollectionUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
 
@@ -123,7 +123,7 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
             >
               {card.oracleText.split('\n').map((paragraph: string, index: number) => (
                 <React.Fragment key={index}>
-                  {paragraph}
+                  {formatSymbolText(paragraph)}
                   {index < card.oracleText!.split('\n').length - 1 && (
                     <>
                       <br />
@@ -142,7 +142,7 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
       {card.flavorText && (
         <Box sx={{ px: 1, mb: 2 }}>
           <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
-            {card.flavorText}
+            {formatSymbolText(card.flavorText)}
           </Typography>
         </Box>
       )}

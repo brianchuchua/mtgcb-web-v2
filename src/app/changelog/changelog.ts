@@ -12,6 +12,14 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-10',
+      version: '1.37.0',
+      changes: [
+        'Oracle text now shows mana, tap and other symbols graphically instead of text',
+        'Fixed some hybrid and Phyrexian mana costs showing blank or wrong symbols',
+      ],
+    },
+    {
       date: '2026-10-09',
       version: '1.36.0',
       changes: [

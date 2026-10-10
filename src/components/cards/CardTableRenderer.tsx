@@ -37,6 +37,7 @@ import { PriceType } from '@/types/pricing';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardBackImageUrl, getCardImageUrl } from '@/utils/cards/getCardImageUrl';
 import { getCollectionCardUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
+import { getManaSymbolName, parseSymbolText } from '@/utils/manaSymbols';
 import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
 export interface CardTableRendererProps {
@@ -1463,78 +1464,18 @@ function preparePriceData(card: CardItemProps) {
 function formatManaSymbols(manaCost: string | null | undefined): React.ReactNode {
   if (!manaCost) return null;
 
-  // Regular expression to match mana symbols in the format {X}
-  const symbolRegex = /\{([^}]+)\}/g;
-  const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-  let match;
-
-  // Find all mana symbols and convert them to spans with appropriate classes
-  while ((match = symbolRegex.exec(manaCost)) !== null) {
-    const [fullMatch, symbol] = match;
-    const startIndex = match.index;
-
-    // Add any text before the current symbol
-    if (startIndex > lastIndex) {
-      parts.push(manaCost.substring(lastIndex, startIndex));
-    }
-
-    // Handle special cases with different class structures
-    if (symbol.startsWith('H')) {
-      // Half mana like {HW}
-      const color = symbol.substring(1).toLowerCase();
-      parts.push(
-        <i
-          key={`${symbol}-${startIndex}`}
-          className={`ms ms-${color} ms-half ms-cost ms-1x`}
-          style={{ margin: '1px' }}
-          aria-label={`Half ${getSymbolName(color)}`}
-        />,
-      );
-    } else if (symbol.toLowerCase().includes('/p')) {
-      // Phyrexian mana like {W/P} or {C/P}
-      const color = symbol.split('/')[0].toLowerCase();
-      // Special case: {C/P} should use ms-h instead of ms-cp (which doesn't exist)
-      const className = color === 'c' ? 'ms-h' : `ms-${color}p`;
-      parts.push(
-        <i
-          key={`${symbol}-${startIndex}`}
-          className={`ms ${className} ms-cost ms-1x`}
-          style={{ margin: '1px' }}
-          aria-label={getSymbolName(symbol)}
-        />,
-      );
-    } else if (symbol.includes('/')) {
-      // Hybrid mana like {W/U}
-      // For hybrid, we use the format "ms-wu" for W/U hybrid
-      const colors = symbol.toLowerCase().split('/').join('');
-      parts.push(
-        <i
-          key={`${symbol}-${startIndex}`}
-          className={`ms ms-${colors} ms-cost ms-1x`}
-          style={{ margin: '1px' }}
-          aria-label={getSymbolName(symbol)}
-        />,
-      );
-    } else {
-      // Regular mana symbol
-      parts.push(
-        <i
-          key={`${symbol}-${startIndex}`}
-          className={`ms ms-${symbol.toLowerCase()} ms-cost ms-1x`}
-          style={{ margin: '1px' }}
-          aria-label={getSymbolName(symbol)}
-        />,
-      );
-    }
-
-    lastIndex = startIndex + fullMatch.length;
-  }
-
-  // Add any remaining text
-  if (lastIndex < manaCost.length) {
-    parts.push(manaCost.substring(lastIndex));
-  }
+  const parts = parseSymbolText(manaCost).map((part, index) =>
+    part.type === 'text' ? (
+      <React.Fragment key={index}>{part.text}</React.Fragment>
+    ) : (
+      <i
+        key={index}
+        className={`ms ${part.classes.join(' ')} ms-cost ms-1x`}
+        style={{ margin: '1px' }}
+        aria-label={getManaSymbolName(part.symbol)}
+      />
+    ),
+  );
 
   return (
     <span
@@ -1548,66 +1489,6 @@ function formatManaSymbols(manaCost: string | null | undefined): React.ReactNode
       {parts}
     </span>
   );
-}
-
-/**
- * Gets a human-readable name for a mana symbol
- */
-function getSymbolName(symbol: string): string {
-  // Handle half mana symbols
-  if (symbol.startsWith('H')) {
-    const color = symbol.substring(1);
-    return `Half ${getSymbolName(color)}`;
-  }
-
-  switch (symbol.toLowerCase()) {
-    case 'w':
-      return 'White Mana';
-    case 'u':
-      return 'Blue Mana';
-    case 'b':
-      return 'Black Mana';
-    case 'r':
-      return 'Red Mana';
-    case 'g':
-      return 'Green Mana';
-    case 'c':
-      return 'Colorless Mana';
-    case 'x':
-      return 'X Mana';
-    case 't':
-      return 'Tap Symbol';
-    case 'q':
-      return 'Untap Symbol';
-    case 's':
-      return 'Snow Mana';
-    case 'e':
-      return 'Energy Counter';
-    case 'p':
-      return 'Phyrexian Mana';
-    case '∞':
-    case 'infinity':
-      return 'Infinity Mana';
-    case '½':
-    case '1/2':
-      return 'Half Generic Mana';
-    default:
-      // For generic mana costs (numbers)
-      if (/^\d+$/.test(symbol)) {
-        return `${symbol} Generic Mana`;
-      }
-      // For Phyrexian mana like w/p or c/p
-      if (symbol.includes('/p')) {
-        const color = symbol.split('/')[0];
-        return `Phyrexian ${getSymbolName(color)}`;
-      }
-      // For hybrid mana like w/u
-      if (symbol.includes('/')) {
-        const [color1, color2] = symbol.split('/');
-        return `Hybrid ${getSymbolName(color1)}/${getSymbolName(color2)}`;
-      }
-      return symbol;
-  }
 }
 
 // Styled components
