@@ -11,7 +11,7 @@ import { TableColumn } from '@/components/common/VirtualizedTable';
 import SetIcon from '@/components/sets/SetIcon';
 import { Set } from '@/types/sets';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 
 export interface CollectionSetTableRendererProps {
   displaySettings: {
@@ -257,7 +257,7 @@ export const useCollectionSetRowRenderer = (
 
     // Release Date Cell
     if (displaySettings.releaseDateIsVisible !== false) {
-      cells.push(<TableCell key="releasedAt">{formatISODate(set.releasedAt)}</TableCell>);
+      cells.push(<TableCell key="releasedAt">{formatReleaseDate(set.releasedAt)}</TableCell>);
     }
 
     // Set Type Cell
@@ -341,7 +341,7 @@ export const extractCollectionSetCellValue = (
     case 'costToComplete.oneOfEachCard':
       return set.costToComplete?.oneOfEachCard !== undefined ? set.costToComplete.oneOfEachCard.toFixed(2) : '';
     case 'releasedAt':
-      return formatISODate(set.releasedAt) || '';
+      return formatReleaseDate(set.releasedAt) || '';
     case 'setType':
       return formatSetType(set.setType) || '';
     case 'category':

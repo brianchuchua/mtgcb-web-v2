@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-10',
+      version: '1.37.1',
+      changes: ['Fixed a bug rendering set release dates for users in some timezones'],
+    },
+    {
+      date: '2026-10-10',
       version: '1.37.0',
       changes: [
         'Oracle text now shows mana, tap and other symbols graphically instead of text',

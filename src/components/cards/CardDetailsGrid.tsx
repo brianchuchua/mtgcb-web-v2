@@ -5,7 +5,7 @@ import React from 'react';
 import { CardModel } from '@/api/browse/types';
 import SetIcon from '@/components/sets/SetIcon';
 import capitalize from '@/utils/capitalize';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 interface CardDetailsGridProps {
@@ -191,7 +191,7 @@ export const CardDetailsGrid: React.FC<CardDetailsGridProps> = ({
               Release Date
             </Typography>
             <Typography variant="body1" sx={{ mb: 2 }}>
-              {formatISODate(card.releaseDate)}
+              {formatReleaseDate(card.releaseDate)}
             </Typography>
           </Grid>
         )}

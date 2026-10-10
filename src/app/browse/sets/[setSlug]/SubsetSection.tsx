@@ -11,7 +11,7 @@ import { CardsProps } from '@/features/browse/types/browseController';
 import { useIndependentBrowseController } from '@/features/browse/useIndependentBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import capitalize from '@/utils/capitalize';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 import pluralize from '@/utils/pluralize';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
@@ -161,7 +161,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
               {formatSetCategoryAndType(subset)}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {subset.releasedAt && formatISODate(subset.releasedAt)} •{' '}
+              {subset.releasedAt && formatReleaseDate(subset.releasedAt)} •{' '}
               {goalCounts
                 ? `${goalCounts.owned}/${goalCounts.total} collected for goal`
                 : subset.cardCount
@@ -280,7 +280,7 @@ export default React.forwardRef<HTMLDivElement, SubsetSectionProps>(function Sub
               </Typography>
               
               <Typography variant="body1" color="text.secondary">
-                {subset.releasedAt && formatISODate(subset.releasedAt)}
+                {subset.releasedAt && formatReleaseDate(subset.releasedAt)}
               </Typography>
               
               {subset.code && (

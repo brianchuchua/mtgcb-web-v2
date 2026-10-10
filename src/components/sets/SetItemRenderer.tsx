@@ -12,7 +12,7 @@ import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
 import { Set } from '@/types/sets';
 import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder';
 import capitalize from '@/utils/capitalize';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 import { formatPrice } from '@/utils/formatters';
 import pluralize from '@/utils/pluralize';
 
@@ -187,7 +187,7 @@ const SetReleaseDate: React.FC<SetReleaseDateProps> = ({ set, isVisible = true }
       sx={{ textAlign: 'center' }}
       data-testid="set-release-date"
     >
-      {formatISODate(set.releasedAt)}
+      {formatReleaseDate(set.releasedAt)}
     </Typography>
   );
 };

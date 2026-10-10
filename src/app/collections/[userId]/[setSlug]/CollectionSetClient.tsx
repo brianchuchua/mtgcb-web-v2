@@ -61,7 +61,6 @@ import {
 } from '@/redux/slices/browse';
 import capitalize from '@/utils/capitalize';
 import { getCollectionUrl } from '@/utils/collectionUrls';
-import { formatISODate } from '@/utils/dateUtils';
 import pluralize from '@/utils/pluralize';
 
 // Allow time for CSS animation to complete before scrolling

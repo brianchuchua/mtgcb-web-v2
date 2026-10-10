@@ -18,7 +18,7 @@ import {
 import React, { useCallback, useState } from 'react';
 import SetIcon from '@/components/sets/SetIcon';
 import capitalize from '@/utils/capitalize';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 import pluralize from '@/utils/pluralize';
 
 interface SubsetDropdownProps {
@@ -150,7 +150,7 @@ const SubsetDropdown: React.FC<SubsetDropdownProps> = ({ subsets, onSubsetSelect
                   </Typography>
                   <br />
                   <Typography variant="caption" color="text.secondary" noWrap component="span">
-                    {subset.releasedAt && formatISODate(subset.releasedAt)} •{' '}
+                    {subset.releasedAt && formatReleaseDate(subset.releasedAt)} •{' '}
                     {subset.cardCount ? `${subset.cardCount} ${pluralize(subset.cardCount, 'card')}` : 'N/A'}
                   </Typography>
                 </>

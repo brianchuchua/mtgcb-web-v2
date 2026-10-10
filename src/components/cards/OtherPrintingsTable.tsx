@@ -18,7 +18,7 @@ import { CardModel } from '@/api/browse/types';
 import SetIcon from '@/components/sets/SetIcon';
 import capitalize from '@/utils/capitalize';
 import { generateCardUrl } from '@/utils/cards/generateCardSlug';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 import { getCollectionCardUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
 
 interface OtherPrintingsTableProps {
@@ -311,7 +311,7 @@ export const OtherPrintingsTable: React.FC<OtherPrintingsTableProps> = ({
                   {/* Release Date */}
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                     <Typography variant="body2" sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-                      {printing.releaseDate ? formatISODate(printing.releaseDate) : '—'}
+                      {printing.releaseDate ? formatReleaseDate(printing.releaseDate) : '—'}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -447,7 +447,7 @@ export const OtherPrintingsTable: React.FC<OtherPrintingsTableProps> = ({
                 {/* Release Date */}
                 <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                   <Typography variant="body2">
-                    {printing.releaseDate ? formatISODate(printing.releaseDate) : 'N/A'}
+                    {printing.releaseDate ? formatReleaseDate(printing.releaseDate) : 'N/A'}
                   </Typography>
                 </TableCell>
 

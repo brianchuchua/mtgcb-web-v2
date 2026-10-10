@@ -46,35 +46,3 @@ export const formatDate = (
     return 'Invalid date';
   }
 };
-
-/**
- * Format a date string to YYYY-MM-DD format in the user's local timezone
- * @param dateString ISO date string or MySQL datetime format (UTC)
- * @param fallback Value to return if date is invalid or null (defaults to empty string)
- * @returns Date in YYYY-MM-DD format using local timezone, or fallback value if invalid
- */
-export const formatISODate = (
-  dateString: string | null | undefined,
-  fallback: string = '',
-): string => {
-  if (!dateString) return fallback;
-
-  try {
-    const date = parseDate(dateString);
-
-    // Check if date is valid
-    if (isNaN(date.getTime())) {
-      return fallback;
-    }
-
-    // Format to YYYY-MM-DD using local timezone components
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
-  } catch (e) {
-    console.error('Error formatting ISO date:', e);
-    return fallback;
-  }
-};

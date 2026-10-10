@@ -9,7 +9,7 @@ import React from 'react';
 import { TableColumn } from '@/components/common/VirtualizedTable';
 import SetIcon from '@/components/sets/SetIcon';
 import { Set } from '@/types/sets';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
 
 export interface SetTableRendererProps {
@@ -171,7 +171,7 @@ export const useSetRowRenderer = (
 
     // Release Date Cell
     if (displaySettings.releaseDateIsVisible !== false) {
-      cells.push(<TableCell key="releasedAt">{formatISODate(set.releasedAt)}</TableCell>);
+      cells.push(<TableCell key="releasedAt">{formatReleaseDate(set.releasedAt)}</TableCell>);
     }
 
     // Set Type Cell
@@ -240,7 +240,7 @@ export const extractSetCellValue = (
     case 'cardCount':
       return set.cardCount || '';
     case 'releasedAt':
-      return formatISODate(set.releasedAt) || '';
+      return formatReleaseDate(set.releasedAt) || '';
     case 'setType':
       return formatSetType(set.setType) || '';
     case 'category':

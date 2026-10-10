@@ -18,7 +18,7 @@ import { Set } from '@/types/sets';
 import { generateTCGPlayerSealedProductLink } from '@/utils/affiliateLinkBuilder';
 import capitalize from '@/utils/capitalize';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 import { formatPrice } from '@/utils/formatters';
 import pluralize from '@/utils/pluralize';
 
@@ -121,7 +121,7 @@ const SetReleaseDate: React.FC<{ set: Set; isVisible?: boolean }> = ({ set, isVi
 
   return (
     <Typography component="div" variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-      {formatISODate(set.releasedAt)}
+      {formatReleaseDate(set.releasedAt)}
     </Typography>
   );
 };

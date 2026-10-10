@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
 import SetIcon from '@/components/sets/SetIcon';
 import capitalize from '@/utils/capitalize';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 import pluralize from '@/utils/pluralize';
 
 interface ParentDropdownProps {
@@ -159,7 +159,7 @@ const ParentDropdown: React.FC<ParentDropdownProps> = ({ parentSet, currentPath,
                 </Typography>
                 <br />
                 <Typography variant="caption" color="text.secondary" noWrap component="span">
-                  {parentSet.releasedAt && formatISODate(parentSet.releasedAt)} •{' '}
+                  {parentSet.releasedAt && formatReleaseDate(parentSet.releasedAt)} •{' '}
                   {parentSet.cardCount ? `${parentSet.cardCount} ${pluralize(parentSet.cardCount, 'card')}` : 'N/A'}
                 </Typography>
               </>

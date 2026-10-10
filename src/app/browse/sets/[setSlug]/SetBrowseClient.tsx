@@ -27,7 +27,7 @@ import { resetSearch, clearSelectedGoal, clearSelectedLocation, selectIncludeSub
 import pluralize from '@/utils/pluralize';
 import { useCardSearchParams } from '@/hooks/useBrowseSearchParams';
 import capitalize from '@/utils/capitalize';
-import { formatISODate } from '@/utils/dateUtils';
+import { formatReleaseDate } from '@/utils/releaseDate';
 
 // Allow time for CSS animation to complete before scrolling
 const SUBSET_EXPANSION_DELAY_MS = 100;
@@ -222,7 +222,7 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
         </Typography>
 
         <Typography variant="body1" color="text.secondary">
-          {set?.releasedAt && formatISODate(set.releasedAt)}
+          {set?.releasedAt && formatReleaseDate(set.releasedAt)}
         </Typography>
 
         {set?.code && (
