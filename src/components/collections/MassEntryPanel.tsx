@@ -28,7 +28,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   marginBottom: theme.spacing(0),
   borderRadius: theme.shape.borderRadius,
   border: `1px solid ${theme.palette.divider}`,
-  maxWidth: 500,
+  maxWidth: 640,
   [theme.breakpoints.down('sm')]: {
     marginTop: theme.spacing(1),
   },
@@ -273,8 +273,10 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
             spacing={1.5}
             alignItems={{ xs: 'stretch', sm: 'flex-end' }}
             justifyContent="center"
+            flexWrap="wrap"
+            useFlexGap
           >
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '100%' }}>
               <Typography
                 variant="caption"
                 color="text.secondary"
@@ -282,7 +284,7 @@ const MassEntryPanel: React.FC<MassEntryPanelProps> = ({
               >
                 For
               </Typography>
-              <FormControl size="small" sx={{ minWidth: 140 }}>
+              <FormControl size="small" sx={{ minWidth: 140, maxWidth: '100%' }}>
                 <Select
                   value={formData.rarity}
                   onChange={handleRarityChange}
