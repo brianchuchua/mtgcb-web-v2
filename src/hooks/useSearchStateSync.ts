@@ -197,6 +197,20 @@ export function clearSpecificSearchField(view: 'cards' | 'sets', field: keyof Br
   }
 }
 
+/**
+ * Remove the selected goal (and its showGoals filter) from both views' stored search state.
+ * Pass a goalId to remove it only when that goal is the stored one.
+ */
+export function forgetStoredGoal(goalId?: number): void {
+  for (const view of ['cards', 'sets'] as const) {
+    const stored = loadSearchState(view);
+    if (stored?.selectedGoalId == null) continue;
+    if (goalId !== undefined && stored.selectedGoalId !== goalId) continue;
+    clearSpecificSearchField(view, 'selectedGoalId');
+    clearSpecificSearchField(view, 'showGoals');
+  }
+}
+
 // Fields that the browse slice keeps synchronized between cardsSearchParams and
 // setsSearchParams (setSelectedGoalId / setShowGoals / setSelectedLocationId /
 // setIncludeChildLocations all write to both). sessionStorage only persists the

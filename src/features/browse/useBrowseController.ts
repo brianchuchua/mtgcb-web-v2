@@ -69,6 +69,7 @@ interface UseBrowseControllerOptions {
   skipCardsUntilReady?: boolean;
   waitForSetFilter?: boolean; // New option to wait for set filter
   waitForInitialLoad?: boolean; // Wait for URL sync to complete
+  waitForGoalCheck?: boolean; // Selected goal not yet confirmed for this collection
 }
 
 export function useBrowseController(options?: UseBrowseControllerOptions): BrowseControllerResult {
@@ -93,9 +94,13 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
   // Price type sync for price sort handling
   const { isPriceMismatched, handlePriceSortChange } = usePriceTypeSync();
 
+  // Searches wait (and show loading) while the selected goal is checked
+  const waitingForGoal = options?.waitForGoalCheck ?? false;
+
   // Determine if we should skip cards query
   const shouldSkipCards = currentView !== 'cards' ||
     (options?.skipCardsUntilReady ?? false) ||
+    waitingForGoal ||
     (options?.waitForSetFilter === true && (!currentSetsFilter?.include || currentSetsFilter.include.length === 0));
 
   // Pagination kept in sync with the URL
@@ -131,26 +136,27 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
   }, [dispatch, currentView, setPreferredCardsSortOrder, setPreferredSetsSortOrder]);
 
   // Data for whichever mode is active
-  const cardData = useCardData({
+  const cardData = showLoadingWhile(waitingForGoal, useCardData({
     searchParams: cardSearchParams,
     pagination,
     skip: shouldSkipCards,
     userId: options?.userId,
-  });
+  }));
 
   // Skip sets query until localStorage is ready to prevent double API calls
   const shouldSkipSets = currentView !== 'sets' || 
     !initialLoadComplete ||
+    waitingForGoal ||
     (options?.waitForInitialLoad === true && !initialLoadComplete);
 
-  const setData = useSetData({
+  const setData = showLoadingWhile(waitingForGoal, useSetData({
     searchParams: setSearchParams,
     pagination,
     skip: shouldSkipSets,
     includeSubsets: includeSubsetsInSets,
     skipCostToComplete: options?.skipCostToComplete,
     userId: options?.userId,
-  });
+  }));
 
   // Visibility flags and setting groups
   const displaySettings = useDisplaySettings({ view: currentView, viewMode });
@@ -214,6 +220,11 @@ export function useBrowseController(options?: UseBrowseControllerOptions): Brows
         handleSortOrderChange,
         sortOptions,
       });
+}
+
+// A skipped search reports "not loading", which would show the empty state while we wait
+function showLoadingWhile<T extends { isLoading: boolean }>(waiting: boolean, data: T): T {
+  return waiting ? { ...data, isLoading: true } : data;
 }
 
 /** Props for Card mode ----------------------------------------------------- */

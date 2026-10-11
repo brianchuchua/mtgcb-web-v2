@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchStateSessionSync } from './browse/useSearchStateSessionSync';
 import { usePreferredCardViewMode, usePreferredSetViewMode } from '@/contexts/DisplaySettingsContext';
+import { useBrowseUrlContext } from '@/features/browse/BrowseSearchForm/hooks/useBrowseUrlContext';
 import { convertStateToUrlParams, parseUrlToState } from '@/features/browse/schema/urlStateAdapters';
 import { useBrowsePreferencesReady, usePreferredViewContentType } from '@/hooks/useBrowsePreferences';
 import { useCardsPageSize } from '@/hooks/useCardsPageSize';
+import { useDropGoalOutsideCollection, useDropUnknownGoal } from '@/hooks/goals/useDropStaleGoal';
 import { loadSearchState, saveSearchState } from '@/hooks/useSearchStateSync';
 import { useSetsPageSize } from '@/hooks/useSetsPageSize';
 import { useDropSharedOwnedDefault } from '@/hooks/useSharedLinkOwnedDefault';
@@ -167,6 +169,9 @@ function syncReduxFromUrlOrSession(
 
 export function useBrowseStateSync() {
   useDropSharedOwnedDefault();
+  useDropGoalOutsideCollection();
+  const { userId: collectionUserId } = useBrowseUrlContext();
+  useDropUnknownGoal(collectionUserId);
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();

@@ -10,6 +10,7 @@ import { useViewMode } from '@/features/browse/hooks';
 import { BrowseControllerResult } from '@/features/browse/types';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { useCollectionDisplaySettings } from '@/features/collections/hooks/useCollectionDisplaySettings';
+import { useIsGoalUnconfirmed } from '@/hooks/goals/useDropStaleGoal';
 import { selectSelectedGoalId, selectSets, selectViewContentType } from '@/redux/slices/browse';
 
 interface UseCollectionBrowseControllerProps {
@@ -54,6 +55,8 @@ export const useCollectionBrowseController = ({
   prevSelectedGoalIdRef.current = selectedGoalId;
   prevUrlGoalIdRef.current = goalIdFromUrl;
 
+  const isGoalUnconfirmed = useIsGoalUnconfirmed(userId);
+
   // Use collection-specific display settings
   const collectionDisplaySettings = useCollectionDisplaySettings({ viewMode, view: currentView });
 
@@ -65,6 +68,7 @@ export const useCollectionBrowseController = ({
     // Skip until goalId is synced from URL or until set is ready
     skipCardsUntilReady: (isWaitingForGoalSync && currentView === 'cards') || skipCardsUntilReady,
     waitForInitialLoad: isWaitingForGoalSync,
+    waitForGoalCheck: isGoalUnconfirmed,
   });
 
   // Override the display settings with collection-specific ones

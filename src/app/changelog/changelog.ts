@@ -12,6 +12,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-11',
+      version: '1.37.2',
+      changes: ['Fixed goals staying in a selected state even after being deleted'],
+    },
+    {
       date: '2026-10-10',
       version: '1.37.1',
       changes: ['Fixed a bug rendering set release dates for users in some timezones'],

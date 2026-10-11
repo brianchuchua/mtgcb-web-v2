@@ -33,6 +33,7 @@ jest.mock('../useSearchStateSync', () => ({
   saveSearchState: jest.fn(),
   clearSearchState: jest.fn(),
   syncSharedFieldsToStorage: jest.fn(),
+  forgetStoredGoal: jest.fn(),
   SHARED_CROSS_VIEW_FIELDS: ['selectedGoalId', 'selectedLocationId', 'includeChildLocations', 'showGoals'],
 }));
 
