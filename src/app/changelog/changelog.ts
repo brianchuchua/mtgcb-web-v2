@@ -12,6 +12,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-12',
+      version: '1.37.3',
+      changes: [
+        'Fixed an annoying cornercase where trying to remove cards from a location whose finish had been overriden would prompt you unnecessarily to override the finish again',
+      ],
+    },
+    {
       date: '2026-10-11',
       version: '1.37.2',
       changes: ['Fixed goals staying in a selected state even after being deleted'],

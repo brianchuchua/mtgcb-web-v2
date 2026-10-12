@@ -137,6 +137,9 @@ export interface QuantitySelectorProps {
   label?: string;
   tooltip?: string;
   size?: 'small' | 'medium';
+  // Keeps "-" usable on a disabled field, so copies already held in a finish the card
+  // doesn't come in can still be removed without the override popup.
+  canDecrementWhileDisabled?: boolean;
 }
 
 export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
@@ -151,6 +154,7 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
   label,
   tooltip,
   size = 'medium',
+  canDecrementWhileDisabled = false,
 }) => {
   const [localValue, setLocalValue] = useState(value.toString());
 
@@ -224,7 +228,9 @@ export const QuantitySelector: React.FC<QuantitySelectorProps> = ({
             e.preventDefault();
             handleDecrement();
           }}
-          disabled={disabled || value <= min}
+          disabled={(disabled && !canDecrementWhileDisabled) || value <= min}
+          // Sit above DualQuantitySelector's click-to-override overlay.
+          sx={disabled && canDecrementWhileDisabled ? { position: 'relative', zIndex: 2 } : undefined}
           aria-label="Decrease quantity"
           error={error}
           disableRipple
@@ -400,6 +406,7 @@ export const DualQuantitySelector: React.FC<DualQuantitySelectorProps> = ({
                 : regularHelperText
             }
             label={labels.regular}
+            canDecrementWhileDisabled
             tooltip={!canBeNonFoil && !overrideNonFoil ? 'This card can only be foil. (Click to override.)' : undefined}
             size={size}
           />
@@ -436,6 +443,7 @@ export const DualQuantitySelector: React.FC<DualQuantitySelectorProps> = ({
                 : foilHelperText
             }
             label={labels.foil}
+            canDecrementWhileDisabled
             tooltip={!canBeFoil && !overrideFoil ? 'This card cannot be foil. (Click to override.)' : undefined}
             size={size}
           />
