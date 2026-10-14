@@ -13,6 +13,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-13',
+      version: '1.37.6',
+      changes: ['Updated Secret Lair Drop Series'],
+      type: 'data',
+    },
+    {
+      date: '2026-10-13',
       version: '1.37.5',
       changes: ['Made spacing consistent at bottom of page between content and pagination controls'],
     },
