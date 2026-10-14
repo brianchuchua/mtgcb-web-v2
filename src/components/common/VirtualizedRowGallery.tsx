@@ -169,7 +169,7 @@ const VirtualizedRowGallery = <T,>({
           // Add proper spacing between rows that Virtuoso can measure
           components={{
             Item: ({ children, item, context, ...props }) => (
-              <div {...props} style={{ ...props.style, paddingBottom: 16 }}>
+              <div {...props} style={{ ...props.style, paddingBottom: item === rows[rows.length - 1] ? 0 : 16 }}>
                 {children}
               </div>
             ),
@@ -193,6 +193,7 @@ const GalleryWrapper = styled(Box, {
   padding: theme.spacing(2),
   paddingLeft: `${horizontalPadding}%`,
   paddingRight: `${horizontalPadding}%`,
+  paddingBottom: 0,
   minHeight: '50vh',
 
   // Small screen layout

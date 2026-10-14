@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-13',
+      version: '1.37.5',
+      changes: ['Made spacing consistent at bottom of page between content and pagination controls'],
+    },
+    {
+      date: '2026-10-13',
       version: '1.37.4',
       changes: ['Updated card legalities'],
       type: 'data',
