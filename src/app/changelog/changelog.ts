@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-20',
+      version: '1.37.8',
+      changes: ['Fixed quantity clicks in grid view sometimes flashing back to the old number and not all saving'],
+    },
+    {
+      date: '2026-10-20',
       version: '1.37.7',
       changes: [
         'Updated Convention Promos, Store Championship Promos, and WPN Promos',

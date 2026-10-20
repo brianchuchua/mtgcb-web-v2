@@ -94,10 +94,9 @@ test.describe('Feature Name', () => {
   ```
 - **Wait for dynamic content** with `waitForFunction`:
   ```typescript
-  await page.waitForFunction(
-    () => document.querySelectorAll('[data-testid="card-name"]').length > 0,
-    { timeout: 10000 }
-  );
+  await page.waitForFunction(() => document.querySelectorAll('[data-testid="card-name"]').length > 0, {
+    timeout: 10000,
+  });
   ```
 
 ## Agent-Driven Manual Testing
@@ -109,7 +108,7 @@ A separate test suite under `tests/manual/` for **agent-driven exploratory verif
 - Regular e2e tests assert specific behavior and gate CI. They fail loudly if anything regresses.
 - Manual tests **explore and capture state**. They take screenshots, log structured observations, and let a reviewer (Claude or human) inspect the output.
 - Mixing them dilutes both: assertion-driven suites get noisy with screenshots, and exploratory suites get pruned every time someone tightens a flaky assertion.
-- Best practice (2026): keep them separate. Industry-standard visual-regression tooling (Playwright's `toHaveScreenshot`, Chromatic, Percy) is *also* separate from functional e2e. We're doing the same with a lighter-weight pattern.
+- Best practice (2026): keep them separate. Industry-standard visual-regression tooling (Playwright's `toHaveScreenshot`, Chromatic, Percy) is _also_ separate from functional e2e. We're doing the same with a lighter-weight pattern.
 
 ### Do NOT add `tests/manual/` to the regular e2e run.
 
@@ -128,7 +127,7 @@ tests/manual/
     <flow>.e2e.test.ts
 ```
 
-One file per *flow*, grouped under the user story it belongs to. Examples:
+One file per _flow_, grouped under the user story it belongs to. Examples:
 
 - `tests/manual/browse/cards-grid.e2e.test.ts`
 - `tests/manual/browse/jump-to-set-menu.e2e.test.ts`
@@ -160,8 +159,12 @@ test.describe('User story: <one sentence>', () => {
     page.on('console', (msg) => {
       if (msg.type() !== 'error') return;
       const text = msg.text();
-      if (text.includes('Rendered more hooks') || text.includes('Rendered fewer hooks')
-          || text.includes('Rules of Hooks') || text.includes('hook order')) {
+      if (
+        text.includes('Rendered more hooks') ||
+        text.includes('Rendered fewer hooks') ||
+        text.includes('Rules of Hooks') ||
+        text.includes('hook order')
+      ) {
         reactErrors.push(text);
       }
     });
@@ -178,11 +181,13 @@ test.describe('User story: <one sentence>', () => {
     await page.screenshot({ path: shot('02-after-click') });
 
     // Emit structured observations the agent can grep out of `--reporter=line` output.
-    console.log(JSON.stringify({
-      url: page.url(),
-      reactErrors,
-      label: 'flow-result',
-    }));
+    console.log(
+      JSON.stringify({
+        url: page.url(),
+        reactErrors,
+        label: 'flow-result',
+      }),
+    );
   });
 });
 ```
@@ -200,9 +205,9 @@ pnpm test:manual tests/manual/goals/goal-flow.e2e.test.ts --reporter=line
 
 - **One file per flow.** Don't pack 12 tests into one file — they're tedious to inspect.
 - **Use `fullPage: false` by default.** Top-of-page is usually what matters; `fullPage: true` for verifying scroll content.
-- **Wait for *content* before screenshotting**, not just `networkidle`. Virtualized tables/grids populate lazily — wait for `>= N rows/items` before capturing.
+- **Wait for _content_ before screenshotting**, not just `networkidle`. Virtualized tables/grids populate lazily — wait for `>= N rows/items` before capturing.
 - **Always log structured JSON** at decision points: URLs after navigation, counts, geometry data. Use a `label` field so the agent can grep specific entries.
-- **Always listen for console errors** — at minimum the React hook-ordering ones. Check the array at the end and `expect(reactErrors).toEqual([])` if you want it to actually *fail* on regression. Otherwise just log it.
+- **Always listen for console errors** — at minimum the React hook-ordering ones. Check the array at the end and `expect(reactErrors).toEqual([])` if you want it to actually _fail_ on regression. Otherwise just log it.
 - **For auth'd flows**, use `test.skip(!getLocalTestJwt(), ...)` so the test doesn't fail when the JWT isn't set.
 - **Keep them stable.** If the screenshot would only make sense in your specific dev DB, note that in a comment so future-you (or future-Claude) doesn't go chasing imaginary regressions.
 
@@ -213,7 +218,7 @@ pnpm test:manual tests/manual/goals/goal-flow.e2e.test.ts --reporter=line
 - When the regular e2e suite passes but you want a human-or-agent eyeball on visual layout (popper anchoring, grid spacing, etc.).
 - When debugging a flaky bug — the captured screenshots become the bug-report attachment.
 
-### When *not* to write one
+### When _not_ to write one
 
 - Pure unit logic, validation rules, API responses → use jest or regular e2e.
 - Anything you'd want CI to fail on → write a regular e2e in `tests/`.
@@ -237,7 +242,7 @@ List all shipped filtering correctly while the summary still read "cards: all".
 
 It now copies everything except `NON_CRITERIA_PARAMS`, the small fixed set of
 paging/ordering/context keys. **When you add a filter, you add nothing here** —
-but if you add a param that controls *how* the search runs rather than what it
+but if you add a param that controls _how_ the search runs rather than what it
 matches, add it to that exclusion set. `formatSearchDescription.test.ts` has a
 drift guard that fails when a filter does not change the sentence.
 
@@ -306,6 +311,7 @@ const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 ```
 
 **Key requirements:**
+
 - NEVER use `<Tooltip>` for info icons (not mobile-friendly)
 - ALWAYS use `component="div"` on Typography to avoid hydration errors
 - Place Popover at the same level as main component return (not inside Dialogs/nested components)
@@ -317,17 +323,18 @@ All text input fields **MUST** enforce API character limits using HTML `maxLengt
 ```tsx
 <TextField
   {...register('fieldName', {
-    maxLength: { value: LIMIT, message: 'Error message' }
+    maxLength: { value: LIMIT, message: 'Error message' },
   })}
   slotProps={{
     htmlInput: {
-      maxLength: LIMIT,  // REQUIRED - prevents typing beyond limit
+      maxLength: LIMIT, // REQUIRED - prevents typing beyond limit
     },
   }}
 />
 ```
 
 **Common Limits:**
+
 - Short text (username, email, location/goal names): 255
 - Long text (descriptions): 1000
 - Search fields (card name, oracle text, artist): 2000
@@ -344,10 +351,11 @@ import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuanti
   type="number"
   onChange={(e) => setValue(clampCollectionQuantity(parseInt(e.target.value) || 0))}
   inputProps={{ min: COLLECTION_QUANTITY_MIN, max: COLLECTION_QUANTITY_MAX }}
-/>
+/>;
 ```
 
 **Numeric Limits (must match mtgcb-api-v3):**
+
 - Collection quantities (set mode): 0..9999
 - Collection quantity deltas (increment mode): -9999..9999
 - Goal target quantities: 1..9999
@@ -419,7 +427,7 @@ Use the `mcp__plugin_Notion_notion__notion-create-pages` tool with `data_source_
 - **Type** - Bug, Feature, Enhancement, Tech Debt, Data Issue, Infrastructure, Chore, New Set
 - **Status** - Captured (default for new), Planned, In Progress, Done, Won't Do
 - **Priority** - P0 (This Week), P1 (This Month), P2 (This Quarter), P3 (Someday)
-- **Source** - Patron, Sentry, Facebook, Email, Internal, Other, Wagers
+- **Source** - Patron, Sentry, Facebook, Email, Internal, Other
 - **Blocked** - "Blocked" if blocked (optional)
 
 **Preference:** Put detailed context in the **page body content** (not the Notes property). Use the `content` field when creating tickets.

@@ -22,6 +22,7 @@ import {
   MassUpdateLocationRequest,
   MassUpdateLocationResponse,
 } from './collectionLocationsTypes';
+import { applyQuantityPatch } from './applyQuantityPatch';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
 import type { RootState } from '@/redux/store';
@@ -72,21 +73,17 @@ const collectionsApi = mtgcbApi.injectEndpoints({
         // Update getCards cache entries
         const cardsCache = mtgcbApi.util.selectInvalidatedBy(state, [{ type: 'Cards', id: `user-${userId}` }]);
 
-        // TODO: Type issue mess. Not even sure if this is necessary anymore, need to test.
+        // Keeps cached card lists in step with what the user just saved, so a card
+        // that remounts before the refetch lands (scrolled out and back in, for
+        // example) shows the new value instead of the old one.
+        // TODO: Type issue mess (getCards is injected by browseApi, not this slice).
         for (const cacheEntry of cardsCache as any[]) {
           const { endpointName, originalArgs } = cacheEntry;
           if (endpointName === 'getCards' && originalArgs) {
             const patchResult = (dispatch as any)(
               (mtgcbApi.util as any).updateQueryData('getCards', originalArgs, (draft: any) => {
                 if (draft?.data?.cards) {
-                  // Update quantities for matching cards
-                  for (const updateCard of arg.cards) {
-                    const cardIndex = draft.data.cards.findIndex((card: any) => card.id === updateCard.cardId);
-                    if (cardIndex !== -1) {
-                      draft.data.cards[cardIndex].quantityReg = updateCard.quantityReg;
-                      draft.data.cards[cardIndex].quantityFoil = updateCard.quantityFoil;
-                    }
-                  }
+                  applyQuantityPatch(draft.data.cards, arg.cards);
                 }
               }),
             );

@@ -3,7 +3,7 @@
 import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Virtuoso } from 'react-virtuoso';
+import { type Components, type ItemProps, Virtuoso } from 'react-virtuoso';
 import { groupIntoRows, getResponsiveColumns, RowGroup } from '@/utils/rowGrouping';
 
 export interface VirtualizedRowGalleryProps<T> {
@@ -58,6 +58,23 @@ function useResponsiveColumns(
 
   return { columns };
 }
+
+// Row wrapper that adds spacing Virtuoso can measure (none after the last row).
+// It must stay at module level. Defined inline, it was a new component type
+// whenever the rows changed (every save refetches them), so React remounted
+// every visible card and each card's local quantity was lost mid-edit.
+interface GalleryContext {
+  lastRow: unknown;
+}
+
+const GalleryItem = ({ children, item, context, ...props }: ItemProps<any> & { context?: GalleryContext }) => (
+  <div {...props} style={{ ...props.style, paddingBottom: item === context?.lastRow ? 0 : 16 }}>
+    {children}
+  </div>
+);
+
+// `any` rows: this is shared by every VirtualizedRowGallery<T>, whatever T is.
+const GALLERY_COMPONENTS: Components<any, GalleryContext> = { Item: GalleryItem };
 
 const VirtualizedRowGallery = <T,>({
   items,
@@ -166,14 +183,8 @@ const VirtualizedRowGallery = <T,>({
           itemContent={rowContent}
           increaseViewportBy={600}
           computeItemKey={(index) => rows[index]?.id ?? index}
-          // Add proper spacing between rows that Virtuoso can measure
-          components={{
-            Item: ({ children, item, context, ...props }) => (
-              <div {...props} style={{ ...props.style, paddingBottom: item === rows[rows.length - 1] ? 0 : 16 }}>
-                {children}
-              </div>
-            ),
-          }}
+          context={{ lastRow: rows[rows.length - 1] }}
+          components={GALLERY_COMPONENTS}
         />
       )}
     </GalleryWrapper>
