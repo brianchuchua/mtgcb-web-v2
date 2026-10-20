@@ -197,14 +197,16 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
     }
   }, [quantityReg, quantityFoil]);
 
-  // The debounced callback reads updatePromiseRefReg/Foil.current to abort the
-  // latest in-flight request per field. This closure runs after the debounce delay
-  // (event-handler context), not during render — but the compiler flags the
-  // transitive ref access.
+  // One debounce per field. With a single shared debounce, clicking Foil within
+  // 400 ms of a Regular click replaced the pending Regular save, so only the
+  // Foil change reached the server.
+  //
+  // The save reads updatePromiseRefReg/Foil.current to abort the latest in-flight
+  // request per field. It runs after the debounce delay (event-handler context),
+  // not during render — but the compiler flags the transitive ref access.
   /* eslint-disable react-compiler/react-compiler */
-  const debouncedUpdate = useMemo(
-    () =>
-      debounce(async (newQuantityReg: number, newQuantityFoil: number, changedType: 'regular' | 'foil') => {
+  const debouncedUpdate = useMemo(() => {
+    const save = async (newQuantityReg: number, newQuantityFoil: number, changedType: 'regular' | 'foil') => {
         // Select the correct promise ref based on which field changed
         const updatePromiseRef = changedType === 'regular' ? updatePromiseRefReg : updatePromiseRefFoil;
 
@@ -272,9 +274,14 @@ export const EditableCardQuantity: React.FC<EditableCardQuantityProps> = ({
             enqueueSnackbar(error?.data?.error?.message || `Error updating ${cardName}`, { variant: 'error' });
           }
         }
-      }, 400),
-    [cardId, cardName, updateCollection, enqueueSnackbar],
-  );
+    };
+    const saveRegular = debounce(save, 400);
+    const saveFoil = debounce(save, 400);
+    return (newQuantityReg: number, newQuantityFoil: number, changedType: 'regular' | 'foil') =>
+      changedType === 'regular'
+        ? saveRegular(newQuantityReg, newQuantityFoil, changedType)
+        : saveFoil(newQuantityReg, newQuantityFoil, changedType);
+  }, [cardId, cardName, updateCollection, enqueueSnackbar]);
   /* eslint-enable react-compiler/react-compiler */
 
   const handleQuantityChange = (type: 'regular' | 'foil', value: number) => {
