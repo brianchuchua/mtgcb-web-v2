@@ -1,7 +1,7 @@
 import debounce from 'lodash.debounce';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 import { useSearchStateSessionSync } from './browse/useSearchStateSessionSync';
 import { usePreferredCardViewMode, usePreferredSetViewMode } from '@/contexts/DisplaySettingsContext';
 import { useBrowseUrlContext } from '@/features/browse/BrowseSearchForm/hooks/useBrowseUrlContext';
@@ -25,7 +25,8 @@ import {
   setSets,
   setViewContentType,
 } from '@/redux/slices/browse';
-import { BrowsePagination } from '@/types/browse';
+import { RootState } from '@/redux/store';
+import { BrowsePagination, BrowseSearchParams } from '@/types/browse';
 import { isSetSpecificPage } from '@/utils/routeHelpers';
 
 // Balance between responsiveness and avoiding URL spam during rapid typing
@@ -167,12 +168,25 @@ function syncReduxFromUrlOrSession(
   }
 }
 
+function buildBrowseUrl(pathname: string, viewType: 'cards' | 'sets', state: BrowseSearchParams): string {
+  const setSpecificPage = isSetSpecificPage(pathname);
+  const params = convertStateToUrlParams(state, viewType, setSpecificPage);
+
+  // Only add contentType if we're not on a set-specific page
+  if (!setSpecificPage) {
+    params.set('contentType', viewType);
+  }
+
+  return params.toString() ? `${pathname}?${params}` : pathname;
+}
+
 export function useBrowseStateSync() {
   useDropSharedOwnedDefault();
   useDropGoalOutsideCollection();
   const { userId: collectionUserId } = useBrowseUrlContext();
   useDropUnknownGoal(collectionUserId);
   const dispatch = useDispatch();
+  const store = useStore<RootState>();
   const router = useRouter();
   const pathname = usePathname();
   const search = useSearchParams();
@@ -194,6 +208,16 @@ export function useBrowseStateSync() {
   const prevView = useRef(viewType);
   const lastUrlPushed = useRef<string | undefined>(undefined);
   const prevSearchParamsString = useRef<string>('');
+  // The URL for the state just synced from the address bar. Writing that URL only fills in
+  // the address the user arrived at (e.g. the sort), so it replaces the history entry
+  // instead of adding one that Back would land on. Cleared by the first push, so returning
+  // to the arrival state later is a normal history step.
+  const arrivalUrl = useRef<string | undefined>(undefined);
+  const rememberArrivalUrl = () => {
+    const { viewContentType, cardsSearchParams, setsSearchParams } = store.getState().browse;
+    const state = viewContentType === 'cards' ? cardsSearchParams : setsSearchParams;
+    arrivalUrl.current = buildBrowseUrl(pathname, viewContentType, state);
+  };
 
   // TODO: Consider using named functions for useEffects for readability
   // TODO: Still not happy with the readability of this code
@@ -248,6 +272,7 @@ export function useBrowseStateSync() {
       isNavigation: false, // Initial load - allow sessionStorage restore
     });
 
+    rememberArrivalUrl();
     prevView.current = initialView;
     hasInit.current = true;
   }, [
@@ -290,6 +315,7 @@ export function useBrowseStateSync() {
       isNavigation: true, // Navigation - respect empty URL (don't restore from sessionStorage)
     });
 
+    rememberArrivalUrl();
     prevSearchParamsString.current = currentSearchString;
   }, [search, dispatch, cardsPageSize, setsPageSize, pathname]);
 
@@ -356,6 +382,7 @@ export function useBrowseStateSync() {
     const url = params.toString() ? `${pathname}?${params}` : pathname;
 
     lastUrlPushed.current = url;
+    arrivalUrl.current = undefined;
     router.push(url, { scroll: false }); // Use push to create history entry
 
     prevView.current = viewType;
@@ -399,21 +426,16 @@ export function useBrowseStateSync() {
 
     const sync = debounce(() => {
       const state = viewType === 'cards' ? cardState : setState;
-      const setSpecificPage = isSetSpecificPage(pathname);
-
-      // Pass context about the page type to convertStateToUrlParams
-      const params = convertStateToUrlParams(state, viewType, setSpecificPage);
-
-      // Only add contentType if we're not on a set-specific page
-      if (!setSpecificPage) {
-        params.set('contentType', viewType);
-      }
-
-      const url = params.toString() ? `${pathname}?${params}` : pathname;
+      const url = buildBrowseUrl(pathname, viewType, state);
 
       if (url !== lastUrlPushed.current) {
         lastUrlPushed.current = url;
-        router.push(url, { scroll: false }); // Use push to create history entry
+        if (url === arrivalUrl.current) {
+          router.replace(url, { scroll: false });
+        } else {
+          arrivalUrl.current = undefined;
+          router.push(url, { scroll: false }); // Use push to create history entry
+        }
       }
     }, DEBOUNCE_URL_SYNC_MS);
 

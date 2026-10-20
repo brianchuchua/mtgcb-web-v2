@@ -103,12 +103,25 @@ const reduxToSchemaKeyMap: Record<string, string | [string, string]> = {
   isFullArt: 'isFullArt',
 };
 
+// Sort by and order travel as a pair: a link with no sort uses the viewer's own saved sort, so
+// half a sort (Artist without its order) would mix the sender's column with the viewer's order.
+// Only a fully default sort is left out of the URL.
+function isDefaultSort(state: Partial<BrowseSearchParams>, mode: 'cards' | 'sets'): boolean {
+  const byConfig = browseParameterSchema[mode === 'cards' ? 'cardsSortBy' : 'setsSortBy'];
+  const orderConfig = browseParameterSchema[mode === 'cards' ? 'cardsSortOrder' : 'setsSortOrder'];
+  return (
+    (state.sortBy === undefined || state.sortBy === byConfig.defaultValue) &&
+    (state.sortOrder === undefined || state.sortOrder === orderConfig.defaultValue)
+  );
+}
+
 export function convertStateToUrlParams(
   state: Partial<BrowseSearchParams>,
   currentMode: 'cards' | 'sets',
   isSetSpecificPage: boolean = false,
 ): URLSearchParams {
   const params = new URLSearchParams();
+  const keepSortPair = !isDefaultSort(state, currentMode);
 
   // Note: contentType is now handled by useBrowseStateSync to avoid adding it on collection set pages
   Object.entries(state).forEach(([reduxKey, value]) => {
@@ -135,7 +148,9 @@ export function convertStateToUrlParams(
 
     // Skip pagination parameters as they're now stored in localStorage
     const isPaginationParam = reduxKey === 'pageSize';
-    if (isPaginationParam || value === config.defaultValue) return;
+    if (isPaginationParam) return;
+    const isSortParam = reduxKey === 'sortBy' || reduxKey === 'sortOrder';
+    if (value === config.defaultValue && !(isSortParam && keepSortPair)) return;
 
     switch (config.type) {
       case 'string':
@@ -313,7 +328,7 @@ function addBooleanParameter(params: URLSearchParams, value: boolean, config: Pa
 function addEnumParameter(params: URLSearchParams, value: string, config: ParameterConfig, key: string) {
   if (config.type !== 'enum') return;
 
-  if (value && value !== config.defaultValue) {
+  if (value) {
     params.set(config.urlParam || key, value);
   }
 }

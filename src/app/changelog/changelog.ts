@@ -12,6 +12,15 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-20',
+      version: '1.37.7',
+      changes: [
+        'Updated Convention Promos, Store Championship Promos, and WPN Promos',
+        'Fixed shared links sometimes opening with a different sort than the one they were shared with',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-10-13',
       version: '1.37.6',
       changes: ['Updated Secret Lair Drop Series'],

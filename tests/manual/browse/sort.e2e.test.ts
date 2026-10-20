@@ -18,7 +18,7 @@ test('Browse cards: changing sortBy via URL reorders the result list', async ({ 
     try { localStorage.clear(); sessionStorage.clear(); } catch (e) { /* noop */ }
   });
 
-  await page.goto('/browse?contentType=cards&sortBy=releasedAt&sortOrder=desc');
+  await page.goto('/browse?contentType=cards&cardsSortBy=releasedAt&cardsSortOrder=desc');
   await page.waitForLoadState('networkidle');
   await page.waitForFunction(
     () => document.querySelectorAll('[data-testid="card-name"]').length > 0,
@@ -28,7 +28,7 @@ test('Browse cards: changing sortBy via URL reorders the result list', async ({ 
   const newestNames = (await page.getByTestId('card-name').allTextContents()).slice(0, 5);
   await page.screenshot({ path: shot('sort-released-desc'), fullPage: false });
 
-  await page.goto('/browse?contentType=cards&sortBy=releasedAt&sortOrder=asc');
+  await page.goto('/browse?contentType=cards&cardsSortBy=releasedAt&cardsSortOrder=asc');
   await page.waitForLoadState('networkidle');
   await page.waitForFunction(
     () => document.querySelectorAll('[data-testid="card-name"]').length > 0,
@@ -40,8 +40,5 @@ test('Browse cards: changing sortBy via URL reorders the result list', async ({ 
 
   console.log(JSON.stringify({ newestNames, oldestNames, label: 'sort-comparison' }));
 
-  // The first 5 cards on each page should be different sets of cards.
-  // (Soft assertion — exploratory test, exact ordering may vary by what's in DB.)
-  const overlap = newestNames.filter((n) => oldestNames.includes(n)).length;
-  expect(overlap).toBeLessThan(5);
+  expect(newestNames[0]).not.toBe(oldestNames[0]);
 });

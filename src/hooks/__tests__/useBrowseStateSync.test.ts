@@ -584,6 +584,81 @@ describe('useBrowseStateSync', () => {
     });
   });
 
+  // Sets view throughout: it is the store's starting view, so no view switch muddies the history.
+  describe('History entries', () => {
+    const router = { push: jest.fn(), replace: jest.fn() };
+
+    const setUrl = (searchParams: Record<string, string>) =>
+      mockNextNavigation({ pathname: '/browse', searchParams: createMockSearchParams(searchParams), ...router });
+
+    const openPage = (searchParams: Record<string, string>) => {
+      router.push = jest.fn();
+      router.replace = jest.fn();
+      setUrl(searchParams);
+    };
+
+    it('replaces the history entry when filling in the URL the page was opened with', async () => {
+      openPage({ contentType: 'sets' });
+
+      renderHookWithRedux(() => useBrowseStateSync(), { store: createTestStore() });
+
+      await waitFor(() =>
+        expect(router.replace).toHaveBeenCalledWith('/browse?contentType=sets', expect.objectContaining({ scroll: false })),
+      );
+      expect(router.push).not.toHaveBeenCalled();
+    });
+
+    it('pushes a history entry for a search change after startup', async () => {
+      openPage({ contentType: 'sets' });
+      const store = createTestStore();
+      renderHookWithRedux(() => useBrowseStateSync(), { store });
+      await waitFor(() => expect(router.replace).toHaveBeenCalled());
+
+      const { setSetSearchParams } = require('@/redux/slices/browse');
+      store.dispatch(setSetSearchParams({ name: 'dominaria' }));
+
+      await waitFor(() =>
+        expect(router.push).toHaveBeenCalledWith(expect.stringContaining('setName=dominaria'), expect.anything()),
+      );
+      expect(router.replace).toHaveBeenCalledTimes(1);
+    });
+
+    it('pushes when a later change returns to the state the page opened with', async () => {
+      openPage({ contentType: 'sets', setName: 'dominaria' });
+      const store = createTestStore();
+      renderHookWithRedux(() => useBrowseStateSync(), { store });
+      await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+
+      const { setSetSearchParams } = require('@/redux/slices/browse');
+      store.dispatch(setSetSearchParams({ name: 'zendikar' }));
+      await waitFor(() => expect(router.push).toHaveBeenCalledTimes(1));
+
+      store.dispatch(setSetSearchParams({ name: 'dominaria' }));
+      await waitFor(() => expect(router.push).toHaveBeenCalledTimes(2));
+      expect(router.push).toHaveBeenLastCalledWith(expect.stringContaining('setName=dominaria'), expect.anything());
+      expect(router.replace).toHaveBeenCalledTimes(1);
+    });
+
+    it('replaces the history entry when filling in a URL reached by Back', async () => {
+      openPage({ contentType: 'sets', setName: 'dominaria' });
+      const store = createTestStore();
+      const { rerender } = renderHookWithRedux(() => useBrowseStateSync(), { store });
+      await waitFor(() => expect(router.replace).toHaveBeenCalledTimes(1));
+
+      const { setSetSearchParams } = require('@/redux/slices/browse');
+      store.dispatch(setSetSearchParams({ name: 'zendikar' }));
+      await waitFor(() => expect(router.push).toHaveBeenCalledTimes(1));
+
+      setUrl({ contentType: 'sets', setName: 'innistrad' });
+      rerender({});
+
+      await waitFor(() =>
+        expect(router.replace).toHaveBeenLastCalledWith(expect.stringContaining('setName=innistrad'), expect.anything()),
+      );
+      expect(router.push).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('View Switching', () => {
     it('should update URL when view type changes', async () => {
       const { useRouter, usePathname, useSearchParams } = require('next/navigation');
