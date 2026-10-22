@@ -12,6 +12,19 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-22',
+      version: '1.37.10',
+      changes: [
+        'Added Reality Fracture Art Series',
+        'Added Reality Fracture Art Series (Signed)',
+        'Added The Hobbit Art Series',
+        'Added The Hobbit Art Series (Signed)',
+        'Added The Hobbit Eternal Art Series',
+        'Fixed squashed images on sideways Art Series cards',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-10-20',
       version: '1.37.9',
       changes: ['Fixed regular quantity changes not saving if you changed the foil quantity right after'],
