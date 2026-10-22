@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-22',
+      version: '1.37.11',
+      changes: ['Improved handling of whitespace between words when searching'],
+    },
+    {
+      date: '2026-10-22',
       version: '1.37.10',
       changes: [
         'Added Reality Fracture Art Series',
