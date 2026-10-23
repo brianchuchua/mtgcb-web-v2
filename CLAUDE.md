@@ -27,7 +27,7 @@ Next.js web app for Magic: The Gathering Collection Builder - Track collections 
 - React Hook Form + React Virtuoso
 - Playwright testing
 
-Package manager: **pnpm 10.33.4** (pinned via `packageManager` field; Corepack auto-fetches). Node: **24.15.0** (pinned via `engines.node` and `.node-version`).
+Package manager: **pnpm 10.33.4** (pinned via `packageManager` field; Corepack auto-fetches). Node: **24.22.1** (pinned via `engines.node` and `.node-version`).
 
 ## Commands
 
@@ -43,7 +43,7 @@ Package manager: **pnpm 10.33.4** (pinned via `packageManager` field; Corepack a
 
 ### Prerequisites
 
-- Local web server running (`pnpm dev`)
+- Local web server running a production build (`pnpm build && pnpm start-local`). Some tests fail against `pnpm dev`, because React runs effects twice in dev mode (duplicate toasts, page size applied late)
 - Local API server running
 - After Playwright updates: `pnpm exec playwright install chromium`
 
