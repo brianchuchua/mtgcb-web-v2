@@ -94,8 +94,10 @@ const CardTable: React.FC<CardTableProps> = ({
       (item.goalTargetQuantityReg || item.goalTargetQuantityFoil || item.goalTargetQuantityAll) &&
       item.goalFullyMet === false;
 
-    // Calculate total quantity for red/green row coloring
-    const totalQuantity = (item?.quantityReg || 0) + (item?.quantityFoil || 0);
+    // Calculate total quantity for red/green row coloring.
+    // Browse cards carry no quantities, so leave them uncoloured.
+    const hasQuantities = item?.quantityReg != null || item?.quantityFoil != null;
+    const totalQuantity = hasQuantities ? (item.quantityReg || 0) + (item.quantityFoil || 0) : undefined;
 
     return { isIncomplete: !!isIncomplete, totalQuantity };
   };

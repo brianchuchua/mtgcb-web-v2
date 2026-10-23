@@ -13,6 +13,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-22',
+      version: '1.37.13',
+      changes: ['Fixed red/green table row setting applying on browse pages'],
+    },
+    {
+      date: '2026-10-22',
       version: '1.37.12',
       changes: ['Fixed price sorting so cards with no price always show last'],
     },
