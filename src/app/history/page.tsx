@@ -290,7 +290,7 @@ const formatBulkOperationSummary = (entry: HistoryEntry, userId: number) => {
       if (isIncrement && quantityText) {
         return (
           <Typography variant="body2" component="span">
-            {action} {quantityText} to {bulkSummary.cardsAffected} {rarityText} in{' '}
+            {action} {quantityText} {action === 'Removed' ? 'from' : 'to'} {bulkSummary.cardsAffected} {rarityText} in{' '}
             {bulkSummary.setSlug ? (
               <Link
                 href={getCollectionSetUrl(userId.toString(), bulkSummary.setSlug)}
@@ -327,7 +327,7 @@ const formatBulkOperationSummary = (entry: HistoryEntry, userId: number) => {
     if (isIncrement && quantityText) {
       return (
         <Typography variant="body2" component="span">
-          {action} {quantityText} to {bulkSummary.cardsAffected} {rarityText}
+          {action} {quantityText} {action === 'Removed' ? 'from' : 'to'} {bulkSummary.cardsAffected} {rarityText}
         </Typography>
       );
     } else {

@@ -281,7 +281,7 @@ export const ExportClient: React.FC = () => {
                         ))}
                       </FormGroup>
 
-                      {selectedFields.size === 0 && (
+                      {[...selectedFields].every((field) => MANDATORY_FIELDS.has(field)) && (
                         <Alert severity="info" sx={{ mt: 2 }}>
                           Only the required fields (ID, Quantity Regular, Quantity Foil) will be exported. Select
                           additional fields to include more data.

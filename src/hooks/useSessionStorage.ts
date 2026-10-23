@@ -37,6 +37,12 @@ export function useSessionStorage<T>(key: string, initialValue: T): [T, (value: 
   };
 
   const [storedValue, setStoredValue] = useState<T>(getInitialState);
+  // Updater functions read this, not storedValue, so several updates before a re-render all apply.
+  const latestValueRef = useRef<T>(storedValue);
+
+  useEffect(() => {
+    latestValueRef.current = storedValue;
+  }, [storedValue]);
 
   useEffect(() => {
     if (hasHydrated.current) return;
@@ -91,7 +97,8 @@ export function useSessionStorage<T>(key: string, initialValue: T): [T, (value: 
   const setValue = (value: T | ((val: T) => T)) => {
     try {
       // Allow value to be a function so we have same API as useState
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      const valueToStore = value instanceof Function ? value(latestValueRef.current) : value;
+      latestValueRef.current = valueToStore;
 
       // Save state
       setStoredValue(valueToStore);

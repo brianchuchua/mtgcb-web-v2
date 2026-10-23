@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { useAuth } from '@/hooks/useAuth';
 import { trimFormData } from '@/utils/form/trimFormData';
+import { getSafeRedirectPath } from '@/utils/safeRedirect';
 
 interface LoginFormInputs {
   username: string;
@@ -30,11 +31,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated && user?.userId) {
-      if (redirectTo) {
-        router.push(decodeURIComponent(redirectTo));
-      } else {
-        router.push('/');
-      }
+      router.push(getSafeRedirectPath(redirectTo));
     }
   }, [isAuthenticated, user, router, isLoading, redirectTo]);
 
@@ -68,11 +65,7 @@ export default function LoginPage() {
       }).unwrap();
 
       if (result.success && result.data?.userId) {
-        if (redirectTo) {
-          router.push(decodeURIComponent(redirectTo));
-        } else {
-          router.push('/');
-        }
+        router.push(getSafeRedirectPath(redirectTo));
       } else if (!result.success) {
         setError('root', {
           type: 'manual',

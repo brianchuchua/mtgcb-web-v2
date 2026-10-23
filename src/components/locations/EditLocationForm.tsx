@@ -64,14 +64,8 @@ export default function EditLocationForm({ location, onDeleteStart }: EditLocati
     const options: React.ReactNode[] = [];
     
     for (const loc of locs) {
-      // Skip only the current location itself
-      if (loc.id === excludeId) {
-        // Still process its children (they can't be selected as parents anyway due to circular reference check)
-        if (loc.children.length > 0) {
-          options.push(...renderLocationOptions(loc.children, depth, excludeId));
-        }
-        continue;
-      }
+      // A location can't sit inside itself or anything inside it, so skip the whole subtree.
+      if (loc.id === excludeId) continue;
       
       const indent = '\u00A0\u00A0'.repeat(depth * 2); // Non-breaking spaces
       const prefix = depth > 0 ? '└ ' : '';
@@ -91,20 +85,6 @@ export default function EditLocationForm({ location, onDeleteStart }: EditLocati
     return options;
   };
 
-  // Helper to check if a location or any of its descendants has the given ID
-  const isLocationOrDescendant = (loc: LocationHierarchy, targetId?: number): boolean => {
-    if (!targetId) return false;
-    if (loc.id === targetId) return true;
-    
-    for (const child of loc.children) {
-      if (isLocationOrDescendant(child, targetId)) {
-        return true;
-      }
-    }
-    
-    return false;
-  };
-
   const onSubmit = async (data: UpdateLocationRequest) => {
     if (!isDirty) {
       router.push('/locations');
@@ -119,7 +99,8 @@ export default function EditLocationForm({ location, onDeleteStart }: EditLocati
       }
       
       if (data.description !== (location.description || '')) {
-        updates.description = data.description?.trim() || undefined;
+        // Send '' (not undefined) when cleared; JSON drops undefined and the API maps '' to null.
+        updates.description = data.description?.trim() ?? '';
       }
 
       if (data.parentId !== location.parentId) {

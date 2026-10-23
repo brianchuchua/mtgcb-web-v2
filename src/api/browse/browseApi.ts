@@ -32,7 +32,7 @@ export const browseApi = mtgcbApi.injectEndpoints({
           body: normalizeCardSearchParams(safeParams),
         };
       },
-      serializeQueryArgs: ({ queryArgs }) => {
+      serializeQueryArgs: ({ queryArgs, endpointName }) => {
         if (!queryArgs) return '';
 
         const { limit = 20, offset = 0, sortBy, sortDirection = 'asc', ...rest } = queryArgs;
@@ -40,7 +40,8 @@ export const browseApi = mtgcbApi.injectEndpoints({
         const sortKey = sortBy ? `&sort=${sortBy}:${sortDirection}` : '';
         const filterKey = JSON.stringify(rest);
 
-        return `${paginationKey}${sortKey}${filterKey}`;
+        // Prefix the endpoint so cards and sets searches with the same args never share a cache entry.
+        return `${endpointName}:${paginationKey}${sortKey}${filterKey}`;
       },
       keepUnusedDataFor: 300, // 5 minutes
       providesTags: (result, error, arg) => {
@@ -62,7 +63,7 @@ export const browseApi = mtgcbApi.injectEndpoints({
           body: normalizeSetSearchParams(safeParams),
         };
       },
-      serializeQueryArgs: ({ queryArgs }) => {
+      serializeQueryArgs: ({ queryArgs, endpointName }) => {
         if (!queryArgs) return '';
 
         const { limit = 20, offset = 0, sortBy, sortDirection = 'asc', ...rest } = queryArgs;
@@ -70,7 +71,8 @@ export const browseApi = mtgcbApi.injectEndpoints({
         const sortKey = sortBy ? `&sort=${sortBy}:${sortDirection}` : '';
         const filterKey = JSON.stringify(rest);
 
-        return `${paginationKey}${sortKey}${filterKey}`;
+        // Prefix the endpoint so cards and sets searches with the same args never share a cache entry.
+        return `${endpointName}:${paginationKey}${sortKey}${filterKey}`;
       },
       keepUnusedDataFor: 300, // 5 minutes
       providesTags: (result, error, arg) => {

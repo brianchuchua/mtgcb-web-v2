@@ -13,6 +13,7 @@
 // Base62 alphabet (0-9, a-z, A-Z)
 const BASE62_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const BASE = BigInt(62);
+const SHARE_TOKEN_HEX_LENGTH = 64;
 
 /**
  * Converts a hex string to base62
@@ -71,9 +72,10 @@ export function decodeToken(encoded: string): string {
     // Convert BigInt back to hex string
     let hex = result.toString(16);
     
-    // Pad with leading zeros if necessary to maintain original length
-    // Most share tokens are 64 characters (256 bits)
-    while (hex.length < 64 && hex.length % 2 !== 0) {
+    // Share tokens are always 64 hex characters (32 random bytes), so restore any leading
+    // zeros the number conversion dropped. Longer values keep an even length.
+    hex = hex.padStart(SHARE_TOKEN_HEX_LENGTH, '0');
+    if (hex.length % 2 !== 0) {
       hex = '0' + hex;
     }
     

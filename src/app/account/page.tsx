@@ -139,21 +139,29 @@ function ProfileContent() {
       const result = await updateUser(trimmedData).unwrap();
 
       if (!result.success) {
-        if (result.error?.code === 'USERNAME_TAKEN') {
-          setProfileError('username', { message: 'Username is already taken' });
-        } else if (result.error?.code === 'EMAIL_TAKEN') {
-          setProfileError('email', { message: 'Email is already registered' });
-        } else {
-          throw new Error(result.error?.message);
-        }
-        return;
+        if (showProfileFieldError(result.error?.code)) return;
+        throw new Error(result.error?.message);
       }
 
       enqueueSnackbar('Profile updated', { variant: 'success' });
     } catch (error: any) {
+      // The API answers a duplicate username with 409, so the code arrives on the error.
+      if (showProfileFieldError(error.data?.error?.code)) return;
       const message = error.data?.error?.message || 'Failed to update profile';
       enqueueSnackbar(message, { variant: 'error' });
     }
+  };
+
+  const showProfileFieldError = (code: string | undefined): boolean => {
+    if (code === 'USERNAME_TAKEN' || code === 'USERNAME_EXISTS') {
+      setProfileError('username', { message: 'Username is already taken' });
+      return true;
+    }
+    if (code === 'EMAIL_TAKEN' || code === 'EMAIL_EXISTS') {
+      setProfileError('email', { message: 'Email is already registered' });
+      return true;
+    }
+    return false;
   };
 
   const onPasswordSubmit = async (data: PasswordFormData) => {

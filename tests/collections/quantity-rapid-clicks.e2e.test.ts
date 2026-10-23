@@ -244,7 +244,8 @@ for (const s of SURFACES) {
         if (p.searchDelayMs) {
           await page.route('**/cards/search', async (route) => {
             await new Promise((r) => setTimeout(r, p.searchDelayMs));
-            await route.continue();
+            // The reload below can cancel a request still in this delay; that's not a failure.
+            await route.continue().catch(() => {});
           });
         }
 

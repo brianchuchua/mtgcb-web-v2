@@ -16,6 +16,19 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-23',
+      version: '1.38.1',
+      changes: [
+        'Some small bug fixes:',
+        [
+          'Fixed some share links not opening',
+          "Fixed a location's own sub-locations showing up as options when picking its parent",
+          'Fixed clearing a location description not saving',
+          'Fixed a collection-only sort sometimes leaving sets in oldest-first order when it got reset',
+        ],
+      ],
+    },
+    {
+      date: '2026-10-23',
       version: '1.38.0',
       changes: [
         'A bunch of little fixes and improvements, including:',

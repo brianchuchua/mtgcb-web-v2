@@ -58,8 +58,10 @@ export function filterCollectionParams<T extends Record<string, any>>(
   if (filtered['sortBy']) {
     const collectionSorts = COLLECTION_ONLY_SORTS[viewType] as readonly string[];
     if (collectionSorts.includes(filtered['sortBy'] as string)) {
+      // API params call the direction sortDirection; UI state calls it sortOrder.
+      const directionKey = 'sortDirection' in filtered ? 'sortDirection' : 'sortOrder';
       (filtered as any)['sortBy'] = DEFAULT_SORT[viewType].sortBy;
-      (filtered as any)['sortOrder'] = DEFAULT_SORT[viewType].sortOrder;
+      (filtered as any)[directionKey] = DEFAULT_SORT[viewType].sortOrder;
     }
   }
 
