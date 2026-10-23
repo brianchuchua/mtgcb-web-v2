@@ -17,11 +17,6 @@ export default function ReCaptchaProvider({ children }: ReCaptchaProviderProps) 
           defer: true,
           appendTo: 'head',
         }}
-        container={{
-          parameters: {
-            badge: 'inline',
-          },
-        }}
       >
         {children}
       </GoogleReCaptchaProvider>

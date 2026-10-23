@@ -30,9 +30,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CardSettingsPanel, { CardSettingGroup } from '@/components/cards/CardSettingsPanel';
 import { useDashboardContext } from '@/components/layout/Dashboard/context/DashboardContext';
 import ParentDropdown from './ParentDropdown';
+import SortToggleButton from './SortToggleButton';
+import { TOOLBAR_BUTTON_HEIGHT, TOOLBAR_ICON_BUTTON_WIDTH } from './toolbarButtonSize';
 import SubsetDropdown from './SubsetDropdown';
 import { useCardSettingGroups } from '@/hooks/useCardSettingGroups';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { getSortOptionLabel } from '@/features/browse/BrowseSearchForm/utils/sortOptions';
 import { SortByOption, SortOrderOption } from '@/types/browse';
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -174,26 +177,7 @@ const Pagination: React.FC<PaginationProps> = ({
                           />
                         )}
                         {sortOptions.length > 0 && (
-                          <Tooltip title={showSortControls ? "Hide sort options" : "Show sort options"}>
-                            <IconButton
-                              size="small"
-                              onClick={handleToggleSortControls}
-                              sx={{
-                                border: 1,
-                                borderColor: (theme) => theme.palette.mode === 'dark'
-                                  ? 'rgba(144, 202, 249, 0.5)'
-                                  : 'rgba(25, 118, 210, 0.5)',
-                                borderRadius: 1,
-                                color: 'primary.main',
-                                '&:hover': {
-                                  borderColor: 'primary.main',
-                                  backgroundColor: 'action.hover',
-                                },
-                              }}
-                            >
-                              <ManageSearchIcon fontSize="small" color="primary" />
-                            </IconButton>
-                          </Tooltip>
+                          <SortToggleButton compact isOpen={showSortControls} onClick={handleToggleSortControls} />
                         )}
                         {additionalAction}
                       </Stack>
@@ -295,26 +279,7 @@ const Pagination: React.FC<PaginationProps> = ({
                         />
                       )}
                       {sortOptions.length > 0 && (
-                        <Tooltip title={showSortControls ? "Hide sort options" : "Show sort options"}>
-                          <IconButton
-                            size="small"
-                            onClick={handleToggleSortControls}
-                            sx={{
-                              border: 1,
-                              borderColor: (theme) => theme.palette.mode === 'dark'
-                                ? 'rgba(144, 202, 249, 0.5)'
-                                : 'rgba(25, 118, 210, 0.5)',
-                              borderRadius: 1,
-                              color: 'primary.main',
-                              '&:hover': {
-                                borderColor: 'primary.main',
-                                backgroundColor: 'action.hover',
-                              },
-                            }}
-                          >
-                            <ManageSearchIcon fontSize="small" color="primary" />
-                          </IconButton>
-                        </Tooltip>
+                        <SortToggleButton compact isOpen={showSortControls} onClick={handleToggleSortControls} />
                       )}
                       {additionalAction}
                     </Stack>
@@ -350,16 +315,7 @@ const Pagination: React.FC<PaginationProps> = ({
                     />
                   )}
                   {sortOptions.length > 0 && (
-                    <Tooltip title={showSortControls ? "Hide sort options" : "Show sort options"}>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={handleToggleSortControls}
-                        startIcon={<ManageSearchIcon />}
-                      >
-                        Sort
-                      </Button>
-                    </Tooltip>
+                    <SortToggleButton compact={false} isOpen={showSortControls} onClick={handleToggleSortControls} />
                   )}
                   {additionalAction}
                 </Stack>
@@ -615,7 +571,8 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
             data-testid="view-mode-toggle-grid"
             sx={{ 
               opacity: isFullyLoaded ? 1 : 0.7,
-              minWidth: isSmallScreen ? 'auto' : undefined,
+              height: TOOLBAR_BUTTON_HEIGHT,
+              minWidth: isSmallScreen ? TOOLBAR_ICON_BUTTON_WIDTH : undefined,
               px: isSmallScreen ? 1 : undefined,
             }}
           >
@@ -634,7 +591,8 @@ const ViewModeToggle: React.FC<ViewModeToggleProps> = ({
             data-testid="view-mode-toggle-table"
             sx={{ 
               opacity: isFullyLoaded ? 1 : 0.7,
-              minWidth: isSmallScreen ? 'auto' : undefined,
+              height: TOOLBAR_BUTTON_HEIGHT,
+              minWidth: isSmallScreen ? TOOLBAR_ICON_BUTTON_WIDTH : undefined,
               px: isSmallScreen ? 1 : undefined,
             }}
           >
@@ -682,6 +640,7 @@ const PaginationSortControls: React.FC<PaginationSortControlsProps> = ({
           value={sortBy}
           label="Sort By"
           onChange={onSortByChange}
+          renderValue={(value) => getSortOptionLabel(sortOptions, value)}
           startAdornment={
             <InputAdornment position="start">
               <ManageSearchIcon color="disabled" />
@@ -882,6 +841,7 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
           {pageNumbers.map((pageNum) => (
             <PageButton
               key={pageNum}
+              buttonWidth={getPageButtonWidth(pageNumbers[pageNumbers.length - 1] ?? 1)}
               variant={page === pageNum ? 'contained' : 'outlined'}
               onClick={() => onPageChange(pageNum)}
               disabled={isLoading}
@@ -1037,11 +997,15 @@ const PageNumbers = styled(Box)(({ theme }) => ({
   gap: theme.spacing(0.5),
 }));
 
+// Every page button in the row shares one width, wide enough for the longest number shown.
+export const getPageButtonWidth = (largestPage: number): number =>
+  Math.max(36, 12 + String(largestPage).length * 9);
+
 const PageButton = styled(Button, {
-  shouldForwardProp: (prop) => prop !== 'current',
-})<{ current?: boolean }>(({ theme }) => ({
-  minWidth: '36px',
-  width: '36px',
+  shouldForwardProp: (prop) => prop !== 'current' && prop !== 'buttonWidth',
+})<{ current?: boolean; buttonWidth: number }>(({ buttonWidth }) => ({
+  minWidth: `${buttonWidth}px`,
+  width: `${buttonWidth}px`,
   height: '36px',
   padding: 0,
 }));

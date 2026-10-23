@@ -50,6 +50,7 @@ import {
   formatFrameStyleName,
 } from '@/features/browse/treatmentLabels';
 import { ColorMatchType, MTG_COLORS } from '@/types/browse';
+import { SEARCH_TEXT_MAX_LENGTH } from '@/utils/validationLimits';
 
 interface GoalSearchFormProps {
   searchConditions: Omit<CardApiParams, 'limit' | 'offset' | 'sortBy' | 'sortDirection'>;
@@ -1040,6 +1041,7 @@ export function GoalSearchForm({
         onChange={(e) => setName(e.target.value)}
         placeholder="Search by card name"
         margin="dense"
+        inputProps={{ maxLength: SEARCH_TEXT_MAX_LENGTH }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -1056,6 +1058,7 @@ export function GoalSearchForm({
         onChange={(e) => setOracleText(e.target.value)}
         placeholder="Search card text"
         margin="dense"
+        inputProps={{ maxLength: SEARCH_TEXT_MAX_LENGTH }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -1085,6 +1088,7 @@ export function GoalSearchForm({
         onChange={(e) => setArtist(e.target.value)}
         placeholder="Search by artist name"
         margin="dense"
+        inputProps={{ maxLength: SEARCH_TEXT_MAX_LENGTH }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">

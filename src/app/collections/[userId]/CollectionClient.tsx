@@ -20,8 +20,10 @@ import MassEntryConfirmDialog from '@/components/collections/MassEntryConfirmDia
 import MassUpdateLocationPanel, { MassUpdateLocationFormData } from '@/components/collections/MassUpdateLocationPanel';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
 import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
+import { EditGoalMenuItem } from '@/components/goals/EditGoalMenuItem';
 import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Pagination } from '@/components/pagination';
+import { TOOLBAR_BUTTON_HEIGHT, TOOLBAR_ICON_BUTTON_WIDTH } from '@/components/pagination/toolbarButtonSize';
 import { useShareTokenContext } from '@/contexts/ShareTokenContext';
 import { CardsProps, SetsProps } from '@/features/browse/types';
 import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
@@ -91,6 +93,9 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
     }
     return [];
   }, [view, cardsProps]);
+
+  const showMassUpdateAction = view === 'cards' && visibleCardIds.length > 0;
+  const showLocationsAction = view === 'cards' && hasLocations && ownedVisibleCardIds.length > 0;
 
   // Menu handlers
   const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
@@ -479,7 +484,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
                 username={username || user?.username || 'User'}
                 isPublic={user?.isPublic || false}
               />
-              {view === 'cards' && (visibleCardIds.length > 0 || (hasLocations && ownedVisibleCardIds.length > 0)) && (
+              {(showMassUpdateAction || showLocationsAction || selectedGoalId) && (
                 <>
                   <Tooltip title="More actions">
                     <Button
@@ -488,7 +493,8 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
                       onClick={handleMenuOpen}
                       data-testid="collection-more-actions"
                       sx={{
-                        minWidth: 'auto',
+                        height: TOOLBAR_BUTTON_HEIGHT,
+                        minWidth: TOOLBAR_ICON_BUTTON_WIDTH,
                         px: 1,
                       }}
                     >
@@ -508,7 +514,8 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
                       horizontal: 'right',
                     }}
                   >
-                    {visibleCardIds.length > 0 && (
+                    {selectedGoalId && <EditGoalMenuItem goalId={selectedGoalId} onClick={handleMenuClose} />}
+                    {showMassUpdateAction && (
                       <MenuItem onClick={handleMassUpdateToggle}>
                         <ListItemIcon>
                           <AutoFixHigh fontSize="small" />
@@ -516,7 +523,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
                         <ListItemText>Mass Update</ListItemText>
                       </MenuItem>
                     )}
-                    {hasLocations && ownedVisibleCardIds.length > 0 && (
+                    {showLocationsAction && (
                       <MenuItem onClick={handleMassUpdateLocationToggle}>
                         <ListItemIcon>
                           <LocationOn fontSize="small" />
@@ -552,6 +559,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
           )}
           <MassUpdateLocationPanel
             isOpen={isMassUpdateLocationOpen}
+            spaceAbove={isMassUpdateOpen}
             onSubmit={handleMassUpdateLocationSubmit}
             onCancel={handleMassUpdateLocationCancel}
             isLoading={isMassUpdateLocationLoading}
@@ -571,7 +579,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
         ))}
 
       {/* Show sets view for collections */}
-      {view === 'sets' && 'setItems' in setsProps && setsProps.setItems && (
+      {!error && view === 'sets' && 'setItems' in setsProps && setsProps.setItems && (
         <CollectionSetDisplay
           {...(setsProps as SetsProps)}
           collectionData={{
@@ -584,7 +592,7 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
       )}
 
       {/* Show cards view for collections */}
-      {view === 'cards' && (
+      {!error && view === 'cards' && (
         <>
           {hasStaleGoalData ? (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">

@@ -30,7 +30,9 @@ import MassUpdateLocationPanel, { MassUpdateLocationFormData } from '@/component
 import MassUpdatePanel, { MassUpdateFormData } from '@/components/collections/MassUpdatePanel';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
 import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
+import { EditGoalMenuItem } from '@/components/goals/EditGoalMenuItem';
 import { Pagination } from '@/components/pagination';
+import { TOOLBAR_BUTTON_HEIGHT, TOOLBAR_ICON_BUTTON_WIDTH } from '@/components/pagination/toolbarButtonSize';
 import SubsetDropdown from '@/components/pagination/SubsetDropdown';
 import { NoteCallout } from '@/components/notes/NoteCallout';
 import SetIcon from '@/components/sets/SetIcon';
@@ -853,7 +855,8 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                       disabled={isMassUpdateLoading || isMassEntryLoading}
                       data-testid="collection-set-more-actions"
                       sx={{
-                        minWidth: 'auto',
+                        height: TOOLBAR_BUTTON_HEIGHT,
+                        minWidth: TOOLBAR_ICON_BUTTON_WIDTH,
                         px: 1,
                       }}
                     >
@@ -873,6 +876,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
                       horizontal: 'right',
                     }}
                   >
+                    {selectedGoalId && <EditGoalMenuItem goalId={selectedGoalId} onClick={handleMenuClose} />}
                     <MenuItem onClick={selectedGoalId ? handleMassEntryToggle : handleMassUpdateToggle}>
                       <ListItemIcon>
                         <AutoFixHigh fontSize="small" />
@@ -933,6 +937,7 @@ export const CollectionSetClient: React.FC<CollectionSetClientProps> = ({ userId
       {isOwnCollection && browseController.view === 'cards' && (
         <MassUpdateLocationPanel
           isOpen={isMassUpdateLocationOpen}
+          spaceAbove={selectedGoalId ? isMassEntryOpen : isMassUpdateOpen}
           onSubmit={handleMassUpdateLocationSubmit}
           onCancel={handleMassUpdateLocationCancel}
           isLoading={isMassUpdateLocationLoading}

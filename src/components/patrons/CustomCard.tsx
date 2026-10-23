@@ -29,6 +29,8 @@ export const CustomCard = ({ username, cardId, color }: CustomCardProps) => {
         component="img"
         src={artCropUrl}
         alt={username}
+        loading="lazy"
+        decoding="async"
         sx={{
           position: 'absolute',
           top: 40,
@@ -46,6 +48,8 @@ export const CustomCard = ({ username, cardId, color }: CustomCardProps) => {
         component="img"
         src={frameUrl}
         alt="Card frame"
+        loading="lazy"
+        decoding="async"
         sx={{
           position: 'absolute',
           top: 0,

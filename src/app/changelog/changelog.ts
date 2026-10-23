@@ -1,7 +1,10 @@
+// A nested array right after a line shows as sub-bullets under that line.
+export type Change = string | Change[];
+
 interface Release {
   date: string;
   version: string;
-  changes: string[];
+  changes: Change[];
   type?: 'feature' | 'data';
 }
 
@@ -11,6 +14,30 @@ interface ChangelogData {
 
 const changelogData: ChangelogData = {
   releases: [
+    {
+      date: '2026-10-23',
+      version: '1.38.0',
+      changes: [
+        'A bunch of little fixes and improvements, including:',
+        [
+          'Added Edit Goal to the collection menu when a goal is selected',
+          "Artist names in table view now link to that artist's cards",
+          'Added 6, 7 and 8 cards per row options for grid view',
+          'Moved the "Include current view" toggle below the share link',
+          'Fixed large page numbers not fitting in the pagination buttons',
+          'Made the Grid, Table, Sort, Share and menu buttons the same height',
+          'Fixed table CSV downloads leaving the price blank when the table showed a fallback price',
+          'Fixed the buy buttons on set pages opening expanded when the set grid setting was expanded (that setting is just intended for individual grid items)',
+          'Fixed a warning icon showing in the selected sort option',
+          'Fixed private collections showing a second "No cards found" message -- that looked ugly',
+          'Fixed the goal header causing a layout shift while it was loading',
+          'Fixed the Mass Update and Locations panels touching when both were open',
+          'Goal search fields now stop at 2,000 characters instead of failing on save',
+          'Supporter cards on the Patrons page now load as you scroll instead of all at once',
+        ],
+      ],
+      type: 'feature',
+    },
     {
       date: '2026-10-22',
       version: '1.37.13',
@@ -2412,6 +2439,27 @@ const changelogData: ChangelogData = {
       ],
     },
   ],
+};
+
+export interface ChangeItem {
+  text: string;
+  children: ChangeItem[];
+}
+
+// Turns ['Line', ['Sub 1', 'Sub 2']] into one item with two children.
+// A nested array with no line before it gets an empty parent line.
+export const groupChanges = (changes: Change[]): ChangeItem[] => {
+  const items: ChangeItem[] = [];
+  for (const change of changes) {
+    if (typeof change === 'string') {
+      items.push({ text: change, children: [] });
+    } else if (items.length > 0) {
+      items[items.length - 1].children.push(...groupChanges(change));
+    } else {
+      items.push({ text: '', children: groupChanges(change) });
+    }
+  }
+  return items;
 };
 
 export const getLatestRelease = (): { date: string; version: string } | null => {

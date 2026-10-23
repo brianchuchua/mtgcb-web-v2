@@ -12,6 +12,7 @@ import {
 import React, { MouseEvent, useState } from 'react';
 import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
+import { pickFoilDisplayPrice, pickNormalDisplayPrice } from '@/utils/pricing/displayPrice';
 import { BuyOptionsMenu } from './BuyOptionsMenu';
 
 interface CardPriceProps {
@@ -62,13 +63,6 @@ const formatPrice = (price: number): string => {
     maximumFractionDigits: 2,
   }).format(price);
 };
-
-// This interface represents a price with its type for fallback mechanism
-interface PriceWithType {
-  price: number;
-  type: PriceType;
-  isFallback: boolean;
-}
 
 const CardPrice: React.FC<CardPriceProps> = ({
   prices,
@@ -197,75 +191,14 @@ const CardPrice: React.FC<CardPriceProps> = ({
     );
   };
 
-  // Get the normal price with fallback mechanism
-  const getNormalPriceWithFallback = (): PriceWithType | null => {
-    if (!normalPriceData) return null;
-
-    // Try to get the selected price type first
-    if (priceType === PriceType.Market && normalPriceData.market !== null && normalPriceData.market !== undefined) {
-      return { price: normalPriceData.market, type: PriceType.Market, isFallback: false };
-    }
-    if (priceType === PriceType.Low && normalPriceData.low !== null && normalPriceData.low !== undefined) {
-      return { price: normalPriceData.low, type: PriceType.Low, isFallback: false };
-    }
-    if (priceType === PriceType.Average && normalPriceData.average !== null && normalPriceData.average !== undefined) {
-      return { price: normalPriceData.average, type: PriceType.Average, isFallback: false };
-    }
-    if (priceType === PriceType.High && normalPriceData.high !== null && normalPriceData.high !== undefined) {
-      return { price: normalPriceData.high, type: PriceType.High, isFallback: false };
-    }
-
-    // Fallback logic: market → low → average → high
-    // If the requested price is not available, try others in order
-    const fallbackChecks = [
-      { value: normalPriceData.market, type: PriceType.Market },
-      { value: normalPriceData.low, type: PriceType.Low },
-      { value: normalPriceData.average, type: PriceType.Average },
-      { value: normalPriceData.high, type: PriceType.High },
-    ];
-
-    // Filter out the originally requested price type that's already been checked
-    const fallbacks = fallbackChecks.filter((check) => check.type !== priceType);
-
-    // Try each fallback in order
-    for (const fallback of fallbacks) {
-      if (fallback.value !== null && fallback.value !== undefined) {
-        return { price: fallback.value, type: fallback.type, isFallback: true };
-      }
-    }
-
-    return null;
-  };
-
-  // Get foil price (usually market price is used for foil)
-  const getFoilPrice = (): number | null => {
-    if (!foilPriceData) return null;
-
-    // For foil, try to get market price first, then fallback to others if not available
-    if (foilPriceData.market !== null && foilPriceData.market !== undefined) {
-      return foilPriceData.market;
-    }
-    if (foilPriceData.low !== null && foilPriceData.low !== undefined) {
-      return foilPriceData.low;
-    }
-    if (foilPriceData.average !== null && foilPriceData.average !== undefined) {
-      return foilPriceData.average;
-    }
-    if (foilPriceData.high !== null && foilPriceData.high !== undefined) {
-      return foilPriceData.high;
-    }
-
-    return null;
-  };
-
   // Check if normal prices exist but are all null (or the object doesn't exist)
   const hasAnyNormalPrice = hasAnyValidPrice(normalPriceData);
 
   // Check if this is a foil-only card (no normal prices, but has foil price)
   const isFoilOnlyCard = !hasAnyNormalPrice && hasAnyValidPrice(foilPriceData);
 
-  const normalPriceWithType = getNormalPriceWithFallback();
-  const foilPrice = getFoilPrice();
+  const normalPriceWithType = pickNormalDisplayPrice(normalPriceData, priceType);
+  const foilPrice = pickFoilDisplayPrice(foilPriceData);
 
   // Get the display label for the price type
   const getPriceTypeLabel = (type: PriceType): string => {

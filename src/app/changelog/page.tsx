@@ -3,7 +3,7 @@
 import { Box, Chip, Divider, Pagination, Paper, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
-import changelogData from './changelog';
+import changelogData, { ChangeItem as ChangeItemData, groupChanges } from './changelog';
 import { Link } from '@/components/ui/link';
 
 const ITEMS_PER_PAGE = 10;
@@ -30,6 +30,17 @@ const ChangeItem = styled('li')(({ theme }) => ({
     color: theme.palette.primary.main,
   },
 }));
+
+const ChangeList = ({ items, nested = false }: { items: ChangeItemData[]; nested?: boolean }) => (
+  <Box component="ul" sx={{ pl: 3, m: 0, mt: nested ? 1 : 0 }}>
+    {items.map((item, index) => (
+      <ChangeItem key={index}>
+        {item.text && <Typography variant="body1">{item.text}</Typography>}
+        {item.children.length > 0 && <ChangeList items={item.children} nested />}
+      </ChangeItem>
+    ))}
+  </Box>
+);
 
 const formatDate = (dateString: string) => {
   const [year, month, day] = dateString.split('-').map((num) => parseInt(num, 10));
@@ -80,13 +91,7 @@ export default function ChangelogPage() {
 
           <Divider sx={{ mb: 2 }} />
 
-          <Box component="ul" sx={{ pl: 3, m: 0 }}>
-            {release.changes.map((change, changeIndex) => (
-              <ChangeItem key={changeIndex}>
-                <Typography variant="body1">{change}</Typography>
-              </ChangeItem>
-            ))}
-          </Box>
+          <ChangeList items={groupChanges(release.changes)} />
         </Paper>
       ))}
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Tooltip, useMediaQuery } from '@mui/material';
+import { TOOLBAR_BUTTON_HEIGHT, TOOLBAR_ICON_BUTTON_WIDTH } from '@/components/pagination/toolbarButtonSize';
 import { Share as ShareIcon } from '@mui/icons-material';
 import { ShareCollectionModal } from './ShareCollectionModal';
 
@@ -40,7 +41,8 @@ export const ShareCollectionButton = ({
             size="small"
             onClick={handleClick}
             sx={{
-              minWidth: 'auto',
+              height: TOOLBAR_BUTTON_HEIGHT,
+              minWidth: TOOLBAR_ICON_BUTTON_WIDTH,
               px: 1,
             }}
           >
@@ -65,8 +67,9 @@ export const ShareCollectionButton = ({
       <Button 
         variant="outlined"
         size="small"
-        startIcon={<ShareIcon />} 
+        startIcon={<ShareIcon />}
         onClick={handleClick}
+        sx={{ height: TOOLBAR_BUTTON_HEIGHT }}
       >
         Share
       </Button>

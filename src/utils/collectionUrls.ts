@@ -91,3 +91,12 @@ export function getCollectionCardUrl(userId: string | number, cardSlug: string, 
   // Otherwise use the standard URL
   return `/collections/${userId}/cards/${cardSlug}/${cardId}`;
 }
+/**
+ * Card search for one artist: inside the collection when a userId is given, otherwise Browse.
+ */
+export function getArtistSearchUrl(artist: string, userId?: string | number | null): string {
+  const artistParam = `artist=${encodeURIComponent(artist)}`;
+  return userId
+    ? `${getCollectionUrl({ userId: Number(userId), contentType: 'cards' })}&${artistParam}`
+    : `/browse?contentType=cards&${artistParam}`;
+}

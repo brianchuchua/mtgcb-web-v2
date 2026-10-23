@@ -3,7 +3,6 @@
 import React from 'react';
 import { Box, Button, Collapse, Typography } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
-import { useCostsToCompleteExpanded } from '@/contexts/DisplaySettingsContext';
 import { CostToComplete } from '@/api/sets/types';
 import TCGPlayerMassImportButton from '@/components/tcgplayer/TCGPlayerMassImportButton';
 import { CountType } from '@/components/tcgplayer/useFetchCardsForMassImport';
@@ -26,12 +25,7 @@ export const SetPageBuyButton: React.FC<SetPageBuyButtonProps> = ({
   userId,
   isCollection = false,
 }) => {
-  const [globalExpanded] = useCostsToCompleteExpanded();
-  const [expanded, setExpanded] = React.useState(globalExpanded);
-
-  React.useEffect(() => {
-    setExpanded(globalExpanded);
-  }, [globalExpanded]);
+  const [expanded, setExpanded] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);

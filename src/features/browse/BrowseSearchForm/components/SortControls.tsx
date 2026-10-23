@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormControl, InputAdornment, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from '@mui/material';
 import SortIcon from '@mui/icons-material/Sort';
+import { getSortOptionLabel } from '@/features/browse/BrowseSearchForm/utils/sortOptions';
 import { SortByOption, SortOrderOption } from '@/types/browse';
 
 interface SortControlsProps {
@@ -27,6 +28,7 @@ const SortControls: React.FC<SortControlsProps> = ({
           value={sortBy}
           label="Sort By"
           onChange={onSortByChange}
+          renderValue={(value) => getSortOptionLabel(sortOptions, value)}
           startAdornment={
             <InputAdornment position="start">
               <SortIcon color="disabled" />

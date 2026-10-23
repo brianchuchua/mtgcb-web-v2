@@ -36,6 +36,7 @@ import {
   useGenerateShareLinkMutation,
   useRevokeShareLinkMutation 
 } from '@/api/user/shareLinkApi';
+import { IncludeCurrentViewToggle } from '@/components/collections/IncludeCurrentViewToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow, parseISO } from '@/utils/shareTokenDateUtils';
 import { getAbsoluteShareUrl } from '@/utils/shareLinkUtils';
@@ -238,27 +239,6 @@ export const ShareCollectionModal = ({
             />
           )}
           
-          {hasQueryParams && (
-            <Box sx={{ mb: 2 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={includeFilters}
-                    onChange={(e) => setIncludeFilters(e.target.checked)}
-                    size="small"
-                  />
-                }
-                label={
-                  <Box>
-                    <Typography variant="body2">Include current view</Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Share with your current filters, search, and settings
-                    </Typography>
-                  </Box>
-                }
-              />
-            </Box>
-          )}
           
           <TextField
             fullWidth
@@ -330,13 +310,15 @@ export const ShareCollectionModal = ({
                 </InputAdornment>
               ),
             }}
-            sx={{ mb: 3 }}
+            sx={{ mb: hasQueryParams ? 1 : 3 }}
             helperText={
               includeFilters && hasQueryParams
                 ? "Sharing current view with filters"
                 : "Sharing collection link"
             }
           />
+
+          {hasQueryParams && <IncludeCurrentViewToggle checked={includeFilters} onChange={setIncludeFilters} />}
           
           {isOwnCollection && (
             <>
@@ -504,27 +486,6 @@ export const ShareCollectionModal = ({
           : `Anyone with this link can view ${username}'s collection`}
       </Typography>
 
-      {hasQueryParams && (
-        <Box sx={{ mb: 2 }}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={includeFilters}
-                onChange={(e) => setIncludeFilters(e.target.checked)}
-                size="small"
-              />
-            }
-            label={
-              <Box>
-                <Typography variant="body2">Include current view</Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Share with your current filters, search, and settings
-                </Typography>
-              </Box>
-            }
-          />
-        </Box>
-      )}
 
       <TextField
         fullWidth
@@ -542,13 +503,15 @@ export const ShareCollectionModal = ({
             </InputAdornment>
           ),
         }}
-        sx={{ mb: 3 }}
+        sx={{ mb: hasQueryParams ? 1 : 3 }}
         helperText={
           includeFilters && hasQueryParams
             ? "Sharing current view with filters"
             : "Sharing plain collection link"
         }
       />
+
+      {hasQueryParams && <IncludeCurrentViewToggle checked={includeFilters} onChange={setIncludeFilters} />}
 
       {isOwnCollection && (
         <>

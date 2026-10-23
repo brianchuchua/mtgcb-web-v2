@@ -1,7 +1,8 @@
-import { Box, Skeleton, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import React from 'react';
+import { CollectionHeaderSkeleton } from './CollectionHeaderSkeleton';
 import { CollectionProgressBar } from './CollectionProgressBar';
 import SetIcon from '@/components/sets/SetIcon';
 import TCGPlayerGoalMassImportButton from '@/components/tcgplayer/TCGPlayerGoalMassImportButton';
@@ -71,17 +72,7 @@ const CollectionHeaderComponent: React.FC<CollectionHeaderProps> = ({
   hideValue = false,
 }) => {
   if (isLoading) {
-    return (
-      <HeaderContainer sx={{ height: 166 }}>
-        <Skeleton variant="text" width={250} height={40} sx={{ mb: 0.5 }} />
-        <Skeleton variant="text" width={150} height={32} sx={{ mb: 0 }} />
-        <Skeleton variant="text" width={200} height={20} sx={{ mb: 0.5 }} />
-        <Skeleton variant="text" width={180} height={32} sx={{ mb: 0 }} />
-        <Box sx={{ mt: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Skeleton variant="rectangular" width="100%" sx={{ maxWidth: '400px' }} height={24} />
-        </Box>
-      </HeaderContainer>
-    );
+    return <CollectionHeaderSkeleton hasGoal={!!selectedGoalId} hideValue={hideValue} />;
   }
 
   // If we have both goal summary and set info, show set-specific goal header

@@ -18,6 +18,19 @@ export const createWarningTooltip = (priceType: string) => (
   </Box>
 );
 
+export const getSortOptionLabel = (sortOptions: React.ReactNode[], value: string): string => {
+  const option = sortOptions.find(
+    (node): node is React.ReactElement<{ value: string; children?: React.ReactNode }> =>
+      React.isValidElement<{ value: string }>(node) && node.props.value === value,
+  );
+  if (!option) return value;
+  const label = React.Children.toArray(option.props.children)
+    .filter((child) => typeof child === 'string' || typeof child === 'number')
+    .join('')
+    .trim();
+  return label || value;
+};
+
 export const getCardSortOptions = (isPriceMismatched: (priceOption: string) => boolean, isCollectionPage: boolean) => {
   const baseCardOptions = [
     <MenuItem key="name" value="name">

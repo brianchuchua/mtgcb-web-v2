@@ -136,6 +136,7 @@ interface MassUpdateLocationPanelProps {
   onCancel: () => void;
   isLoading?: boolean;
   cardCount: number;
+  spaceAbove?: boolean;
 }
 
 const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
@@ -144,6 +145,7 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
   onCancel,
   isLoading = false,
   cardCount,
+  spaceAbove = false,
 }) => {
   const [uiMode, setUiMode] = useState<FormMode>('set');
   const [formData, setFormData] = useState<MassUpdateLocationFormData>({
@@ -288,7 +290,7 @@ const MassUpdateLocationPanel: React.FC<MassUpdateLocationPanelProps> = ({
 
   return (
     <Collapse in={isOpen}>
-      <StyledPaper elevation={0}>
+      <StyledPaper elevation={0} data-testid="mass-update-location-panel" sx={spaceAbove ? { mt: 2 } : undefined}>
         <Typography variant="subtitle1" fontWeight="500" sx={{ textAlign: 'center', mb: 0.5 }}>
           Mass Edit Locations for {cardCount} Card{cardCount !== 1 ? 's' : ''} on this Page
         </Typography>

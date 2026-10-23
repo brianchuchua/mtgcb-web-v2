@@ -36,8 +36,9 @@ import { ResponsiveWidth, TableColumn } from '@/components/common/VirtualizedTab
 import { PriceType } from '@/types/pricing';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardBackImageUrl, getCardImageUrl } from '@/utils/cards/getCardImageUrl';
-import { getCollectionCardUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
+import { getArtistSearchUrl, getCollectionCardUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
 import { getManaSymbolName, parseSymbolText } from '@/utils/manaSymbols';
+import { pickFoilDisplayPrice, pickNormalDisplayPrice } from '@/utils/pricing/displayPrice';
 import { COLLECTION_QUANTITY_MAX, COLLECTION_QUANTITY_MIN, clampCollectionQuantity } from '@/utils/validationLimits';
 
 export interface CardTableRendererProps {
@@ -271,8 +272,7 @@ export const useCardTableColumns = (
           : { xs: '100px', sm: '150px', default: '200px' },
       tooltip: (
         <div>
-          <div>Sort by foil {priceType} price</div>
-          <div>Changes to the price type in settings will update this sort</div>
+          <div>Sort by foil price</div>
         </div>
       ),
       hasInfoIcon: true,
@@ -1278,7 +1278,7 @@ export const useCardRowRenderer = (
               }}
               onClick={(e) => e.stopPropagation()} // Prevent row click when clicking set link
             >
-              <SetLinkText>{card.setName}</SetLinkText>
+              <CellLinkText>{card.setName}</CellLinkText>
             </Link>
           ) : (
             card.setName || 'Unknown'
@@ -1299,7 +1299,24 @@ export const useCardRowRenderer = (
 
     // Artist Cell
     if (displaySettings.artistIsVisible) {
-      cells.push(<TableCell key="artist">{card.artist || 'N/A'}</TableCell>);
+      cells.push(
+        <TableCell key="artist">
+          {card.artist ? (
+            <Link
+              href={getArtistSearchUrl(card.artist, userId)}
+              style={{
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+              onClick={(e) => e.stopPropagation()} // Prevent row click when clicking artist link
+            >
+              <CellLinkText>{card.artist}</CellLinkText>
+            </Link>
+          ) : (
+            'N/A'
+          )}
+        </TableCell>,
+      );
     }
 
     // Mana Cost Cell
@@ -1500,7 +1517,7 @@ const ClickableText = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const SetLinkText = styled(Typography)(({ theme }) => ({
+const CellLinkText = styled(Typography)(({ theme }) => ({
   '&:hover': {
     textDecoration: 'underline',
     color: theme.palette.primary.main,
@@ -1553,31 +1570,13 @@ export const extractCardCellValue = (
     case 'market':
     case 'low':
     case 'average':
-    case 'high':
-      // Handle price columns - export raw numeric values
-      if (priceType === columnId) {
-        const priceData = preparePriceData(card);
-        if (priceData?.normal) {
-          return (priceData.normal as any)[columnId] ?? '';
-        }
-      }
-      return '';
-    case 'foil': {
-      // Export foil price using current price type, falling back to market
-      const priceData = preparePriceData(card);
-      if (priceData?.foil) {
-        const foilPrices = priceData.foil;
-        const price =
-          (priceType ? foilPrices[priceType] : null) ??
-          foilPrices.market ??
-          foilPrices.low ??
-          foilPrices.average ??
-          foilPrices.high ??
-          null;
-        return price ?? '';
-      }
-      return '';
+    case 'high': {
+      // Same price the table shows: the chosen type, else market → low → average → high
+      if (priceType !== columnId) return '';
+      return pickNormalDisplayPrice(preparePriceData(card)?.normal, priceType)?.price ?? '';
     }
+    case 'foil':
+      return pickFoilDisplayPrice(preparePriceData(card)?.foil) ?? '';
     default:
       return '';
   }

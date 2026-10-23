@@ -8,7 +8,7 @@ import { NoteCallout } from '@/components/notes/NoteCallout';
 import SetIcon from '@/components/sets/SetIcon';
 import { formatManaCost, formatSymbolText } from '@/utils/manaFormatter';
 import capitalize from '@/utils/capitalize';
-import { getCollectionUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
+import { getArtistSearchUrl, getCollectionUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
 
 interface CardDetailsSectionProps {
   card: {
@@ -72,9 +72,7 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
 
   // Determine the base URL for links
   const baseUrl = isCollectionView && userId ? getCollectionUrl({ userId }) : '/browse';
-  const artistSearchUrl = isCollectionView && userId
-    ? `${getCollectionUrl({ userId, contentType: 'cards' })}&artist=${encodeURIComponent(card.artist || '')}`
-    : `/browse?contentType=cards&artist=${encodeURIComponent(card.artist || '')}`;
+  const artistSearchUrl = getArtistSearchUrl(card.artist || '', isCollectionView ? userId : null);
   const setUrl = isCollectionView && userId
     ? getCollectionSetUrl(userId, card.setSlug || '')
     : `/browse/sets/${card.setSlug}`;
