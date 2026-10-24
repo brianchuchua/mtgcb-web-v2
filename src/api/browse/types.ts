@@ -154,6 +154,14 @@ export interface CardSearchData {
   message?: string;
 }
 
+// Goal progress depends only on these three values, so it is fetched once per goal view
+// instead of with every card page.
+export interface GoalSummaryApiParams {
+  userId: number;
+  goalId: number;
+  priceType: 'market' | 'low' | 'average' | 'high';
+}
+
 export interface CardApiParams {
   name?: string;
   oracleText?: string;
@@ -233,6 +241,7 @@ export interface CardApiParams {
   priceType?: 'market' | 'low' | 'average' | 'high';
   goalId?: number;
   showGoalProgress?: boolean;
+  goalSummaryOnly?: boolean;
   showGoals?: 'all' | 'complete' | 'incomplete';
   locationId?: number;
   includeChildLocations?: boolean;

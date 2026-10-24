@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation';
 import { useMemo, useCallback, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { useGetCardsQuery } from '@/api/browse/browseApi';
+import { useGetCardsQuery, useGetGoalSummaryQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { isUnassignedLocation } from '@/api/locations/types';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
@@ -13,6 +13,10 @@ import { useCardDisplaySettings, useCollectionSettings } from '@/contexts/Displa
 import { getCollectionCardUrl } from '@/utils/collectionUrls';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setCompilationState } from '@/redux/slices/compilationSlice';
+
+// Edits made in this tab refetch the summary through cache tags right away. This bounds
+// everything else (another device, the nightly price update) while the user keeps paging.
+export const GOAL_SUMMARY_MAX_AGE_MS = 60_000;
 
 interface UseCardDataProps {
   searchParams: any;
@@ -117,9 +121,9 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
         priceType,
         includeLocations: cardDisplaySettings.locationsIsVisible || collectionSettings.tableLocationsIsVisible
       }),
+      // Goal progress (goalSummary) comes from useGetGoalSummaryQuery below, not from each page.
       ...(selectedGoalId && userId && {
         goalId: selectedGoalId,
-        showGoalProgress: true,
         ...(showGoals !== 'all' && { showGoals })
       }),
       // selectedLocationId can be -1 (unassigned sentinel) or a positive Location ID. Both are
@@ -152,11 +156,61 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     isLoading,
     isFetching,
     error,
-    refetch,
+    refetch: refetchCards,
+    fulfilledTimeStamp: cardsFulfilledAt,
   } = useGetCardsQuery(apiArgs, {
     ...queryConfig,
     skip,
   });
+
+  const goalSummaryArgs = useMemo(
+    () => (selectedGoalId && userId ? { userId, goalId: selectedGoalId, priceType } : null),
+    [selectedGoalId, userId, priceType],
+  );
+  const skipGoalSummary = skip || !goalSummaryArgs;
+  const {
+    data: goalSummaryResult,
+    refetch: refetchGoalSummary,
+    fulfilledTimeStamp: goalSummaryFulfilledAt,
+    isFetching: isFetchingGoalSummary,
+  } = useGetGoalSummaryQuery(goalSummaryArgs ?? { userId: 0, goalId: 0, priceType }, {
+    ...queryConfig,
+    skip: skipGoalSummary,
+  });
+
+  useEffect(() => {
+    if (skipGoalSummary || isFetchingGoalSummary || !cardsFulfilledAt || !goalSummaryFulfilledAt) {
+      return;
+    }
+    const summaryIsOld = cardsFulfilledAt - goalSummaryFulfilledAt > GOAL_SUMMARY_MAX_AGE_MS;
+    // The summary request can land mid-compile while the page request lands after it. Only a
+    // page answered after the summary counts, so this fires once and can't loop.
+    const summaryMissedCompile =
+      cardsFulfilledAt > goalSummaryFulfilledAt &&
+      !!goalSummaryResult?.data?.compilationInProgress &&
+      !!cardsSearchResult?.data &&
+      !cardsSearchResult.data.compilationInProgress;
+    if (summaryIsOld || summaryMissedCompile) {
+      refetchGoalSummary();
+    }
+  }, [
+    cardsFulfilledAt,
+    goalSummaryFulfilledAt,
+    skipGoalSummary,
+    isFetchingGoalSummary,
+    refetchGoalSummary,
+    goalSummaryResult,
+    cardsSearchResult,
+  ]);
+
+  // The compilation retry loop calls this; the summary has to come back with the cards once
+  // the goal finishes compiling.
+  const refetch = useCallback(() => {
+    refetchCards();
+    if (!skipGoalSummary) {
+      refetchGoalSummary();
+    }
+  }, [refetchCards, refetchGoalSummary, skipGoalSummary]);
 
   // Handle compilation state detection
   useEffect(() => {
@@ -233,6 +287,6 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       totalValue: cardsSearchResult.data.totalValue,
       hideCollectionValue: cardsSearchResult.data.hideCollectionValue,
     } : undefined,
-    goalSummary: cardsSearchResult?.data?.goalSummary,
+    goalSummary: skipGoalSummary ? undefined : goalSummaryResult?.data?.goalSummary,
   };
 }

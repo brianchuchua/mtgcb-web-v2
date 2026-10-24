@@ -1,4 +1,4 @@
-import { CardApiParams, CardSearchData, SetApiParams } from './types';
+import { CardApiParams, CardSearchData, GoalSummaryApiParams, SetApiParams } from './types';
 import { normalizeCardSearchParams, normalizeSetSearchParams } from './searchTextParams';
 import { mtgcbApi } from '@/api/mtgcbApi';
 import { ApiResponse } from '@/api/types/apiTypes';
@@ -51,6 +51,25 @@ export const browseApi = mtgcbApi.injectEndpoints({
         }
         return tags;
       },
+    }),
+
+    // Provides every tag a goal's card pages or goal list provide, so any change that
+    // refetches those (collection edits, imports, location changes, goal edits) refetches
+    // this too.
+    getGoalSummary: builder.query<ApiResponse<CardSearchData>, GoalSummaryApiParams>({
+      query: ({ userId, goalId, priceType }) => ({
+        url: '/cards/search',
+        method: 'POST',
+        body: { userId, goalId, priceType, goalSummaryOnly: true, limit: 1, offset: 0 },
+      }),
+      keepUnusedDataFor: 300, // 5 minutes, same as getCards
+      providesTags: (result, error, { userId, goalId }) => [
+        { type: 'Cards' },
+        { type: 'Cards', id: `user-${userId}` },
+        'Goals',
+        { type: 'Goals', id: `user-${userId}` },
+        { type: 'Goals', id: goalId },
+      ],
     }),
 
     getSets: builder.query<ApiResponse<SetsSearchResult>, SetApiParams>({
@@ -130,6 +149,7 @@ export const {
   useSearchCardsMutation,
   useGetCardsQuery,
   useLazyGetCardsQuery,
+  useGetGoalSummaryQuery,
   useGetSetsQuery,
   useLazyGetSetsQuery,
   useGetSetTypesQuery,

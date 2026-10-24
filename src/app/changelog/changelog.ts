@@ -15,6 +15,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-24',
+      version: '1.38.2',
+      changes: ['Improved collection goal calculation efficiency by reducing number of calls during pagination'],
+    },
+    {
       date: '2026-10-23',
       version: '1.38.1',
       changes: [

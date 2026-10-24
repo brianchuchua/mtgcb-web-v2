@@ -132,9 +132,10 @@ export function useIndependentBrowseController({ setId, enabled = true, searchPa
       sortDirection: sortOrder || baseParams.sortDirection || 'asc',
       select: selectFields,
       // Add goal-specific parameters when goal is selected
+      // No showGoalProgress: subset sections never show the goal summary, and the per-card
+      // goal fields come back without it.
       ...(goalId && userId && { 
         goalId: goalId,
-        showGoalProgress: true,
         ...(showGoals !== 'all' && { showGoals }),
       }),
     };
