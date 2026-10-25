@@ -4,10 +4,21 @@ import AutoFixHigh from '@mui/icons-material/AutoFixHigh';
 import LocationOn from '@mui/icons-material/LocationOn';
 import MoreVert from '@mui/icons-material/MoreVert';
 import { Box, Button, CircularProgress, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+  Tooltip,
+} from '@mui/material';
 import { useSnackbar } from 'notistack';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useMassUpdateLocationsMutation, useMassEntryCollectionMutation } from '@/api/collections/collectionsApi';
+import { useMassEntryCollectionMutation, useMassUpdateLocationsMutation } from '@/api/collections/collectionsApi';
 import { CollectionSetSummary } from '@/api/collections/types';
 import { useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { SearchDescription } from '@/components/browse/SearchDescription';
@@ -15,8 +26,8 @@ import { CollectionHeader } from '@/components/collections/CollectionHeader';
 import { CollectionSetDisplay } from '@/components/collections/CollectionSetDisplay';
 import CompletionConfetti from '@/components/collections/CompletionConfetti';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
-import MassEntryPanel, { MassEntryFormData } from '@/components/collections/MassEntryPanel';
 import MassEntryConfirmDialog from '@/components/collections/MassEntryConfirmDialog';
+import MassEntryPanel, { MassEntryFormData } from '@/components/collections/MassEntryPanel';
 import MassUpdateLocationPanel, { MassUpdateLocationFormData } from '@/components/collections/MassUpdateLocationPanel';
 import { ShareCollectionButton } from '@/components/collections/ShareCollectionButton';
 import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
@@ -25,10 +36,10 @@ import CenteredContainer from '@/components/layout/CenteredContainer';
 import { Pagination } from '@/components/pagination';
 import { TOOLBAR_BUTTON_HEIGHT, TOOLBAR_ICON_BUTTON_WIDTH } from '@/components/pagination/toolbarButtonSize';
 import { useShareTokenContext } from '@/contexts/ShareTokenContext';
+import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { CardsProps, SetsProps } from '@/features/browse/types';
 import { CardGrid, CardTable, ErrorBanner, PrivacyErrorBanner } from '@/features/browse/views';
 import { useCollectionBrowseController } from '@/features/collections/useCollectionBrowseController';
-import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { useAuth } from '@/hooks/useAuth';
 import { useConfettiBurst, useGoalCompletionTrigger } from '@/hooks/useConfetti';
 import { selectIncludeSubsetsInSets, selectSelectedGoalId } from '@/redux/slices/browse';
@@ -121,64 +132,64 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
     setIsMassUpdateOpen(false);
   }, []);
 
-  const handleConfirmMassUpdate = useCallback(
-    async () => {
-      if (!massUpdateFormData || !visibleCardIds.length) {
-        enqueueSnackbar('No cards available to update', { variant: 'error' });
-        return;
-      }
+  const handleConfirmMassUpdate = useCallback(async () => {
+    if (!massUpdateFormData || !visibleCardIds.length) {
+      enqueueSnackbar('No cards available to update', { variant: 'error' });
+      return;
+    }
 
-      try {
-        const response = await massEntryCollection({
-          mode: massUpdateFormData.mode,
-          cardIds: visibleCardIds,
-          updates: [
+    try {
+      const response = await massEntryCollection({
+        mode: massUpdateFormData.mode,
+        cardIds: visibleCardIds,
+        updates: [
+          {
+            rarity: massUpdateFormData.rarity,
+            quantityReg: massUpdateFormData.quantityReg,
+            quantityFoil: massUpdateFormData.quantityFoil,
+          },
+        ],
+      }).unwrap();
+
+      if (response.success && response.data) {
+        const { updatedCards, totalSkipped } = response.data;
+
+        if (updatedCards === 0 && totalSkipped) {
+          const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
+          enqueueSnackbar(
+            `${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`,
             {
-              rarity: massUpdateFormData.rarity,
-              quantityReg: massUpdateFormData.quantityReg,
-              quantityFoil: massUpdateFormData.quantityFoil,
-            },
-          ],
-        }).unwrap();
-
-        if (response.success && response.data) {
-          const { updatedCards, totalSkipped } = response.data;
-
-          if (updatedCards === 0 && totalSkipped) {
-            const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
-            enqueueSnackbar(`${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`, {
               variant: 'error',
-            });
-          } else if (updatedCards === 0) {
-            enqueueSnackbar('No cards needed updating', { variant: 'info' });
-          } else {
-            let message = `Updated ${updatedCards} ${pluralize(updatedCards, 'card')}`;
+            },
+          );
+        } else if (updatedCards === 0) {
+          enqueueSnackbar('No cards needed updating', { variant: 'info' });
+        } else {
+          let message = `Updated ${updatedCards} ${pluralize(updatedCards, 'card')}`;
 
-            if (totalSkipped) {
-              const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
-              if (totalSkippedCount > 0) {
-                message += `. ${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`;
-                enqueueSnackbar(message, { variant: 'warning', autoHideDuration: 6000 });
-              } else {
-                enqueueSnackbar(message, { variant: 'success' });
-              }
+          if (totalSkipped) {
+            const totalSkippedCount = (totalSkipped.cannotBeFoil || 0) + (totalSkipped.cannotBeNonFoil || 0);
+            if (totalSkippedCount > 0) {
+              message += `. ${totalSkippedCount} ${pluralize(totalSkippedCount, 'card')} skipped due to foil constraints`;
+              enqueueSnackbar(message, { variant: 'warning', autoHideDuration: 6000 });
             } else {
               enqueueSnackbar(message, { variant: 'success' });
             }
+          } else {
+            enqueueSnackbar(message, { variant: 'success' });
           }
-
-          setIsMassUpdateOpen(false);
-          setShowConfirmDialog(false);
-          setMassUpdateFormData(null);
         }
-      } catch (error: any) {
-        enqueueSnackbar(error?.data?.error?.message || 'Failed to mass update collection', {
-          variant: 'error',
-        });
+
+        setIsMassUpdateOpen(false);
+        setShowConfirmDialog(false);
+        setMassUpdateFormData(null);
       }
-    },
-    [massUpdateFormData, visibleCardIds, massEntryCollection, enqueueSnackbar],
-  );
+    } catch (error: any) {
+      enqueueSnackbar(error?.data?.error?.message || 'Failed to mass update collection', {
+        variant: 'error',
+      });
+    }
+  }, [massUpdateFormData, visibleCardIds, massEntryCollection, enqueueSnackbar]);
 
   const handleCancelConfirm = useCallback(() => {
     setShowConfirmDialog(false);
@@ -422,18 +433,28 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
         ? cardsProps.goalSummary
         : null;
 
+  const isGoalSummaryLoading = Boolean(
+    selectedGoalId &&
+      view === 'cards' &&
+      cardsProps &&
+      'goalSummaryLoading' in cardsProps &&
+      cardsProps.goalSummaryLoading,
+  );
+
   // Detect if we have stale goal data (wrong goal loaded)
   const hasStaleGoalData = Boolean(
     selectedGoalId &&
-    view === 'cards' &&
-    cardsProps &&
-    'items' in cardsProps &&
-    cardsProps.items.length > 0 &&
-    goalSummary &&
-    goalSummary.goalId !== selectedGoalId
+      view === 'cards' &&
+      cardsProps &&
+      'items' in cardsProps &&
+      cardsProps.items.length > 0 &&
+      goalSummary &&
+      goalSummary.goalId !== selectedGoalId,
   );
 
   const { showConfetti, recycleConfetti, handleConfettiComplete, celebrate } = useConfettiBurst();
+  const hideHeaderValue = !isOwnCollection && !!collectionSummary && collectionSummary.hideCollectionValue !== false;
+
   useGoalCompletionTrigger({ goalId: selectedGoalId, goalSummary, enabled: isOwnCollection, celebrate });
 
   // Show loading state for initial load
@@ -465,12 +486,12 @@ export const CollectionClient: React.FC<CollectionClientProps> = ({ userId }) =>
           totalCardsCollected={collectionSummary?.totalCardsCollected || 0}
           percentageCollected={collectionSummary?.percentageCollected || 0}
           totalValue={collectionSummary?.totalValue || 0}
-          isLoading={(isLoading && !collectionSummary) || hasStaleGoalData}
+          isLoading={(isLoading && !collectionSummary) || hasStaleGoalData || isGoalSummaryLoading}
           goalSummary={hasStaleGoalData ? undefined : goalSummary || undefined}
           view={view}
           selectedGoalId={selectedGoalId}
           includeSubsetsInSets={includeSubsetsInSets}
-          hideValue={!isOwnCollection && collectionSummary?.hideCollectionValue !== false}
+          hideValue={hideHeaderValue}
         />
       )}
 

@@ -299,6 +299,7 @@ function buildCardPayload({
       username: cardData.username,
       collectionSummary: cardData.collectionSummary,
       goalSummary: cardData.goalSummary,
+      goalSummaryLoading: cardData.goalSummaryLoading,
     },
 
     /* No setsProps while in Card mode */

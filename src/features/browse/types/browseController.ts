@@ -133,6 +133,8 @@ export interface CardData {
     hideCollectionValue?: boolean;
   };
   goalSummary?: any;
+  // True until the first goal summary arrives for the selected goal
+  goalSummaryLoading?: boolean;
 }
 
 /**
@@ -197,6 +199,7 @@ export interface CardsProps {
     totalValue?: number;
     hideCollectionValue?: boolean;
   };
+  goalSummaryLoading?: boolean;
   goalSummary?: {
     goalId: number;
     goalName: string;

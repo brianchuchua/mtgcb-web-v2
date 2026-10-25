@@ -173,6 +173,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
     refetch: refetchGoalSummary,
     fulfilledTimeStamp: goalSummaryFulfilledAt,
     isFetching: isFetchingGoalSummary,
+    isLoading: isGoalSummaryLoading,
   } = useGetGoalSummaryQuery(goalSummaryArgs ?? { userId: 0, goalId: 0, priceType }, {
     ...queryConfig,
     skip: skipGoalSummary,
@@ -288,5 +289,6 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
       hideCollectionValue: cardsSearchResult.data.hideCollectionValue,
     } : undefined,
     goalSummary: skipGoalSummary ? undefined : goalSummaryResult?.data?.goalSummary,
+    goalSummaryLoading: !skipGoalSummary && isGoalSummaryLoading,
   };
 }

@@ -16,6 +16,11 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-24',
+      version: '1.38.3',
+      changes: ['Improved layout shift on the collection page when a goal is loading'],
+    },
+    {
+      date: '2026-10-24',
       version: '1.38.2',
       changes: ['Improved collection goal calculation efficiency by reducing number of calls during pagination'],
     },
