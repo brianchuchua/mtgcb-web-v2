@@ -103,7 +103,7 @@ export default function EditLocationForm({ location, onDeleteStart }: EditLocati
         updates.description = data.description?.trim() ?? '';
       }
 
-      if (data.parentId !== location.parentId) {
+      if ((data.parentId ?? null) !== (location.parentId ?? null)) {
         updates.parentId = data.parentId || null;
       }
 

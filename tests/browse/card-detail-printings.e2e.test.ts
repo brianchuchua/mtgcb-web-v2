@@ -116,9 +116,8 @@ test.describe('Card detail: other printings', () => {
     await expect(mockPrinting).toContainText('E2E Mock Set • #42');
     await expect(mockPrinting).toContainText('$3.50');
 
-    // Pins today's slug rule for printings (punctuation → hyphen), which differs from
-    // generateCardSlug ("bolts-mock-echo"). Either resolves, since routing is by id.
-    const foilOnly = page.locator('a[href="/browse/cards/bolt-s-mock-echo/990002"]');
+    // Printing links use generateCardSlug, so the apostrophe is dropped, not turned into a hyphen.
+    const foilOnly = page.locator('a[href="/browse/cards/bolts-mock-echo/990002"]');
     await expect(foilOnly).toContainText('E2E Foil Set • #7a');
     await expect(foilOnly).toContainText('$12.25 foil');
 

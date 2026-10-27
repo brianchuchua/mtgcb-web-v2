@@ -38,6 +38,15 @@ jest.mock('../useSearchStateSync', () => ({
 }));
 
 describe('useBrowseStateSync', () => {
+  // Fresh mocks for every test, so no test depends on (or leaks into) another:
+  // useRouter.mockReturnValue needs jest.fn navigation hooks, and a stubbed
+  // loadSearchState or useBrowsePreferencesReady must not carry over.
+  beforeEach(() => {
+    mockNextNavigation();
+    jest.requireMock('../useSearchStateSync').loadSearchState.mockReset().mockReturnValue(null);
+    jest.requireMock('../useBrowsePreferences').useBrowsePreferencesReady.mockReset().mockReturnValue(true);
+  });
+
   afterEach(() => {
     resetAllMocks();
     jest.clearAllMocks();

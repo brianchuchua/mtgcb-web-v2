@@ -135,11 +135,22 @@ describe('formatSearchCriteria (goal wording)', () => {
     expect(describeGoal(conditions)).toBe(expected);
   });
 
-  // The goal wording keeps only the type next to a name; colour/rarity/layout are dropped (current behavior).
-  it('drops colour, rarity and layout when a name is present', () => {
-    expect(
-      describeGoal({ name: 'Bolt', colors_array: { exactly: ['R'] }, rarityNumeric: { OR: ['=2'] } }),
-    ).toBe('card named "Bolt"');
+  it.each<[string, Record<string, unknown>, string]>([
+    ['colour and rarity', { name: 'Bolt', colors_array: { exactly: ['R'] }, rarityNumeric: { OR: ['=3'] } }, 'only Red Uncommon card named "Bolt"'],
+    ['colour and type', { name: 'Bolt', colors_array: { exactly: ['R'] }, type: { AND: ['"Instant"'] } }, 'only Red Instant named "Bolt"'],
+    ['layout only', { name: 'Bolt', layout: { OR: ['normal'] } }, 'Normal layout card named "Bolt"'],
+    [
+      'colour, rarity, type and layout',
+      { name: 'Bolt', colors_array: { exactly: ['R'] }, rarityNumeric: { OR: ['=3'] }, type: { AND: ['Instant'] }, layout: { OR: ['normal'] } },
+      'only Red Uncommon Instant Normal layout named "Bolt"',
+    ],
+  ])('keeps the other card filters next to a name: %s', (_label, conditions, expected) => {
+    expect(describeGoal(conditions)).toBe(expected);
+  });
+
+  it('shows colour and rarity next to a name in the full goal description', () => {
+    const criteria = { conditions: { name: 'Bolt', colors_array: { exactly: ['R'] }, rarityNumeric: { OR: ['=3'] } } } as Criteria;
+    expect(formatGoalDescription(criteria, null, null, 1)).toBe('1x of only Red Uncommon card named "Bolt"');
   });
 
   it('includes sets on a set page for goals', () => {

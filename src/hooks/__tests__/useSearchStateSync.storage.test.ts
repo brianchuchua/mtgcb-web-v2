@@ -85,12 +85,24 @@ describe('saveSearchState', () => {
     });
   });
 
-  // Format legality is not in SEARCH_FIELDS, so it does not survive an F5 refresh (current behavior).
-  it('does not persist format legality', () => {
+  it('persists format legality with the rest of the search', () => {
     saveSearchState('cards', {
       name: 'Bolt',
-      formatsLegal: { include: ['modern'] } as unknown as BrowseSearchParams['formatsLegal'],
+      formatsLegal: { include: ['modern'], exclude: [] } as unknown as BrowseSearchParams['formatsLegal'],
       formatsLegalIncludeBanned: true,
+    });
+
+    expect(stored(CARDS_KEY)).toEqual({
+      name: 'Bolt',
+      formatsLegal: { include: ['modern'], exclude: [] },
+      formatsLegalIncludeBanned: true,
+    });
+  });
+
+  it('drops an empty format legality filter', () => {
+    saveSearchState('cards', {
+      name: 'Bolt',
+      formatsLegal: { include: [], exclude: [] } as unknown as BrowseSearchParams['formatsLegal'],
     });
 
     expect(stored(CARDS_KEY)).toEqual({ name: 'Bolt' });

@@ -157,10 +157,6 @@ function ProfileContent() {
       setProfileError('username', { message: 'Username is already taken' });
       return true;
     }
-    if (code === 'EMAIL_TAKEN' || code === 'EMAIL_EXISTS') {
-      setProfileError('email', { message: 'Email is already registered' });
-      return true;
-    }
     return false;
   };
 

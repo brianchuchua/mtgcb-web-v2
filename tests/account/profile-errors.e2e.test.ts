@@ -60,16 +60,19 @@ test.describe('Account profile update errors', () => {
     await expect(page.getByText('Profile updated')).toHaveCount(0);
   });
 
-  test('EMAIL_TAKEN shows a field error under Email', async ({ page }) => {
-    await mockProfileUpdate(page, 200, {
+  // Emails are deliberately not unique, so the API never reports a taken email.
+  // An error on an email change shows the API's message, with no field error.
+  test('an email change error shows the API message in the toast', async ({ page }) => {
+    await mockProfileUpdate(page, 400, {
       success: false,
       data: null,
-      error: { code: 'EMAIL_TAKEN', message: 'Email taken' },
+      error: { code: 'VALIDATION_ERROR', message: 'Invalid email address' },
     });
     await gotoAccount(page);
     await changeEmailAndSubmit(page);
 
-    await expect(page.getByText('Email is already registered')).toBeVisible();
+    await expect(page.getByText('Invalid email address')).toBeVisible();
+    await expect(page.getByText('Email is already registered')).toHaveCount(0);
     await expect(page.getByText('Profile updated')).toHaveCount(0);
   });
 

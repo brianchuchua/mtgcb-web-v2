@@ -16,6 +16,17 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-27',
+      version: '1.38.6',
+      changes: [
+        'Updated Secret Lair Drop Series',
+        'Fixed goal summaries sometimes not including color and rarity in its description',
+        'Fixed format legality not being remembered like other search filters',
+        'Fixed table CSV downloads so cells that could be interpreted as formulas in Excel are properly escaped (Thanks, +2 Mace)',
+        'Fixed set costs to complete lagging up to a day behind card prices depending on cache timing',
+      ],
+    },
+    {
+      date: '2026-10-27',
       version: '1.38.5',
       changes: [
         'Fixed the History page showing an error when a user was not logged in -- it now politely redirects to the login page instead',

@@ -7,6 +7,14 @@ interface UseTableCsvExportOptions<T> {
   extractCellValue: (item: T, columnId: string) => string | number | null | undefined;
 }
 
+// Spreadsheets run a cell that starts with = + - @ (or a tab/CR) as a formula. A leading
+// apostrophe keeps it as text. Plain numbers like -1 are left alone.
+const FORMULA_START = /^[=+\-@\t\r]/;
+const PLAIN_NUMBER = /^[+-]?\d+(\.\d+)?$/;
+
+export const guardFormula = (value: string): string =>
+  FORMULA_START.test(value) && !PLAIN_NUMBER.test(value) ? `'${value}` : value;
+
 export const useTableCsvExport = <T,>({
   items,
   columns,
@@ -17,7 +25,7 @@ export const useTableCsvExport = <T,>({
   // This matches the escaping logic from ImportClient.tsx
   const escapeCSV = (value: string | number | null | undefined): string => {
     if (value === null || value === undefined) return '';
-    const stringValue = String(value);
+    const stringValue = guardFormula(String(value));
 
     // Check if value needs escaping (contains comma, double quote, or newline)
     if (

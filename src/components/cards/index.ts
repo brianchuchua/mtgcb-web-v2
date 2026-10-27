@@ -2,7 +2,6 @@ export { CardDetailsGrid } from './CardDetailsGrid';
 export { CardImageDisplay } from './CardImageDisplay';
 export { CardPricingSection } from './CardPricingSection';
 export { CardHoverPreview } from './CardHoverPreview';
-export { OtherPrintingsTable } from './OtherPrintingsTable';
 export { EditableCardQuantity } from './EditableCardQuantity';
 export { default as CardLocationPills } from './CardLocationPills';
 export { default as CardItem } from './CardItem';

@@ -607,12 +607,10 @@ export function formatSearchCriteria(
   } else {
     // For goals, keep the original format
     if (conditions.name) {
-      // If we have a name and types, format it specially
-      if (typeParts.length > 0) {
-        mainParts.push(`${typeParts.join(' ')} named "${conditions.name}"`);
-      } else {
-        mainParts.push(`card named "${conditions.name}"`);
-      }
+      const cardDescParts = [...colorPart, ...rarityPart, ...typeParts, ...layoutParts];
+      // Without a type there's no noun, so "card" fills in: "only Red Uncommon card named ...".
+      if (typeParts.length === 0) cardDescParts.push('card');
+      mainParts.push(`${cardDescParts.join(' ')} named "${conditions.name}"`);
     } else {
       // Otherwise, compose: [color] [rarity] [type] [layout]
       const cardDescParts: string[] = [];

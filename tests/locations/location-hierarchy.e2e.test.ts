@@ -176,16 +176,14 @@ test.describe('Location hierarchy', () => {
       expect(body).toEqual({ name: 'Middle Shelf' });
     });
 
-    test('renaming a top-level location also sends parentId: null', async ({ page }) => {
-      // Pinned current behaviour: the form stores "no parent" as undefined but the location has null,
-      // so the unchanged parent is always re-sent as null. Harmless (null -> null) but not a minimal diff.
+    test('renaming a top-level location sends only the new name', async ({ page }) => {
       const { patchBodies } = await mockLocationApi(page);
       await openEditPage(page, GARAGE);
 
       await page.getByLabel('Location Name').fill('Big Garage');
       const body = await saveAndCapturePatch(page, patchBodies);
 
-      expect(body).toEqual({ name: 'Big Garage', parentId: null });
+      expect(body).toEqual({ name: 'Big Garage' });
     });
 
     test('moving to another parent sends only the new parentId', async ({ page }) => {

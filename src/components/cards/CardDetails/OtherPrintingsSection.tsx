@@ -8,6 +8,7 @@ import React from 'react';
 import { CardHoverPreview } from '@/components/cards/CardHoverPreview';
 import SetIcon from '@/components/sets/SetIcon';
 import { PriceType } from '@/types/pricing';
+import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCollectionCardUrl } from '@/utils/collectionUrls';
 
 interface Printing {
@@ -202,7 +203,7 @@ export const OtherPrintingsSection: React.FC<OtherPrintingsSectionProps> = ({
 
   // Generate the appropriate URL for each printing
   const getPrintingUrl = (printing: Printing) => {
-    const cardSlug = printing.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '';
+    const cardSlug = printing.name ? generateCardSlug(printing.name) : '';
     if (isCollectionView && userId) {
       return getCollectionCardUrl(userId, cardSlug, printing.id);
     }

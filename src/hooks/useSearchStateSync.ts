@@ -28,6 +28,8 @@ const SEARCH_FIELDS: Array<keyof BrowseSearchParams> = [
   'completionStatus',
   'isReserved',
   'isFullArt',
+  'formatsLegal',
+  'formatsLegalIncludeBanned',
   'includeBadDataOnly',
   'selectedGoalId',
   'selectedLocationId',

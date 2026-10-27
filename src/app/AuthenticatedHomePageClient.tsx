@@ -34,6 +34,7 @@ import { useGetHomeStatisticsQuery } from '@/api/statistics/statisticsApi';
 import { HomeStatisticsData } from '@/api/statistics/types';
 import { useDisplaySettings } from '@/contexts/DisplaySettingsContext';
 import { useAuth } from '@/hooks/useAuth';
+import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import pluralize from '@/utils/pluralize';
 
 export default function AuthenticatedHomePageClient() {
@@ -297,7 +298,7 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
             <TrophyCard
               onClick={() => {
                 if (!stats.trophyCard) return;
-                const cardSlug = stats.trophyCard.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const cardSlug = generateCardSlug(stats.trophyCard.name);
                 router.push(`/collections/${user?.userId}/cards/${cardSlug}/${stats.trophyCard.cardId}`);
               }}
               sx={{ cursor: 'pointer' }}
@@ -361,7 +362,7 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
             <MostCollectedCard
               onClick={() => {
                 if (!stats.mostCollectedCard) return;
-                const cardSlug = stats.mostCollectedCard.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const cardSlug = generateCardSlug(stats.mostCollectedCard.name);
                 router.push(`/collections/${user?.userId}/cards/${cardSlug}/${stats.mostCollectedCard.cardId}`);
               }}
               sx={{ cursor: 'pointer' }}
@@ -418,7 +419,7 @@ const StatisticsSection: React.FC<StatisticsSectionProps> = ({ stats, isMobile, 
             <LeastValuableCard
               onClick={() => {
                 if (!stats.leastValuableMythic) return;
-                const cardSlug = stats.leastValuableMythic.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const cardSlug = generateCardSlug(stats.leastValuableMythic.name);
                 router.push(`/collections/${user?.userId}/cards/${cardSlug}/${stats.leastValuableMythic.cardId}`);
               }}
               sx={{ cursor: 'pointer' }}

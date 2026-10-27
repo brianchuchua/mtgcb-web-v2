@@ -54,6 +54,24 @@ describe('useTableCsvExport — generateCsv', () => {
     expect(csvFor([{ name: undefined, count: null }])).toBe('Name,Count\n,');
   });
 
+  it.each([
+    ['=HYPERLINK("http://x","y")', `"'=HYPERLINK(""http://x"",""y"")"`],
+    ['+2 Mace', "'+2 Mace"],
+    ['-Bolt', "'-Bolt"],
+    ['@SUM(A1)', "'@SUM(A1)"],
+    ['\tTab', "'\tTab"],
+  ])('stops %j from running as a formula', (name, expected) => {
+    expect(csvFor([{ name, count: 1 }])).toBe(`Name,Count\n${expected},1`);
+  });
+
+  it.each(['-1', '+2', '-0.5', '3'])('leaves the plain number %j alone', (name) => {
+    expect(csvFor([{ name, count: -4 }])).toBe(`Name,Count\n${name},-4`);
+  });
+
+  it('leaves ordinary text alone', () => {
+    expect(csvFor([{ name: 'Lightning Bolt - Alpha', count: 1 }])).toBe('Name,Count\nLightning Bolt - Alpha,1');
+  });
+
   it('escapes header labels too', () => {
     const cols = [{ id: 'name', label: 'Name, full' }] as TableColumn<Row>[];
     expect(csvFor([{ name: 'x', count: 1 }], cols)).toBe('"Name, full"\nx');

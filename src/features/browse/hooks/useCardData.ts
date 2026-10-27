@@ -7,7 +7,7 @@ import { isUnassignedLocation } from '@/api/locations/types';
 import { mapApiCardsToCardItems } from '@/features/browse/mappers';
 import { selectSelectedGoalId, selectShowGoals, selectSelectedLocationId, selectIncludeChildLocations } from '@/redux/slices/browse';
 import { usePriceType } from '@/hooks/usePriceType';
-import { generateCardUrl } from '@/utils/cards/generateCardSlug';
+import { generateCardSlug, generateCardUrl } from '@/utils/cards/generateCardSlug';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
 import { useCardDisplaySettings, useCollectionSettings } from '@/contexts/DisplaySettingsContext';
 import { getCollectionCardUrl } from '@/utils/collectionUrls';
@@ -255,9 +255,7 @@ export function useCardData({ searchParams, pagination, skip, userId }: UseCardD
   const handleCardClick = useCallback(
     (cardId: string, cardName?: string) => {
       // Generate the slug part of the URL
-      const cardSlug = cardName ? cardName.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '') : 'unknown';
+      const cardSlug = cardName ? generateCardSlug(cardName) : 'unknown';
       
       // Context-aware navigation: if we have a userId, navigate to collection context
       const cardUrl = userId 
