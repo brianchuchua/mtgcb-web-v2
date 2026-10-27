@@ -16,6 +16,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-10-27',
+      version: '1.38.5',
+      changes: [
+        'Fixed the History page showing an error when a user was not logged in -- it now politely redirects to the login page instead',
+      ],
+    },
+    {
+      date: '2026-10-27',
       version: '1.38.4',
       changes: ['Fixed some invalid requests showing up as server errors'],
     },

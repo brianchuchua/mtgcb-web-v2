@@ -17,6 +17,7 @@ import {
   History as HistoryIcon,
   SwapHoriz as MigrationIcon,
 } from '@mui/icons-material';
+import { withAuth } from '@/components/auth/withAuth';
 import { useAuth } from '@/hooks/useAuth';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCollectionCardUrl, getCollectionSetUrl, getCollectionUrl } from '@/utils/collectionUrls';
@@ -450,7 +451,7 @@ const DayGroup = ({ group, userId }: { group: GroupedHistory; userId: number }) 
   );
 };
 
-export default function HistoryPage() {
+function HistoryPage() {
   const [page, setPage] = useState(1);
   const { user } = useAuth();
   const router = useRouter();
@@ -611,3 +612,5 @@ export default function HistoryPage() {
     </Box>
   );
 }
+
+export default withAuth(HistoryPage);

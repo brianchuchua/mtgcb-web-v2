@@ -99,6 +99,25 @@ test.describe('Login redirectTo', () => {
     await expect(page.getByRole('heading', { name: 'Account Settings' })).toBeVisible();
   });
 
+  test('the history page sends a logged-out user to /login without loading history', async ({ page }) => {
+    const login = await mockLoginSuccess(page);
+    await mockMeFlipsAfterLogin(page, login.wasCalled);
+    let historyRequested = false;
+    await page.route(`${API_BASE}/collection/history**`, async (route) => {
+      historyRequested = true;
+      await route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: false, data: null, error: { message: 'Unauthorized' } }),
+      });
+    });
+
+    await page.goto('/history');
+    await page.waitForURL((url) => url.pathname === '/login', { timeout: 10000 });
+    expect(new URL(page.url()).searchParams.get('redirectTo')).toBe('/history');
+    expect(historyRequested).toBe(false);
+  });
+
   test('does not leave the site for an absolute external redirectTo', async ({ page }) => {
 
     await page.route('https://evil.example/**', (route) =>
