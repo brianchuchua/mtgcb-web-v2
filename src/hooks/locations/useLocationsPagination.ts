@@ -35,18 +35,16 @@ export const useLocationsPagination = (): UseLocationsPaginationReturn => {
     }
   }, []);
 
-  // Save page size to localStorage whenever it changes
-  useEffect(() => {
-    const state: LocationsPaginationState = { pageSize };
-    safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [pageSize]);
-
   const onPageChange = useCallback((page: number) => {
     setCurrentPage(page);
   }, []);
 
+  // Saved here rather than in an effect: an effect would write the default back on mount
+  // and, under Strict Mode's double mount, the stored size would be lost.
   const onPageSizeChange = useCallback((newPageSize: number) => {
     setPageSize(newPageSize);
+    const state: LocationsPaginationState = { pageSize: newPageSize };
+    safeLocalStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     setCurrentPage(1); // Reset to first page when page size changes
   }, []);
 

@@ -15,6 +15,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-27',
+      version: '1.38.4',
+      changes: ['Fixed some invalid requests showing up as server errors'],
+    },
+    {
       date: '2026-10-24',
       version: '1.38.3',
       changes: ['Improved layout shift on the collection page when a goal is loading'],

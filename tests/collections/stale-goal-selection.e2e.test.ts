@@ -38,6 +38,9 @@ const settle = async (page: Page) => {
   await page.waitForTimeout(600);
 };
 
+// The URL is cleaned up asynchronously after the goal list loads, so poll instead of reading it once.
+const urlGoalId = (page: Page) => expect.poll(() => new URL(page.url()).searchParams.get('goalId'), { timeout: 10000 });
+
 const firstGoalId = async (page: Page): Promise<number | null> => {
   const res = await page.request.get(`${API}/goals/${LOCAL_TEST_USER_ID}?limit=500`, {
     headers: { cookie: `MTGCB_AuthToken=${getLocalTestJwt()}` },
@@ -55,10 +58,14 @@ test.describe('Collection goal selection does not go stale', () => {
   test('a link to a goal that no longer exists shows the plain collection', async ({ page }) => {
     const searches = trackGoalSearches(page);
 
+    // The goal is only dropped once the goal list says it's gone, and networkidle can fire before
+    // that request starts, so wait for the list and poll the URL rather than reading it once.
+    const goalList = page.waitForResponse((r) => new URL(r.url()).pathname === `/goals/${LOCAL_TEST_USER_ID}`);
     await page.goto(`/collections/${LOCAL_TEST_USER_ID}?contentType=cards&goalId=${MISSING_GOAL_ID}`);
+    await goalList;
+    await urlGoalId(page).toBeNull();
     await settle(page);
 
-    expect(new URL(page.url()).searchParams.get('goalId')).toBeNull();
     expect(searches.goalIds).not.toContain(MISSING_GOAL_ID);
     expect(searches.failures).toEqual([]);
     await expect(page.getByText(/Unable to load cards/)).toHaveCount(0);
@@ -71,13 +78,13 @@ test.describe('Collection goal selection does not go stale', () => {
 
     await page.goto(`/collections/${LOCAL_TEST_USER_ID}?contentType=cards&goalId=${goalId}`);
     await settle(page);
-    expect(new URL(page.url()).searchParams.get('goalId')).toBe(String(goalId));
+    await urlGoalId(page).toBe(String(goalId));
 
     await page.getByRole('link', { name: 'Browse', exact: true }).first().click();
     await page.waitForURL(/\/browse/);
     await settle(page);
 
-    expect(new URL(page.url()).searchParams.get('goalId')).toBeNull();
+    await urlGoalId(page).toBeNull();
     expect(await storedGoalIds(page)).toEqual([null, null]);
     await expect(page.getByText('Hide duplicate printings')).toBeVisible();
 
@@ -86,7 +93,7 @@ test.describe('Collection goal selection does not go stale', () => {
     await page.waitForURL(new RegExp(`/collections/${LOCAL_TEST_USER_ID}`));
     await settle(page);
 
-    expect(new URL(page.url()).searchParams.get('goalId')).toBeNull();
+    await urlGoalId(page).toBeNull();
     expect(searches.goalIds).toEqual([]);
     await expect(page.getByLabel('Collection Goal').first()).toContainText(/Default \(all cards\)/i);
   });
@@ -98,7 +105,7 @@ test.describe('Collection goal selection does not go stale', () => {
     await page.goto(`/browse?contentType=cards&goalId=${goalId}`);
     await settle(page);
 
-    expect(new URL(page.url()).searchParams.get('goalId')).toBeNull();
+    await urlGoalId(page).toBeNull();
     await expect(page.getByText('Hide duplicate printings')).toBeVisible();
   });
 
@@ -131,7 +138,7 @@ test.describe('Collection goal selection does not go stale', () => {
     const searches = trackGoalSearches(page);
     await page.goto(`/collections/${LOCAL_TEST_USER_ID}?contentType=cards`);
     await settle(page);
-    expect(new URL(page.url()).searchParams.get('goalId')).toBeNull();
+    await urlGoalId(page).toBeNull();
     expect(searches.goalIds).toEqual([]);
   });
 });

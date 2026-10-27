@@ -15,6 +15,9 @@ const fulfillJson = (body: unknown, status = 200) => ({
   body: JSON.stringify(body),
 });
 
+// Dev mode's Strict Mode runs the callback effect twice, so the toast can appear twice there.
+const toast = (page: Page, text: string) => page.getByText(text).first();
+
 const expectUrlIsPlainAccount = async (page: Page) => {
   await expect.poll(() => new URL(page.url()).search).toBe('');
   expect(new URL(page.url()).pathname).toBe('/account');
@@ -29,25 +32,25 @@ test.describe('Patreon on the account page', () => {
 
   test('?patreon=linked shows the linked toast and cleans the URL', async ({ page }) => {
     await page.goto('/account?patreon=linked');
-    await expect(page.getByText('Patreon account linked')).toBeVisible();
+    await expect(toast(page, 'Patreon account linked')).toBeVisible();
     await expectUrlIsPlainAccount(page);
   });
 
   test('?error=invalid_state shows the session expired toast and cleans the URL', async ({ page }) => {
     await page.goto('/account?error=invalid_state');
-    await expect(page.getByText('Session expired. Please try linking again.')).toBeVisible();
+    await expect(toast(page, 'Session expired. Please try linking again.')).toBeVisible();
     await expectUrlIsPlainAccount(page);
   });
 
   test('?error=not_patron shows the not-a-patron toast and cleans the URL', async ({ page }) => {
     await page.goto('/account?error=not_patron');
-    await expect(page.getByText('You must be an active patron to link your account.')).toBeVisible();
+    await expect(toast(page, 'You must be an active patron to link your account.')).toBeVisible();
     await expectUrlIsPlainAccount(page);
   });
 
   test('an unknown ?error code is shown verbatim in the toast', async ({ page }) => {
     await page.goto('/account?error=something_odd');
-    await expect(page.getByText('Unable to link Patreon account: something_odd')).toBeVisible();
+    await expect(toast(page, 'Unable to link Patreon account: something_odd')).toBeVisible();
     await expectUrlIsPlainAccount(page);
   });
 

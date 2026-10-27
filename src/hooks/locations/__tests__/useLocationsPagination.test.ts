@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { act, renderHook } from '@testing-library/react';
 import { useLocationsPagination } from '../useLocationsPagination';
 
@@ -9,11 +10,18 @@ describe('useLocationsPagination', () => {
     localStorage.clear();
   });
 
-  it('starts on page 1 with 9 locations per page and saves that size', () => {
+  it('starts on page 1 with 9 locations per page without saving anything', () => {
     const { result } = renderHook(() => useLocationsPagination());
     expect(result.current.currentPage).toBe(1);
     expect(result.current.pageSize).toBe(9);
-    expect(storedPageSize()).toBe(9);
+    expect(storedPageSize()).toBeUndefined();
+  });
+
+  it('keeps a saved page size through a Strict Mode double mount', () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ pageSize: 2 }));
+    const { result } = renderHook(() => useLocationsPagination(), { wrapper: StrictMode });
+    expect(result.current.pageSize).toBe(2);
+    expect(storedPageSize()).toBe(2);
   });
 
   it('restores the saved page size', () => {

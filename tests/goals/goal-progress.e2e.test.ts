@@ -2,8 +2,9 @@ import { expect, test, type Page, type Route } from '@playwright/test';
 import { LOCAL_TEST_USER_ID, authenticateAsLocalTestUser, getLocalTestJwt } from '../utils/auth';
 
 // Goal progress inside the collection (?goalId=). The goal is fake (id 9201): the goal list is
-// mocked so the collection accepts it, and goal-scoped card searches are answered from a real
-// plain search (no goal) with goal fields layered on top, so the numbers are fixed.
+// mocked so the collection accepts it, the header summary request is answered directly, and
+// goal-scoped card searches are answered from a real plain search (no goal) with goal fields
+// layered on top, so the numbers are fixed.
 
 const API_ORIGIN = 'http://local.mtgcb.com:5000';
 const GOAL_ID = 9201;
@@ -86,6 +87,15 @@ const mockGoalCollection = async (page: Page) => {
       const body = route.request().postDataJSON() ?? {};
       if (body.goalId !== GOAL_ID) return route.fallback();
 
+      // The header's summary is its own request (goalSummaryOnly) and carries no cards.
+      if (body.goalSummaryOnly) {
+        return fulfillJson(route, {
+          success: true,
+          data: { cards: [], totalCount: 0, limit: 1, offset: 0, goalSummary: GOAL_SUMMARY, goalSummaryOnly: true },
+          error: null,
+        });
+      }
+
       const showGoals: ShowGoals = body.showGoals ?? 'all';
       goalSearches.push({ showGoals, body });
 
@@ -144,7 +154,8 @@ test.describe('Goal progress in the collection', () => {
     await expect(page.getByText('$98.76')).toBeVisible();
 
     const firstSearch = mocks.goalSearches[0].body;
-    expect(firstSearch.showGoalProgress).toBe(true);
+    // Progress comes from the separate summary request, so the card search doesn't ask for it.
+    expect(firstSearch).not.toHaveProperty('showGoalProgress');
     expect(firstSearch).not.toHaveProperty('showGoals');
     expect(firstSearch.select).toEqual(expect.arrayContaining(['goalFullyMet', 'goalAllNeeded']));
   });
