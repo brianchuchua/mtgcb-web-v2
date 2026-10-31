@@ -15,6 +15,20 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-10-29',
+      version: '1.39.0',
+      changes: [
+        'Improved page titles and social previews',
+        'Fixed card searches with apostrophes finding nothing when typed on a phone since they default to the curly apostrophe instead of the straight one',
+        "Fixed Jump to Set keeping the card name from your last search -- it wasn't in some cases",
+        'Some small bug fixes:',
+        [
+          'Fixed faded goal cards flashing bright when tapped on phones. Long-press one to see it at full brightness.',
+          'Fixed shared set pages adding extra steps to the Back button',
+        ],
+      ],
+    },
+    {
       date: '2026-10-27',
       version: '1.38.6',
       changes: [

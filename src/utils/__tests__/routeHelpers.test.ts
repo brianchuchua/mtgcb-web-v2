@@ -19,7 +19,9 @@ describe('routeHelpers', () => {
     ['/collections/123/cards/lightning-bolt/9', true, false, false, false, false],
     ['/collections/abc', false, false, false, false, false],
     ['/collections/edit-cards', false, false, false, false, false],
-    ['/shared/token/foundations', false, false, false, false, false],
+    ['/shared/token/foundations', false, false, false, false, true],
+    ['/shared/token', false, false, false, false, false],
+    ['/shared/token/cards/lightning-bolt/9', false, false, false, false, false],
     ['/', false, false, false, false, false],
   ])('%s', (pathname, collection, collectionSet, browse, browseSet, setSpecific) => {
     expect(isCollectionPage(pathname)).toBe(collection);

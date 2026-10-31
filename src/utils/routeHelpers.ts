@@ -4,15 +4,27 @@
  */
 
 /**
- * Check if the current path is a set-specific page (browse or collection)
+ * Check if the current path is a set-specific page (browse, collection or shared link)
  * Examples:
  * - /browse/sets/foundational → true
  * - /collections/123/foundational → true
+ * - /shared/abc123/foundational → true
  * - /browse → false
  * - /collections/123 → false
  */
 export function isSetSpecificPage(pathname: string): boolean {
-  return isCollectionSetPage(pathname) || isBrowseSetPage(pathname);
+  return isCollectionSetPage(pathname) || isBrowseSetPage(pathname) || isSharedSetPage(pathname);
+}
+
+/**
+ * Check if the current path is a set page opened from a share link
+ * Examples:
+ * - /shared/abc123/foundational → true
+ * - /shared/abc123 → false
+ * - /shared/abc123/cards/lightning-bolt/123 → false
+ */
+export function isSharedSetPage(pathname: string): boolean {
+  return /^\/shared\/[^\/]+\/[^\/]+$/.test(pathname);
 }
 
 /**

@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import CollectionCardClient from './CollectionCardClient';
+import { legacyShareRedirect } from '@/utils/legacyShareRedirect';
+import { fetchCardName, titleFromSlug } from '@/utils/seo/collectionTitleLookups';
 
 interface CollectionCardPageProps {
   params: Promise<{
@@ -36,11 +38,12 @@ export async function generateMetadata({ params, searchParams }: CollectionCardP
     ogImageUrl = imageUrl.toString();
   }
 
-  const title = `${cardSlug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())} - MTG Collection Builder`;
+  const cardName = (await fetchCardName(parseInt(cardId, 10))) ?? titleFromSlug(cardSlug);
+  const title = `${cardName} - MTG Collection Builder`;
   const description = `View collection details for this Magic: The Gathering card`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     openGraph: {
       title,
@@ -66,8 +69,10 @@ export async function generateMetadata({ params, searchParams }: CollectionCardP
   };
 }
 
-export default async function CollectionCardPage({ params }: CollectionCardPageProps) {
+export default async function CollectionCardPage({ params, searchParams }: CollectionCardPageProps) {
   const { userId, cardId, cardSlug } = await params;
+  const sharedUrl = legacyShareRedirect(`/cards/${cardSlug}/${cardId}`, await searchParams);
+  if (sharedUrl) redirect(sharedUrl);
 
   const numericUserId = parseInt(userId, 10);
   if (!Number.isInteger(numericUserId) || numericUserId < 1) {

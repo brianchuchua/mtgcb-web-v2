@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import MigrateClient from './MigrateClient';
 
 export const metadata: Metadata = {
-  title: 'Update Cards - MTG Collection Builder',
+  title: 'Update Cards',
   description: 'Apply card data updates to the entries in your collection.',
 };
 

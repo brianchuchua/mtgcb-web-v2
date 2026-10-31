@@ -17,6 +17,7 @@ import { PriceType } from '@/types/pricing';
 import { generateTCGPlayerLink } from '@/utils/affiliateLinkBuilder';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
 import { safeSessionStorage } from '@/utils/browser/safeStorage';
+import { useLongPressReveal } from './useLongPressReveal';
 
 export interface CardItemProps {
   id: string;
@@ -274,6 +275,10 @@ const CardItemComponent = ({
     locationsIsVisible = true,
   } = display;
 
+  // A goal's missing cards are faded. Hover (desktop) or a long-press (touch) shows them at full brightness.
+  const isFaded = goalProgressIsVisible && goalFullyMet === false;
+  const longPress = useLongPressReveal(isFaded);
+
   // Check if we're in a collection view
   // Could be /collections/[userId] or /shared/[token]
   const isCollectionView = pathname?.startsWith('/collections/') || pathname?.startsWith('/shared/');
@@ -409,23 +414,33 @@ const CardItemComponent = ({
     >
       <CardImageContainer
         onClick={!imageLinksToTCGPlayer && !href && onClick ? handleCardElementClick : undefined}
+        {...longPress.handlers}
         sx={{
           cursor: imageLinksToTCGPlayer ? 'default' : (href || onClick) ? 'pointer' : 'default',
-          opacity: goalProgressIsVisible && goalFullyMet === false ? 0.5 : 1,
+          opacity: isFaded && !longPress.revealed ? 0.5 : 1,
           transition: 'opacity 0.2s ease-in-out',
           position: 'relative',
           // 3D context for the card-flip animation. `perspective` only affects direct
           // descendants, so the rotating wrapper inherits a real 3D space and the flip
           // doesn't collapse into a 2D scale-skew.
           perspective: '1200px',
-          '&:hover': {
-            opacity: 1,
+          // Only real hover devices use :hover. Phones fake it on every tap, which flashed the
+          // card bright before opening it; touch uses the long-press above instead.
+          '@media (hover: hover)': {
+            '&:hover': {
+              opacity: 1,
+            },
+            ...(isFaded && {
+              '&:hover::after': {
+                opacity: 0,
+              },
+            }),
           },
           // Add diagonal stripes overlay for incomplete goals
-          ...(goalProgressIsVisible &&
-            goalFullyMet === false && {
+          ...(isFaded && {
               '&::after': {
                 content: '""',
+                opacity: longPress.revealed ? 0 : 1,
                 position: 'absolute',
                 top: 0,
                 left: 0,
@@ -441,9 +456,6 @@ const CardItemComponent = ({
                 pointerEvents: 'none',
                 borderRadius: 'inherit',
                 transition: 'opacity 0.2s ease-in-out',
-              },
-              '&:hover::after': {
-                opacity: 0,
               },
             }),
         }}

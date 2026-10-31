@@ -25,14 +25,16 @@ export const useQuickNavReset = () => {
   const isInitialMount = useRef(true);
 
   useEffect(() => {
-    // Skip on initial mount to avoid interfering with existing initialization logic
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-
     // Check if navigation came from Quick Search or Jump to Sets
     const quickNavFlag = safeSessionStorage.getItem('quickNavReset');
+
+    // Skip the first run unless a quick navigation just landed here. Jumping from Browse to
+    // a set mounts a new page, and production runs mount effects once, so skipping it
+    // there left the old card name on the set page (dev's double effects hid this).
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      if (quickNavFlag !== 'true') return;
+    }
 
     if (quickNavFlag === 'true') {
       // Capture URL params that were just set by quick navigation

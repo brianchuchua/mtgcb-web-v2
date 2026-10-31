@@ -37,12 +37,31 @@ beforeEach(() => {
 });
 
 describe('useQuickNavReset', () => {
-  it('does nothing on the first render even with the flag set', () => {
-    sessionStorage.setItem('quickNavReset', 'true');
+  it('does nothing on the first render without the flag', () => {
     const { cards } = setup();
 
-    expect(cards()).toMatchObject({ name: 'Old search', artist: 'Old artist' });
-    expect(sessionStorage.getItem('quickNavReset')).toBe('true');
+    expect(cards()).toMatchObject({ name: 'Old search', artist: 'Old artist', selectedGoalId: 9 });
+  });
+
+  it('resets on the first render when a jump to a set lands on a new page', () => {
+    // Jump to Set from Browse mounts the set page fresh, so the first run is the only chance.
+    sessionStorage.setItem('quickNavReset', 'true');
+    navigate('/browse/sets/the-hobbit', '');
+    const { cards } = setup();
+
+    expect(cards()).not.toHaveProperty('name');
+    expect(cards()).not.toHaveProperty('artist');
+    expect(cards()).not.toHaveProperty('selectedGoalId');
+    expect(sessionStorage.getItem('quickNavReset')).toBeNull();
+  });
+
+  it('keeps the quick search name when the search lands on a new page', () => {
+    sessionStorage.setItem('quickNavReset', 'true');
+    navigate('/collections/5', 'name=Lightning%20Bolt&contentType=cards');
+    const { cards } = setup();
+
+    expect(cards().name).toBe('Lightning Bolt');
+    expect(cards()).not.toHaveProperty('artist');
   });
 
   it('keeps filters on a normal navigation without the flag', () => {

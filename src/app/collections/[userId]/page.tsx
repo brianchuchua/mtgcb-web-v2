@@ -1,6 +1,9 @@
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { CollectionClient } from './CollectionClient';
+import { legacyShareRedirect } from '@/utils/legacyShareRedirect';
+import { fetchCollectionOwnerName } from '@/utils/seo/collectionTitleLookups';
 
 export async function generateMetadata({
   params,
@@ -37,11 +40,12 @@ export async function generateMetadata({
     ogImageUrl = imageUrl.toString();
   }
 
-  const title = 'MTG Collection Builder';
+  const ownerName = await fetchCollectionOwnerName(parseInt(userId, 10), shareToken);
+  const title = ownerName ? `${ownerName}'s Collection - MTG Collection Builder` : 'MTG Collection Builder';
   const description = 'Track and manage your Magic: The Gathering collection!';
 
   return {
-    title,
+    title: { absolute: title },
     description,
     openGraph: {
       title,
@@ -67,7 +71,16 @@ export async function generateMetadata({
   };
 }
 
-export default async function CollectionPage({ params }: { params: Promise<{ userId: string }> }) {
+export default async function CollectionPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ userId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const sharedUrl = legacyShareRedirect('', await searchParams);
+  if (sharedUrl) redirect(sharedUrl);
+
   const { userId: userIdParam } = await params;
   const userId = parseInt(userIdParam, 10);
 

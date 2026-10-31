@@ -45,8 +45,7 @@ import {
 } from '@/api/user/shareLinkApi';
 import { useSnackbar } from 'notistack';
 import { formatDistanceToNow, parseISO } from '@/utils/shareTokenDateUtils';
-import { getAbsoluteShareUrl } from '@/utils/shareLinkUtils';
-import { smartEncodeToken } from '@/utils/tokenEncoder';
+import { buildTokenShareUrl } from '@/utils/shareLinkUtils';
 
 const EXPIRATION_OPTIONS = [
   { value: 0, label: 'Never expires' },
@@ -77,18 +76,7 @@ export const ShareLinkManager = () => {
 
   const getShareUrl = () => {
     if (!shareData?.shareUrl) return '';
-    
-    // Always convert to token-only URL
-    const urlParts = shareData.shareUrl.split('?share=');
-    if (urlParts.length === 2) {
-      const token = urlParts[1];
-      const encodedToken = smartEncodeToken(token);
-      const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      return `${origin}/shared/${encodedToken}`;
-    }
-    
-    // Fallback to original URL if parsing fails
-    return getAbsoluteShareUrl(shareData.shareUrl);
+    return buildTokenShareUrl(shareData.shareUrl, typeof window !== 'undefined' ? window.location.origin : '');
   };
 
   const handleCopyLink = async () => {
@@ -124,7 +112,7 @@ export const ShareLinkManager = () => {
         enqueueSnackbar('Share link generated', { variant: 'success' });
         // Auto copy the new link
         if (result.data.shareUrl) {
-          const absoluteUrl = getAbsoluteShareUrl(result.data.shareUrl);
+          const absoluteUrl = buildTokenShareUrl(result.data.shareUrl, window.location.origin);
           try {
             await navigator.clipboard.writeText(absoluteUrl);
             setCopied(true);

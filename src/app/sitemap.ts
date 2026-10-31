@@ -1,6 +1,5 @@
 import { MetadataRoute } from 'next';
-
-const SITE_URL = 'https://www.mtgcollectionbuilder.com';
+import { SITE_URL } from '@/utils/seo/pageMetadata';
 
 /**
  * Deliberately limited to canonical public pages.

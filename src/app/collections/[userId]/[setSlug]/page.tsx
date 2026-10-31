@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { CollectionSetClient } from './CollectionSetClient';
+import { legacyShareRedirect } from '@/utils/legacyShareRedirect';
 
 interface CollectionSetPageProps {
   params: Promise<{
@@ -38,7 +40,7 @@ export async function generateMetadata({ params, searchParams }: CollectionSetPa
   const description = `View collection details for this Magic: The Gathering set`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     openGraph: {
       title,
@@ -64,8 +66,10 @@ export async function generateMetadata({ params, searchParams }: CollectionSetPa
   };
 }
 
-export default async function CollectionSetPage({ params }: CollectionSetPageProps) {
+export default async function CollectionSetPage({ params, searchParams }: CollectionSetPageProps) {
   const { userId: userIdParam, setSlug } = await params;
+  const sharedUrl = legacyShareRedirect(`/${setSlug}`, await searchParams);
+  if (sharedUrl) redirect(sharedUrl);
   const userId = parseInt(userIdParam, 10);
 
   if (!Number.isInteger(userId) || userId < 1) {

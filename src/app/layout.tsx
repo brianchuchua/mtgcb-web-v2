@@ -15,6 +15,7 @@ import { TCGPlayerProvider } from '@/context/TCGPlayerContext';
 import { SessionMessagesProvider } from '@/contexts/SessionMessagesContext';
 import StoreProvider from '@/redux/StoreProvider';
 import darkTheme from '@/styles/darkTheme';
+import { SITE_NAME, SITE_URL, pageMetadata } from '@/utils/seo/pageMetadata';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -26,9 +27,15 @@ const roboto = Roboto({
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 const ENABLE_GA = process.env.NEXT_PUBLIC_ENABLE_GA === 'true';
 
+// Google Search Console "HTML tag" ownership check. Read at build time.
+const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION;
+
 export const metadata: Metadata = {
-  title: 'MTG Collection Builder',
-  description: "Track your Magic: the Gathering collection's value for free!",
+  ...pageMetadata(),
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
+  title: { default: SITE_NAME, template: `%s - ${SITE_NAME}` },
+  ...(GOOGLE_SITE_VERIFICATION && { verification: { google: GOOGLE_SITE_VERIFICATION } }),
 };
 
 export default function RootLayout({

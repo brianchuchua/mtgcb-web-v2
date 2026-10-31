@@ -1,4 +1,11 @@
 import { Box, Container, Paper, Typography } from '@mui/material';
+import { pageMetadata } from '@/utils/seo/pageMetadata';
+
+export const metadata = pageMetadata({
+  title: 'Terms and Privacy',
+  description: 'Terms of use and privacy policy for MTG Collection Builder.',
+  path: '/terms-and-privacy',
+});
 
 export default function TermsAndPrivacyPage() {
   return (

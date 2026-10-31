@@ -20,6 +20,7 @@ import { useSetPageFilter } from '@/hooks/useSetPageFilter';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
 import { useAuth } from '@/hooks/useAuth';
 import { CardsProps } from '@/features/browse/types/browseController';
+import { useQuickNavReset } from '@/features/browse/hooks/useQuickNavReset';
 import { useBrowseController } from '@/features/browse/useBrowseController';
 import { CardGrid, CardTable, ErrorBanner } from '@/features/browse/views';
 import InfoBanner from '@/features/browse/views/InfoBanner';
@@ -46,6 +47,9 @@ export default function SetBrowseClient({ setSlug }: SetBrowseClientProps) {
     forceView: 'cards',
     waitForSetFilter: true,
   });
+
+  // Reset browse form state when Quick Search or Jump to Set is used
+  useQuickNavReset();
 
   const subsetRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const subsetToggleRefs = useRef<Record<string, () => void>>({});
