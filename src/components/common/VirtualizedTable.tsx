@@ -226,6 +226,14 @@ const VirtualizedTable = <T,>({
         sx={{
           borderCollapse: 'separate',
           width: '100%',
+          // Column widths come from the header cells only. With automatic layout the browser
+          // sized columns from the rows currently rendered, and since the table is virtualized
+          // that set changes as rows grow or shrink. A long cell at the edge of the rendered
+          // range could make another cell wrap, push itself out of range, and loop every frame.
+          tableLayout: 'fixed',
+          '& .MuiTableBody-root .MuiTableCell-root': {
+            overflowWrap: 'anywhere',
+          },
           ...(props.sx || {}),
         }}
       />

@@ -15,6 +15,13 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-11-02',
+      version: '1.39.1',
+      changes: [
+        'Fixed table rows flickering between one and two lines at some window sizes only if the table row were at the edge of the display and had a text item wrapping to two lines -- it was a fun one to reproduce :)',
+      ],
+    },
+    {
       date: '2026-10-29',
       version: '1.39.0',
       changes: [

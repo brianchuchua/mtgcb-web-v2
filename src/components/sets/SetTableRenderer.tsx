@@ -39,7 +39,7 @@ export const useSetTableColumns = (
     {
       id: 'code',
       label: 'Code',
-      width: { default: '80px' },
+      width: { default: '90px' },
       align: 'center',
       sortable: true,
     },

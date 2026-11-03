@@ -125,7 +125,7 @@ export const useCardTableColumns = (
     {
       id: 'mtgcbCollectorNumber',
       label: 'M#',
-      width: { default: '60px' },
+      width: { default: '90px' },
       tooltip: <MtgcbNumberTooltip />,
       hasInfoIcon: true,
       sortable: true,
@@ -174,7 +174,9 @@ export const useCardTableColumns = (
     {
       id: 'collectorNumber',
       label: '#',
-      width: { default: '60px' },
+      // Fits 3-4 digits, which covers most collector numbers, and keeps the column narrow on small
+      // phones. Longer numbers wrap inside the cell ("DMR-116" as "DMR-" / "116").
+      width: { default: '66px' },
       sortable: true,
     },
     {
@@ -193,7 +195,7 @@ export const useCardTableColumns = (
     {
       id: 'rarityNumeric',
       label: 'Rarity',
-      width: { default: '100px' },
+      width: { default: '110px' },
       tooltip: <RarityTooltip />,
       hasInfoIcon: true,
       sortable: true,
@@ -211,11 +213,7 @@ export const useCardTableColumns = (
     {
       id: 'artist',
       label: 'Artist',
-      width: {
-        xs: '100px',
-        sm: '120px',
-        default: '150px',
-      },
+      width: { default: '150px' },
       sortable: true,
     },
     {
