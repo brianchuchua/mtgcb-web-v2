@@ -2,6 +2,7 @@
 // The config you add here will be used whenever the server handles a request.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 import * as Sentry from '@sentry/nextjs';
+import { filterServerSentryNoise } from './src/utils/sentryServerNoiseFilter';
 
 if (process.env.NODE_ENV === 'production') {
   Sentry.init({
@@ -12,6 +13,9 @@ if (process.env.NODE_ENV === 'production') {
 
     // Enable logs to be sent to Sentry
     enableLogs: true,
+
+    // Visitors leaving mid-render (MTGCB-WEB-V2-90)
+    beforeSend: filterServerSentryNoise,
 
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,

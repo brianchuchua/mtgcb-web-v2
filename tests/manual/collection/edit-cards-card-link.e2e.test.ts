@@ -38,17 +38,22 @@ test.describe('User story: Edit Cards card link goes to collection entry', () =>
     await searchBox.click();
     await searchBox.fill('Giant Spi');
 
-    await page.getByRole('option').first().waitFor({ timeout: 10000 });
-    await page.getByRole('option').first().click();
+    // Pick a fixed printing with an image. The first option changes as sets are added
+    // (it became "Giant Spider (75) [The Zeta Set]", which has no image).
+    const alphaOption = page.getByRole('option', { name: /Giant Spider.*\[Limited Edition Alpha\]/ }).first();
+    await alphaOption.waitFor({ timeout: 10000 });
+    await alphaOption.click();
     await page.getByTestId('edit-cards-quantity-regular').waitFor();
     await page.screenshot({ path: shot('edit-cards-link-02-card-selected'), fullPage: false });
 
-    const cardImage = page.locator('img[alt="Giant Spider"]').first();
+    const cardImage = page.locator('img[alt^="Giant Spider"]').first();
     const beforeUrl = page.url();
     await cardImage.click();
 
     await page.waitForURL(/\/collections\/\d+\/cards\//, { timeout: 5000 });
     await page.waitForLoadState('networkidle');
+    // Wait for the card itself; networkidle can land before the card query renders.
+    await page.getByText('Limited Edition Alpha').first().waitFor({ timeout: 10000 });
     const afterUrl = page.url();
     await page.screenshot({ path: shot('edit-cards-link-03-collection-card-page'), fullPage: false });
 

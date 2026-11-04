@@ -142,3 +142,60 @@ test.describe('Collection goal selection does not go stale', () => {
     expect(searches.goalIds).toEqual([]);
   });
 });
+
+// "Browse link with a goal writes the URL twice on load" (3f9e7f6b51f281d19fe2df8d01f4305d).
+// Dropping a goal the app can't use pushed a new history entry, so Back went to the old
+// ?goalId= address, the goal was dropped again, and Back never left the page.
+test.describe('A goal dropped by the app adds no Back step', () => {
+  test.beforeEach(async ({ context }) => {
+    test.skip(!getLocalTestJwt(), 'Set E2E_TEST_JWT_1337 to run (see tests/utils/auth.ts)');
+    await authenticateAsLocalTestUser(context);
+  });
+
+  const START = '/changelog';
+
+  const openThenGoBack = async (page: Page, link: string) => {
+    await page.goto(START);
+    await page.waitForLoadState('networkidle');
+    await page.goto(link);
+    await settle(page);
+    await urlGoalId(page).toBeNull();
+    const historyLength = await page.evaluate(() => history.length);
+    await page.goBack();
+    await expect.poll(() => new URL(page.url()).pathname, { timeout: 10000 }).toBe(START);
+    return historyLength;
+  };
+
+  test('Back leaves Browse opened from an old goal link', async ({ page }) => {
+    const goalId = await firstGoalId(page);
+    test.skip(goalId === null, 'No active goals for user 1337');
+    // about:blank, the start page, the link: nothing else
+    expect(await openThenGoBack(page, `/browse?contentType=cards&goalId=${goalId}`)).toBe(3);
+  });
+
+  test('Back leaves a collection opened from a link to a missing goal', async ({ page }) => {
+    const goalList = page.waitForResponse((r) => new URL(r.url()).pathname === `/goals/${LOCAL_TEST_USER_ID}`);
+    const link = `/collections/${LOCAL_TEST_USER_ID}?contentType=cards&goalId=${MISSING_GOAL_ID}`;
+    const done = openThenGoBack(page, link);
+    await goalList;
+    expect(await done).toBe(3);
+  });
+
+  test('choosing a goal by hand still adds a Back step', async ({ page }) => {
+    const goalId = await firstGoalId(page);
+    test.skip(goalId === null, 'No active goals for user 1337');
+
+    await page.goto(`/collections/${LOCAL_TEST_USER_ID}?contentType=cards`);
+    await settle(page);
+    const before = await page.evaluate(() => history.length);
+
+    await page.getByLabel('Collection Goal').first().click();
+    await page.getByRole('option').nth(1).click();
+    await urlGoalId(page).not.toBeNull();
+    await settle(page);
+
+    expect(await page.evaluate(() => history.length)).toBe(before + 1);
+    await page.goBack();
+    await urlGoalId(page).toBeNull();
+  });
+});

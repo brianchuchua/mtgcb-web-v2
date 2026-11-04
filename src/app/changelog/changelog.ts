@@ -15,6 +15,19 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-11-04',
+      version: '1.40.1',
+      changes: [
+        'Some more bug fixes:',
+        [
+          'Fixed set filters like "NOT Promo" being ignored on collection set lists when a goal is selected',
+          'Fixed collection set lists sorted by name not matching the order on Browse',
+          'Fixed the Back button getting stuck after opening an old link that had a goal in it',
+          'Update Cards flow now also finds double-sided tokens from bonus sheets like The Big Score and Breaking News',
+        ],
+      ],
+    },
+    {
       date: '2026-11-03',
       version: '1.40.0',
       changes: [

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
 import { GetGoalsResponse } from '@/api/goals/types';
 import { ApiResponse } from '@/api/types/apiTypes';
+import { noteGoalDroppedAutomatically } from '@/hooks/goals/autoDroppedGoal';
 import { isCollectionPath } from '@/hooks/useIsCollectionContext';
 import { forgetStoredGoal } from '@/hooks/useSearchStateSync';
 import { clearSelectedGoal } from '@/redux/slices/browse';
@@ -39,7 +40,10 @@ export const useDropGoalOutsideCollection = () => {
   useLayoutEffect(() => {
     if (!pathname || isCollectionPath(pathname)) return;
     forgetStoredGoal();
-    if (goalId != null) dispatch(clearSelectedGoal());
+    if (goalId != null) {
+      noteGoalDroppedAutomatically();
+      dispatch(clearSelectedGoal());
+    }
   }, [pathname, goalId, dispatch]);
 };
 
@@ -72,6 +76,7 @@ export const useDropUnknownGoal = (userId: number | null) => {
       return;
     }
     forgetStoredGoal(goalId!);
+    noteGoalDroppedAutomatically();
     dispatch(clearSelectedGoal());
   }, [goalId, currentData, isFetching, fulfilledTimeStamp, refetch, dispatch]);
 };

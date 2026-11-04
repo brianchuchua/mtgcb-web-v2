@@ -28,6 +28,7 @@ import {
 import { RootState } from '@/redux/store';
 import { BrowsePagination, BrowseSearchParams } from '@/types/browse';
 import { isSetSpecificPage } from '@/utils/routeHelpers';
+import { takeGoalDroppedAutomatically } from '@/hooks/goals/autoDroppedGoal';
 
 // Balance between responsiveness and avoiding URL spam during rapid typing
 const DEBOUNCE_URL_SYNC_MS = 100;
@@ -324,6 +325,9 @@ export function useBrowseStateSync() {
    * ------------------------------------------------------------------ */
   useEffect(() => {
     if (!hasInit.current || viewType === prevView.current) return;
+    // On a link that loads with state changes (e.g. a goal being dropped) this effect can run in
+    // the same commit as initialisation, with the view from before it. That isn't a view change.
+    if (store.getState().browse.viewContentType !== viewType) return;
 
     // Get current Redux state for the new view
     let state = viewType === 'cards' ? cardState : setState;
@@ -427,10 +431,12 @@ export function useBrowseStateSync() {
     const sync = debounce(() => {
       const state = viewType === 'cards' ? cardState : setState;
       const url = buildBrowseUrl(pathname, viewType, state);
+      const goalDroppedByApp = takeGoalDroppedAutomatically();
 
       if (url !== lastUrlPushed.current) {
         lastUrlPushed.current = url;
-        if (url === arrivalUrl.current) {
+        if (url === arrivalUrl.current || goalDroppedByApp) {
+          if (arrivalUrl.current !== undefined) arrivalUrl.current = url;
           router.replace(url, { scroll: false });
         } else {
           arrivalUrl.current = undefined;
