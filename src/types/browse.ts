@@ -103,6 +103,7 @@ export type SortByOption =
   | 'category'
   | 'isDraftable'
   // Collection-specific sort options
+  | 'ownedValue'
   | 'totalValue'
   | 'costToComplete.oneOfEachCard'
   | 'percentageCollected';

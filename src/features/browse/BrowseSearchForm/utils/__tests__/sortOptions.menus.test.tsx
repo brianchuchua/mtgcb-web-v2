@@ -30,9 +30,10 @@ describe('getCardSortOptions', () => {
     expect(values(getCardSortOptions(() => false, false))).toEqual(BASE_CARD_SORTS);
   });
 
-  it('adds quantity sorts on collection pages only', () => {
+  it('adds the owned-finish price and quantity sorts on collection pages only', () => {
     expect(values(getCardSortOptions(() => false, true))).toEqual([
       ...BASE_CARD_SORTS,
+      'ownedValue',
       'quantityReg',
       'quantityFoil',
       'quantityAll',

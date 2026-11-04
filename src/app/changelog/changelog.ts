@@ -16,6 +16,19 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-11-03',
+      version: '1.40.0',
+      changes: [
+        'Added a "Price (Owned)" sort to collections and goals. It sorts by the price of the copies you own. If you own both foil and non-foil, it sorts by the highest of the two.',
+        'Some sorting fixes:',
+        [
+          'Made it so cards with no mana value or collector number data sort to the bottom instead of the top',
+          'Made quantity sorting on goals when there are ties to list them A to Z like the rest of the site',
+          'Made sorting sets by release date more predictable in case of ties',
+        ],
+      ],
+    },
+    {
+      date: '2026-11-03',
       version: '1.39.3',
       changes: ['Updated The List'],
       type: 'data',

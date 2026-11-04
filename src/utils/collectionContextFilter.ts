@@ -14,9 +14,10 @@ const COLLECTION_ONLY_FIELDS = {
   sets: ['selectedGoalId', 'selectedLocationId', 'completionStatus'] as const,
 };
 
-// Sort options that only work when userId is present (collection context)
-const COLLECTION_ONLY_SORTS = {
-  cards: ['quantityAll', 'quantityFoil', 'quantityReg'] as const,
+// Sort options that only work when userId is present (collection context). useFilteredSortBy
+// reads this list too, so a new collection-only sort goes here once.
+export const COLLECTION_ONLY_SORTS = {
+  cards: ['quantityAll', 'quantityFoil', 'quantityReg', 'ownedValue'] as const,
   sets: ['percentageCollected', 'totalValue', 'costToComplete.oneOfEachCard'] as const,
 };
 

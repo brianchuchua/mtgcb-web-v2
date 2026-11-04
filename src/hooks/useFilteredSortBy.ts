@@ -10,12 +10,7 @@ import { useSelector } from 'react-redux';
 import { selectSortBy, selectSortOrder, selectViewContentType } from '@/redux/slices/browse';
 import { useIsCollectionContext } from '@/hooks/useIsCollectionContext';
 import { SortByOption, SortOrderOption } from '@/types/browse';
-
-// Sort options that only work when userId is present (collection context)
-const COLLECTION_ONLY_SORTS = {
-  cards: ['quantityAll', 'quantityFoil', 'quantityReg'],
-  sets: ['percentageCollected', 'totalValue', 'costToComplete.oneOfEachCard'],
-};
+import { COLLECTION_ONLY_SORTS } from '@/utils/collectionContextFilter';
 
 // Default sort values when collection-only sorts are removed
 const DEFAULT_SORT = {
@@ -45,7 +40,7 @@ export function useFilteredSortBy(): { sortBy: SortByOption; sortOrder: SortOrde
     }
 
     // Check if current sort is collection-only
-    const collectionSorts = COLLECTION_ONLY_SORTS[viewType];
+    const collectionSorts: readonly string[] = COLLECTION_ONLY_SORTS[viewType];
     const isCollectionSort = rawSortBy && collectionSorts.includes(rawSortBy);
 
     // If using collection-only sort in browse context, reset to default

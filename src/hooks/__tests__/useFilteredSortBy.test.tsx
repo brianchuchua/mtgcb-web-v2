@@ -29,7 +29,7 @@ beforeEach(() => {
 });
 
 describe('useFilteredSortBy — public browse', () => {
-  it.each(['quantityAll', 'quantityFoil', 'quantityReg'])('resets the cards sort %s to the default', (sortBy) => {
+  it.each(['quantityAll', 'quantityFoil', 'quantityReg', 'ownedValue'])('resets the cards sort %s to the default', (sortBy) => {
     expect(renderWith('cards', sortBy, 'desc')).toEqual({ sortBy: 'releasedAt', sortOrder: 'asc' });
   });
 

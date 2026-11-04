@@ -138,6 +138,7 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       'quantityReg',
       'quantityFoil',
       'quantityAll',
+      'ownedValue',
     ],
     defaultValue: 'releasedAt',
   },

@@ -39,7 +39,7 @@ describe('filterCollectionParams', () => {
     });
   });
 
-  it.each(['quantityAll', 'quantityFoil', 'quantityReg'])(
+  it.each(['quantityAll', 'quantityFoil', 'quantityReg', 'ownedValue'])(
     'resets the card sort %s to release date ascending',
     (sortBy) => {
       expect(filterCollectionParams({ sortBy, sortOrder: 'desc' }, false, 'cards')).toEqual({

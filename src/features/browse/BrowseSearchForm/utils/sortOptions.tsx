@@ -89,6 +89,10 @@ export const getCardSortOptions = (isPriceMismatched: (priceOption: string) => b
 
   if (isCollectionPage) {
     const collectionCardOptions = [
+      // Price of the finish you own (higher of the two if you own both); unowned cards go last.
+      <MenuItem key="ownedValue" value="ownedValue">
+        Price (Owned)
+      </MenuItem>,
       <MenuItem key="quantityReg" value="quantityReg">
         Quantity (Regular)
       </MenuItem>,
