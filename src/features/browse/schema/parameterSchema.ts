@@ -113,6 +113,13 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
     urlParam: 'setsPageSize',
     defaultValue: 20,
   },
+  // The page number travels in the URL so Back (e.g. from a set or card page) returns to it.
+  page: {
+    type: 'number',
+    mode: 'both',
+    urlParam: 'page',
+    defaultValue: 1,
+  },
 
   cardsSortBy: {
     type: 'enum',

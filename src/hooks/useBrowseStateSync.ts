@@ -43,7 +43,8 @@ const DEBOUNCE_URL_SYNC_MS = 100;
  * @param setsPageSize - Page size for sets from localStorage
  * @param options - Control sync behavior differences
  * @param options.resetBeforeSync - If true, calls resetAllSearches() before parsing URL (URL changes only)
- * @param options.forcePageOne - If true, always sets currentPage to 1 (initialization only)
+ * @param options.pageView - The view a page number in the URL belongs to. The other view, and both
+ *   views when the URL has no page, start at page 1.
  * @param options.isNavigation - If true, empty URL means clear state (not restore from sessionStorage)
  */
 function syncReduxFromUrlOrSession(
@@ -54,7 +55,7 @@ function syncReduxFromUrlOrSession(
   pathname: string,
   options: {
     resetBeforeSync: boolean;
-    forcePageOne: boolean;
+    pageView: 'cards' | 'sets';
     isNavigation: boolean;
   },
 ): void {
@@ -78,8 +79,8 @@ function syncReduxFromUrlOrSession(
       // User navigated to empty URL (e.g., back button) - respect the empty state
       // Don't restore from sessionStorage, clear the search instead
       dispatch(resetAllSearches());
-      dispatch(setCardPagination({ pageSize: cardsPageSize }));
-      dispatch(setSetPagination({ pageSize: setsPageSize }));
+      dispatch(setCardPagination({ pageSize: cardsPageSize, currentPage: 1 }));
+      dispatch(setSetPagination({ pageSize: setsPageSize, currentPage: 1 }));
     } else {
       // Initial load with no URL params - try to restore from sessionStorage
       const cardsSessionState = loadSearchState('cards');
@@ -97,7 +98,8 @@ function syncReduxFromUrlOrSession(
       } else {
         // No session state - reset to defaults (which includes preferences from localStorage)
         dispatch(resetAllSearches());
-        dispatch(setCardPagination({ pageSize: cardsPageSize }));
+        // No page in the URL means page 1, even if the store still holds a page from elsewhere
+        dispatch(setCardPagination({ pageSize: cardsPageSize, currentPage: 1 }));
       }
 
       if (setsSessionState && Object.keys(setsSessionState).length > 0) {
@@ -111,7 +113,7 @@ function syncReduxFromUrlOrSession(
         );
       } else {
         // No session state - reset to defaults (which includes preferences from localStorage)
-        dispatch(setSetPagination({ pageSize: setsPageSize }));
+        dispatch(setSetPagination({ pageSize: setsPageSize, currentPage: 1 }));
       }
     }
   } else {
@@ -124,19 +126,24 @@ function syncReduxFromUrlOrSession(
     const cardsUrlState = parseUrlToState(search, 'cards');
     const setsUrlState = parseUrlToState(search, 'sets');
 
+    // A page number belongs to the view the link is for. The other view starts at page 1.
+    const pageOne = (view: 'cards' | 'sets') => !search.has('page') || view !== options.pageView;
+    if (pageOne('cards')) delete cardsUrlState.currentPage;
+    if (pageOne('sets')) delete setsUrlState.currentPage;
+
     // Update cards state if there are card-specific params
     if (Object.keys(cardsUrlState).length > 0) {
       dispatch(
         setCardSearchParams({
           ...cardsUrlState,
-          ...(options.forcePageOne ? { currentPage: 1 } : {}),
+          ...(pageOne('cards') ? { currentPage: 1 } : {}),
           pageSize: cardsPageSize,
         }),
       );
     } else {
       // Even if no card params, still need to set pagination from localStorage
       const pagination: any = { pageSize: cardsPageSize };
-      if (options.forcePageOne) {
+      if (pageOne('cards')) {
         pagination.currentPage = 1;
       }
       dispatch(setCardPagination(pagination));
@@ -154,19 +161,27 @@ function syncReduxFromUrlOrSession(
       dispatch(
         setSetSearchParams({
           ...setsUrlState,
-          ...(options.forcePageOne ? { currentPage: 1 } : {}),
+          ...(pageOne('sets') ? { currentPage: 1 } : {}),
           pageSize: setsPageSize,
         }),
       );
     } else {
       // Even if no set params, still need to set pagination from localStorage
       const pagination: any = { pageSize: setsPageSize };
-      if (options.forcePageOne) {
+      if (pageOne('sets')) {
         pagination.currentPage = 1;
       }
       dispatch(setSetPagination(pagination));
     }
   }
+}
+
+// The view a navigated-to URL shows: its contentType, else cards on a set page, else sets.
+// Matches how syncReduxFromUrlOrSession picks the view on navigation.
+function pageViewOf(search: URLSearchParams, pathname: string): 'cards' | 'sets' {
+  const contentType = search.get('contentType');
+  if (contentType === 'cards' || contentType === 'sets') return contentType;
+  return isSetSpecificPage(pathname) ? 'cards' : 'sets';
 }
 
 function buildBrowseUrl(pathname: string, viewType: 'cards' | 'sets', state: BrowseSearchParams): string {
@@ -220,6 +235,16 @@ export function useBrowseStateSync() {
     arrivalUrl.current = buildBrowseUrl(pathname, viewContentType, state);
   };
 
+  // The search criteria (everything but page, page size and view mode) last seen per view.
+  // A change resets the page to 1. State loaded from the URL is recorded as-is, so a page
+  // number in the URL (a Back step, a shared link) is kept rather than reset.
+  const prevCriteria = useRef({ cards: '', sets: '' });
+  const criteriaOf = ({ currentPage, pageSize, viewMode, ...rest }: any) => JSON.stringify(rest);
+  const rememberCriteria = () => {
+    const { cardsSearchParams, setsSearchParams } = store.getState().browse;
+    prevCriteria.current = { cards: criteriaOf(cardsSearchParams), sets: criteriaOf(setsSearchParams) };
+  };
+
   // TODO: Consider using named functions for useEffects for readability
   // TODO: Still not happy with the readability of this code
   /** ------------------------------------------------------------------
@@ -269,11 +294,12 @@ export function useBrowseStateSync() {
     // Sync Redux from URL or sessionStorage (initialization)
     syncReduxFromUrlOrSession(search, dispatch, cardsPageSize, setsPageSize, pathname, {
       resetBeforeSync: false, // Don't reset on init, preserve Redux defaults
-      forcePageOne: true, // Always start at page 1 on init
+      pageView: initialView,
       isNavigation: false, // Initial load - allow sessionStorage restore
     });
 
     rememberArrivalUrl();
+    rememberCriteria();
     prevView.current = initialView;
     hasInit.current = true;
   }, [
@@ -312,11 +338,12 @@ export function useBrowseStateSync() {
     // Sync Redux from URL
     syncReduxFromUrlOrSession(search, dispatch, cardsPageSize, setsPageSize, pathname, {
       resetBeforeSync: true, // Reset to ensure clean state
-      forcePageOne: false, // Respect page number from URL
+      pageView: pageViewOf(search, pathname),
       isNavigation: true, // Navigation - respect empty URL (don't restore from sessionStorage)
     });
 
     rememberArrivalUrl();
+    rememberCriteria();
     prevSearchParamsString.current = currentSearchString;
   }, [search, dispatch, cardsPageSize, setsPageSize, pathname]);
 
@@ -328,6 +355,17 @@ export function useBrowseStateSync() {
     // On a link that loads with state changes (e.g. a goal being dropped) this effect can run in
     // the same commit as initialisation, with the view from before it. That isn't a view change.
     if (store.getState().browse.viewContentType !== viewType) return;
+    // On Back/Forward the URL already shows this view and is the source of truth: rewriting it
+    // here would drop its page number and add a history entry.
+    if (!isSetSpecificPage(pathname) && search.get('contentType') === viewType) {
+      // Record the URL as current, as a rewrite would. Otherwise a Forward back to the URL we
+      // last wrote is mistaken for our own write and ignored.
+      const searchString = search.toString();
+      lastUrlPushed.current = searchString ? `${pathname}?${searchString}` : pathname;
+      arrivalUrl.current = undefined;
+      prevView.current = viewType;
+      return;
+    }
 
     // Get current Redux state for the new view
     let state = viewType === 'cards' ? cardState : setState;
@@ -390,7 +428,7 @@ export function useBrowseStateSync() {
     router.push(url, { scroll: false }); // Use push to create history entry
 
     prevView.current = viewType;
-  }, [viewType, cardState, setState, pathname, router, dispatch, cardsPageSize, setsPageSize]);
+  }, [viewType, cardState, setState, pathname, router, dispatch, cardsPageSize, setsPageSize, search]);
 
   /** ------------------------------------------------------------------
    *  Save viewContentType preference to localStorage when it changes
@@ -452,15 +490,14 @@ export function useBrowseStateSync() {
   /** ------------------------------------------------------------------
    *  4️⃣  Reset currentPage ⇢ 1 when criteria change
    * ------------------------------------------------------------------ */
-  const prevCriteria = useRef({ cards: '', sets: '' });
-
   useEffect(() => {
     if (!hasInit.current) return;
 
-    const stripMeta = ({ currentPage, pageSize, viewMode, ...rest }: any) => rest;
-
-    const cardsJSON = JSON.stringify(stripMeta(cardState));
-    const setsJSON = JSON.stringify(stripMeta(setState));
+    // Read the store, not this render's values: on the render that runs initialisation, the
+    // values here are from before it, and comparing them would reset a page from the URL.
+    const { cardsSearchParams, setsSearchParams } = store.getState().browse;
+    const cardsJSON = criteriaOf(cardsSearchParams);
+    const setsJSON = criteriaOf(setsSearchParams);
 
     if (viewType === 'cards' && cardsJSON !== prevCriteria.current.cards) {
       dispatch(setPagination({ currentPage: 1 }));

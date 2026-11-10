@@ -134,7 +134,6 @@ export const useCollectionSetTableColumns = (
 // Collection set row renderer - this renders the cells for each set
 export const useCollectionSetRowRenderer = (
   displaySettings: CollectionSetTableRendererProps['displaySettings'],
-  onSetClick?: (set: Set) => void,
 ) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -289,7 +288,6 @@ export const useCollectionSetRowRenderer = (
 export const useCollectionSetTableRenderers = (
   displaySettings: CollectionSetTableRendererProps['displaySettings'],
   currentSortBy: string,
-  onSetClick?: (set: Set) => void,
   hideValue: boolean = false,
 ) => {
   // When hideValue is true, override value-related visibility settings to hide them
@@ -298,7 +296,7 @@ export const useCollectionSetTableRenderers = (
     : displaySettings;
 
   const columns = useCollectionSetTableColumns({ displaySettings: effectiveDisplaySettings }, currentSortBy);
-  const renderRowContent = useCollectionSetRowRenderer(effectiveDisplaySettings, onSetClick);
+  const renderRowContent = useCollectionSetRowRenderer(effectiveDisplaySettings);
 
   return { columns, renderRowContent };
 };

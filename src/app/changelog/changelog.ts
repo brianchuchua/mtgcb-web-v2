@@ -16,6 +16,14 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-11-04',
+      version: '1.40.2',
+      changes: [
+        'Even more bug fixes:',
+        ['The Back button now remembers which page of results you were on', 'Release date filters are now inclusive'],
+      ],
+    },
+    {
+      date: '2026-11-04',
       version: '1.40.1',
       changes: [
         'Some more bug fixes:',

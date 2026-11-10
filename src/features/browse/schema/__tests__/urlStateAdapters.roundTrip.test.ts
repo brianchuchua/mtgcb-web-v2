@@ -271,8 +271,24 @@ describe('urlStateAdapters — params that never reach the URL', () => {
   });
 
   it('ignores keys with no schema entry', () => {
-    const state = { currentPage: 3, somethingElse: 'x' } as Partial<BrowseSearchParams>;
+    const state = { somethingElse: 'x' } as Partial<BrowseSearchParams>;
     expect(asObject(toParams(state, 'cards'))).toEqual({});
+  });
+
+  // Back from a set or card page returns to the page you were on (ticket "Back button loses
+  // the page number").
+  it('writes the page number, leaving page 1 out', () => {
+    expect(asObject(toParams({ currentPage: 3 } as Partial<BrowseSearchParams>, 'cards'))).toEqual({ page: '3' });
+    expect(asObject(toParams({ currentPage: 3 } as Partial<BrowseSearchParams>, 'sets'))).toEqual({ page: '3' });
+    expect(asObject(toParams({ currentPage: 1 } as Partial<BrowseSearchParams>, 'cards'))).toEqual({});
+  });
+
+  it('reads the page number and drops junk or zero pages', () => {
+    expect(parse('page=8', 'sets')).toEqual({ currentPage: 8 });
+    expect(parse('page=8', 'cards')).toEqual({ currentPage: 8 });
+    expect(parse('page=0', 'cards')).toEqual({});
+    expect(parse('page=-2', 'cards')).toEqual({});
+    expect(parse('page=abc', 'cards')).toEqual({});
   });
 
   it('reads the content type from the URL and drops unknown ones', () => {

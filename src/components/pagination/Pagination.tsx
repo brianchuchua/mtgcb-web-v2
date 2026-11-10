@@ -858,7 +858,7 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
         <span>
           <IconButton 
             onClick={handleNextPage} 
-            disabled={page === totalPages || isLoading} 
+            disabled={page >= totalPages || isLoading} 
             size="small" 
             color="primary"
             data-testid="pagination-next"
@@ -872,7 +872,7 @@ const NavigationControls: React.FC<NavigationControlsProps> = ({
         <span>
           <IconButton 
             onClick={handleLastPage} 
-            disabled={page === totalPages || isLoading} 
+            disabled={page >= totalPages || isLoading} 
             size="small" 
             color="primary"
             data-testid="pagination-last"

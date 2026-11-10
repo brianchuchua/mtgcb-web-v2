@@ -366,7 +366,6 @@ function buildSetPayload({
       isLoading: isApiLoading,
       viewMode,
       onSort: sorting.handleSort,
-      onSetClick: setData.handleSetClick,
       pageSize: pagination.pageSize,
       sortBy: sorting.sortBy,
       sortOrder: sorting.sortOrder,

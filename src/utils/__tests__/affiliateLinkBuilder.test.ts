@@ -4,6 +4,7 @@ import {
   generateTCGPlayerLink,
   generateTCGPlayerAffiliateLink,
   generateTCGPlayerSealedProductLink,
+  TCGPLAYER_AFFILIATE_BASE,
 } from '../affiliateLinkBuilder';
 
 describe('affiliateLinkBuilder', () => {
@@ -161,13 +162,38 @@ describe('affiliateLinkBuilder', () => {
   });
 
   describe('integration — TCG and CK builders produce different host URLs', () => {
-    it('TCG goes to tcgplayer.pxf.io and CK goes to cardkingdom.com', () => {
+    it('TCG goes to partner.tcgplayer.com and CK goes to cardkingdom.com', () => {
       const tcg = generateTCGPlayerLink(123456, 'Lightning Bolt');
       const ck = generateCardKingdomLink('mtg/lea/lightning-bolt');
-      expect(tcg).toContain('tcgplayer.pxf.io');
+      expect(tcg).toContain('partner.tcgplayer.com');
       expect(ck).toContain('cardkingdom.com');
       expect(tcg).not.toContain('cardkingdom.com');
       expect(ck).not.toContain('tcgplayer');
+    });
+  });
+
+  describe('TCGPlayer partner domain', () => {
+    const BASE = 'https://partner.tcgplayer.com/c/4944197/1830156/21018';
+    const links: Array<[string, string, string]> = [
+      ['card id', generateTCGPlayerLink(123456), 'https://www.tcgplayer.com/product/123456'],
+      ['card id, foil', generateTCGPlayerLink(123456, undefined, 'foil'), 'https://www.tcgplayer.com/product/123456?Printing=Foil'],
+      ['card id, normal', generateTCGPlayerLink(123456, undefined, 'normal'), 'https://www.tcgplayer.com/product/123456?Printing=Normal'],
+      ['card name', generateTCGPlayerLink(null, 'Lightning Bolt'), 'https://www.tcgplayer.com/search/magic/product?productLineName=magic&q=Lightning%20Bolt'],
+      ['nothing', generateTCGPlayerLink(), 'https://www.tcgplayer.com/magic'],
+      ['wrapped url', generateTCGPlayerAffiliateLink('https://www.tcgplayer.com/product/1'), 'https://www.tcgplayer.com/product/1'],
+      ['empty url', generateTCGPlayerAffiliateLink(''), 'https://www.tcgplayer.com/magic'],
+      ['sealed url', generateTCGPlayerSealedProductLink('https://www.tcgplayer.com/product/2'), 'https://www.tcgplayer.com/product/2'],
+      ['sealed by set name', generateTCGPlayerSealedProductLink(null, 'Alpha'), 'https://www.tcgplayer.com/search/magic/product?productLineName=magic&q=Alpha%20sealed'],
+    ];
+
+    it('exports the partner-domain base', () => {
+      expect(TCGPLAYER_AFFILIATE_BASE).toBe(BASE);
+    });
+
+    it.each(links)('%s uses the partner domain and keeps the target', (_label, link, target) => {
+      expect(link.startsWith(`${BASE}?u=`)).toBe(true);
+      expect(link).not.toContain('pxf.io');
+      expect(new URL(link).searchParams.get('u')).toBe(target);
     });
   });
 });

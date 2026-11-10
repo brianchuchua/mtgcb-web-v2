@@ -181,15 +181,70 @@ describe('useBrowseStateSync', () => {
       const { usePathname, useSearchParams } = require('next/navigation');
 
       usePathname.mockReturnValue('/browse');
-      useSearchParams.mockReturnValue(createMockSearchParams({ page: '3' }));
+      useSearchParams.mockReturnValue(createMockSearchParams({ contentType: 'cards', page: '3' }));
 
       const store = createTestStore();
       renderHookWithRedux(() => useBrowseStateSync(), { store });
 
       await waitFor(() => {
-        // Force page 1 on initialization (not respecting URL page)
-        expect(store.getState().browse.cardsSearchParams.currentPage).toBe(1);
+        // The page in the URL is kept (Back from a set or card page returns to it)
+        expect(store.getState().browse.cardsSearchParams.currentPage).toBe(3);
       });
+    });
+
+    it('keeps the URL page alongside search filters (the criteria reset must not fire on load)', async () => {
+      const { usePathname, useSearchParams } = require('next/navigation');
+
+      usePathname.mockReturnValue('/browse');
+      useSearchParams.mockReturnValue(
+        createMockSearchParams({ contentType: 'sets', page: '8', setName: 'dominaria' }),
+      );
+
+      const store = createTestStore();
+      renderHookWithRedux(() => useBrowseStateSync(), { store });
+
+      await waitFor(() => {
+        expect(store.getState().browse.setsSearchParams.name).toBe('dominaria');
+      });
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      expect(store.getState().browse.setsSearchParams.currentPage).toBe(8);
+    });
+
+    it('applies the URL page to the view the link is for, not the other view', async () => {
+      const { usePathname, useSearchParams } = require('next/navigation');
+
+      usePathname.mockReturnValue('/browse');
+      useSearchParams.mockReturnValue(createMockSearchParams({ contentType: 'sets', page: '3' }));
+
+      const store = createTestStore();
+      renderHookWithRedux(() => useBrowseStateSync(), { store });
+
+      await waitFor(() => {
+        expect(store.getState().browse.setsSearchParams.currentPage).toBe(3);
+      });
+      // Switching to Cards from Sets page 3 should show Cards page 1
+      expect(store.getState().browse.cardsSearchParams.currentPage).toBe(1);
+    });
+
+    it('starts at page 1 when the URL has no page, even with a page left in the store', async () => {
+      const { usePathname, useSearchParams } = require('next/navigation');
+
+      // A set page reached from Browse page 3: the store still holds the old pages
+      usePathname.mockReturnValue('/browse/sets/dominaria-united');
+      useSearchParams.mockReturnValue(createMockSearchParams({}));
+
+      const store = createTestStore();
+      const { setCardPagination, setSetPagination } = require('@/redux/slices/browse');
+      store.dispatch(setCardPagination({ currentPage: 4 }));
+      store.dispatch(setSetPagination({ currentPage: 3 }));
+
+      renderHookWithRedux(() => useBrowseStateSync(), { store });
+
+      await waitFor(() => {
+        expect(store.getState().browse.viewContentType).toBe('cards');
+      });
+      expect(store.getState().browse.cardsSearchParams.currentPage).toBe(1);
+      expect(store.getState().browse.setsSearchParams.currentPage).toBe(1);
     });
 
     it('should parse multiple search parameters from URL', async () => {

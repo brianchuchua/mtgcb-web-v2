@@ -1,6 +1,6 @@
 {
   "name": "mtgcb-web-v2",
-  "version": "1.40.1",
+  "version": "1.40.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -17,7 +17,8 @@
     "test:e2e-ui": "playwright test --ui",
     "test:e2e-report": "playwright show-report",
     "test:manual": "node scripts/test-manual.js",
-    "test:all": "pnpm test && pnpm test:e2e"
+    "test:all": "pnpm type-check && pnpm test",
+    "test:full": "pnpm type-check && pnpm test && pnpm test:e2e"
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",

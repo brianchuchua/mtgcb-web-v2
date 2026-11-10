@@ -9,6 +9,12 @@ const CK_AFFILIATE_PARAMS =
 const CK_BASE_URL = 'https://www.cardkingdom.com';
 
 /**
+ * TCGPlayer affiliate (Impact) base on TCGPlayer's own partner domain.
+ * Shared with the mass-entry form in TCGPlayerContext so the two can't drift.
+ */
+export const TCGPLAYER_AFFILIATE_BASE = 'https://partner.tcgplayer.com/c/4944197/1830156/21018';
+
+/**
  * Generates a Card Kingdom affiliate link.
  *
  * @param ckUrl - The CK product path stored in Card.cardKingdomUrl /
@@ -107,19 +113,19 @@ export const generateTCGPlayerLink = (
     const targetUrl = printingFilter
       ? `https://www.tcgplayer.com/product/${tcgplayerId}?${printingFilter}`
       : `https://www.tcgplayer.com/product/${tcgplayerId}`;
-    const affiliateLink = `https://tcgplayer.pxf.io/c/4944197/1830156/21018?u=${encodeURIComponent(targetUrl)}`;
+    const affiliateLink = `${TCGPLAYER_AFFILIATE_BASE}?u=${encodeURIComponent(targetUrl)}`;
     return affiliateLink;
   }
 
   // Otherwise, do a search for the card name
   if (cardName) {
     const targetUrl = `https://www.tcgplayer.com/search/magic/product?productLineName=magic&q=${encodeURIComponent(cardName)}${printingFilter ? `&${printingFilter}` : ''}`;
-    const affiliateLink = `https://tcgplayer.pxf.io/c/4944197/1830156/21018?u=${encodeURIComponent(targetUrl)}`;
+    const affiliateLink = `${TCGPLAYER_AFFILIATE_BASE}?u=${encodeURIComponent(targetUrl)}`;
     return affiliateLink;
   }
 
   // If neither is provided, just link to TCGPlayer Magic homepage
-  return `https://tcgplayer.pxf.io/c/4944197/1830156/21018?u=${encodeURIComponent('https://www.tcgplayer.com/magic')}`;
+  return `${TCGPLAYER_AFFILIATE_BASE}?u=${encodeURIComponent('https://www.tcgplayer.com/magic')}`;
 };
 
 /**
@@ -130,10 +136,10 @@ export const generateTCGPlayerLink = (
  */
 export const generateTCGPlayerAffiliateLink = (url: string): string => {
   if (!url) {
-    return `https://tcgplayer.pxf.io/c/4944197/1830156/21018?u=${encodeURIComponent('https://www.tcgplayer.com/magic')}`;
+    return `${TCGPLAYER_AFFILIATE_BASE}?u=${encodeURIComponent('https://www.tcgplayer.com/magic')}`;
   }
   
-  return `https://tcgplayer.pxf.io/c/4944197/1830156/21018?u=${encodeURIComponent(url)}`;
+  return `${TCGPLAYER_AFFILIATE_BASE}?u=${encodeURIComponent(url)}`;
 };
 
 /**

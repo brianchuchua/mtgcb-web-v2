@@ -106,7 +106,6 @@ export const useSetTableColumns = (
 // Set row renderer - this renders the cells for each set
 export const useSetRowRenderer = (
   displaySettings: SetTableRendererProps['displaySettings'],
-  onSetClick?: (set: Set) => void,
 ) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -203,10 +202,9 @@ export const useSetRowRenderer = (
 export const useSetTableRenderers = (
   displaySettings: SetTableRendererProps['displaySettings'],
   currentSortBy: string,
-  onSetClick?: (set: Set) => void,
 ) => {
   const columns = useSetTableColumns({ displaySettings }, currentSortBy);
-  const renderRowContent = useSetRowRenderer(displaySettings, onSetClick);
+  const renderRowContent = useSetRowRenderer(displaySettings);
 
   return { columns, renderRowContent };
 };

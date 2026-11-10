@@ -1,14 +1,11 @@
-import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetSetsQuery } from '@/api/browse/browseApi';
 import { useGetCostToCompleteQuery } from '@/api/sets/setsApi';
 import { mapApiSetsToSetItems } from '@/features/browse/mappers';
 import { selectSelectedGoalId, selectShowGoals } from '@/redux/slices/browse';
 import { useSetPriceType } from '@/hooks/useSetPriceType';
-import { Set } from '@/types/sets';
 import { buildApiParamsFromSearchParams } from '@/utils/searchParamsConverter';
-import { getCollectionSetUrl } from '@/utils/collectionUrls';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setCompilationState } from '@/redux/slices/compilationSlice';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,7 +27,6 @@ interface UseSetDataProps {
  * Handles API params, cost-to-complete data, and transforms API data to view model
  */
 export function useSetData({ searchParams, pagination, skip, includeSubsets, skipCostToComplete = false, userId }: UseSetDataProps) {
-  const router = useRouter();
   const setPriceType = useSetPriceType();
   const selectedGoalId = useSelector(selectSelectedGoalId);
   const showGoals = useSelector(selectShowGoals);
@@ -136,17 +132,6 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
 
   const total = setsSearchResult?.data?.totalCount || 0;
 
-  const handleSetClick = useCallback(
-    (set: Set) => {
-      if (userId) {
-        router.push(getCollectionSetUrl(userId, set.slug, selectedGoalId));
-      } else {
-        router.push(`/browse?includeSets=${set.id}`);
-      }
-    },
-    [router, userId, selectedGoalId],
-  );
-
   return {
     items,
     total,
@@ -155,7 +140,6 @@ export function useSetData({ searchParams, pagination, skip, includeSubsets, ski
     apiArgs,
     refetch,
     costToComplete: costToCompleteData?.data,
-    handleSetClick,
     username: setsSearchResult?.data?.username,
     collectionSummary: setsSearchResult?.data ? {
       totalCardsCollected: setsSearchResult.data.totalCardsCollected,

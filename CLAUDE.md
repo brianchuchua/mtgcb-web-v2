@@ -36,8 +36,14 @@ Package manager: **pnpm 10.33.4** (pinned via `packageManager` field; Corepack a
 - `pnpm type-check` - TypeScript checking
 - `pnpm lint` - ESLint
 - `pnpm test` - Jest unit tests
+- `pnpm test:all` - Type-check + Jest unit tests. **This is what "run all tests" means** (a few minutes)
+- `pnpm test:full` - Type-check + Jest + the full Playwright suite (~25 min). Only when asked by name
 - `pnpm test:e2e` - Playwright E2E tests
 - `pnpm test:e2e tests/path/to/test.ts` - Run specific test file
+
+### Slow tests: only when asked
+
+"Run all tests" = `pnpm test:all`. Do not run the full Playwright suite (`pnpm test:e2e`, `pnpm test:full`) or an old-vs-new URL comparison (scripted browser runs against old and new production builds, ~45 min per run) unless Brian asks for them by name. Running the specific Playwright files for the code you changed is still fine.
 
 ## E2E Testing (Playwright)
 
@@ -50,7 +56,8 @@ Package manager: **pnpm 10.33.4** (pinned via `packageManager` field; Corepack a
 ### Workflow
 
 1. Write/run the specific test file: `pnpm test:e2e tests/path/to/test.ts`
-2. Run full suite to catch regressions: `pnpm test:e2e`
+2. Run the other Playwright files that cover the code you changed
+3. Full suite (`pnpm test:e2e`, ~25 min) only when Brian asks for it
 
 ### Test File Location
 

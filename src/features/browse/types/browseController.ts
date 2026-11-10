@@ -147,7 +147,6 @@ export interface SetData {
   error: any;
   apiArgs: any;
   costToComplete: any;
-  handleSetClick: (set: any) => void;
   refetch: () => void;
   username?: string;
   collectionSummary?: {
@@ -219,7 +218,6 @@ export interface SetsProps {
   isLoading: boolean;
   viewMode: ViewMode;
   onSort: (columnId: string) => void;
-  onSetClick: (set: any) => void;
   pageSize: number;
   sortBy: string;
   sortOrder: 'asc' | 'desc';

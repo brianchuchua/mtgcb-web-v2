@@ -1,8 +1,9 @@
 'use client';
 
 import { createContext, useCallback, useContext, ReactNode } from 'react';
+import { TCGPLAYER_AFFILIATE_BASE } from '@/utils/affiliateLinkBuilder';
 
-const TCGPLAYER_AFFILIATE_URL = 'https://partner.tcgplayer.com/c/4944197/1830156/21018';
+const TCGPLAYER_AFFILIATE_URL = TCGPLAYER_AFFILIATE_BASE;
 
 interface TCGPlayerContextType {
   submitToTCGPlayer: (importString: string, target?: string) => void;

@@ -34,7 +34,6 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
   setItems,
   isLoading,
   viewMode,
-  onSetClick,
   pageSize,
   displaySettings,
   costToCompleteData,
@@ -57,7 +56,6 @@ const CollectionSetDisplayComponent: React.FC<CollectionSetDisplayProps> = ({
   const { columns, renderRowContent } = useCollectionSetTableRenderers(
     displaySettings.table,
     currentSortBy,
-    onSetClick,
     hideValue,
   );
 

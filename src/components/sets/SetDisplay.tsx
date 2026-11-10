@@ -22,7 +22,6 @@ export interface SetDisplayProps {
   setItems: Set[];
   isLoading: boolean;
   viewMode: 'grid' | 'table';
-  onSetClick: (set: Set) => void;
   pageSize: number;
   displaySettings: {
     grid: {
@@ -57,7 +56,6 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   setItems,
   isLoading,
   viewMode,
-  onSetClick,
   pageSize,
   displaySettings,
   costToCompleteData,
@@ -75,7 +73,7 @@ const SetDisplay: React.FC<SetDisplayProps> = ({
   const displaySets = setItems;
 
   // Get the appropriate renderers for table view
-  const { columns, renderRowContent } = useSetTableRenderers(displaySettings.table, currentSortBy, onSetClick);
+  const { columns, renderRowContent } = useSetTableRenderers(displaySettings.table, currentSortBy);
 
   // Handle sort change
   const handleSortChange = (columnId: string) => {

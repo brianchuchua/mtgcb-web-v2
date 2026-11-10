@@ -59,8 +59,7 @@ test.describe('Browse sets: where clicks go (logged out)', () => {
     });
 
     test('clicking a non-link cell in a row does not navigate', async ({ page }) => {
-      // Pins current behaviour: useSetData.handleSetClick (push to /browse?includeSets=<id>) is passed
-      // down as onSetClick but the set table renderer never attaches it to the row.
+      // Rows are not clickable on purpose (only the set name links). The unused row-click wiring was removed in 1.40.2.
       const firstRow = page.locator('main table tbody tr').first();
       const plainCell = firstRow.locator('td').filter({ hasNot: page.locator('a') }).first();
       await expect(plainCell).toBeVisible();

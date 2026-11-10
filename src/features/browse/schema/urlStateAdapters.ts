@@ -21,6 +21,7 @@ const schemaToReduxKeyMap: Record<string, string> = {
   setsSortOrder: 'sortOrder',
   cardsPageSize: 'pageSize',
   setsPageSize: 'pageSize',
+  page: 'currentPage',
   viewContentType: 'viewContentType',
   showSubsets: 'showSubsets',
   includeSubsetsInSets: 'includeSubsetsInSets',
@@ -91,6 +92,7 @@ const reduxToSchemaKeyMap: Record<string, string | [string, string]> = {
   sortBy: ['cardsSortBy', 'setsSortBy'],
   sortOrder: ['cardsSortOrder', 'setsSortOrder'],
   pageSize: ['cardsPageSize', 'setsPageSize'],
+  currentPage: 'page',
   viewContentType: 'viewContentType',
   showSubsets: 'showSubsets',
   includeSubsetsInSets: 'includeSubsetsInSets',
@@ -205,7 +207,10 @@ function parseNumberParameter(state: any, key: string, searchParams: URLSearchPa
 
   const value = searchParams.get(config.urlParam || key);
   if (value) {
-    state[key] = parseInt(value, 10);
+    const parsed = parseInt(value, 10);
+    // A junk or zero page number falls back to page 1
+    if (key === 'currentPage' && !(parsed >= 1)) return;
+    state[key] = parsed;
   }
 }
 
