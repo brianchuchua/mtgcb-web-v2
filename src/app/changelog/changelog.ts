@@ -15,7 +15,7 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
-      date: '2026-11-04',
+      date: '2026-11-10',
       version: '1.40.2',
       changes: [
         'Even more bug fixes:',
