@@ -185,8 +185,8 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
         </Typography>
         <Typography variant="body2">
           <strong>Foil column:</strong> The following values are recognized as foil (case-insensitive):{' '}
-          <code>true</code>, <code>1</code>, <code>foil</code>, <code>yes</code>. All other values, including blank, are
-          treated as non-foil.
+          <code>true</code>, <code>1</code>, <code>foil</code>, <code>etched</code>, <code>yes</code>. All other values,
+          including blank, are treated as non-foil.
         </Typography>
       </Alert>
 

@@ -11,6 +11,7 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   Chip,
   CircularProgress,
   Collapse,
@@ -84,6 +85,7 @@ export const ImportClient: React.FC = () => {
   const dispatch = useDispatch();
   const [selectedFormat, setSelectedFormat] = useState('mtgcb');
   const [updateMode, setUpdateMode] = useState<'replace' | 'merge'>('replace');
+  const [onlyListedFinishes, setOnlyListedFinishes] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFileContent, setSelectedFileContent] = useState<string>('');
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
@@ -101,6 +103,10 @@ export const ImportClient: React.FC = () => {
   const { data: formats, isLoading: formatsLoading, error: formatsError } = useGetImportFormatsQuery();
   const [importCollection, { isLoading: importing }] = useImportCollectionMutation();
   const { progress, isImporting, runChunkedImport, reset } = useChunkedImport(importCollection);
+
+  // The MTG CB format has both quantities on every row, so there is no finish to leave out.
+  const canReplaceByFinish = updateMode === 'replace' && selectedFormat !== 'mtgcb';
+  const replacesByFinish = canReplaceByFinish && onlyListedFinishes;
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -153,6 +159,7 @@ export const ImportClient: React.FC = () => {
         query: {
           format: selectedFormat,
           updateMode,
+          replaceScope: replacesByFinish ? 'finish' : undefined,
           dryRun,
         },
       });
@@ -415,6 +422,26 @@ export const ImportClient: React.FC = () => {
                             </Box>
                           }
                         />
+                        {canReplaceByFinish && (
+                          <FormControlLabel
+                            sx={{ ml: 2.5, mb: 1 }}
+                            control={
+                              <Checkbox
+                                checked={onlyListedFinishes}
+                                onChange={(e) => setOnlyListedFinishes(e.target.checked)}
+                              />
+                            }
+                            label={
+                              <Box>
+                                <Typography variant="body2">Don't change finishes (foil or non-foil) that aren't in the CSV</Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  If the CSV has a card only as foil or only as non-foil: checked, the other one stays the
+                                  same. Unchecked, the other one is set to 0.
+                                </Typography>
+                              </Box>
+                            }
+                          />
+                        )}
                         <FormControlLabel
                           value="merge"
                           control={<Radio />}
@@ -711,10 +738,19 @@ export const ImportClient: React.FC = () => {
             </Typography>
             <Divider sx={{ my: 1.5 }} />
             <Typography variant="body2" color="warning.main">
-              {updateMode === 'replace' ? (
+              {replacesByFinish ? (
+                <>
+                  <strong>Warning:</strong> Replace mode will override the quantities for the finishes (foil or
+                  non-foil) in the CSV file with the new values. Finishes and cards not in the CSV will remain
+                  unchanged.
+                </>
+              ) : updateMode === 'replace' ? (
                 <>
                   <strong>Warning:</strong> Replace mode will completely override the quantities for all cards in the
-                  CSV file with the new values. Cards not in the CSV will remain unchanged.
+                  CSV file with the new values.
+                  {selectedFormat !== 'mtgcb' &&
+                    ' If the CSV has a card only as foil or only as non-foil, the other one will be set to 0.'}{' '}
+                  Cards that aren't in the CSV at all will remain unchanged.
                 </>
               ) : (
                 <>

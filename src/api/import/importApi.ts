@@ -25,6 +25,7 @@ const importApi = mtgcbApi.injectEndpoints({
         if (query?.format) queryParams.append('format', query.format);
         if (query?.dryRun !== undefined) queryParams.append('dryRun', query.dryRun.toString());
         if (query?.updateMode) queryParams.append('updateMode', query.updateMode);
+        if (query?.replaceScope) queryParams.append('replaceScope', query.replaceScope);
 
         const queryString = queryParams.toString();
         

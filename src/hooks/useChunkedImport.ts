@@ -57,6 +57,7 @@ export const useChunkedImport = (importMutation: any) => {
         query: {
           format: string;
           updateMode: 'replace' | 'merge';
+          replaceScope?: 'card' | 'finish';
           dryRun: boolean;
         };
       }
@@ -180,6 +181,7 @@ export const useChunkedImport = (importMutation: any) => {
         query: {
           format: string;
           updateMode: 'replace' | 'merge';
+          replaceScope?: 'card' | 'finish';
           dryRun: boolean;
         };
       }

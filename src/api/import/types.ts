@@ -34,6 +34,7 @@ export interface ImportCollectionQuery {
   format?: string;
   dryRun?: boolean;
   updateMode?: 'replace' | 'merge';
+  replaceScope?: 'card' | 'finish';
 }
 
 export interface ImportError {
