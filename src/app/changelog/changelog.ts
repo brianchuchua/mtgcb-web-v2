@@ -15,6 +15,23 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-11-12',
+      version: '1.41.1',
+      changes: [
+        'Updated Spotlight Series',
+        'Updated WPN Promos',
+        "Added Marvel's History of Heroes",
+        'Updated The Big Score Promos',
+        'Updated Secret Lair',
+        'Updated MagicFest Promos',
+        'Updated Media Inserts',
+        'Updated The List',
+        'Updated Unknown Event',
+        'Added Star Trek Art Series',
+      ],
+      type: 'data',
+    },
+    {
       date: '2026-11-11',
       version: '1.41.0',
       changes: [
