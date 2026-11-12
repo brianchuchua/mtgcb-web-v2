@@ -19,7 +19,7 @@ const changelogData: ChangelogData = {
       version: '1.41.0',
       changes: [
         "Carried over support for 0 quantities in all import formats. In Replace mode it sets that card's quantity to 0. In Add mode it is ignored.",
-        "Added a \"Don't change finishes (foil or non-foil) that aren't in the CSV\" option to Replace mode. With it on, a CSV that only has a card's foils leaves its non-foils alone and vice versa. With it off, Replace works like it always has and the missing finish is set to 0. This is the default behavior since that\s how most export formats work. They don't export what you don't have.",
+        "Added a \"Don't change finishes (foil or non-foil) that aren't in the CSV\" option to Replace mode. With it on, a CSV that only has a card's foils leaves its non-foils alone and vice versa. With it off, Replace works like it always has and the missing finish is set to 0. This is the default behavior since that's how most export formats work. They don't export what you don't have.",
         'Some import fixes:',
         [
           'Fixed Add mode removing a card when using the MTG CB format and its row had 0 for both quantities',
