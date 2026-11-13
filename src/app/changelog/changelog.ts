@@ -16,6 +16,12 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-11-12',
+      version: '1.41.2',
+      changes: ['Updated Star Trek'],
+      type: 'data',
+    },
+    {
+      date: '2026-11-12',
       version: '1.41.1',
       changes: [
         'Updated Spotlight Series',
