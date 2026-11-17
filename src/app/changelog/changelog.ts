@@ -16,6 +16,13 @@ const changelogData: ChangelogData = {
   releases: [
     {
       date: '2026-11-17',
+      version: '1.41.4',
+      changes: [
+        'Fixed an issue that sometimes prevented new versions of the site from being deployed if there was a failure fetching fonts from Google',
+      ],
+    },
+    {
+      date: '2026-11-17',
       version: '1.41.3',
       changes: ['Added Star Trek Tokens'],
       type: 'data',
