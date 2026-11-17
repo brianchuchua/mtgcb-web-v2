@@ -15,6 +15,12 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-11-17',
+      version: '1.41.3',
+      changes: ['Added Star Trek Tokens'],
+      type: 'data',
+    },
+    {
       date: '2026-11-12',
       version: '1.41.2',
       changes: ['Updated Star Trek'],
