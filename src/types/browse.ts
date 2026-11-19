@@ -116,6 +116,11 @@ export interface BrowseSearchParams {
   oracleText?: string;
   artist?: string;
   colors?: ColorFilter;
+  /**
+   * Same shape and match types as `colors`, matched against the card's color
+   * identity (mana cost plus every mana symbol in its rules text) instead.
+   */
+  colorIdentity?: ColorFilter;
   types?: TypeFilter;
   layouts?: LayoutFilter;
   borderColors?: BorderColorFilter;

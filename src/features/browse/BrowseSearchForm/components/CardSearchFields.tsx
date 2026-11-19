@@ -3,6 +3,7 @@ import OracleTextField from './OracleTextField';
 import SearchField from './SearchField';
 import ToggleSwitch from './ToggleSwitch';
 import AdvancedFilters from '@/features/browse/AdvancedFilters';
+import ColorIdentitySelector from '@/features/browse/ColorIdentitySelector';
 import ColorSelector from '@/features/browse/ColorSelector';
 import FormatLegalitySelector from '@/features/browse/FormatLegalitySelector';
 import LayoutSelector from '@/features/browse/LayoutSelector';
@@ -73,6 +74,7 @@ const CardSearchFields: React.FC<CardSearchFieldsProps> = ({
       <TypeSelector />
       <LayoutSelector />
       <ColorSelector />
+      <ColorIdentitySelector />
       <RaritySelector />
       <FormatLegalitySelector />
       <BorderColorSelector />

@@ -1,5 +1,5 @@
 import { CardApiParams, SetApiParams } from '@/api/browse/types';
-import { BrowseSearchParams, ColorMatchType, SortByOption, SortOrderOption } from '@/types/browse';
+import { BrowseSearchParams, ColorFilter, ColorMatchType } from '@/types/browse';
 
 /**
  * Converts browser/Redux search parameters to API parameters
@@ -69,34 +69,15 @@ export const buildApiParamsFromSearchParams = (
       apiParams.isFullArt = searchParams.isFullArt;
     }
 
-    // Add color filtering
-    if (searchParams.colors) {
-      if (searchParams.colors.includeColorless) {
-        apiParams.colors_array = {
-          exactly: [],
-        };
-      } else if (searchParams.colors.colors.length > 0) {
-        const colorArray = searchParams.colors.colors;
-        const matchType = searchParams.colors.matchType as ColorMatchType;
+    // Colour and colour identity share a shape and differ only in the column they match.
+    const colorCondition = toColorCondition(searchParams.colors);
+    if (colorCondition) {
+      apiParams.colors_array = colorCondition;
+    }
 
-        switch (matchType) {
-          case 'exactly':
-            apiParams.colors_array = {
-              exactly: colorArray,
-            };
-            break;
-          case 'atLeast':
-            apiParams.colors_array = {
-              atLeast: colorArray,
-            };
-            break;
-          case 'atMost':
-            apiParams.colors_array = {
-              atMost: colorArray,
-            };
-            break;
-        }
-      }
+    const colorIdentityCondition = toColorCondition(searchParams.colorIdentity);
+    if (colorIdentityCondition) {
+      apiParams.color_identities_array = colorIdentityCondition;
     }
 
     // Add type filtering
@@ -383,4 +364,19 @@ export const buildApiParamsFromSearchParams = (
   }
 
   return apiParams;
+};
+
+const COLOR_MATCH_TYPES: ColorMatchType[] = ['exactly', 'atLeast', 'atMost'];
+
+/**
+ * Colorless is "exactly no colours". An empty selection, or a match type that is
+ * not one of the three the API knows, adds no condition.
+ */
+const toColorCondition = (filter: ColorFilter | undefined): CardApiParams['colors_array'] | undefined => {
+  if (!filter) return undefined;
+  if (filter.includeColorless) return { exactly: [] };
+  if (!filter.colors || filter.colors.length === 0) return undefined;
+  if (!COLOR_MATCH_TYPES.includes(filter.matchType)) return undefined;
+
+  return { [filter.matchType]: filter.colors };
 };

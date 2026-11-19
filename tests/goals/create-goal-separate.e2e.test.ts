@@ -45,8 +45,12 @@ const openCreatePage = async (page: Page) => {
 
 // Colour buttons are sized by the mana-font CDN stylesheet, so before it loads they have no box to
 // click; dispatch the click instead. A selected colour is drawn at full opacity, so retry until it is.
-const selectColor = async (page: Page, color: 'w' | 'u' | 'b' | 'r' | 'g') => {
-  const button = page.locator('form').locator(`button:has(i.ms-${color})`);
+const selectColor = async (
+  page: Page,
+  color: 'w' | 'u' | 'b' | 'r' | 'g' | 'c',
+  filter: 'goal-color-filter' | 'goal-color-identity-filter' = 'goal-color-filter',
+) => {
+  const button = page.locator('form').getByTestId(`${filter}-${color.toUpperCase()}`);
   const opacity = () => button.evaluate((el) => getComputedStyle(el).opacity);
   await expect(async () => {
     if ((await opacity()) !== '1') await button.dispatchEvent('click');
@@ -140,7 +144,7 @@ test.describe('Create goal - separate quantities and criteria', () => {
     await page.getByLabel('Goal Name').fill('Izzet');
     await selectColor(page, 'u');
     await selectColor(page, 'r');
-    await page.getByRole('combobox').filter({ hasText: 'Only These Colors' }).click();
+    await page.getByTestId('goal-color-filter-match-type').getByRole('combobox').click();
     await page.getByRole('option', { name: 'At Least These Colors' }).click();
 
     await expect(goalSummary(page)).toContainText('with Blue/Red');
@@ -149,7 +153,45 @@ test.describe('Create goal - separate quantities and criteria', () => {
 
     const criteria = bodies[0].searchCriteria as { conditions: Record<string, unknown> };
     expect(criteria.conditions.colors_array).toEqual({ atLeast: ['U', 'R'] });
+    expect(criteria.conditions).not.toHaveProperty('color_identities_array');
     expect(bodies[0].targetQuantityAll).toBe(1);
+  });
+
+  test('color identity with "At Most These Colors" writes color_identities_array under atMost', async ({ page }) => {
+    const bodies = await mockCreateGoal(page);
+    await openCreatePage(page);
+
+    await page.getByLabel('Goal Name').fill('Simic Commander Pool');
+    await selectColor(page, 'g', 'goal-color-identity-filter');
+    await selectColor(page, 'u', 'goal-color-identity-filter');
+    await page.getByTestId('goal-color-identity-filter-match-type').getByRole('combobox').click();
+    await page.getByRole('option', { name: 'At Most These Colors' }).click();
+
+    await expect(goalSummary(page)).toContainText('at most Green/Blue color identity');
+    await page.getByRole('button', { name: 'Create Goal' }).click();
+    await expect(page.getByText('Goal created', { exact: true })).toBeVisible();
+
+    const criteria = bodies[0].searchCriteria as { conditions: Record<string, unknown> };
+    expect(criteria.conditions.color_identities_array).toEqual({ atMost: ['G', 'U'] });
+    expect(criteria.conditions).not.toHaveProperty('colors_array');
+  });
+
+  test('colorless color with a color identity sends both criteria', async ({ page }) => {
+    const bodies = await mockCreateGoal(page);
+    await openCreatePage(page);
+
+    await page.getByLabel('Goal Name').fill('Green Lands and Rocks');
+    await selectColor(page, 'c');
+    await selectColor(page, 'g', 'goal-color-identity-filter');
+
+    await expect(goalSummary(page)).toContainText('Colorless');
+    await expect(goalSummary(page)).toContainText('only Green color identity');
+    await page.getByRole('button', { name: 'Create Goal' }).click();
+    await expect(page.getByText('Goal created', { exact: true })).toBeVisible();
+
+    const criteria = bodies[0].searchCriteria as { conditions: Record<string, unknown> };
+    expect(criteria.conditions.colors_array).toEqual({ exactly: [] });
+    expect(criteria.conditions.color_identities_array).toEqual({ exactly: ['G'] });
   });
 
   test('a successful create redirects to the collection filtered by the new goal', async ({ page }) => {

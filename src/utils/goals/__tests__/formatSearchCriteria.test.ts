@@ -34,6 +34,22 @@ describe('formatSearchCriteria (goal wording)', () => {
     ['at most', { colors_array: { atMost: ['B'] } }, 'at most Black'],
     ['unknown colour code', { colors_array: { exactly: ['C'] } }, 'only C'],
 
+    ['colorless identity', { color_identities_array: { exactly: [] } }, 'every card (colorless color identity)'],
+    ['exactly one identity colour', { color_identities_array: { exactly: ['W'] } }, 'every card (only White color identity)'],
+    [
+      'exactly several identity colours',
+      { color_identities_array: { exactly: ['W', 'U'] } },
+      'every card (only White/Blue color identity)',
+    ],
+    ['identity at least', { color_identities_array: { atLeast: ['R', 'G'] } }, 'every card (with Red/Green color identity)'],
+    ['identity at most', { color_identities_array: { atMost: ['B'] } }, 'every card (at most Black color identity)'],
+    ['empty identity condition', { color_identities_array: {} }, 'every card'],
+    [
+      'colour and identity together',
+      { colors_array: { exactly: [] }, color_identities_array: { atLeast: ['G'] }, type: { AND: ['Land'] } },
+      'Colorless Land (with Green color identity)',
+    ],
+
     ['rarities', { rarityNumeric: { OR: ['=4', '=5'] } }, 'Rare/Mythic'],
     ['special rarity', { rarityNumeric: { OR: ['=6'] } }, 'Special'],
     ['excluded rarities', { rarityNumeric: { AND: ['!=2', '!=3'] } }, 'non-Common/non-Uncommon'],
@@ -195,6 +211,7 @@ describe('formatSearchCriteria (goal wording)', () => {
     ['type', { AND: ['Creature'] }],
     ['layout', { OR: ['split'] }],
     ['colors_array', { atLeast: ['G'] }],
+    ['color_identities_array', { atMost: ['G'] }],
     ['rarityNumeric', { OR: ['=4'] }],
     ['isReserved', true],
     ['isFullArt', false],

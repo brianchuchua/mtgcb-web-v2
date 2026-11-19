@@ -282,6 +282,20 @@ export const browseParameterSchema: Record<string, ParameterConfig> = {
       includeColorless: false,
     },
   },
+  colorIdentity: {
+    type: 'colorFilter',
+    mode: 'cards',
+    urlParams: {
+      colors: 'colorIdentity',
+      matchType: 'colorIdentityMatchType',
+      colorless: 'colorlessIdentity',
+    },
+    defaultValue: {
+      colors: [],
+      matchType: 'exactly',
+      includeColorless: false,
+    },
+  },
   types: {
     type: 'inclusionExclusion',
     mode: 'cards',

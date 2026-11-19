@@ -14,6 +14,7 @@ const SEARCH_FIELDS: Array<keyof BrowseSearchParams> = [
   'oracleText',
   'artist',
   'colors',
+  'colorIdentity',
   'types',
   'layouts',
   'borderColors',

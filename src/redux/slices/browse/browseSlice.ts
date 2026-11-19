@@ -194,6 +194,14 @@ export const browseSlice = createSlice({
         state.cardsSearchParams.colors = action.payload;
       }
     },
+    setColorIdentity: (state, action: PayloadAction<ColorFilter>) => {
+      // Cards-specific field
+      if (action.payload.colors.length === 0 && !action.payload.includeColorless) {
+        delete state.cardsSearchParams.colorIdentity;
+      } else {
+        state.cardsSearchParams.colorIdentity = action.payload;
+      }
+    },
     setTypes: (state, action: PayloadAction<TypeFilter>) => {
       // Cards-specific field
       if (action.payload.include.length === 0 && action.payload.exclude.length === 0) {
@@ -676,6 +684,7 @@ export const {
   setOracleText,
   setArtist,
   setColors,
+  setColorIdentity,
   setTypes,
   setLayouts,
   setBorderColors,

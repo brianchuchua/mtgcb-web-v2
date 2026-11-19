@@ -171,6 +171,11 @@ export interface CardApiParams {
     atLeast?: string[];
     atMost?: string[];
   };
+  color_identities_array?: {
+    exactly?: string[];
+    atLeast?: string[];
+    atMost?: string[];
+  };
   type?: {
     AND?: string[];
     NOT?: string[];

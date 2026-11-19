@@ -119,6 +119,24 @@ export function formatSearchCriteria(
     }
   }
 
+  // Color identity. A qualifier rather than part of the noun, so it can sit next
+  // to a colour filter without the two running together ("only Red (at most
+  // Red/Green color identity)").
+  if (conditions.color_identities_array) {
+    const { exactly, atLeast, atMost } = conditions.color_identities_array;
+    const names = (codes: string[]) => codes.map((c: string) => MTG_COLOR_NAMES[c] || c).join('/');
+
+    if (exactly && exactly.length === 0) {
+      attributeParts.push('(colorless color identity)');
+    } else if (exactly) {
+      attributeParts.push(`(only ${names(exactly)} color identity)`);
+    } else if (atLeast) {
+      attributeParts.push(`(with ${names(atLeast)} color identity)`);
+    } else if (atMost) {
+      attributeParts.push(`(at most ${names(atMost)} color identity)`);
+    }
+  }
+
   // Rarities
   const rarityPart: string[] = [];
   if (conditions.rarityNumeric) {

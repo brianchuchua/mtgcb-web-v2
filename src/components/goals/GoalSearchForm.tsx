@@ -38,6 +38,7 @@ import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
 import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
 import OutlinedBox from '@/components/ui/OutlinedBox';
+import ColorFilterBox from '@/features/browse/ColorFilterBox';
 import { FORMAT_LEGALITY_OPTIONS } from '@/features/browse/formatLegalityConstants';
 import {
   RELEASE_DATE_FROM_PLACEHOLDER,
@@ -49,7 +50,7 @@ import {
   formatFrameEffectName,
   formatFrameStyleName,
 } from '@/features/browse/treatmentLabels';
-import { ColorMatchType, MTG_COLORS } from '@/types/browse';
+import { ColorFilter, ColorMatchType } from '@/types/browse';
 import { SEARCH_TEXT_MAX_LENGTH } from '@/utils/validationLimits';
 
 interface GoalSearchFormProps {
@@ -143,18 +144,11 @@ export function GoalSearchForm({
   const [artist, setArtist] = useState(searchConditions.artist || '');
 
   // Color state
-  const [colorState, setColorState] = useState<ColorState>(() => {
-    if (searchConditions.colors_array?.exactly?.length === 0) {
-      return { colors: [], matchType: 'exactly', includeColorless: true };
-    } else if (searchConditions.colors_array?.exactly) {
-      return { colors: searchConditions.colors_array.exactly, matchType: 'exactly', includeColorless: false };
-    } else if (searchConditions.colors_array?.atLeast) {
-      return { colors: searchConditions.colors_array.atLeast, matchType: 'atLeast', includeColorless: false };
-    } else if (searchConditions.colors_array?.atMost) {
-      return { colors: searchConditions.colors_array.atMost, matchType: 'atMost', includeColorless: false };
-    }
-    return { colors: [], matchType: 'exactly', includeColorless: false };
-  });
+  const [colorState, setColorState] = useState<ColorState>(() => toColorState(searchConditions.colors_array));
+  const [colorIdentityState, setColorIdentityState] = useState<ColorState>(() =>
+    toColorState(searchConditions.color_identities_array),
+  );
+  const [isColorIdentityInitialized, setIsColorIdentityInitialized] = useState(false);
 
   // Type state - using AutocompleteOption for AutocompleteWithNegation
   const [cardTypeOptions, setCardTypeOptions] = useState<AutocompleteOption[]>([]);
@@ -636,6 +630,15 @@ export function GoalSearchForm({
       };
     }
 
+    // Color identity
+    if (colorIdentityState.includeColorless) {
+      conditions.color_identities_array = { exactly: [] };
+    } else if (colorIdentityState.colors.length > 0) {
+      conditions.color_identities_array = {
+        [colorIdentityState.matchType]: colorIdentityState.colors,
+      };
+    }
+
     // Types
     const typeInclude = selectedTypes.filter((t) => !t.exclude);
     const typeExclude = selectedTypes.filter((t) => t.exclude);
@@ -852,6 +855,7 @@ export function GoalSearchForm({
     oracleText,
     artist,
     colorState,
+    colorIdentityState,
     selectedTypes,
     selectedLayouts,
     selectedBorderColors,
@@ -874,18 +878,21 @@ export function GoalSearchForm({
   // Initialize color state when searchConditions change (only once)
   useEffect(() => {
     if (!isColorInitialized && searchConditions.colors_array) {
-      if (searchConditions.colors_array?.exactly?.length === 0) {
-        setColorState({ colors: [], matchType: 'exactly', includeColorless: true });
-      } else if (searchConditions.colors_array?.exactly) {
-        setColorState({ colors: searchConditions.colors_array.exactly, matchType: 'exactly', includeColorless: false });
-      } else if (searchConditions.colors_array?.atLeast) {
-        setColorState({ colors: searchConditions.colors_array.atLeast, matchType: 'atLeast', includeColorless: false });
-      } else if (searchConditions.colors_array?.atMost) {
-        setColorState({ colors: searchConditions.colors_array.atMost, matchType: 'atMost', includeColorless: false });
+      if (hasColorCondition(searchConditions.colors_array)) {
+        setColorState(toColorState(searchConditions.colors_array));
       }
       setIsColorInitialized(true);
     }
   }, [searchConditions.colors_array, isColorInitialized]);
+
+  useEffect(() => {
+    if (!isColorIdentityInitialized && searchConditions.color_identities_array) {
+      if (hasColorCondition(searchConditions.color_identities_array)) {
+        setColorIdentityState(toColorState(searchConditions.color_identities_array));
+      }
+      setIsColorIdentityInitialized(true);
+    }
+  }, [searchConditions.color_identities_array, isColorIdentityInitialized]);
 
   // Update basic text fields when searchConditions changes
   useEffect(() => {
@@ -995,28 +1002,6 @@ export function GoalSearchForm({
     }
   }, [cardTreatmentsData]);
 
-  const handleColorToggle = (color: string) => {
-    if (color === 'C') {
-      setColorState((prev) => {
-        const newState = {
-          ...prev,
-          includeColorless: !prev.includeColorless,
-          colors: !prev.includeColorless ? [] : prev.colors,
-        };
-        return newState;
-      });
-    } else {
-      setColorState((prev) => {
-        const newState = {
-          ...prev,
-          colors: prev.colors.includes(color) ? prev.colors.filter((c) => c !== color) : [...prev.colors, color],
-          includeColorless: false,
-        };
-        return newState;
-      });
-    }
-  };
-
   const handleAddStatCondition = () => {
     setStatConditions([...statConditions, { attribute: 'convertedManaCost', operator: '=', value: '' }]);
   };
@@ -1098,77 +1083,14 @@ export function GoalSearchForm({
         }}
       />
 
-      {/* Color Selector */}
-      <OutlinedBox label="Colors">
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: '6px', pb: 1 }}>
-          {MTG_COLORS.map((color) => (
-            <IconButton
-              key={color}
-              size="small"
-              onClick={() => handleColorToggle(color)}
-              sx={{
-                padding: 0,
-                borderRadius: '50%',
-                opacity: colorState.colors.includes(color) ? 1 : 0.3,
-                '&:hover': {
-                  borderRadius: '50%',
-                  opacity: colorState.colors.includes(color) ? 1 : 0.5,
-                  margin: 0,
-                },
-                '&.Mui-disabled': {
-                  opacity: 0.2,
-                },
-                '& .ms': {
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                },
-              }}
-            >
-              <i className={`ms ms-${color.toLowerCase()} ms-cost ms-2x`} />
-            </IconButton>
-          ))}
-          <IconButton
-            size="small"
-            onClick={() => handleColorToggle('C')}
-            sx={{
-              padding: 0,
-              borderRadius: '50%',
-              opacity: colorState.includeColorless ? 1 : 0.3,
-              '&:hover': {
-                borderRadius: '50%',
-                opacity: colorState.includeColorless ? 1 : 0.5,
-                margin: 0,
-              },
-              '& .ms': {
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              },
-            }}
-          >
-            <i className="ms ms-c ms-cost ms-2x" />
-          </IconButton>
-        </Box>
+      <ColorFilterBox label="Colors" testId="goal-color-filter" value={colorState} onChange={toColorStateSetter(setColorState)} />
 
-        <Box sx={{ pt: 1 }}>
-          <Select
-            fullWidth
-            size="small"
-            value={colorState.matchType}
-            onChange={(e) => setColorState({ ...colorState, matchType: e.target.value as ColorMatchType })}
-            sx={{
-              '& .MuiSelect-select': {
-                py: 1,
-              },
-            }}
-          >
-            <MenuItem value="exactly">Only These Colors</MenuItem>
-            <MenuItem value="atLeast">At Least These Colors</MenuItem>
-            <MenuItem value="atMost">At Most These Colors</MenuItem>
-          </Select>
-        </Box>
-      </OutlinedBox>
+      <ColorFilterBox
+        label="Color Identity"
+        testId="goal-color-identity-filter"
+        value={colorIdentityState}
+        onChange={toColorStateSetter(setColorIdentityState)}
+      />
 
       {/* Type Selector */}
       <AutocompleteWithNegation
@@ -1731,4 +1653,28 @@ export function GoalSearchForm({
       </Popover>
     </Box>
   );
+}
+
+type ColorCondition = CardApiParams['colors_array'];
+
+function hasColorCondition(condition: ColorCondition): boolean {
+  return Boolean(condition?.exactly || condition?.atLeast || condition?.atMost);
+}
+
+function toColorState(condition: ColorCondition): ColorState {
+  if (condition?.exactly?.length === 0) {
+    return { colors: [], matchType: 'exactly', includeColorless: true };
+  } else if (condition?.exactly) {
+    return { colors: condition.exactly, matchType: 'exactly', includeColorless: false };
+  } else if (condition?.atLeast) {
+    return { colors: condition.atLeast, matchType: 'atLeast', includeColorless: false };
+  } else if (condition?.atMost) {
+    return { colors: condition.atMost, matchType: 'atMost', includeColorless: false };
+  }
+  return { colors: [], matchType: 'exactly', includeColorless: false };
+}
+
+function toColorStateSetter(setState: (state: ColorState) => void) {
+  return (value: ColorFilter) =>
+    setState({ colors: value.colors, matchType: value.matchType, includeColorless: Boolean(value.includeColorless) });
 }

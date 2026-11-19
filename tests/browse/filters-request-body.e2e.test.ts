@@ -38,6 +38,7 @@ test.describe('Browse filters → POST /cards/search body (from URL)', () => {
 
     expect(body).toMatchObject({ limit: 20, offset: 0 });
     expect(body).not.toHaveProperty('colors_array');
+    expect(body).not.toHaveProperty('color_identities_array');
     expect(body).not.toHaveProperty('type');
     expect(body).not.toHaveProperty('rarityNumeric');
   });
@@ -60,6 +61,36 @@ test.describe('Browse filters → POST /cards/search body (from URL)', () => {
   test('colorless wins over listed colors and becomes exactly []', async ({ page }) => {
     const body = await browseCards(page, '&colors=W&colorless=true', (b) => 'colors_array' in b);
     expect(body.colors_array).toEqual({ exactly: [] });
+  });
+
+  test('color identity with "at most" match type', async ({ page }) => {
+    const body = await browseCards(
+      page,
+      '&colorIdentity=W,U&colorIdentityMatchType=atMost',
+      (b) => 'color_identities_array' in b,
+    );
+    expect(body.color_identities_array).toEqual({ atMost: ['W', 'U'] });
+    expect(body).not.toHaveProperty('colors_array');
+  });
+
+  test('color identity with no match type defaults to "exactly"', async ({ page }) => {
+    const body = await browseCards(page, '&colorIdentity=B,G', (b) => 'color_identities_array' in b);
+    expect(body.color_identities_array).toEqual({ exactly: ['B', 'G'] });
+  });
+
+  test('colorless identity becomes exactly []', async ({ page }) => {
+    const body = await browseCards(page, '&colorlessIdentity=true', (b) => 'color_identities_array' in b);
+    expect(body.color_identities_array).toEqual({ exactly: [] });
+  });
+
+  test('color and color identity travel as separate criteria', async ({ page }) => {
+    const body = await browseCards(
+      page,
+      '&colorless=true&colorIdentity=G&colorIdentityMatchType=atLeast',
+      (b) => 'colors_array' in b && 'color_identities_array' in b,
+    );
+    expect(body.colors_array).toEqual({ exactly: [] });
+    expect(body.color_identities_array).toEqual({ atLeast: ['G'] });
   });
 
   test('included types are ANDed and excluded types go under NOT', async ({ page }) => {
@@ -95,7 +126,8 @@ test.describe('Browse filters → POST /cards/search body (from the sidenav form
   });
 
   test('clicking color symbols and changing match type updates body and URL', async ({ page }) => {
-    const colorButton = (symbol: string) => sidenav(page).locator(`button:has(i.ms-${symbol})`);
+    const colorButton = (symbol: string) =>
+      sidenav(page).getByTestId('color-filter').locator(`button:has(i.ms-${symbol})`);
 
     let body = waitForCardSearch(page, (b) => JSON.stringify(b.colors_array) === JSON.stringify({ exactly: ['W'] }));
     await colorButton('w').click();
@@ -107,15 +139,66 @@ test.describe('Browse filters → POST /cards/search body (from the sidenav form
     await expect(page).toHaveURL(/colors=W%2CU|colors=W,U/);
 
     body = waitForCardSearch(page, (b) => JSON.stringify(b.colors_array) === JSON.stringify({ atMost: ['W', 'U'] }));
-    await sidenav(page).getByRole('combobox').filter({ hasText: 'Only These Colors' }).click();
+    await sidenav(page).getByTestId('color-filter-match-type').getByRole('combobox').click();
     await page.getByRole('option', { name: 'At Most These Colors' }).click();
-    await body;
+    expect(await body).not.toHaveProperty('color_identities_array');
     await expect(page).toHaveURL(/colorMatchType=atMost/);
 
     body = waitForCardSearch(page, (b) => JSON.stringify(b.colors_array) === JSON.stringify({ exactly: [] }));
     await colorButton('c').click();
     await body;
     await expect(page).toHaveURL(/colorless=true/);
+  });
+
+  test('clicking color identity symbols and changing match type updates body and URL', async ({ page }) => {
+    const identity = (b: Body) => JSON.stringify(b.color_identities_array);
+    const identityButton = (symbol: string) => sidenav(page).getByTestId(`color-identity-filter-${symbol}`);
+
+    let body = waitForCardSearch(page, (b) => identity(b) === JSON.stringify({ exactly: ['G'] }));
+    await identityButton('G').click();
+    expect(await body).not.toHaveProperty('colors_array');
+
+    body = waitForCardSearch(page, (b) => identity(b) === JSON.stringify({ exactly: ['G', 'U'] }));
+    await identityButton('U').click();
+    await body;
+    await expect(page).toHaveURL(/colorIdentity=G%2CU|colorIdentity=G,U/);
+
+    body = waitForCardSearch(page, (b) => identity(b) === JSON.stringify({ atMost: ['G', 'U'] }));
+    await sidenav(page).getByTestId('color-identity-filter-match-type').getByRole('combobox').click();
+    await page.getByRole('option', { name: 'At Most These Colors' }).click();
+    await body;
+    await expect(page).toHaveURL(/colorIdentityMatchType=atMost/);
+    await expect(page.getByText(/at most Green\/Blue color identity/).first()).toBeVisible();
+
+    body = waitForCardSearch(page, (b) => identity(b) === JSON.stringify({ exactly: [] }));
+    await identityButton('C').click();
+    await body;
+    await expect(page).toHaveURL(/colorlessIdentity=true/);
+    await expect(page).not.toHaveURL(/colorIdentity=/);
+
+    // Turning colorless back off leaves nothing selected, so the criterion is gone. The
+    // unfiltered search is already cached from page load, so there is no request to wait for.
+    await identityButton('C').click();
+    await expect(page).not.toHaveURL(/colorlessIdentity/);
+    await expect(identityButton('C')).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByText(/color identity\)/)).toHaveCount(0);
+  });
+
+  test('the color and color identity pickers do not disturb each other', async ({ page }) => {
+    const both = waitForCardSearch(
+      page,
+      (b) =>
+        JSON.stringify(b.colors_array) === JSON.stringify({ exactly: ['R'] }) &&
+        JSON.stringify(b.color_identities_array) === JSON.stringify({ exactly: ['R', 'W'] }),
+    );
+    await sidenav(page).getByTestId('color-filter-R').click();
+    await sidenav(page).getByTestId('color-identity-filter-R').click();
+    await sidenav(page).getByTestId('color-identity-filter-W').click();
+    await both;
+
+    await expect(sidenav(page).getByTestId('color-filter-R')).toHaveAttribute('aria-pressed', 'true');
+    await expect(sidenav(page).getByTestId('color-filter-W')).toHaveAttribute('aria-pressed', 'false');
+    await expect(sidenav(page).getByTestId('color-identity-filter-W')).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('picking a rarity includes it; clicking its chip flips it to an exclusion', async ({ page }) => {

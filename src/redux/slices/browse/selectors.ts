@@ -35,7 +35,8 @@ export const selectCardSearchName = (state: RootState) => state.browse.cardsSear
 export const selectOracleText = (state: RootState) => state.browse.cardsSearchParams.oracleText;
 export const selectArtist = (state: RootState) => state.browse.cardsSearchParams.artist;
 export const selectColors = (state: RootState) => state.browse.cardsSearchParams.colors;
-export const selectTypes = (state: RootState) => state.browse.cardsSearchParams.types;
+export const selectColorIdentity = (state: RootState) => state.browse.cardsSearchParams.colorIdentity;
+export const selectTypes =(state: RootState) => state.browse.cardsSearchParams.types;
 export const selectLayouts = (state: RootState) => state.browse.cardsSearchParams.layouts;
 export const selectBorderColors = (state: RootState) => state.browse.cardsSearchParams.borderColors;
 export const selectFrameStyles = (state: RootState) => state.browse.cardsSearchParams.frameStyles;

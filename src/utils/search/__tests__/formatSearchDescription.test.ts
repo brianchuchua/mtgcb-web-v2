@@ -43,6 +43,35 @@ describe('formatSearchDescription — treatments', () => {
   });
 });
 
+describe('formatSearchDescription — color identity', () => {
+  it.each([
+    [{ colors: ['W', 'U'], matchType: 'exactly' as const }, 'cards: all (only White/Blue color identity)'],
+    [{ colors: ['R'], matchType: 'atLeast' as const }, 'cards: all (with Red color identity)'],
+    [{ colors: ['G', 'U'], matchType: 'atMost' as const }, 'cards: all (at most Green/Blue color identity)'],
+    [
+      { colors: [], matchType: 'exactly' as const, includeColorless: true },
+      'cards: all (colorless color identity)',
+    ],
+  ])('describes %j', (colorIdentity, expected) => {
+    expect(describeCards({ colorIdentity })).toBe(expected);
+  });
+
+  it('reads separately from the color filter', () => {
+    expect(
+      describeCards({
+        colors: { colors: [], matchType: 'exactly', includeColorless: true },
+        colorIdentity: { colors: ['G'], matchType: 'atLeast' },
+      }),
+    ).toBe('cards: Colorless (with Green color identity)');
+  });
+
+  it('sits after a card name', () => {
+    expect(describeCards({ name: 'Mox', colorIdentity: { colors: ['G'], matchType: 'exactly' } })).toBe(
+      'cards matching "Mox" (only Green color identity)',
+    );
+  });
+});
+
 describe('formatSearchDescription — the retro frame search', () => {
   it('describes both halves of the query', () => {
     const description = describeCards({
@@ -130,6 +159,8 @@ describe('formatSearchDescription — no filter is silently undescribed', () => 
     ['formatsLegal', { formatsLegal: { include: ['modern'], exclude: [] } }],
     ['stats', { stats: { convertedManaCost: ['gte3'] } }],
     ['colors', { colors: { colors: ['W'], matchType: 'atLeast' } }],
+    ['colorIdentity', { colorIdentity: { colors: ['W'], matchType: 'atLeast' } }],
+    ['colorless identity', { colorIdentity: { colors: [], matchType: 'exactly', includeColorless: true } }],
   ];
 
   it.each(FILTERS)('%s changes the description', (_label, params) => {
