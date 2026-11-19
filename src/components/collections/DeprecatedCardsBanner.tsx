@@ -1,8 +1,9 @@
 'use client';
 
-import { Alert, Box, Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import Link from 'next/link';
 import { useGetDeprecatedCardCountQuery } from '@/api/collections/collectionsApi';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 
 interface DeprecatedCardsBannerProps {
   userId: number;
@@ -29,21 +30,22 @@ export function DeprecatedCardsBanner({ userId, setId }: DeprecatedCardsBannerPr
 
   return (
     <Box sx={{ mb: 2 }}>
-      <Alert
-        severity="warning"
+      <Notice
+        kind="warning"
         action={
           <Button
             component={Link}
             href={`/collections/${userId}/migrate?setId=${setId}`}
             size="small"
-            color="inherit"
+            color="warning"
+            sx={noticeActionSx}
           >
             Update
           </Button>
         }
       >
         {message}
-      </Alert>
+      </Notice>
     </Box>
   );
 }

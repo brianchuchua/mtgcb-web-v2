@@ -1,9 +1,10 @@
 'use client';
 
 import { ErrorOutline as ErrorIcon, Home as HomeIcon } from '@mui/icons-material';
-import { Alert, AlertTitle, Box, Button, Typography } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import { Notice } from '@/components/ui/Notice';
 
 interface InvalidShareLinkBannerProps {
   username?: string;
@@ -38,34 +39,22 @@ export const InvalidShareLinkBanner = ({ username, errorType = 'invalid' }: Inva
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto', mt: 3 }}>
-      <Alert
-        severity="error"
-        icon={<ErrorIcon fontSize="large" />}
-        sx={{
-          borderRadius: 2,
-          '& .MuiAlert-icon': {
-            fontSize: 32,
-          },
-        }}
-      >
-        <AlertTitle sx={{ fontWeight: 600, fontSize: '1.1rem' }}>{title}</AlertTitle>
-        <Typography variant="body1" sx={{ mb: 2 }}>
-          {message}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+      <Notice kind="error" icon={<ErrorIcon />} title={title}>
+        <Box sx={{ mt: 1 }}>{message}</Box>
+        <Box sx={{ mt: 1 }}>
           Share links provide controlled access to private collections. The owner can regenerate or revoke these links
           at any time.
-        </Typography>
+        </Box>
         <Button
           variant="outlined"
           size="small"
           startIcon={<HomeIcon />}
           onClick={() => router.push('/')}
-          sx={{ mt: 1 }}
+          sx={{ mt: 2 }}
         >
           Go to Home
         </Button>
-      </Alert>
+      </Notice>
     </Box>
   );
 };

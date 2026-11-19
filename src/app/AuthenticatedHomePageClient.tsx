@@ -8,7 +8,6 @@ import {
   ImportContacts as LibraryIcon,
 } from '@mui/icons-material';
 import {
-  Alert,
   Box,
   Button,
   Card,
@@ -32,6 +31,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useGetHomeStatisticsQuery } from '@/api/statistics/statisticsApi';
 import { HomeStatisticsData } from '@/api/statistics/types';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import { useDisplaySettings } from '@/contexts/DisplaySettingsContext';
 import { useAuth } from '@/hooks/useAuth';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
@@ -46,7 +46,7 @@ export default function AuthenticatedHomePageClient() {
   const { settings } = useDisplaySettings();
   const [isNewUser] = useState(() => searchParams.get('new') === 'true');
 
-  const { data, isLoading, error } = useGetHomeStatisticsQuery({ priceType: settings.priceType });
+  const { data, isLoading, error, refetch } = useGetHomeStatisticsQuery({ priceType: settings.priceType });
   const stats = data?.success && data.data ? data.data : null;
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function AuthenticatedHomePageClient() {
   }
 
   if (error || !stats) {
-    return <ErrorState isMobile={isMobile} />;
+    return <ErrorState isMobile={isMobile} onRetry={() => refetch()} />;
   }
 
   const hasCollectionData = stats.collectionOverview.totalCardsCollected > 0;
@@ -1007,13 +1007,19 @@ const LoadingState: React.FC<{ isMobile: boolean; isNewUser: boolean }> = ({ isM
   );
 };
 
-const ErrorState: React.FC<{ isMobile: boolean }> = ({ isMobile }) => {
+const ErrorState: React.FC<{ isMobile: boolean; onRetry: () => void }> = ({ isMobile, onRetry }) => {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Alert severity="error">
-        <Typography variant="h6">Unable to load statistics</Typography>
-        <Typography variant="body2">Please try refreshing the page or check back later.</Typography>
-      </Alert>
+      <Notice
+        kind="error"
+        action={
+          <Button size="small" color="error" sx={noticeActionSx} onClick={onRetry}>
+            Retry
+          </Button>
+        }
+      >
+        Could not load statistics.
+      </Notice>
     </Container>
   );
 };

@@ -2,21 +2,17 @@
 
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
-  AlertTitle,
   Box,
-  IconButton,
   Collapse,
-  Typography,
 } from '@mui/material';
 import {
-  Close as CloseIcon,
   Warning as WarningIcon,
   Info as InfoIcon,
   Error as ErrorIcon,
   CheckCircle as SuccessIcon,
 } from '@mui/icons-material';
 import { useSessionMessages } from '@/contexts/SessionMessagesContext';
+import { Notice } from '@/components/ui/Notice';
 
 const getDefaultIcon = (severity: string) => {
   switch (severity) {
@@ -124,46 +120,25 @@ const SessionBannerAlert = ({
   const localTime = useLocalTime && message.scheduledAt ? formatLocalTime(message.scheduledAt) : '';
 
   return (
-    <Alert
-      severity={message.severity}
+    <Notice
+      kind={message.severity}
       icon={message.icon || getDefaultIcon(message.severity)}
-      action={
-        message.dismissable && (
-          <IconButton
-            aria-label="close"
-            color="inherit"
-            size="small"
-            onClick={onDismiss}
-          >
-            <CloseIcon fontSize="inherit" />
-          </IconButton>
-        )
-      }
-      sx={{
-        mb: 4,
-        borderRadius: 2,
-        '& .MuiAlert-icon': {
-          fontSize: 28,
-        }
-      }}
+      title={message.title || undefined}
+      onClose={message.dismissable ? onDismiss : undefined}
+      sx={{ mb: 4 }}
     >
-      {message.title && (
-        <AlertTitle sx={{ fontWeight: 600 }}>
-          {message.title}
-        </AlertTitle>
-      )}
       <Box sx={{ mt: message.title ? 1 : 0 }}>
         {message.message}
         {message.scheduledAt && (
-          <Typography component="span" sx={{ fontWeight: 700, ml: 0.5, fontVariantNumeric: 'tabular-nums' }}>
+          <Box component="span" sx={{ fontWeight: 700, ml: 0.5, fontVariantNumeric: 'tabular-nums' }}>
             {useLocalTime
               ? `Maintenance starts at: ${localTime}`
               : isPast
                 ? '(maintenance has begun)'
                 : `Maintenance will start in: ${timeLeft}`}
-          </Typography>
+          </Box>
         )}
       </Box>
-    </Alert>
+    </Notice>
   );
 };

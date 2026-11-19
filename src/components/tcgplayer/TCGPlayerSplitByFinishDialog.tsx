@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
+import { Tag } from '@/components/ui/Tag';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
 import { getFormTarget } from '@/utils/browser/detectSafari';
 import { CardWithQuantity, formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
@@ -107,25 +108,14 @@ const TCGPlayerSplitByFinishDialog: React.FC<TCGPlayerSplitByFinishDialogProps> 
           {regularCards.length > 0 && (
             <FinishButton variant="outlined" color="primary" onClick={handleRegularSubmit} fullWidth>
               <span>Import Regular Cards</span>
-              <Chip
-                label={`${regularCards.length} cards, ${totalRegularQuantity} total`}
-                size="small"
-                sx={{ ml: 2 }}
-                variant="outlined"
-              />
+              <Tag sx={{ ml: 2 }}>{`${regularCards.length} cards, ${totalRegularQuantity} total`}</Tag>
             </FinishButton>
           )}
 
           {foilCards.length > 0 && (
             <FinishButton variant="outlined" color="secondary" onClick={handleFoilSubmit} fullWidth>
               <span>Import Foil Cards</span>
-              <Chip
-                label={`${foilCards.length} cards, ${totalFoilQuantity} total`}
-                size="small"
-                sx={{ ml: 2 }}
-                color="secondary"
-                variant="outlined"
-              />
+              <Tag tone="purple" sx={{ ml: 2 }}>{`${foilCards.length} cards, ${totalFoilQuantity} total`}</Tag>
             </FinishButton>
           )}
         </Stack>

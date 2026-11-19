@@ -1,12 +1,13 @@
 'use client';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Alert, Box, CircularProgress, IconButton, Paper, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, IconButton, Paper, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useGetGoalQuery } from '@/api/goals/goalsApi';
 import { Goal } from '@/api/goals/types';
 import { EditGoalForm } from '@/components/goals/EditGoalForm';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -21,7 +22,7 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
   const [shouldRedirect, setShouldRedirect] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { data, isLoading, error } = useGetGoalQuery(
+  const { data, isLoading, error, refetch } = useGetGoalQuery(
     {
       userId: user?.userId || 0,
       goalId,
@@ -82,7 +83,16 @@ export function EditGoalClient({ goalId }: EditGoalClientProps) {
           items={[{ label: 'Home', href: '/' }, { label: 'Goals', href: '/goals' }, { label: 'Edit Goal' }]}
         />
         <Box sx={{ maxWidth: 'md', mx: 'auto' }}>
-          <Alert severity="error">Failed to load goal. Please try again later.</Alert>
+          <Notice
+            kind="error"
+            action={
+              <Button size="small" color="error" sx={noticeActionSx} onClick={() => refetch()}>
+                Retry
+              </Button>
+            }
+          >
+            Could not load this goal.
+          </Notice>
         </Box>
       </Box>
     );

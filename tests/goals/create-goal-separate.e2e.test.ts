@@ -247,7 +247,7 @@ test.describe('Create goal - separate quantities and criteria', () => {
     await page.getByText('Separate Regular/Foil', { exact: true }).click();
     await page.getByRole('button', { name: 'Create Goal' }).click();
 
-    await expect(page.getByText('Please fix the following errors:')).toBeVisible();
+    await expect(page.getByText('Fix these before saving')).toBeVisible();
     expect(bodies).toHaveLength(0);
   });
 });

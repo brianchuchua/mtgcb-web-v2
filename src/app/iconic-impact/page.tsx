@@ -3,10 +3,8 @@
 import SettingsIcon from '@mui/icons-material/Settings';
 import WavesIcon from '@mui/icons-material/Waves';
 import {
-  Alert,
   Box,
   Button,
-  Chip,
   Container,
   Dialog,
   DialogActions,
@@ -43,6 +41,7 @@ import {
 } from '@/features/games/iconic-impact';
 // Import the type from the game engine
 import type { SetStatistics } from '@/features/games/iconic-impact';
+import { Notice } from '@/components/ui/Notice';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { safeLocalStorage } from '@/utils/browser/safeStorage';
 
@@ -256,14 +255,14 @@ const GameLogComponent = memo(function GameLogComponent({
       {tabValue === 0 && (
         <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
           {gameState === 'gameover' && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Notice kind="error" sx={{ mb: 2 }}>
               Game Over! Final Score: {score}
-            </Alert>
+            </Notice>
           )}
           {gameState === 'won' && (
-            <Alert severity="success" sx={{ mb: 2 }}>
+            <Notice kind="success" sx={{ mb: 2 }}>
               You Win! All {totalSets} sets identified!
-            </Alert>
+            </Notice>
           )}
           <List dense>
             {gameLog.length === 0 ? (

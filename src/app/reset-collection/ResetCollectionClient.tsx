@@ -4,7 +4,6 @@ import { useState } from 'react';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  Alert,
   Box,
   Button,
   Container,
@@ -23,6 +22,7 @@ import { WarningAmber as WarningIcon, DeleteForever as DeleteIcon } from '@mui/i
 import { useNukeCollectionMutation } from '@/api/collections/collectionsApi';
 import { useSnackbar } from 'notistack';
 import { useAuth } from '@/hooks/useAuth';
+import { Notice } from '@/components/ui/Notice';
 
 const InfoBox = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
@@ -90,16 +90,10 @@ export const ResetCollectionClient = () => {
           </Typography>
         </Box>
 
-        <Alert severity="error" sx={{ mb: 3 }}>
-          <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
-            This action cannot be undone!
-          </Typography>
-          <Typography variant="body2">
-            Resetting your collection will permanently delete all cards, including both regular and foil quantities, 
-            as well as any associated location data. If you haven't already,{' '}
-            <NextLink href="/export">create an MTG CB export backup</NextLink> of your collection first.
-          </Typography>
-        </Alert>
+        <Notice kind="error" title="This cannot be undone" sx={{ mb: 3 }}>
+          Resetting deletes every card quantity, regular and foil, and all location data.{' '}
+          <NextLink href="/export">Export a backup in the MTG CB format</NextLink> first if you have not already.
+        </Notice>
 
         <InfoBox>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 500 }}>
@@ -159,10 +153,9 @@ export const ResetCollectionClient = () => {
           Confirm Collection Reset
         </DialogTitle>
         <DialogContent>
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            This action cannot be reversed. If you haven't already,{' '}
-            <NextLink href="/export">create an MTG CB export backup</NextLink> of your collection first.
-          </Alert>
+          <Notice kind="error" title="This cannot be undone" sx={{ mb: 2 }}>
+            <NextLink href="/export">Export a backup in the MTG CB format</NextLink> first if you have not already.
+          </Notice>
 
           <InfoBox>
             <Typography variant="body2" gutterBottom>

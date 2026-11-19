@@ -1,8 +1,10 @@
 'use client';
 
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useMemo, useState } from 'react';
+import { Tag } from '@/components/ui/Tag';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
 import { CardWithQuantity, formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
 
@@ -156,13 +158,13 @@ const TCGPlayerSplitByFinishChunksDialog: React.FC<TCGPlayerSplitByFinishChunksD
                         Regular cards {startCard}-{endCard}
                         {isSubmitted && ' ✓'}
                       </span>
-                      <Chip
-                        label={`${chunk.length} cards, ${chunkQuantity} total`}
-                        size="small"
+                      <Tag
+                        tone={isSubmitted ? 'green' : 'neutral'}
+                       
                         sx={{ ml: 2 }}
-                        color={isSubmitted ? 'success' : 'default'}
-                        variant={isSubmitted ? 'filled' : 'outlined'}
-                      />
+                      >
+                        {`${chunk.length} cards, ${chunkQuantity} total`}
+                      </Tag>
                     </ChunkButton>
                   );
                 })}
@@ -201,13 +203,13 @@ const TCGPlayerSplitByFinishChunksDialog: React.FC<TCGPlayerSplitByFinishChunksD
                         Foil cards {startCard}-{endCard}
                         {isSubmitted && ' ✓'}
                       </span>
-                      <Chip
-                        label={`${chunk.length} cards, ${chunkQuantity} total`}
-                        size="small"
+                      <Tag
+                        tone={isSubmitted ? 'green' : 'purple'}
+                       
                         sx={{ ml: 2 }}
-                        color={isSubmitted ? 'success' : 'secondary'}
-                        variant={isSubmitted ? 'filled' : 'outlined'}
-                      />
+                      >
+                        {`${chunk.length} cards, ${chunkQuantity} total`}
+                      </Tag>
                     </ChunkButton>
                   );
                 })}

@@ -1,7 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import {
-  Alert,
   Box,
   Chip,
   CircularProgress,
@@ -23,6 +22,7 @@ import { GoalSearchForm } from './GoalSearchForm';
 import { CardApiParams } from '@/api/browse/types';
 import { useCreateGoalMutation } from '@/api/goals/goalsApi';
 import { CreateGoalRequest, Goal } from '@/api/goals/types';
+import { Notice } from '@/components/ui/Notice';
 import { Button } from '@/components/ui/button';
 import { trimFormData } from '@/utils/form/trimFormData';
 import { formatSearchCriteria } from '@/utils/goals/formatSearchCriteria';
@@ -569,24 +569,13 @@ export function CreateGoalForm({ onClose, onSuccess }: CreateGoalFormProps) {
           </Box>
 
           {isSubmitted && Object.keys(errors).length > 0 && (
-            <Alert severity="error">
-              <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 1 }}>
-                Please fix the following errors:
-              </Typography>
-              {errors.name && <Typography variant="body2">• Goal name: {errors.name.message}</Typography>}
-              {errors.description && (
-                <Typography variant="body2">• Description: {errors.description.message}</Typography>
-              )}
-              {errors.targetQuantityReg && (
-                <Typography variant="body2">• Regular quantity: {errors.targetQuantityReg.message}</Typography>
-              )}
-              {errors.targetQuantityFoil && (
-                <Typography variant="body2">• Foil quantity: {errors.targetQuantityFoil.message}</Typography>
-              )}
-              {errors.targetQuantityAll && (
-                <Typography variant="body2">• Quantity: {errors.targetQuantityAll.message}</Typography>
-              )}
-            </Alert>
+            <Notice kind="error" title="Fix these before saving">
+              {errors.name && <div>• Goal name: {errors.name.message}</div>}
+              {errors.description && <div>• Description: {errors.description.message}</div>}
+              {errors.targetQuantityReg && <div>• Regular quantity: {errors.targetQuantityReg.message}</div>}
+              {errors.targetQuantityFoil && <div>• Foil quantity: {errors.targetQuantityFoil.message}</div>}
+              {errors.targetQuantityAll && <div>• Quantity: {errors.targetQuantityAll.message}</div>}
+            </Notice>
           )}
 
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>

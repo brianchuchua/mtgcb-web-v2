@@ -1,8 +1,10 @@
 'use client';
 
-import { Close as CloseIcon, Info as InfoIcon, Link as LinkIcon, Person as PersonIcon } from '@mui/icons-material';
-import { Alert, AlertTitle, Box, Chip, Collapse, IconButton, Typography } from '@mui/material';
+import { Info as InfoIcon, Link as LinkIcon, Person as PersonIcon } from '@mui/icons-material';
+import { Box, Collapse } from '@mui/material';
 import React from 'react';
+import { Notice } from '@/components/ui/Notice';
+import { Tag } from '@/components/ui/Tag';
 import { useShareTokenContext } from '@/contexts/ShareTokenContext';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -25,31 +27,23 @@ export const SharedCollectionBanner = ({ username, userId }: SharedCollectionBan
 
   return (
     <Collapse in={!dismissed}>
-      <Alert
-        severity="info"
+      <Notice
+        kind="info"
         icon={<LinkIcon />}
-        action={
-          <IconButton aria-label="close" color="inherit" size="small" onClick={() => setDismissed(true)}>
-            <CloseIcon fontSize="inherit" />
-          </IconButton>
-        }
-        sx={{
-          mb: 2,
-          borderRadius: 2,
-          '& .MuiAlert-icon': {
-            fontSize: 28,
-          },
-        }}
+        title="Viewing Shared Collection"
+        onClose={() => setDismissed(true)}
+        sx={{ mb: 2 }}
       >
-        <AlertTitle sx={{ fontWeight: 600 }}>Viewing Shared Collection</AlertTitle>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
-          <Typography variant="body2">You are viewing {username}'s collection through a private share link.</Typography>
+          <div>You are viewing {username}'s collection through a private share link.</div>
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
-            <Chip icon={<PersonIcon />} label={`Owner: ${username}`} size="small" variant="outlined" />
-            <Chip icon={<InfoIcon />} label="Read-only access" size="small" variant="outlined" color="info" />
+            <Tag tone="neutral" icon={<PersonIcon />}>{`Owner: ${username}`}</Tag>
+            <Tag tone="blue" icon={<InfoIcon />}>
+              Read-only access
+            </Tag>
           </Box>
         </Box>
-      </Alert>
+      </Notice>
     </Collapse>
   );
 };

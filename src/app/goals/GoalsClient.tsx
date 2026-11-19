@@ -1,8 +1,8 @@
 'use client';
 
 import { Add as AddIcon, InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {
-  Alert,
   Box,
   Button,
   Dialog,
@@ -13,6 +13,7 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
+import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGetUserGoalsQuery } from '@/api/goals/goalsApi';
@@ -20,6 +21,7 @@ import { Goal } from '@/api/goals/types';
 import { GoalWithHydration } from '@/components/goals/GoalWithHydration';
 import { GoalsList } from '@/components/goals/GoalsList';
 import Pagination, { PaginationProps } from '@/components/pagination/Pagination';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import { usePriceType } from '@/contexts/DisplaySettingsContext';
 import { useGoalsPagination } from '@/hooks/goals/useGoalsPagination';
 import { useAuth } from '@/hooks/useAuth';
@@ -52,6 +54,7 @@ export function GoalsClient() {
     data: listData,
     isLoading: isListLoading,
     error: listError,
+    refetch,
   } = useGetUserGoalsQuery(listQueryArgs, {
     skip: !user?.userId,
   });
@@ -189,7 +192,17 @@ export function GoalsClient() {
   if (!isAuthenticated) {
     return (
       <Box p={3}>
-        <Alert severity="info">Please log in to view and manage your collection goals.</Alert>
+        <Notice
+          kind="note"
+          icon={<LockOutlinedIcon />}
+          action={
+            <Button component={NextLink} href="/login" size="small" color="primary" sx={noticeActionSx}>
+              Log in
+            </Button>
+          }
+        >
+          Log in to see your goals.
+        </Notice>
       </Box>
     );
   }
@@ -211,9 +224,17 @@ export function GoalsClient() {
       </Box>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          Failed to load goals. Please try again later.
-        </Alert>
+        <Notice
+          kind="error"
+          sx={{ mb: 2 }}
+          action={
+            <Button size="small" color="error" sx={noticeActionSx} onClick={() => refetch()}>
+              Retry
+            </Button>
+          }
+        >
+          Could not load your goals.
+        </Notice>
       )}
 
       {goals.length === 0 && !isLoading && (

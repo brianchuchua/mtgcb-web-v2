@@ -15,6 +15,11 @@ interface ChangelogData {
 const changelogData: ChangelogData = {
   releases: [
     {
+      date: '2026-11-19',
+      version: '1.43.0',
+      changes: ['Improved the look and feel of message boxes and tags across the site.'],
+    },
+    {
       date: '2026-11-18',
       version: '1.42.0',
       changes: ['Added Color Identity filter to searches and collection goals.'],

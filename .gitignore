@@ -55,3 +55,6 @@ node_modules/
 
 # Ralph autonomous loop files
 /ralph
+
+# Design mock-ups (throwaway pages and their screenshot tests), in any folder
+mockups/

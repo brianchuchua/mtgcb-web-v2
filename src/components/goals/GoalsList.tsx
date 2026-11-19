@@ -2,7 +2,6 @@ import {
   CheckCircle as CheckCircleIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
-  RadioButtonUnchecked as RadioButtonUncheckedIcon,
   Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -10,7 +9,6 @@ import {
   Box,
   Card,
   CardContent,
-  Chip,
   Grid,
   IconButton,
   Stack,
@@ -23,6 +21,7 @@ import { DeleteGoalDialog } from './DeleteGoalDialog';
 import { GoalDescription } from './GoalDescription';
 import { Goal } from '@/api/goals/types';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
+import { Tag } from '@/components/ui/Tag';
 import { useDeleteGoal } from '@/hooks/goals/useDeleteGoal';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate } from '@/utils/dateUtils';
@@ -63,7 +62,9 @@ export function GoalsList({ goals, userId, hydratingGoalId }: GoalsListProps) {
                   <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                     {!goal.isActive && (
                       <Tooltip title="(Inactive goals won't show in the list of goals while viewing your collection.)">
-                        <Chip size="small" icon={<RadioButtonUncheckedIcon />} label="Inactive" color="default" />
+                        <Box component="span" sx={{ display: 'inline-flex' }}>
+                          <Tag>Inactive</Tag>
+                        </Box>
                       </Tooltip>
                     )}
                     {goal.isActive ? (

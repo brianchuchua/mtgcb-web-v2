@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Typography, Paper, Chip, Divider, CircularProgress, Alert, Pagination, Button } from '@mui/material';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import { Box, Typography, Paper, Divider, CircularProgress, Pagination, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
@@ -18,6 +19,8 @@ import {
   SwapHoriz as MigrationIcon,
 } from '@mui/icons-material';
 import { withAuth } from '@/components/auth/withAuth';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
+import { Tag, TagTone } from '@/components/ui/Tag';
 import { useAuth } from '@/hooks/useAuth';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCollectionCardUrl, getCollectionSetUrl, getCollectionUrl } from '@/utils/collectionUrls';
@@ -27,41 +30,25 @@ import { useRouter } from 'next/navigation';
 
 const ITEMS_PER_PAGE = 5;
 
-const OperationChip = styled(Chip, {
-  shouldForwardProp: (prop) => prop !== 'operationType',
-})<{ operationType: OperationType }>(({ theme, operationType }) => {
-  const colorMap: Record<OperationType, { bg: string; text: string }> = {
-    update: { bg: theme.palette.primary.main, text: theme.palette.primary.contrastText },
-    'mass-update': { bg: theme.palette.secondary.main, text: theme.palette.secondary.contrastText },
-    'mass-entry': { bg: theme.palette.secondary.main, text: theme.palette.secondary.contrastText },
-    import: { bg: theme.palette.success.main, text: theme.palette.success.contrastText },
-    nuke: { bg: theme.palette.error.main, text: theme.palette.error.contrastText },
-    'location-assign': { bg: theme.palette.info.main, text: theme.palette.info.contrastText },
-    'location-update': { bg: theme.palette.info.main, text: theme.palette.info.contrastText },
-    'location-remove': { bg: theme.palette.warning.main, text: theme.palette.warning.contrastText },
-    'location-mass-update': { bg: theme.palette.info.dark, text: theme.palette.info.contrastText },
-    migration: { bg: theme.palette.primary.dark, text: theme.palette.primary.contrastText },
+// Unknown future operationTypes fall back to neutral so the row still renders.
+const getOperationTone = (operationType: OperationType): TagTone => {
+  const toneMap: Record<OperationType, TagTone> = {
+    update: 'blue',
+    'mass-update': 'purple',
+    'mass-entry': 'purple',
+    import: 'green',
+    nuke: 'red',
+    'location-assign': 'neutral',
+    'location-update': 'neutral',
+    'location-remove': 'amber',
+    'location-mass-update': 'neutral',
+    migration: 'neutral',
   };
+  return toneMap[operationType] ?? 'neutral';
+};
 
-  // Fall back to a neutral grey for any unrecognized operationType the backend may add in
-  // the future, so an unmapped value can't crash the page (this was the source of the
-  // "Cannot read properties of undefined (reading 'bg')" runtime error).
-  const colors = colorMap[operationType] ?? {
-    bg: theme.palette.grey[700],
-    text: theme.palette.common.white,
-  };
-  return {
-    fontWeight: 600,
-    backgroundColor: colors.bg,
-    color: colors.text,
-  };
-});
-
-const ModeChip = styled(Chip)(({ theme }) => ({
-  fontWeight: 500,
-  backgroundColor: theme.palette.grey[700],
-  color: theme.palette.common.black,
-}));
+const isLocationOperation = (operationType: OperationType) =>
+  typeof operationType === 'string' && operationType.startsWith('location-');
 
 const EntryItem = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(1.5),
@@ -352,12 +339,13 @@ const HistoryEntryItem = ({ entry, userId }: { entry: HistoryEntry; userId: numb
           {formatTime(entry.timestamp)}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', flexGrow: 1 }}>
-          <OperationChip
-            label={getOperationLabel(entry.operationType)}
-            size="small"
-            operationType={entry.operationType}
-          />
-          {entry.mode && <ModeChip label={getModeLabel(entry.mode, entry)} size="small" />}
+          <Tag
+            tone={getOperationTone(entry.operationType)}
+            icon={isLocationOperation(entry.operationType) ? <PlaceOutlinedIcon /> : undefined}
+          >
+            {getOperationLabel(entry.operationType)}
+          </Tag>
+          {entry.mode && <Tag quiet>{getModeLabel(entry.mode, entry)}</Tag>}
         </Box>
       </Box>
 
@@ -455,7 +443,7 @@ function HistoryPage() {
   const [page, setPage] = useState(1);
   const { user } = useAuth();
   const router = useRouter();
-  const { data, isLoading, isError, error } = useGetCollectionHistoryQuery({ limit: 100 });
+  const { data, isLoading, isError, error, refetch } = useGetCollectionHistoryQuery({ limit: 100 });
 
   const history = data?.data?.history || [];
 
@@ -553,9 +541,16 @@ function HistoryPage() {
   if (isError) {
     return (
       <Box sx={{ p: 3, maxWidth: 900, mx: 'auto' }}>
-        <Alert severity="error">
-          Failed to load collection history. {error && 'message' in error ? String(error.message) : 'Please try again later.'}
-        </Alert>
+        <Notice
+          kind="error"
+          action={
+            <Button size="small" color="error" sx={noticeActionSx} onClick={() => refetch()}>
+              Retry
+            </Button>
+          }
+        >
+          Could not load your collection history.{error && 'message' in error ? ` ${String(error.message)}` : ''}
+        </Notice>
       </Box>
     );
   }

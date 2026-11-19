@@ -1,14 +1,12 @@
 'use client';
 
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckIcon from '@mui/icons-material/Check';
 import InfoIcon from '@mui/icons-material/Info';
 import {
-  Alert,
   Box,
   Button,
   Card,
   CardContent,
-  Chip,
   CircularProgress,
   FormControl,
   InputLabel,
@@ -28,6 +26,8 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { usePreviewCSVMutation } from '@/api/import/importApi';
+import { Notice } from '@/components/ui/Notice';
+import { Tag } from '@/components/ui/Tag';
 
 interface FieldMapping {
   csvHeader: string;
@@ -157,11 +157,9 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
     }
 
     return (
-      <Alert severity="error" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          <strong>Error:</strong> {errorMessage}
-        </Typography>
-      </Alert>
+      <Notice kind="error" sx={{ mb: 3 }}>
+        <strong>Error:</strong> {errorMessage}
+      </Notice>
     );
   }
 
@@ -171,24 +169,19 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
 
   return (
     <Box>
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2" paragraph>
-          <strong>Map your CSV columns to MTG CB fields.</strong>
-        </Typography>
-        <Typography variant="body2" paragraph>
+      <Notice kind="note" title="Map your CSV columns to MTG CB fields." sx={{ mb: 3 }}>
+        <Box sx={{ mt: 1 }}>
           For best accuracy, include a <strong>Scryfall ID</strong> or <strong>TCGPlayer ID</strong> column. Without
           these identifiers, the import will attempt to match cards by name and set and collector number, which may be
           less accurate.
-        </Typography>
-        <Typography variant="body2" paragraph>
-          Required: At least one identifier (or Card Name + Set info) and a quantity field.
-        </Typography>
-        <Typography variant="body2">
+        </Box>
+        <Box sx={{ mt: 1 }}>Required: At least one identifier (or Card Name + Set info) and a quantity field.</Box>
+        <Box sx={{ mt: 1 }}>
           <strong>Foil column:</strong> The following values are recognized as foil (case-insensitive):{' '}
           <code>true</code>, <code>1</code>, <code>foil</code>, <code>etched</code>, <code>yes</code>. All other values,
           including blank, are treated as non-foil.
-        </Typography>
-      </Alert>
+        </Box>
+      </Notice>
 
       {isMobile ? (
         // Mobile view - Cards
@@ -208,13 +201,9 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
                           {header}
                         </Typography>
                         {suggestion && currentMapping === suggestion.field && (
-                          <Chip
-                            icon={<CheckCircleIcon />}
-                            label="Auto-detected"
-                            size="small"
-                            color="success"
-                            variant="outlined"
-                          />
+                          <Tag tone="green" icon={<CheckIcon />}>
+                            Auto-detected
+                          </Tag>
                         )}
                       </Stack>
                     </Box>
@@ -309,13 +298,9 @@ export const CustomCSVMapper: React.FC<Props> = ({ csvData, onMappingsChange, on
                       <Stack direction="row" spacing={1} alignItems="center">
                         <Typography variant="body2">{header}</Typography>
                         {suggestion && currentMapping === suggestion.field && (
-                          <Chip
-                            icon={<CheckCircleIcon />}
-                            label="Auto-detected"
-                            size="small"
-                            color="success"
-                            variant="outlined"
-                          />
+                          <Tag tone="green" icon={<CheckIcon />}>
+                            Auto-detected
+                          </Tag>
                         )}
                       </Stack>
                     </TableCell>

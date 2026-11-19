@@ -2,7 +2,7 @@
 
 import AddIcon from '@mui/icons-material/Add';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import Alert from '@mui/material/Alert';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -13,11 +13,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
+import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useGetLocationsQuery } from '@/api/locations/locationsApi';
 import LocationsList from '@/components/locations/LocationsList';
 import Pagination from '@/components/pagination/Pagination';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import { usePriceType } from '@/contexts/DisplaySettingsContext';
 import { useLocationsPagination } from '@/hooks/locations/useLocationsPagination';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,6 +35,7 @@ export default function LocationsClient() {
     data: locationsResponse,
     isLoading,
     error,
+    refetch,
   } = useGetLocationsQuery(
     {
       includeCardCount: true,
@@ -57,7 +60,17 @@ export default function LocationsClient() {
   if (!isAuthenticated) {
     return (
       <Box p={3}>
-        <Alert severity="info">Please log in to view and manage your locations.</Alert>
+        <Notice
+          kind="note"
+          icon={<LockOutlinedIcon />}
+          action={
+            <Button component={NextLink} href="/login" size="small" color="primary" sx={noticeActionSx}>
+              Log in
+            </Button>
+          }
+        >
+          Log in to see your locations.
+        </Notice>
       </Box>
     );
   }
@@ -68,7 +81,16 @@ export default function LocationsClient() {
         <Typography variant="h4" component="h1" color="primary" gutterBottom>
           Locations
         </Typography>
-        <Alert severity="error">Failed to load locations. Please try again later.</Alert>
+        <Notice
+          kind="error"
+          action={
+            <Button size="small" color="error" sx={noticeActionSx} onClick={() => refetch()}>
+              Retry
+            </Button>
+          }
+        >
+          Could not load your locations.
+        </Notice>
       </Box>
     );
   }

@@ -8,11 +8,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import WarningIcon from '@mui/icons-material/Warning';
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
-  Chip,
   CircularProgress,
   Collapse,
   Container,
@@ -49,6 +47,8 @@ import { ImportProgress } from './components/ImportProgress';
 import { useGetImportFormatsQuery, useImportCollectionMutation } from '@/api/import/importApi';
 import type { ImportError, ImportResult } from '@/api/import/types';
 import { mtgcbApi } from '@/api/mtgcbApi';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
+import { Tag } from '@/components/ui/Tag';
 import { Link as NextLink } from '@/components/ui/link';
 import { useChunkedImport } from '@/hooks/useChunkedImport';
 
@@ -100,7 +100,7 @@ export const ImportClient: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const { data: formats, isLoading: formatsLoading, error: formatsError } = useGetImportFormatsQuery();
+  const { data: formats, isLoading: formatsLoading, error: formatsError, refetch } = useGetImportFormatsQuery();
   const [importCollection, { isLoading: importing }] = useImportCollectionMutation();
   const { progress, isImporting, runChunkedImport, reset } = useChunkedImport(importCollection);
 
@@ -260,7 +260,16 @@ export const ImportClient: React.FC = () => {
   if (formatsError) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert severity="error">Failed to load import formats. Please try again later.</Alert>
+        <Notice
+          kind="error"
+          action={
+            <Button size="small" color="error" sx={noticeActionSx} onClick={() => refetch()}>
+              Retry
+            </Button>
+          }
+        >
+          Could not load import formats.
+        </Notice>
       </Container>
     );
   }
@@ -271,13 +280,11 @@ export const ImportClient: React.FC = () => {
         Import Collection
       </Typography>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          <strong>Format Compatibility:</strong> Import and export formats vary across different collection management
-          platforms. Due to differences in card naming conventions, set codes, and edition handling, you may need to
-          manually update a small percentage (1-5%) of cards after importing from another platform.
-        </Typography>
-      </Alert>
+      <Notice kind="note" title="Format compatibility" sx={{ mb: 3 }}>
+        Import and export formats vary across different collection management platforms. Due to differences in card
+        naming conventions, set codes, and edition handling, you may need to manually update a small percentage (1-5%)
+        of cards after importing from another platform.
+      </Notice>
 
       <Paper sx={{ p: 3, mt: 3 }}>
         <FormControl component="fieldset">
@@ -305,9 +312,7 @@ export const ImportClient: React.FC = () => {
                   <Box>
                     <Box display="flex" alignItems="center" gap={1}>
                       <Typography variant="body1">{format.name}</Typography>
-                      {(format as any).supported === false && (
-                        <Chip label="Unsupported" size="small" color="default" sx={{ height: 20 }} />
-                      )}
+                      {(format as any).supported === false && <Tag tone="neutral">Unsupported</Tag>}
                     </Box>
                     <Typography variant="body2" color="text.secondary">
                       {format.description}
@@ -325,27 +330,17 @@ export const ImportClient: React.FC = () => {
             <Divider sx={{ my: 3 }} />
 
             {(currentFormat as any).supported === false ? (
-              <Alert severity="info">
-                <Typography variant="body2">
-                  <strong>This format is not currently supported.</strong>
-                </Typography>
+              <Notice kind="info" title="This format is not currently supported.">
                 {UNSUPPORTED_FORMAT_EXPLANATIONS[currentFormat.id] && (
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    {UNSUPPORTED_FORMAT_EXPLANATIONS[currentFormat.id]}
-                  </Typography>
+                  <Box sx={{ mt: 1 }}>{UNSUPPORTED_FORMAT_EXPLANATIONS[currentFormat.id]}</Box>
                 )}
-              </Alert>
+              </Notice>
             ) : (
               <>
                 {IMPORT_FORMAT_NOTES[currentFormat.id] && (
-                  <Alert severity="info" sx={{ mb: 3 }}>
-                    <Typography variant="body2">
-                      <strong>Tips on this import format:</strong>
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      {IMPORT_FORMAT_NOTES[currentFormat.id]}
-                    </Typography>
-                  </Alert>
+                  <Notice kind="note" title="Tips on this import format" sx={{ mb: 3 }}>
+                    {IMPORT_FORMAT_NOTES[currentFormat.id]}
+                  </Notice>
                 )}
 
                 {currentFormat.id !== 'custom' ? (
@@ -388,14 +383,10 @@ export const ImportClient: React.FC = () => {
                       onError={setHasCustomMappingError}
                     />
                   ) : (
-                    <Alert severity="info">
-                      <Typography variant="body2">
-                        Please select a CSV file first to configure field mappings. It needs its first row to have
-                        column headers. <br /> <br />
-                        Common headers the importer will autodetect include: <br />
-                        Card Name, Set Name/Code, Quantity, Foil, Collector Number, TCGPlayer ID, Scryfall ID.
-                      </Typography>
-                    </Alert>
+                    <Notice kind="note" title="Select a CSV file first">
+                      Its first row needs column headers. Headers the importer detects on its own include: Card Name,
+                      Set Name/Code, Quantity, Foil, Collector Number, TCGPlayer ID, Scryfall ID.
+                    </Notice>
                   )
                 ) : null}
 
@@ -544,11 +535,12 @@ export const ImportClient: React.FC = () => {
 
                 {importResult && (
                   <Box sx={{ mt: 4 }}>
-                    <Alert
-                      severity={
+                    <Notice
+                      kind={
                         importResult.failedRows === 0 ? 'success' : importResult.partialSuccess ? 'warning' : 'error'
                       }
                       sx={{ mb: 3 }}
+                      data-testid="import-result"
                     >
                       {lastImportWasDryRun ? (
                         importResult.failedRows === 0 ? (
@@ -576,7 +568,7 @@ export const ImportClient: React.FC = () => {
                       ) : (
                         <>Import failed: All {importResult.totalRows} rows failed</>
                       )}
-                    </Alert>
+                    </Notice>
 
                     <TableContainer component={Paper} variant="outlined">
                       <Table size="small">
@@ -718,10 +710,9 @@ export const ImportClient: React.FC = () => {
           Confirm Import
         </DialogTitle>
         <DialogContent>
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            This action cannot be reversed. If you haven't already,{' '}
-            <NextLink href="/export">create an MTG CB export backup</NextLink> of your collection first.
-          </Alert>
+          <Notice kind="error" title="This cannot be undone" sx={{ mb: 2 }}>
+            <NextLink href="/export">Export a backup in the MTG CB format</NextLink> first if you have not already.
+          </Notice>
 
           <InfoBox>
             <Typography variant="body2" gutterBottom>

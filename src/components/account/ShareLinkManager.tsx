@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardContent,
-  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -26,7 +25,6 @@ import {
   Typography,
   useTheme,
   useMediaQuery,
-  Alert,
 } from '@mui/material';
 import {
   ContentCopy as CopyIcon,
@@ -46,6 +44,8 @@ import {
 import { useSnackbar } from 'notistack';
 import { formatDistanceToNow, parseISO } from '@/utils/shareTokenDateUtils';
 import { buildTokenShareUrl } from '@/utils/shareLinkUtils';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
+import { Tag } from '@/components/ui/Tag';
 
 const EXPIRATION_OPTIONS = [
   { value: 0, label: 'Never expires' },
@@ -66,7 +66,7 @@ export const ShareLinkManager = () => {
   const [revokeDialogOpen, setRevokeDialogOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const { data, isLoading, error } = useGetShareLinkQuery();
+  const { data, isLoading, error, refetch } = useGetShareLinkQuery();
   const [generateShareLink, { isLoading: isGenerating }] = useGenerateShareLinkMutation();
   const [revokeShareLink, { isLoading: isRevoking }] = useRevokeShareLinkMutation();
 
@@ -185,9 +185,16 @@ export const ShareLinkManager = () => {
     return (
       <Card>
         <CardContent>
-          <Alert severity="error">
-            Failed to load share link status. Please try again later.
-          </Alert>
+          <Notice
+            kind="error"
+            action={
+              <Button size="small" color="error" sx={noticeActionSx} onClick={() => refetch()}>
+                Retry
+              </Button>
+            }
+          >
+            Could not load your share link.
+          </Notice>
         </CardContent>
       </Card>
     );
@@ -212,25 +219,18 @@ export const ShareLinkManager = () => {
             {hasShareLink && !isExpired ? (
               <Stack spacing={2}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                  <Chip
-                    icon={<CheckIcon />}
-                    label="Active"
-                    color="success"
-                    size="small"
-                  />
+                  <Tag tone="green" icon={<CheckIcon />}>
+                    Active
+                  </Tag>
                   {shareData?.createdAt && (
                     <Typography variant="caption" color="text.secondary">
                       Created {formatDistanceToNow(parseISO(shareData.createdAt), { addSuffix: true })}
                     </Typography>
                   )}
                   {shareData?.expiresAt && (
-                    <Chip
-                      icon={<TimeIcon />}
-                      label={formatExpirationDate(shareData.expiresAt)}
-                      color={isExpired ? 'error' : 'default'}
-                      size="small"
-                      variant="outlined"
-                    />
+                    <Tag tone={isExpired ? 'red' : 'neutral'} icon={<TimeIcon />}>
+                      {formatExpirationDate(shareData.expiresAt)}
+                    </Tag>
                   )}
                 </Box>
 
@@ -282,9 +282,9 @@ export const ShareLinkManager = () => {
               </Stack>
             ) : hasShareLink && isExpired ? (
               <Stack spacing={2}>
-                <Alert severity="warning" icon={<WarningIcon />}>
+                <Notice kind="warning" icon={<WarningIcon />}>
                   Your share link has expired. Generate a new one to share your collection.
-                </Alert>
+                </Notice>
                 <Box>
                   <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel>Expiration</InputLabel>
@@ -313,9 +313,9 @@ export const ShareLinkManager = () => {
               </Stack>
             ) : (
               <Stack spacing={2}>
-                <Alert severity="info">
-                  No active share link. Generate one to share your private collection.
-                </Alert>
+                <Notice kind="note">
+                  No share link yet. Generate one to share your private collection.
+                </Notice>
                 <Box>
                   <FormControl fullWidth sx={{ mb: 2 }}>
                     <InputLabel>Expiration</InputLabel>

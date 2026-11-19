@@ -1,35 +1,19 @@
 'use client';
 
-import { Box, Chip, Divider, Pagination, Paper, Stack, Typography } from '@mui/material';
+import { Box, Divider, Pagination, Paper, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 import newsData from './newsData';
+import { Tag, TagTone } from '@/components/ui/Tag';
 import { Link } from '@/components/ui/link';
 
 const ITEMS_PER_PAGE = 5;
 
-const CategoryChip = styled(Chip)<{ category: string }>(({ theme, category }) => {
-  const getColor = () => {
-    switch (category) {
-      case 'feature':
-        return { bg: theme.palette.success.main, text: theme.palette.success.contrastText };
-      case 'news':
-        return { bg: theme.palette.info.main, text: theme.palette.info.contrastText };
-      default:
-        return { bg: theme.palette.grey[500], text: theme.palette.common.white };
-    }
-  };
-
-  const colors = getColor();
-  return {
-    fontWeight: 600,
-    backgroundColor: colors.bg,
-    color: colors.text,
-    '&:hover': {
-      backgroundColor: colors.bg,
-    },
-  };
-});
+const getCategoryTone = (category: string): TagTone => {
+  if (category === 'feature') return 'green';
+  if (category === 'news') return 'blue';
+  return 'neutral';
+};
 
 const NewsCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
@@ -86,7 +70,7 @@ export default function NewsPage() {
                   {article.title}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                  <CategoryChip label={article.category} size="small" category={article.category} />
+                  <Tag tone={getCategoryTone(article.category)}>{article.category}</Tag>
                   <Typography variant="caption" color="text.secondary">
                     {formatVersionDate(article.date)}
                   </Typography>

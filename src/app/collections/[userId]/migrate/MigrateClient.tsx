@@ -3,8 +3,6 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {
-  Alert,
-  AlertTitle,
   Box,
   Button,
   Card,
@@ -38,6 +36,7 @@ import {
 } from '@/api/collections/types';
 import { QuantitySelector } from '@/components/shared/QuantitySelector';
 import { CardHoverPreview } from '@/components/cards/CardHoverPreview';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import { useAuth } from '@/hooks/useAuth';
 import { generateCardSlug } from '@/utils/cards/generateCardSlug';
 import { getCardBackImageUrl, getCardImageUrl } from '@/utils/cards/getCardImageUrl';
@@ -568,9 +567,9 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
   if (!isOwner) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert severity="error">
+        <Notice kind="error">
           You can only update your own collection. Sign in as the owner of this collection to use this tool.
-        </Alert>
+        </Notice>
       </Container>
     );
   }
@@ -601,7 +600,7 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
           percentage, and goal progress until you move them to the new entry — either with
           this tool or manually from your collection.
         </Typography>
-        <Alert severity="success">Your collection is up to date.</Alert>
+        <Notice kind="success">Your collection is up to date.</Notice>
       </Container>
     );
   }
@@ -609,9 +608,16 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
   if (isError) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert severity="error" action={<Button onClick={() => refetch()}>Retry</Button>}>
-          Failed to load card updates.
-        </Alert>
+        <Notice
+          kind="error"
+          action={
+            <Button size="small" color="error" sx={noticeActionSx} onClick={() => refetch()}>
+              Retry
+            </Button>
+          }
+        >
+          Could not load card updates.
+        </Notice>
       </Container>
     );
   }
@@ -634,16 +640,16 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
         <Typography variant="h4" gutterBottom>
           Update Cards
         </Typography>
-        <Alert severity="success" sx={{ mb: 2 }}>
+        <Notice kind="success" sx={{ mb: 2 }}>
           {setLabel
             ? `Nothing left to do for ${setLabel}.`
             : "You've worked through every card update in your collection."}
-        </Alert>
+        </Notice>
         {skippedIds.size > 0 && (
-          <Alert severity="info" sx={{ mb: 2 }}>
+          <Notice kind="info" sx={{ mb: 2 }}>
             You skipped {skippedIds.size} card{skippedIds.size === 1 ? '' : 's'}. They&apos;ll show up again next time
             you visit this page.
-          </Alert>
+          </Notice>
         )}
         <Stack direction="row" spacing={1.5}>
           <Button
@@ -666,12 +672,12 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
         Update Cards
       </Typography>
 
-      <Alert severity="info" sx={{ mb: 2 }}>
+      <Notice kind="note" sx={{ mb: 2 }}>
         These cards have updated entries — improved printing data, fresher pricing, corrected double-sided face
         combinations, or duplicate entries that were retired. Move your copies to the updated entry so they count
         toward your value, percentage, and goal progress. If there are multiple candidates, it&apos;s a double-sided
         token — pick the matching pair. Once you apply an update, you won&apos;t see the old version anymore.
-      </Alert>
+      </Notice>
 
       {/* Required Set picker. A user with thousands of replaced cards across sets is
        * better served focusing on one set at a time, so there's no "All sets" option. */}
@@ -741,9 +747,9 @@ export default function MigrateClient({ userId }: MigrateClientProps) {
         }}
       >
         {errorMessage && (
-          <Alert severity="error" sx={{ mb: 1.5 }} onClose={() => setErrorMessage(null)}>
+          <Notice kind="error" sx={{ mb: 1.5 }} onClose={() => setErrorMessage(null)}>
             {errorMessage}
-          </Alert>
+          </Notice>
         )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ justifyContent: { sm: 'flex-end' } }}>
           <Button
@@ -961,16 +967,15 @@ function CurrentHoldingCard({
                 />
               </>
             ) : holding.resolution === 'never_printed' ? (
-              <Alert severity="warning">
-                <AlertTitle>This card was never printed</AlertTitle>
+              <Notice kind="warning" title="This card was never printed">
                 It was added to Scryfall in error and has since been removed, so there is nothing to update it to.
                 Check your collection for the card you actually own, record that printing, then remove this entry.
-              </Alert>
+              </Notice>
             ) : (
-              <Alert severity="info">
+              <Notice kind="info">
                 No update available yet for this card. Skip for now and check back later — it&apos;ll resurface once an
                 update is published.
-              </Alert>
+              </Notice>
             )}
           </Box>
         </Box>

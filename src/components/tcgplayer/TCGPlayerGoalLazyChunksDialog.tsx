@@ -1,9 +1,9 @@
 'use client';
 
+import CheckIcon from '@mui/icons-material/Check';
 import {
   Box,
   Button,
-  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -15,6 +15,7 @@ import {
 import { styled } from '@mui/material/styles';
 import React, { useCallback, useState } from 'react';
 import { useLazyGetCardsQuery } from '@/api/browse/browseApi';
+import { Tag } from '@/components/ui/Tag';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
 import { getFormTarget } from '@/utils/browser/detectSafari';
 import { CardWithQuantity, formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
@@ -399,13 +400,13 @@ const TCGPlayerGoalLazyChunksDialog: React.FC<TCGPlayerGoalLazyChunksDialogProps
                         Cards {startCard}-{endCard}
                         {isSubmitted && ' ✓'}
                       </span>
-                      <Chip
-                        label={`Chunk ${i + 1}`}
-                        size="small"
-                        color={isSubmitted ? 'success' : 'default'}
-                        variant={isSubmitted ? 'filled' : 'outlined'}
+                      <Tag
+                        tone={isSubmitted ? 'green' : 'neutral'}
+                       
                         sx={{ ml: 2 }}
-                      />
+                      >
+                        {`Chunk ${i + 1}`}
+                      </Tag>
                     </>
                   )}
                 </ChunkButton>
@@ -514,7 +515,7 @@ const TCGPlayerGoalLazyChunksDialog: React.FC<TCGPlayerGoalLazyChunksDialogProps
                             }}
                           >
                             <span>Regular Cards</span>
-                            {regularSubmitted && <Chip label="Opened" size="small" color="success" sx={{ ml: 1 }} />}
+                            {regularSubmitted && <Tag tone="green" icon={<CheckIcon />} sx={{ ml: 1 }}>Opened</Tag>}
                           </Box>
                           {i === 0 && totalRegularCards > 0 && (
                             <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, textAlign: 'left' }}>
@@ -550,7 +551,7 @@ const TCGPlayerGoalLazyChunksDialog: React.FC<TCGPlayerGoalLazyChunksDialogProps
                             }}
                           >
                             <span>Foil Cards</span>
-                            {foilSubmitted && <Chip label="Opened" size="small" color="success" sx={{ ml: 1 }} />}
+                            {foilSubmitted && <Tag tone="green" icon={<CheckIcon />} sx={{ ml: 1 }}>Opened</Tag>}
                           </Box>
                           {i === 0 && totalFoilCards > 0 && (
                             <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, textAlign: 'left' }}>

@@ -6,10 +6,8 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import {
-  Alert,
   Box,
   Button,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -37,6 +35,7 @@ import { useGetCardLayoutsQuery, useGetCardTreatmentsQuery, useGetCardTypesQuery
 import { useGetAllSetsQuery } from '@/api/sets/setsApi';
 import CardSelector, { CardFilter } from '@/components/goals/CardSelector';
 import AutocompleteWithNegation from '@/components/ui/AutocompleteWithNegation';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import OutlinedBox from '@/components/ui/OutlinedBox';
 import ColorFilterBox from '@/features/browse/ColorFilterBox';
 import { FORMAT_LEGALITY_OPTIONS } from '@/features/browse/formatLegalityConstants';
@@ -1339,18 +1338,23 @@ export function GoalSearchForm({
         </ToggleButtonGroup>
 
         {isFullArt === true && onePrintingPerPureName && (
-          <Alert
-            severity="warning"
+          <Notice
+            kind="warning"
             sx={{ mt: 2 }}
             action={
-              <Button color="inherit" size="small" onClick={() => onOnePrintingPerPureNameChange(false)}>
+              <Button
+                color="warning"
+                size="small"
+                sx={noticeActionSx}
+                onClick={() => onOnePrintingPerPureNameChange(false)}
+              >
                 Count every printing
               </Button>
             }
           >
             This goal counts any one printing of each card name. Because full art cards share very few distinct names,
             that is far fewer cards than every full art printing.
-          </Alert>
+          </Notice>
         )}
       </Paper>
 

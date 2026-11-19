@@ -1,8 +1,10 @@
 'use client';
 
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React, { useMemo, useState } from 'react';
+import { Tag } from '@/components/ui/Tag';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
 import { getFormTarget } from '@/utils/browser/detectSafari';
 import { CardWithQuantity, formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
@@ -147,13 +149,13 @@ const TCGPlayerMassImportChunksDialog: React.FC<TCGPlayerMassImportChunksDialogP
                   Mass Entry cards {startCard}-{endCard}
                   {isSubmitted && ' ✓'}
                 </span>
-                <Chip
-                  label={`${chunk.length} cards`}
-                  size="small"
+                <Tag
+                  tone={isSubmitted ? 'green' : 'neutral'}
+                 
                   sx={{ ml: 2 }}
-                  color={isSubmitted ? 'success' : 'default'}
-                  variant={isSubmitted ? 'filled' : 'outlined'}
-                />
+                >
+                  {`${chunk.length} cards`}
+                </Tag>
               </ChunkButton>
             );
           })}

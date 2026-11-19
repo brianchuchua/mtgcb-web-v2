@@ -77,7 +77,7 @@ const chooseFile = async (page: Page, name: string, content: string | Buffer): P
   });
 };
 
-const resultAlert = (page: Page) => page.getByRole('alert').filter({ hasText: /rows|Dry run|Import failed/ });
+const resultAlert = (page: Page) => page.getByTestId('import-result').filter({ hasText: /rows|Dry run|Import failed/ });
 
 test.describe('Import collection', () => {
   test.beforeEach(async ({ context }) => {
@@ -210,7 +210,7 @@ test.describe('Import collection', () => {
       await page.getByRole('dialog').getByRole('button', { name: 'Confirm Import' }).click();
 
       await expect(resultAlert(page)).toHaveText('Partially successful: 1 of 2 rows imported');
-      await expect(resultAlert(page)).toHaveClass(/MuiAlert-.*[Ww]arning/);
+      await expect(resultAlert(page)).toHaveAttribute('data-kind', 'warning');
       expect(calls[0].url.searchParams.get('format')).toBe('archidekt');
       expect(calls[0].body.csvData).toBe(ARCHIDEKT_CSV);
 
@@ -241,7 +241,7 @@ test.describe('Import collection', () => {
       await page.getByRole('dialog').getByRole('button', { name: 'Confirm Import' }).click();
 
       await expect(resultAlert(page)).toHaveText('Import failed: All 2 rows failed');
-      await expect(resultAlert(page)).toHaveClass(/MuiAlert-.*[Ee]rror/);
+      await expect(resultAlert(page)).toHaveAttribute('data-kind', 'error');
       await expect(page.getByRole('button', { name: 'Download Errors' })).toHaveCount(0);
       await expect(page.getByRole('button', { name: 'Proceed with Real Import' })).toHaveCount(0);
     });
@@ -345,7 +345,7 @@ test.describe('Import collection', () => {
       const importCalls = await mockImport(page);
       await gotoImport(page);
       await selectFormat(page, 'custom');
-      await expect(page.getByText('Please select a CSV file first to configure field mappings.', { exact: false })).toBeVisible();
+      await expect(page.getByText('Select a CSV file first', { exact: true })).toBeVisible();
 
       await chooseFile(page, 'custom.csv', CUSTOM_CSV);
       await expect(page.getByText('Map your CSV columns to MTG CB fields.')).toBeVisible();

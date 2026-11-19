@@ -1,13 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
-import Alert from '@mui/material/Alert';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import EditLocationForm from '@/components/locations/EditLocationForm';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import { useAuth } from '@/hooks/useAuth';
 import { useGetLocationQuery } from '@/api/locations/locationsApi';
 
@@ -45,7 +48,17 @@ export default function EditLocationClient({ locationId }: EditLocationClientPro
         <Typography variant="h4" component="h1" gutterBottom>
           Edit Location
         </Typography>
-        <Alert severity="info">Please log in to edit locations.</Alert>
+        <Notice
+          kind="note"
+          icon={<LockOutlinedIcon />}
+          action={
+            <Button component={NextLink} href="/login" size="small" color="primary" sx={noticeActionSx}>
+              Log in
+            </Button>
+          }
+        >
+          Log in to edit this location.
+        </Notice>
       </Container>
     );
   }
@@ -56,7 +69,7 @@ export default function EditLocationClient({ locationId }: EditLocationClientPro
         <Typography variant="h4" component="h1" gutterBottom>
           Edit Location
         </Typography>
-        <Alert severity="error">Location not found or you don't have permission to edit it.</Alert>
+        <Notice kind="error">Location not found or you don't have permission to edit it.</Notice>
       </Container>
     );
   }

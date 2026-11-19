@@ -12,9 +12,7 @@ import {
   Switch,
   TextField,
   InputAdornment,
-  Alert,
   CircularProgress,
-  Chip,
   Divider,
   FormControl,
   InputLabel,
@@ -37,6 +35,8 @@ import {
   useRevokeShareLinkMutation 
 } from '@/api/user/shareLinkApi';
 import { IncludeCurrentViewToggle } from '@/components/collections/IncludeCurrentViewToggle';
+import { Notice } from '@/components/ui/Notice';
+import { Tag } from '@/components/ui/Tag';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow, parseISO } from '@/utils/shareTokenDateUtils';
 import { buildTokenShareUrl } from '@/utils/shareLinkUtils';
@@ -232,12 +232,9 @@ export const ShareCollectionModal = ({
           </Typography>
           
           {shareLinkData.data.expiresAt && (
-            <Chip
-              icon={<TimeIcon />}
-              label={`Expires ${formatDistanceToNow(parseISO(shareLinkData.data.expiresAt), { addSuffix: true })}`}
-              size="small"
-              sx={{ mb: 2 }}
-            />
+            <Tag tone="neutral" icon={<TimeIcon />} sx={{ mb: 2 }}>
+              {`Expires ${formatDistanceToNow(parseISO(shareLinkData.data.expiresAt), { addSuffix: true })}`}
+            </Tag>
           )}
           
           
@@ -329,13 +326,10 @@ export const ShareCollectionModal = ({
             </Typography>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Alert severity="info">
-                <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 1 }}>
-                  Option 1: Make Collection Public
-                </Typography>
-                <Typography variant="body2">
+              <Notice kind="info" title="Option 1: Make Collection Public">
+                <Box sx={{ mt: 1 }}>
                   Your collection will be visible at its public URL that anyone can access.
-                </Typography>
+                </Box>
                 <FormControlLabel
                   sx={{ mt: 2 }}
                   control={
@@ -352,15 +346,12 @@ export const ShareCollectionModal = ({
                     </Box>
                   }
                 />
-              </Alert>
-              
-              <Alert severity="info">
-                <Typography variant="body2" sx={{ fontWeight: 'medium', mb: 1 }}>
-                  Option 2: Generate a Private Share Link
-                </Typography>
-                <Typography variant="body2">
+              </Notice>
+
+              <Notice kind="info" title="Option 2: Generate a Private Share Link">
+                <Box sx={{ mt: 1 }}>
                   Keep your collection private but share it with specific people using a secure link.
-                </Typography>
+                </Box>
                 
                 {!showShareLinkForm ? (
                   <Button
@@ -408,7 +399,7 @@ export const ShareCollectionModal = ({
                     </Box>
                   </Box>
                 )}
-              </Alert>
+              </Notice>
             </Box>
           </>
         ) : (

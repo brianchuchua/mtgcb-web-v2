@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
+import { Tag } from '@/components/ui/Tag';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
 import { getFormTarget } from '@/utils/browser/detectSafari';
 import { CardWithQuantity, formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
@@ -82,13 +83,7 @@ const TCGPlayerFoilOnlyDialog: React.FC<TCGPlayerFoilOnlyDialogProps> = ({ open,
         <Stack spacing={1}>
           <FoilButton variant="outlined" color="secondary" onClick={handleSubmit} fullWidth>
             <span>Import Foil Cards</span>
-            <Chip
-              label={`${foilCards.length} cards, ${totalQuantity} total`}
-              size="small"
-              sx={{ ml: 2 }}
-              color="secondary"
-              variant="outlined"
-            />
+            <Tag tone="purple" sx={{ ml: 2 }}>{`${foilCards.length} cards, ${totalQuantity} total`}</Tag>
           </FoilButton>
         </Stack>
 

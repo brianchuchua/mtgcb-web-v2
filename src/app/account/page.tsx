@@ -7,7 +7,6 @@ import {
   WarningAmber as WarningIcon,
 } from '@mui/icons-material';
 import {
-  Alert,
   Box,
   Collapse,
   Container,
@@ -35,6 +34,7 @@ import { ShareLinkManager } from '@/components/account/ShareLinkManager';
 import { withAuth } from '@/components/auth/withAuth';
 import { CollectionProgressBar } from '@/components/collections/CollectionProgressBar';
 import SetIcon from '@/components/sets/SetIcon';
+import { Notice } from '@/components/ui/Notice';
 import { Button } from '@/components/ui/button';
 import { useLabeledNavigationArrows, usePriceType, useProgressBarStyle, useRedGreenTableRows, useSetIconStyle, useShowQuickEditIcon } from '@/contexts/DisplaySettingsContext';
 import { useAuth } from '@/hooks/useAuth';
@@ -739,16 +739,13 @@ function ProfileContent() {
           </CardHeader>
           <Collapse in={isDangerZoneOpen}>
             <CardContent>
-              <Alert severity="error" sx={{ mb: 3 }}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Permanently delete your account
-                </Typography>
-                <Typography variant="body2">
+              <Notice kind="error" title="Permanently delete your account" sx={{ mb: 3 }}>
+                <Box sx={{ mt: 1 }}>
                   Once you delete your account, there is no going back. All your data will be permanently removed. This
                   includes your entire collection, locations, goals, and all personal information. Consider{' '}
                   <Link href="/export">exporting your collection</Link> first to create a backup of your data.
-                </Typography>
-              </Alert>
+                </Box>
+              </Notice>
 
               <ButtonWrapper>
                 <Button

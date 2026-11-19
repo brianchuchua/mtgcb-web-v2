@@ -1,5 +1,4 @@
 import {
-  Alert,
   Box,
   Button,
   Dialog,
@@ -13,6 +12,7 @@ import {
 import { styled } from '@mui/material/styles';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Notice } from '@/components/ui/Notice';
 
 interface DeleteAccountDialogProps {
   open: boolean;
@@ -76,16 +76,13 @@ export const DeleteAccountDialog: React.FC<DeleteAccountDialogProps> = ({
         Delete Account
       </DialogTitle>
       <DialogContent>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-            This action is permanent and cannot be undone!
-          </Typography>
-          <Typography variant="body2">
+        <Notice kind="error" title="This action is permanent and cannot be undone!" sx={{ mb: 2 }}>
+          <Box sx={{ mt: 1 }}>
             All your data will be permanently deleted, including your collection, locations, goals, and all personal
             information. We strongly recommend <Link href="/export">exporting your collection</Link> first to create a
             backup of your collection. Note that goals and locations are not backed up.
-          </Typography>
-        </Alert>
+          </Box>
+        </Notice>
 
         <InfoBox>
           <Typography variant="body2" gutterBottom sx={{ fontWeight: 500 }}>

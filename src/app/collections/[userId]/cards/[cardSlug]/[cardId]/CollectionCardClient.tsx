@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, AlertTitle, Box, Button, Link, Paper, Typography } from '@mui/material';
+import { Box, Button, Link, Paper, Typography } from '@mui/material';
 import NextLink from 'next/link';
 import Grid from '@mui/material/Grid2';
 import React, { useMemo, useState } from 'react';
@@ -16,6 +16,7 @@ import {
 import CardItem from '@/components/cards/CardItem';
 import { InvalidShareLinkBanner } from '@/components/collections/InvalidShareLinkBanner';
 import { SharedCollectionBanner } from '@/components/collections/SharedCollectionBanner';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { useShareTokenContext } from '@/contexts/ShareTokenContext';
 import PrivacyErrorBanner from '@/features/browse/views/PrivacyErrorBanner';
@@ -274,9 +275,9 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
       />
 
       {card?.deprecated === true && (
-        <Alert
-          severity="warning"
-          variant="outlined"
+        <Notice
+          kind="warning"
+          title="Card data update available"
           sx={{ mt: 2 }}
           action={
             isOwnCollection ? (
@@ -284,21 +285,19 @@ export default function CollectionCardClient({ userId, cardId, cardSlug }: Colle
                 component={NextLink}
                 href={`/collections/${userId}/migrate?cardId=${cardId}`}
                 color="warning"
-                variant="outlined"
                 size="small"
-                sx={{ whiteSpace: 'nowrap', alignSelf: 'center' }}
+                sx={{ ...noticeActionSx, alignSelf: 'center' }}
               >
                 Update
               </Button>
             ) : undefined
           }
         >
-          <AlertTitle>Card data update available</AlertTitle>
           There&apos;s an update for this card entry — usually a corrected double-sided
           token product, fresher pricing data, or improved face data. Your copies here
           don&apos;t count toward your value, collection percentage, or goal progress
           until you apply the update.
-        </Alert>
+        </Notice>
       )}
 
       {/* Compact Three Column Layout */}

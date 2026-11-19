@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
+import { Tag } from '@/components/ui/Tag';
 import { useTCGPlayer } from '@/context/TCGPlayerContext';
 import { getFormTarget } from '@/utils/browser/detectSafari';
 import { CardWithQuantity, formatMassImportString } from '@/utils/tcgplayer/formatMassImportString';
@@ -82,12 +83,7 @@ const TCGPlayerNormalOnlyDialog: React.FC<TCGPlayerNormalOnlyDialogProps> = ({ o
         <Stack spacing={1}>
           <NormalButton variant="outlined" color="primary" onClick={handleSubmit} fullWidth>
             <span>Import Normal Cards</span>
-            <Chip
-              label={`${normalCards.length} cards, ${totalQuantity} total`}
-              size="small"
-              sx={{ ml: 2 }}
-              variant="outlined"
-            />
+            <Tag sx={{ ml: 2 }}>{`${normalCards.length} cards, ${totalQuantity} total`}</Tag>
           </NormalButton>
         </Stack>
 

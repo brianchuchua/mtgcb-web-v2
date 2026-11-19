@@ -65,7 +65,7 @@ test.describe('Collection history', () => {
     await mockHistory(page, { status: 500, body: { success: false, data: null, error: { message: 'down' } } });
     await gotoHistory(page);
 
-    await expect(page.getByRole('alert').filter({ hasText: 'Failed to load collection history.' })).toBeVisible({
+    await expect(page.getByRole('alert').filter({ hasText: 'Could not load your collection history.' })).toBeVisible({
       timeout: 20000,
     });
     await expect(page.getByText('No collection history yet')).toHaveCount(0);

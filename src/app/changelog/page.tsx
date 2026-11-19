@@ -1,27 +1,13 @@
 'use client';
 
-import { Box, Chip, Divider, Pagination, Paper, Typography } from '@mui/material';
+import { Box, Divider, Pagination, Paper, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 import changelogData, { ChangeItem as ChangeItemData, groupChanges } from './changelog';
+import { Tag } from '@/components/ui/Tag';
 import { Link } from '@/components/ui/link';
 
 const ITEMS_PER_PAGE = 10;
-
-const VersionChip = styled(Chip)(({ theme }) => ({
-  fontWeight: 600,
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  '&:hover': {
-    backgroundColor: theme.palette.primary.dark,
-  },
-}));
-
-const NewCardsChip = styled(Chip)(({ theme }) => ({
-  fontWeight: 600,
-  backgroundColor: theme.palette.success.main,
-  color: theme.palette.success.contrastText,
-}));
 
 const ChangeItem = styled('li')(({ theme }) => ({
   marginBottom: theme.spacing(1),
@@ -85,8 +71,8 @@ export default function ChangelogPage() {
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
               {formatDate(release.date)}
             </Typography>
-            <VersionChip label={`v${release.version}`} size="small" />
-            {release.type === 'data' && <NewCardsChip label="New Cards" size="small" />}
+            <Tag tone="blue">{`v${release.version}`}</Tag>
+            {release.type === 'data' && <Tag tone="green">New Cards</Tag>}
           </Box>
 
           <Divider sx={{ mb: 2 }} />

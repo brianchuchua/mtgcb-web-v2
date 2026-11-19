@@ -2,11 +2,9 @@
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
-  Chip,
   CircularProgress,
   Collapse,
   Container,
@@ -23,6 +21,8 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 import { useGetExportFormatsQuery } from '@/api/export/exportApi';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
+import { Tag } from '@/components/ui/Tag';
 
 const MANDATORY_FIELDS = new Set(['id', 'quantity_regular', 'quantity_foil']);
 
@@ -57,7 +57,7 @@ export const ExportClient: React.FC = () => {
   const [exporting, setExporting] = useState(false);
   const [useCustomFields, setUseCustomFields] = useState(false);
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
-  const { data: formats, isLoading: formatsLoading, error: formatsError } = useGetExportFormatsQuery();
+  const { data: formats, isLoading: formatsLoading, error: formatsError, refetch } = useGetExportFormatsQuery();
 
   const handleExport = () => {
     setExporting(true);
@@ -122,7 +122,16 @@ export const ExportClient: React.FC = () => {
   if (formatsError) {
     return (
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Alert severity="error">Failed to load export formats. Please try again later.</Alert>
+        <Notice
+          kind="error"
+          action={
+            <Button size="small" color="error" sx={noticeActionSx} onClick={() => refetch()}>
+              Retry
+            </Button>
+          }
+        >
+          Could not load export formats.
+        </Notice>
       </Container>
     );
   }
@@ -133,13 +142,11 @@ export const ExportClient: React.FC = () => {
         Export Collection
       </Typography>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          <strong>Format Compatibility:</strong> Import and export formats vary across different collection management
-          platforms. Due to differences in card naming conventions, set codes, and edition handling, you may need to
-          manually update a small percentage (1-5%) of cards after importing into another platform.
-        </Typography>
-      </Alert>
+      <Notice kind="note" title="Format compatibility" sx={{ mb: 3 }}>
+        Import and export formats vary across different collection management platforms. Due to differences in card
+        naming conventions, set codes, and edition handling, you may need to manually update a small percentage (1-5%)
+        of cards after importing into another platform.
+      </Notice>
 
       <Paper sx={{ p: 3, mt: 3 }}>
         <FormControl component="fieldset">
@@ -154,9 +161,7 @@ export const ExportClient: React.FC = () => {
                   <Box>
                     <Box display="flex" alignItems="center" gap={1}>
                       <Typography variant="body1">{format.name}</Typography>
-                      {!format.supported && (
-                        <Chip label="Unsupported" size="small" color="default" sx={{ height: 20 }} />
-                      )}
+                      {!format.supported && <Tag tone="neutral">Unsupported</Tag>}
                     </Box>
                     <Typography variant="body2" color="text.secondary">
                       {format.description}
@@ -174,27 +179,17 @@ export const ExportClient: React.FC = () => {
             <Divider sx={{ my: 3 }} />
 
             {!currentFormat.supported ? (
-              <Alert severity="info">
-                <Typography variant="body2">
-                  <strong>This format is not currently supported.</strong>
-                </Typography>
+              <Notice kind="info" title="This format is not currently supported.">
                 {UNSUPPORTED_FORMAT_EXPLANATIONS[currentFormat.id] && (
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    {UNSUPPORTED_FORMAT_EXPLANATIONS[currentFormat.id]}
-                  </Typography>
+                  <Box sx={{ mt: 1 }}>{UNSUPPORTED_FORMAT_EXPLANATIONS[currentFormat.id]}</Box>
                 )}
-              </Alert>
+              </Notice>
             ) : (
               <>
                 {SUPPORTED_FORMAT_NOTES[currentFormat.id] && (
-                  <Alert severity="info" sx={{ mb: 3 }}>
-                    <Typography variant="body2">
-                      <strong>Tips on this export format:</strong>
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      {SUPPORTED_FORMAT_NOTES[currentFormat.id]}
-                    </Typography>
-                  </Alert>
+                  <Notice kind="note" title="Tips on this export format" sx={{ mb: 3 }}>
+                    {SUPPORTED_FORMAT_NOTES[currentFormat.id]}
+                  </Notice>
                 )}
                 <Box>
                   <Collapse in={!useCustomFields}>
@@ -282,10 +277,10 @@ export const ExportClient: React.FC = () => {
                       </FormGroup>
 
                       {[...selectedFields].every((field) => MANDATORY_FIELDS.has(field)) && (
-                        <Alert severity="info" sx={{ mt: 2 }}>
+                        <Notice kind="note" sx={{ mt: 2 }}>
                           Only the required fields (ID, Quantity Regular, Quantity Foil) will be exported. Select
                           additional fields to include more data.
-                        </Alert>
+                        </Notice>
                       )}
                     </Box>
                   </Collapse>

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Box, LinearProgress, Typography, Paper, Stack, Chip } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
+import { Box, LinearProgress, Typography, Paper, Stack } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import { Tag } from '@/components/ui/Tag';
 
 interface ImportProgressProps {
   currentChunk: number;
@@ -31,7 +32,7 @@ export const ImportProgress: React.FC<ImportProgressProps> = ({
           <Typography variant="h6">
             Importing... Chunk {currentChunk} of {totalChunks}
           </Typography>
-          <Chip icon={<HourglassEmptyIcon />} label={`${progressPercentage}%`} color="primary" variant="outlined" />
+          <Tag tone="blue" icon={<HourglassEmptyIcon />}>{`${progressPercentage}%`}</Tag>
         </Box>
 
         {/* Progress Bar */}
@@ -56,22 +57,10 @@ export const ImportProgress: React.FC<ImportProgressProps> = ({
 
           <Stack direction="row" spacing={1}>
             {successfulRows > 0 && (
-              <Chip
-                icon={<CheckCircleIcon />}
-                label={`${successfulRows.toLocaleString()} successful`}
-                size="small"
-                color="success"
-                variant="outlined"
-              />
+              <Tag tone="green" icon={<CheckIcon />}>{`${successfulRows.toLocaleString()} successful`}</Tag>
             )}
             {failedRows > 0 && (
-              <Chip
-                icon={<ErrorIcon />}
-                label={`${failedRows.toLocaleString()} failed`}
-                size="small"
-                color="error"
-                variant="outlined"
-              />
+              <Tag tone="red" icon={<ErrorOutlineIcon />}>{`${failedRows.toLocaleString()} failed`}</Tag>
             )}
           </Stack>
         </Box>

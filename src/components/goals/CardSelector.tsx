@@ -5,7 +5,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
 import {
-  Alert,
   Autocomplete,
   Box,
   Chip,
@@ -26,6 +25,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLazyGetCardsQuery } from '@/api/browse/browseApi';
 import { CardModel } from '@/api/browse/types';
 import { useLazyGetCardsByIdsQuery } from '@/api/cards/cardsApi';
+import { Notice } from '@/components/ui/Notice';
 import { useAuth } from '@/hooks/useAuth';
 import { usePriceType } from '@/hooks/usePriceType';
 import { getCardImageUrl } from '@/utils/cards/getCardImageUrl';
@@ -390,8 +390,8 @@ const CardSelector: React.FC<CardSelectorProps> = ({
       )}
 
       {deprecatedSelectedCount > 0 && (
-        <Alert severity="warning" sx={{ mt: 1.5 }} data-testid="card-selector-deprecated-notice">
-          <Typography variant="body2" component="div">
+        <Notice kind="warning" sx={{ mt: 1.5 }} data-testid="card-selector-deprecated-notice">
+          <div>
             {deprecatedSelectedCount === 1
               ? '1 of these cards has been replaced by an updated entry and no longer counts toward goals. Remove it here, and if you own copies, move them to the updated printing on the '
               : `${deprecatedSelectedCount} of these cards have been replaced by updated entries and no longer count toward goals. Remove them here, and if you own copies, move them to their updated printings on the `}
@@ -403,8 +403,8 @@ const CardSelector: React.FC<CardSelectorProps> = ({
               'Update Cards'
             )}
             {' page.'}
-          </Typography>
-        </Alert>
+          </div>
+        </Notice>
       )}
 
       <Popover

@@ -5,8 +5,9 @@ import {
   HourglassEmpty as HourglassIcon,
   RadioButtonUnchecked as RadioButtonIcon,
 } from '@mui/icons-material';
-import { alpha, Box, Chip, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { alpha, Box, Paper, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { Tag, TagTone } from '@/components/ui/Tag';
 import { Link } from '@/components/ui/link';
 import { roadmapItems, RoadmapStatus } from './roadmapData';
 
@@ -127,38 +128,11 @@ const RoadmapCard = styled(Paper, {
   };
 });
 
-const StatusChip = styled(Chip, {
-  shouldForwardProp: (prop) => prop !== 'status',
-})<{ status: RoadmapStatus }>(({ theme, status }) => {
-  const getColors = () => {
-    switch (status) {
-      case 'completed':
-        return {
-          bg: theme.palette.success.main,
-          text: theme.palette.success.contrastText,
-        };
-      case 'in-progress':
-        return {
-          bg: theme.palette.primary.main,
-          text: theme.palette.primary.contrastText,
-        };
-      default:
-        return {
-          bg: theme.palette.grey[700],
-          text: theme.palette.common.white,
-        };
-    }
-  };
-
-  const colors = getColors();
-  return {
-    fontWeight: 600,
-    fontSize: '0.7rem',
-    height: 22,
-    backgroundColor: colors.bg,
-    color: colors.text,
-  };
-});
+const getStatusTone = (status: RoadmapStatus): TagTone => {
+  if (status === 'completed') return 'green';
+  if (status === 'in-progress') return 'blue';
+  return 'neutral';
+};
 
 export default function RoadmapPage() {
   const theme = useTheme();
@@ -198,7 +172,7 @@ export default function RoadmapPage() {
                     >
                       {item.title}
                     </Typography>
-                    <StatusChip label={label} size="small" status={item.status} />
+                    <Tag tone={getStatusTone(item.status)}>{label}</Tag>
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
                     {item.description}

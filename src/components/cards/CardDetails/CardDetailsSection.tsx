@@ -1,11 +1,12 @@
 'use client';
 
-import { Box, Typography, Divider, Chip, Link, IconButton, Popover } from '@mui/material';
+import { Box, Typography, Divider, Link, IconButton, Popover } from '@mui/material';
 import React from 'react';
 import NextLink from 'next/link';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { NoteCallout } from '@/components/notes/NoteCallout';
 import SetIcon from '@/components/sets/SetIcon';
+import { Tag } from '@/components/ui/Tag';
 import { formatManaCost, formatSymbolText } from '@/utils/manaFormatter';
 import capitalize from '@/utils/capitalize';
 import { getArtistSearchUrl, getCollectionUrl, getCollectionSetUrl } from '@/utils/collectionUrls';
@@ -233,17 +234,10 @@ export const CardDetailsSection: React.FC<CardDetailsSectionProps> = ({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
             <Typography variant="body2" color="text.secondary">Available printings:</Typography>
             {card.canBeNonFoil !== false && (
-              <Chip label="Regular" size="small" variant="outlined" sx={{ height: 20 }} />
+              <Tag>Regular</Tag>
             )}
             {card.canBeFoil && (
-              <Chip 
-                label="Foil" 
-                size="small" 
-                variant="outlined" 
-                sx={{ 
-                  height: 20
-                }} 
-              />
+              <Tag tone="purple">Foil</Tag>
             )}
           </Box>
         </Box>

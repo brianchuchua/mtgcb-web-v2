@@ -1,16 +1,7 @@
 'use client';
 
 import React from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Chip,
-  Stack,
-  Typography,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import {
   Public as PublicIcon,
   Link as LinkIcon,
@@ -20,13 +11,14 @@ import {
   Groups as GroupsIcon,
 } from '@mui/icons-material';
 import { useGetShareLinkQuery } from '@/api/user/shareLinkApi';
+import { Notice } from '@/components/ui/Notice';
+import { Tag } from '@/components/ui/Tag';
 
 interface AccessSummaryProps {
   isPublic: boolean;
 }
 
 export const AccessSummary = ({ isPublic }: AccessSummaryProps) => {
-  const theme = useTheme();
   const { data: shareLinkData } = useGetShareLinkQuery();
   
   const hasActiveShareLink = shareLinkData?.data?.hasShareLink && 
@@ -38,11 +30,10 @@ export const AccessSummary = ({ isPublic }: AccessSummaryProps) => {
         icon: <PublicIcon />,
         title: 'Public Collection',
         description: 'Visible at your public URL',
-        color: theme.palette.info.main,
-        bgColor: alpha(theme.palette.info.main, 0.1),
+        kind: 'info' as const,
         chips: [
-          { icon: <GroupsIcon fontSize="small" />, label: 'Anyone with URL', color: 'info' as const },
-          { icon: <VisibilityIcon fontSize="small" />, label: 'No authentication required', color: 'default' as const },
+          { icon: <GroupsIcon />, label: 'Anyone with URL', tone: 'blue' as const },
+          { icon: <VisibilityIcon />, label: 'No authentication required', tone: 'neutral' as const },
         ],
       };
     } else if (hasActiveShareLink) {
@@ -50,11 +41,10 @@ export const AccessSummary = ({ isPublic }: AccessSummaryProps) => {
         icon: <LinkIcon />,
         title: 'Private with Share Link',
         description: 'Only people with your share link can view',
-        color: theme.palette.warning.main,
-        bgColor: alpha(theme.palette.warning.main, 0.1),
+        kind: 'warning' as const,
         chips: [
-          { icon: <PersonIcon fontSize="small" />, label: 'You', color: 'default' as const },
-          { icon: <LinkIcon fontSize="small" />, label: 'Share link holders', color: 'warning' as const },
+          { icon: <PersonIcon />, label: 'You', tone: 'neutral' as const },
+          { icon: <LinkIcon />, label: 'Share link holders', tone: 'amber' as const },
         ],
       };
     } else {
@@ -62,10 +52,9 @@ export const AccessSummary = ({ isPublic }: AccessSummaryProps) => {
         icon: <LockIcon />,
         title: 'Private Collection',
         description: 'Only you can view your collection',
-        color: theme.palette.success.main,
-        bgColor: alpha(theme.palette.success.main, 0.1),
+        kind: 'success' as const,
         chips: [
-          { icon: <PersonIcon fontSize="small" />, label: 'Only you', color: 'success' as const },
+          { icon: <PersonIcon />, label: 'Only you', tone: 'green' as const },
         ],
       };
     }
@@ -74,62 +63,22 @@ export const AccessSummary = ({ isPublic }: AccessSummaryProps) => {
   const access = getAccessLevel();
 
   return (
-    <Card 
-      sx={{ 
-        bgcolor: access.bgColor,
-        borderLeft: `4px solid ${access.color}`,
-      }}
-    >
-      <CardContent>
-        <Stack spacing={2}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 48,
-                height: 48,
-                borderRadius: '50%',
-                bgcolor: access.color,
-                color: 'white',
-              }}
-            >
-              {access.icon}
-            </Box>
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                {access.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {access.description}
-              </Typography>
-            </Box>
-          </Box>
-          
-          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
-              Who can access:
-            </Typography>
-            {access.chips.map((chip, index) => (
-              <Chip
-                key={index}
-                icon={chip.icon}
-                label={chip.label}
-                size="small"
-                color={chip.color}
-                variant="outlined"
-              />
-            ))}
-          </Box>
+    <Notice kind={access.kind} icon={access.icon} title={access.title}>
+      {access.description}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+        <span>Who can access:</span>
+        {access.chips.map((chip, index) => (
+          <Tag key={index} tone={chip.tone} icon={chip.icon}>
+            {chip.label}
+          </Tag>
+        ))}
+      </Box>
 
-          {hasActiveShareLink && shareLinkData?.data?.expiresAt && (
-            <Typography variant="caption" color="text.secondary">
-              Share link expires: {new Date(shareLinkData.data.expiresAt).toLocaleDateString()}
-            </Typography>
-          )}
-        </Stack>
-      </CardContent>
-    </Card>
+      {hasActiveShareLink && shareLinkData?.data?.expiresAt && (
+        <Typography variant="caption" component="div" color="text.secondary" sx={{ mt: 1 }}>
+          Share link expires: {new Date(shareLinkData.data.expiresAt).toLocaleDateString()}
+        </Typography>
+      )}
+    </Notice>
   );
 };

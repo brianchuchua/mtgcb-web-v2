@@ -1,5 +1,4 @@
 import {
-  Alert,
   Autocomplete,
   Box,
   CircularProgress,
@@ -23,13 +22,14 @@ import { CardModel } from '@/api/browse/types';
 import { useDisconnectPatreonMutation, useGetPatreonStatusQuery } from '@/api/patreon/patreonApi';
 import { useUpdateUserMutation } from '@/api/user/userApi';
 import { CustomCard } from '@/components/patrons/CustomCard';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { SEARCH_TEXT_MAX_LENGTH } from '@/utils/validationLimits';
 
 export const PatreonSection = () => {
   const { user } = useAuth();
-  const { data: patreonData, isLoading, error } = useGetPatreonStatusQuery();
+  const { data: patreonData, isLoading, error, refetch } = useGetPatreonStatusQuery();
   const [disconnectPatreon, { isLoading: isDisconnecting }] = useDisconnectPatreonMutation();
   const [updateUser, { isLoading: isUpdatingSupporterToggle }] = useUpdateUserMutation();
   const [disconnectDialogOpen, setDisconnectDialogOpen] = useState(false);
@@ -194,7 +194,18 @@ export const PatreonSection = () => {
 
   // Error state
   if (error) {
-    return <Alert severity="error">Failed to load Patreon status. Please try again later.</Alert>;
+    return (
+      <Notice
+        kind="error"
+        action={
+          <MuiButton size="small" color="error" sx={noticeActionSx} onClick={() => refetch()}>
+            Retry
+          </MuiButton>
+        }
+      >
+        Could not load your Patreon status.
+      </Notice>
+    );
   }
 
   const isLinked = patreonData?.data?.linked || false;
@@ -274,17 +285,17 @@ export const PatreonSection = () => {
 
           {/* Never Been a Supporter Message */}
           {!currentTier && !highestTier && (
-            <Alert severity="info" sx={{ mb: 2 }}>
+            <Notice kind="info" sx={{ mb: 2 }}>
               Your Patreon account is linked! Join as a supporter to unlock rewards at specific tiers and help keep MTG
               Collection Builder ad-free for everyone.
-            </Alert>
+            </Notice>
           )}
 
           {/* Former Patron Message */}
           {!currentTier && highestTier && (
-            <Alert severity="info" sx={{ mb: 2 }}>
+            <Notice kind="info" sx={{ mb: 2 }}>
               You&apos;re a former patron. Thank you for your support!
-            </Alert>
+            </Notice>
           )}
 
           {/* Supporter Display Toggle - Only show if user has ever been a supporter */}

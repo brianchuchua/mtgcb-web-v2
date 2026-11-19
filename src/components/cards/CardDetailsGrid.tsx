@@ -1,9 +1,10 @@
-import { Box, Chip, Link, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import NextLink from 'next/link';
 import React from 'react';
 import { CardModel } from '@/api/browse/types';
 import SetIcon from '@/components/sets/SetIcon';
+import { Tag, TagTone } from '@/components/ui/Tag';
 import capitalize from '@/utils/capitalize';
 import { formatReleaseDate } from '@/utils/releaseDate';
 import { getCollectionSetUrl } from '@/utils/collectionUrls';
@@ -15,19 +16,17 @@ interface CardDetailsGridProps {
   userId?: number;
 }
 
-const getRarityColor = (rarity: string | undefined) => {
-  if (!rarity) return 'default';
+const getRarityTone = (rarity: string | undefined): TagTone => {
+  if (!rarity) return 'neutral';
   switch (rarity.toLowerCase()) {
-    case 'common':
-      return 'default';
     case 'uncommon':
-      return 'info';
+      return 'blue';
     case 'rare':
-      return 'warning';
+      return 'amber';
     case 'mythic rare':
-      return 'error';
+      return 'red';
     default:
-      return 'default';
+      return 'neutral';
   }
 };
 
@@ -50,7 +49,7 @@ export const CardDetailsGrid: React.FC<CardDetailsGridProps> = ({
   collectionSlug,
   userId 
 }) => {
-  const rarityColor = getRarityColor(card.rarity);
+  const rarityTone = getRarityTone(card.rarity);
   
   // Determine the set link based on context
   const setLink = isCollectionContext && userId && card.setSlug
@@ -105,12 +104,7 @@ export const CardDetailsGrid: React.FC<CardDetailsGridProps> = ({
             Rarity
           </Typography>
           <Box sx={{ mb: 2 }}>
-            <Chip
-              label={capitalize(card.rarity || 'Unknown')}
-              color={rarityColor}
-              variant="outlined"
-              size="small"
-            />
+            <Tag tone={rarityTone}>{capitalize(card.rarity || 'Unknown')}</Tag>
           </Box>
         </Grid>
 
@@ -203,10 +197,10 @@ export const CardDetailsGrid: React.FC<CardDetailsGridProps> = ({
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
             {card.canBeNonFoil !== false && (
-              <Chip label="Regular" size="small" variant="outlined" />
+              <Tag>Regular</Tag>
             )}
             {card.canBeFoil && (
-              <Chip label="Foil" size="small" variant="outlined" color="secondary" />
+              <Tag tone="purple">Foil</Tag>
             )}
           </Box>
         </Grid>

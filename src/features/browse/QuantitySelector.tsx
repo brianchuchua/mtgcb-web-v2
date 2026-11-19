@@ -3,7 +3,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Box,
-  Chip,
   Collapse,
   FormControlLabel,
   IconButton,
@@ -17,6 +16,7 @@ import {
 import React, { useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import OutlinedBox from '@/components/ui/OutlinedBox';
+import { Tag } from '@/components/ui/Tag';
 import {
   selectIncludeBadDataOnly,
   selectSelectedGoalId,
@@ -200,13 +200,7 @@ const QuantitySelector: React.FC<QuantitySelectorProps> = ({ isCollectionPage })
             {label}
           </Typography>
           {filterState.hasCustomFilter && (
-            <Chip
-              label="Custom filter active"
-              size="small"
-              color="primary"
-              variant="outlined"
-              sx={{ height: 20, fontSize: '0.75rem' }}
-            />
+            <Tag tone="blue">Custom filter active</Tag>
           )}
         </Box>
         <ToggleButtonGroup

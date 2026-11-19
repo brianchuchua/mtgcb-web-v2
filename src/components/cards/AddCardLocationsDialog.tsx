@@ -2,12 +2,10 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import {
-  Alert,
   Box,
   Button,
   Card,
   CardContent,
-  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -24,6 +22,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import NextLink from 'next/link';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 import { CardLocation } from '@/api/collections/collectionLocationsTypes';
@@ -35,6 +34,7 @@ import {
 import { useGetLocationsQuery, useGetLocationHierarchyQuery } from '@/api/locations/locationsApi';
 import { LocationHierarchy } from '@/api/locations/types';
 import { DualQuantitySelector } from '@/components/shared/QuantitySelector';
+import { Notice, noticeActionSx } from '@/components/ui/Notice';
 import { COLLECTION_QUANTITY_MAX } from '@/utils/validationLimits';
 
 interface AddCardLocationsDialogProps {
@@ -226,12 +226,16 @@ export default function AddCardLocationsDialog({
         ) : (
           <Stack spacing={2} sx={{ mt: 0 }}>
             {locations.length === 0 ? (
-              <Alert severity="info">
-                No locations found.{' '}
-                <Link href="/locations" underline="hover">
-                  Please create a location first.
-                </Link>
-              </Alert>
+              <Notice
+                kind="note"
+                action={
+                  <Button component={NextLink} href="/locations" size="small" color="primary" sx={noticeActionSx}>
+                    Create location
+                  </Button>
+                }
+              >
+                You have no locations yet.
+              </Notice>
             ) : (
               <>
                 {/* Action and Selectors */}
